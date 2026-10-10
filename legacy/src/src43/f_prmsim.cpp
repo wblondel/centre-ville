@@ -51,8 +51,8 @@ bool TfrmParamSimul::AppliqueChoix()
    {
     switch(AfficheMessage("\
 Lorsque vous changez le nombre de feux,\n\
-tous les feux sont SUPPRIMÉS !\n\
-Êtes-vous sûr(e) de vouloir changer le nombre de feux ?", "Avertissement", tmQuestionFacultative, 2, 2)) // Défaut ET Echap = Annuler
+tous les feux sont SUPPRIMÃ‰S !\n\
+ÃŠtes-vous sÃ»r(e) de vouloir changer le nombre de feux ?", "Avertissement", tmQuestionFacultative, 2, 2)) // DÃ©faut ET Echap = Annuler
      {
       case trOui:    NbFeuxChange=false;
                      if (!cv) break;
@@ -71,9 +71,9 @@ tous les feux sont SUPPRIMÉS !\n\
   if (NbEtapesChange)
    {
     switch(AfficheMessage("\
-Si vous changez le nombre d'étapes,\n\
-toutes les étapes en cours vont être SUPPRIMÉES !\n\
-Êtes-vous sûr(e) de vouloir changer le nombre d'étapes ?", "Avertissement", tmQuestionFacultative, 2, 2)) // Défaut ET Echap = Annuler
+Si vous changez le nombre d'Ã©tapes,\n\
+toutes les Ã©tapes en cours vont Ãªtre SUPPRIMÃ‰ES !\n\
+ÃŠtes-vous sÃ»r(e) de vouloir changer le nombre d'Ã©tapes ?", "Avertissement", tmQuestionFacultative, 2, 2)) // DÃ©faut ET Echap = Annuler
      {
       case trOui:    NbEtapesChange=false;
                      if (!cv) break;
@@ -92,10 +92,10 @@ toutes les étapes en cours vont être SUPPRIMÉES !\n\
   if (NbArretsBusChange) // v3.0
    {
     switch(AfficheMessage("\
-Lorsque vous changez le nombre d'arrêts de bus,\n\
-tous les arrêts de bus sont SUPPRIMÉS et\n\
-toutes les définitions de lignes de bus sont PERDUES !\n\
-Êtes-vous sûr(e) de vouloir changer le nombre d'arrêts de bus ?", "Avertissement", tmQuestionFacultative, 2, 2)) // Défaut ET Echap = Annuler
+Lorsque vous changez le nombre d'arrÃªts de bus,\n\
+tous les arrÃªts de bus sont SUPPRIMÃ‰S et\n\
+toutes les dÃ©finitions de lignes de bus sont PERDUES !\n\
+ÃŠtes-vous sÃ»r(e) de vouloir changer le nombre d'arrÃªts de bus ?", "Avertissement", tmQuestionFacultative, 2, 2)) // DÃ©faut ET Echap = Annuler
      {
       case trOui:    NbArretsBusChange=false;
                      if (!cv) break;
@@ -116,10 +116,10 @@ toutes les définitions de lignes de bus sont PERDUES !\n\
   if (NbArretsTramChange) // v3.5
    {
     switch(AfficheMessage("\
-Lorsque vous changez le nombre d'arrêts de tram,\n\
-tous les arrêts de tram sont SUPPRIMÉS et\n\
-toutes les définitions de lignes de tram sont PERDUES !\n\
-Êtes-vous sûr(e) de vouloir changer le nombre d'arrêts de tram ?", "Avertissement", tmQuestionFacultative, 2, 2)) // Défaut ET Echap = Annuler
+Lorsque vous changez le nombre d'arrÃªts de tram,\n\
+tous les arrÃªts de tram sont SUPPRIMÃ‰S et\n\
+toutes les dÃ©finitions de lignes de tram sont PERDUES !\n\
+ÃŠtes-vous sÃ»r(e) de vouloir changer le nombre d'arrÃªts de tram ?", "Avertissement", tmQuestionFacultative, 2, 2)) // DÃ©faut ET Echap = Annuler
      {
       case trOui:    NbArretsTramChange=false;
                      if (!cv) break;
@@ -141,8 +141,8 @@ toutes les définitions de lignes de tram sont PERDUES !\n\
    {
     switch(AfficheMessage("\
 Si vous changez le nombre de places de taxi,\n\
-toutes les places de taxi en cours vont être SUPPRIMÉES !\n\
-Êtes-vous sûr(e) de vouloir changer le nombre de places de taxi ?", "Avertissement", tmQuestionFacultative, 2, 2)) // Défaut ET Echap = Annuler
+toutes les places de taxi en cours vont Ãªtre SUPPRIMÃ‰ES !\n\
+ÃŠtes-vous sÃ»r(e) de vouloir changer le nombre de places de taxi ?", "Avertissement", tmQuestionFacultative, 2, 2)) // DÃ©faut ET Echap = Annuler
      {
       case trOui:    NbPlacesTaxiChange=false;
                      if (!cv) break;

@@ -17,7 +17,7 @@ const AnsiString asDebutTitreCadreVehicule="                           ",
                  asFrmPourcentage="%.3f%%", // v3.0
                  asFrmVitesse="%d/%d",
                  asNiveauPriorite[NBNIVEAUXPRIORITE]={"Normal", "Urgences", "Police"},
-                 asDepartArrivee[2]={"de départ","d'arrivée"}, // v5.0
+                 asDepartArrivee[2]={"de dÃ©part","d'arrivÃ©e"}, // v5.0
                  asFrmFileParking[2]={"Parking %s :","File Parking %s"}; // v5.0
 //---------------------------------------------------------------------------
 const TColor CouleurNiveauPriorite[NBNIVEAUXPRIORITE]={clBlack, clRed, clBlue};
@@ -73,7 +73,7 @@ void TfrmInfosVehicule::RafraichitInfos()
   int DejaParcouru,
       ResteAParcourir,
       DistMin;
-  voie *CaseDepart; // v5.0 : ATTENTION, le type de parking peut être souterrain ou extérieur !
+  voie *CaseDepart; // v5.0 : ATTENTION, le type de parking peut Ãªtre souterrain ou extÃ©rieur !
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
@@ -182,7 +182,7 @@ void __fastcall TfrmInfosVehicule::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmInfosVehicule::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

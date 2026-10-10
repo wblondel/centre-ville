@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 TfrmStatsComposition *frmStatsComposition;
 //---------------------------------------------------------------------------
-const AnsiString asFrmPC="###.##"; // v5.4, le format de FormatFloat a changé : "###.##" au lieu de "%6.2f"
+const AnsiString asFrmPC="###.##"; // v5.4, le format de FormatFloat a changÃ© : "###.##" au lieu de "%6.2f"
 //---------------------------------------------------------------------------
 void Composition()
  {
@@ -108,7 +108,7 @@ void __fastcall TfrmStatsComposition::FormShow(TObject *Sender)
    }
  LabelTotal->Caption=IntToStr(Total);
  LabelRoutes->Caption=IntToStr(Routes);
- // v1.8.4 : FormatFloat à la place de Format dans toute la suite
+ // v1.8.4 : FormatFloat Ã  la place de Format dans toute la suite
  LabelRoutesPC->Caption=FormatFloat(asFrmPC, 100.0*Routes/Total);
  if (Routes)
   {
@@ -196,7 +196,7 @@ void __fastcall TfrmStatsComposition::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmStatsComposition::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

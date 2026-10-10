@@ -101,7 +101,7 @@ void TfrmInfosTram::RafraichitInfos()
       DrnArret=&(cv->v[cv->ArretTram[NumDrnArret-1].x][cv->ArretTram[NumDrnArret-1].y]);
      }
     else
-     { // Si pas encore d'arrêt... On prend le premier arrêt de la ligne comme dernier arrêt
+     { // Si pas encore d'arrÃªt... On prend le premier arrÃªt de la ligne comme dernier arrÃªt
       LabelDernierArret->Caption=Format( asFrmNumeroCoordonnees[DRN],
                                          ARRAYOFCONST(( 0,
                                                         cv->ArretTram[0].x,

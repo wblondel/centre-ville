@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -114,7 +114,7 @@ procedure TfrmStatsAttenteTrafic.FormShow(Sender: TObject);
 begin
  FormResize(Self);
  if cv.TourCrt>0 then
-  Caption:='Statistiques de fluidité et de trafic au tour n°'+IntToStr(cv.TourCrt);
+  Caption:='Statistiques de fluiditÃ© et de trafic au tour nÂ°'+IntToStr(cv.TourCrt);
  SpinEditEtapeDepart.Max:=cv.NbEtapes;
  SpinEditEtapeArrivee.Max:=cv.NbEtapes;
  RecalculeEtVisualise;
@@ -168,10 +168,10 @@ begin // v3.0
     (cv.v[x, y].Trafic<>nil) and   // v3.0
     (cv.v[x, y].Attente<>nil) then // v3.0
   if ts>0 then
-   stMsg:=Format( 'Trafic en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%',
+   stMsg:=Format( 'Trafic en (%d, %d) au tour %d : %d vÃ©hicules (Max. %d) soit %.3f%%',
                   [x, y, cv.TourCrt, cv.v[x, y].Trafic[ed, ea], m[ts], (100.0*cv.v[x, y].Trafic[ed, ea])/m[ts]])
   else
-   stMsg:=Format( 'Attente en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%',
+   stMsg:=Format( 'Attente en (%d, %d) au tour %d : %d vÃ©hicules (Max. %d) soit %.3f%%',
                   [x, y, cv.TourCrt, cv.v[x, y].Attente[ed, ea], m[ts], (100.0*cv.v[x, y].Attente[ed, ea])/m[ts]]);
  Result:=stMsg;
 end;
@@ -186,7 +186,7 @@ begin
  if CheckBoxEtapeArrivee.Checked then ea:=SpinEditEtapeArrivee.Value else ea:=0;
  if (ed<0) or (ed>cv.NbEtapes) or (ea<0) or (ea>cv.NbEtapes) then
   begin
-  Application.MessageBox('Le n° d''étape est incorrect !', 'Valeur incorrecte', [smbOk], smsWarning);
+  Application.MessageBox('Le nÂ° d''Ã©tape est incorrect !', 'Valeur incorrecte', [smbOk], smsWarning);
   Exit;
   end;
  m[0]:=0; m[1]:=0;

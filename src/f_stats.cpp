@@ -29,11 +29,11 @@ void __fastcall TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 	 yMax=PaintBoxStats->Height,
 	 NbRestants;
 
- // 0. légende selon le mode
+ // 0. lÃ©gende selon le mode
  if (AffichageEpidemique)
-   PaintBoxStats->Hint="Guéris en vert ; Infectés en jaune et Morts en rouge";
+   PaintBoxStats->Hint="GuÃ©ris en vert ; InfectÃ©s en jaune et Morts en rouge";
  else
-   PaintBoxStats->Hint="Sortis en jaune ; Déplacés en vert et Arrivés en rouge";
+   PaintBoxStats->Hint="Sortis en jaune ; DÃ©placÃ©s en vert et ArrivÃ©s en rouge";
 
  // 1. Affichage du quadrillage
  if (cv->QuadrillageStats)
@@ -47,29 +47,29 @@ void __fastcall TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 
  if (!cv->Stats) return;
 
- // 2. Affichage des véhicules v5.4.1 ou piétons
+ // 2. Affichage des vÃ©hicules v5.4.1 ou piÃ©tons
  if (xMax&&yMax)
   {
-   if (AffichageEpidemique) // v5.4.1 : stats épidémiques de piétons si affichage épidémique
+   if (AffichageEpidemique) // v5.4.1 : stats Ã©pidÃ©miques de piÃ©tons si affichage Ã©pidÃ©mique
 	{
 	 PaintBoxStats->Canvas->Pen->Color=clRed; // Morts = Rouges
 	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsMorts/NbPietons);
 	 for(i=0; i<DrnTour-PrmTour+1; i++)
 	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsMorts/NbPietons);
 
-	 PaintBoxStats->Canvas->Pen->Color=clYellow; // Infectés = Jaunes
+	 PaintBoxStats->Canvas->Pen->Color=clYellow; // InfectÃ©s = Jaunes
 	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsInfectes/NbPietons);
 	 for(i=0; i<DrnTour-PrmTour+1; i++)
 	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsInfectes/NbPietons);
 
-	 PaintBoxStats->Canvas->Pen->Color=clGreen; // Guéris = Verts
+	 PaintBoxStats->Canvas->Pen->Color=clGreen; // GuÃ©ris = Verts
 	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsGueris/NbPietons);
 	 for(i=0; i<DrnTour-PrmTour+1; i++)
 	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsGueris/NbPietons);
 	}
-   else // SINON statistiques de véhicules
+   else // SINON statistiques de vÃ©hicules
 	{
-	 PaintBoxStats->Canvas->Pen->Color=clRed; // Arrivés = Rouges
+	 PaintBoxStats->Canvas->Pen->Color=clRed; // ArrivÃ©s = Rouges
 	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesArrives/NbVehicules);
 	 for(i=0; i<DrnTour-PrmTour+1; i++)
 	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives/NbVehicules);
@@ -113,7 +113,7 @@ void __fastcall TfrmStatistiques::FormCreate(TObject *Sender)
 
 void __fastcall TfrmStatistiques::FormKeyDown(TObject *Sender, WORD &Key,
 	  TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

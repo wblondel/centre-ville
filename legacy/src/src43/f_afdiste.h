@@ -33,15 +33,15 @@
 //---------------------------------------------------------------------------
 class TfrmAffDistEtapes : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TStringGrid *StringGridDistances;
   TCheckBox *CheckBoxCouloirsBus;
   TPanel *Panel;
   void __fastcall FormShow(TObject *Sender);
   void __fastcall FormHide(TObject *Sender);
   void __fastcall CheckBoxCouloirsBusClick(TObject *Sender);
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
   __fastcall TfrmAffDistEtapes(TComponent* Owner);
   void EffaceInfos();
   void RafraichitInfos();

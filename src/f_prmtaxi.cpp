@@ -63,7 +63,7 @@ void __fastcall TfrmParamTaxi::CSpinEditParametresChange(
 //---------------------------------------------------------------------------
 void __fastcall TfrmParamTaxi::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

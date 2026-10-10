@@ -79,7 +79,7 @@ void __fastcall TfrmDefNature::ButtonFermerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefNature::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

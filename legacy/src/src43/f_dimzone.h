@@ -34,7 +34,7 @@
 //---------------------------------------------------------------------------
 class TfrmDimensionsZone : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TSPINEDIT *CSpinEditNbX;
   TSPINEDIT *CSpinEditNbY;
   TLabel *Label1;
@@ -49,8 +49,8 @@ __published:	// Composants gérés par l'EDI
   void __fastcall ButtonAideClick(TObject *Sender);
   void __fastcall FormKeyPress(TObject *Sender, char &Key);
   void __fastcall FormResize(TObject *Sender);
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
  int NbX, NbY;
   __fastcall TfrmDimensionsZone(TComponent* Owner);
 };

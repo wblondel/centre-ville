@@ -25,14 +25,14 @@
 //---------------------------------------------------------------------------
 class TfrmAffDistFilesTaxi : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TStringGrid *StringGridDistances;
     void __fastcall FormShow(TObject *Sender);
     void __fastcall FormHide(TObject *Sender);
 
 
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmAffDistFilesTaxi(TComponent* Owner);
     void EffaceInfos();
     void RafraichitInfos();

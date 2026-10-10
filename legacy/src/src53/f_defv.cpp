@@ -14,11 +14,11 @@
 TfrmDefVoie *frmDefVoie=NULL;
 //---------------------------------------------------------------------------
 const AnsiString asFrmMsgSuppr="\
-Le feu %s (‡ supprimer) est rÈfÈrencÈ par le feu %sn∞%d (%d,%d).\n\
-Si vous choisissez de supprimer le feu, TOUTES les rÈfÈrences seront supprimÈes.\n\n\
-Voulez-vous nÈanmoins le supprimer ?", // v5.2 : ajout d'un paramËtre permettant d'indiquer si la rÈfÈrence est un feu de circulation ou de piÈton
-                 asVoieOuPieton[2]={" ","piÈton "}, // v5.2 : ParamËtre %s de la chaÓne ci-dessus
-                 asMAJIgnoree="Modifications de prioritÈ ignorÈes";
+Le feu %s (√† supprimer) est r√©f√©renc√© par le feu %sn¬∞%d (%d,%d).\n\
+Si vous choisissez de supprimer le feu, TOUTES les r√©f√©rences seront supprim√©es.\n\n\
+Voulez-vous n√©anmoins le supprimer ?", // v5.2 : ajout d'un param√®tre permettant d'indiquer si la r√©f√©rence est un feu de circulation ou de pi√©ton
+                 asVoieOuPieton[2]={" ","pi√©ton "}, // v5.2 : Param√®tre %s de la cha√Æne ci-dessus
+                 asMAJIgnoree="Modifications de priorit√© ignor√©es";
 
 //---------------------------------------------------------------------------
 __fastcall TfrmDefVoie::TfrmDefVoie(TComponent* Owner) : TForm(Owner) {}
@@ -43,7 +43,7 @@ void TfrmDefVoie::AppliqueChoix()
                                  BitBtnDefFeuS,
                                  BitBtnDefFeuO};
   frmSimulation->SimulationModifiee=true;
-  // 1. On supprime les feux si on change de prioritÈ (et on ferme la fiche DefFeux)
+  // 1. On supprime les feux si on change de priorit√© (et on ferme la fiche DefFeux)
   for(int d=nord; d<=ouest; d++) // v3.8.3
    {
     int RefTrv, NumRef,
@@ -60,13 +60,13 @@ void TfrmDefVoie::AppliqueChoix()
          for(int j=0; (!RefTrv)&&(j<cv->Feu[NumRef].NbFeuxDmd); j++)
           RefTrv=(cv->Feu[NumRef].NumFeuxDmd[j]==v->NumFeu[d-1]);
         }
-      // v5.2 : RÈfÈrence dans les feux de piÈton
+      // v5.2 : R√©f√©rence dans les feux de pi√©ton
       for(NumRefP=0; (!RefTrv)&&(NumRefP<cv->NbFeuxPieton); NumRefP++)
        if (cv->FeuP[NumRefP].Defini())
         for(int j=0; (!RefTrv)&&(j<cv->FeuP[NumRefP].NbFeux); j++)
          RefTrv=(cv->FeuP[NumRefP].NumFeux[j]==v->NumFeu[d-1]);
       if (RefTrv)
-       { // A. On a trouvÈ des rÈfÈrences au feu ‡ supprimer
+       { // A. On a trouv√© des r√©f√©rences au feu √† supprimer
         if (AfficheMessage( Format( asFrmMsgSuppr,
                                     ARRAYOFCONST(( asDir[d],
                                                    asVoieOuPieton[!NumRef],
@@ -76,7 +76,7 @@ void TfrmDefVoie::AppliqueChoix()
                             "Suppression de feu",
                             tmQuestionNecessaire, 1, 1)==trOui)
          {
-          // A.1.a On supprime les rÈfÈrences au feu ‡ supprimer
+          // A.1.a On supprime les r√©f√©rences au feu √† supprimer
           for(int i=0; i<cv->NbFeux; i++)
            {
             for(int j=0; j<cv->Feu[i].NbFeuxDmd; j++)
@@ -86,7 +86,7 @@ void TfrmDefVoie::AppliqueChoix()
              if (cv->Feu[i].NumFeuxAtt[j]==v->NumFeu[d-1])
               cv->Feu[i].RetireFeuAtt(v->NumFeu[d-1]);
            }
-          // A.1.b On supprime les rÈfÈrences au feu ‡ supprimer dans les feux de piÈton (v5.2)
+          // A.1.b On supprime les r√©f√©rences au feu √† supprimer dans les feux de pi√©ton (v5.2)
           for(int i=0; i<cv->NbFeuxPieton; i++)
            for(int j=0; j<cv->FeuP[i].NbFeux; j++)
             if (cv->FeuP[i].NumFeux[j]==v->NumFeuP[d-1])
@@ -95,11 +95,11 @@ void TfrmDefVoie::AppliqueChoix()
           cv->SupprimeFeu(v->NumFeu[d-1]-1);
           if (frmDefFeux->Visible) frmDefFeux->Hide();
          }
-        else // A.2. On ne supprime pas le feu : on revient ‡ la dÈfinition de prioritÈ Feu.
+        else // A.2. On ne supprime pas le feu : on revient √† la d√©finition de priorit√© Feu.
          RadioGroupPriorite[d-1]->ItemIndex=feux;
        }
       else
-       { // B. On n'a pas trouvÈ de rÈfÈrence : on peut supprimer directement le feu
+       { // B. On n'a pas trouv√© de r√©f√©rence : on peut supprimer directement le feu
         cv->SupprimeFeu(v->NumFeu[d-1]-1);
         if (frmDefFeux->Visible) frmDefFeux->Hide();
        }
@@ -109,19 +109,19 @@ void TfrmDefVoie::AppliqueChoix()
   for(int d=nord; d<=ouest; d++)
    if ((v->Priorite[d-1]!=feux)&&
        (RadioGroupPriorite[d-1]->ItemIndex==feux))
-    cv->AjouteFeu(x, y, (direction)d); // v5.2 : Message Ajout supprimÈ.
+    cv->AjouteFeu(x, y, (direction)d); // v5.2 : Message Ajout supprim√©.
   if (!asMsg.IsEmpty()) AfficheMessage(asMsg, asMAJIgnoree, tmAvertissement, 0, 0);
 
-  // 3. On change les prioritÈs
+  // 3. On change les priorit√©s
   for(int d=nord; d<=ouest; d++)
    v->Priorite[d-1]=(priorite)RadioGroupPriorite[d-1]->ItemIndex;
 
-  // 4. On met ‡ jour l'accessibilitÈ des boutons et groupes
+  // 4. On met √† jour l'accessibilit√© des boutons et groupes
   ButtonAppliquer->Enabled=false;
   for(int d=nord; d<=ouest; d++)
    BitBtnDefFeu[d-1]->Enabled=(RadioGroupPriorite[d-1]->ItemIndex==3);
 
-  // 5. On rafraÓchit la scËne
+  // 5. On rafra√Æchit la sc√®ne
   frmSimulation->RedessineCase(x, y, true);
  }
 //---------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void TfrmDefVoie::RafraichitInfos()
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
-  if ((!v->SensVoieTram)&&(!v->DirPoss)) // v5.2: On teste si prÈsence de voies. Si pas le cas on affiche les prioritÈs PiÈtons !
+  if ((!v->SensVoieTram)&&(!v->DirPoss)) // v5.2: On teste si pr√©sence de voies. Si pas le cas on affiche les priorit√©s Pi√©tons !
    {
     frmDefVoie->Hide();
     frmDefVoiePietons->Show();
@@ -175,12 +175,12 @@ void TfrmDefVoie::RafraichitInfos()
   BitBtnDefFeuE->Enabled=(RadioGroupPrioriteEst->ItemIndex==3);
   BitBtnDefFeuS->Enabled=(RadioGroupPrioriteSud->ItemIndex==3);
   BitBtnDefFeuO->Enabled=(RadioGroupPrioriteOuest->ItemIndex==3);
-  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnÈes (boÓte non modale) => Annulation implicite donc Appliquer ne peut Ítre actif.
+  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonn√©es (bo√Æte non modale) => Annulation implicite donc Appliquer ne peut √™tre actif.
  }
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefVoie::FormShow(TObject *Sender)
 {
- if (frmDefVoiePietons&&frmDefVoiePietons->Visible) frmDefVoiePietons->Hide(); // v5.2: fenÍtres non modales exclusives.
+ if (frmDefVoiePietons&&frmDefVoiePietons->Visible) frmDefVoiePietons->Hide(); // v5.2: fen√™tres non modales exclusives.
  frmSimulation->ActionPriorites->Checked=true;
  RafraichitInfos();
 }
@@ -240,7 +240,7 @@ void __fastcall TfrmDefVoie::RadioGroupPrioriteClick(TObject *Sender)
 
 void __fastcall TfrmDefVoie::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nÈcessite TForm:KeyPreview ‡ true)
+{// v5.3 (n√©cessite TForm:KeyPreview √† true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -169,14 +169,14 @@ procedure TfrmDefVoie.AppliqueChoix;
 var i, j : Integer;
     RefTrv : Boolean; 
     stMsg : String;
-const stFrmMsgSuppr='Le feu %s ne peut être supprimé : le feu n°%d (%d,%d) y fait référence.'#13#10;
-      stFrmMsgAjout='Le feu %s ne peut être ajouté : il y a déjà %d feux.'#13#10;
-      stMAJIgnoree='Modifications de priorité ignorées';
+const stFrmMsgSuppr='Le feu %s ne peut Ãªtre supprimÃ© : le feu nÂ°%d (%d,%d) y fait rÃ©fÃ©rence.'#13#10;
+      stFrmMsgAjout='Le feu %s ne peut Ãªtre ajoutÃ© : il y a dÃ©jÃ  %d feux.'#13#10;
+      stMAJIgnoree='Modifications de prioritÃ© ignorÃ©es';
 begin
   stMsg:='';
   frmSimulation.SimulModifiee:=true;
-  // 1. On suprime les feux si on change de priorité (et on ferme la fiche DefFeux)
-  // - Priorité Nord
+  // 1. On suprime les feux si on change de prioritÃ© (et on ferme la fiche DefFeux)
+  // - PrioritÃ© Nord
   if (v.Priorites[Integer(nord)-1]=feux) and
      (RadioGroupPrioriteNord.ItemIndex<>Integer(feux)) then
    begin
@@ -204,7 +204,7 @@ begin
       if frmDefFeux.Visible then frmDefFeux.Hide;
      end;
    end;
-  // - Priorité Est
+  // - PrioritÃ© Est
   if (v.Priorites[Integer(est)-1]=feux) and
      (RadioGroupPrioriteEst.ItemIndex<>Integer(feux)) then
    begin
@@ -232,7 +232,7 @@ begin
       if frmDefFeux.Visible then frmDefFeux.Hide;
      end;
    end;
-  // - Priorité Sud
+  // - PrioritÃ© Sud
   if (v.Priorites[Integer(sud)-1]=feux) and
      (RadioGroupPrioriteSud.ItemIndex<>Integer(feux)) then
    begin
@@ -260,7 +260,7 @@ begin
       if frmDefFeux.Visible then frmDefFeux.Hide;
      end;
    end;
-  // - Priorité Ouest
+  // - PrioritÃ© Ouest
   if (v.Priorites[Integer(ouest)-1]=feux) and
      (RadioGroupPrioriteOuest.ItemIndex<>Integer(feux)) then
    begin
@@ -322,19 +322,19 @@ begin
 
   if stMsg<>'' then Application.MessageBox(stMsg, stMAJIgnoree, [smbOk], smsWarning);
 
-  // 3. On change les priorités
+  // 3. On change les prioritÃ©s
   v.Priorites[Integer(nord)-1]:=priorite(RadioGroupPrioriteNord.ItemIndex);
   v.Priorites[Integer(est)-1]:=priorite(RadioGroupPrioriteEst.ItemIndex);
   v.Priorites[Integer(sud)-1]:=priorite(RadioGroupPrioriteSud.ItemIndex);
   v.Priorites[Integer(ouest)-1]:=priorite(RadioGroupPrioriteOuest.ItemIndex);
 
-  // 4. On met à jour l'accessibilité des boutons et groupes
+  // 4. On met Ã  jour l'accessibilitÃ© des boutons et groupes
   BitBtnDefFeuN.Enabled:=(RadioGroupPrioriteNord.ItemIndex=3);
   BitBtnDefFeuE.Enabled:=(RadioGroupPrioriteEst.ItemIndex=3);
   BitBtnDefFeuS.Enabled:=(RadioGroupPrioriteSud.ItemIndex=3);
   BitBtnDefFeuO.Enabled:=(RadioGroupPrioriteOuest.ItemIndex=3);
 
-  // 5. On raffraichit la scène
+  // 5. On raffraichit la scÃ¨ne
   frmSimulation.RedessineCase(x, y, true);
 end;
 

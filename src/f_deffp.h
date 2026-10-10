@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 class TfrmDefFeuxPietons : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TLabel *Label1;
     TLabel *LabelCoordonnees;
     TLabel *Label2;
@@ -64,11 +64,11 @@ private:
     voie *v;
 public:
     int x, y;
-    int NbFeux, // Nbre de feux liés
-        *NumFeux; // Liste des feux liés
+    int NbFeux, // Nbre de feux liÃ©s
+        *NumFeux; // Liste des feux liÃ©s
     direction Direction;
     __fastcall TfrmDefFeuxPietons(TComponent* Owner);
-    bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouté le feu
+    bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajoutÃ© le feu
     void RafraichitFeuxPietons();
     void AnalyseEtatFeux(); // v5.2.1
     bool AppliqueChoix();

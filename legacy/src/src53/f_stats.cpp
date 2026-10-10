@@ -40,10 +40,10 @@ void __fastcall TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 
  if (!cv->Stats) return;
 
- // 2. Affichage des véhicules
+ // 2. Affichage des vÃ©hicules
  if (xMax&&yMax)
   {
-   PaintBoxStats->Canvas->Pen->Color=clRed; // Arrivés = Rouges
+   PaintBoxStats->Canvas->Pen->Color=clRed; // ArrivÃ©s = Rouges
    PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesArrives/NbVehicules);
    for(i=0; i<DrnTour-PrmTour+1; i++)
     PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives/NbVehicules);
@@ -86,7 +86,7 @@ void __fastcall TfrmStatistiques::FormCreate(TObject *Sender)
 
 void __fastcall TfrmStatistiques::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 class TfrmRecherche : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TRadioButton *RadioButtonCoordonnees;
   TCSpinEdit *CSpinEditX;
   TCSpinEdit *CSpinEditY;
@@ -75,10 +75,10 @@ __published:	// Composants gérés par l'EDI
   void __fastcall CSpinEditPlaceVehlibChange(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     int xPrc, yPrc;
     void RafraichitAffichage();
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmRecherche(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

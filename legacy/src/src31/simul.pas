@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -43,39 +43,39 @@ unit simul;
 
 interface
 
-// Différences avec le projet cvw (C++Builder) :
-// La façon d'écrire vient de l'adaptation du projet C++Builder d'origine :
+// DiffÃ©rences avec le projet cvw (C++Builder) :
+// La faÃ§on d'Ã©crire vient de l'adaptation du projet C++Builder d'origine :
 // - les identificateurs EN MAJUSCULES sont d'anciens #define
 // - les types en minuscules sont d'anciens enum ou des classes de la simulation
 // - les types avec l'initiale en majuscule sont les types du langage (Pascal)
 
-// Des identificateurs de propriétés de classes ont pris le pluriel car
-// n'ayant pas de différence Min/Maj ils n'ont pas pu garder le même nom !
+// Des identificateurs de propriÃ©tÃ©s de classes ont pris le pluriel car
+// n'ayant pas de diffÃ©rence Min/Maj ils n'ont pas pu garder le mÃªme nom !
 // Exemples : centre_ville.Vehicules : array of vehicule,
 //            centre_ville.Pietons : array of pieton, etc.
-// Idem pour la macro NBDIR -> NBDIRS pour pas confondre avec la propriété voie.NbDir
+// Idem pour la macro NBDIR -> NBDIRS pour pas confondre avec la propriÃ©tÃ© voie.NbDir
 
-// Les tableaux dynamiques d'entités élémentaires de la simulation (véhicules,
-// piétons, feux etc.) ne sont pas détruits puis alloués mais sont adaptés au
-// besoin. Les types sont des tableaux dynamiques réalloués par SetLength.
+// Les tableaux dynamiques d'entitÃ©s Ã©lÃ©mentaires de la simulation (vÃ©hicules,
+// piÃ©tons, feux etc.) ne sont pas dÃ©truits puis allouÃ©s mais sont adaptÃ©s au
+// besoin. Les types sont des tableaux dynamiques rÃ©allouÃ©s par SetLength.
 
-// Les références temporaires d'éléments de simulation (voie*, pieton*, etc)
+// Les rÃ©fÃ©rences temporaires d'Ã©lÃ©ments de simulation (voie*, pieton*, etc)
 // sont ici des pointeurs de type ^voie, ^pieton (pVoie, pPieton), etc.
-// Pour les références de voie, les macros V(x,y,d) et V_(x,y,n,d) ont été
-// respectivement transformées en fonctions
+// Pour les rÃ©fÃ©rences de voie, les macros V(x,y,d) et V_(x,y,n,d) ont Ã©tÃ©
+// respectivement transformÃ©es en fonctions
 // vxyd(x,y : Integer; d : direction) : pVoie et
 // vxynd(x,y,n : Integer; d : direction) : pVoie.
 
 // VERSION 3.0 : Ajout des bus
 // - Classes depot_bus, arret_bus, ligne_bus & bus
-// - Propriétés case.NumArretBus, centre_ville.ArretBus, centre_ville.LigneBus et centre_ville.Autobus
+// - PropriÃ©tÃ©s case.NumArretBus, centre_ville.ArretBus, centre_ville.LigneBus et centre_ville.Autobus
 
 // ----------------------------------------------------------------------------
 // MACROS #define devenues Constantes
 // ----------------------------------------------------------------------------
 const   VERSION=$300;    // v3.0. La version change SSI le format de fichiers change
-        VERSIONMIN=$300; // v3.0. Version minimum stockée : NE PAS MODIFIER
-        VERSIONANC=$200; // v3.0. Version non stockée compatible : NE PAS MODIFIER
+        VERSIONMIN=$300; // v3.0. Version minimum stockÃ©e : NE PAS MODIFIER
+        VERSIONANC=$200; // v3.0. Version non stockÃ©e compatible : NE PAS MODIFIER
         NBX=99;
         NBY=63;
         NBDIRS=4;
@@ -99,7 +99,7 @@ const   VERSION=$300;    // v3.0. La version change SSI le format de fichiers ch
         PEUT_ETRE_INDEFINI=true;
         DOIT_ETRE_DEFINI=false;
 
-// valeurs de distance particulières
+// valeurs de distance particuliÃ¨res
         DIST_INDEFINIE=32767;
 
 //      AUCUN_FEU ((x=-1)&&(y=-1)&&(Dir=indefinie))
@@ -112,7 +112,7 @@ const   VERSION=$300;    // v3.0. La version change SSI le format de fichiers ch
         R180=2;
         R90G=3;
 // ----------------------------------------------------------------------------
-// Types énumérés de la simulation
+// Types Ã©numÃ©rÃ©s de la simulation
 // ----------------------------------------------------------------------------
 type priorite = (a_droite, cedez_le_passage, stop, feux);
      direction = (indefinie, nord, est, sud, ouest);
@@ -141,16 +141,16 @@ pieton = class
   Numero : Integer;
  public
   x, y, DemiCase,
-  NumArretBus, // v3.0. Arrêt de bus d'attente (si >0). Le piéton se trouve à côté de cet arrêt
-  NumBus,      // v3.0. Bus dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
+  NumArretBus, // v3.0. ArrÃªt de bus d'attente (si >0). Le piÃ©ton se trouve Ã  cÃ´tÃ© de cet arrÃªt
+  NumBus,      // v3.0. Bus dans lequel se trouve le piÃ©ton (si >0. Dans ce cas, x=-1 et y=-1)
   TourDrnDepl, TourDrnAff,
-  TourAttBus, // v3.0. Tour à partir duquel le piéton attend le bus
-  DemiCasesParcourues : Integer; // v3.0 : Unité piétonne = 1 demi-case !
+  TourAttBus, // v3.0. Tour Ã  partir duquel le piÃ©ton attend le bus
+  DemiCasesParcourues : Integer; // v3.0 : UnitÃ© piÃ©tonne = 1 demi-case !
   Dir : direction;
   PsgPtTrv,
-  ArretBusTrv,             // v3.0. Arrêt de bus trouvé (comme PsgPtTrv)
-  AttendBus,               // v3.0. Attend un bus à l'arrêt NumBus 
-  VeutDescendre : Boolean; // v3.0. Indique qu'il veut descendre du bus au prochain arrêt
+  ArretBusTrv,             // v3.0. ArrÃªt de bus trouvÃ© (comme PsgPtTrv)
+  AttendBus,               // v3.0. Attend un bus Ã  l'arrÃªt NumBus 
+  VeutDescendre : Boolean; // v3.0. Indique qu'il veut descendre du bus au prochain arrÃªt
   procedure Initialise;
   constructor Create(Num : Integer); overload;
   procedure AffecteNumero(Num : Integer);
@@ -170,18 +170,18 @@ feu = class
   Dir : direction;
   Etat, ProchainEtat : etat_feu;
   NbFeuxDmd, // Nbre de feux demandant le rouge
-  NbFeuxAtt : Integer;// Nbre de feux devant être rouge pour que celui-ci (this) passe au vert
+  NbFeuxAtt : Integer;// Nbre de feux devant Ãªtre rouge pour que celui-ci (this) passe au vert
   NumFeuxDmd, // Liste des feux demandant le rouge
-  NumFeuxAtt : Array of Integer; // Liste des feux devant être rouge pour que celui-ci (this) passe au vert
-  TypeDmdVert : dmd_vert; // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
-  TypePsgRouge : psg_rouge; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
+  NumFeuxAtt : Array of Integer; // Liste des feux devant Ãªtre rouge pour que celui-ci (this) passe au vert
+  TypeDmdVert : dmd_vert; // Type de demande du vert : dÃ¨s l'arrivÃ©e d'un vehicule ou dÃ¨s le passage au rouge
+  TypePsgRouge : psg_rouge; // Type de passage au rouge : dÃ¨s la premiÃ¨re demande ou Ã  l'unanimitÃ© des feux demandeurs
   DureeRouge,
   DureeVert,
-  TourDrnChgEtat : Integer; // Tour du dernier changement d'état
-  DemandeVert, // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
+  TourDrnChgEtat : Integer; // Tour du dernier changement d'Ã©tat
+  DemandeVert, // Indique qu'il demande le rouge (Ã  ceux qui ont Numero dans FeuxDmd[])
   FeuxTousRouges, // Indique que les feux (FeuxAtt) sont tous rouges
   RougeDemande, // Indique qu'un feu demande le rouge
-  ProchainVert, // Indique qu'il est autorisé à passer au vert
+  ProchainVert, // Indique qu'il est autorisÃ© Ã  passer au vert
   VerifEnCours : Boolean; // Drapeau pour Verifie
 
   procedure Initialise;
@@ -204,7 +204,7 @@ feu = class
   procedure Verifie(var stMsgErr : String; stSource : String);
 end{class feu};
 // ----------------------------------------------------------------------------
-// On gère un tableau de points de rendez-vous car la simulation va en utiliser un nombre donné
+// On gÃ¨re un tableau de points de rendez-vous car la simulation va en utiliser un nombre donnÃ©
 etape = class
  private
   Numero : Integer;
@@ -224,7 +224,7 @@ etape = class
   procedure Verifie(var stMsgErr : String);
 end{class etape};
 // ----------------------------------------------------------------------------
-// On gère un tableau de véhicule car la simulation va en utiliser un nombre fixe
+// On gÃ¨re un tableau de vÃ©hicule car la simulation va en utiliser un nombre fixe
 vehicule = class
  private
   Numero : Integer;
@@ -233,10 +233,10 @@ vehicule = class
   Dir, DirDrnDepl : direction;
   NivPriorite : niveau_priorite;
   NumEtapeDepart, NumEtapeArrivee : Integer; // Index de cv.Etape
-  TourDrnDepl, // Tour du dernier déplacement effectué
-  TourDepart, // Tour pdt lequel il a été placé sur l'étape de départ
+  TourDrnDepl, // Tour du dernier dÃ©placement effectuÃ©
+  TourDepart, // Tour pdt lequel il a Ã©tÃ© placÃ© sur l'Ã©tape de dÃ©part
   NbCasesParcourues, // Nombre de cases parcourues
-  NbToursRepos : Integer; // v2.2.4 : Tours pendant lesquels le véhicule ne s'est pas déplacé du fait de la vitesse réduite
+  NbToursRepos : Integer; // v2.2.4 : Tours pendant lesquels le vÃ©hicule ne s'est pas dÃ©placÃ© du fait de la vitesse rÃ©duite
 
   procedure Initialise;
   constructor Create(Num : Integer);
@@ -272,14 +272,14 @@ bus = class // v3.0
  public
   x, y, NumLigne,
   NumDrnArret, NumArretSvt, // Index-1 de centre_ville.ArretBus
-  NbPersonnes,  // Nombre de piétons ayant NumBus = Numero (piétons dans le bus)
-  TourDrnDepl, // Tour du dernier déplacement effectué
-  TourDepart,  // Tour pendant lequel il a été placé sur la case du dépôt
-  TourArriveDrnArret, // Tour pendant lequel le bus est arrivé au dernier arrêt
-  TourDepartArretSvt,  // Tour pour le départ vers l'arrêt suivant
+  NbPersonnes,  // Nombre de piÃ©tons ayant NumBus = Numero (piÃ©tons dans le bus)
+  TourDrnDepl, // Tour du dernier dÃ©placement effectuÃ©
+  TourDepart,  // Tour pendant lequel il a Ã©tÃ© placÃ© sur la case du dÃ©pÃ´t
+  TourArriveDrnArret, // Tour pendant lequel le bus est arrivÃ© au dernier arrÃªt
+  TourDepartArretSvt,  // Tour pour le dÃ©part vers l'arrÃªt suivant
   NbCasesParcourues, // Nombre de cases parcourues
-  NbCasesParcouruesDepuisDrnArret, // Idem mais remis à zéro à chaque arrêt
-  NbToursRepos : Integer; // Nombre de tours pendant lesquels le bus ne s'est pas déplacé du fait de sa vitesse réduite
+  NbCasesParcouruesDepuisDrnArret, // Idem mais remis Ã  zÃ©ro Ã  chaque arrÃªt
+  NbToursRepos : Integer; // Nombre de tours pendant lesquels le bus ne s'est pas dÃ©placÃ© du fait de sa vitesse rÃ©duite
   Dir, DirDrnDepl, DirAvtDrnDepl : direction;
   procedure Initialise;
   constructor Create(Num : Integer);
@@ -302,8 +302,8 @@ arret_bus = class // v3.0
   Numero : Integer;
  public
   x, y, NbLignes : Integer;
-  Ligne : array [0..NBMAXLIGNESBUS-1] of Boolean; // Indique si une ligne passe par cet arrêt (Index-1)
-  NumLigne : array [0..NBMAXLIGNESBUS-1] of Integer; // Liste des lignes passant par cet arrêt (Index-1)
+  Ligne : array [0..NBMAXLIGNESBUS-1] of Boolean; // Indique si une ligne passe par cet arrÃªt (Index-1)
+  NumLigne : array [0..NBMAXLIGNESBUS-1] of Integer; // Liste des lignes passant par cet arrÃªt (Index-1)
   procedure Initialise;
   procedure AffecteNumero(Num : Integer);
   procedure Definit(x0, y0 : Integer);
@@ -323,9 +323,9 @@ ligne_bus = class // v3.0
  private
   Numero : Integer;
  public
-  NbArrets, NbBus : Integer; // Nombre d'arrêts et de bus de la ligne
-  NumArret : Array [0..NBMAXARRETSBUSPARLIGNE-1] of Integer; // Ordre des arrêts à effectuer
-  NumBus : Array [0..NBMAXBUSPARLIGNE-1] of Integer; // N° des bus de la ligne
+  NbArrets, NbBus : Integer; // Nombre d'arrÃªts et de bus de la ligne
+  NumArret : Array [0..NBMAXARRETSBUSPARLIGNE-1] of Integer; // Ordre des arrÃªts Ã  effectuer
+  NumBus : Array [0..NBMAXBUSPARLIGNE-1] of Integer; // NÂ° des bus de la ligne
   procedure Initialise;
   constructor Create(Num : Integer);
   destructor Destroy; override;
@@ -345,26 +345,26 @@ voie = class
   Priorites : array [0..3] of priorite;
   ToutDroit,
   PassagePietons, // Si PassagePieton, est perpendiculaire au sens de la route
-  PassageBus : Boolean; // v3.0. non-opérationnel dans cette version (false)
-  LigneBus : Array [0..NBMAXLIGNESBUS-1] of Boolean; // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation par fiche paramètres du réseau de bus UNIQUEMENT)
+  PassageBus : Boolean; // v3.0. non-opÃ©rationnel dans cette version (false)
+  LigneBus : Array [0..NBMAXLIGNESBUS-1] of Boolean; // v3.0. Si Ligne[i] alors la ligne nÂ°i+1 passe par cette case (visualisation par fiche paramÃ¨tres du rÃ©seau de bus UNIQUEMENT)
 
-  NumFeu : array [0..3] of Integer; // >0 si feu éventuel (=index+1 de cv.Feux)
-  NumVehicule, // >0 si véhicule éventuel (=index+1 de cv.Vehicules)
-  NumBus, // v3.0. >0 si bus éventuel (=index+1 de cv.Autobus)
-  NumEtape, // >0 si c'est une étape (=index+1 de cv.Etape)
-  NumProchVeh, // >0 si un véhicule doit passer sur la case lors du prochain mouvement
+  NumFeu : array [0..3] of Integer; // >0 si feu Ã©ventuel (=index+1 de cv.Feux)
+  NumVehicule, // >0 si vÃ©hicule Ã©ventuel (=index+1 de cv.Vehicules)
+  NumBus, // v3.0. >0 si bus Ã©ventuel (=index+1 de cv.Autobus)
+  NumEtape, // >0 si c'est une Ã©tape (=index+1 de cv.Etape)
+  NumProchVeh, // >0 si un vÃ©hicule doit passer sur la case lors du prochain mouvement
   NumProchBus, // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement
   NbPietons, // Nombre de pietons sur cette case
-  NumArretBus : Integer; // v3.0. >0 si arrêt de bus (=index+1 de cv.ArretsBus)
-  NumPieton : array [0..NBMAXPIETONSPARCASE-1] of Integer; // >0 si un piéton est sur la case. Max. 4 piétons par case.
-  // 2 nids de pointeurs (natifs) : alloués dans voie donc détruits dans ~voie
-  DistEtape, // Autant de Distances (en cases) que d'étapes ssi 2 DirPoss sinon NULL. Natif.
-  // v2.2.7 : Statistiques sur les passages de véhicules
-  // Attente[ed,ea] & Trafic[ed,ea] avec ed=EtapeDépart;ea=EtapeArrivée
-  // - Si ed=0, stats par EtapeArrivée (toute EtapeDépart confondue)
-  // - Si ea=0, stats par EtapeDépart (toute EtapeArrivée confondue)
-  // - Si ed=ea=0, stats tous véhicules
-  DistArretBus, // v3.0. Distance à un arrêt de bus (même principe que DistEtape)
+  NumArretBus : Integer; // v3.0. >0 si arrÃªt de bus (=index+1 de cv.ArretsBus)
+  NumPieton : array [0..NBMAXPIETONSPARCASE-1] of Integer; // >0 si un piÃ©ton est sur la case. Max. 4 piÃ©tons par case.
+  // 2 nids de pointeurs (natifs) : allouÃ©s dans voie donc dÃ©truits dans ~voie
+  DistEtape, // Autant de Distances (en cases) que d'Ã©tapes ssi 2 DirPoss sinon NULL. Natif.
+  // v2.2.7 : Statistiques sur les passages de vÃ©hicules
+  // Attente[ed,ea] & Trafic[ed,ea] avec ed=EtapeDÃ©part;ea=EtapeArrivÃ©e
+  // - Si ed=0, stats par EtapeArrivÃ©e (toute EtapeDÃ©part confondue)
+  // - Si ea=0, stats par EtapeDÃ©part (toute EtapeArrivÃ©e confondue)
+  // - Si ed=ea=0, stats tous vÃ©hicules
+  DistArretBus, // v3.0. Distance Ã  un arrÃªt de bus (mÃªme principe que DistEtape)
   Attente,
   Trafic    : array of ArrayInt;
 
@@ -373,10 +373,10 @@ voie = class
   procedure Initialise;
   procedure Definit(x0, y0 : Integer);
   function v(d : direction) : pVoie; // v3.0 
-  function PrepareCalculDistances : Boolean; // v3.0 : inclut également celui des arrêts de bus
+  function PrepareCalculDistances : Boolean; // v3.0 : inclut Ã©galement celui des arrÃªts de bus
   function PrepareCalculAttenteTrafic : Boolean; // v2.2.7
-  procedure CalculeProchainVehiculeOuBus; // v3.0 (anciennement CalculeProchainVehicule : inclut le prochain bus le cas échéant)
-  procedure DeplaceVehiculeOuBus; // v3.0 (anciennement DeplaceVehicule : inclut le bus le cas échéant)
+  procedure CalculeProchainVehiculeOuBus; // v3.0 (anciennement CalculeProchainVehicule : inclut le prochain bus le cas Ã©chÃ©ant)
+  procedure DeplaceVehiculeOuBus; // v3.0 (anciennement DeplaceVehicule : inclut le bus le cas Ã©chÃ©ant)
   function PietonPeutAller(DirPieton : direction) : Boolean;
   function FaitDescendrePieton(NumPietonAFaireDescendre : Integer) : Boolean; // v3.0
   function AjoutePieton(NumPietonAAjouter : Integer) : Boolean;
@@ -389,8 +389,8 @@ voie = class
   procedure DefinitArretBus(n : Integer); // v3.0
   procedure RedessineCasesArretBus(d0 : direction); // v3.0
   function EstDepotBus : Boolean; // v3.0
-  procedure CalculeDistanceEtape(e, Distance : Integer; DirOrig : direction); // v3.0. Anciennement CalculDistance. Pour différencier Etape et Arrêts de bus
-  procedure CalculeDistanceArretBus(ab, Distance : Integer; DirOrig : direction); // v3.0. Pour différencier Arrêts de bus et Etape
+  procedure CalculeDistanceEtape(e, Distance : Integer; DirOrig : direction); // v3.0. Anciennement CalculDistance. Pour diffÃ©rencier Etape et ArrÃªts de bus
+  procedure CalculeDistanceArretBus(ab, Distance : Integer; DirOrig : direction); // v3.0. Pour diffÃ©rencier ArrÃªts de bus et Etape
   procedure InitialiseInfosLignesBus; // v3.0
   procedure RedessineCase(EffaceFond : Boolean); // v3.0
   function Charge(hfile : Integer) : Boolean;
@@ -414,44 +414,44 @@ centre_ville = class
  public
   TourEnCours : Boolean;
   TourCrt,
-  NbFeux, // Nombre de feux max. pouvant être utilisés
-  NbEtapes, // Nombre d'étapes max. pouvant être utilisés
-  NbVehicules,// Nombre de véhicules générés pour la simulation
-  NbBus, // v3.0. Nombre de bus générés pour la simulation
-  NbPietons, // Nombre de piétons générés pour la simulation
-  NbArretsBus, // v3.0. Nombre d'arrêts de bus à utiliser
+  NbFeux, // Nombre de feux max. pouvant Ãªtre utilisÃ©s
+  NbEtapes, // Nombre d'Ã©tapes max. pouvant Ãªtre utilisÃ©s
+  NbVehicules,// Nombre de vÃ©hicules gÃ©nÃ©rÃ©s pour la simulation
+  NbBus, // v3.0. Nombre de bus gÃ©nÃ©rÃ©s pour la simulation
+  NbPietons, // Nombre de piÃ©tons gÃ©nÃ©rÃ©s pour la simulation
+  NbArretsBus, // v3.0. Nombre d'arrÃªts de bus Ã  utiliser
   NbLignesBus, // v3.0. Nombre de lignes de bus
-  DureeVert, // Durée du vert PAR DEFAUT (à la création d'un feu)
+  DureeVert, // DurÃ©e du vert PAR DEFAUT (Ã  la crÃ©ation d'un feu)
   DureeOrange, // Duree de l'orange dans la simulation;
-  DureeRouge, // Durée du rouge PAR DEFAUT (à la création d'un feu)
-  xErr, yErr, // Coordonnées de la case concernant la dernière erreur
+  DureeRouge, // DurÃ©e du rouge PAR DEFAUT (Ã  la crÃ©ation d'un feu)
+  xErr, yErr, // CoordonnÃ©es de la case concernant la derniÃ¨re erreur
   NbVehiculesDeplaces,
   NbVehiculesArrives,
   NbVehiculesSortis,
-  NbToursStats, // Nombre de tours soumis à la statistiques (derniers)
+  NbToursStats, // Nombre de tours soumis Ã  la statistiques (derniers)
   NbVitesses, // Vitesse
-  NbMaxCasesDetectPsgPt, // Maximum de cases qu'un piéton peut contrôler pour détecter un passage piétons
-  ProbaDirPsgPt, // Probabilité pour un piéton de se diriger vers un passage piéton en changeant de direction
-  NbMaxCasesDetectArretBus, // v3.0. Maximum de cases qu'un piéton peut contrôler pour détecter un arrêt de bus
-  ProbaDirArretBus, // v3.0. Probabilité pour un piéton de se diriger vers un arrêt de bus en changeant de direction
-  ProbaArretBusDmd, // v3.0. Probabilité pour un piéton de demander à descendre au prochain arrêt
-  NbMaxPersonnesBus, // v3.0. Capacité d'un bus
-  NbToursStopArretBus, // v3.0. Arrêt obligatoire (en tours) à chaque arrêt de bus
-  NbMaxToursAttenteBus, // v3.0. Nombre maximum de tours pour un piéton à attendre un bus à un arrêt  
-  AttenteMaxVeh,  // Attente max d'un vehicule bloqué avant choix d'un autre trajet
+  NbMaxCasesDetectPsgPt, // Maximum de cases qu'un piÃ©ton peut contrÃ´ler pour dÃ©tecter un passage piÃ©tons
+  ProbaDirPsgPt, // ProbabilitÃ© pour un piÃ©ton de se diriger vers un passage piÃ©ton en changeant de direction
+  NbMaxCasesDetectArretBus, // v3.0. Maximum de cases qu'un piÃ©ton peut contrÃ´ler pour dÃ©tecter un arrÃªt de bus
+  ProbaDirArretBus, // v3.0. ProbabilitÃ© pour un piÃ©ton de se diriger vers un arrÃªt de bus en changeant de direction
+  ProbaArretBusDmd, // v3.0. ProbabilitÃ© pour un piÃ©ton de demander Ã  descendre au prochain arrÃªt
+  NbMaxPersonnesBus, // v3.0. CapacitÃ© d'un bus
+  NbToursStopArretBus, // v3.0. ArrÃªt obligatoire (en tours) Ã  chaque arrÃªt de bus
+  NbMaxToursAttenteBus, // v3.0. Nombre maximum de tours pour un piÃ©ton Ã  attendre un bus Ã  un arrÃªt  
+  AttenteMaxVeh,  // Attente max d'un vehicule bloquÃ© avant choix d'un autre trajet
   NbToursParSeconde, // Vitesse de simulation
-  NbCasesParcourues, // Nb total de cases parcourues par tous les véhicules
-  NbToursParcourus : Integer; // Nb Total de tours tous véhicules confondus
+  NbCasesParcourues, // Nb total de cases parcourues par tous les vÃ©hicules
+  NbToursParcourus : Integer; // Nb Total de tours tous vÃ©hicules confondus
   VerifOk, DistancesCalculees, QuadrillageStats : Boolean;
   TypeStats : type_stats;
-  v : array [0..NBX-1, 0..NBY-1] of voie; // Dimensions fixées (800x600)...
+  v : array [0..NBX-1, 0..NBY-1] of voie; // Dimensions fixÃ©es (800x600)...
   Feux : array of feu; // Tableau de feux
   Etapes : array of etape; // Tableau des etapes
   Vehicules : array of vehicule; // Tableau de voitures
   Autobus : array of bus; // v3.0. Tableau de bus
-  Pietons : array of pieton; // Tableau de piétons
-  DepotBus : depot_bus; // v3.0. LE Dépôt de bus
-  ArretsBus : array of arret_bus; // v3.0. Tableau d'arrêts de bus
+  Pietons : array of pieton; // Tableau de piÃ©tons
+  DepotBus : depot_bus; // v3.0. LE DÃ©pÃ´t de bus
+  ArretsBus : array of arret_bus; // v3.0. Tableau d'arrÃªts de bus
   LignesBus : array [0..NBMAXLIGNESBUS-1] of ligne_bus; // v3.0. Tableau STATIQUE de lignes de bus
   StatsCV : array of stats; // Tableau de statistiques
   constructor Create(NbElementsParDefaut : Boolean);
@@ -480,10 +480,10 @@ centre_ville = class
   function AjouteArretBus(x, y : Integer) : Integer; // v3.0
   function ExisteCaseArretBus(x, y : Integer) : Boolean; // v3.0
   procedure SupprimeArretBus(x, y : Integer); overload; // v3.0. Supprime sur une case UNIQUEMENT
-  procedure SupprimeArretBus(n : Integer); overload; // v3.0. Supprime COMPLETEMENT l'arrêt de bus (TOUTES les cases)
+  procedure SupprimeArretBus(n : Integer); overload; // v3.0. Supprime COMPLETEMENT l'arrÃªt de bus (TOUTES les cases)
   function SensPassagePietonsPossible(x, y : Integer) : sens;
   function CherchePassagePietons(x, y : Integer; SensRecherche : sens; var NvDir : direction) : direction;
-  function ChercheArretBus(x, y : Integer; SensRecherche : sens; var NvDir : direction) : direction; // v3.0. Comme pour le passage piéton
+  function ChercheArretBus(x, y : Integer; SensRecherche : sens; var NvDir : direction) : direction; // v3.0. Comme pour le passage piÃ©ton
   procedure DefinitArretBus(n, x, y : Integer); // v3.0
   function DirectionArretBus(x, y : Integer) : direction; // v3.0
   function PositionArretBus(x, y : Integer; d : direction) : position_arret_bus; // v3.0
@@ -494,8 +494,8 @@ centre_ville = class
   procedure InitialiseInfosLignesBus; // v3.0
   procedure InitialiseInfosTrajetLignesBus; // v3.0
   procedure CalculeTrajetLignesBus; // v3.0.3
-  function VerifieCalculDistances : Boolean; // v3.0. Inclut celui des arrêts de bus
-  function PrepareCalculDistances : Boolean; // v3.0. Inclut celui des arrêts de bus
+  function VerifieCalculDistances : Boolean; // v3.0. Inclut celui des arrÃªts de bus
+  function PrepareCalculDistances : Boolean; // v3.0. Inclut celui des arrÃªts de bus
   function PrepareCalculAttenteTrafic : Boolean; // v2.2.7
   procedure PlaceVehicule(x, y, NumVehicule : Integer); // v2.2.7
   function PrepareVehicules : Boolean;
@@ -519,7 +519,7 @@ end{class centre_ville};
 const PossDir :     array [direction] of dirposs = (aucune, N, E, S, O);
       InvPossDir :  array [direction] of dirposs = (aucune, S, O, N, E);
 
-      RotPossDir :  array [0..3, dirposs] of dirposs = // 1=+90° 2=180° 3=-90°
+      RotPossDir :  array [0..3, dirposs] of dirposs = // 1=+90Â° 2=180Â° 3=-90Â°
        ((aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO),
         (aucune, E, S, SE, O, EO, SO, ESO, N, NE, NS, NES, NO, NEO, NSO, NESO),
         (aucune, S, O, SO, N, NS, NO, NSO, E, SE, EO, ESO, NE, NES, NEO, NESO),
@@ -546,7 +546,7 @@ const PossDir :     array [direction] of dirposs = (aucune, N, E, S, O);
         vertical, indefini, vertical, indefini,
         indefini, indefini, indefini, indefini);
 
-// (Dirdp[x, y] = (x+1)ème direction pour DirPoss=y
+// (Dirdp[x, y] = (x+1)Ã¨me direction pour DirPoss=y
       Dirdp :       array [0..3, dirposs] of direction =
        ((indefinie,  nord,   est,  nord,   sud,  nord,   est,  nord,
              ouest,  nord,   est,  nord,   sud,  nord,   est,  nord),
@@ -587,7 +587,7 @@ uses SysUtils, QForms, QControls, QGrids,
 
 // ----------------------------------------------------------------------------
 
-// Passage des #define V(x,y,d) et V_(x,y,n,d) en méthodes de centre_ville
+// Passage des #define V(x,y,d) et V_(x,y,n,d) en mÃ©thodes de centre_ville
 // ----------------------------------------------------------------------------
 function centre_ville.vxyd(x, y : Integer; d : direction) : pVoie;
 begin
@@ -610,7 +610,7 @@ procedure VerifiePosition(stMsgErr, stSource : String ; x, y : Integer; PeutEtre
   if (((y<-1) and (PeutEtreIndefinie)) or
       ((y<0) and (not PeutEtreIndefinie)) or
       (y>=NBY)) then
-   stMsgErr:=stMsgErr+stSource+Format(': ordonnée incorrecte (%d)'#13#10'', [y]);
+   stMsgErr:=stMsgErr+stSource+Format(': ordonnÃ©e incorrecte (%d)'#13#10'', [y]);
  end;
 // ----------------------------------------------------------------------------
 procedure VerifieDirection(stMsgErr, stSource : String ; d : direction ; PeutEtreIndefinie : Boolean);
@@ -624,7 +624,7 @@ procedure VerifieDirection(stMsgErr, stSource : String ; d : direction ; PeutEtr
 procedure VerifiePriorite(stMsgErr, stSource : String ; p : priorite);
  begin
   if ((p<a_droite) or (p>feux)) then
-   stMsgErr:=stMsgErr+stSource+Format(': priorité incorrecte (%d)'#13#10'', [Integer(p)]);
+   stMsgErr:=stMsgErr+stSource+Format(': prioritÃ© incorrecte (%d)'#13#10'', [Integer(p)]);
  end;
 // ----------------------------------------------------------------------------
 procedure VerifieDirPoss(stMsgErr, stSource : String ; dp : dirposs);
@@ -636,7 +636,7 @@ procedure VerifieDirPoss(stMsgErr, stSource : String ; dp : dirposs);
 procedure VerifieEtat(stMsgErr, stSource : String ; e : etat_feu);
  begin
   if ((e<inactif) or (e>rouge)) then
-   stMsgErr:=stMsgErr+stSource+Format(': état incorrect (%d)'#13#10'', [Integer(e)]);
+   stMsgErr:=stMsgErr+stSource+Format(': Ã©tat incorrect (%d)'#13#10'', [Integer(e)]);
  end;
 // ----------------------------------------------------------------------------
 procedure VerifieDmdVert(stMsgErr, stSource : String ; dv : dmd_vert);
@@ -651,7 +651,7 @@ procedure VerifiePsgRouge(stMsgErr, stSource : String ; pr : psg_rouge);
    stMsgErr:=stMsgErr+stSource+Format(': type de passage au rouge incorrect (%d)'#13#10'', [Integer(pr)]);
  end;
 //-----------------------------------------------------------------------------
-// Classe Piétons
+// Classe PiÃ©tons
 
 // ----------------------------------------------------------------------------
 
@@ -708,13 +708,13 @@ function pieton.Defini : Boolean;
 procedure pieton.Verifie(var stMsgErr : String);
  var  stSource : String;
  begin
- stSource:=Format('Piéton n°%d (%d,%d)', [Numero, x, y]);
+ stSource:=Format('PiÃ©ton nÂ°%d (%d,%d)', [Numero, x, y]);
  if (Numero<0) then
-  stMsgErr:=stMsgErr+stSource+Format(': numéro incorrect (%d)'#13#10'', [Numero]);
+  stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro incorrect (%d)'#13#10'', [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirection(stMsgErr, stSource, Dir, DOIT_ETRE_DEFINI);
   if ((DemiCase<0) or (DemiCase>1)) then
-   stMsgErr:=stMsgErr+stSource+Format(': valeur ½ case incorrecte (%d)'#13#10'', [DemiCase]);
+   stMsgErr:=stMsgErr+stSource+Format(': valeur Â½ case incorrecte (%d)'#13#10'', [DemiCase]);
  end;
 // ----------------------------------------------------------------------------
 // Classe Feux
@@ -839,7 +839,7 @@ begin
            end;
     rouge: begin
            RougeDemande:=false;
-           // On informe quels sont les prochains feux à se mettre au vert
+           // On informe quels sont les prochains feux Ã  se mettre au vert
            for i:=0 to NbFeuxDmd-1 do
             if ((cv.Feux[NumFeuxDmd[i]-1].Etat=rouge) and
                 (not cv.Feux[NumFeuxDmd[i]-1].ProchainVert) and
@@ -857,25 +857,25 @@ procedure feu.Evolue;
 var i, NumVeh, NumBus : Integer; // v3.0 (NumBus)
  begin
   if Etat=inactif then Exit;
-  ProchainEtat:=Etat; // Par défaut
+  ProchainEtat:=Etat; // Par dÃ©faut
   NumVeh:=cv.v[x, y].NumVehicule;
   NumBus:=cv.v[x, y].NumBus;
   case Etat of
-    vert:      // Si (rouge demandé ou passage immediat) et durée vert écoulée . Orange
+    vert:      // Si (rouge demandÃ© ou passage immediat) et durÃ©e vert Ã©coulÃ©e . Orange
                if (((RougeDemande and (TourDrnChgEtat<cv.TourCrt)) or
                     (TypePsgRouge=immediat)) and
                    (cv.TourCrt-TourDrnChgEtat>DureeVert)) then DefinitProchainEtat;
     orange:    if (cv.TourCrt-TourDrnChgEtat>cv.DureeOrange) then DefinitProchainEtat();
-    rouge:     begin // Le vert n'est pas encore demandé
+    rouge:     begin // Le vert n'est pas encore demandÃ©
                if not DemandeVert then
                 begin
-                 if ((cv.TourCrt-TourDrnChgEtat>DureeRouge) and  // la durée du rouge est écoulée ET
-                     ((TypeDmdVert=immediate) or  // La demande est immédiate Ou
-                      ((NumVeh>0) and  // un véhicule est sur la case et
+                 if ((cv.TourCrt-TourDrnChgEtat>DureeRouge) and  // la durÃ©e du rouge est Ã©coulÃ©e ET
+                     ((TypeDmdVert=immediate) or  // La demande est immÃ©diate Ou
+                      ((NumVeh>0) and  // un vÃ©hicule est sur la case et
                        (cv.Vehicules[NumVeh-1].Dir=Dir)) or
                       ((NumBus>0) and  // un bus est sur la case et
                        (cv.Autobus[NumBus-1].Dir=Dir)))) then// dans la direction du feu... v3.0
-                  begin // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
+                  begin // Alors...On demande le vert DES QU'UN DES FEUX (devant Ãªtre rouge) EST VERT
                   i:=0;
                   while(i<NbFeuxAtt) and
                         ((cv.Feux[NumFeuxAtt[i]-1].Etat<>vert) or
@@ -885,20 +885,20 @@ var i, NumVeh, NumBus : Integer; // v3.0 (NumBus)
                   if DemandeVert then TourDrnChgEtat:=cv.TourCrt;
                   end{if cv.TourCrt...};
                 end{if not DmdVert};
-               // Le vert est demandé...
+               // Le vert est demandÃ©...
                if DemandeVert then
                 begin
                  // On le fait toujours savoir (si jamais un feu devient vert entre-temps)
-                 for i:=0 to NbFeuxAtt-1 do // On parcours les feux devant être rouge
-                  if ((cv.Feux[NumFeuxAtt[i]-1].Etat=vert) and  // feu opposé vert et
+                 for i:=0 to NbFeuxAtt-1 do // On parcours les feux devant Ãªtre rouge
+                  if ((cv.Feux[NumFeuxAtt[i]-1].Etat=vert) and  // feu opposÃ© vert et
                       (cv.Feux[NumFeuxAtt[i]-1].TourDrnChgEtat<cv.TourCrt) and
-                      (not cv.Feux[NumFeuxAtt[i]-1].RougeDemande)) then// le rouge n'a pas encore été demandé)
+                      (not cv.Feux[NumFeuxAtt[i]-1].RougeDemande)) then// le rouge n'a pas encore Ã©tÃ© demandÃ©)
                    begin
                    cv.Feux[NumFeuxAtt[i]-1].RougeDemande:=true; // Ben maintenant...
                    cv.Feux[NumFeuxAtt[i]-1].TourDrnChgEtat:=cv.TourCrt; //  c'est fait
                    end;
                 end{if DemandeVert};
-               // On vérifie que les feux opposés ne sont pas déjà tous rouges (vert demandé ou non)
+               // On vÃ©rifie que les feux opposÃ©s ne sont pas dÃ©jÃ  tous rouges (vert demandÃ© ou non)
                if not FeuxTousRouges then
                 begin
                 i:=0;
@@ -910,7 +910,7 @@ var i, NumVeh, NumBus : Integer; // v3.0 (NumBus)
                 FeuxTousRouges:=(i=NbFeuxAtt);
                 if FeuxTousRouges then TourDrnChgEtat:=cv.TourCrt;
                 end{if not FeuxTousRouges};
-               // On passe au vert si on le demande ou on l'autorise (vert demandé ou non)
+               // On passe au vert si on le demande ou on l'autorise (vert demandÃ© ou non)
                if FeuxTousRouges and ProchainVert and (TourDrnChgEtat<cv.TourCrt) then
                 DefinitProchainEtat();
                end{rouge:};
@@ -972,35 +972,35 @@ procedure feu.Verifie(var stMsgErr : String; stSource : String);
 var i : Integer;
  begin
   if (Numero<0) then
-   stMsgErr:=stMsgErr+stSource+Format(': numéro incorrect (%d)'#13#10'', [Numero]);
+   stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro incorrect (%d)'#13#10'', [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirection(stMsgErr, stSource, Dir, DOIT_ETRE_DEFINI);
   VerifieEtat(stMsgErr, stSource, Etat);
   VerifieEtat(stMsgErr, stSource, ProchainEtat);
 
-  VerifEnCours:=true; // Evite les boucles infinies dues aux pointages mutuels de références
+  VerifEnCours:=true; // Evite les boucles infinies dues aux pointages mutuels de rÃ©fÃ©rences
 
   if ((NbFeuxDmd<0) or (NbFeuxDmd>cv.NbFeux)) then
    stMsgErr:=stMsgErr+stSource+Format(': nombre des prochains feux verts incorrect (%d)'#13#10'', [NbFeuxDmd])
   else
    for i:=0 to NbFeuxDmd-1 do
     if ((NumFeuxDmd[i]<1) or (NumFeuxDmd[i]>=cv.NbFeux)) then
-     stMsgErr:=stMsgErr+stSource+Format(': numéro du %d° prochain feu vert incorrect (%d)'#13#10'', [i+1, NumFeuxDmd[i]])
+     stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro du %dÂ° prochain feu vert incorrect (%d)'#13#10'', [i+1, NumFeuxDmd[i]])
     else
      if not cv.Feux[NumFeuxDmd[i]-1].VerifEnCours then
-      cv.Feux[NumFeuxDmd[i]-1].Verifie(stMsgErr, Format('%d° prochain feu vert [n°%d, (%d,%d)]'#13#10'',
+      cv.Feux[NumFeuxDmd[i]-1].Verifie(stMsgErr, Format('%dÂ° prochain feu vert [nÂ°%d, (%d,%d)]'#13#10'',
                                                         [i+1, NumFeuxDmd[i],
                                                          cv.Feux[NumFeuxDmd[i]-1].x,
                                                          cv.Feux[NumFeuxDmd[i]-1].y]));
   if ((NbFeuxAtt<0) or (NbFeuxAtt>cv.NbFeux)) then
-   stMsgErr:=stMsgErr+stSource+Format(': nombre des feux devant être rouge incorrect (%d)'#13#10'', [NbFeuxAtt])
+   stMsgErr:=stMsgErr+stSource+Format(': nombre des feux devant Ãªtre rouge incorrect (%d)'#13#10'', [NbFeuxAtt])
   else
    for i:=0 to NbFeuxAtt-1 do
     if ((NumFeuxAtt[i]<1) or (NumFeuxAtt[i]>=cv.NbFeux)) then
-     stMsgErr:=stMsgErr+stSource+Format(': numéro du %d° feu devant être rouge incorrect (%d)'#13#10'', [i+1, NumFeuxAtt[i]])
+     stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro du %dÂ° feu devant Ãªtre rouge incorrect (%d)'#13#10'', [i+1, NumFeuxAtt[i]])
     else
      if not cv.Feux[NumFeuxAtt[i]-1].VerifEnCours then
-      cv.Feux[NumFeuxAtt[i]-1].Verifie(stMsgErr, Format('%d° feu devant être rouge [n°%d, (%d,%d)]'#13#10'',
+      cv.Feux[NumFeuxAtt[i]-1].Verifie(stMsgErr, Format('%dÂ° feu devant Ãªtre rouge [nÂ°%d, (%d,%d)]'#13#10'',
                                                         [i+1, NumFeuxAtt[i],
                                                          cv.Feux[NumFeuxAtt[i]-1].x,
                                                          cv.Feux[NumFeuxAtt[i]-1].y]));
@@ -1010,7 +1010,7 @@ var i : Integer;
   if DemandeVert and (Etat<>rouge) then
    stMsgErr:=stMsgErr+stSource+': demande le vert alors qu''il n''est pas rouge'#13#10'';
   if RougeDemande and (Etat<>vert) then
-   stMsgErr:=stMsgErr+stSource+': le rouge est demandé alors qu''il n''est pas vert'#13#10'';
+   stMsgErr:=stMsgErr+stSource+': le rouge est demandÃ© alors qu''il n''est pas vert'#13#10'';
  end{feu.Verifie};
 //-----------------------------------------------------------------------------
 // Classe Etapes
@@ -1061,7 +1061,7 @@ procedure etape.PlaceProchainVehicule;
                             (cv.Vehicules[i].y=y));
      Inc(i);
      end{while};
-    if NumVehicule>0 then // Il y a encore un véhicule à sortir
+    if NumVehicule>0 then // Il y a encore un vÃ©hicule Ã  sortir
      begin
       cv.v[x, y].NumVehicule:=NumVehicule;
       cv.PlaceVehicule(x, y, NumVehicule);
@@ -1088,13 +1088,13 @@ function etape.Sauve(hfile : Integer) : Boolean;
 procedure etape.Verifie(var stMsgErr : String);
 var stSource : String;
  begin
-  stSource:=Format('Etape n°%d (%d,%d)', [Numero, x, y]);
+  stSource:=Format('Etape nÂ°%d (%d,%d)', [Numero, x, y]);
   if Numero<0 then
-   stMsgErr:=stMsgErr+stSource+Format(': numéro incorrect (%d)'#13#10'', [Numero]);
+   stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro incorrect (%d)'#13#10'', [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, DOIT_ETRE_DEFINI);
  end{etape.Verifie};
 //-----------------------------------------------------------------------------
-// Classe Véhicules
+// Classe VÃ©hicules
 // ----------------------------------------------------------------------------
 procedure vehicule.Initialise;
 begin
@@ -1146,15 +1146,15 @@ procedure vehicule.CalculeProchaineDirection;
   AncDir:=Dir; // v2.2.4
   Dir:=indefinie;
 
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for i:=0 to ndp-1 do
    for j:=0 to ndp-1 do
-    if i<>j then // On dégringole si distance supérieure.
+    if i<>j then // On dÃ©gringole si distance supÃ©rieure.
      Inc(OrdreDir[i], Ord(((v.DistEtape[NumEtapeArrivee-1, i]>v.DistEtape[NumEtapeArrivee-1, j]) or
                            ((v.DistEtape[NumEtapeArrivee-1, i]=v.DistEtape[NumEtapeArrivee-1, j]) and
-                            (Dirdp[i, v.DirPoss]<>AncDir) and // En cas d'égalité, préfère garder la direction courante : v2.2.4
-                            ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
+                            (Dirdp[i, v.DirPoss]<>AncDir) and // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4
+                            ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
   i:=0;
   while (Dir=indefinie) and (i<ndp) do
    begin
@@ -1164,7 +1164,7 @@ procedure vehicule.CalculeProchaineDirection;
     Voie:=cv.vxyd(x,y,Dirdp[j, v.DirPoss]);
     if ((OrdreDir[j]=i) and
         ((not v.ToutDroit) or     // Direction interdite si : obligation d'aller tout droit ET
-         (DirDrnDepl=direction(j+1))) and  //                          pas même direction que lors du dernier déplacement
+         (DirDrnDepl=direction(j+1))) and  //                          pas mÃªme direction que lors du dernier dÃ©placement
         (((Voie.NumVehicule=0) and (Voie.NumBus=0)) or // v3.0 (NumBus)
          ((Voie.NumEtape>0) and (Voie.NumEtape=NumEtapeArrivee)) or
          (cv.TourCrt<=1+TourDrnDepl+Ord(NivPriorite=normal)*cv.AttenteMaxVeh*(1+OrdreDir[j])))) then
@@ -1174,7 +1174,7 @@ procedure vehicule.CalculeProchaineDirection;
    Inc(i);
    end{while not dir and i<ndp};
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (Dir=indefinie) then
     begin
     i:=0;
@@ -1201,14 +1201,14 @@ var v : pVoie;
   ndp:=NbDir[v.DirPoss];
   for i:=0 to 3 do OrdreDir[i]:=0;
   DirAuCarrefour:=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for i:=0 to ndp-1 do
    for j:=0 to ndp-1 do
     if i<>j then
      Inc(OrdreDir[i], Ord(((v.DistEtape[NumEtapeArrivee-1, i]>v.DistEtape[NumEtapeArrivee-1, j]) or
                        ((v.DistEtape[NumEtapeArrivee-1, i]=v.DistEtape[NumEtapeArrivee-1, j]) and
-                        ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
+                        ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
   i:=0;
   while (DirAuCarrefour=indefinie) and (i<ndp) do
    begin
@@ -1217,7 +1217,7 @@ var v : pVoie;
     begin
     if ((OrdreDir[j]=i) and
         ((not v.ToutDroit) or // Direction interdite si : obligation d'aller tout droit ET
-         (DirDrnDepl=direction(j+1)))) then //                       pas même direction que lors du dernier déplacement
+         (DirDrnDepl=direction(j+1)))) then //                       pas mÃªme direction que lors du dernier dÃ©placement
      DirAuCarrefour:=Dirdp[j, v.DirPoss];
     Inc(j);
     end{while Dir>indefinie and j<ndp};
@@ -1247,21 +1247,21 @@ var v : pVoie;
 procedure vehicule.Verifie(var stMsgErr : String);
 var stSource : String;
  begin
-  stSource:=Format('Véhicule n°%d (%d,%d)', [Numero, x, y]);
+  stSource:=Format('VÃ©hicule nÂ°%d (%d,%d)', [Numero, x, y]);
   if Numero<0 then
-   stMsgErr:=stMsgErr+stSource+Format(': numéro incorrect (%d)'#13#10'', [Numero]);
+   stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro incorrect (%d)'#13#10'', [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, PEUT_ETRE_INDEFINI);
   VerifieDirection(stMsgErr, stSource, Dir, PEUT_ETRE_INDEFINI);
   if (NumEtapeDepart<>0) and (NumEtapeArrivee<>0) then
-   begin // On ne teste pas si Depart=Arrivee=0 (les véhicules sont préparés avant)
+   begin // On ne teste pas si Depart=Arrivee=0 (les vÃ©hicules sont prÃ©parÃ©s avant)
    if NumEtapeDepart<1 then
-    stMsgErr:=stMsgErr+stSource+Format(': numéro d''étape de départ incorrect (%d)'#13#10'', [NumEtapeDepart]);
+    stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro d''Ã©tape de dÃ©part incorrect (%d)'#13#10'', [NumEtapeDepart]);
    if NumEtapeArrivee<1 then
-    stMsgErr:=stMsgErr+stSource+Format(': numéro d''étape d''arrivée incorrect (%d)'#13#10'', [NumEtapeArrivee]);
+    stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro d''Ã©tape d''arrivÃ©e incorrect (%d)'#13#10'', [NumEtapeArrivee]);
    end;
  end;
 //-----------------------------------------------------------------------------
-// Classe Dépot de bus (v3.0)
+// Classe DÃ©pot de bus (v3.0)
 //-----------------------------------------------------------------------------
 procedure depot_bus.Initialise;
 begin
@@ -1291,10 +1291,10 @@ end;
 procedure depot_bus.PlaceProchainBus;
 var NumProchBus : Integer;
 begin
-if Defini and // Défini ET
+if Defini and // DÃ©fini ET
    (cv.v[x,y].NumBus=0) and // pas de bus ET
-   (cv.v[x,y].NumVehicule=0) and // pas de véhicule sur la case dépôt ET
-   (NumDrnBusSorti<cv.NbBus) then // encore au moins un bus à sortir
+   (cv.v[x,y].NumVehicule=0) and // pas de vÃ©hicule sur la case dÃ©pÃ´t ET
+   (NumDrnBusSorti<cv.NbBus) then // encore au moins un bus Ã  sortir
  begin
  Inc(NumDrnBusSorti);
  NumProchBus:=NumDrnBusSorti;
@@ -1318,7 +1318,7 @@ function depot_bus.Sauve(hfile : Integer) : Boolean;
 procedure depot_bus.Verifie(var stMsgErr : String); // v3.0.3
 var stSource : String;
  begin
-  stSource:=Format('Dépôt bus : ', [x, y]);
+  stSource:=Format('DÃ©pÃ´t bus : ', [x, y]);
   VerifiePosition(stMsgErr, stSource, x, y, PEUT_ETRE_INDEFINI);
  end;
 //-----------------------------------------------------------------------------
@@ -1398,7 +1398,7 @@ var i : Integer;
     if not p.VeutDescendre then
      p.VeutDescendre:=cv.ProbaArretBusDmd>Random(100);
     if p.VeutDescendre then
-     v.FaitDescendrePieton(i); // Si on peut faire descendre, il descend au prochain arrêt
+     v.FaitDescendrePieton(i); // Si on peut faire descendre, il descend au prochain arrÃªt
     end{if};
    if (p.NumArretBus=NumDrnArret) and p.AttendBus then
     FaitMonterPieton(i); // Si on ne peut pas faire monter, il montera dans le prochain bus
@@ -1417,15 +1417,15 @@ procedure bus.CalculeProchaineDirection; // v3.0
   AncDir:=Dir; 
   Dir:=indefinie;
 
-  // On classe les dir.poss. dans l'ordre < des distances aux arrêts de bus.
-  // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux arrÃªts de bus.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Bus.+Tour) Modulo Directions Possibles
   for i:=0 to ndp-1 do
    for j:=0 to ndp-1 do
-    if i<>j then // On dégringole si distance supérieure.
+    if i<>j then // On dÃ©gringole si distance supÃ©rieure.
      Inc(OrdreDir[i], Ord(((v.DistArretBus[NumArretSvt-1, i]>v.DistArretBus[NumArretSvt-1, j]) or
                            ((v.DistArretBus[NumArretSvt-1, i]=v.DistArretBus[NumArretSvt-1, j]) and
-                            (Dirdp[i, v.DirPoss]<>AncDir) and // En cas d'égalité, préfère garder la direction courante : v2.2.4
-                            ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
+                            (Dirdp[i, v.DirPoss]<>AncDir) and // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4
+                            ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
   i:=0;
   while (Dir=indefinie) and (i<ndp) do
    begin
@@ -1435,7 +1435,7 @@ procedure bus.CalculeProchaineDirection; // v3.0
     Voie:=cv.vxyd(x,y,Dirdp[j, v.DirPoss]);
     if ((OrdreDir[j]=i) and
         ((not v.ToutDroit) or     // Direction interdite si : obligation d'aller tout droit ET
-         (DirDrnDepl=direction(j+1))) and  //                          pas même direction que lors du dernier déplacement
+         (DirDrnDepl=direction(j+1))) and  //                          pas mÃªme direction que lors du dernier dÃ©placement
         (((Voie.NumVehicule=0) and (Voie.NumBus=0)) or
          ((Voie.NumArretBus>0) and (Voie.NumArretBus=NumArretSvt)) or
          (cv.TourCrt<=1+TourDrnDepl+5*cv.AttenteMaxVeh*(1+OrdreDir[j])))) then // AttenteMaxBus = 5*AttenteMaxVeh
@@ -1445,7 +1445,7 @@ procedure bus.CalculeProchaineDirection; // v3.0
    Inc(i);
    end{while not dir and i<ndp};
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (Dir=indefinie) then
     begin
     i:=0;
@@ -1474,14 +1474,14 @@ var v : pVoie;
   ndp:=NbDir[v.DirPoss];
   for i:=0 to 3 do OrdreDir[i]:=0;
   DirAuCarrefour:=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux arrêts de bus si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux arrÃªts de bus si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Bus.+Tour) Modulo Directions Possibles
   for i:=0 to ndp-1 do
    for j:=0 to ndp-1 do
     if i<>j then
      Inc(OrdreDir[i], Ord(((v.DistArretBus[NumArretSvt-1, i]>v.DistArretBus[NumArretSvt-1, j]) or
                        ((v.DistArretBus[NumArretSvt-1, i]=v.DistArretBus[NumArretSvt-1, j]) and
-                        ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
+                        ((i+Numero+cv.TourCrt) mod ndp>(j+Numero+cv.TourCrt) mod ndp))))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
   i:=0;
   while (DirAuCarrefour=indefinie) and (i<ndp) do
    begin
@@ -1490,7 +1490,7 @@ var v : pVoie;
     begin
     if ((OrdreDir[j]=i) and
         ((not v.ToutDroit) or // Direction interdite si : obligation d'aller tout droit ET
-         (DirDrnDepl=direction(j+1)))) then //                       pas même direction que lors du dernier déplacement
+         (DirDrnDepl=direction(j+1)))) then //                       pas mÃªme direction que lors du dernier dÃ©placement
      DirAuCarrefour:=Dirdp[j, v.DirPoss];
     Inc(j);
     end{while Dir>indefinie and j<ndp};
@@ -1525,16 +1525,16 @@ var i : Integer;
 procedure bus.Verifie(var stMsgErr : String); // v3.0.3
 var stSource : String;
  begin
-  stSource:=Format('Véhicule n°%d (%d,%d)', [Numero, x, y]);
+  stSource:=Format('VÃ©hicule nÂ°%d (%d,%d)', [Numero, x, y]);
   if Numero<0 then
-   stMsgErr:=stMsgErr+stSource+Format(': numéro incorrect (%d)'#13#10'', [Numero]);
+   stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro incorrect (%d)'#13#10'', [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, PEUT_ETRE_INDEFINI);
   VerifieDirection(stMsgErr, stSource, Dir, PEUT_ETRE_INDEFINI);
   if (NumLigne<0) or (NumLigne>=NBMAXLIGNESBUS) then
-   stMsgErr:=stSource+Format(': numéro de ligne de bus incorrect (%d)'#13#10'', [NumLigne]);
+   stMsgErr:=stSource+Format(': numÃ©ro de ligne de bus incorrect (%d)'#13#10'', [NumLigne]);
  end;
 // ----------------------------------------------------------------------------
-// Classe Arrêt de bus (v3.0)
+// Classe ArrÃªt de bus (v3.0)
 // ----------------------------------------------------------------------------
 procedure arret_bus.Initialise;
 var i : Integer;
@@ -1634,16 +1634,16 @@ procedure arret_bus.Verifie(var stMsgErr : String);
 var i : Integer;
     stSource : String;
  begin
-  stSource:=Format('Arrêt de bus n°%d (%d,%d)', [Numero, x, y]);
+  stSource:=Format('ArrÃªt de bus nÂ°%d (%d,%d)', [Numero, x, y]);
   if Numero<0 then
-   stMsgErr:=stSource+Format(': numéro incorrect (%d)'#13#10, [Numero]);
+   stMsgErr:=stSource+Format(': numÃ©ro incorrect (%d)'#13#10, [Numero]);
   VerifiePosition(stMsgErr, stSource, x, y, PEUT_ETRE_INDEFINI);
   if (NbLignes<0) or (NbLignes>NBMAXLIGNESBUS) then
    stMsgErr:=stSource+Format(': nombre de lignes de bus incorrect (%d)'#13#10, [NbLignes]);
   for i:=0 to NbLignes-1 do
    if Ligne[i] and
       ((NumLigne[i]<0) or (NumLigne[i]>NBMAXLIGNESBUS)) then
-    stMsgErr:=stSource+Format(': numéro de %d° ligne de bus incorrect (%d)'#13#10, [i+1, NbLignes]);
+    stMsgErr:=stSource+Format(': numÃ©ro de %dÂ° ligne de bus incorrect (%d)'#13#10, [i+1, NbLignes]);
  end;
 //-----------------------------------------------------------------------------
 // Classe Ligne de bus
@@ -1678,7 +1678,7 @@ destructor ligne_bus.Destroy;
  end;
 //-----------------------------------------------------------------------------
 function ligne_bus.Charge(hfile : Integer) : Boolean;
- begin // Attention : on ne stocke par le nombre et les n° de bus (calculés avant simul)
+ begin // Attention : on ne stocke par le nombre et les nÂ° de bus (calculÃ©s avant simul)
   Result:=(FileRead(hfile, Numero, sizeof(Numero))>0) and
           (FileRead(hfile, NbArrets, sizeof(NbArrets))>0) and
           (FileRead(hfile, NumArret, sizeof(NumArret))>0);
@@ -1695,14 +1695,14 @@ procedure ligne_bus.Verifie(var stMsgErr : String);
 var i : Integer;
     stSource : String;
  begin
-  stSource:=Format('Ligne de bus n°%d', [Numero]);
+  stSource:=Format('Ligne de bus nÂ°%d', [Numero]);
   if Numero<0 then
-   stMsgErr:=stSource+Format(': numéro incorrect (%d)'#13#10, [Numero]);
+   stMsgErr:=stSource+Format(': numÃ©ro incorrect (%d)'#13#10, [Numero]);
   if (NbArrets<0) or (NbArrets>NBMAXARRETSBUSPARLIGNE) then
-   stMsgErr:=stSource+Format(': nombre d''arrêts de bus incorrect (%d)'#13#10, [NbArrets]);
+   stMsgErr:=stSource+Format(': nombre d''arrÃªts de bus incorrect (%d)'#13#10, [NbArrets]);
   for i:=0 to NbArrets-1 do
    if ((NumArret[i]<0) or (NumArret[i]>cv.NbArretsBus)) then
-    stMsgErr:=stSource+Format(': numéro du %d° arrêt de bus incorrect (%d)'#13#10, [i+1, NumArret[i]]);
+    stMsgErr:=stSource+Format(': numÃ©ro du %dÂ° arrÃªt de bus incorrect (%d)'#13#10, [i+1, NumArret[i]]);
  end;
 //-----------------------------------------------------------------------------
 // Classe Voie
@@ -1750,7 +1750,7 @@ procedure voie.Definit(x0, y0 : Integer);
  Initialise;
  end;
 //-----------------------------------------------------------------------------
-function voie.PrepareCalculDistances : Boolean; // v3.0 : inclut également la préparation des distances aux arrêts de bus
+function voie.PrepareCalculDistances : Boolean; // v3.0 : inclut Ã©galement la prÃ©paration des distances aux arrÃªts de bus
 var i, j, nd, ne, nab : Integer;
  begin
   nd:=NbDir[DirPoss];
@@ -1793,13 +1793,13 @@ var i, j, ne : Integer;
     if ne>0 then
      begin
      SetLength(Attente, (ne+1)*sizeof(ArrayInt));
-     for i:=0 to ne do // Puis les étapes d'arrivée nombre de directions possibles
+     for i:=0 to ne do // Puis les Ã©tapes d'arrivÃ©e nombre de directions possibles
       begin
       SetLength(Attente[i], (ne+1)*sizeof(Integer));
       for j:=0 to ne do Attente[i, j]:=0;
       end{for i};
      SetLength(Trafic, (ne+1)*sizeof(ArrayInt));
-     for i:=0 to ne do // Puis les étapes d'arrivée nombre de directions possibles
+     for i:=0 to ne do // Puis les Ã©tapes d'arrivÃ©e nombre de directions possibles
       begin
       SetLength(Trafic[i], (ne+1)*sizeof(Integer));
       for j:=0 to ne do Trafic[i, j]:=0;
@@ -1816,15 +1816,15 @@ var invd, MaxNivP, NumVV, NumBV : Integer;
     NivPriorite : array [direction] of Integer;
     d, DirCrt, DirAuCarrefour : direction;
     v : pVoie;
- begin // Rq : Nécessite de connaître les 2 prochaines directions de chaque véhicule/bus
+ begin // Rq : NÃ©cessite de connaÃ®tre les 2 prochaines directions de chaque vÃ©hicule/bus
   MaxNivP:=0;
   for d:=indefinie to ouest do NivPriorite[d]:=0;
-  NumProchVeh:=0; // Aucun par défaut;
-  // 1. S'il y a un piéton, aucun ne peut arriver
+  NumProchVeh:=0; // Aucun par dÃ©faut;
+  // 1. S'il y a un piÃ©ton, aucun ne peut arriver
   if NbPietons>0 then Exit;
-  // 1bis. S'il y a déjà un véhicule et que ce n'est pas une étape, aucun ne peut arriver
+  // 1bis. S'il y a dÃ©jÃ  un vÃ©hicule et que ce n'est pas une Ã©tape, aucun ne peut arriver
   if (NumVehicule>0) and (NumEtape=0) then Exit;
-  // 1ter. S'il y a déjà un bus, aucun ne peut arriver. v3.0
+  // 1ter. S'il y a dÃ©jÃ  un bus, aucun ne peut arriver. v3.0
   if (NumBus>0) then Exit; 
   for d:=nord to ouest do
    begin
@@ -1832,57 +1832,57 @@ var invd, MaxNivP, NumVV, NumBV : Integer;
     v:=cv.vxyd(x,y,d);
     NumVV:=v.NumVehicule;
     if v.EstTeteBus then NumBV:=v.NumBus else NumBV:=0; // v3.0
-    if NumVV>0 then // 1. SOIT un Vehicule voisin arrivant sur la case ? Priorité 1
+    if NumVV>0 then // 1. SOIT un Vehicule voisin arrivant sur la case ? PrioritÃ© 1
      begin
      NivPriorite[d]:=Ord((cv.Vehicules[NumVV-1].Dir=InvDir[d]) and  // Qui arrive sur la case...
-                         cv.TourDeDeplacementVehicule(NumVV-1) and  // Et que c'est son tour de déplacement... (multivitesse : version 1.5)
-                         ((NumVehicule=0) or  // alors... Soit y a pas de véhicule sur la case,
-                          ((NumEtape>0) and   // soit y en a une mais c'est une étape...
-                           (cv.Vehicules[NumVV-1].NumEtapeArrivee=NumEtape)))); // et c'est l'arrivée
+                         cv.TourDeDeplacementVehicule(NumVV-1) and  // Et que c'est son tour de dÃ©placement... (multivitesse : version 1.5)
+                         ((NumVehicule=0) or  // alors... Soit y a pas de vÃ©hicule sur la case,
+                          ((NumEtape>0) and   // soit y en a une mais c'est une Ã©tape...
+                           (cv.Vehicules[NumVV-1].NumEtapeArrivee=NumEtape)))); // et c'est l'arrivÃ©e
      if NivPriorite[d]>0 then
       begin
        if cv.Vehicules[NumVV-1].NivPriorite=normal then
         begin
-         // 2. Sont-elles obligées de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+         // 2. Sont-elles obligÃ©es de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
          Inc(NivPriorite[d], Ord(((v.Priorites[invd]=stop) and (cv.Vehicules[NumVV-1].TourDrnDepl>cv.TourCrt-2)) or
                                  ((v.Priorites[invd]=feux) and (cv.Feux[v.NumFeu[invd]-1].Etat>vert))));
-         // 3. Doivent-elles céder le passage (clp ou stop marqué) ? Priorité 3
+         // 3. Doivent-elles cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
          Inc(NivPriorite[d], 2*Ord((v.Priorites[invd]=cedez_le_passage) or
                                    ((v.Priorites[invd]=stop) and (cv.TourCrt-cv.Vehicules[NumVV-1].TourDrnDepl>=2))));
-         // 4. Véhicules sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+         // 4. VÃ©hicules sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
          Inc(NivPriorite[d], 3*Ord((v.Priorites[invd]=a_droite) or
                                    ((v.Priorites[invd]=feux) and (cv.Feux[v.NumFeu[invd]-1].Etat<orange))));
         end{if normal}
-       else // 5. Véhicule prioritaire ? Urgence : Priorité 6 ; Police : Priorité 7
+       else // 5. VÃ©hicule prioritaire ? Urgence : PrioritÃ© 6 ; Police : PrioritÃ© 7
         Inc(NivPriorite[d], 5+Integer(cv.Vehicules[NumVV-1].NivPriorite));
       end{if Priorite};
      end{if NumVV>0}
-    else // 1bis. SOIT un Bus voisin arrivant sur la case ? Priorité 1. v3.0
+    else // 1bis. SOIT un Bus voisin arrivant sur la case ? PrioritÃ© 1. v3.0
      if (NumBV>0) and (NumVehicule=0) then
       begin
       NivPriorite[d]:=Ord((cv.Autobus[NumBV-1].Dir=InvDir[d]) and  // 1 Bus qui arrive sur la case...
-                          cv.TourDeDeplacementBus(NumBV-1) and  // Et que c'est son tour de déplacement... (multivitesse)
-                          (cv.TourCrt>=cv.Autobus[NumBV-1].TourDepartArretSvt) and // ET que c'est son tour de départ vers le prochain arrêt
+                          cv.TourDeDeplacementBus(NumBV-1) and  // Et que c'est son tour de dÃ©placement... (multivitesse)
+                          (cv.TourCrt>=cv.Autobus[NumBV-1].TourDepartArretSvt) and // ET que c'est son tour de dÃ©part vers le prochain arrÃªt
                           (NumBus=0));
       if NivPriorite[d]>0 then
        begin
-        // 2. Sont-elles obligées de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+        // 2. Sont-elles obligÃ©es de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
         Inc(NivPriorite[d], Ord(((v.Priorites[invd]=stop) and (cv.Autobus[NumBV-1].TourDrnDepl>cv.TourCrt-2)) or
                                 ((v.Priorites[invd]=feux) and (cv.Feux[v.NumFeu[invd]-1].Etat>vert))));
-        // 3. Doivent-elles céder le passage (clp ou stop marqué) ? Priorité 3
+        // 3. Doivent-elles cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
         Inc(NivPriorite[d], 2*Ord((v.Priorites[invd]=cedez_le_passage) or
                                   ((v.Priorites[invd]=stop) and (cv.TourCrt-cv.Autobus[NumBV-1].TourDrnDepl>=2))));
-        // 4. Véhicules sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+        // 4. VÃ©hicules sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
         Inc(NivPriorite[d], 3*Ord((v.Priorites[invd]=a_droite) or
                                   ((v.Priorites[invd]=feux) and (cv.Feux[v.NumFeu[invd]-1].Etat<orange))));
        end{if NivPriorite}
       end{if NumBV>0}
    end{for d};
 
-  // 5. Entre véhicules prioritaires (V.P.) :
-  //    V.P. tournant à droite ? Priorité 5
-  //    V.P. allant tout droit et pas de V.P. venant de droite ? Priorité 5
-  //    V.P. tournant à gauche et pas de V.P. venant de la droite ou de devant ? Priorité 5
+  // 5. Entre vÃ©hicules prioritaires (V.P.) :
+  //    V.P. tournant Ã  droite ? PrioritÃ© 5
+  //    V.P. allant tout droit et pas de V.P. venant de droite ? PrioritÃ© 5
+  //    V.P. tournant Ã  gauche et pas de V.P. venant de la droite ou de devant ? PrioritÃ© 5
   for d:=nord to ouest do
    begin
    if NivPriorite[d]=4 then
@@ -1926,15 +1926,15 @@ var invd, MaxNivP, NumVV, NumBV : Integer;
 procedure voie.DeplaceVehiculeOuBus; // v3.0 : tient compte des bus
  begin
   if (NumProchVeh>0) and cv.Vehicules[NumProchVeh-1].PeutPasser then
-   begin  // Si le prochain véhicule peut arriver sur la case...
-    cv.v[cv.Vehicules[NumProchVeh-1].x, cv.Vehicules[NumProchVeh-1].y].NumVehicule:=0; // Effacée de la case d'origine
+   begin  // Si le prochain vÃ©hicule peut arriver sur la case...
+    cv.v[cv.Vehicules[NumProchVeh-1].x, cv.Vehicules[NumProchVeh-1].y].NumVehicule:=0; // EffacÃ©e de la case d'origine
     frmSimulation.RedessineCase(cv.Vehicules[NumProchVeh-1].x, cv.Vehicules[NumProchVeh-1].y, false);
     if (NumEtape=0) or (NumEtape<>cv.Vehicules[NumProchVeh-1].NumEtapeArrivee) then
      begin
       cv.PlaceVehicule(x, y, NumProchVeh); // v2.2.7 : Inclut les stats d'Attente/Trafic
       NumVehicule:=NumProchVeh;
      end
-    else // Etape : NumVehicule est réservé pour les véhicules qui partent de l'étape uniquement
+    else // Etape : NumVehicule est rÃ©servÃ© pour les vÃ©hicules qui partent de l'Ã©tape uniquement
      begin
       Inc(cv.NbToursParcourus, ( cv.TourCrt-
                                  cv.Vehicules[NumProchVeh-1].TourDepart-
@@ -2050,7 +2050,7 @@ var i : Integer;
    Result:=false;
  end{voie.RetirePieton};
 //-----------------------------------------------------------------------------
-procedure voie.DeplacePietons; // v3.0 : Inclut l'attente aux arrêts de bus, la montée et la descente du bus
+procedure voie.DeplacePietons; // v3.0 : Inclut l'attente aux arrÃªts de bus, la montÃ©e et la descente du bus
 var DirTrv : Boolean;
     i, d, dd : Integer;
     p, pv : pPieton;
@@ -2058,57 +2058,57 @@ var DirTrv : Boolean;
  begin
   for i:=0 to NBMAXPIETONSPARCASE-1 do
    if (NumPieton[i]>0) and
-      (cv.Pietons[NumPieton[i]-1].NumBus=0) and // v3.0 : Ne doit pas être dans un bus
+      (cv.Pietons[NumPieton[i]-1].NumBus=0) and // v3.0 : Ne doit pas Ãªtre dans un bus
       (cv.Pietons[NumPieton[i]-1].TourDrnDepl<cv.TourCrt) then
     begin
      p:=@(cv.Pietons[NumPieton[i]-1]);
      NvDir:=indefinie;
      if p.ArretBusTrv and (cv.vxyd(x, y, p.Dir).NumArretBus>0) then // v3.0
-      begin // Si arrêt de bus trouvé ET qu'il arrive dessus ALORS on attend le bus (ça bloque le piéton)
+      begin // Si arrÃªt de bus trouvÃ© ET qu'il arrive dessus ALORS on attend le bus (Ã§a bloque le piÃ©ton)
        p.ArretBusTrv:=false;
        p.NumArretBus:=cv.vxyd(x, y, p.Dir).NumArretBus;
        p.AttendBus:=true;
        p.TourAttBus:=cv.TourCrt;
       end;
      if p.AttendBus and (p.TourAttBus+cv.NbMaxToursAttenteBus<cv.TourCrt) then // v3.0
-      begin // Si attente de bus tro longue (paramètre), il abandonne
+      begin // Si attente de bus tro longue (paramÃ¨tre), il abandonne
        p.ArretBusTrv:=false;
        p.NumArretBus:=0;
        p.AttendBus:=false;
        p.TourAttBus:=0;
       end;
-     if not p.AttendBus and // Le piéton n'attend pas de bus ET
-        not p.PsgPtTrv and // il ne se dirige NI vers un passage piétons
-        not p.ArretBusTrv then             // NI vers un arrêt de bus
-      begin // 1. Recherche de passages piétons
-       if (cv.ProbaDirPsgPt>0) and // SI Recherche de passage piétons il y a ET
-          (cv.CherchePassagePietons(x, y, sens(2-Integer(p.Dir) mod 2), NvDir)>indefinie) and // Passage piéton trouvé ET
-          (random(100)<cv.ProbaDirPsgPt) then // Probabilité d'y aller (paramètre) ALORS
-        begin // Il va vers le passage piéton trouvé
+     if not p.AttendBus and // Le piÃ©ton n'attend pas de bus ET
+        not p.PsgPtTrv and // il ne se dirige NI vers un passage piÃ©tons
+        not p.ArretBusTrv then             // NI vers un arrÃªt de bus
+      begin // 1. Recherche de passages piÃ©tons
+       if (cv.ProbaDirPsgPt>0) and // SI Recherche de passage piÃ©tons il y a ET
+          (cv.CherchePassagePietons(x, y, sens(2-Integer(p.Dir) mod 2), NvDir)>indefinie) and // Passage piÃ©ton trouvÃ© ET
+          (random(100)<cv.ProbaDirPsgPt) then // ProbabilitÃ© d'y aller (paramÃ¨tre) ALORS
+        begin // Il va vers le passage piÃ©ton trouvÃ©
         p.Dir:=NvDir;
-        p.PsgPtTrv:=true; // Indique qu'il est en train d'aller vers un passage piéton (inhibe les futures recherches)
+        p.PsgPtTrv:=true; // Indique qu'il est en train d'aller vers un passage piÃ©ton (inhibe les futures recherches)
         end
-       else // 2. v3.0 : Recherche d'arrêt de bus
-        if (cv.ProbaDirArretBus>0) and // SI recherche d'arrêt de bus il y a ET
-           (cv.ChercheArretBus(x, y, sens(2-Integer(p.Dir) mod 2), NvDir)>indefinie) and // Arrêt de bus trouvé ET
-           (random(100)<cv.ProbaDirArretBus) then // Probabilité d'y aller (paramètre) ALORS
-         begin // Il va vers le passage piéton trouvé
+       else // 2. v3.0 : Recherche d'arrÃªt de bus
+        if (cv.ProbaDirArretBus>0) and // SI recherche d'arrÃªt de bus il y a ET
+           (cv.ChercheArretBus(x, y, sens(2-Integer(p.Dir) mod 2), NvDir)>indefinie) and // ArrÃªt de bus trouvÃ© ET
+           (random(100)<cv.ProbaDirArretBus) then // ProbabilitÃ© d'y aller (paramÃ¨tre) ALORS
+         begin // Il va vers le passage piÃ©ton trouvÃ©
          p.Dir:=NvDir;
-         p.ArretBusTrv:=true; // Indique qu'il est en train d'aller vers un arrêt de bus (inhibe les futures recherches)
+         p.ArretBusTrv:=true; // Indique qu'il est en train d'aller vers un arrÃªt de bus (inhibe les futures recherches)
          end
       end{if not not not};
-     if (NvDir=indefinie) and not p.AttendBus then // La direction n'a pas changé et aucun bus attendu (il marche tranquillement)
-      begin  // Il se déplace
-       if p.DemiCase>0 then // Demi-case et même direction : il sort de la case
+     if (NvDir=indefinie) and not p.AttendBus then // La direction n'a pas changÃ© et aucun bus attendu (il marche tranquillement)
+      begin  // Il se dÃ©place
+       if p.DemiCase>0 then // Demi-case et mÃªme direction : il sort de la case
         if cv.vxyd(x,y,p.Dir).PietonPeutAller(p.Dir) then
          cv.DeplacePieton( NumPieton[i]-1,
                            (x+dx[p.Dir]) mod NBX,
                            (y+dy[p.Dir]) mod NBY,
                            p.Dir)
-        else // Peut pas sortir : on cherche une autre direction à gauche ou à droite (au sort)
+        else // Peut pas sortir : on cherche une autre direction Ã  gauche ou Ã  droite (au sort)
          begin
           if cv.TourCrt-cv.Pietons[NumPieton[i]-1].TourDrnDepl>1+cv.AttenteMaxVeh div 2 then
-           begin // S'il a assez attendu (Paramètre AttenteVéhicule/2)
+           begin // S'il a assez attendu (ParamÃ¨tre AttenteVÃ©hicule/2)
            DirTrv:=false;
            dd:=1-2*random(2);
            d:=2-dd;
@@ -2118,7 +2118,7 @@ var DirTrv : Boolean;
             DirTrv:=cv.vxyd(x,y,NvDir).PietonPeutAller(NvDir);
             if DirTrv then
              begin
-             p.AnnuleRechercheEnCours; // v3.0 : Toute recherche est annulée car la direction a changé
+             p.AnnuleRechercheEnCours; // v3.0 : Toute recherche est annulÃ©e car la direction a changÃ©
              cv.DeplacePieton( NumPieton[i]-1,
                                (x+dx[NvDir]) mod NBX,
                                (y+dy[NvDir]) mod NBY,
@@ -2133,14 +2133,14 @@ var DirTrv : Boolean;
          // 1. On regarde si on peut passer la demi-case not
          if NumPieton[1-i]>0 then
           begin
-           pv:=@(cv.Pietons[NumPieton[1-i]-1]); // pv comme piéton voisin
+           pv:=@(cv.Pietons[NumPieton[1-i]-1]); // pv comme piÃ©ton voisin
            if ((((pv.Dir=p.Dir) and
                  (pv.DemiCase>0)) or
                 ((pv.Dir=InvDir[p.Dir]) and
                  (pv.DemiCase=0))) and
                (cv.TourCrt-cv.Pietons[NumPieton[i]-1].TourDrnDepl>1+cv.AttenteMaxVeh div 2)) then
-            begin // On choisit une direction à gauche ou à droite (sûre) s'il a assez attendu
-            p.AnnuleRechercheEnCours; // v3.0 : Toute recherche est annulée car la direction a changé
+            begin // On choisit une direction Ã  gauche ou Ã  droite (sÃ»re) s'il a assez attendu
+            p.AnnuleRechercheEnCours; // v3.0 : Toute recherche est annulÃ©e car la direction a changÃ©
             p.Dir:=direction(1+(Integer(p.Dir)+1+2*random(2)) mod NBDIRS);
             end;
           end;
@@ -2223,8 +2223,8 @@ var d : direction;
     VoieCrt:=cv.vxyd(x,y,d);
     if ((Integer(VoieCrt.DirPoss) and
          Integer(InvPossDir[d]))=
-        Integer(InvPossDir[d])) and  // Si VoieCrt pointe sur l'étape ET
-       (VoieCrt.DistEtape[e, NumDirdp[InvDir[d], VoieCrt.DirPoss]]>Distance+1) then // Distance indéfinie
+        Integer(InvPossDir[d])) and  // Si VoieCrt pointe sur l'Ã©tape ET
+       (VoieCrt.DistEtape[e, NumDirdp[InvDir[d], VoieCrt.DirPoss]]>Distance+1) then // Distance indÃ©finie
      VoieCrt.CalculeDistanceEtape(e, Distance+1, InvDir[d]); // On lance le calcul de distance
    end;
  end;
@@ -2240,8 +2240,8 @@ var d : direction;
     VoieCrt:=cv.vxyd(x,y,d);
     if ((Integer(VoieCrt.DirPoss) and
          Integer(InvPossDir[d]))=
-        Integer(InvPossDir[d])) and  // Si VoieCrt pointe sur l'arrêt de bus ET
-       (VoieCrt.DistArretBus[ab, NumDirdp[InvDir[d], VoieCrt.DirPoss]]>Distance+1) then // Distance indéfinie
+        Integer(InvPossDir[d])) and  // Si VoieCrt pointe sur l'arrÃªt de bus ET
+       (VoieCrt.DistArretBus[ab, NumDirdp[InvDir[d], VoieCrt.DirPoss]]>Distance+1) then // Distance indÃ©finie
      VoieCrt.CalculeDistanceArretBus(ab, Distance+1, InvDir[d]); // On lance le calcul de distance
    end;
  end;
@@ -2315,9 +2315,9 @@ var i, xx, yy : Integer;
     d:=direction(i+1); // Permet de remplacer les direction(i+1)
     VerifiePriorite(stMsgErr, stSource+' ('+stDir[d]+')', Priorites[i]);
     if (NumFeu[i]>0) and (Priorites[i]<>feux) then
-     stMsgErr:=stMsgErr+stSource+Format(': numéro de feu %s mais priorité différente de Feu (%d)'#13#10'', [stDir[d], Integer(Priorites[i])]);
+     stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro de feu %s mais prioritÃ© diffÃ©rente de Feu (%d)'#13#10'', [stDir[d], Integer(Priorites[i])]);
     if (NumFeu[i]<0) or (NumFeu[i]>=cv.NbFeux) then
-     stMsgErr:=stMsgErr+stSource+Format(': numéro de feu %s incorrect (%d)'#13#10'', [stDir[d], NumFeu[i]])
+     stMsgErr:=stMsgErr+stSource+Format(': numÃ©ro de feu %s incorrect (%d)'#13#10'', [stDir[d], NumFeu[i]])
     else
      if NumFeu[i]>0 then
       begin
@@ -2325,7 +2325,7 @@ var i, xx, yy : Integer;
        xx:=cv.Feux[NumFeu[i]-1].x;
        yy:=cv.Feux[NumFeu[i]-1].y;
        if (x<>xx) or (y<>yy) then
-        stMsgErr:=stMsgErr+stSource+Format(': coordonnées du feu %s (%d,%d) différentes des coordonnées de la case'#13#10'', [stDir[d], xx, yy]);
+        stMsgErr:=stMsgErr+stSource+Format(': coordonnÃ©es du feu %s (%d,%d) diffÃ©rentes des coordonnÃ©es de la case'#13#10'', [stDir[d], xx, yy]);
       end;
    end;
  end;
@@ -2376,7 +2376,7 @@ var i, j : Integer;
   for i:=0 to NBMAXLIGNESBUS-1 do // v3.0
     LignesBus[i]:=ligne_bus.Create(i+1);
   DepotBus:=depot_bus.Create; // v3.0
-  // Tableaux avec nombre par défaut;
+  // Tableaux avec nombre par dÃ©faut;
   DefinitNbFeux(NBFEUXDEFAUT);
   DefinitNbEtapes(NBETAPESDEFAUT);
   DefinitNbVehicules(NBVEHICULESDEFAUT, DEFINIT_SEULEMENT); // v3.0.4. On n'alloue pas maintenant
@@ -2565,10 +2565,10 @@ var i : Integer;
     begin
      if i=0 then
       i:=Voie.NumArretBus;
-     if (Voie.NumArretBus=i) and // Si la case contiguë est un arrêt de bus ET
-        (Voie.v(direction(1+(Integer(d)+2) mod NBDIRS)).DirPoss=aucune) and // il y a un trottoir à sa gauche (en regardant vers l'arrière de l'arrêt de bus) ET
+     if (Voie.NumArretBus=i) and // Si la case contiguÃ« est un arrÃªt de bus ET
+        (Voie.v(direction(1+(Integer(d)+2) mod NBDIRS)).DirPoss=aucune) and // il y a un trottoir Ã  sa gauche (en regardant vers l'arriÃ¨re de l'arrÃªt de bus) ET
         (Integer(Voie.DirPoss) and Integer(InvPossDir[d])>0) then // Si d est dans le sens du bus ALORS
-      ArretsBus[i-1].Definit(x, y); // (x,y) devient la tête de l'arrêt de bus Voie.NumArret
+      ArretsBus[i-1].Definit(x, y); // (x,y) devient la tÃªte de l'arrÃªt de bus Voie.NumArret
     end{if};
    end{for};
   Result:=i; 
@@ -2579,9 +2579,9 @@ var i : Integer;
  begin
   i:=ArretBusExistant(x, y);
   if i>0 then
-   Result:=i // L'arrêt existe déjà (case contiguë qui communique : va ou vient)
+   Result:=i // L'arrÃªt existe dÃ©jÃ  (case contiguÃ« qui communique : va ou vient)
   else
-   begin // C'est un nouvel arrêt de bus
+   begin // C'est un nouvel arrÃªt de bus
    i:=0; while (i<NbArretsBus-1) and ArretsBus[i].Defini do Inc(i);
    Result:=(i+1)*Ord(i<NbArretsBus);
    end;
@@ -2595,7 +2595,7 @@ var i : Integer;
    begin
     Feux[i-1].Definit(x, y, d);
     v[x, y].NumFeu[Integer(d)-1]:=i;
-    // Définition des durées par défaut
+    // DÃ©finition des durÃ©es par dÃ©faut
     Feux[i-1].DureeVert:=DureeVert;
     Feux[i-1].DureeRouge:=DureeRouge;
    end;
@@ -2667,9 +2667,9 @@ var Existe : Boolean;
    begin
     Voie:=vxyd(x,y,d);
     if Voie.NumArretBus=i then
-     begin // On profite pour regarder si on change de tête d'arrêt de bus
+     begin // On profite pour regarder si on change de tÃªte d'arrÃªt de bus
       Existe:=true;
-      if v[x,y].EstTeteArretBus then // SI c'était une tête d'arrêt de bus ALORS
+      if v[x,y].EstTeteArretBus then // SI c'Ã©tait une tÃªte d'arrÃªt de bus ALORS
        Voie.DefinitArretBus(i); // sa voisine prend la place. v3.0.3
      end{if};
    end{for};
@@ -2678,28 +2678,28 @@ var Existe : Boolean;
 //-----------------------------------------------------------------------------
 procedure centre_ville.SupprimeArretBus(x, y : Integer); // v3.0
 var i : Integer;
- begin // Supprime l'arrêt de bus sur une case seulement
+ begin // Supprime l'arrÃªt de bus sur une case seulement
   i:=v[x,y].NumArretBus;
   if (i>0) and (i<=NbArretsBus) then
    begin
-    if not ExisteCaseArretBus(x, y) then // Si l'arrêt n'a pas d'autre case ALORS
-     ArretsBus[i-1].Initialise; // on supprime l'arrêt de bus
+    if not ExisteCaseArretBus(x, y) then // Si l'arrÃªt n'a pas d'autre case ALORS
+     ArretsBus[i-1].Initialise; // on supprime l'arrÃªt de bus
     v[x,y].NumArretBus:=0;
    end;
  end;
 //-----------------------------------------------------------------------------
 procedure centre_ville.SupprimeArretBus(n : Integer); // v3.0
- begin // Supprime COMPLETEMENT l'arrêt de bus (sur TOUTES les cases)
-  v[ArretsBus[n].x,ArretsBus[n].y].RetireArretBus; // Retire le n° d'arrêt de bus récursivement sur toutes les cases
+ begin // Supprime COMPLETEMENT l'arrÃªt de bus (sur TOUTES les cases)
+  v[ArretsBus[n].x,ArretsBus[n].y].RetireArretBus; // Retire le nÂ° d'arrÃªt de bus rÃ©cursivement sur toutes les cases
   ArretsBus[n].Initialise; 
  end;
 //-----------------------------------------------------------------------------
 function centre_ville.SensPassagePietonsPossible(x, y : Integer) : sens;
 var sns : sens;
  begin
-  // 1. Sens suivant DirPoss (Directions de l'intérieur vers l'extérieur)
+  // 1. Sens suivant DirPoss (Directions de l'intÃ©rieur vers l'extÃ©rieur)
   sns:=SensPsgPt[v[x, y].DirPoss];
-  // 2. Test des cases voisines (Directions de l'extérieur vers l'intérieur)
+  // 2. Test des cases voisines (Directions de l'extÃ©rieur vers l'intÃ©rieur)
   case sns of
     vertical:   if (((Integer(vxyd(x,y,nord).DirPoss) and Integer(S))>0) or
                     ((Integer(vxyd(x,y,sud).DirPoss) and Integer(N))>0)) then
@@ -2727,7 +2727,7 @@ var i, j : Integer;
   if (NbMaxCasesDetectPsgPt=0) or  // NbMaxCasesDetectPsgPt et
      (SensRecherche=indefini) then // SensRecherche
    begin
-   Result:=indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   Result:=indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
    NvDir:=Result;
    Exit;
    end;
@@ -2771,7 +2771,7 @@ var i, j : Integer;
   if (NbMaxCasesDetectArretBus=0) or  // NbMaxCasesDetectArretBus et
      (SensRecherche=indefini) then // SensRecherche
    begin
-   Result:=indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   Result:=indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
    NvDir:=Result;
    Exit;
    end;
@@ -2813,10 +2813,10 @@ var Ambiguite : Boolean;
  begin
   Ambiguite:=false;
   Dir:=indefinie;
-  for d:=nord to ouest do // On prend la dernière possibilité en cas de litige
-   if (Integer(v[x,y].DirPoss) and Integer(PossDir[d])=0) and // Si pas de déplacement possible vers d ET
+  for d:=nord to ouest do // On prend la derniÃ¨re possibilitÃ© en cas de litige
+   if (Integer(v[x,y].DirPoss) and Integer(PossDir[d])=0) and // Si pas de dÃ©placement possible vers d ET
       (vxyd(x,y,d).DirPoss=aucune) and // Mur vers d ET
-      (Integer(v[x,y].DirPoss) and Integer(PossDir[direction(1+(Integer(d)+2) mod NBDIRS)])>0) then // Direction possible à gauche (dans le sens de la circulation de la voie)
+      (Integer(v[x,y].DirPoss) and Integer(PossDir[direction(1+(Integer(d)+2) mod NBDIRS)])>0) then // Direction possible Ã  gauche (dans le sens de la circulation de la voie)
     begin
      Ambiguite:=(Dir>indefinie);
      Dir:=d;
@@ -2876,7 +2876,7 @@ var d, DirArretVoisin : direction;
  begin
  Possible:=false;
   if (v[x, y].DirPoss>aucune) and // C'est de la route ET
-     not ArretsBusVoisinsDifferents(x, y) then // pas 2 arrêts de bus différents voisins
+     not ArretsBusVoisinsDifferents(x, y) then // pas 2 arrÃªts de bus diffÃ©rents voisins
    begin
     DirArretVoisin:=DirArretBusVoisin(x, y);
     d:=nord;
@@ -2884,9 +2884,9 @@ var d, DirArretVoisin : direction;
      begin
      if (Integer(v[x, y].DirPoss) and Integer(PossDir[d])=0) and // Si pas de direction possible vers d ET
         (vxyd(x,y,d).DirPoss=aucune) then // il y a un mur ALORS
-      Possible:=((DirArretVoisin=indefinie) or // Soit 1 seul arrêt (d'un côté ou de l'autre) soit c'est le même n+ (ou nul les 2)
-                 (DirArretVoisin=direction(1+Integer(d) mod NBDIRS)) or // Il doit être dans
-                 (DirArretVoisin=direction(1+(Integer(d)+2) mod NBDIRS)) and // le même sens
+      Possible:=((DirArretVoisin=indefinie) or // Soit 1 seul arrÃªt (d'un cÃ´tÃ© ou de l'autre) soit c'est le mÃªme n+ (ou nul les 2)
+                 (DirArretVoisin=direction(1+Integer(d) mod NBDIRS)) or // Il doit Ãªtre dans
+                 (DirArretVoisin=direction(1+(Integer(d)+2) mod NBDIRS)) and // le mÃªme sens
                 ((Ord(vxyd(x,y,direction(1+(Integer(d)+1) mod NBDIRS)).NumArretBus>0)+
                   Ord(vxyd(x,y,direction(1+(Integer(d)+3) mod NBDIRS)).NumArretBus>0)=1) or
                  (vxyd(x,y,direction(1+(Integer(d)+1) mod NBDIRS)).NumArretBus=
@@ -2961,7 +2961,7 @@ var i, j, dp, ndp, DistArretBus, DistCrt, NumArretSvt : Integer;
      end{for j};
  end;
 //-----------------------------------------------------------------------------
-function centre_ville.VerifieCalculDistances : Boolean; // v3.0. Inclut les distances aux arrêts de bus
+function centre_ville.VerifieCalculDistances : Boolean; // v3.0. Inclut les distances aux arrÃªts de bus
 var Ok : Boolean;
     i, j, d, k, ndp : Integer;
  begin
@@ -3000,7 +3000,7 @@ var Ok : Boolean;
   Result:=Ok;
  end;
 //-----------------------------------------------------------------------------
-function centre_ville.PrepareCalculDistances : Boolean; // v3.0. Inclut les distances aux arrêts de bus
+function centre_ville.PrepareCalculDistances : Boolean; // v3.0. Inclut les distances aux arrÃªts de bus
 var Ok : Boolean;
     i, j : Integer;
  begin
@@ -3124,7 +3124,7 @@ var b : pBus;
   b:=@Autobus[NumBus-1];
   if b.Defini and (b.DirDrnDepl>indefinie) then
    begin
-    vxyd(b.x, b.y, InvDir[b.DirDrnDepl]).NumBus:=0; // Effacé de la case d'origine (arrière du bus)
+    vxyd(b.x, b.y, InvDir[b.DirDrnDepl]).NumBus:=0; // EffacÃ© de la case d'origine (arriÃ¨re du bus)
     vxyd(b.x, b.y, InvDir[b.DirDrnDepl]).RedessineCase(false);
    end;
   b.DirAvtDrnDepl:=b.DirDrnDepl;
@@ -3157,7 +3157,7 @@ procedure centre_ville.DefinitBus(NumBus, NumLigne : Integer); // v3.0
 //-----------------------------------------------------------------------------
 function centre_ville.PrepareBus; // v3.0
 var i, NbBusADefinir, NumLigneCrt : Integer;
- begin // On définit 1 bus de 1 à 3 arrêts, 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts.
+ begin // On dÃ©finit 1 bus de 1 Ã  3 arrÃªts, 2 bus de 4 Ã  6 arrÃªts et 3 bus de 7 Ã  9 arrÃªts.
  NbBusADefinir:=0; NumLigneCrt:=0;
   for i:=0 to NBMAXLIGNESBUS-1 do
    if LignesBus[i].NbArrets>0 then
@@ -3209,18 +3209,18 @@ procedure centre_ville.DeplacePieton(NumPieton, x, y : Integer; d : direction);
   Inc(Pietons[NumPieton].DemiCasesParcourues); // v3.0
   if Pietons[NumPieton].Dir<>d then Pietons[NumPieton].Dir:=d;
   Pietons[NumPieton].TourDrnDepl:=TourCrt;
-  if Pietons[NumPieton].PsgPtTrv and   // Si le piéton se dirige vers un passage piéton ET
-     v[x, y].PassagePietons then       // Si le passage piéton est trouvé ALORS
-   Pietons[NumPieton].PsgPtTrv:=false; // On réactive les recherches de passages piétons
+  if Pietons[NumPieton].PsgPtTrv and   // Si le piÃ©ton se dirige vers un passage piÃ©ton ET
+     v[x, y].PassagePietons then       // Si le passage piÃ©ton est trouvÃ© ALORS
+   Pietons[NumPieton].PsgPtTrv:=false; // On rÃ©active les recherches de passages piÃ©tons
   v[x, y].AjoutePieton(NumPieton);
   frmSimulation.RedessineCase(x, y, false);
  end;
 //-----------------------------------------------------------------------------
 function centre_ville.ChangeDirectionSiPossible(x, y : Integer; dp : dirposs) : Boolean; // ATTENTION : dp = N|E|S|O
  begin // On change si...
-  if ((v[x, y].NumEtape=0) and  // Pas d'étape sur la case
-      (((Integer(cv.v[x, y].DirPoss) and Integer(dp))=0) or  // Et pas de priorité (clp, stop ou feu)
-       (v[x, y].Priorites[Integer(Dirdp[0, dp])-1]=a_droite))) then // si on enlève une direction
+  if ((v[x, y].NumEtape=0) and  // Pas d'Ã©tape sur la case
+      (((Integer(cv.v[x, y].DirPoss) and Integer(dp))=0) or  // Et pas de prioritÃ© (clp, stop ou feu)
+       (v[x, y].Priorites[Integer(Dirdp[0, dp])-1]=a_droite))) then // si on enlÃ¨ve une direction
    begin
     v[x, y].DirPoss:=dirposs(Integer(v[x, y].DirPoss) xor Integer(dp));
     frmSimulation.RedessineCase(x, y, true);
@@ -3230,10 +3230,10 @@ function centre_ville.ChangeDirectionSiPossible(x, y : Integer; dp : dirposs) : 
    Result:=false;
  end;
 //-----------------------------------------------------------------------------
-procedure centre_ville.CalculeDistances; // v3.0 : Inclut celles des arrêts de bus
+procedure centre_ville.CalculeDistances; // v3.0 : Inclut celles des arrÃªts de bus
 var i : Integer;
  begin
-  frmSimulation.StatusBar.Panels.Items[0].Text:='Calcul des distances aux étapes...';
+  frmSimulation.StatusBar.Panels.Items[0].Text:='Calcul des distances aux Ã©tapes...';
   frmSimulation.StatusBar.Repaint;
   for i:=0 to NbEtapes-1 do
    begin
@@ -3242,7 +3242,7 @@ var i : Integer;
    if Etapes[i].Definie then
     v[Etapes[i].x, Etapes[i].y].CalculeDistanceEtape(i, 0, indefinie);
    end;
-  frmSimulation.StatusBar.Panels.Items[0].Text:='Calcul des arrêts de bus...';
+  frmSimulation.StatusBar.Panels.Items[0].Text:='Calcul des arrÃªts de bus...';
   frmSimulation.StatusBar.Repaint;
   for i:=0 to NbArretsBus-1 do
    begin
@@ -3258,18 +3258,18 @@ var i, j : Integer;
  begin
   TourEnCours:=true;
   NbVehiculesDeplaces:=0;
-  // 0. On déplace les piétons
+  // 0. On dÃ©place les piÃ©tons
   for i:=0 to NBX-1 do
    for j:=0 to NBY-1 do
     if v[i, j].NbPietons>0 then
      v[i, j].DeplacePietons;
 
-  // 1. On calcule les priorités de passage sur chaque case de la voie
+  // 1. On calcule les prioritÃ©s de passage sur chaque case de la voie
   for i:=0 to NBX-1 do
    for j:=0 to NBY-1 do
     v[i, j].CalculeProchainVehiculeOuBus;
 
-  // 2. On déplace les véhicules
+  // 2. On dÃ©place les vÃ©hicules
   for i:=0 to NBX-1 do
    for j:=0 to NBY-1 do
     v[i, j].DeplaceVehiculeOuBus;
@@ -3278,21 +3278,21 @@ var i, j : Integer;
   for i:=0 to NbFeux-1 do Feux[i].Evolue;
   for i:=0 to NbFeux-1 do Feux[i].ChangeEtat;
 
-  // 4. On sort les voitures des étapes sur la voie
+  // 4. On sort les voitures des Ã©tapes sur la voie
   for i:=0 to NbEtapes-1 do Etapes[i].PlaceProchainVehicule;
-  // 4bis. Ainsi que les bus du dépôt
+  // 4bis. Ainsi que les bus du dÃ©pÃ´t
   DepotBus.PlaceProchainBus;
 
-  // 5. On calcule la prochaine direction de chaque véhicule
+  // 5. On calcule la prochaine direction de chaque vÃ©hicule
   for i:=0 to NbVehicules-1 do
    if Vehicules[i].Defini then
-    Vehicules[i].CalculeProchaineDirection; // Vehicules[i].Dir défini
+    Vehicules[i].CalculeProchaineDirection; // Vehicules[i].Dir dÃ©fini
   // 5bis. Ainsi que celle des bus
   for i:=0 to NbBus-1 do
    if Autobus[i].Defini then
-    Autobus[i].CalculeProchaineDirection; // Bus[i].Dir défini
+    Autobus[i].CalculeProchaineDirection; // Bus[i].Dir dÃ©fini
 
-  // 6. On rafraîchit les véhicules (la direction a pu changer)
+  // 6. On rafraÃ®chit les vÃ©hicules (la direction a pu changer)
   for i:=0 to 2*NbEtapes-1 do
    if Vehicules[i*(NbVehicules div NbEtapes div 2)].Defini then
     frmSimulation.RedessineCase( Vehicules[i*(NbVehicules div NbEtapes div 2)].x,
@@ -3333,11 +3333,11 @@ begin
   NbPietons:=-1;
   Ok:=(FileRead(hfile, NvNbFeux, sizeof(NvNbFeux))>0);
   if NvNbFeux>=VERSIONMIN then // v3.0
-   begin // Version stockée
+   begin // Version stockÃ©e
     VersionFichier:=NvNbFeux;
     Ok:=(FileRead(hfile, NvNbFeux, sizeof(NvNbFeux))>0); // On relit le nombre de feux
    end
-  else // Version non stockée compatible (2.0 <<= Version < 3.0)
+  else // Version non stockÃ©e compatible (2.0 <<= Version < 3.0)
    VersionFichier:=VERSIONANC;
   if Ok then
    Ok:=(FileRead(hfile, NvNbEtapes, sizeof(NvNbEtapes))>0) and
@@ -3380,7 +3380,7 @@ begin
      Inc(i);
     end;
   if VersionFichier>=$300 then // v3.0
-   begin // Dépot, Arrêts & Lignes de bus
+   begin // DÃ©pot, ArrÃªts & Lignes de bus
    Ok:=DepotBus.Charge(hfile);
    if Ok then Ok:=(DefinitNbArretsBus(NvNbArretsBus)=NbArretsbus);
    i:=0; while Ok and (i<NbArretsBus) do
@@ -3487,25 +3487,25 @@ var i, j : Integer;
   if NbFeux<0 then
    stMsgErr:=stMsgErr+Format('Le nombre de feux est incorrect (%d)'#13#10'', [NbFeux]);
   if NbEtapes<2 then
-   stMsgErr:=stMsgErr+Format('Le nombre d''étapes est incorrect (%d)'#13#10'', [NbEtapes]);
+   stMsgErr:=stMsgErr+Format('Le nombre d''Ã©tapes est incorrect (%d)'#13#10'', [NbEtapes]);
   if NbVehicules<=0 then
-   stMsgErr:=stMsgErr+Format('Le nombre de véhicules est incorrect (%d)'#13#10'', [NbVehicules])
+   stMsgErr:=stMsgErr+Format('Le nombre de vÃ©hicules est incorrect (%d)'#13#10'', [NbVehicules])
   else
    if (NbVehicules<NBMAXVEHICULES) and
       ((NbEtapes=0) or
        (NbEtapes=1) or
        (NbVehicules mod (NbEtapes*(NbEtapes-1))>0)) then
-    stMsgErr:=stMsgErr+Format('Le nombre de véhicules ne permet pas une simulation équilibrée (%d)'#13#10'', [NbVehicules]);
+    stMsgErr:=stMsgErr+Format('Le nombre de vÃ©hicules ne permet pas une simulation Ã©quilibrÃ©e (%d)'#13#10'', [NbVehicules]);
   if NbPietons<0 then
-   stMsgErr:=stMsgErr+Format('Le nombre de piétons est incorrect (%d)'#13#10'', [NbPietons]);
+   stMsgErr:=stMsgErr+Format('Le nombre de piÃ©tons est incorrect (%d)'#13#10'', [NbPietons]);
   if DureeVert<0 then
-   stMsgErr:=stMsgErr+Format('La durée du feu vert par défaut est incorrecte (%d)'#13#10'', [DureeOrange]);
+   stMsgErr:=stMsgErr+Format('La durÃ©e du feu vert par dÃ©faut est incorrecte (%d)'#13#10'', [DureeOrange]);
   if DureeOrange<0 then
-   stMsgErr:=stMsgErr+Format('La durée du feu orange est incorrecte (%d)'#13#10'', [DureeOrange]);
+   stMsgErr:=stMsgErr+Format('La durÃ©e du feu orange est incorrecte (%d)'#13#10'', [DureeOrange]);
   if DureeRouge<0 then
-   stMsgErr:=stMsgErr+Format('La durée du feu rouge par défaut est incorrecte (%d)'#13#10'', [DureeOrange]);
+   stMsgErr:=stMsgErr+Format('La durÃ©e du feu rouge par dÃ©faut est incorrecte (%d)'#13#10'', [DureeOrange]);
   if AttenteMaxVeh<0 then
-   stMsgErr:=stMsgErr+'La durée d''attente maximale d''un véhicule est incorrecte'#13#10'';
+   stMsgErr:=stMsgErr+'La durÃ©e d''attente maximale d''un vÃ©hicule est incorrecte'#13#10'';
   if NbToursParSeconde<0 then
    stMsgErr:=stMsgErr+'Le nombre de tours par seconde est incorrect'#13#10'';
   if NbToursStats<0 then
@@ -3515,15 +3515,15 @@ var i, j : Integer;
   if (NbVitesses<1) or (NbVitesses>3) then
    stMsgErr:=stMsgErr+Format('Le nombre de vitesses est incorrecte (%d)'#13#10'', [NbVitesses]);
   if (NbMaxCasesDetectPsgPt<0) or (NbMaxCasesDetectPsgPt>5) then
-   stMsgErr:=stMsgErr+Format('Le nombre de case maximum pour la détection de passage piétons est incorrect (%d)'#13#10'', [NbMaxCasesDetectPsgPt]);
+   stMsgErr:=stMsgErr+Format('Le nombre de case maximum pour la dÃ©tection de passage piÃ©tons est incorrect (%d)'#13#10'', [NbMaxCasesDetectPsgPt]);
   if (ProbaDirPsgPt<0) or (ProbaDirPsgPt>100) then
-   stMsgErr:=stMsgErr+Format('La probabilité qu''un piéton se dirige vers un passage piétons détecté est incorrecte (%d)'#13#10'', [ProbaDirPsgPt]);
+   stMsgErr:=stMsgErr+Format('La probabilitÃ© qu''un piÃ©ton se dirige vers un passage piÃ©tons dÃ©tectÃ© est incorrecte (%d)'#13#10'', [ProbaDirPsgPt]);
 
   for i:=0 to NBX-1 do
    for j:=0 to NBY-1 do
     v[i, j].Verifie(stMsgErr);
    for i:=0 to NbFeux-1 do
-    Feux[i].Verifie(stMsgErr, Format('Feu n°%d', [i+1]));
+    Feux[i].Verifie(stMsgErr, Format('Feu nÂ°%d', [i+1]));
    for i:=0 to NbEtapes-1 do
     Etapes[i].Verifie(stMsgErr);
    for i:=0 to NbVehicules-1 do

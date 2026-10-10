@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -92,8 +92,8 @@ type
   public
     x, y,
     NbFeuxDmd, // Nbre de feux demandant le rouge
-    NbFeuxAtt : Integer;// Nbre de feux devant être rouge pour que Numero passe au vert
-    NumFeuxAtt, // Liste des feux devant être rouge pour que Numero passe au vert
+    NbFeuxAtt : Integer;// Nbre de feux devant Ãªtre rouge pour que Numero passe au vert
+    NumFeuxAtt, // Liste des feux devant Ãªtre rouge pour que Numero passe au vert
     NumFeuxDmd : array of Integer; // Liste des feux demandant le rouge
     DirFeu : direction;
     procedure ControleDemandeEtPassage;
@@ -150,7 +150,7 @@ var i : Integer;
    Numero:=cv.AjouteFeu(x, y, DirFeu);
    if Numero=0 then
     begin
-     Application.MessageBox('Vous ne pouvez plus ajouter de feu :'#13#10'vous avez déjà atteint le nombre maximum. Augmentez le nombre de feux dans les paramètres.', 'Modifications impossibles', [smbOk], smsWarning);
+     Application.MessageBox('Vous ne pouvez plus ajouter de feu :'#13#10'vous avez dÃ©jÃ  atteint le nombre maximum. Augmentez le nombre de feux dans les paramÃ¨tres.', 'Modifications impossibles', [smbOk], smsWarning);
      Result:=false;
      Exit;
     end
@@ -180,7 +180,7 @@ var i : Integer;
   for i:=0 to NbFeuxDmd-1 do
    begin
    NumFeuxDmd[i]:=f.NumFeuxDmd[i];
-   stSitFeux:=stSitFeux+Format('n°%d(%d,%d) ', [ NumFeuxDmd[i],
+   stSitFeux:=stSitFeux+Format('nÂ°%d(%d,%d) ', [ NumFeuxDmd[i],
                                                cv.Feux[NumFeuxDmd[i]-1].x,
                                                cv.Feux[NumFeuxDmd[i]-1].y]);
    end;
@@ -188,7 +188,7 @@ var i : Integer;
   for i:=0 to NbFeuxAtt-1 do
    begin
    NumFeuxAtt[i]:=f.NumFeuxAtt[i];
-   stSitFeux:=stSitFeux+Format('n°%d(%d,%d) ', [ NumFeuxAtt[i],
+   stSitFeux:=stSitFeux+Format('nÂ°%d(%d,%d) ', [ NumFeuxAtt[i],
                                                cv.Feux[NumFeuxAtt[i]-1].x,
                                                cv.Feux[NumFeuxAtt[i]-1].y]);
    end;

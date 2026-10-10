@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 class TfrmParamBus : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TGroupBox *GroupBox1;
     TLabel *LabelNbArretsBus;
     TLabel *Label3;
@@ -210,12 +210,12 @@ __published:	// Composants gérés par l'EDI
     void __fastcall CheckBoxToutClick(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     int NbArretsBus;
     bool InitialisationEnCours;
     void RafraichitNbBus();
     bool AppliqueChoix();
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     int NumArretBusAMontrer;
     __fastcall TfrmParamBus(TComponent* Owner);
 };

@@ -21,7 +21,7 @@ const AnsiString asDebutTitreCadreTaxi="                           ",
                  asFrmCoordonnees="%2.2d, %2.2d",
                  asFrmPourcentage="%.3f%%",
                  asFrmVitesse="%d/%d",
-                 asSituation[NBSITUATIONSTAXI]={"En attente","Départ d'une course","Dépôt de client(s)","Retour d'une course"};
+                 asSituation[NBSITUATIONSTAXI]={"En attente","DÃ©part d'une course","DÃ©pÃ´t de client(s)","Retour d'une course"};
 //---------------------------------------------------------------------------
 __fastcall TfrmInfosTaxi::TfrmInfosTaxi(TComponent* Owner)
     : TForm(Owner)

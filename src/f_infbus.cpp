@@ -97,7 +97,7 @@ void TfrmInfosBus::RafraichitInfos()
       DrnArret=&(cv->v[cv->ArretBus[NumDrnArret-1].x][cv->ArretBus[NumDrnArret-1].y]);
      }
     else
-     { // Si pas encore d'arrêt... On prend le dépôt comme dernier arrêt
+     { // Si pas encore d'arrÃªt... On prend le dÃ©pÃ´t comme dernier arrÃªt
       LabelDernierArret->Caption=Format( asFrmNumeroCoordonnees[DRN],
                                          ARRAYOFCONST(( 0,
                                                         cv->DepotBus.x,
@@ -157,7 +157,7 @@ void __fastcall TfrmInfosBus::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmInfosBus::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

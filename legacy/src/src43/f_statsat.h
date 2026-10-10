@@ -45,7 +45,7 @@
 //---------------------------------------------------------------------------
 class TfrmStatsAttenteTrafic : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TRadioGroup *RadioGroupType;
     TLabel *Label1;
     TLabel *Label2;
@@ -102,11 +102,11 @@ __published:	// Composants gérés par l'EDI
 
     void __fastcall RubriqueClick(TObject *Sender);
   void __fastcall FormResize(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     int m[2];
     void RecalculeEtVisualise();
 
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmStatsAttenteTrafic(TComponent* Owner);
     TColor CouleurCase(int x, int y);
     AnsiString asMsgDetailCase(int x, int y);

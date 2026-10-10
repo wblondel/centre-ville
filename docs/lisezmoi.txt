@@ -6,910 +6,910 @@ CENTRE-VILLE : LISEZ-MOI
 
 Centre-Ville est sous Licence GPL v2.0.
 Le texte de licence se trouve dans le fichier LICENSE.TXT, une traduction 
-non-officielle en français se trouve dans le fichier LICENCE.TXT.
+non-officielle en franÃ§ais se trouve dans le fichier LICENCE.TXT.
 
 --------------------------------------------------------------------------------
-2. DÉSINSTALLATION D'UNE VERSION PRÉCÉDENTE
+2. DÃ‰SINSTALLATION D'UNE VERSION PRÃ‰CÃ‰DENTE
 --------------------------------------------------------------------------------
 
-SI VOUS AVEZ INSTALLÉ UNE VERSION PRÉCÉDENTE DE CENTRE-VILLE, IL EST FORTEMENT
-CONSEILLÉ DE LA DÉSINSTALLER AVANT D'INSTALLER CETTE VERSION.
+SI VOUS AVEZ INSTALLÃ‰ UNE VERSION PRÃ‰CÃ‰DENTE DE CENTRE-VILLE, IL EST FORTEMENT
+CONSEILLÃ‰ DE LA DÃ‰SINSTALLER AVANT D'INSTALLER CETTE VERSION.
 
-Attention : les fichiers CRÉÉS NE SERONT PAS SUPPRIMÉS. Seuls les fichiers 
-installés (même modifiés) sont supprimés. Donc, si vous avez modifié les
-exemples fournis Géant.cvw, Carfours.cvw ou Démo.cvw, il faut les sauvegarder
+Attention : les fichiers CRÃ‰Ã‰S NE SERONT PAS SUPPRIMÃ‰S. Seuls les fichiers 
+installÃ©s (mÃªme modifiÃ©s) sont supprimÃ©s. Donc, si vous avez modifiÃ© les
+exemples fournis GÃ©ant.cvw, Carfours.cvw ou DÃ©mo.cvw, il faut les sauvegarder
 avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 
 ------------------------------------------------------------------------------
-3. SI VOUS AVEZ DES FICHIERS CRÉÉS AVEC UNE VERSION ANTÉRIEURE DE CENTRE-VILLE
+3. SI VOUS AVEZ DES FICHIERS CRÃ‰Ã‰S AVEC UNE VERSION ANTÃ‰RIEURE DE CENTRE-VILLE
 ------------------------------------------------------------------------------
 
- - À PARTIR DE LA VERSION 3.0, IL N'EST PLUS POSSIBLE D'OUVRIR DES FICHIERS 
-   DE SIMULATION CRÉÉS AVEC UNE VERSION ANTÉRIEURE À LA VERSION 2.0 (EXCLUE).
- - DANS LES AUTRES CAS, LA MISE À NIVEAU DES FICHIERS SE FAIT AUTOMATIQUEMENT
+ - Ã€ PARTIR DE LA VERSION 3.0, IL N'EST PLUS POSSIBLE D'OUVRIR DES FICHIERS 
+   DE SIMULATION CRÃ‰Ã‰S AVEC UNE VERSION ANTÃ‰RIEURE Ã€ LA VERSION 2.0 (EXCLUE).
+ - DANS LES AUTRES CAS, LA MISE Ã€ NIVEAU DES FICHIERS SE FAIT AUTOMATIQUEMENT
    AU CHARGEMENT AVEC TOUTE NOUVELLE VERSION.
 
 ------------------------------------------------------------------------------
-4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
+4. MODIFICATIONS APPORTÃ‰ES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
 [Version 5.4.3] 
- - Icônes en haute résolution.
- - Aide en ligne mise à jour (icône associée aux parties sauvegardées).
+ - IcÃ´nes en haute rÃ©solution.
+ - Aide en ligne mise Ã  jour (icÃ´ne associÃ©e aux parties sauvegardÃ©es).
  
 [Version 5.4.2] 
- - La notion de rang d'infection a été revu : Si un piéton qui a eu plusieurs
-   infections infecte un autre piéton, ce dernier prend son dernier rang qui
-   est incrémenté de 1 (au lieu du premier rang).
- - Ajout du paramètre "Réinfections possibles après guérison".
- - La case à cocher "Activer l'épidémie" dans les paramètres n'est plus 
-   modifiable et a été renommée "Epidémie activée". Le bouton et la rubrique
-   "Simulation | Epidémie"... deviennent des interrupteurs : ils activent ou 
-   désactivent l'épidémie. Si l'épidémie est activée, la boîte de dialogue
-   des paramètres s'affiche. Si une simulation est en cours ou en pause, il
-   n'est plus possible de voir les paramètres de l'épidémie, qu'elle soit
-   activée ou non.
- - Aide en ligne mise à jour : paramètres de l'épidémie.
+ - La notion de rang d'infection a Ã©tÃ© revu : Si un piÃ©ton qui a eu plusieurs
+   infections infecte un autre piÃ©ton, ce dernier prend son dernier rang qui
+   est incrÃ©mentÃ© de 1 (au lieu du premier rang).
+ - Ajout du paramÃ¨tre "RÃ©infections possibles aprÃ¨s guÃ©rison".
+ - La case Ã  cocher "Activer l'Ã©pidÃ©mie" dans les paramÃ¨tres n'est plus 
+   modifiable et a Ã©tÃ© renommÃ©e "EpidÃ©mie activÃ©e". Le bouton et la rubrique
+   "Simulation | EpidÃ©mie"... deviennent des interrupteurs : ils activent ou 
+   dÃ©sactivent l'Ã©pidÃ©mie. Si l'Ã©pidÃ©mie est activÃ©e, la boÃ®te de dialogue
+   des paramÃ¨tres s'affiche. Si une simulation est en cours ou en pause, il
+   n'est plus possible de voir les paramÃ¨tres de l'Ã©pidÃ©mie, qu'elle soit
+   activÃ©e ou non.
+ - Aide en ligne mise Ã  jour : paramÃ¨tres de l'Ã©pidÃ©mie.
 
 [Version 5.4.1] 
-Edition spéciale Coronavirus
- - Ajout du paramétrage d'une épidémie (actions Simulation + Affichage).
- - Si l'affichage épidémique est activé, le graphe d'évolution montre la 
-   progression de l'épidémie sinon elle montre la progression des véhicules.
- - Les données épidémiques ont été rajoutées dans les informations du piéton.
+Edition spÃ©ciale Coronavirus
+ - Ajout du paramÃ©trage d'une Ã©pidÃ©mie (actions Simulation + Affichage).
+ - Si l'affichage Ã©pidÃ©mique est activÃ©, le graphe d'Ã©volution montre la 
+   progression de l'Ã©pidÃ©mie sinon elle montre la progression des vÃ©hicules.
+ - Les donnÃ©es Ã©pidÃ©miques ont Ã©tÃ© rajoutÃ©es dans les informations du piÃ©ton.
 Autres 
- - Ajout dans l'À propos du facteur multiplicateur HDPI par rapport à la 
-   résolution normale de 96dpi.
- - Dans les affichages de propriétés d'élément les nombres à virgule n'étaient
-   pas affichés.`
- - Les coordonnées du tram, taxi ou vehlib n'étaient pas affichées dans les 
-   informations de suivi de piéton quand celui-ci était dans un de ces trois
+ - Ajout dans l'Ã€ propos du facteur multiplicateur HDPI par rapport Ã  la 
+   rÃ©solution normale de 96dpi.
+ - Dans les affichages de propriÃ©tÃ©s d'Ã©lÃ©ment les nombres Ã  virgule n'Ã©taient
+   pas affichÃ©s.`
+ - Les coordonnÃ©es du tram, taxi ou vehlib n'Ã©taient pas affichÃ©es dans les 
+   informations de suivi de piÃ©ton quand celui-ci Ã©tait dans un de ces trois
    modes de transport.
- - Le tram, taxi ou vehlib n'étaient pas montrés dans la recherche sur un 
-   piéton quand celui-ci était dans un de ces trois modes de transport.
- - Les priorités de voies de tram apparaissent en fond ciel dans la boîte de
-   dialogue des priorités de voie. Le fond a été mis dans la couleur des voies
+ - Le tram, taxi ou vehlib n'Ã©taient pas montrÃ©s dans la recherche sur un 
+   piÃ©ton quand celui-ci Ã©tait dans un de ces trois modes de transport.
+ - Les prioritÃ©s de voies de tram apparaissent en fond ciel dans la boÃ®te de
+   dialogue des prioritÃ©s de voie. Le fond a Ã©tÃ© mis dans la couleur des voies
    normales de circulation (Sarcelle). 
- - La case à cocher "Avec couloir de bus" des statistiques de distance était
-   mal affichée.
- - Les chiffres des statistiques de véhicules parkings à parkings étaient 
-   tronqués à l'affichage.
- - Toutes les images de l'aide en ligne ont été refaites en PNG.
- - Le détail vehlib ne suivait pas le changement de numéro dans la recherche.
- - Les numéros des éléments affichés dans les boîtes de dialogue "Détail"
-   étaient tronqués.
+ - La case Ã  cocher "Avec couloir de bus" des statistiques de distance Ã©tait
+   mal affichÃ©e.
+ - Les chiffres des statistiques de vÃ©hicules parkings Ã  parkings Ã©taient 
+   tronquÃ©s Ã  l'affichage.
+ - Toutes les images de l'aide en ligne ont Ã©tÃ© refaites en PNG.
+ - Le dÃ©tail vehlib ne suivait pas le changement de numÃ©ro dans la recherche.
+ - Les numÃ©ros des Ã©lÃ©ments affichÃ©s dans les boÃ®tes de dialogue "DÃ©tail"
+   Ã©taient tronquÃ©s.
 ------------------------------------------------------------------------------
 [Version 5.4] Versions 32 et 64 bits
- - À partir de Windows 7, les fichiers de simulation (*.cvw) sont stockés dans
-   %LocalAppData%\Patquoi.fr\Centre-Ville sur Windows 7 ou ultérieur ou sur
+ - Ã€ partir de Windows 7, les fichiers de simulation (*.cvw) sont stockÃ©s dans
+   %LocalAppData%\Patquoi.fr\Centre-Ville sur Windows 7 ou ultÃ©rieur ou sur
    %UserProfile%\Local Settings\Application Data\Patquoi.fr\Centre-Ville sur
    Windows XP.
- - La gestion du HDPI est supportée (résolution > 96 dpi).
- - La fonction zoom est désormais activée par défaut et donc supprimée ! 
+ - La gestion du HDPI est supportÃ©e (rÃ©solution > 96 dpi).
+ - La fonction zoom est dÃ©sormais activÃ©e par dÃ©faut et donc supprimÃ©e ! 
  - Le menu principal n'est plus dans la barre de boutons mais au-dessus de 
-   manière classique.
- - Les barres d'outils ne sont ni détachables, ni déplaçable suite à des 
-   problèmes de comportement en haute résolution (HDPI).
- - Aide et tutoriel html mis à jour. 
+   maniÃ¨re classique.
+ - Les barres d'outils ne sont ni dÃ©tachables, ni dÃ©plaÃ§able suite Ã  des 
+   problÃ¨mes de comportement en haute rÃ©solution (HDPI).
+ - Aide et tutoriel html mis Ã  jour. 
 ------------------------------------------------------------------------------
 [Version 5.3]
- - Ajout des vehlibs (véhicule en libre service) avec ses places réservées.
+ - Ajout des vehlibs (vÃ©hicule en libre service) avec ses places rÃ©servÃ©es.
  - Aide contextuelle en format HTML au lieu du format HLP (Windows 9x/XP).
-   # Les vehlibs sont en gris et seuls les vehlibs sont gris (couleur réservée).
-   # Les vehlib vont d'une place vehlib à une autre reconnaissables à une prise
-     électrique jaune.
-   # Quand un piéton prend un vehlib, la place cible réservée passe en bleu.
-   # Comme pour les autres éléments de la simulation, il y a un paramétrage, 
-     un détail et un suivi des vehlibs.
+   # Les vehlibs sont en gris et seuls les vehlibs sont gris (couleur rÃ©servÃ©e).
+   # Les vehlib vont d'une place vehlib Ã  une autre reconnaissables Ã  une prise
+     Ã©lectrique jaune.
+   # Quand un piÃ©ton prend un vehlib, la place cible rÃ©servÃ©e passe en bleu.
+   # Comme pour les autres Ã©lÃ©ments de la simulation, il y a un paramÃ©trage, 
+     un dÃ©tail et un suivi des vehlibs.
 Corrections mineures : 
- - Les voies de tram pouvaient disparaître à l'usage des boutons de navigation
-   dans le paramétrage du réseau de trams (problème d'affichage uniquement).
- - Décocher la case (T) ou une case de ligne de bus/tram dans les paramètres 
-   du réseau de bus/trams ne minimise plus la boîte de dialogue.
- - Les images de boutons suivants ont été revus pour qu'ils puissent être
+ - Les voies de tram pouvaient disparaÃ®tre Ã  l'usage des boutons de navigation
+   dans le paramÃ©trage du rÃ©seau de trams (problÃ¨me d'affichage uniquement).
+ - DÃ©cocher la case (T) ou une case de ligne de bus/tram dans les paramÃ¨tres 
+   du rÃ©seau de bus/trams ne minimise plus la boÃ®te de dialogue.
+ - Les images de boutons suivants ont Ã©tÃ© revus pour qu'ils puissent Ãªtre
    mieux visibles sur un fond clair de barre d'outils : Passage bus, passage
-   piéton, places de parking, places de taxi et arrêts de bus/tram.
- - Quand le curseur est sur une place, est indiqué dans la barre de statut
-   le n° de la file correspondante (park/taxi/vehlib).
- - La fenêtre principale est ajustée également quand active le zoom (x2) comme
-   quand on revient à la taille x1.
+   piÃ©ton, places de parking, places de taxi et arrÃªts de bus/tram.
+ - Quand le curseur est sur une place, est indiquÃ© dans la barre de statut
+   le nÂ° de la file correspondante (park/taxi/vehlib).
+ - La fenÃªtre principale est ajustÃ©e Ã©galement quand active le zoom (x2) comme
+   quand on revient Ã  la taille x1.
 ------------------------------------------------------------------------------
 [Version 5.2.4]
- - Les feux de tram ont été différenciés des feux de circulation (barres à la
+ - Les feux de tram ont Ã©tÃ© diffÃ©renciÃ©s des feux de circulation (barres Ã  la
    place de couleurs).
 ------------------------------------------------------------------------------
 [Version 5.2.3]
- - Des véhicules pouvaient ne pas trouver leur file de parking destination.
- - Les taxis et bus pouvaient tourner même quand c'était interdit (obligation 
+ - Des vÃ©hicules pouvaient ne pas trouver leur file de parking destination.
+ - Les taxis et bus pouvaient tourner mÃªme quand c'Ã©tait interdit (obligation 
    d'aller tout droit).
  - un nouvel exemple est fourni avec l'archive d'installation : Colimasson
-   avec une résolution 1024x768.
- - L'information de licence GPL est affichée si l'on clique sur la fenêtre 
-   "À propos" (hors liens web+mail).
+   avec une rÃ©solution 1024x768.
+ - L'information de licence GPL est affichÃ©e si l'on clique sur la fenÃªtre 
+   "Ã€ propos" (hors liens web+mail).
  - L'association des fichiers d'extension .cvw (Simulation Centre-Ville) est 
-   réalisée au lancement de Centre-Ville mais également par le programme
+   rÃ©alisÃ©e au lancement de Centre-Ville mais Ã©galement par le programme
    d'installation (inscvw95.exe et inscvw95'.exe).
 ------------------------------------------------------------------------------
 [Version 5.2.2]
- - Dans la vérification du réseau, on vérifie les voies de tram afin qu'il n'y
+ - Dans la vÃ©rification du rÃ©seau, on vÃ©rifie les voies de tram afin qu'il n'y
    ait pas de culs de sac.
 ------------------------------------------------------------------------------
 [Version 5.2.1]
- - Bulle d'aide (fonction et raccourci) pour la commande/bouton Rafraîchir.
- - Tutoriel enrichi de la mise en place de feux de piétons.
- - Lorsque vous appuyez sur OK ou Appliquer sur la boîte de dfinition d'un 
-   feu de piétons, un assistant permet de définir automatiquement l'état des
-   feux de piétons par rapport aux feux de circulation liés et vice versa dans
-   le cas où ils sont indéfinis ou mal définis.
- - Les sources ont été zippées (installation avec sources).
+ - Bulle d'aide (fonction et raccourci) pour la commande/bouton RafraÃ®chir.
+ - Tutoriel enrichi de la mise en place de feux de piÃ©tons.
+ - Lorsque vous appuyez sur OK ou Appliquer sur la boÃ®te de dfinition d'un 
+   feu de piÃ©tons, un assistant permet de dÃ©finir automatiquement l'Ã©tat des
+   feux de piÃ©tons par rapport aux feux de circulation liÃ©s et vice versa dans
+   le cas oÃ¹ ils sont indÃ©finis ou mal dÃ©finis.
+ - Les sources ont Ã©tÃ© zippÃ©es (installation avec sources).
 ------------------------------------------------------------------------------
 [Version 5.2] 
- Ajout de l'élément "feu de piéton" dans la simulation :
- - Nouveau bouton Priorités piétons exclusif par rapport aux priorités voies
-   selon la présence de voies sur la case courante.
- - La liaison des feux de piétons avec les feux de circulation ne se fait qu'à
-   partir des feux de piéton.
- - Mise à jour de l'aide CVW.HLP (deux nouvelles fiches).
+ Ajout de l'Ã©lÃ©ment "feu de piÃ©ton" dans la simulation :
+ - Nouveau bouton PrioritÃ©s piÃ©tons exclusif par rapport aux prioritÃ©s voies
+   selon la prÃ©sence de voies sur la case courante.
+ - La liaison des feux de piÃ©tons avec les feux de circulation ne se fait qu'Ã 
+   partir des feux de piÃ©ton.
+ - Mise Ã  jour de l'aide CVW.HLP (deux nouvelles fiches).
  Divers :
- - Les boîtes de dialogue de priorité et de définition de feu ont leur bouton
-   Appliquer grisé lorsque les coordonnées de la case sélectionnée change.
-   En effet, les modifications éventuelles sont perdues et donc le bouton
+ - Les boÃ®tes de dialogue de prioritÃ© et de dÃ©finition de feu ont leur bouton
+   Appliquer grisÃ© lorsque les coordonnÃ©es de la case sÃ©lectionnÃ©e change.
+   En effet, les modifications Ã©ventuelles sont perdues et donc le bouton
    Appliquer est alors inutile.
- - Lorsqu'un feu était paramétré et les feux liés étaient sélectionnés, le
-   curseur restait sur le dernier feu lié sélectionné à la fermeture de la
-   fenêtre de définition du feu. 
- - On ne peut plus poser un bâtiment sur des voies de circulation.
- - Dans le paramétrage des feux de circulation (et des feux de piétons),
-   les options "Demande le vert" et "Rouge demandé" ont été retirées. 
-   Ils n'apportaient pas grand chose et compliquaient le paramétrage des feux.
-   Par défaut, il n'y a donc plus de demande de vert ou de rouge demandé.
+ - Lorsqu'un feu Ã©tait paramÃ©trÃ© et les feux liÃ©s Ã©taient sÃ©lectionnÃ©s, le
+   curseur restait sur le dernier feu liÃ© sÃ©lectionnÃ© Ã  la fermeture de la
+   fenÃªtre de dÃ©finition du feu. 
+ - On ne peut plus poser un bÃ¢timent sur des voies de circulation.
+ - Dans le paramÃ©trage des feux de circulation (et des feux de piÃ©tons),
+   les options "Demande le vert" et "Rouge demandÃ©" ont Ã©tÃ© retirÃ©es. 
+   Ils n'apportaient pas grand chose et compliquaient le paramÃ©trage des feux.
+   Par dÃ©faut, il n'y a donc plus de demande de vert ou de rouge demandÃ©.
 ------------------------------------------------------------------------------
 [Version 5.1.1]
- - Lorsqu'un feu était déplacé d'une case à une autre, il arrivait que des 
-   véhicules s'arrêtent à l'ancien emplacement quand le feu était rouge 
-   empêchant la simulation de se terminer. Ces "feux fantômes" existants dans
-   les fichiers cvw sont éliminés à l'ouverture.
- - Le rafraîchissement (F5) ne fonctionnait pas lorsque le réseau n'était pas
-   entièrement visible.
- - Les coordonnées de la case où se trouve le curseur reste toujours visible.  
- - Il n'est plus possible de changer nature & décords en cours de simulation
+ - Lorsqu'un feu Ã©tait dÃ©placÃ© d'une case Ã  une autre, il arrivait que des 
+   vÃ©hicules s'arrÃªtent Ã  l'ancien emplacement quand le feu Ã©tait rouge 
+   empÃªchant la simulation de se terminer. Ces "feux fantÃ´mes" existants dans
+   les fichiers cvw sont Ã©liminÃ©s Ã  l'ouverture.
+ - Le rafraÃ®chissement (F5) ne fonctionnait pas lorsque le rÃ©seau n'Ã©tait pas
+   entiÃ¨rement visible.
+ - Les coordonnÃ©es de la case oÃ¹ se trouve le curseur reste toujours visible.  
+ - Il n'est plus possible de changer nature & dÃ©cords en cours de simulation
    y compris en pause.
- - Aucune demande d'enregistrement n'apparaît lorsqu'une simulation est en 
+ - Aucune demande d'enregistrement n'apparaÃ®t lorsqu'une simulation est en 
    cours ou en pause et que l'on choisit de fermer Centre-Ville en utilisant
-   [Alt+F4] ou la croix en haut à droite.
- - Ajout d'une note dans la composition du réseau concernant le nombre Dispo
-   pour les parkings et places de parking : il doit être à 0 pour pouvoir 
-   lancer une simulation ; Le nombre Dispo s'incrémente à chaque fois qu'un 
-   élément est supprimé depuis la dernière réouverture du fichier du réseau.
+   [Alt+F4] ou la croix en haut Ã  droite.
+ - Ajout d'une note dans la composition du rÃ©seau concernant le nombre Dispo
+   pour les parkings et places de parking : il doit Ãªtre Ã  0 pour pouvoir 
+   lancer une simulation ; Le nombre Dispo s'incrÃ©mente Ã  chaque fois qu'un 
+   Ã©lÃ©ment est supprimÃ© depuis la derniÃ¨re rÃ©ouverture du fichier du rÃ©seau.
 ------------------------------------------------------------------------------
 [Version 5.1] 
- - Suppression des paramètres obligeant à définir le nombre de feux, parkings
-   arrêts de bus/tram, places de taxi/parking.
- - Si un parking ou une place de parking a été supprimé, leur nombre est 
-   réduit qu'après avoir enregistré puis rouvert le réseau (l'opération est
-   effectuée à la réouverture du fichier).
- - Tutoriel, aide contextuelle et fichier infosrc.txt mis à jour.
+ - Suppression des paramÃ¨tres obligeant Ã  dÃ©finir le nombre de feux, parkings
+   arrÃªts de bus/tram, places de taxi/parking.
+ - Si un parking ou une place de parking a Ã©tÃ© supprimÃ©, leur nombre est 
+   rÃ©duit qu'aprÃ¨s avoir enregistrÃ© puis rouvert le rÃ©seau (l'opÃ©ration est
+   effectuÃ©e Ã  la rÃ©ouverture du fichier).
+ - Tutoriel, aide contextuelle et fichier infosrc.txt mis Ã  jour.
 ------------------------------------------------------------------------------
 [Version 5.0.3]
- - Le nombre maximal de véhicules a été porté à 9999.
- - Le nombre de véhicules pouvait changer à l'affichage des paramètres de la 
+ - Le nombre maximal de vÃ©hicules a Ã©tÃ© portÃ© Ã  9999.
+ - Le nombre de vÃ©hicules pouvait changer Ã  l'affichage des paramÃ¨tres de la 
    simulation.
 ------------------------------------------------------------------------------
 [Version 5.0.2]
- - L'accès au tutoriel depuis le menu de Centre-Ville ne fonctionnait pas !
+ - L'accÃ¨s au tutoriel depuis le menu de Centre-Ville ne fonctionnait pas !
 ------------------------------------------------------------------------------
 [Version 5.0.1]
- - Ajout d'un tutoriel (accès au menu ?) : Page html qui aborde les phases 
-   successives de création d'un réseau complet. 
- - Ajout de la commande Rafraîchir (accès au menu Affichage et par touche F5).
- - Aide en ligne mise à jour.
+ - Ajout d'un tutoriel (accÃ¨s au menu ?) : Page html qui aborde les phases 
+   successives de crÃ©ation d'un rÃ©seau complet. 
+ - Ajout de la commande RafraÃ®chir (accÃ¨s au menu Affichage et par touche F5).
+ - Aide en ligne mise Ã  jour.
 ------------------------------------------------------------------------------
 [Version 5.0.0] 
 Naissance des places de parkings
- - Elles permettent de faire partir et destiner des véhicules en dehors des 
-   étapes.
- - Elles concurrencent donc les étapes qui ont été rebaptisées pour l'occasion
+ - Elles permettent de faire partir et destiner des vÃ©hicules en dehors des 
+   Ã©tapes.
+ - Elles concurrencent donc les Ã©tapes qui ont Ã©tÃ© rebaptisÃ©es pour l'occasion
    Parkings (sous-entendus souterrains) qui visuellement deviennent bleus au 
-   lieu de rouges. Le mot "étape" a donc été substitué par "Parking" dans toute
+   lieu de rouges. Le mot "Ã©tape" a donc Ã©tÃ© substituÃ© par "Parking" dans toute
    la simulation y compris l'aide en ligne.
 Corrections
- - Lorsqu'un élément ne peut être placé (nombre max atteint), le bouton de la
-   barre d'outils restait enfoncé (étapes, places de taxi, arrêts bus/tram).
- - Les dimensions de la simulation s'accumulaient dans le titre de la fenêtre 
-   des paramètres lorsque l'on accédait à des paramètres de taxis, bus, trams.  
- - L'aide contextuelle des distances aux arrêts de tram était celle des 
-   distances aux arrêts de bus (correction du fichier d'aide).
- - Le changement de décor (trottoirs, pelouses, arbres, immeubles) n'était pas
-   considérée comme modification du réseau (indicateur = astérisque à côté du
+ - Lorsqu'un Ã©lÃ©ment ne peut Ãªtre placÃ© (nombre max atteint), le bouton de la
+   barre d'outils restait enfoncÃ© (Ã©tapes, places de taxi, arrÃªts bus/tram).
+ - Les dimensions de la simulation s'accumulaient dans le titre de la fenÃªtre 
+   des paramÃ¨tres lorsque l'on accÃ©dait Ã  des paramÃ¨tres de taxis, bus, trams.  
+ - L'aide contextuelle des distances aux arrÃªts de tram Ã©tait celle des 
+   distances aux arrÃªts de bus (correction du fichier d'aide).
+ - Le changement de dÃ©cor (trottoirs, pelouses, arbres, immeubles) n'Ã©tait pas
+   considÃ©rÃ©e comme modification du rÃ©seau (indicateur = astÃ©risque Ã  cÃ´tÃ© du
    nom de fichier de simulation).
- - À l'affichage des paramètres de simulation, les min/max et incrément du
-   sélecteur de nombre de véhicules n'étaient pas recalculés en fonction du 
-   nombre de parkings définis.
+ - Ã€ l'affichage des paramÃ¨tres de simulation, les min/max et incrÃ©ment du
+   sÃ©lecteur de nombre de vÃ©hicules n'Ã©taient pas recalculÃ©s en fonction du 
+   nombre de parkings dÃ©finis.
 ------------------------------------------------------------------------------
 [Version 4.4.3]
  - Les action "Fichier | Nouveau", "Enregistrer", "Enregistrer sous", "Ouvrir"
-   ont été désactivées lorsqu'une simulation est en pause.
+   ont Ã©tÃ© dÃ©sactivÃ©es lorsqu'une simulation est en pause.
 ------------------------------------------------------------------------------
 [Version 4.4.2]
- - Archive d'installation générée avec InnoSetup (Outil en GPL 2.0).
- - Police du menu principal réduite et changée (MS Serif 8) pour éviter le
-   débordement et la disparition à l'écran du menu Informations (?).
- - Redimensionnement par défaut de la fenêtre principale pour que la grille
-   n'apparaisse pas avec dès le départ avec les ascenseurs et translateurs.
+ - Archive d'installation gÃ©nÃ©rÃ©e avec InnoSetup (Outil en GPL 2.0).
+ - Police du menu principal rÃ©duite et changÃ©e (MS Serif 8) pour Ã©viter le
+   dÃ©bordement et la disparition Ã  l'Ã©cran du menu Informations (?).
+ - Redimensionnement par dÃ©faut de la fenÃªtre principale pour que la grille
+   n'apparaisse pas avec dÃ¨s le dÃ©part avec les ascenseurs et translateurs.
 ------------------------------------------------------------------------------
 [Version 4.4.1] 
  - Clignotement du curseur en mode de recherche ou suivi pour une meilleure 
 	  localisation de la cible.
 ------------------------------------------------------------------------------
 [Version 4.4] 4 modifications
- - Abandon de la version Linux (dernière version Linux : 4.3.1).
- - Les dimensions affichées dans la barre de titre des paramètres de 
-   simulation après création étaient systématiquement [99x63] quelles que 
+ - Abandon de la version Linux (derniÃ¨re version Linux : 4.3.1).
+ - Les dimensions affichÃ©es dans la barre de titre des paramÃ¨tres de 
+   simulation aprÃ¨s crÃ©ation Ã©taient systÃ©matiquement [99x63] quelles que 
    soient les dimensions de la nouvelle simulation.
- - Les barres d'outils sont à nouveaux détachables.
- - Le zoom et l'agrandissement de la fenêtre principale sont automatiquement
-   désactivés (le cas échéant) lorsqu'un redimensionnement automatique a lieu
-   (par exemple lorsqu'une simulation est chargée).
+ - Les barres d'outils sont Ã  nouveaux dÃ©tachables.
+ - Le zoom et l'agrandissement de la fenÃªtre principale sont automatiquement
+   dÃ©sactivÃ©s (le cas Ã©chÃ©ant) lorsqu'un redimensionnement automatique a lieu
+   (par exemple lorsqu'une simulation est chargÃ©e).
 ------------------------------------------------------------------------------
 [Version 4.3.1] 2 ajouts
- - Le bouton correspondant à la rubrique Simulation | Sanglante a été ajouté 
-   dans la barre d'outils Simulation (générale).
- - La commande Simulation | Résurrection (Maj+Ctrl+Alt+G) a été ajouté : elle
-   permet de ressusciter tous les piétons écrasés dû à l'activation du mode
+ - Le bouton correspondant Ã  la rubrique Simulation | Sanglante a Ã©tÃ© ajoutÃ© 
+   dans la barre d'outils Simulation (gÃ©nÃ©rale).
+ - La commande Simulation | RÃ©surrection (Maj+Ctrl+Alt+G) a Ã©tÃ© ajoutÃ© : elle
+   permet de ressusciter tous les piÃ©tons Ã©crasÃ©s dÃ» Ã  l'activation du mode
    sanglant depuis la version 4.3.
 ------------------------------------------------------------------------------
 [Version 4.3] 1 ajout
  - Option "Sanglante" (Menu Simulation).
 ------------------------------------------------------------------------------
 [Version 4.2.3] 1 modification
- - Les coordonnées électroniques ont changé.
+ - Les coordonnÃ©es Ã©lectroniques ont changÃ©.
 ------------------------------------------------------------------------------
 [Version 4.2.2] 2 modifications
- - Les actions de prolongement de voie de tramway n'étaient pas suspendues en 
+ - Les actions de prolongement de voie de tramway n'Ã©taient pas suspendues en 
    cours de simulation (Est, Sud et Ouest).
- - Les actions de décors sont suspendues lors d'une simulation en cours.
+ - Les actions de dÃ©cors sont suspendues lors d'une simulation en cours.
 ------------------------------------------------------------------------------
 [Version 4.2.1] 1 ajout
- - Ajout du contrôle de la commande "Copier Vers..." : tous les éléments 
-   devant être dans la sélection sont affichés empêchant de générer des 
-   réseaux avec des erreurs d'intégrité. Aide en ligne mise à jour.
+ - Ajout du contrÃ´le de la commande "Copier Vers..." : tous les Ã©lÃ©ments 
+   devant Ãªtre dans la sÃ©lection sont affichÃ©s empÃªchant de gÃ©nÃ©rer des 
+   rÃ©seaux avec des erreurs d'intÃ©gritÃ©. Aide en ligne mise Ã  jour.
 ------------------------------------------------------------------------------
 [Version 4.2] 2 ajouts - 4 corrections
- - Possibilité de générer aléatoirement un réseau (option ajoutée après 
-   l'option d'affichage des paramètres dans la boîte de définition des 
+ - PossibilitÃ© de gÃ©nÃ©rer alÃ©atoirement un rÃ©seau (option ajoutÃ©e aprÃ¨s 
+   l'option d'affichage des paramÃ¨tres dans la boÃ®te de dÃ©finition des 
    dimensions d'une nouvelle zone de simulation).
- - Un fichier exemple de réseau a été ajouté en guise d'exemple de génération
-   aléatoire de réseau : spaghettis.cvw.
- - Une erreur dans le réseau pouvait être "masquée" par l'erreur "Il n'y a pas
-   assez de place pour ... piétons".
- - Un message d'avertissement a été ajouté au moment du choix de la commande 
-   "Copier vers..." dans lequel il est expliqué les limites indiquées dans la
+ - Un fichier exemple de rÃ©seau a Ã©tÃ© ajoutÃ© en guise d'exemple de gÃ©nÃ©ration
+   alÃ©atoire de rÃ©seau : spaghettis.cvw.
+ - Une erreur dans le rÃ©seau pouvait Ãªtre "masquÃ©e" par l'erreur "Il n'y a pas
+   assez de place pour ... piÃ©tons".
+ - Un message d'avertissement a Ã©tÃ© ajoutÃ© au moment du choix de la commande 
+   "Copier vers..." dans lequel il est expliquÃ© les limites indiquÃ©es dans la
    section [Version 4.0.1'] ci-dessous.
- - La vitesse de simulation par défaut est passée de 2 à 10 tours par seconde.
- - L'aide a été mise à jour.
+ - La vitesse de simulation par dÃ©faut est passÃ©e de 2 Ã  10 tours par seconde.
+ - L'aide a Ã©tÃ© mise Ã  jour.
 ------------------------------------------------------------------------------
 [Version 4.1] 
- - Possibilité d'afficher les paramètres juste après avoir défini les 
-   dimensions d'une nouvelle zone de simulation (les paramètres sont affichés
-   par défaut).
- - L'utilisation des raccourcis-clavier pour l'affichage exécutait deux fois 
+ - PossibilitÃ© d'afficher les paramÃ¨tres juste aprÃ¨s avoir dÃ©fini les 
+   dimensions d'une nouvelle zone de simulation (les paramÃ¨tres sont affichÃ©s
+   par dÃ©faut).
+ - L'utilisation des raccourcis-clavier pour l'affichage exÃ©cutait deux fois 
    la commande.
 ------------------------------------------------------------------------------
 [Version 4.0.1'] 3 corrections - 1 ajout
 Saisie des dimensions de la zone de simulation (version Windows seulement)
- - la touche Entrée sur l'un des deux champs vide ce dernier au lieu de 
-   valider les valeurs courantes provoquant l'erreur "Vous devez spécifier une
+ - la touche EntrÃ©e sur l'un des deux champs vide ce dernier au lieu de 
+   valider les valeurs courantes provoquant l'erreur "Vous devez spÃ©cifier une
    zone d'au moins 8x8".
- - la touche Echap étant le raccourci du bouton Annuler ne fonctionnait pas
-   lorsque l'un des deux champs étaient mis en évidence (comme ci-dessus).
-Redimensionnement automatique à l'ouverture (version Windows seulement)
+ - la touche Echap Ã©tant le raccourci du bouton Annuler ne fonctionnait pas
+   lorsque l'un des deux champs Ã©taient mis en Ã©vidence (comme ci-dessus).
+Redimensionnement automatique Ã  l'ouverture (version Windows seulement)
  - Depuis la version 4.0, les dimensions pouvant changer, les dimensions de la
-   fenêtres sont automatiquement adaptées à l'ouverture d'un fichier de 
-   simulation, jusqu'aux limites des possibilités des barres d'outils.
-Nouvelle commande "Copier Vers..." Barre d'outil édition (Sélection).
- - Il s'agit d'une version livrée telle quelle c'est-à-dire : 
-    # Il n'y a aucune vérification de dépendance entre éléments (pour 
-      l'instant) c'est-à-dire que si un élément extérieur à la sélection est
-      lié à un élément de la sélection, cela pourrait provoquer des erreurs au
+   fenÃªtres sont automatiquement adaptÃ©es Ã  l'ouverture d'un fichier de 
+   simulation, jusqu'aux limites des possibilitÃ©s des barres d'outils.
+Nouvelle commande "Copier Vers..." Barre d'outil Ã©dition (SÃ©lection).
+ - Il s'agit d'une version livrÃ©e telle quelle c'est-Ã -dire : 
+    # Il n'y a aucune vÃ©rification de dÃ©pendance entre Ã©lÃ©ments (pour 
+      l'instant) c'est-Ã -dire que si un Ã©lÃ©ment extÃ©rieur Ã  la sÃ©lection est
+      liÃ© Ã  un Ã©lÃ©ment de la sÃ©lection, cela pourrait provoquer des erreurs au
       lancement de la simulation.
-    # Pour repérer ces liaisons après copie, cocher l'option "Fichier | 
-      Vérifier intégrité après ouverture" avant ouverture du fichier généré.
+    # Pour repÃ©rer ces liaisons aprÃ¨s copie, cocher l'option "Fichier | 
+      VÃ©rifier intÃ©gritÃ© aprÃ¨s ouverture" avant ouverture du fichier gÃ©nÃ©rÃ©.
     # Il n'y a pas de rubrique d'aide sur cette commande
- - L'exemple de simulation Géant.cvw a été modifié (généré) par cette commande 
-   comme seul test (élimination des bandes inférieures gauches).
+ - L'exemple de simulation GÃ©ant.cvw a Ã©tÃ© modifiÃ© (gÃ©nÃ©rÃ©) par cette commande 
+   comme seul test (Ã©limination des bandes infÃ©rieures gauches).
 ------------------------------------------------------------------------------
 [Version 4.0] 1 ajout - 1 modification
-Les dimensions de la zone de simulation peuvent à présent être définies à la
-création d'une simulation (8x8 minimum). En voici les conséquences...
- - Une boîte de dialogue apparaît lorsque l'on crée une nouvelle simulation : 
+Les dimensions de la zone de simulation peuvent Ã  prÃ©sent Ãªtre dÃ©finies Ã  la
+crÃ©ation d'une simulation (8x8 minimum). En voici les consÃ©quences...
+ - Une boÃ®te de dialogue apparaÃ®t lorsque l'on crÃ©e une nouvelle simulation : 
    elle permet de saisir les dimensions.
- - Les dimensions d'une simulation sont affichées dans le titre de la fenêtre 
-   des paramètres entre crochets [colonnes x lignes].
- - Le format de fichier a changé.
- - L'aide a été complétée : ajout de la rubrique contextuelle "Définition des
+ - Les dimensions d'une simulation sont affichÃ©es dans le titre de la fenÃªtre 
+   des paramÃ¨tres entre crochets [colonnes x lignes].
+ - Le format de fichier a changÃ©.
+ - L'aide a Ã©tÃ© complÃ©tÃ©e : ajout de la rubrique contextuelle "DÃ©finition des
    dimensions de la zone de simulation".
-Champs numériques avec double flèches (Linux uniquement)
- - La plupart des champs numériques avec double flèches n'avaient plus de
-   réaction !
+Champs numÃ©riques avec double flÃ¨ches (Linux uniquement)
+ - La plupart des champs numÃ©riques avec double flÃ¨ches n'avaient plus de
+   rÃ©action !
 ------------------------------------------------------------------------------
 [Version 3.9.3]
- - Après l'affichage d'un message "Réseau non connexe", le tableau des 
-   distances incomplet s'affiche permettant de déterminer où se trouve le 
-   problème.
+ - AprÃ¨s l'affichage d'un message "RÃ©seau non connexe", le tableau des 
+   distances incomplet s'affiche permettant de dÃ©terminer oÃ¹ se trouve le 
+   problÃ¨me.
  - Tous les tableaux de distances sont modifiables en hauteur.
 ------------------------------------------------------------------------------
 [Version 3.9.2] 1 ajout, 1 modification
- - J'ai ajouté le calcul de durée de la simulation pour donner un aperçu de la
+ - J'ai ajoutÃ© le calcul de durÃ©e de la simulation pour donner un aperÃ§u de la
    performance du programme et/ou de la machine sur laquelle Centre-Ville
    tourne.
- - Les fenêtres ouvertes n'étaient plus fermées automatiquement lorsque se 
-   terminait une simulation ce qui empêchait de visualiser les statistiques de
-   trafic & fluidité et pouvait provoquer ensuite des erreurs lors de la 
-   fermeture manuelle des fenêtres.
+ - Les fenÃªtres ouvertes n'Ã©taient plus fermÃ©es automatiquement lorsque se 
+   terminait une simulation ce qui empÃªchait de visualiser les statistiques de
+   trafic & fluiditÃ© et pouvait provoquer ensuite des erreurs lors de la 
+   fermeture manuelle des fenÃªtres.
  - Les pelouses sont d'un vert uni (Windows seulement).
 ------------------------------------------------------------------------------
-[Version 3.9.1] Spécial Tout Droit
- - Les distances aux étapes, aux files de taxis et aux arrêts de bus ne 
+[Version 3.9.1] SpÃ©cial Tout Droit
+ - Les distances aux Ã©tapes, aux files de taxis et aux arrÃªts de bus ne 
    tenaient pas compte des contraintes d'obligation d'aller tout droit 
-   (Merci à Sébastien).
- - Les véhicules prioritaires (Police & Urgences) ne sont plus soumis à
+   (Merci Ã  SÃ©bastien).
+ - Les vÃ©hicules prioritaires (Police & Urgences) ne sont plus soumis Ã 
    l'obligation d'aller tout droit.
 ------------------------------------------------------------------------------
 [Version 3.9]
- - Ajout des décors sur la zone de nature piétonne uniquement. Il n'y a que
-   l'arbre et la pelouse. Le trottoir et le décor par défaut de la zone 
-   piétonne et le toit est le décor par défaut des immeubles. Le choix 
-   s'effectue au niveau du menu déroulant et de la barre d'outil de sélection
+ - Ajout des dÃ©cors sur la zone de nature piÃ©tonne uniquement. Il n'y a que
+   l'arbre et la pelouse. Le trottoir et le dÃ©cor par dÃ©faut de la zone 
+   piÃ©tonne et le toit est le dÃ©cor par dÃ©faut des immeubles. Le choix 
+   s'effectue au niveau du menu dÃ©roulant et de la barre d'outil de sÃ©lection
    (case).
- - Lors de la définition de la nature d'une zone, j'ai ajouté la possibilité
-   de couvrir de pelouse si la nature est piétonne (trottoir) par une case à
+ - Lors de la dÃ©finition de la nature d'une zone, j'ai ajoutÃ© la possibilitÃ©
+   de couvrir de pelouse si la nature est piÃ©tonne (trottoir) par une case Ã 
    cocher "Pelouse".
- - L'icône de la commande "Segment de voie de tram" était celle de la commande
+ - L'icÃ´ne de la commande "Segment de voie de tram" Ã©tait celle de la commande
    "Segment de route".
- - Modifications, en conséquence, de l'aide en ligne.
- - L'exemple "Géant.cvw" a été décoré !
+ - Modifications, en consÃ©quence, de l'aide en ligne.
+ - L'exemple "GÃ©ant.cvw" a Ã©tÃ© dÃ©corÃ© !
  - Les boutons Oui/Non, Oui/Non/Annuler s'affichaient dans le sens contraire
    (version Linux uniquement).
 ------------------------------------------------------------------------------
 [Version 3.8.3]
- - Il est maintenant possible d'agrandir la fenêtre quand le zoom n'est pas 
-   activé. Cela permet d'éviter des comportements chaotiques du au replacement
+ - Il est maintenant possible d'agrandir la fenÃªtre quand le zoom n'est pas 
+   activÃ©. Cela permet d'Ã©viter des comportements chaotiques du au replacement
    automatique des barres d'outils.
- - Le nombre maximal de tours par seconde (vitesse de simulation) a été 
-   augmenté de 10 à 99.
- - Un bouton de fermeture (croix dans le coin supérieur droit) a été ajouté 
-   dans la boîte "À propos" (Windows uniquement).
- - Changer l'option "Vérifier l'intégrité avant simulation" changeait l'option
-   "Vérifier l'intégrité après ouverture".
- - On ne pouvait pas retirer un feu en changeant de priorité s'il était 
-   référencé par un autre feu. Maintenant, on peut mais un avertissement 
-   indique s'il y a au moins un feu qui y fait référence.
+ - Le nombre maximal de tours par seconde (vitesse de simulation) a Ã©tÃ© 
+   augmentÃ© de 10 Ã  99.
+ - Un bouton de fermeture (croix dans le coin supÃ©rieur droit) a Ã©tÃ© ajoutÃ© 
+   dans la boÃ®te "Ã€ propos" (Windows uniquement).
+ - Changer l'option "VÃ©rifier l'intÃ©gritÃ© avant simulation" changeait l'option
+   "VÃ©rifier l'intÃ©gritÃ© aprÃ¨s ouverture".
+ - On ne pouvait pas retirer un feu en changeant de prioritÃ© s'il Ã©tait 
+   rÃ©fÃ©rencÃ© par un autre feu. Maintenant, on peut mais un avertissement 
+   indique s'il y a au moins un feu qui y fait rÃ©fÃ©rence.
 ------------------------------------------------------------------------------
 [Version 3.8.2] 1 correction
- - La création d'un carrefour avec feux pouvait provoquer une erreur.
+ - La crÃ©ation d'un carrefour avec feux pouvait provoquer une erreur.
 ------------------------------------------------------------------------------
 [Version 3.8.1]
 Ajout d'un filtre d'affichage
- - Bouton et rubrique d'affichage de l'environnement : Trottoirs & bâtiments, 
-   permettant une meilleure visibilité.
- - Aide en ligne mise à jour.
+ - Bouton et rubrique d'affichage de l'environnement : Trottoirs & bÃ¢timents, 
+   permettant une meilleure visibilitÃ©.
+ - Aide en ligne mise Ã  jour.
 Modifications diverses
- - L'unité toursimul supprimée dans la version 3.8 était encore déclarée dans
+ - L'unitÃ© toursimul supprimÃ©e dans la version 3.8 Ã©tait encore dÃ©clarÃ©e dans
    le projet cvx.
- - La barre d'outils a été redimensionnée : les boutons étaient tronqués sur 
+ - La barre d'outils a Ã©tÃ© redimensionnÃ©e : les boutons Ã©taient tronquÃ©s sur 
    le bas (Version Linux seulement).
 ------------------------------------------------------------------------------
 [Version 3.8]
-Ajout de la notion de nature (voies, trottoirs & immeubles) et préparation des
-futurs décors. Conséquence :
- - Le format de fichier a changé (ajout de la nature).
- - Ajout d'un bouton/d'une rubrique "Définition de la nature de la zone" 
-   (voies trottoirs ou immeubles) dans la barre/menu "Edition Sélection".
- - Mise à jour de l'aide (définition de la nature d'une zone).
- - Du fait de la restriction de l'espace de circulation des piétons (réduit à 
-   présent aux trottoirs et aux passages piétons), une vérification a été
-   ajouté dans le contrôle du réseau avant lancement : on y calcule l'espace
-   disponible pour les piétons ce qui permet d'empêcher le lancement de la
-   simulation s'il n'y a pas de place pour placer tous les piétons !
- - La rubrique "Affichage | Routes" a été renommée plus justement "Affichage |
+Ajout de la notion de nature (voies, trottoirs & immeubles) et prÃ©paration des
+futurs dÃ©cors. ConsÃ©quence :
+ - Le format de fichier a changÃ© (ajout de la nature).
+ - Ajout d'un bouton/d'une rubrique "DÃ©finition de la nature de la zone" 
+   (voies trottoirs ou immeubles) dans la barre/menu "Edition SÃ©lection".
+ - Mise Ã  jour de l'aide (dÃ©finition de la nature d'une zone).
+ - Du fait de la restriction de l'espace de circulation des piÃ©tons (rÃ©duit Ã  
+   prÃ©sent aux trottoirs et aux passages piÃ©tons), une vÃ©rification a Ã©tÃ©
+   ajoutÃ© dans le contrÃ´le du rÃ©seau avant lancement : on y calcule l'espace
+   disponible pour les piÃ©tons ce qui permet d'empÃªcher le lancement de la
+   simulation s'il n'y a pas de place pour placer tous les piÃ©tons !
+ - La rubrique "Affichage | Routes" a Ã©tÃ© renommÃ©e plus justement "Affichage |
    Voies de circulation" (pour routes, voies de tram, trottoirs et immeubles).
 Corrections
- - la Visualisation des lignes de trams n'était pas définie (alors que les 
-   cases à cocher étaient présentes).
- - Correction du libellé de la rubrique "Statistiques | Affichage | 5. 200 
+ - la Visualisation des lignes de trams n'Ã©tait pas dÃ©finie (alors que les 
+   cases Ã  cocher Ã©taient prÃ©sentes).
+ - Correction du libellÃ© de la rubrique "Statistiques | Affichage | 5. 200 
    derniers tours" (il manquait le 'r' de tours).
- - Le nombre de stops était erroné dans la composition du réseau.
- - La simulation était lancée en utilisant la synchronisation tour par tour à 
-   l'aide d'un thread. Celui-ci a été retiré dans la version Linux (déjà 
-   retiré sous Windows car sans effet).
+ - Le nombre de stops Ã©tait erronÃ© dans la composition du rÃ©seau.
+ - La simulation Ã©tait lancÃ©e en utilisant la synchronisation tour par tour Ã  
+   l'aide d'un thread. Celui-ci a Ã©tÃ© retirÃ© dans la version Linux (dÃ©jÃ  
+   retirÃ© sous Windows car sans effet).
 ------------------------------------------------------------------------------
 [Version 3.7.2] 2 corrections
- - Lors de la suppression de voies, les priorités n'étaient pas effacées et 
-   les étapes ne pouvaient plus être redéfinies.
- - La vérification des feux donnait un message d'erreur systématiquement pour
-   le dernier feu défini.
+ - Lors de la suppression de voies, les prioritÃ©s n'Ã©taient pas effacÃ©es et 
+   les Ã©tapes ne pouvaient plus Ãªtre redÃ©finies.
+ - La vÃ©rification des feux donnait un message d'erreur systÃ©matiquement pour
+   le dernier feu dÃ©fini.
 ------------------------------------------------------------------------------
 [Version 3.7.1] 2 modifications
  - La contrainte "Obligation d'aller tout droit" ne marchait pas dans certains
-   cas (merci Sébastien).
- - Le n° de version dans la boîte à propos pouvait avoir un pâle fond !
+   cas (merci SÃ©bastien).
+ - Le nÂ° de version dans la boÃ®te Ã  propos pouvait avoir un pÃ¢le fond !
 ------------------------------------------------------------------------------
 [Version 3.7] Unification des versions Windows/Linux + 1 modification
-Unification des versions Windows/Linux. Conséquence :
+Unification des versions Windows/Linux. ConsÃ©quence :
  - Passage en GPL, les sources sont incluses aux archives Windows/Linux.
-   Pour Linux, l'archive ne contient que les sources. Nécessite Kylix 3 pour
-   compiler les sources et obtenir l'exécutable.
- - Pour les différences entre la version Windows et la version Linux, voir
+   Pour Linux, l'archive ne contient que les sources. NÃ©cessite Kylix 3 pour
+   compiler les sources et obtenir l'exÃ©cutable.
+ - Pour les diffÃ©rences entre la version Windows et la version Linux, voir
    le paragraphe DIFFERENCES ENTRE LES VERSION LINUX ET WINDOWS.
-Modifications par rapport à la version précédente (Windows)
- - Les paramètres de taxi étaient accessibles pendant la simulation.
+Modifications par rapport Ã  la version prÃ©cÃ©dente (Windows)
+ - Les paramÃ¨tres de taxi Ã©taient accessibles pendant la simulation.
 ------------------------------------------------------------------------------
 [Version 3.6.1]
- - Le bouton Appliquer restait grisé dans la fenêtre de paramétrage des taxis.
- - Le bouton Place de taxi de la barre d'outils était active quand une 
-   simulation était lancée (en marche ou interrompue).
- - La barre d'outils n'est plus détachable (pour des raison de comportements 
+ - Le bouton Appliquer restait grisÃ© dans la fenÃªtre de paramÃ©trage des taxis.
+ - Le bouton Place de taxi de la barre d'outils Ã©tait active quand une 
+   simulation Ã©tait lancÃ©e (en marche ou interrompue).
+ - La barre d'outils n'est plus dÃ©tachable (pour des raison de comportements 
    obscurs.
 ------------------------------------------------------------------------------
 [Version 3.6] 
- - Ajout de l'élément Taxi :
-   · Apparition dans la simulation des voitures de taxi (couleur jaune). Elles
-     sont indépendantes des étapes et peuvent empruntent les couloirs de bus.
-   · Apparition de l'élément Place de taxi (case départ et d'attente des
+ - Ajout de l'Ã©lÃ©ment Taxi :
+   Â· Apparition dans la simulation des voitures de taxi (couleur jaune). Elles
+     sont indÃ©pendantes des Ã©tapes et peuvent empruntent les couloirs de bus.
+   Â· Apparition de l'Ã©lÃ©ment Place de taxi (case dÃ©part et d'attente des
      taxis).
-   · Ajout d'un bouton et d'une rubrique "Place de taxi" respectivement dans
+   Â· Ajout d'un bouton et d'une rubrique "Place de taxi" respectivement dans
      la barre d'outils et le menu "Edition Case".
-   · Les fenêtres de paramétrage de la simulation, de composition du réseau et
-     de recherche d'éléments ont été complétées pour les taxis. 
-   · Ont été créées les fenêtres suivantes pour les taxis : une fenêtre de 
-     paramétrage propres aux taxis (bouton Taxi dans la fenêtre de paramétrage 
-     de la simulation), une fenêtre de distances aux files de taxis ainsi 
-     qu'une fenêtre d'information sur le taxi en cours de suivi.
- - La vérification d'intégrité des données des cases a été étendue.
- - Les piétons ne peuvent plus attendre un bus, un tram (maintenant un taxi)
-   sur un passage piétons (il y avait risque de blocage des voies de circula-
+   Â· Les fenÃªtres de paramÃ©trage de la simulation, de composition du rÃ©seau et
+     de recherche d'Ã©lÃ©ments ont Ã©tÃ© complÃ©tÃ©es pour les taxis. 
+   Â· Ont Ã©tÃ© crÃ©Ã©es les fenÃªtres suivantes pour les taxis : une fenÃªtre de 
+     paramÃ©trage propres aux taxis (bouton Taxi dans la fenÃªtre de paramÃ©trage 
+     de la simulation), une fenÃªtre de distances aux files de taxis ainsi 
+     qu'une fenÃªtre d'information sur le taxi en cours de suivi.
+ - La vÃ©rification d'intÃ©gritÃ© des donnÃ©es des cases a Ã©tÃ© Ã©tendue.
+ - Les piÃ©tons ne peuvent plus attendre un bus, un tram (maintenant un taxi)
+   sur un passage piÃ©tons (il y avait risque de blocage des voies de circula-
    tion).
- - La suppression de voies dans une sélection n'effaçait pas les informations
-   sur les étapes, les arrêts de bus/tram et le dépôt de bus.
- - La durée des feux verts et rouges dans les paramètres étaient limitée à 10.
-   La limite a été étendue à 99.
+ - La suppression de voies dans une sÃ©lection n'effaÃ§ait pas les informations
+   sur les Ã©tapes, les arrÃªts de bus/tram et le dÃ©pÃ´t de bus.
+ - La durÃ©e des feux verts et rouges dans les paramÃ¨tres Ã©taient limitÃ©e Ã  10.
+   La limite a Ã©tÃ© Ã©tendue Ã  99.
  - L'effacement de la simulation courante par la rubrique Nouveau ou Ouvrir ne
-   libérait pas toute la mémoire.
- - L'aspect des barres d'outils a légèrement été revu MAIS leur comportement 
-   a été ENCORE revu car il était encore trop chaotique (mais j'espère que 
-   cette fois ça ira !). Astuce : Pour détacher les barres, il faut cliquer 
-   sur un séparateur de bouton puis faire glisser vers l'extérieur de la barre
-   d'outils (fallait trouver)... Mais pour le menu, il faut cliquer juste à 
-   droite du point d'interrogation (il ne doit pas être sélectionné) et faire
-   glisser vers l'extérieur de la barre d'outils.
- - Les situations de piétons concernant le tram n'étaient pas mentionnées dans
-   la fenêtre d'informations sur un piéton.
- - La fenêtre d'informations sur un tram n'était pas rafraîchie lorsque l'on
+   libÃ©rait pas toute la mÃ©moire.
+ - L'aspect des barres d'outils a lÃ©gÃ¨rement Ã©tÃ© revu MAIS leur comportement 
+   a Ã©tÃ© ENCORE revu car il Ã©tait encore trop chaotique (mais j'espÃ¨re que 
+   cette fois Ã§a ira !). Astuce : Pour dÃ©tacher les barres, il faut cliquer 
+   sur un sÃ©parateur de bouton puis faire glisser vers l'extÃ©rieur de la barre
+   d'outils (fallait trouver)... Mais pour le menu, il faut cliquer juste Ã  
+   droite du point d'interrogation (il ne doit pas Ãªtre sÃ©lectionnÃ©) et faire
+   glisser vers l'extÃ©rieur de la barre d'outils.
+ - Les situations de piÃ©tons concernant le tram n'Ã©taient pas mentionnÃ©es dans
+   la fenÃªtre d'informations sur un piÃ©ton.
+ - La fenÃªtre d'informations sur un tram n'Ã©tait pas rafraÃ®chie lorsque l'on
    changeait de case (en dehors d'un suivi).
- - Il pouvait arriver qu'un piéton descende d'un bus ou d'un tram sur la route
+ - Il pouvait arriver qu'un piÃ©ton descende d'un bus ou d'un tram sur la route
 ------------------------------------------------------------------------------
 [version 3.5.2b]
- - Quelques corrections ont été apportées dans le fichier d'aide.
+ - Quelques corrections ont Ã©tÃ© apportÃ©es dans le fichier d'aide.
 ------------------------------------------------------------------------------
 [Version 3.5.2]
- - La modification de redimensionnement de la version précédente entraîne un 
-   redimensionnement aléatoire lors d'un changement manuel de la taille de la
-   fenêtre principale (comme quoi le chaos n'est pas que dans la circulation).
+ - La modification de redimensionnement de la version prÃ©cÃ©dente entraÃ®ne un 
+   redimensionnement alÃ©atoire lors d'un changement manuel de la taille de la
+   fenÃªtre principale (comme quoi le chaos n'est pas que dans la circulation).
 ------------------------------------------------------------------------------
 [Version 3.5.1]
- - Lorsque les barres d'outils sont retirées ou remises à leur emplacement sur
-   la fenêtre principale, la zone de simulation est redimensionnée (si le zoom 
-   est désactivé).
+ - Lorsque les barres d'outils sont retirÃ©es ou remises Ã  leur emplacement sur
+   la fenÃªtre principale, la zone de simulation est redimensionnÃ©e (si le zoom 
+   est dÃ©sactivÃ©).
  - Les barres d'outils ne sont plus redimensionnables (elles avaient quelques
-   comportements étranges).
- - Le raccourci pour afficher le sommaire de l'aide a changé : Maj+Alt+F1.
+   comportements Ã©tranges).
+ - Le raccourci pour afficher le sommaire de l'aide a changÃ© : Maj+Alt+F1.
 ------------------------------------------------------------------------------
 [Version 3.5]
- - Ajout de l'élément tramway et les éléments relatifs : arrêt & ligne comme
-   pour le réseau de bus. 
-   Seules différences avec le réseau de bus :
-   · Pas de dépôt de tram : ils partent d'un arrêt de tram.
-   · Ils se déplacent sur des voies inaccessibles aux autres véhicules.
-   · Les arrêts de tram se posent comme pour les arrêts de bus (même bouton)
-     mais la voie N'AYANT PAS DE SENS, la position de la tête de l'arrêt de
-     tram doit être positionnée en fonction du sens dans lequel les trams vont
-     passer sur la voie. Pour permettre les deux sens, mettre la tête de
-     l'arrêt au milieu de l'arrêt (3 cases) sachant que la première case sur 
-     laquelle on pose un arrêt est toujours définie comme la tête.
-   Interactions avec le réseau de routes
-   · Les priorités normales sont appliquées (priorité à droite par défaut).
-   · Les feux, cédez-le-passage et stops peuvent être utilisés pour les trams
-     (les priorités apparaissent alors en bleu dans la boîte de dialogue des
-     priorités).
-   L'exemple Géant.cvw a été modifié pour fournir un exemple avec un réseau de
+ - Ajout de l'Ã©lÃ©ment tramway et les Ã©lÃ©ments relatifs : arrÃªt & ligne comme
+   pour le rÃ©seau de bus. 
+   Seules diffÃ©rences avec le rÃ©seau de bus :
+   Â· Pas de dÃ©pÃ´t de tram : ils partent d'un arrÃªt de tram.
+   Â· Ils se dÃ©placent sur des voies inaccessibles aux autres vÃ©hicules.
+   Â· Les arrÃªts de tram se posent comme pour les arrÃªts de bus (mÃªme bouton)
+     mais la voie N'AYANT PAS DE SENS, la position de la tÃªte de l'arrÃªt de
+     tram doit Ãªtre positionnÃ©e en fonction du sens dans lequel les trams vont
+     passer sur la voie. Pour permettre les deux sens, mettre la tÃªte de
+     l'arrÃªt au milieu de l'arrÃªt (3 cases) sachant que la premiÃ¨re case sur 
+     laquelle on pose un arrÃªt est toujours dÃ©finie comme la tÃªte.
+   Interactions avec le rÃ©seau de routes
+   Â· Les prioritÃ©s normales sont appliquÃ©es (prioritÃ© Ã  droite par dÃ©faut).
+   Â· Les feux, cÃ©dez-le-passage et stops peuvent Ãªtre utilisÃ©s pour les trams
+     (les prioritÃ©s apparaissent alors en bleu dans la boÃ®te de dialogue des
+     prioritÃ©s).
+   L'exemple GÃ©ant.cvw a Ã©tÃ© modifiÃ© pour fournir un exemple avec un rÃ©seau de
    trams
- - Le menu déroulant en mode conception donne directement sur le menu 
-   Sélection lorsque plusieurs cases sont sélectionnées évitant de dérouler
-   2 menus. Idem dans le cas contraire : le menu édition d'une case apparaît 
-   directement lorsqu'une seule case est sélectionnée.
+ - Le menu dÃ©roulant en mode conception donne directement sur le menu 
+   SÃ©lection lorsque plusieurs cases sont sÃ©lectionnÃ©es Ã©vitant de dÃ©rouler
+   2 menus. Idem dans le cas contraire : le menu Ã©dition d'une case apparaÃ®t 
+   directement lorsqu'une seule case est sÃ©lectionnÃ©e.
  - La barre d'outils et le menu sont maintenant flottants permettant de 
-   libérer de la place pour la zone de simulation en faisant un glisser-
-   déplacer sur les différentes parties de la barre d'outils (menu principal
+   libÃ©rer de la place pour la zone de simulation en faisant un glisser-
+   dÃ©placer sur les diffÃ©rentes parties de la barre d'outils (menu principal
    inclus).
- - Un message apparaît si l'on ouvre un fichier (.cvw) généré avec une version
-   supérieure de Centre-Ville.
- - Les passages piétons incorrects (qui ne peuvent pas avoir de sens) sont
-   détectés et supprimés à la vérification du réseau.
- - Lorsque le réseau n'est pas connexe, le message indiquant la case indique 
-   également le type de distance (à une étape, à un arrêt de bus ou à un arrêt
+ - Un message apparaÃ®t si l'on ouvre un fichier (.cvw) gÃ©nÃ©rÃ© avec une version
+   supÃ©rieure de Centre-Ville.
+ - Les passages piÃ©tons incorrects (qui ne peuvent pas avoir de sens) sont
+   dÃ©tectÃ©s et supprimÃ©s Ã  la vÃ©rification du rÃ©seau.
+ - Lorsque le rÃ©seau n'est pas connexe, le message indiquant la case indique 
+   Ã©galement le type de distance (Ã  une Ã©tape, Ã  un arrÃªt de bus ou Ã  un arrÃªt
    de tram).
- - La vérification du réseau détecte à présent le ou les passages réservés aux
-   bus qui pourraient bloquer des véhicules (ne pouvant les emprunter).
- - Le curseur jaune indiquant la case où se trouve une erreur est à présent 
-   clignotant afin d'être repérable plus facilement.
+ - La vÃ©rification du rÃ©seau dÃ©tecte Ã  prÃ©sent le ou les passages rÃ©servÃ©s aux
+   bus qui pourraient bloquer des vÃ©hicules (ne pouvant les emprunter).
+ - Le curseur jaune indiquant la case oÃ¹ se trouve une erreur est Ã  prÃ©sent 
+   clignotant afin d'Ãªtre repÃ©rable plus facilement.
  - Les boutons de directions possibles et de prolongement de voie de tram sont
-   désactivés dans certaines situations (éléments existants sur les cases
-   comme les arrêts de bus ou tram, les passages de bus, de piétons etc.).
- - Seuls des arrêts de bus/tram indéfinis qui sont utilisés par les lignes de 
-   bus/tram sont signalés à la vérification du réseau.
-   Il n'est plus obligatoire de définir le nombre d'arrêts de bus et de trams 
-   défini dans les paramètres.
- - Lorsqu'un réseau de simulation est modifié, un astérisque (*) apparaît à la
-   fin du titre de la fenêtre principale.
- - La recherche d'un élément a été déplacée du menu principal Simulation au
-   menu déroulant en mode simulation. De plus, son raccourci clavier est passé
-   de Maj+Ctrl+H à Ctrl+H.
- - La commande de zoom a été déplacée du menu Simulation au menu Affichage.
- - Le choix de continuer dans la même direction (dans le cas échéant) n'était
-   pas systématique concernant les véhicules et les bus.
- - Le n° de ligne de bus ainsi que le tour de sortie du dépôt étaient toujours
-   indiqués 0 dans la fenêtre d'informations détaillées d'un bus.
+   dÃ©sactivÃ©s dans certaines situations (Ã©lÃ©ments existants sur les cases
+   comme les arrÃªts de bus ou tram, les passages de bus, de piÃ©tons etc.).
+ - Seuls des arrÃªts de bus/tram indÃ©finis qui sont utilisÃ©s par les lignes de 
+   bus/tram sont signalÃ©s Ã  la vÃ©rification du rÃ©seau.
+   Il n'est plus obligatoire de dÃ©finir le nombre d'arrÃªts de bus et de trams 
+   dÃ©fini dans les paramÃ¨tres.
+ - Lorsqu'un rÃ©seau de simulation est modifiÃ©, un astÃ©risque (*) apparaÃ®t Ã  la
+   fin du titre de la fenÃªtre principale.
+ - La recherche d'un Ã©lÃ©ment a Ã©tÃ© dÃ©placÃ©e du menu principal Simulation au
+   menu dÃ©roulant en mode simulation. De plus, son raccourci clavier est passÃ©
+   de Maj+Ctrl+H Ã  Ctrl+H.
+ - La commande de zoom a Ã©tÃ© dÃ©placÃ©e du menu Simulation au menu Affichage.
+ - Le choix de continuer dans la mÃªme direction (dans le cas Ã©chÃ©ant) n'Ã©tait
+   pas systÃ©matique concernant les vÃ©hicules et les bus.
+ - Le nÂ° de ligne de bus ainsi que le tour de sortie du dÃ©pÃ´t Ã©taient toujours
+   indiquÃ©s 0 dans la fenÃªtre d'informations dÃ©taillÃ©es d'un bus.
 ------------------------------------------------------------------------------
 [Version 3.1.1]
- - La création d'un arrêt de bus provoquait une erreur lors de l'affichage de
-   son numéro dans la barre d'état rendant impossible l'utilisation du réseau
+ - La crÃ©ation d'un arrÃªt de bus provoquait une erreur lors de l'affichage de
+   son numÃ©ro dans la barre d'Ã©tat rendant impossible l'utilisation du rÃ©seau
    de bus !
 ------------------------------------------------------------------------------
 [Version 3.1]
- - Les fichiers de démonstrations ont changé : les lignes de bus n'étaient pas 
-   définies à l'ouverture !
- - Les affichages sur la barre de statut des numéros de lignes de bus entre 
-   parenthèses à droite du numéro d'arrêt de bus étaient ceux de l'arrêt de
-   bus de numéro suivant. Pour le dernier arrêt de bus un plantage ou un 
+ - Les fichiers de dÃ©monstrations ont changÃ© : les lignes de bus n'Ã©taient pas 
+   dÃ©finies Ã  l'ouverture !
+ - Les affichages sur la barre de statut des numÃ©ros de lignes de bus entre 
+   parenthÃ¨ses Ã  droite du numÃ©ro d'arrÃªt de bus Ã©taient ceux de l'arrÃªt de
+   bus de numÃ©ro suivant. Pour le dernier arrÃªt de bus un plantage ou un 
    message d'erreur pouvait survenir.
- - Activation des couloirs réservés aux bus (seuls les bus et les véhicules 
+ - Activation des couloirs rÃ©servÃ©s aux bus (seuls les bus et les vÃ©hicules 
    d'urgence peuvent les emprunter).
- - Réduction de la taille de la police utilisée dans la barre de statut.
- - Mise à jour de l'aide concernant les couloirs de bus + quelques précisions.
+ - RÃ©duction de la taille de la police utilisÃ©e dans la barre de statut.
+ - Mise Ã  jour de l'aide concernant les couloirs de bus + quelques prÃ©cisions.
 ------------------------------------------------------------------------------
 [Version 3.0.5]
- - Quelques valeurs par défaut de paramètres ont été revus
- - Le calcul des lignes de bus passant par un arrêt n'était pas correct mais 
-   n'était pas encore utilisé mais pouvait entraîner des débordements de 
+ - Quelques valeurs par dÃ©faut de paramÃ¨tres ont Ã©tÃ© revus
+ - Le calcul des lignes de bus passant par un arrÃªt n'Ã©tait pas correct mais 
+   n'Ã©tait pas encore utilisÃ© mais pouvait entraÃ®ner des dÃ©bordements de 
    tableaux dans certains cas.
- - Les lignes de bus passant par un arrêt de bus sont indiquées entre paren-
-   thèses dans la ligne d'état lorsque le curseur est sur un arrêt de bus.
+ - Les lignes de bus passant par un arrÃªt de bus sont indiquÃ©es entre paren-
+   thÃ¨ses dans la ligne d'Ã©tat lorsque le curseur est sur un arrÃªt de bus.
 ------------------------------------------------------------------------------
 [Version 3.0.4]
- - Lorsque le nombre d'arrêts de bus d'une ligne était inférieur à 9, un 
-   message indiquait que les autres arrêts n'étaient pas définis.
- - Les données des bus n'étaient pas vérifiées lors d'une vérification d'inté-
-   grité des données.
- - Quelques messages de la vérification du réseau ont été revus. L'aide a été
-   revue en conséquence.
+ - Lorsque le nombre d'arrÃªts de bus d'une ligne Ã©tait infÃ©rieur Ã  9, un 
+   message indiquait que les autres arrÃªts n'Ã©taient pas dÃ©finis.
+ - Les donnÃ©es des bus n'Ã©taient pas vÃ©rifiÃ©es lors d'une vÃ©rification d'intÃ©-
+   gritÃ© des donnÃ©es.
+ - Quelques messages de la vÃ©rification du rÃ©seau ont Ã©tÃ© revus. L'aide a Ã©tÃ©
+   revue en consÃ©quence.
 ------------------------------------------------------------------------------
 [Version 3.0.3]
- - Les têtes d'arrêt de bus pouvaient être mal définies dans certains cas 
-   entraînant des boucles infinies dans le calcul des trajets de lignes de
+ - Les tÃªtes d'arrÃªt de bus pouvaient Ãªtre mal dÃ©finies dans certains cas 
+   entraÃ®nant des boucles infinies dans le calcul des trajets de lignes de
    bus.
- - Pour les réseaux contenant des têtes de bus incorrectes ou indéfinies,
-   un message prévient ces cas lors de la vérification du réseau.
- - Le message précédent a été ajouté dans l'aide.
+ - Pour les rÃ©seaux contenant des tÃªtes de bus incorrectes ou indÃ©finies,
+   un message prÃ©vient ces cas lors de la vÃ©rification du rÃ©seau.
+ - Le message prÃ©cÃ©dent a Ã©tÃ© ajoutÃ© dans l'aide.
 ------------------------------------------------------------------------------
 [Version 3.0.2]
- - Lorsque la fenêtre des types de carrefours était utilisée plus d'une fois,
-   les types de carrefour qui avaient été choisi avant restaient accessibles
-   (avec un nombre de lignes et un nombre de colonnes différent de ceux de la
-   sélection).
+ - Lorsque la fenÃªtre des types de carrefours Ã©tait utilisÃ©e plus d'une fois,
+   les types de carrefour qui avaient Ã©tÃ© choisi avant restaient accessibles
+   (avec un nombre de lignes et un nombre de colonnes diffÃ©rent de ceux de la
+   sÃ©lection).
 ------------------------------------------------------------------------------
 [Version 3.0.1]
  - Un message d'erreur se produisait lorsque l'on cliquait sur Vu ou Appliquer
-   dans les paramètres du réseau de bus.
+   dans les paramÃ¨tres du rÃ©seau de bus.
 ------------------------------------------------------------------------------
 [Version 3.0]
- - Ajout de l'élément bus et éléments relatifs : arrêt, ligne & couloir de
-   bus. Conséquence :
-   · Il y a 5 boutons supplémentaires dans la barre d'outils : Dépôt, Arrêt &
-     Couloir de bus (ce dernier n'est pas opérationnel dans cette version) et
-     enfin 2 boutons Infos Bus et Distances aux arrêts de bus.
-   · Le format de fichier a changé (voir ligne suivante).
-   · il y a un paramètre supplémentaire : le nombre d'arrêts de bus mais aussi
-     une fiche de paramétrage du réseau de lignes de bus (bouton BUS à droite
-     du nouveau paramètre).
- - Les rubriques de compatibilité ont été retirée. La compatibilité est gérée
-   automatiquement. Cependant, si des fichiers de simulations ont été enregis-
-   trés avec une version antérieure à la version 2.0, ils ne peuvent plus être
+ - Ajout de l'Ã©lÃ©ment bus et Ã©lÃ©ments relatifs : arrÃªt, ligne & couloir de
+   bus. ConsÃ©quence :
+   Â· Il y a 5 boutons supplÃ©mentaires dans la barre d'outils : DÃ©pÃ´t, ArrÃªt &
+     Couloir de bus (ce dernier n'est pas opÃ©rationnel dans cette version) et
+     enfin 2 boutons Infos Bus et Distances aux arrÃªts de bus.
+   Â· Le format de fichier a changÃ© (voir ligne suivante).
+   Â· il y a un paramÃ¨tre supplÃ©mentaire : le nombre d'arrÃªts de bus mais aussi
+     une fiche de paramÃ©trage du rÃ©seau de lignes de bus (bouton BUS Ã  droite
+     du nouveau paramÃ¨tre).
+ - Les rubriques de compatibilitÃ© ont Ã©tÃ© retirÃ©e. La compatibilitÃ© est gÃ©rÃ©e
+   automatiquement. Cependant, si des fichiers de simulations ont Ã©tÃ© enregis-
+   trÃ©s avec une version antÃ©rieure Ã  la version 2.0, ils ne peuvent plus Ãªtre
    ouverts.
- - Ajout de boutons de navigation sur la fenêtre de statistiques de fluidité
-   et de trafic. De plus, l'information de statistiques (fluidité/Trafic) est
-   détaillée dans la barre de statut pour la case sélectionnée dans la zone de
+ - Ajout de boutons de navigation sur la fenÃªtre de statistiques de fluiditÃ©
+   et de trafic. De plus, l'information de statistiques (fluiditÃ©/Trafic) est
+   dÃ©taillÃ©e dans la barre de statut pour la case sÃ©lectionnÃ©e dans la zone de
    simulation.
  - Ajout d'un bouton "Aide" sur toutes les fiches ayant des boutons.
- - Les messages d'avertissement lors des changement d'éléments ont pour bouton
-   par défaut Annuler au lieu de Oui et une icône d'avertissement est visible.
- - Les boutons "Ok" et "Fermer" ont été remplacés par des boutons "Vu".
- - Une fiche d'informations piéton a été créée (3ème bouton d'information).
- - Le bouton d'information Véhicule a changé pour que les trois boutons d'in-
+ - Les messages d'avertissement lors des changement d'Ã©lÃ©ments ont pour bouton
+   par dÃ©faut Annuler au lieu de Oui et une icÃ´ne d'avertissement est visible.
+ - Les boutons "Ok" et "Fermer" ont Ã©tÃ© remplacÃ©s par des boutons "Vu".
+ - Une fiche d'informations piÃ©ton a Ã©tÃ© crÃ©Ã©e (3Ã¨me bouton d'information).
+ - Le bouton d'information VÃ©hicule a changÃ© pour que les trois boutons d'in-
    formations se ressemblent.
- - La fenêtre de composition a été complétée avec les arrêts de bus.
- - La procédure d'initialisation de la simulation est plus longue du fait du
-   calcul des distances aux arrêts de bus. J'ai ajouté une jauge en bas à
-   droite pour les calculs de distances aux étapes et aux arrêts de bus (n°
+ - La fenÃªtre de composition a Ã©tÃ© complÃ©tÃ©e avec les arrÃªts de bus.
+ - La procÃ©dure d'initialisation de la simulation est plus longue du fait du
+   calcul des distances aux arrÃªts de bus. J'ai ajoutÃ© une jauge en bas Ã 
+   droite pour les calculs de distances aux Ã©tapes et aux arrÃªts de bus (nÂ°
    courant/nombre).
- - L'aide a été mise à jour avec toutes ces nouveautés et modifications. Le
-   sommaire a été revu (plus compact).
+ - L'aide a Ã©tÃ© mise Ã  jour avec toutes ces nouveautÃ©s et modifications. Le
+   sommaire a Ã©tÃ© revu (plus compact).
 ------------------------------------------------------------------------------
 [Version 2.3]
- - Lorsqu'une erreur est détectée, un message précise que la cause est
-   inscrite en bas de la fenêtre et que le curseur jaune indique l'endroit de
+ - Lorsqu'une erreur est dÃ©tectÃ©e, un message prÃ©cise que la cause est
+   inscrite en bas de la fenÃªtre et que le curseur jaune indique l'endroit de
    l'erreur.
 ------------------------------------------------------------------------------
 [Version 2.2.8]
- - Remplacement du terme "attente" par "fluidité" concernant les nouvelles 
+ - Remplacement du terme "attente" par "fluiditÃ©" concernant les nouvelles 
    statistiques.
- - La palette de couleurs des nouvelles statistiques a été corrigée (il y a
+ - La palette de couleurs des nouvelles statistiques a Ã©tÃ© corrigÃ©e (il y a
    plus d'orange).
 ------------------------------------------------------------------------------
 [Version 2.2.7]
- - La fenêtre d'affichage des distances aux étapes a été soignée : les
-   directions possibles sont à présent des flèches et la fenêtre a perdu de la
+ - La fenÃªtre d'affichage des distances aux Ã©tapes a Ã©tÃ© soignÃ©e : les
+   directions possibles sont Ã  prÃ©sent des flÃ¨ches et la fenÃªtre a perdu de la
    largeur.
- - Des statistiques de fluidité et de trafic sont à présent affichées après 
-   interruption ou après la fin de la simulation. Elles donnent un aperçu en 
-   couleurs de la situation de fluidité et de trafic sur le réseau.
- - L'aide à été modifiée en conséquence de ces modifications et nouveautés.
+ - Des statistiques de fluiditÃ© et de trafic sont Ã  prÃ©sent affichÃ©es aprÃ¨s 
+   interruption ou aprÃ¨s la fin de la simulation. Elles donnent un aperÃ§u en 
+   couleurs de la situation de fluiditÃ© et de trafic sur le rÃ©seau.
+ - L'aide Ã  Ã©tÃ© modifiÃ©e en consÃ©quence de ces modifications et nouveautÃ©s.
 ------------------------------------------------------------------------------
 [Version 2.2.6]
- - Changement de comportement de la fenêtre de recherche.
-   Elle indique la situation de l'élément demandé au lieu de rechercher le
-   prochain élément existant sur le réseau.
+ - Changement de comportement de la fenÃªtre de recherche.
+   Elle indique la situation de l'Ã©lÃ©ment demandÃ© au lieu de rechercher le
+   prochain Ã©lÃ©ment existant sur le rÃ©seau.
 ------------------------------------------------------------------------------
 [Version 2.2.5]
- - La bulle d'aide du bouton Passage piétons a été défini.
- - Une erreur pouvait se produire lors de la suppression des éléments d'une
-   zone sélectionnée comportant des feux.
+ - La bulle d'aide du bouton Passage piÃ©tons a Ã©tÃ© dÃ©fini.
+ - Une erreur pouvait se produire lors de la suppression des Ã©lÃ©ments d'une
+   zone sÃ©lectionnÃ©e comportant des feux.
 ------------------------------------------------------------------------------
 [Version 2.2.4]
- - Les tours pendant lesquels les véhicules ne se déplacent pas du fait de
-   leur vitesse lente ne sont pas comptés en tant que tours d'attente dans le
+ - Les tours pendant lesquels les vÃ©hicules ne se dÃ©placent pas du fait de
+   leur vitesse lente ne sont pas comptÃ©s en tant que tours d'attente dans le
    bilan.
- - Entre la direction courante et une autre direction ayant la même distance à 
-   l'étape d'arrivée, le choix se porte en priorité sur la direction courante.
+ - Entre la direction courante et une autre direction ayant la mÃªme distance Ã  
+   l'Ã©tape d'arrivÃ©e, le choix se porte en prioritÃ© sur la direction courante.
 ------------------------------------------------------------------------------
 [Version 2.2.3]
- - Quelques corrections d'affichage (définition des feux, info véhicule).
- - Le numéro de piéton dans la recherche pouvait s'incrémenté dans certains
+ - Quelques corrections d'affichage (dÃ©finition des feux, info vÃ©hicule).
+ - Le numÃ©ro de piÃ©ton dans la recherche pouvait s'incrÃ©mentÃ© dans certains
    cas.
- - Le numéro de sous-version (3ème chiffre) a été ajouté dans la boîte À
+ - Le numÃ©ro de sous-version (3Ã¨me chiffre) a Ã©tÃ© ajoutÃ© dans la boÃ®te Ã€
    propos.
- - Les paramètres "piéton" en cours de simulation étaient désactivés mais pas
-   grisés.
- - L'information de priorité dans les informations véhicule n'était jamais
-   grisée.
+ - Les paramÃ¨tres "piÃ©ton" en cours de simulation Ã©taient dÃ©sactivÃ©s mais pas
+   grisÃ©s.
+ - L'information de prioritÃ© dans les informations vÃ©hicule n'Ã©tait jamais
+   grisÃ©e.
 ------------------------------------------------------------------------------
 [Version 2.2.2]
  - La rubrique Statistiques | Affichage | 20 derniers tours se comportait
    comme la rubrique Statistiques | Affichage | 10 derniers tours.
 ------------------------------------------------------------------------------
 [Version 2.2.1]
- - Petite correction dans l'algorithme de choix de direction à un carrefour.
+ - Petite correction dans l'algorithme de choix de direction Ã  un carrefour.
 ------------------------------------------------------------------------------
 [Version 2.2]
- - Ajout de véhicules prioritaires : Urgence (véhicules rouges, gyrophare
-   bleu) et Police (véhicules blancs et gyrophares bleus et jaunes).
- - La fenêtre d'informations sur le véhicule a été modifiée pour y ajouter le 
-   niveau de priorité : Normale, Urgence ou Police.
- - À présent, sur chaque étape apparaît son numéro.
- - La fenêtre de recherche de coordonnées, d'étape, de véhicule ou de piéton
-   est affichée en restant en avant-plan.
- - Modification de l'aide concernant les ajouts précédents.
- - Lorsque les véhicules ou les piétons ne sont pas affichés et que l'on
-   appuie sur le bouton "Marche", ils ne sont plus réaffichés d'office si la
-   simulation est en pause (au démarrage de la simulation uniquement).
+ - Ajout de vÃ©hicules prioritaires : Urgence (vÃ©hicules rouges, gyrophare
+   bleu) et Police (vÃ©hicules blancs et gyrophares bleus et jaunes).
+ - La fenÃªtre d'informations sur le vÃ©hicule a Ã©tÃ© modifiÃ©e pour y ajouter le 
+   niveau de prioritÃ© : Normale, Urgence ou Police.
+ - Ã€ prÃ©sent, sur chaque Ã©tape apparaÃ®t son numÃ©ro.
+ - La fenÃªtre de recherche de coordonnÃ©es, d'Ã©tape, de vÃ©hicule ou de piÃ©ton
+   est affichÃ©e en restant en avant-plan.
+ - Modification de l'aide concernant les ajouts prÃ©cÃ©dents.
+ - Lorsque les vÃ©hicules ou les piÃ©tons ne sont pas affichÃ©s et que l'on
+   appuie sur le bouton "Marche", ils ne sont plus rÃ©affichÃ©s d'office si la
+   simulation est en pause (au dÃ©marrage de la simulation uniquement).
 ------------------------------------------------------------------------------
 [Version 2.1]
- - Ajout de la recherche d'un piéton (boîte de dialogue Recherche). Le compor-
-   tement est le même que celui de la recherche d'un véhicule (le curseur
-   reste sur le piéton lors de son déplacement comme pour le véhicule).
- - Modification de l'aide concernant l'ajout précédent.
+ - Ajout de la recherche d'un piÃ©ton (boÃ®te de dialogue Recherche). Le compor-
+   tement est le mÃªme que celui de la recherche d'un vÃ©hicule (le curseur
+   reste sur le piÃ©ton lors de son dÃ©placement comme pour le vÃ©hicule).
+ - Modification de l'aide concernant l'ajout prÃ©cÃ©dent.
 ------------------------------------------------------------------------------
 [Version 2.0] 
- - Ajout de l'élément PIÉTON dans la simulation. Conséquence :
-   · Le format de fichier a changé
-   · Des paramètres ont été ajoutés pour les piétons
-   · L'exemple Géant.cvw a été modifié pour montrer la simulation des piétons
- - Ajout d'un outil dans l'édition : le déplacement de feu. Ceci peut être 
-   utile pour poser des passages piétons devant les feux qui doivent être 
-   reculés d'une case : la rubrique Case | Déplacer ce feu a donc été ajoutée 
-   dans le menu contextuel en mode édition.
- - Correction dans la boîte de dialogue de paramétrage dans le comportement 
-   après changement du nombre de feux : le nombre de véhicules changeait.
- - Les messages d'erreur après vérification d'intégrité n'étaient jamais
-   affichés si message(s) il y avai(en)t.
- - Tous les paramètres de simulation sont à présent stockés dans les fichiers
+ - Ajout de l'Ã©lÃ©ment PIÃ‰TON dans la simulation. ConsÃ©quence :
+   Â· Le format de fichier a changÃ©
+   Â· Des paramÃ¨tres ont Ã©tÃ© ajoutÃ©s pour les piÃ©tons
+   Â· L'exemple GÃ©ant.cvw a Ã©tÃ© modifiÃ© pour montrer la simulation des piÃ©tons
+ - Ajout d'un outil dans l'Ã©dition : le dÃ©placement de feu. Ceci peut Ãªtre 
+   utile pour poser des passages piÃ©tons devant les feux qui doivent Ãªtre 
+   reculÃ©s d'une case : la rubrique Case | DÃ©placer ce feu a donc Ã©tÃ© ajoutÃ©e 
+   dans le menu contextuel en mode Ã©dition.
+ - Correction dans la boÃ®te de dialogue de paramÃ©trage dans le comportement 
+   aprÃ¨s changement du nombre de feux : le nombre de vÃ©hicules changeait.
+ - Les messages d'erreur aprÃ¨s vÃ©rification d'intÃ©gritÃ© n'Ã©taient jamais
+   affichÃ©s si message(s) il y avai(en)t.
+ - Tous les paramÃ¨tres de simulation sont Ã  prÃ©sent stockÃ©s dans les fichiers
    de sauvegarde d'extension cvw.
- - L'aide en ligne a été complétée.
- - L'icône des fichiers de simulation a changé (différente de celle de
+ - L'aide en ligne a Ã©tÃ© complÃ©tÃ©e.
+ - L'icÃ´ne des fichiers de simulation a changÃ© (diffÃ©rente de celle de
    l'application).
- - La boîte À propos de Centre-ville a subi un lifting.
+ - La boÃ®te Ã€ propos de Centre-ville a subi un lifting.
 ------------------------------------------------------------------------------
 [Version 1.7] 2 ajouts, 1 correction
-Amélioration du mode édition pour aider à la conception d'un réseau
- - Il y a à présent un menu déroulant en mode édition et un menu déroulant en 
+AmÃ©lioration du mode Ã©dition pour aider Ã  la conception d'un rÃ©seau
+ - Il y a Ã  prÃ©sent un menu dÃ©roulant en mode Ã©dition et un menu dÃ©roulant en 
    mode simulation (ils sont exclusifs).
- - Il est possible à présent de sélectionner plusieurs cases pour tracer des
-   routes plus rapidement à l'aide du menu déroulant (après sélection).
- - En sélectionnant plusieurs cases, il est possible de tracer des routes,
+ - Il est possible Ã  prÃ©sent de sÃ©lectionner plusieurs cases pour tracer des
+   routes plus rapidement Ã  l'aide du menu dÃ©roulant (aprÃ¨s sÃ©lection).
+ - En sÃ©lectionnant plusieurs cases, il est possible de tracer des routes,
    placer des carrefours-types ou de supprimer le contenu.
  - Ajout d'un exemple pour illustrer les carrefours-types : carfours.cvw.
- - Mise à jour de l'aide.
- Ajout de statistiques sur la composition du réseau
- - En choisissant Statistiques | Composition du réseau, il est possible de
-   savoir le nombre d'éléments du réseau ainsi que le nombre d'étapes qui
-   manquent et le nombre maximum de feux pouvant être ajoutés.
- - Mise à jour de l'aide (Rubrique Statistique sur la composition du réseau).
- Détection de modification d'un réseau (correction)
+ - Mise Ã  jour de l'aide.
+ Ajout de statistiques sur la composition du rÃ©seau
+ - En choisissant Statistiques | Composition du rÃ©seau, il est possible de
+   savoir le nombre d'Ã©lÃ©ments du rÃ©seau ainsi que le nombre d'Ã©tapes qui
+   manquent et le nombre maximum de feux pouvant Ãªtre ajoutÃ©s.
+ - Mise Ã  jour de l'aide (Rubrique Statistique sur la composition du rÃ©seau).
+ DÃ©tection de modification d'un rÃ©seau (correction)
  - Aucune demande d'enregistrement ne s'affichait lorsque l'on quittait par
-   le bouton fermer en haut à droite (croix).
- - Lorsque l'on choisissait Annuler dans la boîte de dialogue Enregistrer,
-   l'action demandée avant était quand même effectuée (quitter ou ouvrir une 
+   le bouton fermer en haut Ã  droite (croix).
+ - Lorsque l'on choisissait Annuler dans la boÃ®te de dialogue Enregistrer,
+   l'action demandÃ©e avant Ã©tait quand mÃªme effectuÃ©e (quitter ou ouvrir une 
    autre simulation).
 ------------------------------------------------------------------------------
 [Version 1.6.3]
- - Une étape s'affichait à la place du curseur jaune lorsqu'une erreur était
-   détectée lors de la vérification du réseau.
+ - Une Ã©tape s'affichait Ã  la place du curseur jaune lorsqu'une erreur Ã©tait
+   dÃ©tectÃ©e lors de la vÃ©rification du rÃ©seau.
 ------------------------------------------------------------------------------
 [Version 1.6.2]
- - Une rubrique "Suivre ce véhicule" (Ctrl+S) a été ajoutée dans le menu qui
-   apparaît lorsque l'on fait clic droit sur une case. La rubrique est grisée
-   s'il n'y a aucun véhicule. Il est possible de faire clic-droit sur une case
-   puis attendre qu'un véhicule arrive sur la case sélectionnée pour cliquer
-   aussitôt sur la rubrique "Suivre ce véhicule".
- - Mise à jour de l'aide pour les ajouts depuis la version 1.6.1
+ - Une rubrique "Suivre ce vÃ©hicule" (Ctrl+S) a Ã©tÃ© ajoutÃ©e dans le menu qui
+   apparaÃ®t lorsque l'on fait clic droit sur une case. La rubrique est grisÃ©e
+   s'il n'y a aucun vÃ©hicule. Il est possible de faire clic-droit sur une case
+   puis attendre qu'un vÃ©hicule arrive sur la case sÃ©lectionnÃ©e pour cliquer
+   aussitÃ´t sur la rubrique "Suivre ce vÃ©hicule".
+ - Mise Ã  jour de l'aide pour les ajouts depuis la version 1.6.1
 ------------------------------------------------------------------------------
 [Version 1.6.1]
- - Le déplacement des véhicules est plus facile à suivre : on peut les voir 
-   tourner et donc mieux savoir d'où ils viennent et où ils vont.
- - Il est possible de décider de vérifier ou non l'intégrité du réseau à l'ou-
-   verture d'un fichier et avant la simulation. 2 rubriques (cocher/décocher)
-   ont donc été ajoutées au menu (une dans le menu Fichier et l'autre dans le
+ - Le dÃ©placement des vÃ©hicules est plus facile Ã  suivre : on peut les voir 
+   tourner et donc mieux savoir d'oÃ¹ ils viennent et oÃ¹ ils vont.
+ - Il est possible de dÃ©cider de vÃ©rifier ou non l'intÃ©gritÃ© du rÃ©seau Ã  l'ou-
+   verture d'un fichier et avant la simulation. 2 rubriques (cocher/dÃ©cocher)
+   ont donc Ã©tÃ© ajoutÃ©es au menu (une dans le menu Fichier et l'autre dans le
    menu Simulation).
 ------------------------------------------------------------------------------
 [Version 1.6]
- - Ajout d'une propriété sur les cases : il est possible d'obliger de
-   continuer tout droit (autrement dit d'interdire de tourner à gauche ou à 
-   droite). Voici les conséquences :
-    · Les flèches de directions possibles sur le réseau sont de couleur bleu
+ - Ajout d'une propriÃ©tÃ© sur les cases : il est possible d'obliger de
+   continuer tout droit (autrement dit d'interdire de tourner Ã  gauche ou Ã  
+   droite). Voici les consÃ©quences :
+    Â· Les flÃ¨ches de directions possibles sur le rÃ©seau sont de couleur bleu
       ciel.
-    · Les fichiers de simulation jusqu'à la version 1.5 ne sont plus compati-
-      bles : ajout de la propriété Compatibilité 1.5 dans le menu (voir debut)
-    · Mise à jour de l'aide.
-    · Le fichier Géant.cvw a été modifié : la propriété "Continuer tout droit"
-      a été activée pour deux cases.
- - Le bouton de vérification du réseau restait grisé après une simulation et 
-   réouverture du fichier de simulation.
+    Â· Les fichiers de simulation jusqu'Ã  la version 1.5 ne sont plus compati-
+      bles : ajout de la propriÃ©tÃ© CompatibilitÃ© 1.5 dans le menu (voir debut)
+    Â· Mise Ã  jour de l'aide.
+    Â· Le fichier GÃ©ant.cvw a Ã©tÃ© modifiÃ© : la propriÃ©tÃ© "Continuer tout droit"
+      a Ã©tÃ© activÃ©e pour deux cases.
+ - Le bouton de vÃ©rification du rÃ©seau restait grisÃ© aprÃ¨s une simulation et 
+   rÃ©ouverture du fichier de simulation.
  - Ajout de la liste des messages d'erreurs possibles dans le fichier d'aide. 
 ------------------------------------------------------------------------------
 [Version 1.5]
- - Les véhicules sont en couleurs ! 6 couleurs possibles au lieu du gris.
+ - Les vÃ©hicules sont en couleurs ! 6 couleurs possibles au lieu du gris.
    Cela permet de mieux suivre le mouvement.
- - Il est à présent possible de lancer une simulation jusqu'à 3 vitesses
-   différentes pour les véhicules. Les véhicules vont au plus à 1 case/tour et
-   au moins à 1 case tous les 3 tours (simulation à 3 vitesses).
- - Modification de la fenêtre d'information sur un véhicule : ajout de la 
-   vitesse maximale du véhicule.
- - Le curseur est en forme de sablier à l'ouverture et à l'enregistrement de
-   fichier de simulation ainsi qu'à la vérification de l'intégrité.
- - Lorsque l'on choisit Nouveau, le nom de fichier précédent n'est plus
-   utilisé ce qui oblige à spécifier un nom de fichier.
+ - Il est Ã  prÃ©sent possible de lancer une simulation jusqu'Ã  3 vitesses
+   diffÃ©rentes pour les vÃ©hicules. Les vÃ©hicules vont au plus Ã  1 case/tour et
+   au moins Ã  1 case tous les 3 tours (simulation Ã  3 vitesses).
+ - Modification de la fenÃªtre d'information sur un vÃ©hicule : ajout de la 
+   vitesse maximale du vÃ©hicule.
+ - Le curseur est en forme de sablier Ã  l'ouverture et Ã  l'enregistrement de
+   fichier de simulation ainsi qu'Ã  la vÃ©rification de l'intÃ©gritÃ©.
+ - Lorsque l'on choisit Nouveau, le nom de fichier prÃ©cÃ©dent n'est plus
+   utilisÃ© ce qui oblige Ã  spÃ©cifier un nom de fichier.
  - Lorsque l'on choisit Nouveau, Ouvrir ou Quitter, une confirmation est
-   demandée pour enregistrer la simulation courante si elle a été modifiée.
- - Le bouton Etape était grisé lorsque l'on avait 3 directions possibles sur
-   une voie. En fait, il s'agissait de 4 (il faut au moins une entrée).
- - La boîte À propos ne disparaît pas au bout d'1 seconde lorsqu'on l'appelle 
+   demandÃ©e pour enregistrer la simulation courante si elle a Ã©tÃ© modifiÃ©e.
+ - Le bouton Etape Ã©tait grisÃ© lorsque l'on avait 3 directions possibles sur
+   une voie. En fait, il s'agissait de 4 (il faut au moins une entrÃ©e).
+ - La boÃ®te Ã€ propos ne disparaÃ®t pas au bout d'1 seconde lorsqu'on l'appelle 
    depuis le menu.
- - Modifications de l'aide concernant les couleurs et la vitesse des véhicules
- - Fichier Géant.cvw modifié : le périphérique extérieur a 2 files pour
-   montrer comment se comporte la simulation avec des véhicules de différentes
-   vitesses (à définir avant de lancer). Modifications de certaines priorités 
+ - Modifications de l'aide concernant les couleurs et la vitesse des vÃ©hicules
+ - Fichier GÃ©ant.cvw modifiÃ© : le pÃ©riphÃ©rique extÃ©rieur a 2 files pour
+   montrer comment se comporte la simulation avec des vÃ©hicules de diffÃ©rentes
+   vitesses (Ã  dÃ©finir avant de lancer). Modifications de certaines prioritÃ©s 
    (optimisation).
 ------------------------------------------------------------------------------
 [Version 1.4.1]
 Aide :
- - Les accès aux rubriques d'aide par la touche F1 a été remis (surtout pour
+ - Les accÃ¨s aux rubriques d'aide par la touche F1 a Ã©tÃ© remis (surtout pour
    les statistiques).
- - Les bitmaps de curseur dans l'aide ont été revus.
-Suivi d'un véhicule :
- - Le suivi d'un véhicule ne s'arrête pas si ce dernier est arrivé, le suivi
-   reprend avec un autre véhicule (par ordre croissant).
+ - Les bitmaps de curseur dans l'aide ont Ã©tÃ© revus.
+Suivi d'un vÃ©hicule :
+ - Le suivi d'un vÃ©hicule ne s'arrÃªte pas si ce dernier est arrivÃ©, le suivi
+   reprend avec un autre vÃ©hicule (par ordre croissant).
 ------------------------------------------------------------------------------
 [Version 1.4] 
-Ajout de 2 fonctionnalités :
- - Recherche d'une case, d'une étape, d'un feu ou recherche/suivi d'un
-   véhicule.
- - Informations d'un véhicule sélectionné/suivi.
-Modification de la présentation et de l'accessibilité :
- - Ajout dans la barre d'outils d'un bouton d'accès aux propriétés de la
+Ajout de 2 fonctionnalitÃ©s :
+ - Recherche d'une case, d'une Ã©tape, d'un feu ou recherche/suivi d'un
+   vÃ©hicule.
+ - Informations d'un vÃ©hicule sÃ©lectionnÃ©/suivi.
+Modification de la prÃ©sentation et de l'accessibilitÃ© :
+ - Ajout dans la barre d'outils d'un bouton d'accÃ¨s aux propriÃ©tÃ©s de la
    simulation.
- - Réorganisation des boutons dans la barre d'outils.
- - Réorganisation du menu principal (séparation en deux menus Simulation et
+ - RÃ©organisation des boutons dans la barre d'outils.
+ - RÃ©organisation du menu principal (sÃ©paration en deux menus Simulation et
    Statistiques).
- - Ajout d'un menu déroulement contextuel à l'endroit où se trouve le 
+ - Ajout d'un menu dÃ©roulement contextuel Ã  l'endroit oÃ¹ se trouve le 
    curseur (clic droit) : 
-   · édition (directions, étape, priorités),
-   · infos (véhicule, distances aux étapes).
+   Â· Ã©dition (directions, Ã©tape, prioritÃ©s),
+   Â· infos (vÃ©hicule, distances aux Ã©tapes).
 Ouverture/Lancement :
- - La boîte à propos reste affichée lors du chargement d'un fichier cvw.
- - À la fin d'une simulation, le fichier de la simulation terminée est ré-
+ - La boÃ®te Ã  propos reste affichÃ©e lors du chargement d'un fichier cvw.
+ - Ã€ la fin d'une simulation, le fichier de la simulation terminÃ©e est rÃ©-
    ouvert automatiquement (il demandait un nom de fichier).
  - Le chemin et le nom du fichier de simulation en cours d'utilisation est
-   affiché dans le titre de la fenêtre principale.
- - Le nom de fichier par défaut proposé dans la boîte de dialogue à l'ouver-
-   ture ou à l'enregistrement est le dernier fichier ouvert ou enregistré.
- - Après avoir spécifié un nom de fichier à l'enregistrement, une confirmation
-   d'écrasement est affichée si le fichier existe déjà.
+   affichÃ© dans le titre de la fenÃªtre principale.
+ - Le nom de fichier par dÃ©faut proposÃ© dans la boÃ®te de dialogue Ã  l'ouver-
+   ture ou Ã  l'enregistrement est le dernier fichier ouvert ou enregistrÃ©.
+ - AprÃ¨s avoir spÃ©cifiÃ© un nom de fichier Ã  l'enregistrement, une confirmation
+   d'Ã©crasement est affichÃ©e si le fichier existe dÃ©jÃ .
 Aide :
  - 1 Correction (Alt+F4 pour quitter au lieu de Ctrl+F4).
- - Changement des clichés d'écran (gris au lieu de bleu gris).
- - Mise à jour suite aux changements de la version.
-Modification du fichier Géant.cvw :
+ - Changement des clichÃ©s d'Ã©cran (gris au lieu de bleu gris).
+ - Mise Ã  jour suite aux changements de la version.
+Modification du fichier GÃ©ant.cvw :
  - Ajout d'une file sur la voie qui monte vers le haut au dessus du carrefour
-   à 3 feux en bas à droite. Ceci pour montrer comment définir des files sur
-   une voie à sens unique.
+   Ã  3 feux en bas Ã  droite. Ceci pour montrer comment dÃ©finir des files sur
+   une voie Ã  sens unique.
 ------------------------------------------------------------------------------
 [Version 1.3.4]
- - À chaque lancement, le programme lancé devient automatiquement le programme
+ - Ã€ chaque lancement, le programme lancÃ© devient automatiquement le programme
    principal des fichiers de simulation (extension .cvw).
 ------------------------------------------------------------------------------
 [Version 1.3.3]
- - Quelques corrections de sécurité ont été ajouté lors des accès des outils
+ - Quelques corrections de sÃ©curitÃ© ont Ã©tÃ© ajoutÃ© lors des accÃ¨s des outils
    de statistiques hors simulation.
- - Le quadrillage des statistiques réapparaît.
+ - Le quadrillage des statistiques rÃ©apparaÃ®t.
 ------------------------------------------------------------------------------
 [Version 1.3.1]
- - Les éléments de jeu ont subi un petit "lifting" en zoom avant.
+ - Les Ã©lÃ©ments de jeu ont subi un petit "lifting" en zoom avant.
 ------------------------------------------------------------------------------
 [Version 1.3]
  - Ajout du bouton de zoom avant (x2).
- - La taille de la fenêtre principale peut être changée. Cependant elle ne
-   peut dépasser les dimensions d'un écran 800x600 si l'option zoom n'est pas
-   activée.
- - Mise à jour de l'aide pour les nouvelles fonctionnalités.
+ - La taille de la fenÃªtre principale peut Ãªtre changÃ©e. Cependant elle ne
+   peut dÃ©passer les dimensions d'un Ã©cran 800x600 si l'option zoom n'est pas
+   activÃ©e.
+ - Mise Ã  jour de l'aide pour les nouvelles fonctionnalitÃ©s.
 ------------------------------------------------------------------------------
 [Version 1.2]
- - Correction au niveau du graphique d'évolution : il présentait des creux
+ - Correction au niveau du graphique d'Ã©volution : il prÃ©sentait des creux
    lorsqu'il s'affichait.
- - Ajout des statistiques des véhicules d'une étape à l'autre.
- - Mise à jour de l'aide pour les nouvelles fonctionnalités et pour expliquer
-   comment définir les feux dans la boîte de dialogue de définition des feux.
+ - Ajout des statistiques des vÃ©hicules d'une Ã©tape Ã  l'autre.
+ - Mise Ã  jour de l'aide pour les nouvelles fonctionnalitÃ©s et pour expliquer
+   comment dÃ©finir les feux dans la boÃ®te de dialogue de dÃ©finition des feux.
 
 ------------------------------------------------------------------------------
 6. CONTENU DES SOURCES DE PROGRAMME
 ------------------------------------------------------------------------------
 
 Centre-Ville est en GPL depuis la version 3.7.
-Ceci entraîne le fait que les archives contiennent les sources des programmes.
-Les sources sont en C++Builder 6. Les sources de la version 3.1 ont été 
+Ceci entraÃ®ne le fait que les archives contiennent les sources des programmes.
+Les sources sont en C++Builder 6. Les sources de la version 3.1 ont Ã©tÃ© 
 incluses en guise d'exemple de portage Delphi. Les sources de la version 4.3.1
-ont été également incluses en guise d'exemple de code C++ commun entre les 
-versions Windows et Linux. Le projet Kylix Delphi (v3.1) peut être ouvert avec
+ont Ã©tÃ© Ã©galement incluses en guise d'exemple de code C++ commun entre les 
+versions Windows et Linux. Le projet Kylix Delphi (v3.1) peut Ãªtre ouvert avec
 toutes les versions de Kylix alors que le projet Kylix C++ (v4.3.1) ne peut 
-être ouvert qu'avec Kylix 3 ou version supérieure. Pour plus d'informations, 
+Ãªtre ouvert qu'avec Kylix 3 ou version supÃ©rieure. Pour plus d'informations, 
 consulter le fichier INFOSRC.TXT.
 
 ------------------------------------------------------------------------------
-7. PRÉVISIONS & IDÉES POUR LES PROCHAINES VERSIONS
+7. PRÃ‰VISIONS & IDÃ‰ES POUR LES PROCHAINES VERSIONS
 ------------------------------------------------------------------------------
 
- - Commande "Coller à partir de..." ;
+ - Commande "Coller Ã  partir de..." ;
  - Clignotants pour signaler l'intention de tourner (trop petit ?) ;
  - Cyclistes (& Rollers ?) et leurs couloirs de cyclistes ;
- - Affichages d'estimation de durées (tours) de trajet jusqu'à une étape.
+ - Affichages d'estimation de durÃ©es (tours) de trajet jusqu'Ã  une Ã©tape.
 
 ------------------------------------------------------------------------------
-Dernière mise à jour le 02/05/2020.
+DerniÃ¨re mise Ã  jour le 02/05/2020.
 ------------------------------------------------------------------------------

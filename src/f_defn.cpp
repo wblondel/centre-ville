@@ -15,7 +15,7 @@ TfrmDefNature *frmDefNature=NULL;
 __fastcall TfrmDefNature::TfrmDefNature(TComponent* Owner)
   : TForm(Owner)
 {
- // v5.4 cette boîte ne s'affiche pas comme il faut en HDPI :^(
+ // v5.4 cette boÃ®te ne s'affiche pas comme il faut en HDPI :^(
  Width=Width*Screen->PixelsPerInch/96;
  Height=Height*Screen->PixelsPerInch/96;
 }
@@ -82,7 +82,7 @@ void __fastcall TfrmDefNature::ButtonFermerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefNature::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

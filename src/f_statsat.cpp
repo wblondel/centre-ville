@@ -38,7 +38,7 @@ void __fastcall TfrmStatsAttenteTrafic::PaintBoxPaint(
 void __fastcall TfrmStatsAttenteTrafic::FormShow(TObject *Sender)
 {
  if (cv->TourCrt)
-  Caption="Statistiques de fluidité et de trafic au tour n°"+IntToStr(cv->TourCrt);
+  Caption="Statistiques de fluiditÃ© et de trafic au tour nÂ°"+IntToStr(cv->TourCrt);
  CSpinEditParkingDepart->MAXVALUE=cv->NbParkings;
  CSpinEditParkingArrivee->MAXVALUE=cv->NbParkings;
  RecalculeEtVisualise();
@@ -72,7 +72,7 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
    {
 	if (ts)
 	 {
-	  asMsg=Format( "Trafic en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%",
+	  asMsg=Format( "Trafic en (%d, %d) au tour %d : %d vÃ©hicules (Max. %d) soit %.3f%%",
 					ARRAYOFCONST(( x, y, (int)cv->TourCrt,
 								   cv->v[x][y].Trafic[ed][ea], m[ts],
 								   (long double)((100.0*cv->v[x][y].Trafic[ed][ea])/m[ts]))));
@@ -95,7 +95,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
      ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
  if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings))
   {
-   AfficheMessage("Le n° d'étape est incorrect !", "Valeur incorrecte", tmAvertissement, 0, 0);
+   AfficheMessage("Le nÂ° d'Ã©tape est incorrect !", "Valeur incorrecte", tmAvertissement, 0, 0);
    return;
   }
  m[0]=0; m[1]=0;
@@ -114,13 +114,13 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
     }
  LabelMax->Caption=IntToStr(m[RadioGroupType->ItemIndex]);
  LabelAttenteCumulee->Caption=IntToStr(t[ATTENTE]);
- if (n) // v1.8.4 : FormatFloat à la place de Format
+ if (n) // v1.8.4 : FormatFloat Ã  la place de Format
   LabelAttenteMoyenne->Caption=FormatFloat("0.0", 1.0*t[ATTENTE]/n); // v3.0 (ajout). v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
  else
   LabelAttenteMoyenne->Caption="N/D";
  LabelAttenteMaximale->Caption=IntToStr(m[ATTENTE]);
  LabelTraficCumule->Caption=IntToStr(t[TRAFIC]);
- if (n) // v1.8.4 : FormatFloat à la place de Format
+ if (n) // v1.8.4 : FormatFloat Ã  la place de Format
   LabelTraficMoyen->Caption=FormatFloat("0.0", 1.0*t[TRAFIC]/n); // v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
  else
   LabelTraficMoyen->Caption="N/D";
@@ -130,7 +130,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
 //---------------------------------------------------------------------------
 void __fastcall TfrmStatsAttenteTrafic::ParametresParkingsClick(TObject *Sender)
 {
- switch(((TComponent*)Sender)->Tag) // Comportements propres à certains objets
+ switch(((TComponent*)Sender)->Tag) // Comportements propres Ã  certains objets
   {
    case 1: CSpinEditParkingDepart->Enabled=CheckBoxParkingDepart->Checked;
            if (CSpinEditParkingDepart->Enabled) CSpinEditParkingDepart->SetFocus();
@@ -187,7 +187,7 @@ void __fastcall TfrmStatsAttenteTrafic::RubriqueClick(
 
 void __fastcall TfrmStatsAttenteTrafic::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

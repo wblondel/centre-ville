@@ -21,7 +21,7 @@
 //---------------------------------------------------------------------------
 #include "simul.h"
 //---------------------------------------------------------------------------
-// v5.4 : les glyphes de TSpeedButtons sont chargées manuellement (HDPI)
+// v5.4 : les glyphes de TSpeedButtons sont chargÃ©es manuellement (HDPI)
 //---------------------------------------------------------------------------
 #define GLYPHE_DEF    0
 #define GLYPHE_DEFF   1
@@ -33,7 +33,7 @@
 #define GLYPHE_DEFVL  7
 #define GLYPHE_DIR    8
 //----------------------------------------------------------------------------------------------------------------------
-// Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets)
+// Types Ã©numÃ©rÃ©s. /!\ v5.4 : le type char a Ã©tÃ© forcÃ© pour que l'Ã©numÃ©rÃ© ne prenne pas la taille d'un entier (4 octets)
 //----------------------------------------------------------------------------------------------------------------------
 // pour RafraichitBoutonsEdition(...) v3.5
 enum affichage : unsigned char {aff_aucun, aff_dir, aff_sign, aff_veh=4, aff_ptn=8, aff_voie=16, aff_quadr=32, aff_env=64, aff_infct=128}; // v3.8.1 (aff_env). v5.4.1 (unsigned + aff_infct)
@@ -41,13 +41,13 @@ enum type_demande : char {tdRien, tdPause, tdArret};
 enum operation_avant : char {oaNouveau, oaOuvrir, oaQuitter};
 enum mode_edition : char {meAucun, meCase, meSelection}; // pour RafraichitBoutonEdition. v3.5
 //---------------------------------------------------------------------------
-// Utilisée dans la classe TfrmSimulation
+// UtilisÃ©e dans la classe TfrmSimulation
 extern const AnsiString asTitreCV;
 //---------------------------------------------------------------------------
 // Classe de la fiche
 class TfrmSimulation : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TTimer *TimerSimul;
   TTimer *TimerClignotementLocalisation;
   TTimer *TimerClignotementErreur;
@@ -531,7 +531,7 @@ private:
        RedimensionnementEnCours;
   int xErr, yErr, xDeplFeu, yDeplFeu,
       xCrt, yCrt,
-      xPrc, yPrc; // Détecteurs de direction du curseur. v3.5
+      xPrc, yPrc; // DÃ©tecteurs de direction du curseur. v3.5
   direction DirOrigVoieTram; // v3.5
   // v5.4 : conversion BCB6>BCBX : (AnsiString>String)
   String asNomFichAuto;
@@ -541,7 +541,7 @@ private:
   bool VerifieIntegrite();
   bool VerifieReseau();
   void AfficheMsgInfoNonDisp(const AnsiString asTitre); // v3.7
-  // Définition de la propriété SimulEnCours
+  // DÃ©finition de la propriÃ©tÃ© SimulEnCours
   bool __fastcall SimulEstEnCours() { return SimulEnCours; };
   void __fastcall MarcheArretSimul(bool EnCours)
    {
@@ -580,7 +580,7 @@ private:
 	ActionMarche->Enabled=!EnCours;
 	ActionInterruption->Enabled=EnCours;
 	ActionArret->Enabled=EnCours;
-	ActionEpidemie->Enabled=(!Pause)&&(!EnCours); // v5.4.2 : Action en mode interrupteur donc désactivé pendant la simulation
+	ActionEpidemie->Enabled=(!Pause)&&(!EnCours); // v5.4.2 : Action en mode interrupteur donc dÃ©sactivÃ© pendant la simulation
 	ActionEvolution->Enabled=Pause||EnCours;
     ActionFluiditeTrafic->Enabled=Pause||EnCours;
     ActionStatsParkings->Enabled=Pause||EnCours;
@@ -590,9 +590,9 @@ private:
     ActionDirectionGauche->Enabled=(!Pause)&&(!EnCours);
     ActionEffacerRoute->Enabled=(!Pause)&&(!EnCours);
     ActionDirectionHautTram->Enabled=(!Pause)&&(!EnCours);
-    ActionDirectionDroiteTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut répété !)
-    ActionDirectionBasTram->Enabled=(!Pause)&&(!EnCours);    // v4.2.2 (Haut répété !)
-    ActionDirectionGaucheTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut répété !)
+    ActionDirectionDroiteTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
+    ActionDirectionBasTram->Enabled=(!Pause)&&(!EnCours);    // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
+    ActionDirectionGaucheTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
     ActionEffacerVoieTram->Enabled=(!Pause)&&(!EnCours);
     ActionToutDroit->Enabled=(!Pause)&&(!EnCours);
     ActionPriorites->Enabled=(!Pause)&&(!EnCours);
@@ -606,14 +606,14 @@ private:
     ActionPlaceVehlib->Enabled=(!Pause)&&(!EnCours); // v5.3
     ActionDeplacerFeuSource->Enabled=(!Pause)&&(!EnCours);
     ActionDeplacerFeuDestination->Enabled=(!Pause)&&(!EnCours);
-    // Changement d'échelle en abscisse désactivée pendant la simulation (v3.8.3)
+    // Changement d'Ã©chelle en abscisse dÃ©sactivÃ©e pendant la simulation (v3.8.3)
     ActionStatsAff10Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff20Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff50Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff100Tours->Enabled=(!Pause)&&(!EnCours);
 	ActionStatsAff200Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff500Tours->Enabled=(!Pause)&&(!EnCours);
-    // Décors (v4.2.2)
+    // DÃ©cors (v4.2.2)
     ActionNatureTrottoir->Enabled=(!Pause)&&(!EnCours);
     ActionNatureImmeuble->Enabled=(!Pause)&&(!EnCours);
     ActionDecorsArbre->Enabled=(!Pause)&&(!EnCours);
@@ -678,7 +678,7 @@ public:
     void AfficheBilan();
 	bool SupprimeToutDansSelection(type_voie TypeVoie);
 	void AffecteGlyphe(const int NumGlyphe, TBitmap *Glyphe)
-	 { // v5.4 pour affecter les BitBtn->Glyph à partir d'une virtualImageList et supporter le HDPI
+	 { // v5.4 pour affecter les BitBtn->Glyph Ã  partir d'une virtualImageList et supporter le HDPI
       VirtualImageListGlyphes->GetBitmap(NumGlyphe, Glyphe);
 	 };
 };

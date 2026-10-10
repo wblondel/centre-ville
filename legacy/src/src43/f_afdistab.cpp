@@ -20,7 +20,7 @@ TfrmAffDistArretsBus *frmAffDistArretsBus;
 const AnsiString asDir1[NBDIR+1]={"", "   N", "   E", "   S", "   O"};
 #endif
 #ifdef CV_WINDOWS
-const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+const AnsiString asDir1[NBDIR+1]={"", "   Â­", "   Â®", "   Â¯", "   Â¬"};
 #endif
 //---------------------------------------------------------------------------
 __fastcall TfrmAffDistArretsBus::TfrmAffDistArretsBus(TComponent* Owner) : TForm(Owner) {}
@@ -43,7 +43,7 @@ void TfrmAffDistArretsBus::RafraichitInfos()
   EffaceInfos();
   if (!v->DistArretBus) return;
   NbCases=(NbX=1+NbDir[v->DirPoss])*(1+cv->NbArretsBus);
-  Caption="Arrêts de bus "+Format(asFormatCoord, ARRAYOFCONST((x, y)));
+  Caption="ArrÃªts de bus "+Format(asFormatCoord, ARRAYOFCONST((x, y)));
   for(i=0; i<NbCases; i++)
    {
     if (i)

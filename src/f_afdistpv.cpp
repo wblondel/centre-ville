@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 TfrmAffDistPlacesVehlib *frmAffDistPlacesVehlib;
 //---------------------------------------------------------------------------
-const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+const AnsiString asDir1[NBDIR+1]={"", "   Â­", "   Â®", "   Â¯", "   Â¬"};
 //---------------------------------------------------------------------------
 __fastcall TfrmAffDistPlacesVehlib::TfrmAffDistPlacesVehlib(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void __fastcall TfrmAffDistPlacesVehlib::CheckBoxCouloirsBusClick(
 //---------------------------------------------------------------------------
 void __fastcall TfrmAffDistPlacesVehlib::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

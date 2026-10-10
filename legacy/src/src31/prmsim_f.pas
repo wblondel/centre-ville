@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -128,10 +128,10 @@ const NbElementsMinDef : array [0..11] of Integer = (  0,  2,  120,  0,  0,  0, 
       NbElementsMaxDef : array [0..11] of Integer = (100, 32, 1000, 50, 81, 10, 10, 10, 99, 10, 10, 100);
       NbElementsDef    : array [0..11] of Integer = ( 30,  4,  120, 25,  0,  5,  1,  5, 10,  2,  5,  50);
       // v3.0.4
-      stNbElements : array [0..4] of String = ('Nombre de feux', 'Nombre d''étapes', 'Nombre de véhicules', 'Nombre de piétons', 'Nombre d''arrêts de bus');
+      stNbElements : array [0..4] of String = ('Nombre de feux', 'Nombre d''Ã©tapes', 'Nombre de vÃ©hicules', 'Nombre de piÃ©tons', 'Nombre d''arrÃªts de bus');
       stMsgValeurIncorrecte : array [0..2] of String = ( #13#10' - %s incorrect.'#13#10'Vous devez entrer un nombre entier compris entre %d et %d.',
-                                                         #13#10' - %s incorrect.'#13#10'Vous devez entrer un nombre entier supérieur à %d.',
-                                                         #13#10' - %s incorrect.'#13#10'Vous devez entrer un nombre entier inférieur à %d.');
+                                                         #13#10' - %s incorrect.'#13#10'Vous devez entrer un nombre entier supÃ©rieur Ã  %d.',
+                                                         #13#10' - %s incorrect.'#13#10'Vous devez entrer un nombre entier infÃ©rieur Ã  %d.');
 //----------------------------------------------------------------------------
 procedure Parametres;
  begin
@@ -196,8 +196,8 @@ var Valeur,
                          [stNbElements[i], NbMax[i]]);
     Edit[i].Text:=IntToStr(NbMax[i]);
     end;
-   if (i=2) and // Si Véhicules ALORS
-     (Valeur mod IncrementVehicules<>0) then // Le nombre doit être divisible par IncrementVehicules
+   if (i=2) and // Si VÃ©hicules ALORS
+     (Valeur mod IncrementVehicules<>0) then // Le nombre doit Ãªtre divisible par IncrementVehicules
     EditNbVehicules.Text:=IntToStr(IncrementVehicules*(Valeur div IncrementVehicules));
   except
    stMsg:=stMsg+Format( stMsgValeurIncorrecte[0],
@@ -206,7 +206,7 @@ var Valeur,
   end{try};
   if stMsg<>'' then
    begin
-    Application.MessageBox(pChar('Une ou plusieurs erreurs ont été détectée(s) :'+stMsg), 'Paramètres incorrects', [smbOk], smsWarning);
+    Application.MessageBox(pChar('Une ou plusieurs erreurs ont Ã©tÃ© dÃ©tectÃ©e(s) :'+stMsg), 'ParamÃ¨tres incorrects', [smbOk], smsWarning);
     Result:=false;
    end
   else
@@ -221,7 +221,7 @@ function TfrmParamSimul.AppliqueChoix : Boolean;
    Exit;
    end;
   frmSimulation.SimulModifiee:=true;
-  // v3.0.4. On n'alloue pas maintenant les véhicules et les piétons
+  // v3.0.4. On n'alloue pas maintenant les vÃ©hicules et les piÃ©tons
   cv.DefinitNbVehicules(StrToInt(EditNbVehicules.Text), DEFINIT_SEULEMENT);
   cv.DefinitNbPietons((StrToInt(EditNbPietons.Text)*StrToInt(EditNbVehicules.Text)) div 100, DEFINIT_SEULEMENT);
   cv.DefinitNbFeux(StrToInt(EditNbFeuxMax.Text));

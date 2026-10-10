@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 TfrmAffDistFilesTaxi *frmAffDistFilesTaxi;
 //---------------------------------------------------------------------------
-const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+const AnsiString asDir1[NBDIR+1]={"", "   Â­", "   Â®", "   Â¯", "   Â¬"};
 //---------------------------------------------------------------------------
 __fastcall TfrmAffDistFilesTaxi::TfrmAffDistFilesTaxi(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void __fastcall TfrmAffDistFilesTaxi::FormHide(TObject *Sender)
 
 void __fastcall TfrmAffDistFilesTaxi::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

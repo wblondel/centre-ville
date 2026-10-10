@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -324,7 +324,7 @@ uses Math, propos_f, prmsim_f, afdiste_f, carfours_f, deff_f, defv_f,
 
 {$R *.xfm}
 
-// Décalage gyrophares d{x|y}g[dorig][ddest]
+// DÃ©calage gyrophares d{x|y}g[dorig][ddest]
 //                                             ddest =      n   e   s   o
 const dxg : array [direction,direction] of Integer = (( 0,  0,  0,  0,  0), // ZOOMx2
                                                       ( 0,  0,  1,  0, -1), // dorig = nord
@@ -336,7 +336,7 @@ const dxg : array [direction,direction] of Integer = (( 0,  0,  0,  0,  0), // Z
                                                       ( 0, -1,  0,  1,  0), // dorig = est
                                                       ( 0,  0,  1,  0,  1), // dorig = sud
                                                       ( 0, -1,  0,  1,  0));//dorig = ouest
-// v3.0 : N°image de bus à partir de IDB_BUS: [Dir1,Dir2,avt|arr] Dir2 = N       E       S                Dir1
+// v3.0 : NÂ°image de bus Ã  partir de IDB_BUS: [Dir1,Dir2,avt|arr] Dir2 = N       E       S                Dir1
       NumImgBus : array [0..NBDIRS-1,0..NBDIRS-1,0..1] of Integer = ((( 1, 7),( 2, 9),(12,12),( 0, 5)), // N
                                                                      (( 3, 8),( 4,10),( 5, 0),(12,12)), // E
                                                                      ((12,12),( 6,11),( 7, 1),( 8, 3)), // S
@@ -363,7 +363,7 @@ const dxg : array [direction,direction] of Integer = (( 0,  0,  0,  0,  0), // Z
       IDB_BUS=     233; // v3.0
       IDB_DEPOTBUS=341; // v3.0
 
-      // v3.0 : 2ème indice de NumImgBus
+      // v3.0 : 2Ã¨me indice de NumImgBus
       TETE=0; QUEUE=1;
 
       NBCOULDIFFV   =6;
@@ -379,44 +379,44 @@ const dxg : array [direction,direction] of Integer = (( 0,  0,  0,  0,  0), // Z
 
       stCvw = 'Cvw';
       stVide = '';
-      stChargementNonEffectue = 'Chargement non effectué';
-      stSauvegardeNonEffectuee = 'Sauvegarde non effectuée';
-      stMemInsuff = 'Mémoire insuffisante !';
+      stChargementNonEffectue = 'Chargement non effectuÃ©';
+      stSauvegardeNonEffectuee = 'Sauvegarde non effectuÃ©e';
+      stMemInsuff = 'MÃ©moire insuffisante !';
       stErrInattendue = 'Erreur inattendue';
-      stErrDsReseau = 'Une erreur a été trouvée dans le réseau !';
+      stErrDsReseau = 'Une erreur a Ã©tÃ© trouvÃ©e dans le rÃ©seau !';
       stAvertissement = 'Impossible de continuer';
-      stReseauNonConnexe = 'Le réseau n''est pas connexe : une distance à une étape n''a pas pu être définie !';
-      stNbEtapesInsuff = 'Il manque des étapes !';
-      stSelectionIncorrecte = 'Sélection incorrecte';
-      stTracerEffacerPeripherique = 'Pour tracer ou effacer un périphérique;'#13#10'vous devez sélectionner au moins 2 lignes et 2 colonnes.';
-      stNombreLignesColonnesDifferent = 'Le nombre de lignes sélectionnées doit être différent du nombre de colonnes sélectionnées.';
-      stTracerEffacerRoute = 'Vous ne devez sélectionner...'#13#10' - qu''1 SEULE LIGNE ou qu''1 SEULE COLONNE pour tracer ou effacer une route À SENS UNIQUE.'#13#10' - que 2 LIGNES ou 2 COLONNES pour tracer ou effacer une route À DOUBLE SENS.';
+      stReseauNonConnexe = 'Le rÃ©seau n''est pas connexe : une distance Ã  une Ã©tape n''a pas pu Ãªtre dÃ©finie !';
+      stNbEtapesInsuff = 'Il manque des Ã©tapes !';
+      stSelectionIncorrecte = 'SÃ©lection incorrecte';
+      stTracerEffacerPeripherique = 'Pour tracer ou effacer un pÃ©riphÃ©rique;'#13#10'vous devez sÃ©lectionner au moins 2 lignes et 2 colonnes.';
+      stNombreLignesColonnesDifferent = 'Le nombre de lignes sÃ©lectionnÃ©es doit Ãªtre diffÃ©rent du nombre de colonnes sÃ©lectionnÃ©es.';
+      stTracerEffacerRoute = 'Vous ne devez sÃ©lectionner...'#13#10' - qu''1 SEULE LIGNE ou qu''1 SEULE COLONNE pour tracer ou effacer une route Ã€ SENS UNIQUE.'#13#10' - que 2 LIGNES ou 2 COLONNES pour tracer ou effacer une route Ã€ DOUBLE SENS.';
       stFrmTitleCV = 'Centre-Ville [%d]';
       stFrmCaptionCV = 'Centre-Ville - %s [%d]';
       stTitreCV = 'Centre-Ville';
       stQstEnregistrerFichier = 'Voulez-vous enregistrer le fichier ';
-      stFormatBilan : array [0..12] of String = ( 'Données initiales'#13#10#13#10,
-                                                  ' - Nombre de véhicules : %d'#13#10,
-                                                  ' - Parcours minimum moyen par véhicule (cases) : %.2f'#13#10,
-                                                  ' - Temps minimum moyen par véhicule (tours) : %.2f'#13#10,
-                                                  ' - Temps minimum moyen d''attente de départ par véhicule : %d'#13#10#13#10,
-                                                  'Bilan au tour n°%d'#13#10#13#10,
-                                                  ' - Nombre de véhicule(s) arrivé(s) : %d (%.2f%%)'#13#10,
-                                                  ' - Parcours moyen effectué par véhicule (cases) : %.2f (%.2f%%)'#13#10,
-                                                  ' - Attente de départ par véhicule (tours) : %.2f (%.2f%%)'#13#10,
-                                                  ' - Temps moyen du parcours par véhicule (tours) : %.2f (%.2f%%) dont'#13#10,
-                                                  '    · Déplacement par véhicule (tours) : %.2f (%.2f%%)'#13#10,
-                                                  '    · Attente par véhicule (tours) : %.2f (%.2f%%)'#13#10#13#10,
-                                                  'Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?');
-      stFormatBilanSansArrives : array [0..7] of String = ( 'Données initiales'#13#10#13#10,
-                                                            ' - Nombre de véhicules : %d'#13#10,
-                                                            ' - Parcours minimum moyen par véhicule (cases) : %.2f'#13#10,
-                                                            ' - Temps minimum moyen par véhicule (tours) : %.2f'#13#10,
-                                                            ' - Temps minimum moyen d''attente de départ par véhicule : %d'#13#10#13#10,
-                                                            'Bilan au tour n°%d'#13#10#13#10,
-                                                            ' Aucun véhicule n''est encore arrivé.'#13#10#13#10,
-                                                            'Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?');
-      stRubriqueDeplacerFeu : array [0..1] of String = ('Déplacer ce &feu', 'Déplacer le &feu sur cette case');
+      stFormatBilan : array [0..12] of String = ( 'DonnÃ©es initiales'#13#10#13#10,
+                                                  ' - Nombre de vÃ©hicules : %d'#13#10,
+                                                  ' - Parcours minimum moyen par vÃ©hicule (cases) : %.2f'#13#10,
+                                                  ' - Temps minimum moyen par vÃ©hicule (tours) : %.2f'#13#10,
+                                                  ' - Temps minimum moyen d''attente de dÃ©part par vÃ©hicule : %d'#13#10#13#10,
+                                                  'Bilan au tour nÂ°%d'#13#10#13#10,
+                                                  ' - Nombre de vÃ©hicule(s) arrivÃ©(s) : %d (%.2f%%)'#13#10,
+                                                  ' - Parcours moyen effectuÃ© par vÃ©hicule (cases) : %.2f (%.2f%%)'#13#10,
+                                                  ' - Attente de dÃ©part par vÃ©hicule (tours) : %.2f (%.2f%%)'#13#10,
+                                                  ' - Temps moyen du parcours par vÃ©hicule (tours) : %.2f (%.2f%%) dont'#13#10,
+                                                  '    Â· DÃ©placement par vÃ©hicule (tours) : %.2f (%.2f%%)'#13#10,
+                                                  '    Â· Attente par vÃ©hicule (tours) : %.2f (%.2f%%)'#13#10#13#10,
+                                                  'Voulez-vous voir les statistiques de fluiditÃ© et de trafic en couleurs ?');
+      stFormatBilanSansArrives : array [0..7] of String = ( 'DonnÃ©es initiales'#13#10#13#10,
+                                                            ' - Nombre de vÃ©hicules : %d'#13#10,
+                                                            ' - Parcours minimum moyen par vÃ©hicule (cases) : %.2f'#13#10,
+                                                            ' - Temps minimum moyen par vÃ©hicule (tours) : %.2f'#13#10,
+                                                            ' - Temps minimum moyen d''attente de dÃ©part par vÃ©hicule : %d'#13#10#13#10,
+                                                            'Bilan au tour nÂ°%d'#13#10#13#10,
+                                                            ' Aucun vÃ©hicule n''est encore arrivÃ©.'#13#10#13#10,
+                                                            'Voulez-vous voir les statistiques de fluiditÃ© et de trafic en couleurs ?');
+      stRubriqueDeplacerFeu : array [0..1] of String = ('DÃ©placer ce &feu', 'DÃ©placer le &feu sur cette case');
       stTypeVehicule : array [0..NBNIVEAUXPRIORITE-1] of String = ('', 'd''urgence','de police');
 //---------------------------------------------------------------------------
 procedure TfrmSimulation.RedessineCase(x, y : Integer; EffaceFond : Boolean);
@@ -538,7 +538,7 @@ begin
    DrawGridSimul.Canvas.Brush.Color:=frmStatsAttenteTrafic.CouleurCase(ACol, ARow);
    DrawGridSimul.Canvas.FillRect(Rect);
    end
-  else // 1.b. On met le bitume. À savoir, où passe la route... Si on peut aller ou venir du nord, on pose le bitume jusqu'en haut, et ainsi de suite...
+  else // 1.b. On met le bitume. Ã€ savoir, oÃ¹ passe la route... Si on peut aller ou venir du nord, on pose le bitume jusqu'en haut, et ainsi de suite...
    if (Integer(Affichages) and (Integer(aff_voie) or Integer(aff_quadr)))>0 then
     begin
      for d:=nord to ouest do
@@ -551,7 +551,7 @@ begin
           (Ord(PassPoss>0)*Integer(aff_voie))))>0 then
       ImageList8x8x2.Draw(DrawGridSimul.Canvas, Rect.Left, Rect.Top, IDB_VOIE+PassPoss);
     end;
-  // 2. On peint la route : ligne de stop ou cédez-le-passage
+  // 2. On peint la route : ligne de stop ou cÃ©dez-le-passage
   if (Integer(Affichages) and Integer(aff_sign))>0 then
    begin
     for i:=0 to 3 do
@@ -563,14 +563,14 @@ begin
                                               Rect.Left, Rect.Top,
                                               IDB_STOP+i);
      end{case of};
-  // 2bis. On peint le passage piétons
+  // 2bis. On peint le passage piÃ©tons
     if v.PassagePietons and (sns>indefini) then
      begin
       ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                          Rect.Left, Rect.Top,
                          IDB_PSGPT+Integer(sns)-1);
      end;
-  // 2ter. On peint l'arrêt de bus. v3.0
+  // 2ter. On peint l'arrÃªt de bus. v3.0
     if v.NumArretBus>0 then
      begin
      DirArretBus:=cv.DirectionArretBus(ACol, ARow);
@@ -586,11 +586,11 @@ begin
                            Integer(cv.PositionArretBus(ACol, ARow, DirArretBus)));
      end
    end;
-  // 3. On met le véhicule le cas échéant
+  // 3. On met le vÃ©hicule le cas Ã©chÃ©ant
   if ((Integer(Affichages) and
        Integer(aff_veh))>0) and
-     (v.NumEtape=0) and     // v3.0. SI pas d'étape ET
-     not v.EstDepotBus then //       NI de dépôt de bus 
+     (v.NumEtape=0) and     // v3.0. SI pas d'Ã©tape ET
+     not v.EstDepotBus then //       NI de dÃ©pÃ´t de bus 
    begin
     if (v.NumVehicule>0) then
      begin
@@ -604,14 +604,14 @@ begin
       case Veh.NivPriorite of
          normal:  ImageList8x8x2.Draw( DrawGridSimul.Canvas,
                                        Rect.Left, Rect.Top,
-                                       IDB_VEH+ // Numero de bitmap initiale des véhicules
-                                       (v.NumVehicule-1) mod NBCOULDIFFV+ // Numéro de couleur
+                                       IDB_VEH+ // Numero de bitmap initiale des vÃ©hicules
+                                       (v.NumVehicule-1) mod NBCOULDIFFV+ // NumÃ©ro de couleur
                                        (3*(Integer(dorig)-1)+Integer(ddest)-1-Ord(ddest>dorig))*NBCOULDIFFV);
          urgence: begin
                   ImageList8x8x2.Draw( DrawGridSimul.Canvas,
                                        Rect.Left, Rect.Top,
-                                       IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
-                                       COULEURURGENCE+ // Numéro de couleur (rouge)
+                                       IDB_VEHPU+ // Numero de bitmap initiale des vÃ©hicules de police/urgence
+                                       COULEURURGENCE+ // NumÃ©ro de couleur (rouge)
                                        (3*(Integer(dorig)-1)+Integer(ddest)-1-Ord(ddest>dorig))*NBCOULDIFFVPU);
                   ImageList8x8x2.Draw( DrawGridSimul.Canvas,
                                        Rect.Left+dxg[dorig][ddest],
@@ -623,8 +623,8 @@ begin
          police:  begin
                   ImageList8x8x2.Draw( DrawGridSimul.Canvas,
                                        Rect.Left, Rect.Top,
-                                       IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
-                                       // Couleur Police = 1ère couleur (blanche)
+                                       IDB_VEHPU+ // Numero de bitmap initiale des vÃ©hicules de police/urgence
+                                       // Couleur Police = 1Ã¨re couleur (blanche)
                                        (3*(Integer(dorig)-1)+Integer(ddest)-1-Ord(ddest>dorig))*NBCOULDIFFVPU);
                   ImageList8x8x2.Draw( DrawGridSimul.Canvas,
                                        Rect.Left+dxg[dorig][ddest],
@@ -635,49 +635,49 @@ begin
                   end;
       end{case of};
      end{if NumVehicule>0};
-    // 3bis. On met une moitié de bus le cas échéant. v3.0
+    // 3bis. On met une moitiÃ© de bus le cas Ã©chÃ©ant. v3.0
     if v.NumBus>0 then
      begin
       b:=@(cv.Autobus[v.NumBus-1]);
       if v.EstTeteBus then
        ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                            Rect.Left, Rect.Top,
-                           IDB_BUS+ // N° de bitmap initiale des bus
+                           IDB_BUS+ // NÂ° de bitmap initiale des bus
                            12*(b.NumLigne-1)+ // Couleur de la ligne du bus
-                           NumImgBus[Integer(b.Dir)-1, Integer(b.DirDrnDepl)-1, TETE]) // Tête de bus
+                           NumImgBus[Integer(b.Dir)-1, Integer(b.DirDrnDepl)-1, TETE]) // TÃªte de bus
       else
        ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                            Rect.Left, Rect.Top,
-                           IDB_BUS+ // N° de bitmap initiale des bus
+                           IDB_BUS+ // NÂ° de bitmap initiale des bus
                            12*(b.NumLigne-1)+ // Couleur de la ligne du bus
                            NumImgBus[Integer(b.DirDrnDepl)-1, Integer(b.DirAvtDrnDepl)-1, QUEUE]); // Queue du bus
      end{if NumBus}
    end{if Affichages};
-  // 3ter. On met le(s) piéton(s) le(s) cas échéant(s).
-  // (Oui 3bis parce que je suis fainéant de décaler. La prochaine fois je fais comme en Basic : de 10 en 10, na.)
+  // 3ter. On met le(s) piÃ©ton(s) le(s) cas Ã©chÃ©ant(s).
+  // (Oui 3bis parce que je suis fainÃ©ant de dÃ©caler. La prochaine fois je fais comme en Basic : de 10 en 10, na.)
   if (Integer(Affichages) and Integer(aff_ptn)>0) and (v.NbPietons>0) then
    for i:=0 to NBMAXPIETONSPARCASE-1 do
     if v.NumPieton[i]>0 then
-     begin // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
+     begin // On dÃ©cale les piÃ©tons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
       NumPieton:=v.NumPieton[i]-1;
       p:=@(cv.Pietons[NumPieton]);
-      if p.TourDrnDepl<p.TourDrnAff then // à l'arrêt
+      if p.TourDrnDepl<p.TourDrnAff then // Ã  l'arrÃªt
        ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                            1+Rect.Left+(2*p.DemiCase-1)*dxr[p.Dir]*((1+Rect.Right-Rect.Left) div 4),
                            1+Rect.Top+ (2*p.DemiCase-1)*dyr[p.Dir]*((1+Rect.Bottom-Rect.Top) div 4),
-                           IDB_PIETON+                // Début image piéton
+                           IDB_PIETON+                // DÃ©but image piÃ©ton
                            8*(NumPieton mod NBCOULDIFFP)+ // Couleur
-                           Integer(p.Dir)-1) // <-- à l'arrêt
+                           Integer(p.Dir)-1) // <-- Ã  l'arrÃªt
       else // en mouvement
        ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                            1+Rect.Left+(2*p.DemiCase-1)*dxr[p.Dir]*((1+Rect.Right-Rect.Left) div 4),
                            1+Rect.Top+ (2*p.DemiCase-1)*dyr[p.Dir]*((1+Rect.Bottom-Rect.Top) div 4),
-                           IDB_PIETON+                // Début image piéton
+                           IDB_PIETON+                // DÃ©but image piÃ©ton
                            8*(NumPieton mod NBCOULDIFFP)+ // Couleur
                            (4+p.DemiCase mod 2+2*(1-Integer(p.Dir) mod 2))); // <-- en mouvement
       p.TourDrnAff:=cv.TourCrt;
      end;
-  // 4. On met le feu (ouais qu'ça pète !) de signalisation le cas échéant
+  // 4. On met le feu (ouais qu'Ã§a pÃ¨te !) de signalisation le cas Ã©chÃ©ant
   if (Integer(Affichages) and Integer(aff_sign))>0 then
    for i:=0 to 3 do
     if ((v.NumFeu[i]>0) and
@@ -688,7 +688,7 @@ begin
                          Rect.Left, Rect.Top,
                          IDB_FEU+4*i+Integer(cv.Feux[v.NumFeu[i]-1].Etat));
 
-  // 5a. On met l'étape le cas échéant et qqsoit l'affichage
+  // 5a. On met l'Ã©tape le cas Ã©chÃ©ant et qqsoit l'affichage
   if v.NumEtape>0 then
    begin
     ImageList8x8x2.Draw(DrawGridSimul.Canvas,
@@ -698,7 +698,7 @@ begin
                         Rect.Left, Rect.Top,
                         IDB_NUMETAPE+v.NumEtape-1);
    end;
-  // 5b. On met le dépôt de bus le cas échéant et qqsoit l'affichage. v3.0
+  // 5b. On met le dÃ©pÃ´t de bus le cas Ã©chÃ©ant et qqsoit l'affichage. v3.0
   if v.EstDepotBus then
    ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                        Rect.Left, Rect.Top,
@@ -724,7 +724,7 @@ begin
         CoulTxt:=CoulTLigneBus[i];
        end;
      end{for};
-    if v.EstTeteArretBus and (CoulTxt<>clTeal) then // On écrit le numéro de l'arrêt de bus
+    if v.EstTeteArretBus and (CoulTxt<>clTeal) then // On Ã©crit le numÃ©ro de l'arrÃªt de bus
      begin
       DrawGridSimul.Canvas.Font:=DrawGridSimul.Font;
       DrawGridSimul.Canvas.Font.Color:=CoulTxt;
@@ -733,7 +733,7 @@ begin
                                     IntToStr(v.NumArretBus));
      end;
    end; 
-  // 8. Case où est le curseur : on en profite pour raffraichir l'état des ToolButtons
+  // 8. Case oÃ¹ est le curseur : on en profite pour raffraichir l'Ã©tat des ToolButtons
   if (DrawGridSimul.Col=ACol) and (DrawGridSimul.Row=ARow) then
    begin
     if v.ToutDroit then stMsg:=stMsg+'Tout droit. ';
@@ -749,23 +749,23 @@ begin
     if v.NumEtape>0 then
      stMsg:=stMsg+Format('Etape %d. ', [v.NumEtape]);
     if v.EstDepotBus then // v3.0
-     stMsg:=stMsg+'Dépôt de bus. ';
+     stMsg:=stMsg+'DÃ©pÃ´t de bus. ';
     if v.NumArretBus>0 then // v3.0
      if v.EstTeteArretBus then
-      stMsg:=stMsg+Format( 'Arrêt %d* (%s). ',
+      stMsg:=stMsg+Format( 'ArrÃªt %d* (%s). ',
                            [ v.NumArretBus,
                              cv.ArretsBus[v.NumArretBus-1].stListeLignesBus]) // v3.0.5
      else
-      stMsg:=stMsg+Format( 'Arrêt %d (%s). ',
+      stMsg:=stMsg+Format( 'ArrÃªt %d (%s). ',
                            [ v.NumArretBus,
                              cv.ArretsBus[v.NumArretBus-1].stListeLignesBus]); // v3.0.5
     if v.NumVehicule>0 then
      begin
      NivPriorite:=cv.Vehicules[v.NumVehicule-1].NivPriorite;
      if NivPriorite>normal then
-      stMsg:=stMsg+Format('Véhicule %s %d. ', [stTypeVehicule[Integer(NivPriorite)], v.NumVehicule])
+      stMsg:=stMsg+Format('VÃ©hicule %s %d. ', [stTypeVehicule[Integer(NivPriorite)], v.NumVehicule])
      else
-      stMsg:=stMsg+Format('Véhicule %d. ', [v.NumVehicule]);
+      stMsg:=stMsg+Format('VÃ©hicule %d. ', [v.NumVehicule]);
      end;
     if v.NumBus>0 then // v3.0
      if v.EstTeteBus then
@@ -774,7 +774,7 @@ begin
       stMsg:=stMsg+Format('Bus %d. ', [v.NumBus]);
     if v.NbPietons>0 then
      begin
-      stMsg:=stMsg+'Piéton';
+      stMsg:=stMsg+'PiÃ©ton';
       if v.NbPietons>1 then stMsg:=stMsg+'s';
       for i:=0 to NBMAXPIETONSPARCASE-1 do
        if v.NumPieton[i]>0 then
@@ -784,14 +784,14 @@ begin
          stMsg:=stMsg+Format('%s%d', [' ', v.NumPieton[i]]);
       stMsg:=stMsg+'. ';
      end;
-    // v3.0 : Affichage du détail des statistiques de fluidité et de trafic pour la case courante
+    // v3.0 : Affichage du dÃ©tail des statistiques de fluiditÃ© et de trafic pour la case courante
     if StatsAttenteTrafic and (frmStatsAttenteTrafic<>nil) then
      StatusBar.Panels.Items[0].Text:=frmStatsAttenteTrafic.stMsgDetailCase(ACol, ARow);
     StatusBar.Panels.Items[1].Text:=stMsg;
     StatusBar.Panels.Items[2].Text:=stDirPoss[v.DirPoss];
     StatusBar.Panels.Items[3].Text:=Format(stFormatCoord, [ACol, ARow]);
     if not SelectionFeuxDmd and
-       not SelectionFeuxAtt then// Pas de curseur en sélection de feux
+       not SelectionFeuxAtt then// Pas de curseur en sÃ©lection de feux
      ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                          Rect.Left, Rect.Top,
                          IDB_CURSEUR);
@@ -875,7 +875,7 @@ begin
     RubriqueSuivreLe1erPieton.Enabled:=(v.NumPieton[0]>0); // v3.0
     RubriqueSuivreLe2emePieton.Enabled:=(v.NumPieton[1]>0); // v3.0
 
-    // Boutons d'affichage (rafraîchissement, Système XWindows uniquement)
+    // Boutons d'affichage (rafraÃ®chissement, SystÃ¨me XWindows uniquement)
     if ToolButtonAffDir.Down<>(Integer(Affichages) and Integer(aff_dir)>0) then
      ToolButtonAffDir.Down:=not ToolButtonAffDir.Down;
     if ToolButtonAffSign.Down<>(Integer(Affichages) and Integer(aff_sign)>0) then
@@ -890,13 +890,13 @@ begin
      ToolButtonAffQuadr.Down:=not ToolButtonAffQuadr.Down;
    end;
 
-  // 8. Case illustrée par un message
+  // 8. Case illustrÃ©e par un message
   if not SelectionFeuxDmd and not SelectionFeuxAtt and (xErr=ACol) and (yErr=ARow) then
    ImageList8x8x2.Draw(DrawGridSimul.Canvas,
                        Rect.Left, Rect.Top,
                        IDB_CURSERR);
 
-  // 9. feux sélectionnés depuis la fenêtre de définition d'un feu
+  // 9. feux sÃ©lectionnÃ©s depuis la fenÃªtre de dÃ©finition d'un feu
   if SelectionFeuxDmd then
    for i:=0 to frmDefFeux.NbFeuxDmd-1 do
     if (cv.Feux[frmDefFeux.NumFeuxDmd[i]-1].x=ACol) and
@@ -912,10 +912,10 @@ begin
                         Rect.Left, Rect.Top,
                         IDB_SELFEU+Integer(cv.Feux[frmDefFeux.NumFeuxAtt[i]-1].Dir)-1); 
   if (Colonnes>1) or (Lignes>1) then
-   StatusBar.Panels.Items[0].Text:=Format( 'Sélection en cours : %d colonne(s) et %d ligne(s)',
+   StatusBar.Panels.Items[0].Text:=Format( 'SÃ©lection en cours : %d colonne(s) et %d ligne(s)',
                                            [Colonnes, Lignes])
   else
-   if Pos('Sélection en cours', StatusBar.Panels.Items[0].Text)>0 then
+   if Pos('SÃ©lection en cours', StatusBar.Panels.Items[0].Text)>0 then
     StatusBar.Panels.Items[0].Text:='';
 end;
 //---------------------------------------------------------------------------
@@ -927,7 +927,7 @@ var mrRep : TMessageButton;
   if not SimulModifiee then begin Result:=true; Exit end; // Inutile car pas de modif
   case Operation of
     oaNouveau: stMessage:=stQstEnregistrerFichier+
-                              SaveDialog.FileName+' avant de créer une nouvelle simulation ?';
+                              SaveDialog.FileName+' avant de crÃ©er une nouvelle simulation ?';
     oaOuvrir:  stMessage:=stQstEnregistrerFichier+
                               SaveDialog.FileName+' avant d''ouvrir une autre simulation ?';
     oaQuitter: stMessage:=stQstEnregistrerFichier+
@@ -938,7 +938,7 @@ var mrRep : TMessageButton;
    smbYes:    begin
               EnregistrerAvant:=true;
               RubriqueEnregistrerClick(self);
-              // Enregistrement annulé : on annule la création
+              // Enregistrement annulÃ© : on annule la crÃ©ation
               if not EnregistrerAvant then Result:=false else Result:=true;
               end;
    smbNo:     begin
@@ -990,10 +990,10 @@ begin
      cv:=centre_ville.Create(AUCUN_ELEMENT_PAR_DEFAUT);
      if not cv.Charge(hfile) then
       begin
-       Application.MessageBox('Erreur de données dans le fichier', stChargementNonEffectue, [smbOk], smsCritical);
+       Application.MessageBox('Erreur de donnÃ©es dans le fichier', stChargementNonEffectue, [smbOk], smsCritical);
        FileClose(hfile);
        Screen.Cursor:=crDefault;
-       StatusBar.Panels.Items[0].Text:='Chargement non effectué.';
+       StatusBar.Panels.Items[0].Text:='Chargement non effectuÃ©.';
        Close;
       end
      else
@@ -1006,12 +1006,12 @@ begin
        Caption:='Centre-Ville - '+stNomFichier;
        if VerifierApresOuverture then
         begin
-         StatusBar.Panels.Items[0].Text:='Contrôle d''intégrité du réseau en cours...';
+         StatusBar.Panels.Items[0].Text:='ContrÃ´le d''intÃ©gritÃ© du rÃ©seau en cours...';
          cv.Verifie(stMsgErr);
          if Length(stMsgErr)>0 then
-          Application.MessageBox(stMsgErr, 'Erreurs d''intégrité trouvées dans le réseau', [smbOk], smsCritical);
+          Application.MessageBox(stMsgErr, 'Erreurs d''intÃ©gritÃ© trouvÃ©es dans le rÃ©seau', [smbOk], smsCritical);
         end;
-       // Mise à jour du menu Statistiques | Affichage
+       // Mise Ã  jour du menu Statistiques | Affichage
        RubriqueQuadrillageStatistiques.Checked:=cv.QuadrillageStats;
        case cv.TypeStats of
          par_nombre:      RubriqueParNbVehicules.Checked:=true;
@@ -1026,18 +1026,18 @@ begin
          500: Rubrique500DrnTours.Checked:=true;
        end{case of};
 
-       StatusBar.Panels.Items[0].Text:='Affichage du réseau en cours...';
+       StatusBar.Panels.Items[0].Text:='Affichage du rÃ©seau en cours...';
        DrawGridSimul.Repaint;
        if Length(stMsgErr)>0 then
-        StatusBar.Panels.Items[0].Text:='Chargement effectué mais erreur(s) d''intégrité trouvée(s)'
+        StatusBar.Panels.Items[0].Text:='Chargement effectuÃ© mais erreur(s) d''intÃ©gritÃ© trouvÃ©e(s)'
        else
-        StatusBar.Panels.Items[0].Text:='Chargement terminé.';
+        StatusBar.Panels.Items[0].Text:='Chargement terminÃ©.';
       end;
     end
    else
     begin
      Application.MessageBox('Impossible d''ouvrir le fichier', stChargementNonEffectue, [smbOk], smsCritical);
-     StatusBar.Panels.Items[0].Text:='Chargement non effectué.';
+     StatusBar.Panels.Items[0].Text:='Chargement non effectuÃ©.';
     end;
    stNomFichAuto:='';
   end;
@@ -1059,10 +1059,10 @@ begin
     begin
      if not cv.Sauve(hfile) then
       begin
-       Application.MessageBox('Erreur de données dans le fichier', stSauvegardeNonEffectuee, [smbOk], smsCritical);
+       Application.MessageBox('Erreur de donnÃ©es dans le fichier', stSauvegardeNonEffectuee, [smbOk], smsCritical);
        FileClose(hfile);
        Screen.Cursor:=crDefault;
-       StatusBar.Panels.Items[0].Text:='Enregistrement non effectué.';
+       StatusBar.Panels.Items[0].Text:='Enregistrement non effectuÃ©.';
        if EnregistrerAvant then EnregistrerAvant:=false;
       end
      else
@@ -1072,15 +1072,15 @@ begin
        SaveDialog.FileName:=stNomFichier;
        OpenDialog.FileName:=stNomFichier;
        Caption:='Centre-Ville - '+stNomFichier;
-       StatusBar.Panels.Items[0].Text:='Enregistrement terminé.';
+       StatusBar.Panels.Items[0].Text:='Enregistrement terminÃ©.';
        SimulModifiee:=false;
       end;
     end
    else
     begin
      Screen.Cursor:=crDefault;
-     Application.MessageBox('Impossible de créer le fichier', stSauvegardeNonEffectuee, [smbOk], smsCritical);
-     StatusBar.Panels.Items[0].Text:='Enregistrement non effectué.';
+     Application.MessageBox('Impossible de crÃ©er le fichier', stSauvegardeNonEffectuee, [smbOk], smsCritical);
+     StatusBar.Panels.Items[0].Text:='Enregistrement non effectuÃ©.';
      if EnregistrerAvant then EnregistrerAvant:=false;
     end;
   end
@@ -1150,22 +1150,22 @@ begin
  x:=DrawGridSimul.Col;
  y:=DrawGridSimul.Row;
  NumEtape:=cv.v[x, y].NumEtape;
- if NumEtape>0 then // Si étape on la supprime
+ if NumEtape>0 then // Si Ã©tape on la supprime
   begin
    cv.SupprimeEtape(NumEtape-1);
-   stMsgOp:=Format('L''étape numéro %d a été supprimée.', [NumEtape]);
+   stMsgOp:=Format('L''Ã©tape numÃ©ro %d a Ã©tÃ© supprimÃ©e.', [NumEtape]);
    SimulModifiee:=true;
   end
- else // Sinon on la crée
+ else // Sinon on la crÃ©e
   begin
    NumEtape:=cv.AjouteEtape(x, y);
    if NumEtape>0 then
     begin
-     stMsgOp:=Format('L''étape créée a le numéro %d.', [NumEtape]);
+     stMsgOp:=Format('L''Ã©tape crÃ©Ã©e a le numÃ©ro %d.', [NumEtape]);
      SimulModifiee:=true;
     end
    else
-    stMsgOp:=Format('Impossible de créer une étape : il n''y en a déjà %d !', [cv.NbEtapes]);
+    stMsgOp:=Format('Impossible de crÃ©er une Ã©tape : il n''y en a dÃ©jÃ  %d !', [cv.NbEtapes]);
   end;
  RedessineCase(x, y, true);
  StatusBar.Panels.Items[0].Text:=stMsgOp;
@@ -1177,8 +1177,8 @@ const NumSvtOrdSel : array [0..1, 0..3] of Integer = ((0,0,1,0),(1,1,1,1));
 var x, y, i, j, NbFeux,  // Variables de transition
      NbFeuxListe, // Nombre de feux de la liste frmDefFeux.NumFeux...
      NbFeuxVoie, // Nombre de feux dans la voie v[Col, Row]
-     NbNonSel : Integer; // Compteur du nombre de feux non sélectionnés
-    NumFeuVoie, // Numéros de feux de la voie beginPrm,Drnend;
+     NbNonSel : Integer; // Compteur du nombre de feux non sÃ©lectionnÃ©s
+    NumFeuVoie, // NumÃ©ros de feux de la voie beginPrm,Drnend;
     Selection : array [0..1] of Integer; // 0:=Aucun;1:=Prm;2:=Drn;3:=Prm+Drn (Anc,Nv)
     NumFeu : array of Integer;
     v : pVoie;
@@ -1191,10 +1191,10 @@ begin
   NumFeuVoie[i]:=0;
   Selection[i]:=0;
   end;
- // Traite le clic sur la case avec des feux lors d'une sélection de feux :
- // 2 feux := passage de aucun à feu1, de feu1 à feu2,
- //                  de feu2 à feu1+feu2 et de feu1+feu2 à aucun.
- // 1 feu := passage de aucun à feu1, de feu1 à aucun
+ // Traite le clic sur la case avec des feux lors d'une sÃ©lection de feux :
+ // 2 feux := passage de aucun Ã  feu1, de feu1 Ã  feu2,
+ //                  de feu2 Ã  feu1+feu2 et de feu1+feu2 Ã  aucun.
+ // 1 feu := passage de aucun Ã  feu1, de feu1 Ã  aucun
  v:=@(cv.v[x, y]);
 
  if (v.NumEtape>0) and ToolButtonEtape.Enabled then
@@ -1212,31 +1212,31 @@ begin
    Exit;
   end;
 
- // Calcul du nombre et des numéros de feux de la voie
+ // Calcul du nombre et des numÃ©ros de feux de la voie
  for i:=0 to 3 do
   if v.NumFeu[i]>0 then begin NumFeuVoie[NbFeuxVoie]:=v.NumFeu[i]; Inc(NbFeuxVoie); end;
 
- // Attention : les listes sont exclusives à la sélection donc pas d'initialisation entre les 2
+ // Attention : les listes sont exclusives Ã  la sÃ©lection donc pas d'initialisation entre les 2
 
  // Calcul de la nouvelle liste NumFeuxDmd
  if SelectionFeuxDmd then
   begin
    NbFeuxListe:=frmDefFeux.NbFeuxDmd;
-   // Sélection courante
+   // SÃ©lection courante
    for i:=0 to NbFeuxListe-1 do
     for j:=0 to NbFeuxVoie-1 do
      if frmDefFeux.NumFeuxDmd[i]=NumFeuVoie[j] then
       Inc(Selection[0], j+1);
 
-   // Sélection suivante selon la règle ci-dessus
+   // SÃ©lection suivante selon la rÃ¨gle ci-dessus
    if NbFeuxVoie>0 then
     Selection[1]:=(Selection[0]+1) mod (2*NbFeuxVoie);
 
-   // Génération de la liste                                             Selection  Nombre
+   // GÃ©nÃ©ration de la liste                                             Selection  Nombre
    NbFeux:=NbFeuxListe+(Selection[1]+1) div 2-(Selection[0]+1) div 2; // (0,1,2,3).(0,1,1,2) : f(s):=(s+1) div 2
    SetLength(NumFeu, NbFeux*sizeof(Integer));
    NbNonSel:=0;
-   for i:=0 to NbFeuxListe-1 do // On recopie déjà les feux de la précédente liste
+   for i:=0 to NbFeuxListe-1 do // On recopie dÃ©jÃ  les feux de la prÃ©cÃ©dente liste
     begin
      NumFeu[i-NbNonSel]:=frmDefFeux.NumFeuxDmd[i];
      for j:=0 to NbFeuxVoie-1 do
@@ -1244,7 +1244,7 @@ begin
            Ord( (frmDefFeux.NumFeuxDmd[i]=NumFeuVoie[j]) and
                 (j and Selection[1]=0)));
     end;
-   for i:=NbFeuxListe-NbNonSel to NbFeux-1 do // Cas de recopie d'une nouvelle sélection
+   for i:=NbFeuxListe-NbNonSel to NbFeux-1 do // Cas de recopie d'une nouvelle sÃ©lection
     NumFeu[i]:=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel, Selection[1]]];
 
    // Changement de liste
@@ -1259,21 +1259,21 @@ begin
  if SelectionFeuxAtt then
   begin
    NbFeuxListe:=frmDefFeux.NbFeuxAtt;
-   // Sélection courante
+   // SÃ©lection courante
    for i:=0 to NbFeuxListe-1 do
     for j:=0 to NbFeuxVoie-1 do
      if frmDefFeux.NumFeuxAtt[i]=NumFeuVoie[j] then
       Inc(Selection[0], j+1);
 
-   // Sélection suivante selon la règle ci-dessus
+   // SÃ©lection suivante selon la rÃ¨gle ci-dessus
    if NbFeuxVoie>0 then
     Selection[1]:=(Selection[0]+1) mod (2*NbFeuxVoie);
 
-   // Génération de la liste                                             Selection  Nombre
+   // GÃ©nÃ©ration de la liste                                             Selection  Nombre
    NbFeux:=NbFeuxListe+(Selection[1]+1) div 2-(Selection[0]+1) div 2; // (0,1,2,3).(0,1,1,2) : f(s):=(s+1) div 2
    SetLength(NumFeu, NbFeux*sizeof(Integer));
    NbNonSel:=0;
-   for i:=0 to NbFeuxListe-1 do // On recopie déjà les feux de la précédente liste
+   for i:=0 to NbFeuxListe-1 do // On recopie dÃ©jÃ  les feux de la prÃ©cÃ©dente liste
     begin
      NumFeu[i-NbNonSel]:=frmDefFeux.NumFeuxAtt[i];
      for j:=0 to NbFeuxVoie-1 do
@@ -1281,7 +1281,7 @@ begin
            Ord( (frmDefFeux.NumFeuxAtt[i]=NumFeuVoie[j]) and
                 (j and Selection[1]=0)));
     end;
-   for i:=NbFeuxListe-NbNonSel to NbFeux-1 do // Cas de recopie d'une nouvelle sélection
+   for i:=NbFeuxListe-NbNonSel to NbFeux-1 do // Cas de recopie d'une nouvelle sÃ©lection
     NumFeu[i]:=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel, Selection[1]]];
 
    // Changement de liste
@@ -1299,7 +1299,7 @@ var Ok : Boolean;
     d : direction;
     stMsgErr : String;
     dp : dirposs;
-const stMsgOk = 'Réseau correct.';
+const stMsgOk = 'RÃ©seau correct.';
  begin
   Ok:=true;
   cv.VerifOk:=false;
@@ -1310,7 +1310,7 @@ const stMsgOk = 'Réseau correct.';
    begin
    Ok:=cv.Etapes[i].Definie;
    if not Ok then
-    stMsgErr:=Format( 'L''étape n°%d n''est pas définie. Les %d étapes doivent être définies.',
+    stMsgErr:=Format( 'L''Ã©tape nÂ°%d n''est pas dÃ©finie. Les %d Ã©tapes doivent Ãªtre dÃ©finies.',
                       [i+1, cv.NbEtapes]);
    Inc(i);
    end;
@@ -1320,7 +1320,7 @@ const stMsgOk = 'Réseau correct.';
    Ok:=cv.ArretsBus[i].Defini;
    if not Ok then
     begin
-    stMsgErr:=Format( 'L''arrêt de bus n°%d n''est pas défini. Les %d arrêts de bus doivent être définis.',
+    stMsgErr:=Format( 'L''arrÃªt de bus nÂ°%d n''est pas dÃ©fini. Les %d arrÃªts de bus doivent Ãªtre dÃ©finis.',
                       [i+1, cv.NbArretsBus]);
     Break;
     end;
@@ -1328,7 +1328,7 @@ const stMsgOk = 'Réseau correct.';
    if not Ok then
     begin
     xErr:=cv.ArretsBus[i].x; yErr:=cv.ArretsBus[i].y;
-    stMsgErr:=Format( 'La tête de l''arrêt de bus n°%d n''est pas définie ou est incorrecte.',
+    stMsgErr:=Format( 'La tÃªte de l''arrÃªt de bus nÂ°%d n''est pas dÃ©finie ou est incorrecte.',
                       [i+1]);
     Break;
     end;
@@ -1338,14 +1338,14 @@ const stMsgOk = 'Réseau correct.';
    begin
    Ok:=cv.DepotBus.Defini;
    if not Ok then
-    stMsgErr:='Si des arrêts de bus et des lignes de bus sont définis, un dépôt de bus est obligatoire.'
+    stMsgErr:='Si des arrÃªts de bus et des lignes de bus sont dÃ©finis, un dÃ©pÃ´t de bus est obligatoire.'
    else
     begin
     Ok:=(cv.v[cv.DepotBus.x, cv.DepotBus.y].DirPoss>aucune);
     if not Ok then
      begin
      xErr:=cv.DepotBus.x; yErr:=cv.DepotBus.y;
-     stMsgErr:='Un dépôt de bus doit avoir au moins une direction possible vers l''extérieur.';
+     stMsgErr:='Un dÃ©pÃ´t de bus doit avoir au moins une direction possible vers l''extÃ©rieur.';
      end;
     d:=nord;
     while Ok and (d<=ouest) do
@@ -1354,7 +1354,7 @@ const stMsgOk = 'Réseau correct.';
      if not Ok then
       begin
       xErr:=(cv.DepotBus.x+dx[d]) mod NBX; yErr:=(cv.DepotBus.y+dy[d]) mod NBY;
-      stMsgErr:='On ne peut diriger une case vers le dépôt de bus (il est en SORTIE SEULE).';
+      stMsgErr:='On ne peut diriger une case vers le dÃ©pÃ´t de bus (il est en SORTIE SEULE).';
       end;
      Inc(d);
      end{while Ok};
@@ -1376,7 +1376,7 @@ const stMsgOk = 'Réseau correct.';
         if dp=InvPossDir[d] then
          begin
           Ok:=false; xErr:=i; yErr:=j;
-          stMsgErr:=Format('Demi-tour obligé entre les cases (%d, %d) et (%d, %d).',
+          stMsgErr:=Format('Demi-tour obligÃ© entre les cases (%d, %d) et (%d, %d).',
                           [i, j, (i+dx[d]) mod NBX, (j+dy[d]) mod NBY]);
           break;
          end;
@@ -1395,7 +1395,7 @@ const stMsgOk = 'Réseau correct.';
        if cv.v[i, j].DirPoss=aucune then
         begin
          Ok:=false; xErr:=i; yErr:=j;
-         stMsgErr:=Format('La case (%d, %d) est une étape mais n''a aucune direction possible.',
+         stMsgErr:=Format('La case (%d, %d) est une Ã©tape mais n''a aucune direction possible.',
                           [i, j]);
          Break;
         end;
@@ -1407,7 +1407,7 @@ const stMsgOk = 'Réseau correct.';
        if d>ouest then
         begin
          Ok:=false; xErr:=i; yErr:=j;
-         stMsgErr:=Format('La case (%d, %d) est une étape mais il est impossible d''y accéder.',
+         stMsgErr:=Format('La case (%d, %d) est une Ã©tape mais il est impossible d''y accÃ©der.',
                           [i, j]);
          Break;
         end;
@@ -1423,7 +1423,7 @@ const stMsgOk = 'Réseau correct.';
       if not Ok then
        begin
        xErr:=i; yErr:=j;
-       stMsgErr:=Format( 'L''arrêt de bus n°%d n''est défini que sur la case (%d, %d).',
+       stMsgErr:=Format( 'L''arrÃªt de bus nÂ°%d n''est dÃ©fini que sur la case (%d, %d).',
                          [cv.v[i,j].NumArretBus, i, j]);
        Break;
        end{if not Ok};
@@ -1456,7 +1456,7 @@ procedure TfrmSimulation.AfficheBilan;
 var i, j, d, ndp, MinDist,
     xe, ye,
     ne, nv,
-    nva, // NbVehiculesArrivés
+    nva, // NbVehiculesArrivÃ©s
     nvpe, // NbVehiculesParEtape
     ParcoursMin,
     AttenteDepart,
@@ -1467,7 +1467,7 @@ var i, j, d, ndp, MinDist,
  begin
   ne:=cv.NbEtapes; // NbEtapes
   nv:=cv.NbVehicules; // NbVehicules
-  nva:=cv.NbVehiculesArrives; // NbVehiculesArrivés
+  nva:=cv.NbVehiculesArrives; // NbVehiculesArrivÃ©s
   nvpe:=nv div ne; // NbVehiculesParEtape
   ParcoursMin:=0;
   AttenteDepart:=0;
@@ -1486,7 +1486,7 @@ var i, j, d, ndp, MinDist,
       Inc(ParcoursMin, MinDist);
      end;
   m:=(1.0*ParcoursMin)/ne/(ne-1);
-  // 2. Calcul du temps d'attente de départ
+  // 2. Calcul du temps d'attente de dÃ©part
   for i:=0 to nv-1 do
    if not cv.Vehicules[i].Defini then
     Inc(AttenteDepart, cv.Vehicules[i].TourDepart-1);
@@ -1550,7 +1550,7 @@ begin
 end;
 //---------------------------------------------------------------------------
 procedure TfrmSimulation.ToolButtonAffDistEtapesClick(Sender: TObject);
-begin // v3.0. changement de nom suite aux distances aux arrêts de bus
+begin // v3.0. changement de nom suite aux distances aux arrÃªts de bus
  frmAffDistEtapes.Visible:=ToolButtonAffDistEtapes.Down;
 end;
 //---------------------------------------------------------------------------
@@ -1600,7 +1600,7 @@ procedure TfrmSimulation.ToolButtonAffStatsEtapesClick(
 begin
   if ToolButtonAffStatsEtapes.Down and (cv.NbVehiculesArrives=0) then
    begin
-    AfficheMsgInfoNonDisp('Statistiques sur les véhicules');
+    AfficheMsgInfoNonDisp('Statistiques sur les vÃ©hicules');
     ToolButtonAffStatsEtapes.Down:=false;
     RubriqueStatistiquesEtapes.Checked:=false;
    end{ // A DEFINIR
@@ -2182,9 +2182,9 @@ var Abandon,
        while not Abandon and (j<cv.Feux[i].NbFeuxDmd) do
         begin
         if cv.Feux[i].NumFeuxDmd[j]=NumFeu then
-         case MessageDlg( Format( 'Le feu n°%d dépend du feu n°%d (à supprimer) :'#13#10+
+         case MessageDlg( Format( 'Le feu nÂ°%d dÃ©pend du feu nÂ°%d (Ã  supprimer) :'#13#10+
                                   'Ce dernier demande que le premier soit rouge pour passer au vert.'#13#10#13#10+
-                                  'Le feu n°%d sera-t-il à supprimer ?',
+                                  'Le feu nÂ°%d sera-t-il Ã  supprimer ?',
                                   [i+1, NumFeu, NumFeu]),
                             mtConfirmation,
                             [mbYes, mbNo, mbIgnore], 0, mbNo) of
@@ -2203,9 +2203,9 @@ var Abandon,
        while not Abandon and (j<cv.Feux[i].NbFeuxAtt) do
         begin
         if cv.Feux[i].NumFeuxAtt[j]=NumFeu then
-         case MessageDlg( Format( 'Le feu n°%d dépend du feu n°%d (à supprimer) :'#13#10+
-                                  'Ce dernier doit être rouge pour que le premier passe au vert.'#13#10#13#10+
-                                  'Le feu n°%d sera-t-il à supprimer ?',
+         case MessageDlg( Format( 'Le feu nÂ°%d dÃ©pend du feu nÂ°%d (Ã  supprimer) :'#13#10+
+                                  'Ce dernier doit Ãªtre rouge pour que le premier passe au vert.'#13#10#13#10+
+                                  'Le feu nÂ°%d sera-t-il Ã  supprimer ?',
                                   [i+1, NumFeu, NumFeu]),
                           mtConfirmation,
                           [mbYes, mbNo, mbIgnore], 0, mbNo) of
@@ -2280,7 +2280,7 @@ var x, y,
 //---------------------------------------------------------------------------
 function TfrmSimulation.SupprimeToutDansSelection : Boolean;
  begin
-  if (Application.MessageBox( 'Êtes-vous bien sûr de vouloir effacer les routes, supprimer les priorités, feux et étapes dans la zone sélectionnée ?',
+  if (Application.MessageBox( 'ÃŠtes-vous bien sÃ»r de vouloir effacer les routes, supprimer les prioritÃ©s, feux et Ã©tapes dans la zone sÃ©lectionnÃ©e ?',
                               'Confirmation d''effacement',
                               [smbYes, smbNo], smsWarning,  smbNo)=smbYes) and
      ConfirmeSuppressionFeuxUtilisesDansSelection then
@@ -2314,7 +2314,7 @@ begin
       (vSrc.Priorites[2]<>feux) and
       (vSrc.Priorites[3]<>feux) then
     begin
-     Application.MessageBox('Il n''y a aucun feu sur cette case not ', 'Déplacement de feu impossible', [smbOk], smsWarning);
+     Application.MessageBox('Il n''y a aucun feu sur cette case not ', 'DÃ©placement de feu impossible', [smbOk], smsWarning);
      DeplacementFeuEnCours:=false;
      RubriqueDeplacerFeu.Caption:=stRubriqueDeplacerFeu[0];
      xDeplFeu:=-1; yDeplFeu:=-1;
@@ -2333,10 +2333,10 @@ begin
       if vSrc.Priorites[i]=feux then
        begin
         if vDst.Priorites[i]=feux then
-         Application.MessageBox('Vous ne pouvez pas i+1éplacer un feu sur une case où un feu de même orientation existe déjà.', 'Déplacement de feu impossible', [smbOk], smsWarning)
+         Application.MessageBox('Vous ne pouvez pas i+1Ã©placer un feu sur une case oÃ¹ un feu de mÃªme orientation existe dÃ©jÃ .', 'DÃ©placement de feu impossible', [smbOk], smsWarning)
         else
          if (Integer(vDst.DirPoss) and Integer(PossDir[d]))=0 then
-          Application.MessageBox('Vous ne pouvez pas déplacer un feu sur une case qui n''a pas la même direction.', 'Déplacement de feu impossible', [smbOk], smsWarning)
+          Application.MessageBox('Vous ne pouvez pas dÃ©placer un feu sur une case qui n''a pas la mÃªme direction.', 'DÃ©placement de feu impossible', [smbOk], smsWarning)
          else
           begin
            FeuADeplacer:=@(cv.Feux[vSrc.NumFeu[i]-1]);
@@ -2470,7 +2470,7 @@ begin
            RubriqueSuivreLe1erPieton.Enabled:=false; // v3.0
            RubriqueSuivreLe2emePieton.Enabled:=false; // v3.0
            AfficheBilan;
-           StatusBar.Panels.Items[0].Text:='Arrêt de la simulation et réinitialisation du réseau en cours...';
+           StatusBar.Panels.Items[0].Text:='ArrÃªt de la simulation et rÃ©initialisation du rÃ©seau en cours...';
            RubriqueOuvrirClick(self);
            stNomFichAuto:='';
 
@@ -2492,7 +2492,7 @@ begin
 
  if cv.NbVehiculesArrives=cv.NbVehicules then
   begin
-   StatusBar.Panels.Items[0].Text:=Format('Simulation terminée (%d véhicules)', [cv.NbVehicules]);
+   StatusBar.Panels.Items[0].Text:=Format('Simulation terminÃ©e (%d vÃ©hicules)', [cv.NbVehicules]);
    TypeDemande:=arret;
   end
  else
@@ -2500,7 +2500,7 @@ begin
 // TourSimulThread:=new TTourSimulThread(false); // Avec TThread A DEFINIR
   cv.EffectueTourSimulation; // Sans thread
   if (cv.NbVehiculesSortis>0) and (cv.NbVehiculesSortis-cv.NbVehiculesArrives>0) then
-   StatusBar.Panels.Items[0].Text:=Format('Sur %d sortis [%d%%] : %d arrivé(s) [%d%%]. Sur %d en course : %d déplacé(s) [%d%%].',
+   StatusBar.Panels.Items[0].Text:=Format('Sur %d sortis [%d%%] : %d arrivÃ©(s) [%d%%]. Sur %d en course : %d dÃ©placÃ©(s) [%d%%].',
                                             [cv.NbVehiculesSortis, 100*cv.NbVehiculesSortis div cv.NbVehicules,
                                                           cv.NbVehiculesArrives, 100*cv.NbVehiculesArrives div cv.NbVehiculesSortis,
                                                           cv.NbVehiculesSortis-cv.NbVehiculesArrives,
@@ -2522,9 +2522,9 @@ begin
  RubriqueArret.Enabled:=true;
  if cv.TourCrt=0 then // Pas de simulation en pause
   begin
-   StatusBar.Panels.Items[0].Text:='Vérification de la validité du réseau...';
+   StatusBar.Panels.Items[0].Text:='VÃ©rification de la validitÃ© du rÃ©seau...';
    StatusBar.Repaint;
-   if not VerifieReseau then  // Il faut d'abord que le réseau soit correct
+   if not VerifieReseau then  // Il faut d'abord que le rÃ©seau soit correct
     begin
      Application.MessageBox(stErrDsReseau, stAvertissement, [smbOk], smsWarning);
      Exit;
@@ -2537,30 +2537,30 @@ begin
      Exit;
     end;
 
-   StatusBar.Panels.Items[0].Text:='Préparation du calcul des distances aux étapes...';
+   StatusBar.Panels.Items[0].Text:='PrÃ©paration du calcul des distances aux Ã©tapes...';
    StatusBar.Repaint;
    if not cv.PrepareCalculDistances then // On alloue la place pour calculer les distances
-    begin // Si erreur alors problème de manque de mémoire
+    begin // Si erreur alors problÃ¨me de manque de mÃ©moire
      Application.MessageBox(stMemInsuff, stErrInattendue, [smbOk], smsCritical);
      Exit;
     end;
-   StatusBar.Panels.Items[0].Text:='Préparation des statistiques de fluidité et de trafic...';
+   StatusBar.Panels.Items[0].Text:='PrÃ©paration des statistiques de fluiditÃ© et de trafic...';
    StatusBar.Repaint;
    if not cv.PrepareCalculAttenteTrafic then // v2.2.7 : On alloue la place pour calculer les stats
-    begin // Si erreur alors problème de manque de mémoire
+    begin // Si erreur alors problÃ¨me de manque de mÃ©moire
      Application.MessageBox(stMemInsuff, stErrInattendue, [smbOk], smsCritical);
      Exit;
     end;
-   StatusBar.Panels.Items[0].Text:='Calcul des distances aux étapes...';
+   StatusBar.Panels.Items[0].Text:='Calcul des distances aux Ã©tapes...';
    StatusBar.Repaint;
-   cv.CalculeDistances; // On calcule les distances par récurrence
+   cv.CalculeDistances; // On calcule les distances par rÃ©currence
 
-   StatusBar.Panels.Items[0].Text:='Vérification du calcul des distances aux étapes...';
+   StatusBar.Panels.Items[0].Text:='VÃ©rification du calcul des distances aux Ã©tapes...';
    StatusBar.Repaint;
-   if not cv.VerifieCalculDistances then // Sont-elles toutes définies ?
+   if not cv.VerifieCalculDistances then // Sont-elles toutes dÃ©finies ?
     begin
      xErr:=cv.xErr; yErr:=cv.yErr;
-     StatusBar.Panels.Items[0].Text:=Format('La case (%d, %d) a une distance indéfinie.',
+     StatusBar.Panels.Items[0].Text:=Format('La case (%d, %d) a une distance indÃ©finie.',
                                               [xErr, yErr]);
      if (xErr>-1) and (yErr>-1) then RedessineCase(xErr, yErr, true);
      Application.MessageBox(stReseauNonConnexe, stAvertissement, [smbOk], smsWarning);
@@ -2575,24 +2575,24 @@ begin
    RubriqueInfosDistancesEtapes.Enabled:=true;
    ToolButtonAffDistArretsBus.Enabled:=true; // v3.0
    RubriqueInfosDistancesArretsBus.Enabled:=true; // v3.0
-   StatusBar.Panels.Items[0].Text:='Préparation des véhicules...';
+   StatusBar.Panels.Items[0].Text:='PrÃ©paration des vÃ©hicules...';
    StatusBar.Repaint;
-   if not cv.PrepareVehicules then // On alloue la place et on prépare les véhicules
-    begin // Si erreur alors problème de manque de mémoire
+   if not cv.PrepareVehicules then // On alloue la place et on prÃ©pare les vÃ©hicules
+    begin // Si erreur alors problÃ¨me de manque de mÃ©moire
      Application.MessageBox(stMemInsuff, stErrInattendue, [smbOk], smsCritical);
      Exit;
     end;
-   StatusBar.Panels.Items[0].Text:='Préparation des bus...'; // v3.0
+   StatusBar.Panels.Items[0].Text:='PrÃ©paration des bus...'; // v3.0
    StatusBar.Repaint;
-   if not cv.PrepareBus then // On alloue la place et on prépare les bus. v3.0
-    begin // Si erreur alors problème de manque de mémoire
+   if not cv.PrepareBus then // On alloue la place et on prÃ©pare les bus. v3.0
+    begin // Si erreur alors problÃ¨me de manque de mÃ©moire
      Application.MessageBox(stMemInsuff, stErrInattendue, [smbOk], smsCritical);
      Exit;
     end;
-   StatusBar.Panels.Items[0].Text:='Préparation des piétons...';
+   StatusBar.Panels.Items[0].Text:='PrÃ©paration des piÃ©tons...';
    StatusBar.Repaint;
-   if not cv.PreparePietons then // On alloue la place et on prépare les piétons
-    begin // Si erreur alors problème de manque de mémoire
+   if not cv.PreparePietons then // On alloue la place et on prÃ©pare les piÃ©tons
+    begin // Si erreur alors problÃ¨me de manque de mÃ©moire
      Application.MessageBox(stMemInsuff, stErrInattendue, [smbOk], smsCritical);
      Exit;
     end;
@@ -2601,19 +2601,19 @@ begin
    cv.NbVehiculesArrives:=0;
    if VerifierAvantSimulation then
     begin
-     StatusBar.Panels.Items[0].Text:='Contrôle d''intégrité du réseau...';
+     StatusBar.Panels.Items[0].Text:='ContrÃ´le d''intÃ©gritÃ© du rÃ©seau...';
      StatusBar.Repaint;
      cv.Verifie(stMsgErr);
      if Length(stMsgErr)>0 then
       begin
-       Application.MessageBox(stMsgErr, 'Erreurs d''intégrité trouvées dans le réseau', [smbOk], smsCritical);
+       Application.MessageBox(stMsgErr, 'Erreurs d''intÃ©gritÃ© trouvÃ©es dans le rÃ©seau', [smbOk], smsCritical);
        Exit;
       end;
     end;
    stNomFichAuto:=SaveDialog.FileName;
    EnregistrerAvant:=true; // On teste si on annule l'enregistrement (j'emprunte EnregistrerAvant)
    RubriqueEnregistrerClick(RubriqueEnregistrer);
-   if not EnregistrerAvant then Exit; // Enregistrement Annulé
+   if not EnregistrerAvant then Exit; // Enregistrement AnnulÃ©
    EnregistrerAvant:=false;
    SetLength(cv.StatsCV, cv.NbToursStats*sizeof(stats));
    for i:=0 to cv.NbToursStats-1 do cv.StatsCV[i]:=stats.Create;
@@ -2621,14 +2621,14 @@ begin
   end;
  if cv.TourCrt=0 then
   begin
-   // On active l'affichage des véhicules
+   // On active l'affichage des vÃ©hicules
    if not ToolButtonAffVeh.Down then
     begin
      ToolButtonAffVeh.Down:=true;
      RubriqueVehicules.Checked:=true;
      ToolButtonAffVeh.Click;
     end;
-   // On active l'affichage des piétons
+   // On active l'affichage des piÃ©tons
    if not ToolButtonAffPtn.Down then
     begin
      ToolButtonAffPtn.Down:=true;
@@ -2647,7 +2647,7 @@ begin
  frmStatsAttenteTrafic:=TfrmStatsAttenteTrafic.Create(self);
  try
   StatsAttenteTrafic:=True;
-  Affichages:=aucun; // Pour une meilleure lisibilité
+  Affichages:=aucun; // Pour une meilleure lisibilitÃ©
   frmStatsAttenteTrafic.ShowModal;
  finally
   StatsAttenteTrafic:=False;
@@ -2661,9 +2661,9 @@ end;
 procedure TfrmSimulation.RubriqueAttenteTraficClick(Sender: TObject);
 begin
 if SimulEnCours then
- Application.MessageBox( 'Vous devez interrompre ou arrêter la simulation en cours pour visualiser ces statistiques.'#13#10+
+ Application.MessageBox( 'Vous devez interrompre ou arrÃªter la simulation en cours pour visualiser ces statistiques.'#13#10+
                          'A l''affichage du bilan, on vous demandera si vous souhaitez voir ces statistiques.',
-                         'Statistiques de fluidité et de trafic')
+                         'Statistiques de fluiditÃ© et de trafic')
 else
  AfficheStatsAttenteTrafic;
 end;
@@ -2688,13 +2688,13 @@ begin // v3.0
  x:=DrawGridSimul.Col;
  y:=DrawGridSimul.Row;
  NumArretBus:=cv.v[x, y].NumArretBus;
- if NumArretBus>0 then // SI arrêt de bus
+ if NumArretBus>0 then // SI arrÃªt de bus
   begin // on le SUPPRIME
    cv.SupprimeArretBus(x, y);
-   for d:=nord to ouest do // On rafraîchit les cases voisines du même arrêt
+   for d:=nord to ouest do // On rafraÃ®chit les cases voisines du mÃªme arrÃªt
     if NumArretBus=cv.vxyd(x,y,d).NumArretBus then
      RedessineCase((x+dx[d]) mod NBX, (y+dy[d]) mod NBY, true);
-   stMsgOp:=Format( 'La case (%d,%d) a été retirée de l''arrêt de bus %d.',
+   stMsgOp:=Format( 'La case (%d,%d) a Ã©tÃ© retirÃ©e de l''arrÃªt de bus %d.',
                     [DrawGridSimul.Col, DrawGridSimul.Row, NumArretBus]);
    SimulModifiee:=true;
   end{if NumArretBus}
@@ -2706,16 +2706,16 @@ begin // v3.0
      for d:=nord to ouest do
       if NumArretBus=cv.vxyd(x,y,d).NumArretBus then
        RedessineCase((x+dx[d]) mod NBX, (y+dy[d]) mod NBY, true);
-     stMsgOp:=Format( 'La case (%d,%d) a été ajoutée à l''arrêt de bus %d.',
+     stMsgOp:=Format( 'La case (%d,%d) a Ã©tÃ© ajoutÃ©e Ã  l''arrÃªt de bus %d.',
                       [DrawGridSimul.Col, DrawGridSimul.Row, NumArretBus]);
      SimulModifiee:=true;
     end{if NumArretBus}
    else
     if cv.NbArretsBus>0 then
-     stMsgOp:=Format( 'Impossible de créer un arrêt de bus : il y en a déjà %d !',
+     stMsgOp:=Format( 'Impossible de crÃ©er un arrÃªt de bus : il y en a dÃ©jÃ  %d !',
                       [cv.NbArretsBus])
     else
-     stMsgOp:='Impossible de créer un arrêt de bus : vous devez déjà en définir le nombre !';
+     stMsgOp:='Impossible de crÃ©er un arrÃªt de bus : vous devez dÃ©jÃ  en dÃ©finir le nombre !';
   end{else};
  RedessineCase(x, y, true);
  StatusBar.Panels.Items[0].Text:=stMsgOp;

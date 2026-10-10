@@ -58,7 +58,7 @@ bool TfrmDefFeux::RafraichitInfos()
   LabelNbFeuxDmd->Caption=IntToStr(NbFeuxDmd);
   LabelNbFeuxAtt->Caption=IntToStr(NbFeuxAtt);
 
-  // Affichage des numéros de feux piétons liés (v5.2)
+  // Affichage des numÃ©ros de feux piÃ©tons liÃ©s (v5.2)
   LabelFeuxPietons->Caption="";
 
   for(i=0,NbFeuxP=0; i<cv->NbFeuxPieton; i++)
@@ -74,7 +74,7 @@ bool TfrmDefFeux::RafraichitInfos()
   else
    LabelFeuxPietons->Caption=IntToStr(NbFeuxP)+" ("+LabelFeuxPietons->Caption+")";
 
-  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation implicite donc Appliquer ne peut être actif.
+  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnÃ©es (boÃ®te non modale) => Annulation implicite donc Appliquer ne peut Ãªtre actif.
   return true;
  }
 //---------------------------------------------------------------------------
@@ -139,7 +139,7 @@ void __fastcall TfrmDefFeux::FormHide(TObject *Sender)
    frmSimulation->RedessineCase(cv->Feu[NumFeuxAtt[i]-1].x, cv->Feu[NumFeuxAtt[i]-1].y, true);
  frmSimulation->SelectionFeuxDmd=false;
  frmSimulation->SelectionFeuxAtt=false;
- // v5.2 : En cas de dfinition de feux, on revient à la case initiale.
+ // v5.2 : En cas de dfinition de feux, on revient Ã  la case initiale.
  frmSimulation->DrawGridSimul->Col=x;
  frmSimulation->DrawGridSimul->Row=y;
  frmSimulation->DrawGridSimulClick(frmSimulation);
@@ -215,7 +215,7 @@ void __fastcall TfrmDefFeux::ButtonAideClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefFeux::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

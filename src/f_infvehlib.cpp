@@ -17,7 +17,7 @@ const AnsiString asDebutTitreCadreVehlib="                           ",
                  asFrmCoordonnees="%2.2d, %2.2d",
                  asFrmPourcentage="%.3f%%",
                  asFrmVitesse="%d/%d",
-                 asSituation[NBSITUATIONSTAXI]={"En attente","Départ d'une course","Dépôt de client(s)","Retour d'une course"};
+                 asSituation[NBSITUATIONSTAXI]={"En attente","DÃ©part d'une course","DÃ©pÃ´t de client(s)","Retour d'une course"};
 //---------------------------------------------------------------------------
 __fastcall TfrmInfosVehlib::TfrmInfosVehlib(TComponent* Owner)
     : TForm(Owner)
@@ -131,7 +131,7 @@ void __fastcall TfrmInfosVehlib::ButtonAideClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmInfosVehlib::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

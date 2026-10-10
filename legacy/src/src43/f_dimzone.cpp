@@ -65,7 +65,7 @@ void __fastcall TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
  if ((NbX>=NBXMIN)&&(NbY>=NBYMIN))
   ModalResult=mrOk;
  else
-  AfficheMessage( Format( "Vous devez spécifier une zone d'au moins %dx%d.",
+  AfficheMessage( Format( "Vous devez spÃ©cifier une zone d'au moins %dx%d.",
                           ARRAYOFCONST((NBXMIN, NBYMIN))),
                   "Zone insuffisante",
                   tmAvertissement, 0, 0);

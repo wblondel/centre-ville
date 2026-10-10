@@ -46,7 +46,7 @@ void __fastcall TfrmStatsAttenteTrafic::FormShow(TObject *Sender)
  FormResize(this);
 #endif
  if (cv->TourCrt)
-  Caption="Statistiques de fluidité et de trafic au tour n°"+IntToStr(cv->TourCrt);
+  Caption="Statistiques de fluiditÃ© et de trafic au tour nÂ°"+IntToStr(cv->TourCrt);
  CSpinEditEtapeDepart->MAXVALUE=cv->NbEtapes;
  CSpinEditEtapeArrivee->MAXVALUE=cv->NbEtapes;
  RecalculeEtVisualise();
@@ -78,7 +78,7 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
       ts=RadioGroupType->ItemIndex;
   if (m[ts]&&cv->v[x][y].Trafic&&cv->v[x][y].Attente)
    if (ts)
-    asMsg=Format( "Trafic en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%",
+    asMsg=Format( "Trafic en (%d, %d) au tour %d : %d vÃ©hicules (Max. %d) soit %.3f%%",
                   ARRAYOFCONST(( x, y, (int)cv->TourCrt,
                                  cv->v[x][y].Trafic[ed][ea], m[ts],
                                  (100.0*cv->v[x][y].Trafic[ed][ea])/m[ts])));
@@ -97,7 +97,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
      ea=CheckBoxEtapeArrivee->Checked?CSpinEditEtapeArrivee->Value:0;
  if ((ed<0)||(ed>cv->NbEtapes)||(ea<0)||(ea>cv->NbEtapes))
   {
-   AfficheMessage("Le n° d'étape est incorrect !", "Valeur incorrecte", tmAvertissement, 0, 0);
+   AfficheMessage("Le nÂ° d'Ã©tape est incorrect !", "Valeur incorrecte", tmAvertissement, 0, 0);
    return;
   }
  m[0]=0; m[1]=0;
@@ -132,7 +132,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
 //---------------------------------------------------------------------------
 void __fastcall TfrmStatsAttenteTrafic::ParametresEtapesClick(TObject *Sender)
 {
- switch(((TComponent*)Sender)->Tag) // Comportements propres à certains objets
+ switch(((TComponent*)Sender)->Tag) // Comportements propres Ã  certains objets
   {
    case 1: CSpinEditEtapeDepart->Enabled=CheckBoxEtapeDepart->Checked;
            if (CSpinEditEtapeDepart->Enabled) CSpinEditEtapeDepart->SetFocus();

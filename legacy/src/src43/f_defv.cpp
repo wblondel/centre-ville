@@ -18,11 +18,11 @@
 TfrmDefVoie *frmDefVoie=NULL;
 //---------------------------------------------------------------------------
 const AnsiString asFrmMsgSuppr="\
-Le feu %s (à supprimer) est référencé par le feu n°%d (%d,%d).\n\
-Si vous choisissez de supprimer le feu, TOUTES les références seront supprimées.\n\n\
-Voulez-vous néanmoins le supprimer ?",
-                 asFrmMsgAjout="Le feu %s ne peut être ajouté : il y a déjà %d feux.\n",
-                 asMAJIgnoree="Modifications de priorité ignorées";
+Le feu %s (Ã  supprimer) est rÃ©fÃ©rencÃ© par le feu nÂ°%d (%d,%d).\n\
+Si vous choisissez de supprimer le feu, TOUTES les rÃ©fÃ©rences seront supprimÃ©es.\n\n\
+Voulez-vous nÃ©anmoins le supprimer ?",
+                 asFrmMsgAjout="Le feu %s ne peut Ãªtre ajoutÃ© : il y a dÃ©jÃ  %d feux.\n",
+                 asMAJIgnoree="Modifications de prioritÃ© ignorÃ©es";
 //---------------------------------------------------------------------------
 __fastcall TfrmDefVoie::TfrmDefVoie(TComponent* Owner) : TForm(Owner) {}
 
@@ -82,7 +82,7 @@ void TfrmDefVoie::AppliqueChoix()
                                  BitBtnDefFeuS,
                                  BitBtnDefFeuO};
   frmSimulation->SimulationModifiee=true;
-  // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeux)
+  // 1. On supprime les feux si on change de prioritÃ© (et on ferme la fiche DefFeux)
   for(int d=nord; d<=ouest; d++) // v3.8.3
    {
     int RefTrv, NumRef;
@@ -99,13 +99,13 @@ void TfrmDefVoie::AppliqueChoix()
           RefTrv=(cv->Feu[NumRef].NumFeuxDmd[j]==v->NumFeu[d-1]);
         }
       if (RefTrv)
-       { // A. On a trouvé des références au feu à supprimer
+       { // A. On a trouvÃ© des rÃ©fÃ©rences au feu Ã  supprimer
         if (AfficheMessage( Format( asFrmMsgSuppr,
                                     ARRAYOFCONST(( asDir[d], NumRef+1, cv->Feu[NumRef].x, cv->Feu[NumRef].y))),
                             "Suppression de feu",
                             tmQuestionNecessaire, 1, 1)==trOui)
          {
-          // A.1.a On supprime les références au feu à supprimer
+          // A.1.a On supprime les rÃ©fÃ©rences au feu Ã  supprimer
           for(int i=0; i<cv->NbFeux; i++)
            {
             for(int j=0; j<cv->Feu[i].NbFeuxDmd; j++)
@@ -119,11 +119,11 @@ void TfrmDefVoie::AppliqueChoix()
           cv->SupprimeFeu(v->NumFeu[d-1]-1);
           if (frmDefFeux->Visible) frmDefFeux->Hide();
          }
-        else // A.2. On ne supprime pas le feu : on revient à la définition de priorité Feu.
+        else // A.2. On ne supprime pas le feu : on revient Ã  la dÃ©finition de prioritÃ© Feu.
          RadioGroupPriorite[d-1]->ItemIndex=feux;
        }
       else
-       { // B. On n'a pas trouvé de référence : on peut supprimer directement le feu
+       { // B. On n'a pas trouvÃ© de rÃ©fÃ©rence : on peut supprimer directement le feu
         cv->SupprimeFeu(v->NumFeu[d-1]-1);
         if (frmDefFeux->Visible) frmDefFeux->Hide();
        }
@@ -140,16 +140,16 @@ void TfrmDefVoie::AppliqueChoix()
     }
   if (!asMsg.IsEmpty()) AfficheMessage(asMsg, asMAJIgnoree, tmAvertissement, 0, 0);
 
-  // 3. On change les priorités
+  // 3. On change les prioritÃ©s
   for(int d=nord; d<=ouest; d++)
    v->Priorite[d-1]=(priorite)RadioGroupPriorite[d-1]->ItemIndex;
 
-  // 4. On met à jour l'accessibilité des boutons et groupes
+  // 4. On met Ã  jour l'accessibilitÃ© des boutons et groupes
   ButtonAppliquer->Enabled=false;
   for(int d=nord; d<=ouest; d++)
    BitBtnDefFeu[d-1]->Enabled=(RadioGroupPriorite[d-1]->ItemIndex==3);
 
-  // 5. On rafraîchit la scène
+  // 5. On rafraÃ®chit la scÃ¨ne
   frmSimulation->RedessineCase(x, y, true);
  }
 //---------------------------------------------------------------------------

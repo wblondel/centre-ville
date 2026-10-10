@@ -44,29 +44,29 @@ const AnsiString asLabel="Label",
 				 asFrmNumeroCoordonnees="%d (%2.2d, %2.2d)",
 				 asFrmCoordonnees="%2.2d, %2.2d",
 				 asFrmPourcentage="#.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais "#.000%"
-				 asFrmPourcents="0.0%", // v5.4.1 : porucentage à 0,1 près
+				 asFrmPourcents="0.0%", // v5.4.1 : porucentage Ã  0,1 prÃ¨s
 				 asFrmDemiCase="0.0", // v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
-				 asPosition[NBPOSITIONS]={"Entrée de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "ans un vehlib"}, // v5.3 (vehlib)
-				 asSituation[NBSITUATIONS]={ "Se promène",
-											 "Se dirige vers un passage piéton",
-											 "Se dirige vers un arrêt de bus",
-											 "Se dirige vers un arrêt de trams",
+				 asPosition[NBPOSITIONS]={"EntrÃ©e de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "ans un vehlib"}, // v5.3 (vehlib)
+				 asSituation[NBSITUATIONS]={ "Se promÃ¨ne",
+											 "Se dirige vers un passage piÃ©ton",
+											 "Se dirige vers un arrÃªt de bus",
+											 "Se dirige vers un arrÃªt de trams",
 											 "Se dirige vers une file de taxis",
 											 "Se dirige vers une file de vehlibs", // v5.3
-											 "Attend un bus à l'arrêt",
+											 "Attend un bus Ã  l'arrÃªt",
 											 "Attend dans le bus",
-											 "Attend un tram à l'arrêt",
+											 "Attend un tram Ã  l'arrÃªt",
 											 "Attend dans le tram",
-											 "Attend un taxi en tête de file",
+											 "Attend un taxi en tÃªte de file",
 											 "Attend dans le taxi",
 											 "Attend un vehlib", // v5.3
 											 "Attend dans le vehlib", // v5.3
-											 "Descend au prochain arrêt",
-											 "Ecrasé (mode sanglant)",
-											 "Mort (épidémie)"},
+											 "Descend au prochain arrÃªt",
+											 "EcrasÃ© (mode sanglant)",
+											 "Mort (Ã©pidÃ©mie)"},
 				 asOuiNon[2]={"Non","Oui"}, // v5.4.1
 				 asFrmPrmDrn="%d, %d", // v5.4.1
-				 asEtatFinal[2]={"Guéri","Mort"},
+				 asEtatFinal[2]={"GuÃ©ri","Mort"},
                  asNA="N/A";
 //---------------------------------------------------------------------------
 __fastcall TfrmInfosPieton::TfrmInfosPieton(TComponent* Owner)
@@ -108,7 +108,7 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
 											 ARRAYOFCONST(( NumPieton,
 															cv->Bus[p->NumVehlib-1].x,
 															cv->Bus[p->NumVehlib-1].y)));
-		  else // à pied
+		  else // Ã  pied
 			GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 									 Format( asFrmNumeroCoordonnees,
 									         ARRAYOFCONST((NumPieton, p->x, p->y)));
@@ -118,17 +118,17 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
   RadioButtonAucunPieton->Checked=!ARendreVisible;
   RadioButtonPietonNumero->Checked=ARendreVisible;
   RadioButtonPietonNumero->Enabled=ARendreVisible;
-  // Libellés
+  // LibellÃ©s
   for(i=1; i<7; i++)
    ((TLabel*)FindComponent(asLabel+IntToStr(i)))->Enabled=ARendreVisible;
-  // Données
+  // DonnÃ©es
   LabelDirection->Visible=ARendreVisible;
   LabelPosition->Visible=ARendreVisible;
   LabelSituation->Visible=ARendreVisible;
   LabelParcours->Visible=ARendreVisible;
   LabelBusTramTaxiVehlib->Visible=ARendreVisible;  // v5.3 ajout de Vehlib dans le nom
   LabelArretBusTramFileTaxiVehlib->Visible=ARendreVisible; // v5.3 ajout de Vehlib dans le nom
-  // v5.4.1 Partie Epidémie (on active aussi si épidémie activée)
+  // v5.4.1 Partie EpidÃ©mie (on active aussi si Ã©pidÃ©mie activÃ©e)
   CheckBoxEpidemie->Checked=ARendreVisible&&frmSimulation->EpidemieActivee;
   for(i=7; i<14; i++) // v5.4.1 (+9)
    ((TLabel*)FindComponent(asLabel+IntToStr(i)))->Enabled=CheckBoxEpidemie->Checked;
@@ -154,7 +154,7 @@ void TfrmInfosPieton::RafraichitInfos()
 	  frmRecherche->Visible&&
 	  frmRecherche->RadioButtonPieton->Checked)
    NumPieton=frmRecherche->CSpinEditPieton->Value;
-  if (!NumPieton) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
+  if (!NumPieton) // Si pas de piÃ©ton suivi, on cherche parmi ceux de la case courante
    {
 	if (v->NumPieton[0])
 	 NumPieton=v->NumPieton[0];
@@ -164,13 +164,13 @@ void TfrmInfosPieton::RafraichitInfos()
    }
   else
    {
-    if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvé de piéton
+    if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvÃ© de piÃ©ton
 		(v->NumPieton[1]!=NumPieton)&& // sur la case courante ET
 		(v->NumBus!=cv->Pieton[NumPieton-1].NumBus)&&
 		(v->NumTram!=cv->Pieton[NumPieton-1].NumTram)&&
 		(v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi)&&
 		(v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib)) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
-	 { // On cherche un autre piéton
+	 { // On cherche un autre piÃ©ton
 	  if (v->NumPieton[0])
 	   NumPieton=v->NumPieton[0];
 	  else
@@ -286,7 +286,7 @@ void TfrmInfosPieton::RafraichitInfos()
 	  else
 	   LabelArretBusTramFileTaxiVehlib->Caption="Aucun";
 
-	// v5.4.1 : partie Epidémie
+	// v5.4.1 : partie EpidÃ©mie
 	if (frmSimulation->EpidemieActivee)
 	 {
 	  bool Infection=p->EstContagieux();
@@ -351,7 +351,7 @@ void __fastcall TfrmInfosPieton::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmInfosPieton::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

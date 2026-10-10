@@ -4,10 +4,10 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 //---------------------------------------------------------------------------
-// Propriétés de TCSpinEdit
+// PropriÃ©tÃ©s de TCSpinEdit
 #define MINVALUE MinValue
 #define MAXVALUE MaxValue
-// Propriétés de TOpen/CloseDialog
+// PropriÃ©tÃ©s de TOpen/CloseDialog
 #define FILENAME(x) ((x)->FileName)
 // Types
 #define TBITMAP Graphics::TBitmap

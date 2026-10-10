@@ -79,7 +79,7 @@ const struct { int Numero; char *szHREF; } // v5.3 : aide type HLP converti en t
                        {69, "RC"},
                        {70, "MDE"}};
 //---------------------------------------------------------------------------
-// v5.3. S'active automatiquement au lancement de cvw.exe avec le paramètre ! et génère un fichier cvw.log où se trouve cvw.exe à la fermeture de l'application
+// v5.3. S'active automatiquement au lancement de cvw.exe avec le paramÃ¨tre ! et gÃ©nÃ¨re un fichier cvw.log oÃ¹ se trouve cvw.exe Ã  la fermeture de l'application
 // Usage : DebugEcrit("message");
 bool Debug = false;
 TStringList *slDebug = NULL;

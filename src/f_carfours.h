@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 class TfrmCarrefours : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TGroupBox *GroupBox34;
     TSpeedButton *SpeedButton34b1;
     TSpeedButton *SpeedButton34b2;
@@ -50,12 +50,12 @@ __published:	// Composants gérés par l'EDI
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
     
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
 	void AffecteGlyphe(TVirtualImageList *VirtualImageList, const int NumGlyphe, TBitmap *Glyphe)
-	 { // v5.4 pour affecter les SpeedButton->Glyph à partir des virtualImageList et supporter le HDPI
+	 { // v5.4 pour affecter les SpeedButton->Glyph Ã  partir des virtualImageList et supporter le HDPI
 	  VirtualImageList->GetBitmap(NumGlyphe, Glyphe);
 	 };
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmCarrefours(TComponent* Owner);
     void Active(int Colonnes, int Lignes);
 };

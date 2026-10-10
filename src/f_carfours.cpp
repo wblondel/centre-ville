@@ -47,15 +47,15 @@ const dirposs DirPossC4x4[4][4]=
 const AnsiString asNbFeuxLibresInsuffisant="\
 Il reste moins de %d feux de libres !\n\
 Il faut...\n\
- - Soit supprimer des feux existants puis réessayer,\n\
- - Soit augmenter le nombre maximum de feux puis réessayer ; Pour ce faire :\n\
-   · Enregistrer le réseau actuel,\n\
-   · Dans les paramètres de simulation, augmenter le nombre de feux maximum\n\
-   · Cocher \"Maintenus à l'ouverture\"\n\
-   · Appuyer sur Ok puis confirmer la suppression des feux\n\
-   · Ouvrir à nouveau le réseau (SURTOUT NE PAS ENREGISTRER les modifications)\n\
-   · Réessayer.",
-                 asImpossibleCreerCarrefour="Impossible de créer le carrefour";
+ - Soit supprimer des feux existants puis rÃ©essayer,\n\
+ - Soit augmenter le nombre maximum de feux puis rÃ©essayer ; Pour ce faire :\n\
+   Â· Enregistrer le rÃ©seau actuel,\n\
+   Â· Dans les paramÃ¨tres de simulation, augmenter le nombre de feux maximum\n\
+   Â· Cocher \"Maintenus Ã  l'ouverture\"\n\
+   Â· Appuyer sur Ok puis confirmer la suppression des feux\n\
+   Â· Ouvrir Ã  nouveau le rÃ©seau (SURTOUT NE PAS ENREGISTRER les modifications)\n\
+   Â· RÃ©essayer.",
+                 asImpossibleCreerCarrefour="Impossible de crÃ©er le carrefour";
 //---------------------------------------------------------------------------
 int Carrefours(int Colonnes, int Lignes)
 {
@@ -254,7 +254,7 @@ void __fastcall TfrmCarrefours::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmCarrefours::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

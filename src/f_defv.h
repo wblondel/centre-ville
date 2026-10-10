@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 class TfrmDefVoie : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TLabel *Label1;
     TLabel *LabelCoordonnees;
     TRadioGroup *RadioGroupPrioriteNord;
@@ -38,12 +38,12 @@ __published:	// Composants gérés par l'EDI
     void __fastcall RadioGroupPrioriteClick(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     voie *v;
     int x, y;
     TBitBtn *BitBtn[NBDIR]; // v5.2 
     void DefinitFeu(direction Dir);
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmDefVoie(TComponent* Owner);
     void RafraichitInfos();
     void AppliqueChoix();

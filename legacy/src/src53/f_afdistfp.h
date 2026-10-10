@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 class TfrmAffDistFilesPark : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TStringGrid *StringGridDistances;
   TPanel *Panel;
   TCheckBox *CheckBoxCouloirsBus;
@@ -21,8 +21,8 @@ __published:	// Composants gérés par l'EDI
           TShiftState Shift);
 
 
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmAffDistFilesPark(TComponent* Owner);
     void EffaceInfos();
     void RafraichitInfos();

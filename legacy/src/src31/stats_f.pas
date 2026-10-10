@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -129,10 +129,10 @@ begin
      PaintBoxStats.Canvas.Rectangle(x-1, yMax-y-1, x+1, yMax-y+1);
     end;
 
- // 2. Affichage des véhicules
+ // 2. Affichage des vÃ©hicules
  if xMax and yMax>0 then
   begin
-   PaintBoxStats.Canvas.Pen.Color:=clRed; // Arrivés = Rouges
+   PaintBoxStats.Canvas.Pen.Color:=clRed; // ArrivÃ©s = Rouges
    PaintBoxStats.Canvas.MoveTo(0, yMax-yMax*cv.StatsCV[PrmTour mod NbTours].NbVehiculesArrives div NbVehicules);
    for i:=0 to DrnTour-PrmTour do
     PaintBoxStats.Canvas.LineTo(xMax*i div NbTours, yMax-yMax*cv.StatsCV[(PrmTour+i) mod NbTours].NbVehiculesArrives div NbVehicules);

@@ -34,7 +34,7 @@
 //---------------------------------------------------------------------------
 class TfrmGeneration : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TGroupBox *GroupBox;
   TTrackBar *TrackBarTailleMinSegments;
   TLabel *Label1;
@@ -54,8 +54,8 @@ __published:	// Composants gérés par l'EDI
   void __fastcall ButtonOkClick(TObject *Sender);
   void __fastcall FormResize(TObject *Sender);
   void __fastcall ButtonAideClick(TObject *Sender);
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
   __fastcall TfrmGeneration(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

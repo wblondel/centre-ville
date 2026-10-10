@@ -44,10 +44,10 @@ void __fastcall TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 
  if (!cv->Stats) return;
 
- // 2. Affichage des véhicules
+ // 2. Affichage des vÃ©hicules
  if (xMax&&yMax)
   {
-   PaintBoxStats->Canvas->Pen->Color=clRed; // Arrivés = Rouges
+   PaintBoxStats->Canvas->Pen->Color=clRed; // ArrivÃ©s = Rouges
    PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesArrives/NbVehicules);
    for(i=0; i<DrnTour-PrmTour+1; i++)
     PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives/NbVehicules);

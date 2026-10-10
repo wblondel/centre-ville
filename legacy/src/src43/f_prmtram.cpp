@@ -18,7 +18,7 @@
 
 TfrmParamTram *frmParamTram;
 
-const AnsiString asOrdre[2]={"ème","er"};
+const AnsiString asOrdre[2]={"Ã¨me","er"};
 
 //---------------------------------------------------------------------------
 __fastcall TfrmParamTram::TfrmParamTram(TComponent* Owner)
@@ -31,7 +31,7 @@ void TfrmParamTram::RafraichitNbTrams()
   int i, NbTrams=0;
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
    if (cv->LigneTram[i].NbArrets)
-    NbTrams+=1+(cv->LigneTram[i].NbArrets-1)/3; // On définit 1 tram de 1 à 3 arrêts. 2 trams de 4 à 6 arrêts et 3 trams de 7 à 9 arrêts
+    NbTrams+=1+(cv->LigneTram[i].NbArrets-1)/3; // On dÃ©finit 1 tram de 1 Ã  3 arrÃªts. 2 trams de 4 Ã  6 arrÃªts et 3 trams de 7 Ã  9 arrÃªts
   LabelNbTrams->Caption=IntToStr(NbTrams);
  }
 //---------------------------------------------------------------------------
@@ -84,8 +84,8 @@ void __fastcall TfrmParamTram::FormShow(TObject *Sender)
   {
    for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
     ((TSPINEDIT*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Visible=false;
-   AfficheMessage( "Vous devez poser au moins un arrêt de tram sur le réseau pour pouvoir définir le réseau de lignes de tram.",
-                   "Impossible de paramétrer le réseau de lignes de tram", tmAvertissement, 0, 0);
+   AfficheMessage( "Vous devez poser au moins un arrÃªt de tram sur le rÃ©seau pour pouvoir dÃ©finir le rÃ©seau de lignes de tram.",
+                   "Impossible de paramÃ©trer le rÃ©seau de lignes de tram", tmAvertissement, 0, 0);
   }
  CSpinEditNbMaxPersonnesTram->Value=cv->NbMaxPersonnesTram;
  CSpinEditNbToursStopArretTram->Value=cv->NbToursStopArretTram;
@@ -94,7 +94,7 @@ void __fastcall TfrmParamTram::FormShow(TObject *Sender)
  CSpinEditNbMaxToursAttenteTram->Value=cv->NbMaxToursAttenteTram;
  CSpinEditProbaArretDmd->Value=cv->ProbaArretTramDmd;
  InitialisationEnCours=false;
-#ifdef CV_LINUX // v3.8. Permet de rafraîchir les SpinEdit des numéros de lignes (OnClick != OnChange)
+#ifdef CV_LINUX // v3.8. Permet de rafraÃ®chir les SpinEdit des numÃ©ros de lignes (OnClick != OnChange)
  for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
   CSpinEditChange(((TSPINEDIT*)FindComponent(asDebutNomSpinEdit+IntToStr(i))));
 #endif
@@ -109,11 +109,11 @@ void __fastcall TfrmParamTram::CSpinEditChange(TObject *Sender)
      AncNumArretTramAMontrer;
  switch(k/10)
   {
-   case 0: // Nombre d'arrêts
+   case 0: // Nombre d'arrÃªts
            for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++)
             ((TSPINEDIT*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
            break;
-   default:// N°d'arrêt de tram
+   default:// NÂ°d'arrÃªt de tram
            if ((!n)||(n>cv->NbArretsTram))
             CSpinEdit->Value=0;
            else
@@ -129,7 +129,7 @@ void __fastcall TfrmParamTram::CSpinEditChange(TObject *Sender)
                       [cv->ArretTram[AncNumArretTramAMontrer-1].y].RedessineCasesArretTram(indefinie);
                 }
                NumArretTramAMontrer=CSpinEdit->Value;
-               // On bouge le curseur pour être sûr de voir l'arrêt
+               // On bouge le curseur pour Ãªtre sÃ»r de voir l'arrÃªt
                frmSimulation->DrawGridSimul->Col=cv->ArretTram[NumArretTramAMontrer-1].x;
                frmSimulation->DrawGridSimul->Row=cv->ArretTram[NumArretTramAMontrer-1].y;
               }
@@ -202,7 +202,7 @@ bool TfrmParamTram::AppliqueChoix()
   AnsiString asMsg;
   int i, j;
   TSPINEDIT *CSpinEditNb, *CSpinEditNum;
-  // 1. On vérifie que tous les arrêts sont définis
+  // 1. On vÃ©rifie que tous les arrÃªts sont dÃ©finis
   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
    {
     CSpinEditNb=(TSPINEDIT*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
@@ -213,14 +213,14 @@ bool TfrmParamTram::AppliqueChoix()
         CSpinEditNum=(TSPINEDIT*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
         if (!CSpinEditNum->Value)
          asMsg= asMsg+
-                Format( " - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
+                Format( " - Le %d%s arrÃªt de la ligne nÂ°%d n'est pas dÃ©fini.\n",
                         ARRAYOFCONST(( j, asOrdre[!(j-1)], i)));
        }
      }
    }
   if (!asMsg.IsEmpty())
    {
-    AfficheMessage( Format("Le réseau de trams n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
+    AfficheMessage( Format("Le rÃ©seau de trams n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
                     "Impossible de continuer", tmAvertissement, 0, 0);
     return false;
    }
@@ -241,7 +241,7 @@ bool TfrmParamTram::AppliqueChoix()
        }
      }
    }
-  // 3. On valide les autres paramètres
+  // 3. On valide les autres paramÃ¨tres
   cv->NbMaxPersonnesTram=CSpinEditNbMaxPersonnesTram->Value;
   cv->NbToursStopArretTram=CSpinEditNbToursStopArretTram->Value;
   cv->NbMaxCasesDetectArretTram=CSpinEditNbCasesMaxArretTram->Value;

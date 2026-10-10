@@ -90,10 +90,10 @@ void __fastcall TfrmParamSimul::CSpinEditNbPietonsChange(TObject *Sender)
    }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des possibilités de véhicules déporté en fonction car utilisé dans FormShow
+void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des possibilitÃ©s de vÃ©hicules dÃ©portÃ© en fonction car utilisÃ© dans FormShow
  {
   int NbMinVehicules= cv->NbParkings*(cv->NbParkings-1)
-                     +2*cv->NbPlacesPark, // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
+                     +2*cv->NbPlacesPark, // v5.0 : 1 vÃ©h dÃ©part + 1 vÃ©h arrivÃ©e par place de parking
 	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules), // v5.0.3
       NbVehicules=NbMinVehicules*(CSpinEditNbVehicules->Value/NbMinVehicules); // v5.0.3
     CSpinEditNbVehicules->Increment=NbMinVehicules;
@@ -282,7 +282,7 @@ void __fastcall TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
 
 void __fastcall TfrmParamSimul::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

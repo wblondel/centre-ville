@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------
 class TfrmEpidemie : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
 	TGroupBox *GroupBox;
 	TCSpinEdit *CSpinEditInfectiosite;
 	TLabel *Label1;
@@ -32,8 +32,8 @@ __published:	// Composants gérés par l'EDI
 	void __fastcall ButtonOkClick(TObject *Sender);
 	void __fastcall ButtonAideClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
-private:	// Déclarations utilisateur
-public:		// Déclarations utilisateur
+private:	// DÃ©clarations utilisateur
+public:		// DÃ©clarations utilisateur
 	__fastcall TfrmEpidemie(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

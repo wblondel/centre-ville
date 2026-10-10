@@ -43,23 +43,23 @@ const AnsiString asDebutTitreCadrePieton="                           ",
                  asFrmCoordonnees="%2.2d, %2.2d",
                  asFrmPourcentage="%.3f%%",
                  asFrmDemiCase="%.1f",
-                 asPosition[NBPOSITIONS]={"Entrée de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "ans un vehlib"}, // v5.3 (vehlib)
-                 asSituation[NBSITUATIONS]={ "Se promène",
-                                             "Se dirige vers un passage piéton",
-                                             "Se dirige vers un arrêt de bus",
-                                             "Se dirige vers un arrêt de trams",
+                 asPosition[NBPOSITIONS]={"EntrÃ©e de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "ans un vehlib"}, // v5.3 (vehlib)
+                 asSituation[NBSITUATIONS]={ "Se promÃ¨ne",
+                                             "Se dirige vers un passage piÃ©ton",
+                                             "Se dirige vers un arrÃªt de bus",
+                                             "Se dirige vers un arrÃªt de trams",
                                              "Se dirige vers une file de taxis",
                                              "Se dirige vers une file de vehlibs", // v5.3
-                                             "Attend un bus à l'arrêt",
+                                             "Attend un bus Ã  l'arrÃªt",
                                              "Attend dans le bus",
-                                             "Attend un tram à l'arrêt",
+                                             "Attend un tram Ã  l'arrÃªt",
                                              "Attend dans le tram",
-                                             "Attend un taxi en tête de file",
+                                             "Attend un taxi en tÃªte de file",
                                              "Attend dans le taxi",
                                              "Attend un vehlib", // v5.3
                                              "Attend dans le vehlib", // v5.3
-                                             "Descend au prochain arrêt",
-                                             "Ecrasé"};
+                                             "Descend au prochain arrÃªt",
+                                             "EcrasÃ©"};
 //---------------------------------------------------------------------------
 __fastcall TfrmInfosPieton::TfrmInfosPieton(TComponent* Owner)
     : TForm(Owner)
@@ -111,7 +111,7 @@ void TfrmInfosPieton::RafraichitInfos()
       frmRecherche->Visible&&
       frmRecherche->RadioButtonPieton->Checked)
    NumPieton=frmRecherche->CSpinEditPieton->Value;
-  if (!NumPieton) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
+  if (!NumPieton) // Si pas de piÃ©ton suivi, on cherche parmi ceux de la case courante
    {
     if (v->NumPieton[0])
      NumPieton=v->NumPieton[0];
@@ -121,13 +121,13 @@ void TfrmInfosPieton::RafraichitInfos()
    }
   else
    {
-    if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvé de piéton
+    if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvÃ© de piÃ©ton
         (v->NumPieton[1]!=NumPieton)&& // sur la case courante ET
         (v->NumBus!=cv->Pieton[NumPieton-1].NumBus)&&
         (v->NumTram!=cv->Pieton[NumPieton-1].NumTram)&&
         (v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi)&&
         (v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib)) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
-     { // On cherche un autre piéton
+     { // On cherche un autre piÃ©ton
       if (v->NumPieton[0])
        NumPieton=v->NumPieton[0];
       else
@@ -266,7 +266,7 @@ void __fastcall TfrmInfosPieton::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmInfosPieton::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

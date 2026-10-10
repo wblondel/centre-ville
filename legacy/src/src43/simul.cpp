@@ -38,7 +38,7 @@
 // v3.5 : remplacement des [5] par [NBDIR+1] et des [4] par [NBDIR]
 const dirposs PossDir[NBDIR+1]={aucune, N, E, S, O},
               InvPossDir[NBDIR+1]={aucune, S, O, N, E},
-              // 1=90°droite, 2=180°, 3=90°gauche
+              // 1=90Â°droite, 2=180Â°, 3=90Â°gauche
               RotPossDir[NBDIR][16]={{aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO},
                                      {aucune, E, S, SE, O, EO, SO, ESO, N, NE, NS, NES, NO, NEO, NSO, NESO},
                                      {aucune, S, O, SO, N, NS, NO, NSO, E, SE, EO, ESO, NE, NES, NEO, NESO},
@@ -61,7 +61,7 @@ const sens SensPsgPt[16]={indefini,   horizontal, vertical, indefini,
                           vertical, indefini, vertical, indefini,
                           indefini, indefini, indefini, indefini};
 //---------------------------------------------------------------------------
-// (Dirdp[x][y] = (x+1)ème direction pour DirPoss=y
+// (Dirdp[x][y] = (x+1)Ã¨me direction pour DirPoss=y
 const direction Dirdp[NBDIR][16]={{indefinie,  nord,   est,  nord,   sud,  nord,   est,  nord,
                                    ouest,  nord,   est,  nord,   sud,  nord,   est,  nord},
                                   {indefinie,indefinie,indefinie,   est,indefinie,   sud,   sud,   est,
@@ -158,7 +158,7 @@ void AppelleAuChaos()
   srand((unsigned)time(&t));
  }
 //-----------------------------------------------------------------------------
-// Routines privées
+// Routines privÃ©es
 //-----------------------------------------------------------------------------
 void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y);
 void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie);
@@ -177,7 +177,7 @@ void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y, boo
   if (((y<-1)&&(PeutEtreIndefinie))||
       ((y<0)&&(!PeutEtreIndefinie))||
       (y>=cv->NbY))
-   asMsgErr+=asSource+Format(": ordonnée incorrecte (%d)\n", ARRAYOFCONST((y)));
+   asMsgErr+=asSource+Format(": ordonnÃ©e incorrecte (%d)\n", ARRAYOFCONST((y)));
  }
 //-----------------------------------------------------------------------------
 void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie)
@@ -191,7 +191,7 @@ void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, boo
 void VerifiePriorite(AnsiString asMsgErr, AnsiString asSource, priorite p)
  {
   if ((p<a_droite)||(p>feux))
-   asMsgErr+=asSource+Format(": priorité incorrecte (%d)\n", ARRAYOFCONST((p)));
+   asMsgErr+=asSource+Format(": prioritÃ© incorrecte (%d)\n", ARRAYOFCONST((p)));
  }
 //-----------------------------------------------------------------------------
 void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp)
@@ -203,7 +203,7 @@ void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp)
 void VerifieEtat(AnsiString asMsgErr, AnsiString asSource, etat_feu e)
  {
   if ((e<inactif)||(e>rouge))
-   asMsgErr+=asSource+Format(": état incorrect (%d)\n", ARRAYOFCONST((e)));
+   asMsgErr+=asSource+Format(": Ã©tat incorrect (%d)\n", ARRAYOFCONST((e)));
  }
 //-----------------------------------------------------------------------------
 void VerifieDmdVert(AnsiString asMsgErr, AnsiString asSource, dmd_vert dv)
@@ -218,17 +218,17 @@ void VerifiePsgRouge(AnsiString asMsgErr, AnsiString asSource, psg_rouge pr)
    asMsgErr+=asSource+Format(": type de passage au rouge incorrect (%d)\n", ARRAYOFCONST((pr)));
  }
 //-----------------------------------------------------------------------------
-// Méthodes des classes
+// MÃ©thodes des classes
 //-----------------------------------------------------------------------------
 void pieton::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("PiÃ©ton nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirection(asMsgErr, asSource, (direction)Dir, DOIT_ETRE_DEFINI);
   if ((DemiCase<0)||(DemiCase>1))
-   asMsgErr+=asSource+Format(": valeur ½ case incorrecte (%d)\n", ARRAYOFCONST((DemiCase)));
+   asMsgErr+=asSource+Format(": valeur Â½ case incorrecte (%d)\n", ARRAYOFCONST((DemiCase)));
  }
 //-----------------------------------------------------------------------------
 void pieton::ChercheFileTaxis() // v3.6
@@ -240,7 +240,7 @@ void pieton::ChercheFileTaxis() // v3.6
   if (!NumFileTaxi) // Cas improbable mais on ne sait jamais
    { // On abandonne la recherche de file de taxi
     FileTaxiTrv=false;
-    return; // Numéro de file de taxi obligatoire pour que l'on puisse trouver la tête !
+    return; // NumÃ©ro de file de taxi obligatoire pour que l'on puisse trouver la tÃªte !
    }
   for(int d=nord; (!NumPlaceTaxi)&&(d<=ouest); d++)
    {
@@ -252,7 +252,7 @@ void pieton::ChercheFileTaxis() // v3.6
       DirPlace=(direction)d;
      }
    }
-  if (!NumPlaceTaxi) // Pas trouvé de place de taxi aux allentours...
+  if (!NumPlaceTaxi) // Pas trouvÃ© de place de taxi aux allentours...
    { // On abandonne la recherche de file de taxi
     FileTaxiTrv=false;
     NumFileTaxi=0;
@@ -260,7 +260,7 @@ void pieton::ChercheFileTaxis() // v3.6
    }
   else
    if ((!cv->v[x][y].PassagePietons)&&(cv->PlaceTaxi[NumPlaceTaxi-1].EstTeteFile()))
-    { // On a finalement trouvé la tête : il attend le taxi (bloque le piéton)
+    { // On a finalement trouvÃ© la tÃªte : il attend le taxi (bloque le piÃ©ton)
      FileTaxiTrv=false;
      AttendTaxi=true;
      TourAttTaxi=cv->TourCrt;
@@ -275,7 +275,7 @@ void pieton::ChercheFileTaxis() // v3.6
       return;
      }
    }
-  else // Même direction : il faut contourner la case !
+  else // MÃªme direction : il faut contourner la case !
    {
     ProchDir=ADroiteDe[DirPlace];
     if (cv->V(x,y,ProchDir).PietonPeutAller(ProchDir)&&
@@ -291,7 +291,7 @@ void pieton::ChercheFileTaxis() // v3.6
       Dir=ProchDir;
       return;
      }
-    // On a pas trouvé de direction, on abandonne la recherche
+    // On a pas trouvÃ© de direction, on abandonne la recherche
     FileTaxiTrv=false;
     NumFileTaxi=0;
    }
@@ -355,7 +355,7 @@ void feu::AjouteFeuAtt(int NumNvFeu)
   NumFeuxAtt=NvNumFeuxAtt;
  }
 //-----------------------------------------------------------------------------
-void feu::RetireFeuDmd(int NumFeu) // NumFeu(>0) doit être dans NumFeuxDmd[]
+void feu::RetireFeuDmd(int NumFeu) // NumFeu(>0) doit Ãªtre dans NumFeuxDmd[]
  {
   int i, Trv=0, *NvNumFeuxDmd=NULL;
   if (--NbFeuxDmd)
@@ -368,7 +368,7 @@ void feu::RetireFeuDmd(int NumFeu) // NumFeu(>0) doit être dans NumFeuxDmd[]
   NumFeuxDmd=NvNumFeuxDmd;
  }
 //-----------------------------------------------------------------------------
-void feu::RetireFeuAtt(int NumFeu) // NumFeu(>0) doit être dans NumFeuxAtt[]
+void feu::RetireFeuAtt(int NumFeu) // NumFeu(>0) doit Ãªtre dans NumFeuxAtt[]
  {
   int i, Trv=0, *NvNumFeuxAtt=NULL;
   if (--NbFeuxAtt)
@@ -400,7 +400,7 @@ void feu::DefinitProchainEtat()
                 ProchainVert=false;
                 break;
     case rouge: RougeDemande=false;
-                // On informe quels sont les prochains feux à se mettre au vert
+                // On informe quels sont les prochains feux Ã  se mettre au vert
                 for(i=0; i<NbFeuxDmd; i++)
                  if ((cv->Feu[NumFeuxDmd[i]-1].Etat==rouge)&&
                      (!cv->Feu[NumFeuxDmd[i]-1].ProchainVert)&&
@@ -422,11 +422,11 @@ void feu::Evolue()
       NumBus, // v3.0 
       NumTram, // v3.5
       NumTaxi; // v3.6
-  ProchainEtat=Etat; // Par défaut
+  ProchainEtat=Etat; // Par dÃ©faut
   switch(Etat)
    {
     case inactif : break;
-    case vert:     // Si (rouge demandé ou passage immediat) et durée vert écoulée -> Orange
+    case vert:     // Si (rouge demandÃ© ou passage immediat) et durÃ©e vert Ã©coulÃ©e -> Orange
                    if (((RougeDemande&&(TourDrnChgEtat<cv->TourCrt))||
                         (TypePsgRouge==immediat))&&
                        (cv->TourCrt-TourDrnChgEtat>DureeVert))
@@ -435,12 +435,12 @@ void feu::Evolue()
     case orange:   if (cv->TourCrt-TourDrnChgEtat>cv->DureeOrange)
                     DefinitProchainEtat();
                    break;
-    case rouge:    // Le vert n'est pas encore demandé
+    case rouge:    // Le vert n'est pas encore demandÃ©
                    if (!DemandeVert)
                     {
-                     if ((cv->TourCrt-TourDrnChgEtat>DureeRouge)&& // la durée du rouge est écoulée ET
-                         ((TypeDmdVert==immediate)|| // La demande est immédiate Ou
-                          ((NumVeh=cv->v[x][y].NumVehicule)&& // un véhicule est sur la case et
+                     if ((cv->TourCrt-TourDrnChgEtat>DureeRouge)&& // la durÃ©e du rouge est Ã©coulÃ©e ET
+                         ((TypeDmdVert==immediate)|| // La demande est immÃ©diate Ou
+                          ((NumVeh=cv->v[x][y].NumVehicule)&& // un vÃ©hicule est sur la case et
                            (cv->Vehicule[NumVeh-1].Dir==Dir))|| // dans la direction du feu... Ou
                           ((NumBus=cv->v[x][y].NumBus)&& // un bus est sur la case et
                            (cv->Bus[NumBus-1].Dir==Dir))||
@@ -448,7 +448,7 @@ void feu::Evolue()
                            (cv->Tram[NumTram-1].Dir==Dir))|| // dans la direction du feu... (v3.5)
                           ((NumTaxi=cv->v[x][y].NumTaxi)&& // un taxi est sur la case et
                            (cv->Taxi[NumTaxi-1].Dir==Dir)))) // dans la direction du feu... (v3.6)
-                      { // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
+                      { // Alors...On demande le vert DES QU'UN DES FEUX (devant Ãªtre rouge) EST VERT
                        for(i=0;
                            (i<NbFeuxAtt)&&
                            ((cv->Feu[NumFeuxAtt[i]-1].Etat!=vert)||
@@ -458,20 +458,20 @@ void feu::Evolue()
                        if (DemandeVert=(i<NbFeuxAtt)) TourDrnChgEtat=cv->TourCrt;
                       }
                     }
-                   // Le vert est demandé...
+                   // Le vert est demandÃ©...
                    if (DemandeVert)
                     {
                      // On le fait toujours savoir (si jamais un feu devient vert entre-temps)
-                     for(i=0; i<NbFeuxAtt; i++) // On parcours les feux devant être rouge
-                      if ((cv->Feu[NumFeuxAtt[i]-1].Etat==vert)&& // feu opposé vert et
+                     for(i=0; i<NbFeuxAtt; i++) // On parcours les feux devant Ãªtre rouge
+                      if ((cv->Feu[NumFeuxAtt[i]-1].Etat==vert)&& // feu opposÃ© vert et
                           (cv->Feu[NumFeuxAtt[i]-1].TourDrnChgEtat<cv->TourCrt)&&
-                          (!cv->Feu[NumFeuxAtt[i]-1].RougeDemande)) // le rouge n'a pas encore été demandé)
+                          (!cv->Feu[NumFeuxAtt[i]-1].RougeDemande)) // le rouge n'a pas encore Ã©tÃ© demandÃ©)
                        {
                         cv->Feu[NumFeuxAtt[i]-1].RougeDemande=true; // Ben maintenant...
                         cv->Feu[NumFeuxAtt[i]-1].TourDrnChgEtat=cv->TourCrt; //  c'est fait !
                        }
                     }
-                   // On vérifie que les feux opposés ne sont pas déjà tous rouges (vert demandé ou non)
+                   // On vÃ©rifie que les feux opposÃ©s ne sont pas dÃ©jÃ  tous rouges (vert demandÃ© ou non)
                    if (!FeuxTousRouges)
                     {
                      for(i=0;
@@ -483,7 +483,7 @@ void feu::Evolue()
                          i++);
                      if (FeuxTousRouges=(i==NbFeuxAtt)) TourDrnChgEtat=cv->TourCrt;
                     }
-                   // On passe au vert si on le demande ou on l'autorise (vert demandé ou non)
+                   // On passe au vert si on le demande ou on l'autorise (vert demandÃ© ou non)
                    if (FeuxTousRouges&&ProchainVert&&(TourDrnChgEtat<cv->TourCrt))
                     DefinitProchainEtat();
                    break;
@@ -545,37 +545,37 @@ void feu::Verifie(AnsiString &asMsgErr, AnsiString asSource)
  {
   int i;
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirection(asMsgErr, asSource, (direction)Dir, DOIT_ETRE_DEFINI);
   VerifieEtat(asMsgErr, asSource, Etat);
   VerifieEtat(asMsgErr, asSource, ProchainEtat);
 
-  VerifEnCours=true; // Evite les boucles infinies dues aux pointages mutuels de références
+  VerifEnCours=true; // Evite les boucles infinies dues aux pointages mutuels de rÃ©fÃ©rences
 
   if ((NbFeuxDmd<0)||(NbFeuxDmd>cv->NbFeux))
    asMsgErr+=asSource+Format(": nombre des prochains feux verts incorrect (%d)\n", ARRAYOFCONST((NbFeuxDmd)));
   else
    for(i=0; i<NbFeuxDmd; i++)
     if ((NumFeuxDmd[i]<1)||(NumFeuxDmd[i]>cv->NbFeux)) // v3.7.2 : > strict
-     asMsgErr+=asSource+Format(": numéro du %d° prochain feu vert incorrect (%d)\n", ARRAYOFCONST((i+1, NumFeuxDmd[i])));
+     asMsgErr+=asSource+Format(": numÃ©ro du %dÂ° prochain feu vert incorrect (%d)\n", ARRAYOFCONST((i+1, NumFeuxDmd[i])));
     else
      if (!cv->Feu[NumFeuxDmd[i]-1].VerifEnCours)
-      cv->Feu[NumFeuxDmd[i]-1].Verifie(asMsgErr, Format("%d° prochain feu vert [n°%d, (%d,%d)]\n",
+      cv->Feu[NumFeuxDmd[i]-1].Verifie(asMsgErr, Format("%dÂ° prochain feu vert [nÂ°%d, (%d,%d)]\n",
                                                         ARRAYOFCONST((i+1, NumFeuxDmd[i],
                                                                       cv->Feu[NumFeuxDmd[i]-1].x,
                                                                       cv->Feu[NumFeuxDmd[i]-1].y
                                                                      ))));
 
   if ((NbFeuxAtt<0)||(NbFeuxAtt>cv->NbFeux))
-   asMsgErr+=asSource+Format(": nombre des feux devant être rouge incorrect (%d)\n", ARRAYOFCONST((NbFeuxAtt)));
+   asMsgErr+=asSource+Format(": nombre des feux devant Ãªtre rouge incorrect (%d)\n", ARRAYOFCONST((NbFeuxAtt)));
   else
    for(i=0; i<NbFeuxAtt; i++)
     if ((NumFeuxAtt[i]<1)||(NumFeuxAtt[i]>cv->NbFeux)) // v3.7.2 : > strict
-     asMsgErr+=asSource+Format(": numéro du %d° feu devant être rouge incorrect (%d)\n", ARRAYOFCONST((i+1, NumFeuxAtt[i])));
+     asMsgErr+=asSource+Format(": numÃ©ro du %dÂ° feu devant Ãªtre rouge incorrect (%d)\n", ARRAYOFCONST((i+1, NumFeuxAtt[i])));
     else
      if (!cv->Feu[NumFeuxAtt[i]-1].VerifEnCours)
-      cv->Feu[NumFeuxAtt[i]-1].Verifie(asMsgErr, Format("%d° feu devant être rouge [n°%d, (%d,%d)]\n",
+      cv->Feu[NumFeuxAtt[i]-1].Verifie(asMsgErr, Format("%dÂ° feu devant Ãªtre rouge [nÂ°%d, (%d,%d)]\n",
                                                         ARRAYOFCONST((i+1, NumFeuxAtt[i],
                                                                       cv->Feu[NumFeuxAtt[i]-1].x,
                                                                       cv->Feu[NumFeuxAtt[i]-1].y
@@ -589,7 +589,7 @@ void feu::Verifie(AnsiString &asMsgErr, AnsiString asSource)
   if (DemandeVert&&(Etat!=rouge))
    asMsgErr+=asSource+": demande le vert alors qu'il n'est pas rouge\n";
   if (RougeDemande&&(Etat!=vert))
-   asMsgErr+=asSource+": le rouge est demandé alors qu'il n'est pas vert\n";
+   asMsgErr+=asSource+": le rouge est demandÃ© alors qu'il n'est pas vert\n";
  }
 //-----------------------------------------------------------------------------
 void etape::PlaceProchainVehicule()
@@ -601,7 +601,7 @@ void etape::PlaceProchainVehicule()
      NumVehicule=((cv->Vehicule[i].NumEtapeDepart==Numero)&&
                   (cv->Vehicule[i].x==x)&&
                   (cv->Vehicule[i].y==y))*(i+1);
-    if (NumVehicule) // Il y a encore un véhicule à sortir
+    if (NumVehicule) // Il y a encore un vÃ©hicule Ã  sortir
      {
       cv->v[x][y].NumVehicule=NumVehicule;
       cv->PlaceVehicule(x, y, NumVehicule); // v2.2.7. Inclut les stats d'Attente/Trafic
@@ -628,9 +628,9 @@ bool etape::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void etape::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Etape n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("Etape nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
  }
 //-----------------------------------------------------------------------------
@@ -642,25 +642,25 @@ void vehicule::CalculeProchaineDirection()
   int OrdreDir[NBDIR]={0,0,0,0},
       i, j, ndp=NbDir[v->DirPoss];
   Dir=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
-    if (i!=j) // On dégringole si distance supérieure.
+    if (i!=j) // On dÃ©gringole si distance supÃ©rieure.
      OrdreDir[i]+=((v->DistEtape[NumEtapeArrivee-1][i][Prioritaire]>v->DistEtape[NumEtapeArrivee-1][j][Prioritaire])||
                    ((v->DistEtape[NumEtapeArrivee-1][i][Prioritaire]==v->DistEtape[NumEtapeArrivee-1][j][Prioritaire])&&
-                    ((Dirdp[i][v->DirPoss]!=AncDir)|| // En cas d'égalité, préfère garder la direction courante : v2.2.4.  // v3.5 : || par && !
+                    ((Dirdp[i][v->DirPoss]!=AncDir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4.  // v3.5 : || par && !
                      ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // sinon tirage au hasard (Ici TourCrt+1)
-  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!Dir)&&(j<ndp); j++)
     {
      Voie=&(cv->V(x,y,Dirdp[j][v->DirPoss]));
      if ((OrdreDir[j]==i)&&
          ((!v->ToutDroit)||    // Direction interdite si : - Obligation d'aller tout droit ET
-          Prioritaire|| //                                   Véhicule NON prioritaire (v3.9.1) ET
-          (DirDrnDepl==Dirdp[j][v->DirPoss]))&& //           pas même direction que lors du dernier déplacement // v3.7.1 : Erreur !
+          Prioritaire|| //                                   VÃ©hicule NON prioritaire (v3.9.1) ET
+          (DirDrnDepl==Dirdp[j][v->DirPoss]))&& //           pas mÃªme direction que lors du dernier dÃ©placement // v3.7.1 : Erreur !
          (!Voie->NumPlaceTaxi)&& //                        - Place de taxi. v3.6
-         ((!Voie->PassageBus)||  //                        - Passage bus dans cette direction sauf véhicules prioritaires (police, urgence)
+         ((!Voie->PassageBus)||  //                        - Passage bus dans cette direction sauf vÃ©hicules prioritaires (police, urgence)
           Prioritaire)&&
          (((!Voie->NumVehicule)&&
            (!Voie->NumBus)&& // v3.0
@@ -671,9 +671,9 @@ void vehicule::CalculeProchaineDirection()
       Dir=Dirdp[j][v->DirPoss];
     }
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (!Dir)
-    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
      for(j=0; (!Dir)&&(j<ndp); j++)
       if (OrdreDir[j]==i)
        Dir=Dirdp[j][v->DirPoss];
@@ -686,22 +686,22 @@ direction vehicule::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE
   int OrdreDir[NBDIR]={0,0,0,0},
       i, j, ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
     if (i!=j)
      OrdreDir[i]+=((v->DistEtape[NumEtapeArrivee-1][i][Prioritaire]>v->DistEtape[NumEtapeArrivee-1][j][Prioritaire])||
                    ((v->DistEtape[NumEtapeArrivee-1][i][Prioritaire]==v->DistEtape[NumEtapeArrivee-1][j][Prioritaire])&&
-                    ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'égalité, préfère garder la direction courante : v2.2.4.  // v3.5 : || par && !
-                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
-  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+                    ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4.  // v3.5 : || par && !
+                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
+  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!DirAuCarrefour)&&(j<ndp); j++)
     if ((OrdreDir[j]==i)&&
         (!v->NumPlaceTaxi)&& // Direction interdite si :     - Place de Taxi. v3.6
         ((!v->ToutDroit)||   //                              - Obligation d'aller tout droit ET
-         Prioritaire|| //                                      Véhicule NON Prioritaire (v3.9.1) ET
-         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas même direction que lors du dernier déplacement. v3.7.1 : Erreur !
+         Prioritaire|| //                                      VÃ©hicule NON Prioritaire (v3.9.1) ET
+         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas mÃªme direction que lors du dernier dÃ©placement. v3.7.1 : Erreur !
     DirAuCarrefour=Dirdp[j][v->DirPoss];
   return DirAuCarrefour;
  }
@@ -720,15 +720,15 @@ bool vehicule::PeutPasser()
 //-----------------------------------------------------------------------------
 void vehicule::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Véhicule n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("VÃ©hicule nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
   VerifieDirection(asMsgErr, asSource, Dir, PEUT_ETRE_INDEFINI);
   if (NumEtapeDepart<1)
-   asMsgErr+=asSource+Format(": numéro d'étape de départ incorrect (%d)\n", ARRAYOFCONST((NumEtapeDepart)));
+   asMsgErr+=asSource+Format(": numÃ©ro d'Ã©tape de dÃ©part incorrect (%d)\n", ARRAYOFCONST((NumEtapeDepart)));
   if (NumEtapeArrivee<1)
-   asMsgErr+=asSource+Format(": numéro d'étape d'arrivée incorrect (%d)\n", ARRAYOFCONST((NumEtapeArrivee)));
+   asMsgErr+=asSource+Format(": numÃ©ro d'Ã©tape d'arrivÃ©e incorrect (%d)\n", ARRAYOFCONST((NumEtapeArrivee)));
  }
 //-----------------------------------------------------------------------------
 void depot_bus::PlaceProchainBus() // v3.0
@@ -737,9 +737,9 @@ void depot_bus::PlaceProchainBus() // v3.0
   if (Defini()&&
       (!cv->v[x][y].NumBus)&& // Pas de bus
       (!cv->v[x][y].NumTram)&& // Pas de tram
-      (!cv->v[x][y].NumVehicule)&& // pas de véhicule
-      (!cv->v[x][y].NumTaxi)&& // Pas de taxi (v3.6)... sur la case dépôt
-      (NumDrnBusSorti<cv->NbBus)) // ET Encore au moins un bus à sortir
+      (!cv->v[x][y].NumVehicule)&& // pas de vÃ©hicule
+      (!cv->v[x][y].NumTaxi)&& // Pas de taxi (v3.6)... sur la case dÃ©pÃ´t
+      (NumDrnBusSorti<cv->NbBus)) // ET Encore au moins un bus Ã  sortir
    {
     NumProchBus=++NumDrnBusSorti;
     cv->PlaceBus(x, y, NumProchBus);
@@ -762,7 +762,7 @@ bool depot_bus::Sauve(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 void depot_bus::Verifie(AnsiString &asMsgErr) // v3.03
  {
-  AnsiString asSource=Format("Dépot bus : ", ARRAYOFCONST((x, y)));
+  AnsiString asSource=Format("DÃ©pot bus : ", ARRAYOFCONST((x, y)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
@@ -791,7 +791,7 @@ void bus::FaitMonterEtDescendre() // v3.0
     if ((p->NumBus==Numero)&&
         (p->VeutDescendre||
          (p->VeutDescendre=(cv->ProbaArretBusDmd>(rand()%100)))))
-     v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
+     v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrÃªt
     if ((p->NumArretBus==NumDrnArret)&&
         p->AttendBus)
      FaitMonterPieton(i); // Si on ne peut pas faire monter, il montera dans le prochain bus
@@ -805,32 +805,32 @@ void bus::CalculeProchaineDirection() // v3.0
   int OrdreDir[NBDIR]={0,0,0,0},
       i, j, ndp=NbDir[v->DirPoss];
   Dir=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux arrêts de bus
-  // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux arrÃªts de bus
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Bus.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
-    if (i!=j) // On dégringole si distance supérieure.
+    if (i!=j) // On dÃ©gringole si distance supÃ©rieure.
      OrdreDir[i]+=((v->DistArretBus[NumArretSvt-1][i]>v->DistArretBus[NumArretSvt-1][j])||
                    ((v->DistArretBus[NumArretSvt-1][i]==v->DistArretBus[NumArretSvt-1][j])&&
-                    ((Dirdp[i][v->DirPoss]!=AncDir)|| // En cas d'égalité, préfère garder la direction courante : v2.2.4
+                    ((Dirdp[i][v->DirPoss]!=AncDir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4
                      ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // sinon tirage au hasard (Ici TourCrt+1)
-  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!Dir)&&(j<ndp); j++)
     {
      Voie=&(cv->V(x,y,Dirdp[j][v->DirPoss]));
      if ((OrdreDir[j]==i)&&
          (!v->NumPlaceTaxi)&&  // Direction interdite si       - Place de taxi. v3.6
          ((!v->ToutDroit)||    //                              - Obligation d'aller tout droit ET
-          (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))&& // pas même direction que lors du dernier déplacement. v3.7.1 : Erreur !
+          (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))&& // pas mÃªme direction que lors du dernier dÃ©placement. v3.7.1 : Erreur !
          (((!Voie->NumVehicule)&&(!Voie->NumBus)&&(!Voie->NumTram)&&(!Voie->NumTaxi))||
           (Voie->NumArretBus&&(Voie->NumArretBus==NumArretSvt))||
           (cv->TourCrt<=1+TourDrnDepl+5*cv->AttenteMaxVeh*(1+OrdreDir[j])))) // AttentMaxBus = 5*AttenteMaxVeh
       Dir=Dirdp[j][v->DirPoss];
     }
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (!Dir)
-    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
      for(j=0; (!Dir)&&(j<ndp); j++)
       if (OrdreDir[j]==i) Dir=Dirdp[j][v->DirPoss];
   if (!DirDrnDepl) DirDrnDepl=Dir;
@@ -843,21 +843,21 @@ direction bus::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFI
   int OrdreDir[NBDIR]={0,0,0,0},
       i, j, ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Bus.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
     if (i!=j)
      OrdreDir[i]+=((v->DistArretBus[NumArretSvt-1][i]>v->DistArretBus[NumArretSvt-1][j])||
                    ((v->DistArretBus[NumArretSvt-1][i]==v->DistArretBus[NumArretSvt-1][j])&&
-                    ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'égalité, préfère garder la direction courante : // v3.5 : || par && !
-                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
-  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+                    ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : // v3.5 : || par && !
+                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
+  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!DirAuCarrefour)&&(j<ndp); j++)
     if ((OrdreDir[j]==i)&&
         (!v->NumPlaceTaxi)&& // Direction interdite si :    - Place de taxi
         ((!v->ToutDroit)||   //                             - Obligation d'aller tout droit ET
-         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas même direction que lors du dernier déplacement. v3.7.1 : Erreur !
+         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas mÃªme direction que lors du dernier dÃ©placement. v3.7.1 : Erreur !
     DirAuCarrefour=Dirdp[j][v->DirPoss];
   return DirAuCarrefour;
  }
@@ -888,13 +888,13 @@ int bus::NumeroArretSuivant() // v3.0
 //-----------------------------------------------------------------------------
 void bus::Verifie(AnsiString &asMsgErr) // v3.03
  {
-  AnsiString asSource=Format("Bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("Bus nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
   VerifieDirection(asMsgErr, asSource, Dir, PEUT_ETRE_INDEFINI);
   if ((NumLigne<0)||(NumLigne>=NBMAXLIGNESBUSTRAM))
-   asMsgErr+=asSource+Format(": numéro de ligne de bus incorrect (%d)\n", ARRAYOFCONST((NumLigne)));
+   asMsgErr+=asSource+Format(": numÃ©ro de ligne de bus incorrect (%d)\n", ARRAYOFCONST((NumLigne)));
  }
 //-----------------------------------------------------------------------------
 void arret_bus::Initialise() // v3.0
@@ -962,16 +962,16 @@ bool arret_bus::Sauve(int hfile) // v3.0
 void arret_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i;
-  AnsiString asSource=Format("Arrêt de bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("ArrÃªt de bus nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
   if ((NbLignes<0)||(NbLignes>NBMAXLIGNESBUSTRAM))
    asMsgErr+=asSource+Format(": nombre de lignes de bus incorrect (%d)\n", ARRAYOFCONST((NbLignes)));
   for(i=0; i<NbLignes; i++)
    if (Ligne[i]&&
        ((NumLigne[i]<0)||(NumLigne[i]>NBMAXLIGNESBUSTRAM)))
-    asMsgErr+=asSource+Format(": numéro de la %d° ligne de bus incorrect (%d)\n", ARRAYOFCONST((i+1, NumLigne[i]))); // v3.03
+    asMsgErr+=asSource+Format(": numÃ©ro de la %dÂ° ligne de bus incorrect (%d)\n", ARRAYOFCONST((i+1, NumLigne[i]))); // v3.03
  }
 //-----------------------------------------------------------------------------
 void ligne_bus::Initialise() // v3.0
@@ -988,14 +988,14 @@ void ligne_bus::AjouteBus(int NumeroBus) // v3.0
  }
 //-----------------------------------------------------------------------------
 bool ligne_bus::Charge(int hfile) // v3.0
- { // Attention : On ne stocke pas le nombre et les n° de bus (calculés avant simul)
+ { // Attention : On ne stocke pas le nombre et les nÂ° de bus (calculÃ©s avant simul)
   return FileRead(hfile, &Numero, sizeof(Numero))&&
          FileRead(hfile, &NbArrets, sizeof(NbArrets))&&
          FileRead(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
  }
 //-----------------------------------------------------------------------------
 bool ligne_bus::Sauve(int hfile) // v3.0
- { // Attention : On ne stocke pas le nombre et les n° de bus (calculés avant simul)
+ { // Attention : On ne stocke pas le nombre et les nÂ° de bus (calculÃ©s avant simul)
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, &NbArrets, sizeof(NbArrets))&&
          FileWrite(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
@@ -1004,14 +1004,14 @@ bool ligne_bus::Sauve(int hfile) // v3.0
 void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i;
-  AnsiString asSource=Format("Ligne de bus n°%d", ARRAYOFCONST((Numero)));
+  AnsiString asSource=Format("Ligne de bus nÂ°%d", ARRAYOFCONST((Numero)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   if ((NbArrets<0)||(NbArrets>NBMAXARRETSBUSTRAMPARLIGNE))
-   asMsgErr+=asSource+Format(": nombre d'arrêts de bus incorrect (%d)\n", ARRAYOFCONST((NbArrets)));
+   asMsgErr+=asSource+Format(": nombre d'arrÃªts de bus incorrect (%d)\n", ARRAYOFCONST((NbArrets)));
   for(i=0; i<NbArrets; i++)
    if ((NumArret[i]<0)||(NumArret[i]>cv->NbArretsBus))
-    asMsgErr+=asSource+Format(": numéro du %d° arrêt de bus incorrect (%d)\n", ARRAYOFCONST((i+1, NumArret[i]))); // v3.03
+    asMsgErr+=asSource+Format(": numÃ©ro du %dÂ° arrÃªt de bus incorrect (%d)\n", ARRAYOFCONST((i+1, NumArret[i]))); // v3.03
  }
 //-----------------------------------------------------------------------------
 //////////// ICI COMMENCENT LES METHODES DES CLASSES LIEES AU RESEAU DE TRAM //
@@ -1041,7 +1041,7 @@ void tram::FaitMonterEtDescendre() // v3.5
     if ((p->NumTram==Numero)&&
         (p->VeutDescendre||
          (p->VeutDescendre=(cv->ProbaArretTramDmd>(rand()%100)))))
-     v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
+     v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrÃªt
     if ((p->NumArretTram==NumDrnArret)&&
         p->AttendTram)
      FaitMonterPieton(i); // Si on ne peut pas faire monter, il montera dans le prochain tram
@@ -1057,24 +1057,24 @@ void tram::CalculeProchaineDirection() // v3.5
       nd=v->NbDirPossSensVoieTram(indefinie), // Nombre total de directions (pour DistArretTram)
       ndp=v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre de directions possibles
   Dir=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux arrêts de tram
-  // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux arrÃªts de tram
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Tram.+Tour) Modulo Directions Possibles
   for(i=0; i<nd; i++)
    for(j=0; j<nd; j++)
     if ((i!=j)&&  // Direction possible
         (v->EstDirPossSensVoieTram(InvDir[AncDir], (direction)(d=v->DirSensVoieTram(indefinie, i)))))
-     // On dégringole si distance supérieure.
+     // On dÃ©gringole si distance supÃ©rieure.
      OrdreDir[d-1]+=((v->DistArretTram[NumArretSvt-1][i]>v->DistArretTram[NumArretSvt-1][j])||
                    ((v->DistArretTram[NumArretSvt-1][i]==v->DistArretTram[NumArretSvt-1][j])&&
-                    ((d!=AncDir)|| // En cas d'égalité, préfère garder la direction courante // v3.5 : || par && !
+                    ((d!=AncDir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante // v3.5 : || par && !
                      ((i+Numero+cv->TourCrt)%nd>(j+Numero+cv->TourCrt)%nd)))); // sinon tirage au hasard (Ici TourCrt+1)
-  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+  for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!Dir)&&(j<ndp); j++)
     {
      Voie=&(cv->V(x,y,d=v->DirSensVoieTram(InvDir[AncDir], j)));
      if ((OrdreDir[d-1]==i)&&
          ((!v->ToutDroit)||    // Direction interdite si : - Obligation d'aller tout droit ET
-          (DirDrnDepl==d))&&   //                            pas même direction que lors du dernier déplacement
+          (DirDrnDepl==d))&&   //                            pas mÃªme direction que lors du dernier dÃ©placement
          (!v->NumPlaceTaxi)&&  //                          - Place taxi. v3.6
          (((!Voie->NumVehicule)&&(!Voie->NumBus)&&(!Voie->NumTram)&&(!Voie->NumTaxi))||
           (Voie->NumArretTram&&(Voie->NumArretTram==NumArretSvt))||
@@ -1082,9 +1082,9 @@ void tram::CalculeProchaineDirection() // v3.5
       Dir=(direction)d;
     }
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (!Dir)
-    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
      for(j=0; (!Dir)&&(j<ndp); j++)
       if (OrdreDir[(d=v->DirSensVoieTram(InvDir[AncDir], j))-1]==i)
        Dir=(direction)d;
@@ -1099,23 +1099,23 @@ direction tram::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEF
       d, i, j,
       ndp=v->NbDirPossSensVoieTram(InvDir[Dir]); // Nombre de directions possibles
   direction DirAuCarrefour=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Tram.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
     if ((i!=j)&&  // Direction possible
         (v->EstDirPossSensVoieTram(InvDir[Dir], (direction)(d=v->DirSensVoieTram(indefinie, i)))))
-     // On dégringole si distance supérieure.
+     // On dÃ©gringole si distance supÃ©rieure.
      OrdreDir[d-1]+=((v->DistArretTram[NumArretSvt-1][i]>v->DistArretTram[NumArretSvt-1][j])||
                    ((v->DistArretTram[NumArretSvt-1][i]==v->DistArretTram[NumArretSvt-1][j])&&
-                    ((d!=Dir)|| // En cas d'égalité, préfère garder la direction courante. // v3.5 : || par && !
-                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'égalité (Ici TourCrt+1)
-  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+                    ((d!=Dir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante. // v3.5 : || par && !
+                     ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // tirage au hasard en cas d'Ã©galitÃ© (Ici TourCrt+1)
+  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!DirAuCarrefour)&&(j<ndp); j++)
     if ((OrdreDir[(d=v->DirSensVoieTram(InvDir[Dir], j))-1]==i)&&
         (!v->NumPlaceTaxi)&&  // Direction interdite si : - Place taxi. v3.6
         ((!v->ToutDroit)||    //                          - Obligation d'aller tout droit ET
-         (DirDrnDepl==d)))    //                            pas même direction que lors du dernier déplacement
+         (DirDrnDepl==d)))    //                            pas mÃªme direction que lors du dernier dÃ©placement
     DirAuCarrefour=(direction)d;
   return DirAuCarrefour;
  }
@@ -1146,13 +1146,13 @@ int tram::NumeroArretSuivant() // v3.0
 //-----------------------------------------------------------------------------
 void tram::Verifie(AnsiString &asMsgErr) // v3.03
  {
-  AnsiString asSource=Format("Tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("Tram nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
   VerifieDirection(asMsgErr, asSource, Dir, PEUT_ETRE_INDEFINI);
   if ((NumLigne<0)||(NumLigne>=NBMAXLIGNESBUSTRAM))
-   asMsgErr+=asSource+Format(": numéro de ligne de tram incorrect (%d)\n", ARRAYOFCONST((NumLigne)));
+   asMsgErr+=asSource+Format(": numÃ©ro de ligne de tram incorrect (%d)\n", ARRAYOFCONST((NumLigne)));
  }
 //-----------------------------------------------------------------------------
 void arret_tram::Initialise() // v3.0
@@ -1220,16 +1220,16 @@ bool arret_tram::Sauve(int hfile) // v3.0
 void arret_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i;
-  AnsiString asSource=Format("Arrêt de tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("ArrÃªt de tram nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
   if ((NbLignes<0)||(NbLignes>NBMAXLIGNESBUSTRAM))
    asMsgErr+=asSource+Format(": nombre de lignes de tram incorrect (%d)\n", ARRAYOFCONST((NbLignes)));
   for(i=0; i<NbLignes; i++)
    if (Ligne[i]&&
        ((NumLigne[i]<0)||(NumLigne[i]>NBMAXLIGNESBUSTRAM)))
-    asMsgErr+=asSource+Format(": numéro de la %d° ligne de tram incorrect (%d)\n", ARRAYOFCONST((i+1, NumLigne[i]))); // v3.03
+    asMsgErr+=asSource+Format(": numÃ©ro de la %dÂ° ligne de tram incorrect (%d)\n", ARRAYOFCONST((i+1, NumLigne[i]))); // v3.03
  }
 //-----------------------------------------------------------------------------
 void ligne_tram::Initialise() // v3.0
@@ -1246,14 +1246,14 @@ void ligne_tram::AjouteTram(int NumeroTram) // v3.0
  }
 //-----------------------------------------------------------------------------
 bool ligne_tram::Charge(int hfile) // v3.0
- { // Attention : On ne stocke pas le nombre et les n° de tram (calculés avant simul)
+ { // Attention : On ne stocke pas le nombre et les nÂ° de tram (calculÃ©s avant simul)
   return FileRead(hfile, &Numero, sizeof(Numero))&&
          FileRead(hfile, &NbArrets, sizeof(NbArrets))&&
          FileRead(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
  }
 //-----------------------------------------------------------------------------
 bool ligne_tram::Sauve(int hfile) // v3.0
- { // Attention : On ne stocke pas le nombre et les n° de tram (calculés avant simul)
+ { // Attention : On ne stocke pas le nombre et les nÂ° de tram (calculÃ©s avant simul)
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, &NbArrets, sizeof(NbArrets))&&
          FileWrite(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
@@ -1262,14 +1262,14 @@ bool ligne_tram::Sauve(int hfile) // v3.0
 void ligne_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i;
-  AnsiString asSource=Format("Ligne de tram n°%d", ARRAYOFCONST((Numero)));
+  AnsiString asSource=Format("Ligne de tram nÂ°%d", ARRAYOFCONST((Numero)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   if ((NbArrets<0)||(NbArrets>NBMAXARRETSBUSTRAMPARLIGNE))
-   asMsgErr+=asSource+Format(": nombre d'arrêts de tram incorrect (%d)\n", ARRAYOFCONST((NbArrets)));
+   asMsgErr+=asSource+Format(": nombre d'arrÃªts de tram incorrect (%d)\n", ARRAYOFCONST((NbArrets)));
   for(i=0; i<NbArrets; i++)
    if ((NumArret[i]<0)||(NumArret[i]>cv->NbArretsTram))
-    asMsgErr+=asSource+Format(": numéro du %d° arrêt de tram incorrect (%d)\n", ARRAYOFCONST((i+1, NumArret[i]))); // v3.03
+    asMsgErr+=asSource+Format(": numÃ©ro du %dÂ° arrÃªt de tram incorrect (%d)\n", ARRAYOFCONST((i+1, NumArret[i]))); // v3.03
  }
 //-----------------------------------------------------------------------------
 ///////////// ICI FINISSENT LES METHODES DES CLASSES LIEES AU RESEAU DE TRAM //
@@ -1292,9 +1292,9 @@ bool place_taxi::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void place_taxi::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Place Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("Place Taxi nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
@@ -1326,7 +1326,7 @@ direction place_taxi::DirPlaceSvtMemeFile()
    if ((NumPlaceSvt=cv->V(x,y,d).NumPlaceTaxi)&&
        (cv->PlaceTaxi[NumPlaceSvt-1].NumFile==NumFile))
     DirSvt=(direction)d;
-  return DirSvt; // Si indefinie, il s'agit de la tête de file !
+  return DirSvt; // Si indefinie, il s'agit de la tÃªte de file !
  }
 //-----------------------------------------------------------------------------
 void taxi::Place(int p) // 0 <= p < NbPlacesTaxi
@@ -1358,27 +1358,27 @@ void taxi::CalculeProchaineDirection()
       i, j, ndp=NbDir[v->DirPoss];
 
   if ((Situation==stAttente)&&  // Si le taxi attend,
-      (NbPietonsQuiSontMontes())) // On regarde déjà s'il y a des piétons qui veulent monter...
+      (NbPietonsQuiSontMontes())) // On regarde dÃ©jÃ  s'il y a des piÃ©tons qui veulent monter...
    { // pour pouvoir partir...
     Situation=stDepart;
     TourDepartDrnCourse=cv->TourCrt;
    }
   Dir=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux files.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
-    if (i!=j) // On dégringole si distance supérieure.
+    if (i!=j) // On dÃ©gringole si distance supÃ©rieure.
      switch(Situation)
       {
-       case stDepart: OrdreDir[i]+=(rand()%2); break; // Le hasard dans toute sa splendeur (en fait le taxi promène le client)
-       case stRetour: OrdreDir[i]+=((cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi&& // 1. File recherchée
+       case stDepart: OrdreDir[i]+=(rand()%2); break; // Le hasard dans toute sa splendeur (en fait le taxi promÃ¨ne le client)
+       case stRetour: OrdreDir[i]+=((cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi&& // 1. File recherchÃ©e
                                      (cv->PlaceTaxi[cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi-1].NumFile==NumFile))>
                                     (cv->V(x,y,Dirdp[i][v->DirPoss]).NumPlaceTaxi&&
                                      (cv->PlaceTaxi[cv->V(x,y,Dirdp[i][v->DirPoss]).NumPlaceTaxi-1].NumFile==NumFile)))||
-                                   ((v->DistFileTaxi[NumFile][i]>v->DistFileTaxi[NumFile][j])|| // 2. Distance à la file
+                                   ((v->DistFileTaxi[NumFile][i]>v->DistFileTaxi[NumFile][j])|| // 2. Distance Ã  la file
                                     ((v->DistFileTaxi[NumFile][i]==v->DistFileTaxi[NumFile][j])&&
-                                     ((Dirdp[i][v->DirPoss]!=AncDir)|| // 3. En cas d'égalité, préfère garder la direction courante : v2.2.4. // v3.5 : || par && !
+                                     ((Dirdp[i][v->DirPoss]!=AncDir)|| // 3. En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4. // v3.5 : || par && !
                                       ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // sinon tirage au hasard (Ici TourCrt+1)
                       break;
       }
@@ -1388,7 +1388,7 @@ void taxi::CalculeProchaineDirection()
      Voie=&(cv->V(x,y,Dirdp[j][v->DirPoss]));
      if ((OrdreDir[j]==i)&&
          ((!v->ToutDroit)||    // Direction interdite si :     - obligation d'aller tout droit ET
-          (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))&& // pas même direction que lors du dernier déplacement. v3.7.1 : Erreur !
+          (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))&& // pas mÃªme direction que lors du dernier dÃ©placement. v3.7.1 : Erreur !
          (((!Voie->NumVehicule)&&(!Voie->NumBus)&& // Sinon...
            (!Voie->NumTram)&&(!Voie->NumTaxi))|| //   - Il n'y a rien sur la route OU
           ((Situation==stRetour)&&               //   - Il est de retour et c'est la file du retour OU
@@ -1397,9 +1397,9 @@ void taxi::CalculeProchaineDirection()
       Dir=Dirdp[j][v->DirPoss];
     }
 
-   // Si la direction est toujours indéfinie : on prend la meilleure direction possible
+   // Si la direction est toujours indÃ©finie : on prend la meilleure direction possible
    if (!Dir)
-    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+    for(i=0; (!Dir)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
      for(j=0; (!Dir)&&(j<ndp); j++)
       if (OrdreDir[j]==i)
        Dir=Dirdp[j][v->DirPoss];
@@ -1411,29 +1411,29 @@ direction taxi::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEF
   int OrdreDir[NBDIR]={0,0,0,0},
       i, j, ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
-  // On classe les dir.poss. dans l'ordre < des distances aux étapes si la case est libre.
-  // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
+  // On classe les dir.poss. dans l'ordre < des distances aux Ã©tapes si la case est libre.
+  // En cas d'Ã©galitÃ©, c'est le hasard : (NÂ°Veh.+Tour) Modulo Directions Possibles
   for(i=0; i<ndp; i++)
    for(j=0; j<ndp; j++)
     if (i!=j)
      switch(Situation)
       {
-       case stDepart: OrdreDir[i]+=(rand()%2); break; // Le hasard dans toute sa splendeur (en fait le taxi promène le client)
-       case stRetour: OrdreDir[i]+=((cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi&& // 1. File recherchée
+       case stDepart: OrdreDir[i]+=(rand()%2); break; // Le hasard dans toute sa splendeur (en fait le taxi promÃ¨ne le client)
+       case stRetour: OrdreDir[i]+=((cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi&& // 1. File recherchÃ©e
                                      (cv->PlaceTaxi[cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceTaxi-1].NumFile==NumFile))>
                                     (cv->V(x,y,Dirdp[i][v->DirPoss]).NumPlaceTaxi&&
                                      (cv->PlaceTaxi[cv->V(x,y,Dirdp[i][v->DirPoss]).NumPlaceTaxi-1].NumFile==NumFile)))||
                                    ((v->DistFileTaxi[NumFile][i]>v->DistFileTaxi[NumFile][j])||
                                     ((v->DistFileTaxi[NumFile][i]==v->DistFileTaxi[NumFile][j])&&
-                                     ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'égalité, préfère garder la direction courante : v2.2.4.  // v3.5 : || par && !
+                                     ((Dirdp[i][v->DirPoss]!=Dir)|| // En cas d'Ã©galitÃ©, prÃ©fÃ¨re garder la direction courante : v2.2.4.  // v3.5 : || par && !
                                       ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // sinon tirage au hasard (Ici TourCrt+1)
                       break;
       }
-  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilité de blocage si test n'est pas large (i<5)
+  for(i=0; (!DirAuCarrefour)&&(i<5); i++) // v3.5 : possibilitÃ© de blocage si test n'est pas large (i<5)
    for(j=0; (!DirAuCarrefour)&&(j<ndp); j++)
     if ((OrdreDir[j]==i)&&
         ((!v->ToutDroit)||    // Direction interdite si :    - obligation d'aller tout droit ET
-         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas même direction que lors du dernier déplacement. v3.7.1 : Erreur !
+         (DirDrnDepl==(DirDrnDepl==Dirdp[j][v->DirPoss])))) // pas mÃªme direction que lors du dernier dÃ©placement. v3.7.1 : Erreur !
     DirAuCarrefour=Dirdp[j][v->DirPoss];
   return DirAuCarrefour;
  }
@@ -1478,7 +1478,7 @@ void taxi::FaitMonterPieton(int NumPietonAFaireMonter)
    }
  }
 //-----------------------------------------------------------------------------
-int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attendaient et qui sont montés
+int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piÃ©tons qui attendaient et qui sont montÃ©s
  {
   voie *v;
   pieton *p;
@@ -1498,11 +1498,11 @@ int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attendai
 //-----------------------------------------------------------------------------
 void taxi::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString asSource=Format("Taxi nÂ°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0)
-   asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
+   asMsgErr+=asSource+Format(": numÃ©ro incorrect (%d)\n", ARRAYOFCONST((Numero)));
   if (NumFile<=0)
-   asMsgErr+=asSource+Format(": numéro de file indéfini ou incorrect (%d)\n", ARRAYOFCONST((NumFile)));
+   asMsgErr+=asSource+Format(": numÃ©ro de file indÃ©fini ou incorrect (%d)\n", ARRAYOFCONST((NumFile)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
  }
 //-----------------------------------------------------------------------------
@@ -1587,7 +1587,7 @@ void voie::Initialise()
     Priorite[i]=a_droite;
     NumFeu[i]=0;
    }
-  for(i=0; i<NBMAXPIETONSPARCASE; i++) NumPieton[i]=0; // v3.5 (sorti de la boucle précédente)
+  for(i=0; i<NBMAXPIETONSPARCASE; i++) NumPieton[i]=0; // v3.5 (sorti de la boucle prÃ©cÃ©dente)
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++) LigneTram[i]=LigneBus[i]=false; // v3.5
   DirPoss=aucune;
   NbPietons=NumTaxi=NumPlaceTaxi=NumArretBus=NumArretTram=NumProchTaxi=NumProchTram=NumProchBus=NumProchVeh=NumEtape=NumTram=NumBus=NumVehicule=0; // v3.8 (Nature)
@@ -1605,7 +1605,7 @@ void voie::Initialise(type_voie TypeVoie) // v3.5
     DirPoss=aucune;
     ToutDroit=PassageBus=false;
     for(int i=0; i<NBMAXLIGNESBUSTRAM; i++) LigneBus[i]=false;
-    NumPlaceTaxi=NumArretBus=NumProchTaxi=NumProchBus=NumProchVeh=NumTaxi=NumBus=NumVehicule=0; // v3.7.2 : Pas l'étape !
+    NumPlaceTaxi=NumArretBus=NumProchTaxi=NumProchBus=NumProchVeh=NumTaxi=NumBus=NumVehicule=0; // v3.7.2 : Pas l'Ã©tape !
    }
   if (TypeVoie&tvVoieTram)
    {
@@ -1631,7 +1631,7 @@ voie *voie::v(direction d)
   return &cv->V(x,y,d);
  }
 //-----------------------------------------------------------------------------
-bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation des distances aux arrêts de bus. v3.5... Et des trams ! v3.6...Et des taxis !
+bool voie::PrepareCalculDistances() // v3.0 : inclut Ã©galement la prÃ©paration des distances aux arrÃªts de bus. v3.5... Et des trams ! v3.6...Et des taxis !
  {
   bool Ok=true;
   int i, j,
@@ -1676,7 +1676,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation de
    {
     if (ne>0)
      {
-      if (Ok=(!!(DistEtape=new int**[ne]))) // D'abord le nombre d'étapes
+      if (Ok=(!!(DistEtape=new int**[ne]))) // D'abord le nombre d'Ã©tapes
        for(i=0; Ok&&(i<ne); i++) // Puis le nombre de directions possibles
         {
          DistEtape[i]=NULL;
@@ -1688,7 +1688,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation de
      }
     if (nab>0) // v3.0
      {
-      if (Ok=(!!(DistArretBus=new int*[nab]))) // D'abord le nombre d'arrêts de bus
+      if (Ok=(!!(DistArretBus=new int*[nab]))) // D'abord le nombre d'arrÃªts de bus
        for(i=0; Ok&&(i<nab); i++) // Puis le nombre de directions possibles
         {
          DistArretBus[i]=NULL;
@@ -1710,7 +1710,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation de
   nd=NbDirPossSensVoieTram(indefinie); // v3.5
   if ((nd>0)&&(nat>0)) // v3.5
    {
-    if (Ok=(!!(DistArretTram=new int*[nat]))) // D'abord le nombre d'arrêts de tram
+    if (Ok=(!!(DistArretTram=new int*[nat]))) // D'abord le nombre d'arrÃªts de tram
      for(i=0; Ok&&(i<nat); i++) // Puis le nombre de directions possibles
       {
        DistArretTram[i]=NULL;
@@ -1759,27 +1759,27 @@ bool voie::PrepareCalculAttenteTrafic()
   return Ok;
  }
 //-----------------------------------------------------------------------------
-void voie::CalculeProchainVehiculeOuBusOuTramOuTaxi() // v3.6. Rq : Nécessite de connaître les 2 prochaines directions de chaque Véhicule/Bus/Tram
+void voie::CalculeProchainVehiculeOuBusOuTramOuTaxi() // v3.6. Rq : NÃ©cessite de connaÃ®tre les 2 prochaines directions de chaque VÃ©hicule/Bus/Tram
  {
   int d, MaxNivP=0,
-      NumVV, // NUMéro du Véhicule Voisin. v3.0
-      NumBV, // NUMéro du Bus Voisin. v3.0
-      NumTV, // NUMéro du Tram Voisin. v3.5
-      NumXV, // NUMéro du taXi Voisin. v3.6
+      NumVV, // NUMÃ©ro du VÃ©hicule Voisin. v3.0
+      NumBV, // NUMÃ©ro du Bus Voisin. v3.0
+      NumTV, // NUMÃ©ro du Tram Voisin. v3.5
+      NumXV, // NUMÃ©ro du taXi Voisin. v3.6
       NivPriorite[5]={0,0,0,0,0};
   direction DirCrt, DirAuCarrefour;
   voie *v;
 
-  NumProchTaxi=NumProchTram=NumProchBus=NumProchVeh=0; // Aucun par défaut
-  // 1. S'il y a un piéton, aucun ne peut arriver SAUF (v4.3) :
+  NumProchTaxi=NumProchTram=NumProchBus=NumProchVeh=0; // Aucun par dÃ©faut
+  // 1. S'il y a un piÃ©ton, aucun ne peut arriver SAUF (v4.3) :
   if ((!frmSimulation->SimulationSanglante)&& // Mode Sanglant OU
-      NbPietons&&                             // NbPietons=NbPiétonsEcrases ALORS on peut rouler dessus (v4.3)
+      NbPietons&&                             // NbPietons=NbPiÃ©tonsEcrases ALORS on peut rouler dessus (v4.3)
       (NbPietons!=(NumPieton[0]&&
                    (cv->Pieton[NumPieton[0]-1].Ecrase))+
                   (NumPieton[1]&&
                    (cv->Pieton[NumPieton[1]-1].Ecrase))))
    return;
-  // 1bis. S'il y a déjà un véhicule et que ce n'est pas une étape, aucun ne peut arriver
+  // 1bis. S'il y a dÃ©jÃ  un vÃ©hicule et que ce n'est pas une Ã©tape, aucun ne peut arriver
   if (NumVehicule&&(!NumEtape)) return;
   // 1ter. S'il y a un bus ou un tram ou un taxi, aucun ne peut arriver. v3.5
   if (NumBus||NumTram||NumTaxi) return;
@@ -1790,94 +1790,94 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxi() // v3.6. Rq : Nécessite de
     NumXV=v->NumTaxi; // v3.6
     if (v->EstTeteBus()) NumBV=v->NumBus; else NumBV=0; // v3.0
     if (v->EstTeteTram()) NumTV=v->NumTram; else NumTV=0; // v3.5
-    if (NumVV&& // 1. SOIT 1 Vehicule voisin arrivant sur la case ? Priorité 1
+    if (NumVV&& // 1. SOIT 1 Vehicule voisin arrivant sur la case ? PrioritÃ© 1
         ((!PassageBus)|| // v3.1. Passage Bus interdit sauf...
          (cv->Vehicule[NumVV-1].NivPriorite>normal))) // pour les urgences
      {
       if (NivPriorite[d]=((cv->Vehicule[NumVV-1].Dir==InvDir[d])&& // 1 VEHICULE Qui arrive sur la case...
-                          cv->TourDeDeplacementVehicule(NumVV-1)&& // Et que c'est son tour de déplacement... (multivitesse : version 1.5). v3.0.4 (chgtde nom)
-                          ((!NumVehicule)|| // alors... Soit y a pas de véhicule sur la case,
-                           (NumEtape&&  // soit y en a une mais c'est une étape...
-                            (cv->Vehicule[NumVV-1].NumEtapeArrivee==NumEtape))))) // et c'est l'arrivée
+                          cv->TourDeDeplacementVehicule(NumVV-1)&& // Et que c'est son tour de dÃ©placement... (multivitesse : version 1.5). v3.0.4 (chgtde nom)
+                          ((!NumVehicule)|| // alors... Soit y a pas de vÃ©hicule sur la case,
+                           (NumEtape&&  // soit y en a une mais c'est une Ã©tape...
+                            (cv->Vehicule[NumVV-1].NumEtapeArrivee==NumEtape))))) // et c'est l'arrivÃ©e
        {
         if (!cv->Vehicule[NumVV-1].NivPriorite)
          {
-          // 2. Sont-elles obligées de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+          // 2. Sont-elles obligÃ©es de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
           NivPriorite[d]+=(((v->Priorite[InvDir[d]-1]==stop)&&(cv->Vehicule[NumVV-1].TourDrnDepl>cv->TourCrt-2L))||
                            ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat>vert)));
-          // 3. Doivent-elles céder le passage (clp ou stop marqué) ? Priorité 3
+          // 3. Doivent-elles cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
           NivPriorite[d]+=2*((v->Priorite[InvDir[d]-1]==cedez_le_passage)||
                              ((v->Priorite[InvDir[d]-1]==stop)&&(cv->TourCrt-cv->Vehicule[NumVV-1].TourDrnDepl>=2L)));
-          // 4. Véhicules sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+          // 4. VÃ©hicules sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
           NivPriorite[d]+=3*((v->Priorite[InvDir[d]-1]==a_droite)||
                              ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat<orange)));
          }
-        else // 5. Véhicule prioritaire ? Urgence : Priorité 6 ; Police : Priorité 7
+        else // 5. VÃ©hicule prioritaire ? Urgence : PrioritÃ© 6 ; Police : PrioritÃ© 7
          NivPriorite[d]+=5+cv->Vehicule[NumVV-1].NivPriorite; // v2.2
        }
      }
-    else // 1bis. SOIT 1 Bus voisin arrivant sur la case ? Priorité 1. v3.0
+    else // 1bis. SOIT 1 Bus voisin arrivant sur la case ? PrioritÃ© 1. v3.0
      if (NumBV&&(!NumVehicule))
       {
        if (NivPriorite[d]=((cv->Bus[NumBV-1].Dir==InvDir[d])&& // 1 BUS Qui arrive sur la case...
-                           cv->TourDeDeplacementBus(NumBV-1)&& // ET que c'est son tour de déplacement... (multivitesse)
-                           (cv->TourCrt>=cv->Bus[NumBV-1].TourDepartArretSvt)&& // ET que c'est son tour de départ vers le prochain arrêt
+                           cv->TourDeDeplacementBus(NumBV-1)&& // ET que c'est son tour de dÃ©placement... (multivitesse)
+                           (cv->TourCrt>=cv->Bus[NumBV-1].TourDepartArretSvt)&& // ET que c'est son tour de dÃ©part vers le prochain arrÃªt
                            (!NumBus))) // et qu'y a pas de bus sur la case
         {
-         // 2. Sont-ils obligés de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+         // 2. Sont-ils obligÃ©s de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
          NivPriorite[d]+=(((v->Priorite[InvDir[d]-1]==stop)&&(cv->Bus[NumBV-1].TourDrnDepl>cv->TourCrt-2L))||
                           ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat>vert)));
-         // 3. Doivent-ils céder le passage (clp ou stop marqué) ? Priorité 3
+         // 3. Doivent-ils cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
          NivPriorite[d]+=2*((v->Priorite[InvDir[d]-1]==cedez_le_passage)||
                             ((v->Priorite[InvDir[d]-1]==stop)&&(cv->TourCrt-cv->Bus[NumBV-1].TourDrnDepl>=2L)));
-         // 4. Bus sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+         // 4. Bus sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
          NivPriorite[d]+=3*((v->Priorite[InvDir[d]-1]==a_droite)||
                             ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat<orange)));
         }
       }
-     else // 1ter. SOIT 1 Tram voisin arrivant sur la case ? Priorité 1. v3.5
+     else // 1ter. SOIT 1 Tram voisin arrivant sur la case ? PrioritÃ© 1. v3.5
       if (NumTV&&(!NumVehicule))
        {
         if (NivPriorite[d]=((cv->Tram[NumTV-1].Dir==InvDir[d])&& // 1 TRAM Qui arrive sur la case...
-                            cv->TourDeDeplacementTram(NumTV-1)&& // ET que c'est son tour de déplacement... (multivitesse)
-                            (cv->TourCrt>=cv->Tram[NumTV-1].TourDepartArretSvt)&& // ET que c'est son tour de départ vers le prochain arrêt
+                            cv->TourDeDeplacementTram(NumTV-1)&& // ET que c'est son tour de dÃ©placement... (multivitesse)
+                            (cv->TourCrt>=cv->Tram[NumTV-1].TourDepartArretSvt)&& // ET que c'est son tour de dÃ©part vers le prochain arrÃªt
                             (!NumTram))) // et qu'y a pas de tram sur la case
          {
-          // 2. Sont-ils obligés de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+          // 2. Sont-ils obligÃ©s de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
           NivPriorite[d]+=(((v->Priorite[InvDir[d]-1]==stop)&&(cv->Tram[NumTV-1].TourDrnDepl>cv->TourCrt-2L))||
                            ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat>vert)));
-          // 3. Doivent-ils céder le passage (clp ou stop marqué) ? Priorité 3
+          // 3. Doivent-ils cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
           NivPriorite[d]+=2*((v->Priorite[InvDir[d]-1]==cedez_le_passage)||
                              ((v->Priorite[InvDir[d]-1]==stop)&&(cv->TourCrt-cv->Tram[NumTV-1].TourDrnDepl>=2L)));
-          // 4. Tram sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+          // 4. Tram sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
           NivPriorite[d]+=3*((v->Priorite[InvDir[d]-1]==a_droite)||
                              ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat<orange)));
          }
        }
-      else // 1ter. SOIT 1 Taxi voisin arrivant sur la case ? Priorité 1. v3.5
+      else // 1ter. SOIT 1 Taxi voisin arrivant sur la case ? PrioritÃ© 1. v3.5
        if (NumXV&&(!NumVehicule))
         {
          if (NivPriorite[d]=((cv->Taxi[NumXV-1].Dir==InvDir[d])&& // 1 TAXI Qui arrive sur la case...
-                             cv->TourDeDeplacementTaxi(NumXV-1)&& // ET que c'est son tour de déplacement... (multivitesse)
-                             (cv->Taxi[NumXV-1].Situation%2)&& // ET qu'il est sur le départ ou le retour
+                             cv->TourDeDeplacementTaxi(NumXV-1)&& // ET que c'est son tour de dÃ©placement... (multivitesse)
+                             (cv->Taxi[NumXV-1].Situation%2)&& // ET qu'il est sur le dÃ©part ou le retour
                              (!NumTaxi))) // et qu'y a pas de taxi sur la case
           {
-           // 2. Sont-ils obligés de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+           // 2. Sont-ils obligÃ©s de s'arrÃªter (stop non marquÃ© ou feu non vert) ? PrioritÃ© 2
            NivPriorite[d]+=(((v->Priorite[InvDir[d]-1]==stop)&&(cv->Taxi[NumXV-1].TourDrnDepl>cv->TourCrt-2L))||
                             ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat>vert)));
-           // 3. Doivent-ils céder le passage (clp ou stop marqué) ? Priorité 3
+           // 3. Doivent-ils cÃ©der le passage (clp ou stop marquÃ©) ? PrioritÃ© 3
            NivPriorite[d]+=2*((v->Priorite[InvDir[d]-1]==cedez_le_passage)||
                               ((v->Priorite[InvDir[d]-1]==stop)&&(cv->TourCrt-cv->Taxi[NumXV-1].TourDrnDepl>=2L)));
-           // 4. Taxi sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+           // 4. Taxi sur voie Ã  prioritÃ© Ã  droite (ou feu inactif/vert) ? PrioritÃ© 4
            NivPriorite[d]+=3*((v->Priorite[InvDir[d]-1]==a_droite)||
                               ((v->Priorite[InvDir[d]-1]==feux)&&(cv->Feu[v->NumFeu[InvDir[d]-1]-1].Etat<orange)));
           }
         }
    }
-  // 5. Entre véhicules prioritaires (V.P.) :
-  //    V.P. tournant à droite ? Priorité 5
-  //    V.P. allant tout droit et pas de V.P. venant de droite ? Priorité 5
-  //    V.P. tournant à gauche et pas de V.P. venant de la droite ou de devant ? Priorité 5
+  // 5. Entre vÃ©hicules prioritaires (V.P.) :
+  //    V.P. tournant Ã  droite ? PrioritÃ© 5
+  //    V.P. allant tout droit et pas de V.P. venant de droite ? PrioritÃ© 5
+  //    V.P. tournant Ã  gauche et pas de V.P. venant de la droite ou de devant ? PrioritÃ© 5
   for(d=nord; d<=ouest; d++)
    if (NivPriorite[d]==4)
     {
@@ -1935,15 +1935,15 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxi() // v3.6. Rq : Nécessite de
 void voie::DeplaceVehiculeOuBusOuTramOuTaxi() // v3.6 (Taxis)
  {
   if (NumProchVeh&&cv->Vehicule[NumProchVeh-1].PeutPasser())
-   {  // Si le prochain véhicule peut arriver sur la case...
-    cv->v[cv->Vehicule[NumProchVeh-1].x][cv->Vehicule[NumProchVeh-1].y].NumVehicule=0; // Effacée de la case d'origine
+   {  // Si le prochain vÃ©hicule peut arriver sur la case...
+    cv->v[cv->Vehicule[NumProchVeh-1].x][cv->Vehicule[NumProchVeh-1].y].NumVehicule=0; // EffacÃ©e de la case d'origine
     frmSimulation->RedessineCase(cv->Vehicule[NumProchVeh-1].x, cv->Vehicule[NumProchVeh-1].y, false);
     if ((!NumEtape)||(NumEtape!=cv->Vehicule[NumProchVeh-1].NumEtapeArrivee))
      {
       cv->PlaceVehicule(x, y, NumProchVeh); // v2.2.7. Inclut les stats d'Attente/Trafic
       NumVehicule=NumProchVeh;
      }
-    else // Etape : NumVehicule est réservé pour les véhicules qui partent de l'étape uniquement
+    else // Etape : NumVehicule est rÃ©servÃ© pour les vÃ©hicules qui partent de l'Ã©tape uniquement
      {
       cv->NbToursParcourus+= cv->TourCrt-
                              cv->Vehicule[NumProchVeh-1].TourDepart-
@@ -1972,7 +1972,7 @@ void voie::DeplaceVehiculeOuBusOuTramOuTaxi() // v3.6 (Taxis)
    }
   if (NumProchTaxi&&cv->Taxi[NumProchTaxi-1].PeutPasser()) // v3.6
    {  // Si le prochain taxi peut arriver sur la case...
-    cv->v[cv->Taxi[NumProchTaxi-1].x][cv->Taxi[NumProchTaxi-1].y].NumTaxi=0; // Effacée de la case d'origine
+    cv->v[cv->Taxi[NumProchTaxi-1].x][cv->Taxi[NumProchTaxi-1].y].NumTaxi=0; // EffacÃ©e de la case d'origine
     frmSimulation->RedessineCase(cv->Taxi[NumProchTaxi-1].x, cv->Taxi[NumProchTaxi-1].y, false);
     cv->PlaceVehiculeTaxi(x, y, NumProchTaxi);
     NumProchTaxi=0;
@@ -2079,7 +2079,7 @@ bool voie::RetirePieton(int NumPietonARetirer) //v2.0
    return false;
  }
 //-----------------------------------------------------------------------------
-void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, la montée et la descente du bus/tram 
+void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrÃªts de bus/tram, la montÃ©e et la descente du bus/tram 
  {
   bool DirTrv;
   int i, d, dd, n;
@@ -2087,23 +2087,23 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, la
   direction NvDir;
   for(i=0; i<NBMAXPIETONSPARCASE; i++)
    if (NumPieton[i]&&
-       (!cv->Pieton[NumPieton[i]-1].NumBus)&& // Ne doit pas être dans un bus, v3.0
+       (!cv->Pieton[NumPieton[i]-1].NumBus)&& // Ne doit pas Ãªtre dans un bus, v3.0
        (!cv->Pieton[NumPieton[i]-1].NumTram)&& //             ni dans un tram, v3.5
        (!cv->Pieton[NumPieton[i]-1].NumTaxi)&& //             ni dans un taxi, v3.6
-       (!cv->Pieton[NumPieton[i]-1].Ecrase)&& //              ni écrasé.       v4.3
+       (!cv->Pieton[NumPieton[i]-1].Ecrase)&& //              ni Ã©crasÃ©.       v4.3
        (cv->Pieton[NumPieton[i]-1].TourDrnDepl<cv->TourCrt))
     {
      p=&(cv->Pieton[NumPieton[i]-1]);
      NvDir=indefinie;
-     if (p->ArretBusTrv&&(!PassagePietons)&&(n=cv->V(x,y,p->Dir).NumArretBus)) // Pas d'attente sur un passage piéton (v3.6)
-      { // Si Arrêt de bus trouvé et qu'il arrive dessus alors on attend le bus (bloque le piéton)
+     if (p->ArretBusTrv&&(!PassagePietons)&&(n=cv->V(x,y,p->Dir).NumArretBus)) // Pas d'attente sur un passage piÃ©ton (v3.6)
+      { // Si ArrÃªt de bus trouvÃ© et qu'il arrive dessus alors on attend le bus (bloque le piÃ©ton)
        p->ArretBusTrv=false;
        p->NumArretBus=n;
        p->AttendBus=true;
        p->TourAttBus=cv->TourCrt;
       }
-     if (p->ArretTramTrv&&(!PassagePietons)&&(n=cv->V(x,y,p->Dir).NumArretTram))// Pas d'attente sur un passage piéton (v3.6)
-      { // Si Arrêt de tram trouvé et qu'il arrive dessus alors on attend le tram (bloque le piéton)
+     if (p->ArretTramTrv&&(!PassagePietons)&&(n=cv->V(x,y,p->Dir).NumArretTram))// Pas d'attente sur un passage piÃ©ton (v3.6)
+      { // Si ArrÃªt de tram trouvÃ© et qu'il arrive dessus alors on attend le tram (bloque le piÃ©ton)
        p->ArretTramTrv=false;
        p->NumArretTram=n;
        p->AttendTram=true;
@@ -2113,34 +2113,34 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, la
       if (n=cv->V(x,y,p->Dir).NumPlaceTaxi)
        {
         if ((!PassagePietons)&&(cv->PlaceTaxi[n-1].EstTeteFile())) // v3.6.
-         { // Phase 2 : Si File de taxi trouvée ET qu'il arrive dessus et que c'est la tête de la file ALORS il attend le taxi (bloque le piéton)
+         { // Phase 2 : Si File de taxi trouvÃ©e ET qu'il arrive dessus et que c'est la tÃªte de la file ALORS il attend le taxi (bloque le piÃ©ton)
           p->NumFileTaxi=cv->PlaceTaxi[n-1].NumFile+1;
           p->FileTaxiTrv=false;
           p->AttendTaxi=true;
           p->TourAttTaxi=cv->TourCrt;
          }
         else
-         { // Phase 1 : Recherche de la tête de la file de taxi. ATTENTION ! p->NumFileTaxi>0 n'implique pas que le piéton attend un taxi comme les bus ou les trams.
-          if (!p->NumFileTaxi) p->NumFileTaxi=cv->PlaceTaxi[n-1].NumFile+1; // On fixe la file à chercher
-          p->ChercheFileTaxis(); // Change p->Dir pour se diriger vers la tête de file
+         { // Phase 1 : Recherche de la tÃªte de la file de taxi. ATTENTION ! p->NumFileTaxi>0 n'implique pas que le piÃ©ton attend un taxi comme les bus ou les trams.
+          if (!p->NumFileTaxi) p->NumFileTaxi=cv->PlaceTaxi[n-1].NumFile+1; // On fixe la file Ã  chercher
+          p->ChercheFileTaxis(); // Change p->Dir pour se diriger vers la tÃªte de file
          }
        }
      if (p->AttendBus&&(p->TourAttBus+cv->NbMaxToursAttenteBus<cv->TourCrt)) // v3.0.
-      { // Si attente de bus trop longue (paramètre), le piéton abandonne
+      { // Si attente de bus trop longue (paramÃ¨tre), le piÃ©ton abandonne
        p->ArretBusTrv=false;
        p->NumArretBus=0;
        p->AttendBus=false;
        p->TourAttBus=0;
       }
      if (p->AttendTram&&(p->TourAttTram+cv->NbMaxToursAttenteTram<cv->TourCrt)) // v3.5.
-      { // Si attente de tram trop longue (paramètre), le piéton abandonne
+      { // Si attente de tram trop longue (paramÃ¨tre), le piÃ©ton abandonne
        p->ArretTramTrv=false;
        p->NumArretTram=0;
        p->AttendTram=false;
        p->TourAttTram=0;
       }
      if (p->AttendTaxi&&(p->TourAttTaxi+cv->NbMaxToursAttenteTaxi<cv->TourCrt)) // v3.6.
-      { // Si attente de taxi trop longue (paramètre), le piéton abandonne
+      { // Si attente de taxi trop longue (paramÃ¨tre), le piÃ©ton abandonne
        p->FileTaxiTrv=false;
        p->NumFileTaxi=0;
        p->AttendTaxi=false;
@@ -2148,58 +2148,58 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, la
       }
      if ((!p->AttendBus)&& // Le pieton n'attend pas de bus
          (!p->AttendTram)&& // Le pieton n'attend pas de tram (v3.5)
-         (!p->AttendTaxi)&& // Le piéton n'attend pas de taxi (v3.6)
-         (!p->PsgPtTrv)&& // Le piéton ne se dirige pas déjà vers un passage piétons ET
-         (!p->ArretBusTrv)&& // Le piéton ne se dirige pas déjà vers un arrêt de bus ET
-         (!p->ArretTramTrv)&& // Le piéton ne se dirige pas déjà vers un arrêt de tram (v3.5)
-         (!p->FileTaxiTrv)) // Le piéton ne se dirige pas déjà vers une tête de file de taxi (v3.6)
-      { // 1. Recherche de passage piétons
-       if (cv->ProbaDirPsgPt&& // Si recherche de passage piétons il y a ET
-           (NvDir=cv->CherchePassagePietons(x, y, (sens)(2-p->Dir%2)))&& // Passage piéton trouvé ET
-           ((rand()%100)<cv->ProbaDirPsgPt)) // Probabilité d'y aller (paramètre)
-        { // Il va vers le passage piéton trouvé
+         (!p->AttendTaxi)&& // Le piÃ©ton n'attend pas de taxi (v3.6)
+         (!p->PsgPtTrv)&& // Le piÃ©ton ne se dirige pas dÃ©jÃ  vers un passage piÃ©tons ET
+         (!p->ArretBusTrv)&& // Le piÃ©ton ne se dirige pas dÃ©jÃ  vers un arrÃªt de bus ET
+         (!p->ArretTramTrv)&& // Le piÃ©ton ne se dirige pas dÃ©jÃ  vers un arrÃªt de tram (v3.5)
+         (!p->FileTaxiTrv)) // Le piÃ©ton ne se dirige pas dÃ©jÃ  vers une tÃªte de file de taxi (v3.6)
+      { // 1. Recherche de passage piÃ©tons
+       if (cv->ProbaDirPsgPt&& // Si recherche de passage piÃ©tons il y a ET
+           (NvDir=cv->CherchePassagePietons(x, y, (sens)(2-p->Dir%2)))&& // Passage piÃ©ton trouvÃ© ET
+           ((rand()%100)<cv->ProbaDirPsgPt)) // ProbabilitÃ© d'y aller (paramÃ¨tre)
+        { // Il va vers le passage piÃ©ton trouvÃ©
          p->Dir=NvDir;
-         p->PsgPtTrv=true; // Indique qu'il est en train d'aller vers un passage piéton (inhibe les futures recherches)
+         p->PsgPtTrv=true; // Indique qu'il est en train d'aller vers un passage piÃ©ton (inhibe les futures recherches)
         }
-       else // 2. Recherche d'arrêt de bus. v3.0
+       else // 2. Recherche d'arrÃªt de bus. v3.0
         if (cv->ProbaDirArretBus&& // Si recherche d'arret de bus il y a ET
-            (NvDir=cv->ChercheArretBus(x, y, (sens)(2-p->Dir%2)))&& // Arret bus trouvé ET
-            ((rand()%100)<cv->ProbaDirArretBus)) // Probabilité d'y aller (paramètre)
-         { // Il va vers l'arrêt de bus
+            (NvDir=cv->ChercheArretBus(x, y, (sens)(2-p->Dir%2)))&& // Arret bus trouvÃ© ET
+            ((rand()%100)<cv->ProbaDirArretBus)) // ProbabilitÃ© d'y aller (paramÃ¨tre)
+         { // Il va vers l'arrÃªt de bus
           p->Dir=NvDir;
-          p->ArretBusTrv=true; // Indique qu'il est en train d'aller vers un arrêt de bus (inhibe les futures recherches)
+          p->ArretBusTrv=true; // Indique qu'il est en train d'aller vers un arrÃªt de bus (inhibe les futures recherches)
          }
-        else // 3. Recherche d'arrêt de tram. v3.5
+        else // 3. Recherche d'arrÃªt de tram. v3.5
          if (cv->ProbaDirArretTram&& // Si recherche d'arret de tram il y a ET
-             (NvDir=cv->ChercheArretTram(x, y, (sens)(2-p->Dir%2)))&& // Arret tram trouvé ET
-             ((rand()%100)<cv->ProbaDirArretTram)) // Probabilité d'y aller (paramètre)
-          { // Il va vers l'arrêt de tram
+             (NvDir=cv->ChercheArretTram(x, y, (sens)(2-p->Dir%2)))&& // Arret tram trouvÃ© ET
+             ((rand()%100)<cv->ProbaDirArretTram)) // ProbabilitÃ© d'y aller (paramÃ¨tre)
+          { // Il va vers l'arrÃªt de tram
            p->Dir=NvDir;
-           p->ArretTramTrv=true; // Indique qu'il est en train d'aller vers un arrêt de tram (inhibe les futures recherches)
+           p->ArretTramTrv=true; // Indique qu'il est en train d'aller vers un arrÃªt de tram (inhibe les futures recherches)
           }
          else // 4. Recherche de file de taxi. v3.6
           if (cv->ProbaDirFileTaxi&& // Si recherche de file de taxi il y a ET
-              (NvDir=cv->CherchePlaceTaxi(x, y, (sens)(2-p->Dir%2)))&& // Place de taxi trouvée ET
-              ((rand()%100)<cv->ProbaDirFileTaxi)) // Probabilité d'y aller (paramètre)
-           { // Il va vers le tête de file de taxi
+              (NvDir=cv->CherchePlaceTaxi(x, y, (sens)(2-p->Dir%2)))&& // Place de taxi trouvÃ©e ET
+              ((rand()%100)<cv->ProbaDirFileTaxi)) // ProbabilitÃ© d'y aller (paramÃ¨tre)
+           { // Il va vers le tÃªte de file de taxi
             p->Dir=NvDir;
-            p->FileTaxiTrv=true; // Indique qu'il est en train d'aller vers une tête de file de taxi (inhibe les futures recherches)
+            p->FileTaxiTrv=true; // Indique qu'il est en train d'aller vers une tÃªte de file de taxi (inhibe les futures recherches)
            }
       }
-     if ((!NvDir)&&(!p->AttendBus)&&(!p->AttendTram)&&(!p->AttendTaxi)) // La direction n'a pas changé et aucun bus/tram/taxi attendu (il marche tranquillement) v3.6 (taxi)
-      if (p->DemiCase) // Demi-case et même direction : il sort de la case
+     if ((!NvDir)&&(!p->AttendBus)&&(!p->AttendTram)&&(!p->AttendTaxi)) // La direction n'a pas changÃ© et aucun bus/tram/taxi attendu (il marche tranquillement) v3.6 (taxi)
+      if (p->DemiCase) // Demi-case et mÃªme direction : il sort de la case
        if (cv->V(x,y,p->Dir).PietonPeutAller((direction)p->Dir))
         cv->DeplacePieton(NumPieton[i]-1, (x+dx[p->Dir])%cv->NbX, (y+dy[p->Dir])%cv->NbY, (direction)p->Dir);
-       else // Peut pas sortir : on cherche une autre direction à gauche ou à droite (au sort)
+       else // Peut pas sortir : on cherche une autre direction Ã  gauche ou Ã  droite (au sort)
         {
          if (cv->TourCrt-cv->Pieton[NumPieton[i]-1].TourDrnDepl>1+cv->AttenteMaxVeh/2)
-          { // S'il a assez attendu (Paramètre AttenteVéhicule/2)
+          { // S'il a assez attendu (ParamÃ¨tre AttenteVÃ©hicule/2)
            for(DirTrv=false,dd=1-2*(rand()%2),d=2-dd; (!DirTrv)&&(d&&(d<NBDIR)); d+=dd)
             {
-             NvDir=(direction)(1+(p->Dir+d-1)%NBDIR); // à Gauche ou à droite
+             NvDir=(direction)(1+(p->Dir+d-1)%NBDIR); // Ã  Gauche ou Ã  droite
              if (DirTrv=cv->V(x,y,NvDir).PietonPeutAller(NvDir))
               {
-               p->AnnuleRechercheEnCours(); // Toute recherche est annulée car la direction a changé !
+               p->AnnuleRechercheEnCours(); // Toute recherche est annulÃ©e car la direction a changÃ© !
                cv->DeplacePieton(NumPieton[i]-1, (x+dx[NvDir])%cv->NbX, (y+dy[NvDir])%cv->NbY, NvDir);
               }
             }
@@ -2209,15 +2209,15 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, la
        {// On regarde si on peut passer la demi-case !
         if (NumPieton[1-i])
          {
-          pv=&(cv->Pieton[NumPieton[1-i]-1]); // pv comme piéton voisin
+          pv=&(cv->Pieton[NumPieton[1-i]-1]); // pv comme piÃ©ton voisin
           if ((((pv->Dir==p->Dir)&&
                 pv->DemiCase)||
                ((pv->Dir==InvDir[p->Dir])&&
                 (!pv->DemiCase)))&&
               (cv->TourCrt-cv->Pieton[NumPieton[i]-1].TourDrnDepl>1+cv->AttenteMaxVeh/2))
-            // On choisit une direction à gauche ou à droite (sûre) s'il a assez attendu
+            // On choisit une direction Ã  gauche ou Ã  droite (sÃ»re) s'il a assez attendu
            {
-            p->AnnuleRechercheEnCours(); // Toute recherche est annulée car la direction a changé !
+            p->AnnuleRechercheEnCours(); // Toute recherche est annulÃ©e car la direction a changÃ© !
             p->Dir=(direction)(1+(p->Dir+1+2*(rand()%2))%NBDIR);
            }
          }
@@ -2336,9 +2336,9 @@ int voie::PlaceQueueFileTaxi() // v3.6. Retourne 1+NumPlace si elle existe sinon
      NumPlaceQueue=v->PlaceQueueFileTaxi();
    }
   if (!NumPlaceQueue)
-   return NumPlaceTaxi; // Pas d'autre place trouvée alors c'est la queue
+   return NumPlaceTaxi; // Pas d'autre place trouvÃ©e alors c'est la queue
   else
-   return NumPlaceQueue; // Sinon c'est celle qui a été trouvée
+   return NumPlaceQueue; // Sinon c'est celle qui a Ã©tÃ© trouvÃ©e
  }
 //-----------------------------------------------------------------------------
 int voie::PlaceTeteFileTaxi() // v3.6. Retourne 1+NumPlace si elle existe sinon 0
@@ -2354,9 +2354,9 @@ int voie::PlaceTeteFileTaxi() // v3.6. Retourne 1+NumPlace si elle existe sinon 
      NumPlaceTete=v->PlaceTeteFileTaxi();
    }
   if (!NumPlaceTete)
-   return NumPlaceTaxi; // Pas d'autre place trouvée alors c'est la tête
+   return NumPlaceTaxi; // Pas d'autre place trouvÃ©e alors c'est la tÃªte
   else
-   return NumPlaceTete; // Sinon c'est celle qui a été trouvée
+   return NumPlaceTete; // Sinon c'est celle qui a Ã©tÃ© trouvÃ©e
  }
 //-----------------------------------------------------------------------------
 bool voie::ExistePlusieursQueuesFileTaxis() // v3.6
@@ -2438,21 +2438,21 @@ void voie::CalculeDistanceEtape(int e, int DistSansPsgBus, int DistAvecPsgBus, d
      DistEtape[e][NumDirdp[DirOrig][DirPoss]][AVECPSGBUS]=DistAvecPsgBus;
    }
   for(int d=nord; d<=ouest; d++)
-   { // ATTENTION, faire un saut à v(x,y,d,2) si obligation d'aller tout droit car risque qu'il ne soit pas défini plus tard par isolation (on ne passe pas deux fois sur une même case)
+   { // ATTENTION, faire un saut Ã  v(x,y,d,2) si obligation d'aller tout droit car risque qu'il ne soit pas dÃ©fini plus tard par isolation (on ne passe pas deux fois sur une mÃªme case)
     int DistCrtAvecPsgBus=DistAvecPsgBus,
-        DistCrtSansPsgBus=DistSansPsgBus; // Distances par défaut (v3.9.1)
+        DistCrtSansPsgBus=DistSansPsgBus; // Distances par dÃ©faut (v3.9.1)
     voie *VoieCrt=v((direction)d), *Voie2Cases=&(cv->V_(x,y,2,d));
     if (ToutDroit&&((DirPoss&InvPossDir[d])==InvPossDir[d])) // SI ToutDroit ET d est une direction possible (Tout Droit) ALORS on ne prend que la distance de la case d'en face (v3.9.1)
      {
       voie *VoieOpposee=v(InvDir[d]);
       DistCrtAvecPsgBus=VoieOpposee->DistEtape[e][NumDirdp[InvDir[d]][VoieOpposee->DirPoss]][AVECPSGBUS]; // distance depuis la case d'en face (avec passage bus)
       DistCrtSansPsgBus=VoieOpposee->DistEtape[e][NumDirdp[InvDir[d]][VoieOpposee->DirPoss]][SANSPSGBUS]; // distance depuis la case d'en face (sans passage bus)
-      if (DistCrtAvecPsgBus!=DIST_INDEFINIE) DistCrtAvecPsgBus++; // Si distance définie, on l'incrémente de 1
-      if (DistCrtSansPsgBus!=DIST_INDEFINIE) DistCrtSansPsgBus++; // Si distance définie, on l'incrémente de 1
+      if (DistCrtAvecPsgBus!=DIST_INDEFINIE) DistCrtAvecPsgBus++; // Si distance dÃ©finie, on l'incrÃ©mente de 1
+      if (DistCrtSansPsgBus!=DIST_INDEFINIE) DistCrtSansPsgBus++; // Si distance dÃ©finie, on l'incrÃ©mente de 1
      }
     if (VoieCrt->PassageBus)
      {
-      if (((VoieCrt->DirPoss&InvPossDir[d])==InvPossDir[d])&& // Si VoieCrt pointe sur l'étape ET
+      if (((VoieCrt->DirPoss&InvPossDir[d])==InvPossDir[d])&& // Si VoieCrt pointe sur l'Ã©tape ET
           (VoieCrt->DistEtape[e][NumDirdp[InvDir[d]][VoieCrt->DirPoss]][AVECPSGBUS]>DistCrtAvecPsgBus+1))
        VoieCrt->CalculeDistanceEtape( e,
                                       DIST_INDEFINIE,
@@ -2493,8 +2493,8 @@ void voie::CalculeDistanceArretBus(int ab, int Distance, direction DirOrig) // 0
   for(int d=nord; d<=ouest; d++)
    {
     voie *VoieCrt=v((direction)d), *Voie2Cases=&(cv->V_(x,y,2,d));
-    if (((VoieCrt->DirPoss&InvPossDir[d])==InvPossDir[d])&& // Si VoieCrt pointe sur l'arrêt de bus ET
-        (VoieCrt->DistArretBus[ab][NumDirdp[InvDir[d]][VoieCrt->DirPoss]]>Distance+1)) // Distance indéfinie
+    if (((VoieCrt->DirPoss&InvPossDir[d])==InvPossDir[d])&& // Si VoieCrt pointe sur l'arrÃªt de bus ET
+        (VoieCrt->DistArretBus[ab][NumDirdp[InvDir[d]][VoieCrt->DirPoss]]>Distance+1)) // Distance indÃ©finie
      VoieCrt->CalculeDistanceArretBus(ab, Distance+1, InvDir[d]); // On lance le calcul de distance
     if ((VoieCrt->ToutDroit&& // v3.9.1 (On traite le ToutDroit : 2 cases)
         ((Voie2Cases->DirPoss&InvPossDir[d])==InvPossDir[d])&&
@@ -2508,11 +2508,11 @@ void voie::CalculeDistanceArretTram(int at, int Distance, direction DirOrig) // 
   if (DirOrig) DistArretTram[at][NumDirPossSensVoieTram(indefinie, DirOrig)]=Distance;
   for(int d=nord; d<=ouest; d++)
    {
-    if ((DirOrig&&EstDirPossSensVoieTram((direction)d, DirOrig))|| // Si une voie va vers DirOrig (définie) depuis d OU
-        (!DirOrig)&&EstDirPossSensVoieTram(indefinie, (direction)d)) // on part d'un arrêt de tram (DirOrig==indefinie) et on regarde toutes les directions
+    if ((DirOrig&&EstDirPossSensVoieTram((direction)d, DirOrig))|| // Si une voie va vers DirOrig (dÃ©finie) depuis d OU
+        (!DirOrig)&&EstDirPossSensVoieTram(indefinie, (direction)d)) // on part d'un arrÃªt de tram (DirOrig==indefinie) et on regarde toutes les directions
      {
       voie *VoieCrt=v((direction)d);
-      if (VoieCrt->DistArretTram[at][VoieCrt->NumDirPossSensVoieTram(indefinie, InvDir[d])]>Distance+1) // Distance indéfinie
+      if (VoieCrt->DistArretTram[at][VoieCrt->NumDirPossSensVoieTram(indefinie, InvDir[d])]>Distance+1) // Distance indÃ©finie
        VoieCrt->CalculeDistanceArretTram(at, Distance+1, InvDir[d]); // On lance le calcul de distance
      }
    }
@@ -2525,7 +2525,7 @@ void voie::CalculeDistanceFileTaxi(int ft, int Distance, direction DirOrig) // 0
    {
     voie *VoieCrt=v((direction)d), *Voie2Cases=&(cv->V_(x,y,2,d));
     if (((VoieCrt->DirPoss&InvPossDir[d])==InvPossDir[d])&& // Si VoieCrt pointe sur la file de taxi ET
-        (VoieCrt->DistFileTaxi[ft][NumDirdp[InvDir[d]][VoieCrt->DirPoss]]>Distance+1)) // Distance indéfinie
+        (VoieCrt->DistFileTaxi[ft][NumDirdp[InvDir[d]][VoieCrt->DirPoss]]>Distance+1)) // Distance indÃ©finie
      VoieCrt->CalculeDistanceFileTaxi(ft, Distance+1, InvDir[d]); // On lance le calcul de distance
     if ((VoieCrt->ToutDroit&& // v3.9.1 (On traite le ToutDroit : 2 cases)
         ((Voie2Cases->DirPoss&InvPossDir[d])==InvPossDir[d])&&
@@ -2553,7 +2553,7 @@ void voie::ModifieSensVoieTram(direction DirOrig, direction DirDest) // v3.5
  }
 //-----------------------------------------------------------------------------
 direction voie::DirSensVoieTram(direction DirOrigine, int iDir) // v3.5
- { // ATTENTION : 0<=iDir<=3 (0 = première, etc.)
+ { // ATTENTION : 0<=iDir<=3 (0 = premiÃ¨re, etc.)
   int n=0;
   direction DirTrv=indefinie;
   for(int DirCrt=nord; (!DirTrv)&&(DirCrt<=ouest); DirCrt++)
@@ -2597,7 +2597,7 @@ bool voie::SupprimePassagePietonsInvalide() // v3.5
   else return false;
  }
 //-----------------------------------------------------------------------------
-inline bool voie::ExisteVoieDansDirection(type_voie TypeVoie, direction d) // v3.5 // condition nécessaire d>indefinie
+inline bool voie::ExisteVoieDansDirection(type_voie TypeVoie, direction d) // v3.5 // condition nÃ©cessaire d>indefinie
  {
   return ((TypeVoie&tvRoute)&&(DirPoss&PossDir[d]))||
          ((TypeVoie&tvVoieTram)&&EstDirPossSensVoieTram(indefinie, d));
@@ -2696,26 +2696,26 @@ void voie::Verifie(AnsiString &asMsgErr)
    {
     VerifiePriorite(asMsgErr, asSource+" ("+asDir[i+1]+")", Priorite[i]);
     if (NumFeu[i]&&(Priorite[i]!=feux))
-     asMsgErr+=asSource+Format(": numéro de feu %s mais priorité différente de Feu (%d)\n", ARRAYOFCONST((asDir[i+1], Priorite[i])));
+     asMsgErr+=asSource+Format(": numÃ©ro de feu %s mais prioritÃ© diffÃ©rente de Feu (%d)\n", ARRAYOFCONST((asDir[i+1], Priorite[i])));
     if ((NumFeu[i]<0)||(NumFeu[i]>cv->NbFeux))
-     asMsgErr+=asSource+Format(": numéro de feu %s incorrect (%d)\n", ARRAYOFCONST((asDir[i+1], NumFeu[i])));
+     asMsgErr+=asSource+Format(": numÃ©ro de feu %s incorrect (%d)\n", ARRAYOFCONST((asDir[i+1], NumFeu[i])));
     else
      if (NumFeu[i])
       {
        cv->Feu[NumFeu[i]-1].Verifie(asMsgErr, asSource+Format(" Feu %s", ARRAYOFCONST((asDir[i+1]))));
        if ((x!=(xx=cv->Feu[NumFeu[i]-1].x))||(y!=(yy=cv->Feu[NumFeu[i]-1].y)))
-        asMsgErr+=asSource+Format(": coordonnées du feu %s (%d,%d) différentes des coordonnées de la case\n", ARRAYOFCONST((asDir[i+1], xx, yy)));
+        asMsgErr+=asSource+Format(": coordonnÃ©es du feu %s (%d,%d) diffÃ©rentes des coordonnÃ©es de la case\n", ARRAYOFCONST((asDir[i+1], xx, yy)));
       }
    }
-  // Complément des contrôles (v3.6)
+  // ComplÃ©ment des contrÃ´les (v3.6)
   if ((NumEtape<0)||(NumEtape>cv->NbEtapes))
-   asMsgErr+=asSource+Format(": numéro de place de taxi incorrect (%d)\n", ARRAYOFCONST((NumPlaceTaxi)));
+   asMsgErr+=asSource+Format(": numÃ©ro de place de taxi incorrect (%d)\n", ARRAYOFCONST((NumPlaceTaxi)));
   if ((NumArretBus<0)||(NumArretBus>cv->NbArretsBus))
-   asMsgErr+=asSource+Format(": numéro d'arrêt de bus incorrect (%d)\n", ARRAYOFCONST((NumArretBus)));
+   asMsgErr+=asSource+Format(": numÃ©ro d'arrÃªt de bus incorrect (%d)\n", ARRAYOFCONST((NumArretBus)));
   if ((NumArretTram<0)||(NumArretTram>cv->NbArretsTram))
-   asMsgErr+=asSource+Format(": numéro d'arrêt de tram incorrect (%d)\n", ARRAYOFCONST((NumArretTram)));
+   asMsgErr+=asSource+Format(": numÃ©ro d'arrÃªt de tram incorrect (%d)\n", ARRAYOFCONST((NumArretTram)));
   if ((NumPlaceTaxi<0)||(NumPlaceTaxi>cv->NbPlacesTaxi))
-   asMsgErr+=asSource+Format(": numéro de place de taxi incorrect (%d)\n", ARRAYOFCONST((NumPlaceTaxi)));
+   asMsgErr+=asSource+Format(": numÃ©ro de place de taxi incorrect (%d)\n", ARRAYOFCONST((NumPlaceTaxi)));
  }
 //-----------------------------------------------------------------------------
 void stats::Definit()
@@ -2786,7 +2786,7 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
     LigneBus[i].AffecteNumero(i+1); // v3.0
     LigneTram[i].AffecteNumero(i+1); // v3.5
    }
-  // Tableaux avec nombre par défaut
+  // Tableaux avec nombre par dÃ©faut
   if (NbElementsParDefaut)
    {
     DefinitNbFeux(NBFEUXDEFAUT);
@@ -2794,7 +2794,7 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
     DefinitNbVehicules(NBVEHICULESDEFAUT);
     DefinitNbPietons(NBPIETONSDEFAUT); // v2.0
    }
-  // Propriétés pour la génération aléatoire de réseau (v4.2)
+  // PropriÃ©tÃ©s pour la gÃ©nÃ©ration alÃ©atoire de rÃ©seau (v4.2)
   LgrMinSgmtRoute=LgrMaxSgmtRoute=ProbaSortieIntersection=ProbaEntreeIntersection=ProbaTraverseeRoute=0;
  }
 //-----------------------------------------------------------------------------
@@ -2994,7 +2994,7 @@ int centre_ville::DefinitFilesTaxi() // v3.6
   if (NbFilesTrv)
    {
     if (DefinitNbFilesTaxi(NbFilesTrv)!=NbFilesTrv) return 0;
-    // D'abord on définit la file pour les queues de file
+    // D'abord on dÃ©finit la file pour les queues de file
     for(int i=0; i<NbPlacesTaxi; i++)
      if (PlaceTaxi[i].Definie()&&
          PlaceTaxi[i].EstQueueFile())
@@ -3059,24 +3059,24 @@ int centre_ville::ArretBusExistant(int x, int y) // v3.0
      {
       if (!i)
        i=Voie->NumArretBus;
-      if ((Voie->NumArretBus==i)&& // Si case contiguë est arrêt de bus
-          (!Voie->v(AGaucheDe[d])->DirPoss)&& // ET qu'il y a un trottoir à sa gauche (en regardant vers l'arrière de l'arrêt)
+      if ((Voie->NumArretBus==i)&& // Si case contiguÃ« est arrÃªt de bus
+          (!Voie->v(AGaucheDe[d])->DirPoss)&& // ET qu'il y a un trottoir Ã  sa gauche (en regardant vers l'arriÃ¨re de l'arrÃªt)
           (Voie->DirPoss&InvPossDir[d])) // Si d est dans la bonne direction (sens bus)
-       ArretBus[i-1].Definit(x, y); // (x,y) devient la tête d'arrêt de bus Voie->NumArretBus
+       ArretBus[i-1].Definit(x, y); // (x,y) devient la tÃªte d'arrÃªt de bus Voie->NumArretBus
      }
    }
   return i;
  }
 //-----------------------------------------------------------------------------
 int centre_ville::ArretTramExistant(int x, int y) // v3.5
- { // Pour les trams on ne change pas la tête de l'arrêt car il peut y avoir un double sens sur la voie
+ { // Pour les trams on ne change pas la tÃªte de l'arrÃªt car il peut y avoir un double sens sur la voie
   int d, i=0;
   voie *Voie;
   for(d=nord; (!i)&&(d<=ouest); d++)
    {
     Voie=&_V(x,y,d);
-    if (Voie->NumArretTram&& // Un arrêt contigu existe ET
-        (v[x][y].SensVoieTram==SensVoieTramDir[d][d])&& // Même sens de la voie
+    if (Voie->NumArretTram&& // Un arrÃªt contigu existe ET
+        (v[x][y].SensVoieTram==SensVoieTramDir[d][d])&& // MÃªme sens de la voie
         (Voie->SensVoieTram==SensVoieTramDir[d][d])) // Dans le prolongement
      i=Voie->NumArretTram;
    }
@@ -3087,9 +3087,9 @@ int centre_ville::NumeroArretBusLibre(int x, int y) // v3.0
  {
   int i;
   if (i=ArretBusExistant(x, y))
-   return i; // L'arrêt existe déjà (case contiguë qui communique : va ou vient)
+   return i; // L'arrÃªt existe dÃ©jÃ  (case contiguÃ« qui communique : va ou vient)
   else
-   { // C'est un nouvel arrêt de bus
+   { // C'est un nouvel arrÃªt de bus
     for(i=0; (i<NbArretsBus)&&ArretBus[i].Defini(); i++);
     return (i+1)*(i<NbArretsBus);
    }
@@ -3099,9 +3099,9 @@ int centre_ville::NumeroArretTramLibre(int x, int y) // v3.5
  {
   int i;
   if (i=ArretTramExistant(x, y))
-   return i; // L'arrêt existe déjà (case contiguë qui communique : va ou vient)
+   return i; // L'arrÃªt existe dÃ©jÃ  (case contiguÃ« qui communique : va ou vient)
   else
-   { // C'est un nouvel arrêt de tram
+   { // C'est un nouvel arrÃªt de tram
     for(i=0; (i<NbArretsTram)&&ArretTram[i].Defini(); i++);
     return (i+1)*(i<NbArretsTram);
    }
@@ -3121,7 +3121,7 @@ int centre_ville::AjouteFeu(int x, int y, direction d)
    {
     Feu[i-1].Definit(x, y, d);
     v[x][y].NumFeu[d-1]=i;
-    // Définition des durées par défaut
+    // DÃ©finition des durÃ©es par dÃ©faut
     Feu[i-1].DureeVert=DureeVert;
     Feu[i-1].DureeRouge=DureeRouge;
    }
@@ -3244,9 +3244,9 @@ bool centre_ville::ExisteCaseArretBus(int x, int y) // v3.0
    {
     Voie=&_V(x,y,d);
     if (Voie->NumArretBus==i)
-     { // On profite pour regarder si on change de tête d'arrêt de bus
+     { // On profite pour regarder si on change de tÃªte d'arrÃªt de bus
       Existe=true;
-      if (v[x][y].EstTeteArretBus()) // Si c'était une tête d'arrêt de bus,
+      if (v[x][y].EstTeteArretBus()) // Si c'Ã©tait une tÃªte d'arrÃªt de bus,
        Voie->DefinitArretBus(i);// sa voisine prend la place. v3.0.3
      }
    }
@@ -3262,9 +3262,9 @@ bool centre_ville::ExisteCaseArretTram(int x, int y) // v3.5
    {
     Voie=&_V(x,y,d);
     if (Voie->NumArretTram==i)
-     { // On profite pour regarder si on change de tête d'arrêt de tram
+     { // On profite pour regarder si on change de tÃªte d'arrÃªt de tram
       Existe=true;
-      if (v[x][y].EstTeteArretTram()) // Si c'était une tête d'arrêt de tram,
+      if (v[x][y].EstTeteArretTram()) // Si c'Ã©tait une tÃªte d'arrÃªt de tram,
        Voie->DefinitArretTram(i);// sa voisine prend la place. v3.0.3
      }
    }
@@ -3277,7 +3277,7 @@ void centre_ville::SupprimeArretBus(int x, int y) // v3.0. Supprime sur une case
   if ((i>0)&&(i<=NbArretsBus))
    {
     if (!ExisteCaseArretBus(x, y))
-     ArretBus[i-1].Initialise(); // Si l'arrêt n'a pas d'autre case
+     ArretBus[i-1].Initialise(); // Si l'arrÃªt n'a pas d'autre case
     v[x][y].NumArretBus=0;
    }
  }
@@ -3288,20 +3288,20 @@ void centre_ville::SupprimeArretTram(int x, int y) // v3.5. Supprime sur une cas
   if ((i>0)&&(i<=NbArretsTram))
    {
     if (!ExisteCaseArretTram(x, y))
-     ArretTram[i-1].Initialise(); // Si l'arrêt n'a pas d'autre case
+     ArretTram[i-1].Initialise(); // Si l'arrÃªt n'a pas d'autre case
     v[x][y].NumArretTram=0;
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretBus(int n) // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
+void centre_ville::SupprimeArretBus(int n) // v3.0. Supprime complÃ¨tement l'arrÃªt (sur TOUTES les cases)
  {
-  v[ArretBus[n].x][ArretBus[n].y].RetireArretBus(); // Retire le n° d'arrêt de bus récursivement sur toutes les cases
+  v[ArretBus[n].x][ArretBus[n].y].RetireArretBus(); // Retire le nÂ° d'arrÃªt de bus rÃ©cursivement sur toutes les cases
   ArretBus[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretTram(int n) // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
+void centre_ville::SupprimeArretTram(int n) // v3.5. Supprime complÃ¨tement l'arrÃªt (sur TOUTES les cases)
  {
-  v[ArretTram[n].x][ArretTram[n].y].RetireArretTram(); // Retire le n° d'arrêt de tram récursivement sur toutes les cases
+  v[ArretTram[n].x][ArretTram[n].y].RetireArretTram(); // Retire le nÂ° d'arrÃªt de tram rÃ©cursivement sur toutes les cases
   ArretTram[n].Initialise();
  }
 //-----------------------------------------------------------------------------
@@ -3313,9 +3313,9 @@ void centre_ville::SupprimePlaceTaxi(int n) // v3.6
 //-----------------------------------------------------------------------------
 sens centre_ville::SensPassagePietonsPossible(int x, int y)
  { // v2.0
-  // 1. Sens suivant DirPoss (Directions de l'intérieur vers l'extérieur)
+  // 1. Sens suivant DirPoss (Directions de l'intÃ©rieur vers l'extÃ©rieur)
   sens Sens=SensPsgPt[v[x][y].DirPoss];
-  // 2. Test des cases voisines (Directions de l'extérieur vers l'intérieur)
+  // 2. Test des cases voisines (Directions de l'extÃ©rieur vers l'intÃ©rieur)
   switch(Sens)
    {
     case vertical:   if ((_V(x,y,nord).DirPoss&S)||
@@ -3334,7 +3334,7 @@ sens centre_ville::SensPassagePietonsPossible(int x, int y)
     if (!v[x][y].SensVoieTram) // Si pas de voie de tram alors
      Sens=indefini; // Pas de sens possible (case noire)
     else
-     { // Sinon deux cas de voies de tram permettent le passage piétons
+     { // Sinon deux cas de voies de tram permettent le passage piÃ©tons
       if (v[x][y].SensVoieTram==est_ouest) Sens=vertical;
       if (v[x][y].SensVoieTram==nord_sud) Sens=horizontal;
      }
@@ -3352,7 +3352,7 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
   direction Dir[2]={(direction)(3-SensRecherche),(direction)(5-SensRecherche)};
   if ((!NbMaxCasesDetectPsgPt)|| // NbMaxCasesDetectPsgPt et
       (!SensRecherche)) // SensRecherche
-   return indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   return indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
   for(d=0; d<2; d++)
    {
     for(Trv=false,i=1;
@@ -3382,7 +3382,7 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
   direction Dir[2]={(direction)(3-SensRecherche),(direction)(5-SensRecherche)};
   if ((!NbMaxCasesDetectArretBus)|| // NbMaxCasesDetectArretBus et
       (!SensRecherche)) // SensRecherche
-   return indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   return indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
   for(d=0; d<2; d++)
    {
     for(Trv=false,i=1;
@@ -3390,7 +3390,7 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
         (!V_(x,y,i,3-SensRecherche+2*d).DirPoss)&&
         (i<=NbMaxCasesDetectArretBus));
         i++);
-    if (i<=NbMaxCasesDetectArretBus) // Si toujours dans les distances on vérifie la dernière case (l'arrêt EST sur une route)
+    if (i<=NbMaxCasesDetectArretBus) // Si toujours dans les distances on vÃ©rifie la derniÃ¨re case (l'arrÃªt EST sur une route)
      Trv|=V_(x,y,i,3-SensRecherche+2*d).NumArretBus;
     if (Trv) Dist[d]=i;
    }
@@ -3414,7 +3414,7 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
   direction Dir[2]={(direction)(3-SensRecherche),(direction)(5-SensRecherche)};
   if ((!NbMaxCasesDetectArretTram)|| // NbMaxCasesDetectArretTram et
       (!SensRecherche)) // SensRecherche
-   return indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   return indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
   for(d=0; d<2; d++)
    {
     for(Trv=false,i=1;
@@ -3422,7 +3422,7 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
         (!V_(x,y,i,3-SensRecherche+2*d).DirPoss)&&
         (i<=NbMaxCasesDetectArretTram));
         i++);
-    if (i<=NbMaxCasesDetectArretTram) // Si toujours dans les distances on vérifie la dernière case (l'arrêt EST sur une route)
+    if (i<=NbMaxCasesDetectArretTram) // Si toujours dans les distances on vÃ©rifie la derniÃ¨re case (l'arrÃªt EST sur une route)
      Trv|=V_(x,y,i,3-SensRecherche+2*d).NumArretTram;
     if (Trv) Dist[d]=i;
    }
@@ -3446,7 +3446,7 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
   direction Dir[2]={(direction)(3-SensRecherche),(direction)(5-SensRecherche)};
   if ((!NbMaxCasesDetectFileTaxi)|| // NbMaxCasesDetectFileTaxi et
       (!SensRecherche)) // SensRecherche
-   return indefinie; //  doivent être définis (horizontal|vertical ; >0)
+   return indefinie; //  doivent Ãªtre dÃ©finis (horizontal|vertical ; >0)
   for(d=0; d<2; d++)
    {
     for(Trv=false,i=1;
@@ -3454,7 +3454,7 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
         (!V_(x,y,i,3-SensRecherche+2*d).DirPoss)&&
         (i<=NbMaxCasesDetectFileTaxi));
         i++);
-    if (i<=NbMaxCasesDetectFileTaxi) // Si toujours dans les distances on vérifie la dernière case (le place de taxi EST sur une route)
+    if (i<=NbMaxCasesDetectFileTaxi) // Si toujours dans les distances on vÃ©rifie la derniÃ¨re case (le place de taxi EST sur une route)
      Trv|=V_(x,y,i,3-SensRecherche+2*d).NumPlaceTaxi;
     if (Trv) Dist[d]=i;
    }
@@ -3488,10 +3488,10 @@ direction centre_ville::DirectionArretBus(int x, int y) // v3.0
   bool Ambiguite=false;
   int d;
   direction Dir=indefinie;
-  for(d=nord; d<=ouest; d++) // On prend la dernière possibilité en cas de litige
-   if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de déplacement vers d ET
+  for(d=nord; d<=ouest; d++) // On prend la derniÃ¨re possibilitÃ© en cas de litige
+   if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de dÃ©placement vers d ET
        (!_V(x,y,d).DirPoss)&& // Mur vers d ET
-       (v[x][y].DirPoss&PossDir[AGaucheDe[d]])) // Direction possible à gauche (sens de la circulation de la voie)
+       (v[x][y].DirPoss&PossDir[AGaucheDe[d]])) // Direction possible Ã  gauche (sens de la circulation de la voie)
     {
      Ambiguite=!!Dir;
      Dir=(direction)d;
@@ -3504,10 +3504,10 @@ direction centre_ville::DirectionArretTram(int x, int y) // v3.5
   bool Ambiguite=false;
   int d;
   direction Dir=indefinie;
-  for(d=nord; d<=ouest; d++) // On prend la dernière possibilité en cas de litige
-   if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de déplacement vers d ET
+  for(d=nord; d<=ouest; d++) // On prend la derniÃ¨re possibilitÃ© en cas de litige
+   if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de dÃ©placement vers d ET
        (!_V(x,y,d).DirPoss)&& // Mur vers d ET
-       (v[x][y].DirPoss&PossDir[AGaucheDe[d]])) // Direction possible à gauche (sens de la circulation de la voie)
+       (v[x][y].DirPoss&PossDir[AGaucheDe[d]])) // Direction possible Ã  gauche (sens de la circulation de la voie)
     {
      Ambiguite=!!Dir;
      Dir=(direction)d;
@@ -3578,7 +3578,7 @@ direction centre_ville::DirArretBusVoisin(int x, int y) // v3.0
   for(d=nord; (!DirArretBusVoisin)&&(d<=ouest); d++)
    {
     Voie=&_V(x,y,d);
-    if (Voie->NumArretBus&& // Arrêt de bus voisin ET
+    if (Voie->NumArretBus&& // ArrÃªt de bus voisin ET
         ((v[x][y].DirPoss&PossDir[d])|| // on peut y aller ou
          (Voie->DirPoss&InvPossDir[d]))) // on peut en venir
      DirArretBusVoisin=d;
@@ -3593,7 +3593,7 @@ direction centre_ville::DirArretTramVoisin(int x, int y) // v3.5
   for(d=nord; (!DirArretTramVoisin)&&(d<=ouest); d++)
    {
     Voie=&_V(x,y,d);
-    if (Voie->NumArretTram&& // Arrêt de tram voisin ET
+    if (Voie->NumArretTram&& // ArrÃªt de tram voisin ET
         ((v[x][y].DirPoss&PossDir[d])|| // on peut y aller ou
          (Voie->DirPoss&InvPossDir[d]))) // on peut en venir
      DirArretTramVoisin=d;
@@ -3606,15 +3606,15 @@ bool centre_ville::AjoutArretBusPossible(int x, int y) // v3.0
   int d;
   direction DirArretVoisin;
   bool Possible=false;
-  if (v[x][y].DirPoss&&(!ArretsBusVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux arrêts différents voisins
+  if (v[x][y].DirPoss&&(!ArretsBusVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux arrÃªts diffÃ©rents voisins
    {
     DirArretVoisin=DirArretBusVoisin(x,y);
     for(d=nord; (!Possible)&&(d<=ouest); d++)
      if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de direction possible vers d et dans cette direction il y a un mur ALORS
-         (!_V(x,y,d).DirPoss)) // Soit 1 arrêt d'un côté ou de l'autre soit c'est le même n° (ou nul les 2)
-      Possible=((!DirArretVoisin)|| // Si arrêt voisin il y a, ALORS
-                (DirArretVoisin==ADroiteDe[d])||  // il doit être dans le même
-                (DirArretVoisin==AGaucheDe[d]))&& // sens que le futur arrêt
+         (!_V(x,y,d).DirPoss)) // Soit 1 arrÃªt d'un cÃ´tÃ© ou de l'autre soit c'est le mÃªme nÂ° (ou nul les 2)
+      Possible=((!DirArretVoisin)|| // Si arrÃªt voisin il y a, ALORS
+                (DirArretVoisin==ADroiteDe[d])||  // il doit Ãªtre dans le mÃªme
+                (DirArretVoisin==AGaucheDe[d]))&& // sens que le futur arrÃªt
                ((!!_V(x,y,AGaucheDe[d]).NumArretBus+!!_V(x,y,ADroiteDe[d]).NumArretBus==1)||
                 (_V(x,y,AGaucheDe[d]).NumArretBus==_V(x,y,ADroiteDe[d]).NumArretBus));
     return Possible;
@@ -3627,15 +3627,15 @@ bool centre_ville::AjoutArretTramPossible(int x, int y) // v3.5
   int d;
   direction DirArretVoisin;
   bool Possible=false;
-  if (v[x][y].SensVoieTram&&(!ArretsTramVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux arrêts différents voisins
+  if (v[x][y].SensVoieTram&&(!ArretsTramVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux arrÃªts diffÃ©rents voisins
    {
     DirArretVoisin=DirArretTramVoisin(x,y);
     for(d=nord; (!Possible)&&(d<=ouest); d++)
      if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de direction possible vers d et dans cette direction il y a un mur ALORS
-         (!_V(x,y,d).DirPoss)) // Soit 1 arrêt d'un côté ou de l'autre soit c'est le même n° (ou nul les 2)
-      Possible=((!DirArretVoisin)|| // Si arrêt voisin il y a, ALORS
-                (DirArretVoisin==ADroiteDe[d])||  // il doit être dans le même
-                (DirArretVoisin==AGaucheDe[d]))&& // sens que le futur arrêt
+         (!_V(x,y,d).DirPoss)) // Soit 1 arrÃªt d'un cÃ´tÃ© ou de l'autre soit c'est le mÃªme nÂ° (ou nul les 2)
+      Possible=((!DirArretVoisin)|| // Si arrÃªt voisin il y a, ALORS
+                (DirArretVoisin==ADroiteDe[d])||  // il doit Ãªtre dans le mÃªme
+                (DirArretVoisin==AGaucheDe[d]))&& // sens que le futur arrÃªt
                ((!!_V(x,y,AGaucheDe[d]).NumArretTram+!!_V(x,y,ADroiteDe[d]).NumArretTram==1)||
                 (_V(x,y,AGaucheDe[d]).NumArretTram==_V(x,y,ADroiteDe[d]).NumArretTram));
     return Possible;
@@ -3692,7 +3692,7 @@ void centre_ville::InitialiseInfosTrajetLignesTram()
  }
 //-----------------------------------------------------------------------------
 void centre_ville::CalculeTrajetLignesBus() // v3.0.3
- { // InitialiseInfosTrajetLignesBus doit avoir été lancé avant pour mettre les voie::LigneBus[i] à false
+ { // InitialiseInfosTrajetLignesBus doit avoir Ã©tÃ© lancÃ© avant pour mettre les voie::LigneBus[i] Ã  false
   int i, j, dp, ndp, DistArretBus, DistCrt, NumArretSvt;
   direction DirSvt;
   voie *Voie;
@@ -3717,7 +3717,7 @@ void centre_ville::CalculeTrajetLignesBus() // v3.0.3
             DirSvt=Dirdp[dp][Voie->DirPoss];
            }
          }
-        Voie=Voie->v(DirSvt); // 1. On va dans la direction ayant la distance la plus petite vers le prochain arrêt
+        Voie=Voie->v(DirSvt); // 1. On va dans la direction ayant la distance la plus petite vers le prochain arrÃªt
         Voie->LigneBus[i]=true; // 2. On marque la ligne sur cette case
        }
       while(!Voie->EstTeteArretBus(NumArretSvt));
@@ -3725,7 +3725,7 @@ void centre_ville::CalculeTrajetLignesBus() // v3.0.3
  }
 //-----------------------------------------------------------------------------
 void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
- { // InitialiseInfosTrajetLignesTram doit avoir été lancé avant pour mettre les voie::LigneTram[i] à false
+ { // InitialiseInfosTrajetLignesTram doit avoir Ã©tÃ© lancÃ© avant pour mettre les voie::LigneTram[i] Ã  false
   int i, j, dp, ndp, DistArretTram, DistCrt, NumArretSvt;
   direction DirCrt, DirPrc, // v3.8
             DirSvt;
@@ -3743,7 +3743,7 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
         DistArretTram=0x7FFFFFFF;
         DirSvt=indefinie;
         ndp=Voie->NbDirPossSensVoieTram(indefinie); // v3.8. DistArretTram travaille dans toutes les directions !
-        for(dp=0; dp<ndp; dp++)  // donc il faut alors regarder si la direction courante est accessible depuis d'où l'on vient !
+        for(dp=0; dp<ndp; dp++)  // donc il faut alors regarder si la direction courante est accessible depuis d'oÃ¹ l'on vient !
          if (Voie->EstDirPossSensVoieTram(InvDir[DirPrc], DirCrt=Voie->DirSensVoieTram(indefinie, dp)))
           {
            DistCrt=Voie->DistArretTram[NumArretSvt-1][dp];
@@ -3753,14 +3753,14 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
              DirSvt=DirCrt; // v3.8
             }
           }
-        Voie=Voie->v(DirPrc=DirSvt); // 1. On va dans la direction ayant la distance la plus petite vers le prochain arrêt. v3.8 (DirPrc)
+        Voie=Voie->v(DirPrc=DirSvt); // 1. On va dans la direction ayant la distance la plus petite vers le prochain arrÃªt. v3.8 (DirPrc)
         Voie->LigneTram[i]=true; // 2. On marque la ligne sur cette case
        }
       while(!Voie->EstTeteArretTram(NumArretSvt));
      }
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 : inclut également celui des arrêts de bus et tram. v3.6... Et des files de taxi
+bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 : inclut Ã©galement celui des arrÃªts de bus et tram. v3.6... Et des files de taxi
  {
   bool Ok=true;
   int i, j, k, d, ndp;
@@ -3817,7 +3817,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
   return Ok;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::PrepareCalculDistances() // v3.0 : inclut également celui des arrêts de bus/tram. v3.6 ...Et des files de taxis
+bool centre_ville::PrepareCalculDistances() // v3.0 : inclut Ã©galement celui des arrÃªts de bus/tram. v3.6 ...Et des files de taxis
  {
   bool Ok=true;
   int i, j;
@@ -3905,7 +3905,7 @@ void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
   bus *b=Bus+NumBus-1;
   if (b->Defini()&&b->DirDrnDepl)
    {
-    _V(b->x,b->y,InvDir[b->DirDrnDepl]).NumBus=0; // Effacé de la case d'origine (arrière du bus)
+    _V(b->x,b->y,InvDir[b->DirDrnDepl]).NumBus=0; // EffacÃ© de la case d'origine (arriÃ¨re du bus)
     _V(b->x,b->y,InvDir[b->DirDrnDepl]).RedessineCase(false);
    }
   b->DirAvtDrnDepl=b->DirDrnDepl;
@@ -3928,7 +3928,7 @@ void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
    b->NbCasesParcouruesDepuisDrnArret++;
   b->NbCasesParcourues++;
   b->TourDrnDepl=TourCrt;
-  // On ne dessine pas l'arrière du bus car ils peuvent sortir du dépôt (contrairement aux trams).
+  // On ne dessine pas l'arriÃ¨re du bus car ils peuvent sortir du dÃ©pÃ´t (contrairement aux trams).
   v[x][y].NumBus=NumBus;
   _V(x,y,InvDir[b->DirDrnDepl]).RedessineCase(false);
   v[x][y].RedessineCase(false);
@@ -3939,7 +3939,7 @@ void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
   tram *t=Tram+NumTram-1;
   if (t->Defini()&&t->DirDrnDepl)
    {
-    _V(t->x,t->y,InvDir[t->DirDrnDepl]).NumTram=0; // Effacé de la case d'origine (arrière du tram)
+    _V(t->x,t->y,InvDir[t->DirDrnDepl]).NumTram=0; // EffacÃ© de la case d'origine (arriÃ¨re du tram)
     _V(t->x,t->y,InvDir[t->DirDrnDepl]).RedessineCase(false);
    }
   t->DirAvtDrnDepl=t->DirDrnDepl;
@@ -3993,7 +3993,7 @@ void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
                    break;
     case stRetour:  if ((NumPlace=v[x][y].NumPlaceTaxi)&& // Si c'est une place de taxi
                         (PlaceTaxi[NumPlace-1].NumFile==t->NumFile)&& // de la file du taxi ET
-                        PlaceTaxi[NumPlace-1].EstTeteFile()) // c'est la tête de file ALORS
+                        PlaceTaxi[NumPlace-1].EstTeteFile()) // c'est la tÃªte de file ALORS
                      {
                       t->Situation=stAttente;
                       t->TourRetourDrnCourse=TourCrt;
@@ -4017,7 +4017,7 @@ void centre_ville::DefinitTram(int NumTram, int NumLigne) // v3.5
 bool centre_ville::PrepareBus() // v3.0
  {
   int i, NbBusADefinir=0, NumLigneCrt=0;
-  // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts
+  // On dÃ©finit 1 bus de 1 Ã  3 arrÃªts. 2 bus de 4 Ã  6 arrÃªts et 3 bus de 7 Ã  9 arrÃªts
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
    if (LigneBus[i].NbArrets)
     NbBusADefinir+=1+(LigneBus[i].NbArrets-1)/3;
@@ -4039,7 +4039,7 @@ bool centre_ville::PrepareTrams() // v3.5
   int i, j, x, y, NbTramsADefinir=0, NumLigneCrt=0, NumArret, NumProchArret, dp, DistProchArret;
   bool ArretTrv;
   voie *Voie;
-  // On définit 1 tram de 1 à 3 arrêts. 2 tram de 4 à 6 arrêts et 3 tram de 7 à 9 arrêts
+  // On dÃ©finit 1 tram de 1 Ã  3 arrÃªts. 2 tram de 4 Ã  6 arrÃªts et 3 tram de 7 Ã  9 arrÃªts
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
    if (LigneTram[i].NbArrets)
     NbTramsADefinir+=1+(LigneTram[i].NbArrets-1)/3;
@@ -4053,11 +4053,11 @@ bool centre_ville::PrepareTrams() // v3.5
     DefinitTram(i+1, NumLigneCrt+1);
     NumLigneCrt=(NumLigneCrt+1)%NBMAXLIGNESBUSTRAM;
    }
-  // On place les trams sur les arrêts...
+  // On place les trams sur les arrÃªts...
   for(ArretTrv=true,i=0; (ArretTrv)&&(i<NbTrams); i++)
    {
     for(ArretTrv=false,j=0; (!ArretTrv)&&(j<LigneTram[Tram[i].NumLigne-1].NbArrets); j++)
-     { // Pour chaque tram, on cherche le premier arrêt libre dans l'ordre de leur ligne respective
+     { // Pour chaque tram, on cherche le premier arrÃªt libre dans l'ordre de leur ligne respective
       NumArret=LigneTram[Tram[i].NumLigne-1].NumArret[j];
       NumProchArret=LigneTram[Tram[i].NumLigne-1].NumArret[(j+1)%LigneTram[Tram[i].NumLigne-1].NbArrets];
       ArretTrv= ArretTram[NumArret-1].Defini()&&
@@ -4083,8 +4083,8 @@ bool centre_ville::PrepareTrams() // v3.5
   if (!ArretTrv)
    {
     AfficheMessage( "\n\
-Il n'est pas possible de placer tous les trams sur un arrêt de leur ligne respective !\n\
-Réorganisez votre réseau de trams (les lignes ou les arrêts) pour que le réseau puisse démarrer, puis réessayez !",
+Il n'est pas possible de placer tous les trams sur un arrÃªt de leur ligne respective !\n\
+RÃ©organisez votre rÃ©seau de trams (les lignes ou les arrÃªts) pour que le rÃ©seau puisse dÃ©marrer, puis rÃ©essayez !",
                     "Impossible de placer les trams", tmAvertissement, 0, 0);
     return false;
    }
@@ -4129,9 +4129,9 @@ void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) // v2
   Pieton[NumPieton].DemiCasesParcourues++; // v3.0
   if (Pieton[NumPieton].Dir!=d) Pieton[NumPieton].Dir=d;
   Pieton[NumPieton].TourDrnDepl=TourCrt;
-  if (Pieton[NumPieton].PsgPtTrv&&   // Si le piéton se dirige vers un passage piéton ET
-      v[x][y].PassagePietons)        // Si le passage piéton est trouvé ALORS
-   Pieton[NumPieton].PsgPtTrv=false; // On réactive les recherches de passages piétons
+  if (Pieton[NumPieton].PsgPtTrv&&   // Si le piÃ©ton se dirige vers un passage piÃ©ton ET
+      v[x][y].PassagePietons)        // Si le passage piÃ©ton est trouvÃ© ALORS
+   Pieton[NumPieton].PsgPtTrv=false; // On rÃ©active les recherches de passages piÃ©tons
   v[x][y].AjoutePieton(NumPieton);
   frmSimulation->RedessineCase(x, y, false);
  }
@@ -4153,10 +4153,10 @@ bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENT
   else return false;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arrêts de bus. v3.5... Et des trams ! v3.6... Et des files de taxis !
+void centre_ville::CalculeDistances() // v3.0 : inclut Ã©galement celles des arrÃªts de bus. v3.5... Et des trams ! v3.6... Et des files de taxis !
  {
   int i;
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux étapes...";
+  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux Ã©tapes...";
   frmSimulation->StatusBar->Repaint();
   for(i=0; i<NbEtapes; i++)
    {
@@ -4166,7 +4166,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arrê
      v[Etape[i].x][Etape[i].y].CalculeDistanceEtape(i, 0, 0, indefinie);
    }
   // v3.0
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrêts de bus...";
+  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrÃªts de bus...";
   frmSimulation->StatusBar->Repaint();
   for(i=0; i<NbArretsBus; i++)
    {
@@ -4176,7 +4176,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arrê
      v[ArretBus[i].x][ArretBus[i].y].CalculeDistanceArretBus(i, 0, indefinie);
    }
   // v3.5
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrêts de tram...";
+  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrÃªts de tram...";
   frmSimulation->StatusBar->Repaint();
   for(i=0; i<NbArretsTram; i++)
    {
@@ -4219,18 +4219,18 @@ void __fastcall centre_ville::EffectueTourSimulation()
     RessuscitePietons();
     frmSimulation->ResurrectionDemandee=false;
    }
-  // 0. On déplace les piétons
+  // 0. On dÃ©place les piÃ©tons
   for(i=0; i<NbX; i++)
    for(j=0; j<NbY; j++)
     if (v[i][j].NbPietons)
      v[i][j].DeplacePietons();
 
-  // 1. On calcule les priorités de passage sur chaque case de la voie
+  // 1. On calcule les prioritÃ©s de passage sur chaque case de la voie
   for(i=0; i<NbX; i++)
    for(j=0; j<NbY; j++)
     v[i][j].CalculeProchainVehiculeOuBusOuTramOuTaxi();
 
-  // 2. On déplace les véhicules
+  // 2. On dÃ©place les vÃ©hicules
   for(i=0; i<NbX; i++)
    for(j=0; j<NbY; j++)
     v[i][j].DeplaceVehiculeOuBusOuTramOuTaxi();
@@ -4239,43 +4239,43 @@ void __fastcall centre_ville::EffectueTourSimulation()
   for(i=0; i<NbFeux; i++) Feu[i].Evolue();
   for(i=0; i<NbFeux; i++) Feu[i].ChangeEtat();
 
-  // 4. On sort les voitures des étapes sur la voie
+  // 4. On sort les voitures des Ã©tapes sur la voie
   for(i=0; i<NbEtapes; i++)
    Etape[i].PlaceProchainVehicule();
-  // 4bis. Ainsi que les bus du dépôt. v3.0
+  // 4bis. Ainsi que les bus du dÃ©pÃ´t. v3.0
   DepotBus.PlaceProchainBus();
 
-  // 5a. On calcule la prochaine direction de chaque véhicule
+  // 5a. On calcule la prochaine direction de chaque vÃ©hicule
   for(i=0; i<NbVehicules; i++)
    if (Vehicule[i].Defini())
-    Vehicule[i].CalculeProchaineDirection(); // Vehicule[i].Dir défini
+    Vehicule[i].CalculeProchaineDirection(); // Vehicule[i].Dir dÃ©fini
   // 5b. Ainsi que celle des bus. v3.0
   for(i=0; i<NbBus; i++)
    if (Bus[i].Defini())
-    Bus[i].CalculeProchaineDirection(); // Bus[i].Dir défini
+    Bus[i].CalculeProchaineDirection(); // Bus[i].Dir dÃ©fini
   // 5c. Ainsi que celle des trams. v3.5
   for(i=0; i<NbTrams; i++)
    if (Tram[i].Defini())
-    Tram[i].CalculeProchaineDirection(); // Tram[i].Dir défini
+    Tram[i].CalculeProchaineDirection(); // Tram[i].Dir dÃ©fini
   // 5d. Ainsi que celle des taxis. v3.6
   for(i=0; i<NbTaxis; i++)
-   Taxi[i].CalculeProchaineDirection(); // Taxi[i].Dir défini
+   Taxi[i].CalculeProchaineDirection(); // Taxi[i].Dir dÃ©fini
 
-  // 6a. On rafraîchit les véhicules (la direction a pu changé)
+  // 6a. On rafraÃ®chit les vÃ©hicules (la direction a pu changÃ©)
   for(i=0; i<2*NbEtapes; i++)
    if (Vehicule[i*(NbVehicules/NbEtapes/2)].Defini())
     frmSimulation->RedessineCase( Vehicule[i*(NbVehicules/NbEtapes/2)].x,
                                   Vehicule[i*(NbVehicules/NbEtapes/2)].y,
                                   false);
-  // 6b. Et les bus (la direction a pu changé). v3.0
+  // 6b. Et les bus (la direction a pu changÃ©). v3.0
   for(i=0; i<NbBus; i++)
    if (Bus[i].Defini())
     frmSimulation->RedessineCase( Bus[i].x, Bus[i].y, false);
-  // 6c. Et les trams (la direction a pu changé). v3.5
+  // 6c. Et les trams (la direction a pu changÃ©). v3.5
   for(i=0; i<NbTrams; i++)
    if (Tram[i].Defini())
     frmSimulation->RedessineCase( Tram[i].x, Tram[i].y, false);
-  // 6d. Et les taxis (la direction a pu changé). v3.6
+  // 6d. Et les taxis (la direction a pu changÃ©). v3.6
   for(i=0; i<NbTaxis; i++)
    frmSimulation->RedessineCase( Taxi[i].x, Taxi[i].y, false);
 
@@ -4313,13 +4313,13 @@ bool centre_ville::Charge(int hfile)
   NbPietons=-1;
   Ok=FileRead(hfile, &NbFeux, sizeof(NbFeux));
   if (NbFeux>=VERSIONMIN) // v3.0
-   { // Version stockée
+   { // Version stockÃ©e
     VersionFichier=NbFeux;
     Ok=FileRead(hfile, &NbFeux, sizeof(NbFeux)); // On relit le nombre de feux
    }
-  else // Version non stockée compatible (2.0 <= version < 3.0)
+  else // Version non stockÃ©e compatible (2.0 <= version < 3.0)
    VersionFichier=VERSIONANC;
-  if (VersionFichier>VERSION) return false; // v3.5 : n'ouvre pas les fichier de simulation générés par une version ultérieure de la version actuelle (format de fichier)
+  if (VersionFichier>VERSION) return false; // v3.5 : n'ouvre pas les fichier de simulation gÃ©nÃ©rÃ©s par une version ultÃ©rieure de la version actuelle (format de fichier)
   if (VersionFichier<0x400) // On charge les dimensions de la zone
    {
     NbX=NBXDEF;
@@ -4387,7 +4387,7 @@ bool centre_ville::Charge(int hfile)
   if (Vehicule) { delete[] Vehicule; Vehicule=NULL; }
   if (Pieton) { delete[] Pieton; Pieton=NULL; }
   if (VersionFichier>=0x300) // v3.0
-   { // Dépot, arrêts et lignes de bus
+   { // DÃ©pot, arrÃªts et lignes de bus
     Ok=DepotBus.Charge(hfile);
     if (Ok&&NbArretsBus&&(Ok=!!(ArretBus=new arret_bus[(ParamsInchanges&&(SvgNbArretsBus>NbArretsBus))?SvgNbArretsBus:NbArretsBus])))
      for(i=0; Ok&&(i<NbArretsBus); i++)
@@ -4403,7 +4403,7 @@ bool centre_ville::Charge(int hfile)
       }
    }
   if (VersionFichier>=0x350) // v3.5
-   { // Arrêts et lignes de tram
+   { // ArrÃªts et lignes de tram
     if (Ok&&NbArretsTram&&(Ok=!!(ArretTram=new arret_tram[(ParamsInchanges&&(SvgNbArretsTram>NbArretsTram))?SvgNbArretsTram:NbArretsTram])))
      for(i=0; Ok&&(i<NbArretsTram); i++)
       {
@@ -4429,7 +4429,7 @@ bool centre_ville::Charge(int hfile)
   for(i=0; Ok&&(i<NbX); i++)
    for(j=0; Ok&&(j<NbY); j++)
     Ok=v[i][j].Charge(hfile);
-  if (NbPietons==-1) NbPietons=0; // Si version sans piétons alors pas de piéton !
+  if (NbPietons==-1) NbPietons=0; // Si version sans piÃ©tons alors pas de piÃ©ton !
   if (ParamsInchanges)
    {
     if (SvgNbFeux>NbFeux) NbFeux=SvgNbFeux;
@@ -4515,25 +4515,25 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
   if (NbFeux<0)
    asMsgErr+=Format("Le nombre de feux est incorrect (%d)\n", ARRAYOFCONST((NbFeux)));
   if (NbEtapes<2)
-   asMsgErr+=Format("Le nombre d'étapes est incorrect (%d)\n", ARRAYOFCONST((NbEtapes)));
+   asMsgErr+=Format("Le nombre d'Ã©tapes est incorrect (%d)\n", ARRAYOFCONST((NbEtapes)));
   if (NbVehicules<=0)
-   asMsgErr+=Format("Le nombre de véhicules est incorrect (%d)\n", ARRAYOFCONST((NbVehicules)));
+   asMsgErr+=Format("Le nombre de vÃ©hicules est incorrect (%d)\n", ARRAYOFCONST((NbVehicules)));
   else
    if ((NbVehicules<NBMAXVEHICULES)&&
        ((!NbEtapes)||
         (NbEtapes==1)||
         (NbVehicules%(NbEtapes*(NbEtapes-1)))))
-    asMsgErr+=Format("Le nombre de véhicules ne permet pas une simulation équilibrée (%d)\n", ARRAYOFCONST((NbVehicules)));
+    asMsgErr+=Format("Le nombre de vÃ©hicules ne permet pas une simulation Ã©quilibrÃ©e (%d)\n", ARRAYOFCONST((NbVehicules)));
   if (NbPietons<0)
-   asMsgErr+=Format("Le nombre de piétons est incorrect (%d)\n", ARRAYOFCONST((NbPietons)));
+   asMsgErr+=Format("Le nombre de piÃ©tons est incorrect (%d)\n", ARRAYOFCONST((NbPietons)));
   if (DureeVert<0)
-   asMsgErr+=Format("La durée du feu vert par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
+   asMsgErr+=Format("La durÃ©e du feu vert par dÃ©faut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
   if (DureeOrange<0)
-   asMsgErr+=Format("La durée du feu orange est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
+   asMsgErr+=Format("La durÃ©e du feu orange est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
   if (DureeRouge<0)
-   asMsgErr+=Format("La durée du feu rouge par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
+   asMsgErr+=Format("La durÃ©e du feu rouge par dÃ©faut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
   if (AttenteMaxVeh<0)
-   asMsgErr+=AnsiString("La durée d'attente maximale d'un véhicule est incorrecte\n");
+   asMsgErr+=AnsiString("La durÃ©e d'attente maximale d'un vÃ©hicule est incorrecte\n");
   if (NbToursParSeconde<0)
    asMsgErr+=AnsiString("Le nombre de tours par seconde est incorrect\n");
   if (NbToursStats<0)
@@ -4543,15 +4543,15 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
   if ((NbVitesses<1)||(NbVitesses>3))
    asMsgErr+=Format("Le nombre de vitesses est incorrecte (%d)\n", ARRAYOFCONST((NbVitesses)));
   if ((NbMaxCasesDetectPsgPt<0)||(NbMaxCasesDetectPsgPt>5))
-   asMsgErr+=Format("Le nombre de case maximum pour la détection de passage piétons est incorrect (%d)\n", ARRAYOFCONST((NbMaxCasesDetectPsgPt)));
+   asMsgErr+=Format("Le nombre de case maximum pour la dÃ©tection de passage piÃ©tons est incorrect (%d)\n", ARRAYOFCONST((NbMaxCasesDetectPsgPt)));
   if ((ProbaDirPsgPt<0)||(ProbaDirPsgPt>100))
-   asMsgErr+=Format("La probabilité qu'un piéton se dirige vers un passage piétons détecté est incorrecte (%d)\n", ARRAYOFCONST((ProbaDirPsgPt)));
+   asMsgErr+=Format("La probabilitÃ© qu'un piÃ©ton se dirige vers un passage piÃ©tons dÃ©tectÃ© est incorrecte (%d)\n", ARRAYOFCONST((ProbaDirPsgPt)));
   if (NbArretsBus<0)
-   asMsgErr+=Format("Le nombre d'arrêts de bus est incorrect (%d)\n", ARRAYOFCONST((NbArretsBus)));
+   asMsgErr+=Format("Le nombre d'arrÃªts de bus est incorrect (%d)\n", ARRAYOFCONST((NbArretsBus)));
   if (NbLignesBus<0)
    asMsgErr+=Format("Le nombre de lignes de bus est incorrect (%d)\n", ARRAYOFCONST((NbLignesBus)));
   if (NbArretsTram<0)
-   asMsgErr+=Format("Le nombre d'arrêts de tram est incorrect (%d)\n", ARRAYOFCONST((NbArretsTram)));
+   asMsgErr+=Format("Le nombre d'arrÃªts de tram est incorrect (%d)\n", ARRAYOFCONST((NbArretsTram)));
   if (NbLignesTram<0)
    asMsgErr+=Format("Le nombre de lignes de tram est incorrect (%d)\n", ARRAYOFCONST((NbLignesTram)));
   if (NbPlacesTaxi<0)
@@ -4563,7 +4563,7 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
    for(j=0; j<NbY; j++)
     v[i][j].Verifie(asMsgErr);
   for(i=0; i<NbFeux; i++)
-   Feu[i].Verifie(asMsgErr, Format("Feu n°%d", ARRAYOFCONST((i+1))));
+   Feu[i].Verifie(asMsgErr, Format("Feu nÂ°%d", ARRAYOFCONST((i+1))));
   for(i=0; i<NbEtapes; i++)
    Etape[i].Verifie(asMsgErr);
   if (Vehicule)
@@ -4643,21 +4643,21 @@ bool centre_ville::CopieValide() // v4.2.1
   AnsiString asMsg;
   for(int i=0; i<NbEtapes; i++)
    if (Etape[i].Definie()&&(!DansSelectionEnCours(Etape+i)))
-    asMsg=asMsg+"l'étape n°"+IntToStr(i+1)+" "+asCoordonnees(Etape+i)+", ";
+    asMsg=asMsg+"l'Ã©tape nÂ°"+IntToStr(i+1)+" "+asCoordonnees(Etape+i)+", ";
   if (DepotBus.Defini()&&(!DansSelectionEnCours(&DepotBus)))
-   asMsg=asMsg+"le dépôt de bus n°"+asCoordonnees(&DepotBus)+", ";
+   asMsg=asMsg+"le dÃ©pÃ´t de bus nÂ°"+asCoordonnees(&DepotBus)+", ";
   for(int i=0; i<NbFeux; i++)
    if (Feu[i].Defini()&&(!DansSelectionEnCours(Feu+i)))
-    asMsg=asMsg+"le feu n°"+IntToStr(i+1)+" "+asCoordonnees(Feu+i)+", ";
+    asMsg=asMsg+"le feu nÂ°"+IntToStr(i+1)+" "+asCoordonnees(Feu+i)+", ";
   for(int i=0; i<NbArretsBus; i++)
    if (ArretBus[i].Defini()&&(!DansSelectionEnCours(ArretBus+i)))
-    asMsg=asMsg+"l'arrêt de bus n°"+IntToStr(i+1)+" "+asCoordonnees(ArretBus+i)+", ";
+    asMsg=asMsg+"l'arrÃªt de bus nÂ°"+IntToStr(i+1)+" "+asCoordonnees(ArretBus+i)+", ";
   for(int i=0; i<NbPlacesTaxi; i++)
    if (PlaceTaxi[i].Definie()&&(!DansSelectionEnCours(PlaceTaxi+i)))
-    asMsg=asMsg+"la place de taxi n°"+IntToStr(i+1)+" "+asCoordonnees(PlaceTaxi+i)+", ";
+    asMsg=asMsg+"la place de taxi nÂ°"+IntToStr(i+1)+" "+asCoordonnees(PlaceTaxi+i)+", ";
   if (!asMsg.IsEmpty())
    {
-    AfficheMessage("Les éléments suivants DOIVENT ÊTRE dans la sélection :\n"+asMsg+"\n\nVeuillez soit les supprimer, soit les inclure dans la sélection avant de réessayer.", "Commande de copie impossible", tmAvertissement, 0, 0);
+    AfficheMessage("Les Ã©lÃ©ments suivants DOIVENT ÃŠTRE dans la sÃ©lection :\n"+asMsg+"\n\nVeuillez soit les supprimer, soit les inclure dans la sÃ©lection avant de rÃ©essayer.", "Commande de copie impossible", tmAvertissement, 0, 0);
     return false;
    }
   else
@@ -4665,51 +4665,51 @@ bool centre_ville::CopieValide() // v4.2.1
  }
 //-----------------------------------------------------------------------------
 void centre_ville::Genere(int x, int y, int d) // v4.2
- { // ATTENTION : d peut changer à l'intérieur de Genere(...)
+ { // ATTENTION : d peut changer Ã  l'intÃ©rieur de Genere(...)
   int k=0;
   bool Ok=true,
        DejaFait[NBDIR+1]={false,false,false,false,false},
        AutreDirection=false;
   do
-   { /* LE CODE EN COMMENTAIRE sert pour le débogage
+   { /* LE CODE EN COMMENTAIRE sert pour le dÃ©bogage
     frmSimulation->DrawGridSimul->Col=x;
     frmSimulation->DrawGridSimul->Row=y;
     frmSimulation->RedessineCase(x,y,true); */
     int l=1+(LgrMinSgmtRoute*((d-1)%2?NbX:NbY))/10+ // Longueur du nouveau segment de route
           rand()%(1+((LgrMaxSgmtRoute-LgrMinSgmtRoute)*((d-1)%2?NbX:NbY))/10);
-    //AfficheMessage("Départ du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
-    bool //MemeDir=false, // pour débogage
-         //TraverseeRoute=true, // pour débogage
+    //AfficheMessage("DÃ©part du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
+    bool //MemeDir=false, // pour dÃ©bogage
+         //TraverseeRoute=true, // pour dÃ©bogage
          DirOpposee=false,
          EntreeIntersection=true;
     for(k=0,Ok=true,AutreDirection=false; Ok&&(k<=l); k++)
      {
       voie *vc=&(_V_(x,y,k,d)); // Case suivante
       Ok=(!(/*MemeDir=*/vc->DirPoss&PossDir[d]))&& // S'il s'agit d'une direction possible = d
-         (!(DirOpposee=vc->DirPoss&InvPossDir[d]))&& // OU une direction opposée à d
+         (!(DirOpposee=vc->DirPoss&InvPossDir[d]))&& // OU une direction opposÃ©e Ã  d
          ((!vc->DirPoss)||
-          (/*TraverseeRoute=*/(ProbaTraverseeRoute>rand()%10))|| // OU une traversée de route refusée, ALORS on NE TRACE pas le segment de route sur la case.
-          (EntreeIntersection=(ProbaEntreeIntersection>rand()%10))); // OU une entrée d'intersection ?
+          (/*TraverseeRoute=*/(ProbaTraverseeRoute>rand()%10))|| // OU une traversÃ©e de route refusÃ©e, ALORS on NE TRACE pas le segment de route sur la case.
+          (EntreeIntersection=(ProbaEntreeIntersection>rand()%10))); // OU une entrÃ©e d'intersection ?
       if (Ok)
        {
-        vc->DirPoss+=PossDir[d]; // On trace la route jusqu'à la case courante
+        vc->DirPoss+=PossDir[d]; // On trace la route jusqu'Ã  la case courante
         //frmSimulation->RedessineCase((x+k*dx[d])%NbX, (y+k*dy[d])%NbY, true);
-        //AfficheMessage("Tracé de segment","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
+        //AfficheMessage("TracÃ© de segment","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
        }
      }
-    if (!Ok) // Le segment N'a PAS été tracé jusqu'au bout
+    if (!Ok) // Le segment N'a PAS Ã©tÃ© tracÃ© jusqu'au bout
      {
-      k--; // On revient sur la case précédente TRACÉE
+      k--; // On revient sur la case prÃ©cÃ©dente TRACÃ‰E
       if (DirOpposee|| // SI direction OPPOSEE,
-          (!EntreeIntersection)) // OU SI arrivée sur une route refusée
-       { // ALORS on part A GAUCHE OU A DROITE (on évite les deux problèmes)
-        //AfficheMessage("DirOpposée||(!EntreeIntersection)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
+          (!EntreeIntersection)) // OU SI arrivÃ©e sur une route refusÃ©e
+       { // ALORS on part A GAUCHE OU A DROITE (on Ã©vite les deux problÃ¨mes)
+        //AfficheMessage("DirOpposÃ©e||(!EntreeIntersection)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
         int dd=1+(d+2*(rand()%2))%NBDIR;
         if (!k)
          DejaFait[dd]=true;
         else
          for(int i=0; i<NBDIR+1; i++) DejaFait[i]=false;
-        if (k||(!DejaFait[dd])) // On teste si on n'a pas déjà fait cette direction sur la même case...
+        if (k||(!DejaFait[dd])) // On teste si on n'a pas dÃ©jÃ  fait cette direction sur la mÃªme case...
          {
           x=(x+k*dx[d])%NbX;
           y=(y+k*dy[d])%NbY;
@@ -4718,13 +4718,13 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
          }
        }
 /*    else
-       AfficheMessage("MêmeDir||(!TraverséeRoute)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
+       AfficheMessage("MÃªmeDir||(!TraversÃ©eRoute)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
 */   }
-    else // Le segment a été tracé jusqu'au bout : MAIS ATTENTION V(x,y,k,d) N'EST PAS TRACÉ !!!
+    else // Le segment a Ã©tÃ© tracÃ© jusqu'au bout : MAIS ATTENTION V(x,y,k,d) N'EST PAS TRACÃ‰ !!!
      {
-      if ((_V_(x,y,k,d).DirPoss&(NESO-InvPossDir[d]))!=NESO-InvPossDir[d]) // peut-on continuer à créer des segments ?
+      if ((_V_(x,y,k,d).DirPoss&(NESO-InvPossDir[d]))!=NESO-InvPossDir[d]) // peut-on continuer Ã  crÃ©er des segments ?
        {
-        if (ProbaSortieIntersection>rand()%10) // Crée-t-on une sortie d'intersection ?
+        if (ProbaSortieIntersection>rand()%10) // CrÃ©e-t-on une sortie d'intersection ?
          {
           //AfficheMessage("SortieIntersection","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
           int dd;

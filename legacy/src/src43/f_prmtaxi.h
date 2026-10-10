@@ -31,7 +31,7 @@
 //---------------------------------------------------------------------------
 class TfrmParamTaxi : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
         TGroupBox *GroupBox;
         TLabel *LabelNbCasesMaxPsgPtn;
         TLabel *Label23;
@@ -58,10 +58,10 @@ __published:	// Composants gérés par l'EDI
         void __fastcall FormShow(TObject *Sender);
         void __fastcall CSpinEditParametresChange(TObject *Sender);
   void __fastcall FormResize(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     bool InitialisationEnCours;
     void AppliqueChoix();
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
         __fastcall TfrmParamTaxi(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

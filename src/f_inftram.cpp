@@ -96,7 +96,7 @@ void TfrmInfosTram::RafraichitInfos()
       DrnArret=&(cv->v[cv->ArretTram[NumDrnArret-1].x][cv->ArretTram[NumDrnArret-1].y]);
      }
     else
-     { // Si pas encore d'arrêt... On prend le premier arrêt de la ligne comme dernier arrêt
+     { // Si pas encore d'arrÃªt... On prend le premier arrÃªt de la ligne comme dernier arrÃªt
       LabelDernierArret->Caption=Format( asFrmNumeroCoordonnees[DRN],
                                          ARRAYOFCONST(( 0,
                                                         cv->ArretTram[0].x,
@@ -155,7 +155,7 @@ void __fastcall TfrmInfosTram::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmInfosTram::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

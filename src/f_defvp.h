@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 class TfrmDefVoiePietons : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TLabel *Label1;
   TLabel *LabelCoordonnees;
   TButton *ButtonOk;
@@ -49,14 +49,14 @@ __published:	// Composants gérés par l'EDI
   void __fastcall SpeedButtonClick(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private:	// Déclarations de l'utilisateur
-    bool FeuExistant[NBDIR]; // Indique lors de l'affichage de la fenêtre, l'existence des feux. Sert à l'annulation (suppression)
+private:	// DÃ©clarations de l'utilisateur
+    bool FeuExistant[NBDIR]; // Indique lors de l'affichage de la fenÃªtre, l'existence des feux. Sert Ã  l'annulation (suppression)
     voie *v;
     int x, y, xfo[NBDIR], yfo[NBDIR];
     TSpeedButton *SpeedButton[NBDIR];
     TImage *Image[NBDIR];
     void DefinitFeu(direction Dir);
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmDefVoiePietons(TComponent* Owner);
     void RafraichitInfos();
     void AppliqueChoix();

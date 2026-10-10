@@ -35,7 +35,7 @@ void TfrmDefVoiePietons::AppliqueChoix()
   AnsiString asMsg;
   frmSimulation->SimulationModifiee=true;
 
-  // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
+  // 1. On supprime les feux si on change de prioritÃ© (et on ferme la fiche DefFeuxPieton)
   for(int d=nord; d<=ouest; d++)
    if (v->NumFeuP[d-1]&&(!SpeedButton[d-1]->Down))
     {
@@ -43,12 +43,12 @@ void TfrmDefVoiePietons::AppliqueChoix()
      if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
     }
 
-  // 2. On met à jour l'accessibilité des boutons et groupes
+  // 2. On met Ã  jour l'accessibilitÃ© des boutons et groupes
   ButtonAppliquer->Enabled=false;
   for(int d=nord; d<=ouest; d++)
    SpeedButton[d-1]->Down=(v->NumFeuP[d-1]>0);
 
-  // 3. On rafraîchit la scène
+  // 3. On rafraÃ®chit la scÃ¨ne
   frmSimulation->RedessineCase(x, y, true);
   for(int d=nord; d<=ouest; d++)
    if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1))
@@ -62,7 +62,7 @@ void TfrmDefVoiePietons::RafraichitInfos()
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
 
-  // On sauvegarde les coordonnées de tous les feux de piétons opposés
+  // On sauvegarde les coordonnÃ©es de tous les feux de piÃ©tons opposÃ©s
   for(int d=nord; d<=ouest; d++)
    if (v->NumFeuP[d-1])
     {
@@ -73,7 +73,7 @@ void TfrmDefVoiePietons::RafraichitInfos()
    else
     xfo[d-1]=yfo[d-1]=-1;
 
-  if (v->SensVoieTram||v->DirPoss) // On teste si présence de voies. Si pas le cas on affiche les priorités Piétons !
+  if (v->SensVoieTram||v->DirPoss) // On teste si prÃ©sence de voies. Si pas le cas on affiche les prioritÃ©s PiÃ©tons !
    {
     frmDefVoiePietons->Hide();
     frmDefVoie->Show();
@@ -86,12 +86,12 @@ void TfrmDefVoiePietons::RafraichitInfos()
     SpeedButton[d-1]->Down=(v->NumFeuP[d-1]>0);
     Image[d-1]->Visible=SpeedButton[d-1]->Enabled;
    }
-  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation implicite donc Appliquer ne peut être actif.
+  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnÃ©es (boÃ®te non modale) => Annulation implicite donc Appliquer ne peut Ãªtre actif.
  }
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefVoiePietons::FormShow(TObject *Sender)
 {
- if (frmDefVoie&&frmDefVoie->Visible) frmDefVoie->Hide(); // Fenêtres non modales exclusives
+ if (frmDefVoie&&frmDefVoie->Visible) frmDefVoie->Hide(); // FenÃªtres non modales exclusives
  frmSimulation->ActionPrioritesPietons->Checked=true;
  RafraichitInfos();
  for(int i=0; i<NBDIR; i++) FeuExistant[i]=(v->NumFeuP[i]>0);
@@ -110,7 +110,7 @@ void __fastcall TfrmDefVoiePietons::ButtonAppliquerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefVoiePietons::ButtonAnnulerClick(TObject *Sender)
 {
- // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
+ // 1. On supprime les feux si on change de prioritÃ© (et on ferme la fiche DefFeuxPieton)
  for(int d=nord; d<=ouest; d++)
   if ((!FeuExistant[d-1])&&v->NumFeuP[d-1])
    {
@@ -118,12 +118,12 @@ void __fastcall TfrmDefVoiePietons::ButtonAnnulerClick(TObject *Sender)
     if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
    }
 
- // 2. On met à jour l'accessibilité des boutons et groupes
+ // 2. On met Ã  jour l'accessibilitÃ© des boutons et groupes
  ButtonAppliquer->Enabled=false;
  for(int d=nord; d<=ouest; d++)
   SpeedButton[d-1]->Down=(v->NumFeuP[d-1]>0);
 
- // 3. On rafraîchit la scène
+ // 3. On rafraÃ®chit la scÃ¨ne
  frmSimulation->RedessineCase(x, y, true);
  for(int d=nord; d<=ouest; d++)
   if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1))
@@ -171,8 +171,8 @@ void __fastcall TfrmDefVoiePietons::SpeedButtonClick(TObject *Sender)
    else
     {
      AfficheMessage("\
-Impossible de définir un feu de piétons ici car le passage piétons est un cul de sac et le feu piétons opposé ne peut être placé.\n\n\
-Placez un trottoir à l'extrémité du passage piétons puis réessayez.", asTitreCV, tmErreur, 0, 0);
+Impossible de dÃ©finir un feu de piÃ©tons ici car le passage piÃ©tons est un cul de sac et le feu piÃ©tons opposÃ© ne peut Ãªtre placÃ©.\n\n\
+Placez un trottoir Ã  l'extrÃ©mitÃ© du passage piÃ©tons puis rÃ©essayez.", asTitreCV, tmErreur, 0, 0);
      SpeedButtonNESO->Down=false;
     }
   }
@@ -188,7 +188,7 @@ Placez un trottoir à l'extrémité du passage piétons puis réessayez.", asTitreCV,
 
 void __fastcall TfrmDefVoiePietons::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

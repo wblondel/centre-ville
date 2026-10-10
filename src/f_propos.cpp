@@ -10,10 +10,10 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-// ATTENTION : LE CHANGEMENT DE VERSION DOIT ÊTRE RÉPERCUTÉ sur :
-// · Le numéro de version dans les paramètres du projet
-// · Le #define VERSION en hexadécimal (simul.h) si le format de fichier a changé
-// · La bitmap ici ImageVersion et la sous-version dans LabelSousVersion
+// ATTENTION : LE CHANGEMENT DE VERSION DOIT ÃŠTRE RÃ‰PERCUTÃ‰ sur :
+// Â· Le numÃ©ro de version dans les paramÃ¨tres du projet
+// Â· Le #define VERSION en hexadÃ©cimal (simul.h) si le format de fichier a changÃ©
+// Â· La bitmap ici ImageVersion et la sous-version dans LabelSousVersion
 //---------------------------------------------------------------------------
 TfrmAPropos *frmAPropos;
 //---------------------------------------------------------------------------
@@ -93,11 +93,11 @@ void __fastcall TfrmAPropos::FormKeyPress(TObject *Sender, char &Key)
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmAPropos::LabelClick(TObject *Sender)
-{ // v5.2.3. : où que l'on clique, ça apparaît + Texte revu
- AppelleAuChaos(); // v5.2.3 : Déplacé ici
- // v5.4 : conversion BCB6>BCBX (Application-> supprimé + String)
+{ // v5.2.3. : oÃ¹ que l'on clique, Ã§a apparaÃ®t + Texte revu
+ AppelleAuChaos(); // v5.2.3 : DÃ©placÃ© ici
+ // v5.4 : conversion BCB6>BCBX (Application-> supprimÃ© + String)
  MessageBoxW(Application->Handle, String("\
-Centre-Ville est sous Licence Publique Générale version 2.0.\n\
+Centre-Ville est sous Licence Publique GÃ©nÃ©rale version 2.0.\n\
 1998-2018, Patrice FOUQUET\n\n\
 Se reporter au fichier licence.txt.\n\
 Centre-Ville est fourni SANS AUCUNE GARANTIE.").w_str(), String("Licence").w_str(), MB_ICONINFORMATION);

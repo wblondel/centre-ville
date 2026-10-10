@@ -20,7 +20,7 @@ TfrmAffDistFilesTaxi *frmAffDistFilesTaxi;
 const AnsiString asDir1[NBDIR+1]={"", "   N", "   E", "   S", "   O"};
 #endif
 #ifdef CV_WINDOWS
-const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+const AnsiString asDir1[NBDIR+1]={"", "   Â­", "   Â®", "   Â¯", "   Â¬"};
 #endif
 //---------------------------------------------------------------------------
 __fastcall TfrmAffDistFilesTaxi::TfrmAffDistFilesTaxi(TComponent* Owner) : TForm(Owner) {}

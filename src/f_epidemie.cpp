@@ -20,7 +20,7 @@ __fastcall TfrmEpidemie::TfrmEpidemie(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall TfrmEpidemie::ButtonOkClick(TObject *Sender)
 {
- // On enregistre les paramètres
+ // On enregistre les paramÃ¨tres
  cv->EpidemieInfectiosite = CSpinEditInfectiosite->Value;
  cv->EpidemieIterationPatientZero = CSpinEditPatientZero->Value;
  cv->EpidemieChargeFatale = CSpinEditChargeViraleFatale->Value;
@@ -36,13 +36,13 @@ void __fastcall TfrmEpidemie::ButtonAideClick(TObject *Sender)
 
 void __fastcall TfrmEpidemie::FormShow(TObject *Sender)
 {
- // On charge les paramètres
- CSpinEditInfectiosite->Value = cv->EpidemieInfectiosite; // Nb tours (100 par défaut)
- CSpinEditPatientZero->Value = cv->EpidemieIterationPatientZero; // Nb piétons (100 par défaut)
- CSpinEditChargeViraleFatale->Value = cv->EpidemieChargeFatale; // en % piétons infectés au bout de la période d'infectiosité (5 par défaut)
- CheckBoxReinfections->Checked = cv->EpidemieReinfections; // v5.4.2 : Si vrai, alors même guéri, un piéton peut être réinfecté, si faux, il ne peut plus l'être (faux par défaut)
+ // On charge les paramÃ¨tres
+ CSpinEditInfectiosite->Value = cv->EpidemieInfectiosite; // Nb tours (100 par dÃ©faut)
+ CSpinEditPatientZero->Value = cv->EpidemieIterationPatientZero; // Nb piÃ©tons (100 par dÃ©faut)
+ CSpinEditChargeViraleFatale->Value = cv->EpidemieChargeFatale; // en % piÃ©tons infectÃ©s au bout de la pÃ©riode d'infectiositÃ© (5 par dÃ©faut)
+ CheckBoxReinfections->Checked = cv->EpidemieReinfections; // v5.4.2 : Si vrai, alors mÃªme guÃ©ri, un piÃ©ton peut Ãªtre rÃ©infectÃ©, si faux, il ne peut plus l'Ãªtre (faux par dÃ©faut)
 
- // On rafraîchit les accès. v5.4.2 : on ne teste plus CheckBoxActiver->Enabled
+ // On rafraÃ®chit les accÃ¨s. v5.4.2 : on ne teste plus CheckBoxActiver->Enabled
  CheckBoxActiver->Checked = frmSimulation->ActionEpidemie->Checked;
  GroupBox->Enabled = CheckBoxActiver->Checked;
  CSpinEditInfectiosite->Enabled = CheckBoxActiver->Checked;

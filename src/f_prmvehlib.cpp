@@ -61,7 +61,7 @@ void __fastcall TfrmParamVehlib::CSpinEditParametresChange(
 //---------------------------------------------------------------------------
 void __fastcall TfrmParamVehlib::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

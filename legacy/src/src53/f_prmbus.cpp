@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 TfrmParamBus *frmParamBus;
 //---------------------------------------------------------------------------
-const AnsiString asOrdre[2]={"ème","er"};
+const AnsiString asOrdre[2]={"Ã¨me","er"};
 //---------------------------------------------------------------------------
 __fastcall TfrmParamBus::TfrmParamBus(TComponent* Owner)
     : TForm(Owner)
@@ -25,7 +25,7 @@ void TfrmParamBus::RafraichitNbBus()
   int i, NbBus=0;
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
    if (cv->LigneBus[i].NbArrets)
-    NbBus+=1+(cv->LigneBus[i].NbArrets-1)/3; // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts
+    NbBus+=1+(cv->LigneBus[i].NbArrets-1)/3; // On dÃ©finit 1 bus de 1 Ã  3 arrÃªts. 2 bus de 4 Ã  6 arrÃªts et 3 bus de 7 Ã  9 arrÃªts
   LabelNbBus->Caption=IntToStr(NbBus);
  }
 //---------------------------------------------------------------------------
@@ -75,8 +75,8 @@ void __fastcall TfrmParamBus::FormShow(TObject *Sender)
   {
    for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
     ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Visible=false;
-   AfficheMessage( "Vous devez poser au moins un arrêt de bus sur le réseau pour pouvoir définir le réseau de lignes de bus.",
-                   "Impossible de paramétrer le réseau de lignes de bus", tmAvertissement, 0, 0);
+   AfficheMessage( "Vous devez poser au moins un arrÃªt de bus sur le rÃ©seau pour pouvoir dÃ©finir le rÃ©seau de lignes de bus.",
+                   "Impossible de paramÃ©trer le rÃ©seau de lignes de bus", tmAvertissement, 0, 0);
   }
  CSpinEditNbMaxPersonnesBus->Value=cv->NbMaxPersonnesBus;
  CSpinEditNbToursStopArretBus->Value=cv->NbToursStopArretBus;
@@ -96,11 +96,11 @@ void __fastcall TfrmParamBus::CSpinEditChange(TObject *Sender)
      AncNumArretBusAMontrer;
  switch(k/10)
   {
-   case 0: // Nombre d'arrêts
+   case 0: // Nombre d'arrÃªts
            for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++)
             ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
            break;
-   default:// N°d'arrêt de bus
+   default:// NÂ°d'arrÃªt de bus
            if ((!n)||(n>cv->NbArretsBus))
             CSpinEdit->Value=0;
            else
@@ -116,7 +116,7 @@ void __fastcall TfrmParamBus::CSpinEditChange(TObject *Sender)
                       [cv->ArretBus[AncNumArretBusAMontrer-1].y].RedessineCasesArretBus(indefinie);
                 }
                NumArretBusAMontrer=CSpinEdit->Value;
-               // On bouge le curseur pour être sûr de voir l'arrêt
+               // On bouge le curseur pour Ãªtre sÃ»r de voir l'arrÃªt
                frmSimulation->DrawGridSimul->Col=cv->ArretBus[NumArretBusAMontrer-1].x;
                frmSimulation->DrawGridSimul->Row=cv->ArretBus[NumArretBusAMontrer-1].y;
               }
@@ -184,7 +184,7 @@ bool TfrmParamBus::AppliqueChoix()
   AnsiString asMsg;
   int i, j;
   TCSpinEdit *CSpinEditNb, *CSpinEditNum;
-  // 1. On vérifie que tous les arrêts sont définis
+  // 1. On vÃ©rifie que tous les arrÃªts sont dÃ©finis
   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
    {
     CSpinEditNb=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
@@ -195,14 +195,14 @@ bool TfrmParamBus::AppliqueChoix()
         CSpinEditNum=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
         if (!CSpinEditNum->Value)
          asMsg= asMsg+
-                Format( " - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
+                Format( " - Le %d%s arrÃªt de la ligne nÂ°%d n'est pas dÃ©fini.\n",
                         ARRAYOFCONST(( j, asOrdre[!(j-1)], i)));
        }
      }
    }
   if (!asMsg.IsEmpty())
    {
-    AfficheMessage( Format("Le réseau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
+    AfficheMessage( Format("Le rÃ©seau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
                     "Impossible de continuer", tmAvertissement, 0, 0);
     return false;
    }
@@ -223,7 +223,7 @@ bool TfrmParamBus::AppliqueChoix()
        }
      }
    }
-  // 3. On valide les autres paramètres
+  // 3. On valide les autres paramÃ¨tres
   cv->NbMaxPersonnesBus=CSpinEditNbMaxPersonnesBus->Value;
   cv->NbToursStopArretBus=CSpinEditNbToursStopArretBus->Value;
   cv->NbMaxCasesDetectArretBus=CSpinEditNbCasesMaxArretBus->Value;
@@ -279,7 +279,7 @@ void __fastcall TfrmParamBus::CheckBoxToutClick(TObject *Sender)
 
 void __fastcall TfrmParamBus::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

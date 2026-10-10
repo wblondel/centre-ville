@@ -21,13 +21,13 @@ enum type_demande {tdRien, tdPause, tdArret};
 enum operation_avant {oaNouveau, oaOuvrir, oaQuitter};
 enum mode_edition {meAucun, meCase, meSelection}; // pour RafraichitBoutonEdition. v3.5
 //---------------------------------------------------------------------------
-// Utilisée dans la classe TfrmSimulation
+// UtilisÃ©e dans la classe TfrmSimulation
 extern const AnsiString asTitreCV;
 //---------------------------------------------------------------------------
 // Classe de la fiche
 class TfrmSimulation : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
   TTimer *TimerSimul;
   TTimer *TimerClignotementLocalisation;
   TTimer *TimerClignotementErreur;
@@ -509,7 +509,7 @@ private:
        RedimensionnementEnCours;
   int xErr, yErr, xDeplFeu, yDeplFeu,
       xCrt, yCrt,
-      xPrc, yPrc; // Détecteurs de direction du curseur. v3.5
+      xPrc, yPrc; // DÃ©tecteurs de direction du curseur. v3.5
   direction DirOrigVoieTram; // v3.5
   AnsiString asNomFichAuto,
              asMsgErr;
@@ -518,7 +518,7 @@ private:
   bool VerifieIntegrite();
   bool VerifieReseau();
   void AfficheMsgInfoNonDisp(const AnsiString asTitre); // v3.7
-  // Définition de la propriété SimulEnCours
+  // DÃ©finition de la propriÃ©tÃ© SimulEnCours
   bool __fastcall SimulEstEnCours() { return SimulEnCours; };
   void __fastcall MarcheArretSimul(bool EnCours)
    {
@@ -566,9 +566,9 @@ private:
     ActionDirectionGauche->Enabled=(!Pause)&&(!EnCours);
     ActionEffacerRoute->Enabled=(!Pause)&&(!EnCours);
     ActionDirectionHautTram->Enabled=(!Pause)&&(!EnCours);
-    ActionDirectionDroiteTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut répété !)
-    ActionDirectionBasTram->Enabled=(!Pause)&&(!EnCours);    // v4.2.2 (Haut répété !)
-    ActionDirectionGaucheTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut répété !)
+    ActionDirectionDroiteTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
+    ActionDirectionBasTram->Enabled=(!Pause)&&(!EnCours);    // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
+    ActionDirectionGaucheTram->Enabled=(!Pause)&&(!EnCours); // v4.2.2 (Haut rÃ©pÃ©tÃ© !)
     ActionEffacerVoieTram->Enabled=(!Pause)&&(!EnCours);
     ActionToutDroit->Enabled=(!Pause)&&(!EnCours);
     ActionPriorites->Enabled=(!Pause)&&(!EnCours);
@@ -582,14 +582,14 @@ private:
     ActionPlaceVehlib->Enabled=(!Pause)&&(!EnCours); // v5.3
     ActionDeplacerFeuSource->Enabled=(!Pause)&&(!EnCours);
     ActionDeplacerFeuDestination->Enabled=(!Pause)&&(!EnCours);
-    // Changement d'échelle en abscisse désactivée pendant la simulation (v3.8.3)
+    // Changement d'Ã©chelle en abscisse dÃ©sactivÃ©e pendant la simulation (v3.8.3)
     ActionStatsAff10Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff20Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff50Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff100Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff200Tours->Enabled=(!Pause)&&(!EnCours);
     ActionStatsAff500Tours->Enabled=(!Pause)&&(!EnCours);
-    // Décors (v4.2.2)
+    // DÃ©cors (v4.2.2)
     ActionNatureTrottoir->Enabled=(!Pause)&&(!EnCours);
     ActionNatureImmeuble->Enabled=(!Pause)&&(!EnCours);
     ActionDecorsArbre->Enabled=(!Pause)&&(!EnCours);

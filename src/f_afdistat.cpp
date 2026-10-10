@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 TfrmAffDistArretsTram *frmAffDistArretsTram;
 //---------------------------------------------------------------------------
-const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+const AnsiString asDir1[NBDIR+1]={"", "   Â­", "   Â®", "   Â¯", "   Â¬"};
 //---------------------------------------------------------------------------
 __fastcall TfrmAffDistArretsTram::TfrmAffDistArretsTram(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
@@ -34,7 +34,7 @@ void TfrmAffDistArretsTram::RafraichitInfos()
   EffaceInfos();
   if (!v->DistArretTram) return;
   NbCases=(NbX=1+v->NbDirPossSensVoieTram(indefinie))*(1+cv->NbArretsTram);
-  Caption="Arrêts tram "+Format(asFormatCoord, ARRAYOFCONST((x, y)));
+  Caption="ArrÃªts tram "+Format(asFormatCoord, ARRAYOFCONST((x, y)));
   for(i=0; i<NbCases; i++)
    {
     if (i)
@@ -63,7 +63,7 @@ void __fastcall TfrmAffDistArretsTram::FormHide(TObject *Sender)
 
 void __fastcall TfrmAffDistArretsTram::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

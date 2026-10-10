@@ -50,7 +50,7 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
   LabelCoordonneesFeuPietonsOppose->Caption=Format("%2.2d, %2.2d",
                                                    ARRAYOFCONST((f->x[f->IFEUOPPDIR(Direction)],
                                                                  f->y[f->IFEUOPPDIR(Direction)])));
-  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation implicite donc Appliquer ne peut être actif.
+  ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnÃ©es (boÃ®te non modale) => Annulation implicite donc Appliquer ne peut Ãªtre actif.
   return true;
  }
 //---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
            EtatFC=inactif,
            EtatCrt;
   bool FeuxFCDifferents=false;
-  // On relève l'état des feux de circulation liés
+  // On relÃ¨ve l'Ã©tat des feux de circulation liÃ©s
 
   for(int i=0; i<NbFeux; i++)
    {
@@ -78,12 +78,12 @@ void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
      if (EtatCrt=cv->Feu[NumFeux[i]-1].Etat)
       FeuxFCDifferents=FeuxFCDifferents||(EtatFC!=EtatCrt);
    }
-  if (!EtatFP) // Si pas d'état, on propose l'état opposé des feux liés
+  if (!EtatFP) // Si pas d'Ã©tat, on propose l'Ã©tat opposÃ© des feux liÃ©s
    if (EtatFC&&(!FeuxFCDifferents))
     if (AfficheMessage("\
-Vous n'avez pas affecté d'état au feu de piétons.\n\
-Voulez-vous affecter le feu par rapport aux feux de circulation liés ?",
-                       "Assistant feu de piétons",
+Vous n'avez pas affectÃ© d'Ã©tat au feu de piÃ©tons.\n\
+Voulez-vous affecter le feu par rapport aux feux de circulation liÃ©s ?",
+                       "Assistant feu de piÃ©tons",
                        tmQuestionNecessaire, 0, 2)==trOui)
      switch(EtatFC)
       {
@@ -100,9 +100,9 @@ Voulez-vous affecter le feu par rapport aux feux de circulation liés ?",
   else
    if (FeuxFCDifferents||(EtatFC!=4-EtatFP))
     if (AfficheMessage("\
-Les feux de circulation liés n'ont pas tous l'état opposé à celui du feu de piéton.\n\
-Voulez-vous affecter l'état opposé à tous les feux de circulation liés ?",
-                       "Assistant feu de piétons",
+Les feux de circulation liÃ©s n'ont pas tous l'Ã©tat opposÃ© Ã  celui du feu de piÃ©ton.\n\
+Voulez-vous affecter l'Ã©tat opposÃ© Ã  tous les feux de circulation liÃ©s ?",
+                       "Assistant feu de piÃ©tons",
                        tmQuestionNecessaire, 0, 2)==trOui)
      {
       for(int i=0; i<NbFeux; i++)
@@ -127,7 +127,7 @@ Voulez-vous affecter l'état opposé à tous les feux de circulation liés ?",
 bool TfrmDefFeuxPietons::AppliqueChoix()
  {
   int i;
-  AnalyseEtatFeux(); // Assistant pour les états de feux (v5.2.1)
+  AnalyseEtatFeux(); // Assistant pour les Ã©tats de feux (v5.2.1)
   frmSimulation->SimulationModifiee=true;
   f->Etat=(etat_feu)(RadioGroupEtat->ItemIndex+(RadioGroupEtat->ItemIndex==2));
   f->TypeDmdVert=(dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
@@ -237,7 +237,7 @@ void __fastcall TfrmDefFeuxPietons::ButtonAideClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmDefFeuxPietons::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

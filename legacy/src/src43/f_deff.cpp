@@ -32,7 +32,7 @@ bool TfrmDefFeux::RafraichitInfos()
   if (!Numero)
    if (!(Numero=cv->AjouteFeu(x, y, Direction)))
     {
-     AfficheMessage( "Vous ne pouvez plus ajouter de feu :\nvous avez dÈj‡ atteint le nombre maximum !",
+     AfficheMessage( "Vous ne pouvez plus ajouter de feu :\nvous avez d√©j√† atteint le nombre maximum !",
                      "Modifications impossibles", tmAvertissement, 0, 0);
      return false;
     }

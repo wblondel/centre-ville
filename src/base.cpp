@@ -84,9 +84,9 @@ const struct { int Numero; const char *szHREF; } // v5.3 : aide type HLP convert
                        {69, "RC"},
                        {70, "MDE"}};
 //---------------------------------------------------------------------------
-// v5.4 : Pour les fichiers créés par Centre-Ville
-//        on utilise le chemin donné par %LocalAppData% pour Windows 7 ou plus
-//        sinon le dossier de l'exécutable
+// v5.4 : Pour les fichiers crÃ©Ã©s par Centre-Ville
+//        on utilise le chemin donnÃ© par %LocalAppData% pour Windows 7 ou plus
+//        sinon le dossier de l'exÃ©cutable
 //---------------------------------------------------------------------------
 String stRepLocalAppData()
  {
@@ -119,7 +119,7 @@ String stRepLocalAppData()
    return stResult;
  }
 //---------------------------------------------------------------------------
-// v5.3. S'active automatiquement au lancement de cvw.exe avec le paramètre ! et génère un fichier cvw.log où se trouve cvw.exe à la fermeture de l'application
+// v5.3. S'active automatiquement au lancement de cvw.exe avec le paramÃ¨tre ! et gÃ©nÃ¨re un fichier cvw.log oÃ¹ se trouve cvw.exe Ã  la fermeture de l'application
 // Usage : DebugEcrit("message");
 bool Debug = false;
 TStringList *slDebug = NULL;
@@ -160,7 +160,7 @@ type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre
    }
  }
 //---------------------------------------------------------------------------
-// v5.4 : procédure privée (base.cpp) pour afficher une page HTML
+// v5.4 : procÃ©dure privÃ©e (base.cpp) pour afficher une page HTML
 //---------------------------------------------------------------------------
 void AffichePageHtml(const String stURL)
  {
@@ -197,7 +197,7 @@ void AfficheAideContextuelle(TForm *Form)
 					 ExtractFilePath(ParamStr(0))+
 					 String("html\\index.html#")+
 					 String(caCorresp[i].szHREF);
-	  AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
+	  AffichePageHtml(stURL); // v5.4 : appel Ã  CreateProcess au lieu de ShellExecute
 	  break;
 	 }
  }
@@ -208,10 +208,10 @@ void AfficheIndexAide(TForm *Form)
   String stURL = String("file:///")+
 				 ExtractFilePath(ParamStr(0))+
 				 String("html\\index.html");
-  AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
+  AffichePageHtml(stURL); // v5.4 : appel Ã  CreateProcess au lieu de ShellExecute
  }
 //---------------------------------------------------------------------------
-void AfficheTutoriel() // v5.4 (appelée par TfrmSimulation::ActionTutorielExecute
+void AfficheTutoriel() // v5.4 (appelÃ©e par TfrmSimulation::ActionTutorielExecute
  {
   String stURL = String("file:///")+
 				 ExtractFilePath(ParamStr(0))+

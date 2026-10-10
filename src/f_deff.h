@@ -14,7 +14,7 @@
 //---------------------------------------------------------------------------
 class TfrmDefFeux : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TLabel *Label1;
     TLabel *LabelCoordonnees;
     TLabel *Label2;
@@ -67,9 +67,9 @@ private:
 public:
     int x, y;
     int NbFeuxDmd, // Nbre de feux demandant le rouge
-        NbFeuxAtt,// Nbre de feux devant être rouge pour que Numero passe au vert
+        NbFeuxAtt,// Nbre de feux devant Ãªtre rouge pour que Numero passe au vert
         *NumFeuxDmd, // Liste des feux demandant le rouge
-        *NumFeuxAtt; // Liste des feux devant être rouge pour que Numero passe au vert
+        *NumFeuxAtt; // Liste des feux devant Ãªtre rouge pour que Numero passe au vert
     direction Direction;
     __fastcall TfrmDefFeux(TComponent* Owner);
     bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouter le feu

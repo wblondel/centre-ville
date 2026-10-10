@@ -194,7 +194,7 @@ uses Math, simul, prmsim_f, simul_f;
 
 {$R *.xfm}
 
-const stOrdre : array [0..1] of String = ('ème', 'er');
+const stOrdre : array [0..1] of String = ('Ã¨me', 'er');
 //---------------------------------------------------------------------------
 procedure TfrmParamBus.RafraichitNbBus;
 var i, NbBus : Integer;
@@ -202,7 +202,7 @@ var i, NbBus : Integer;
   NbBus:=0;
   for i:=0 to NBMAXLIGNESBUS-1 do
    if cv.LignesBus[i].NbArrets>0 then
-    Inc(NbBus, 1+(cv.LignesBus[i].NbArrets-1) div 3); // On a 1 bus pour 1 à 3 arrêts ; 2 pour 4 à 6 et 3 pour 7 à 9.
+    Inc(NbBus, 1+(cv.LignesBus[i].NbArrets-1) div 3); // On a 1 bus pour 1 Ã  3 arrÃªts ; 2 pour 4 Ã  6 et 3 pour 7 Ã  9.
   LabelNbBus.Caption:=IntToStr(NbBus);
  end;
 //---------------------------------------------------------------------------
@@ -257,8 +257,8 @@ begin
    begin
     for i:=1 to NBMAXLIGNESBUS do
      (FindComponent('SpinEdit'+IntToStr(i)) as TSpinEdit).Visible:=false;
-    Application.MessageBox( 'Vous devez poser au moins un arrêt de bus sur le réseau pour pouvoir définir le réseau de lignes de bus.',
-                            'Impossible de paramétrer le réseau de lignes de bus', [smbOk], smsWarning);
+    Application.MessageBox( 'Vous devez poser au moins un arrÃªt de bus sur le rÃ©seau pour pouvoir dÃ©finir le rÃ©seau de lignes de bus.',
+                            'Impossible de paramÃ©trer le rÃ©seau de lignes de bus', [smbOk], smsWarning);
    end;
   SpinEditNbMaxPersonnesBus.Value:=cv.NbMaxPersonnesBus;
   SpinEditNbToursStopArretBus.Value:=cv.NbToursStopArretBus;
@@ -274,7 +274,7 @@ var stMsg : String;
     i, j : Integer;
     SpinEditNb, SpinEditNum : TSpinEdit;
  begin
-  // 1. On vérifie que tous les arrêts sont définis
+  // 1. On vÃ©rifie que tous les arrÃªts sont dÃ©finis
   for i:=1 to NBMAXLIGNESBUS do
    begin
     SpinEditNb:=FindComponent('SpinEdit'+IntToStr(i)) as TSpinEdit;
@@ -285,14 +285,14 @@ var stMsg : String;
         SpinEditNum:=FindComponent('SpinEdit'+IntToStr(10*i+j)) as TSpinEdit;
         if SpinEditNum.Value=0 then
          stMsg:= stMsg+
-                 Format( ' - Le %d%s arrêt de ligne n°%d n''est pas défini.'#13#10,
+                 Format( ' - Le %d%s arrÃªt de ligne nÂ°%d n''est pas dÃ©fini.'#13#10,
                          [j, stOrdre[Ord(j=1)], i]);
        end{for j};
      end;
    end{for i};
   if stMsg<>'' then
    begin
-    Application.MessageBox( 'Le réseau de bus n''est pas correct :'#13#10+stMsg+#13#10'Corrigez avant de continuer.',
+    Application.MessageBox( 'Le rÃ©seau de bus n''est pas correct :'#13#10+stMsg+#13#10'Corrigez avant de continuer.',
                             'Impossible de continuer', [smbOk], smsWarning);
     Result:=false;
     Exit;
@@ -315,7 +315,7 @@ var stMsg : String;
        end{for j};
      end;
    end{for i};
-  // 3. On valide les autres paramètres
+  // 3. On valide les autres paramÃ¨tres
   cv.NbMaxPersonnesBus:=SpinEditNbMaxPersonnesBus.Value;
   cv.NbToursStopArretBus:=SpinEditNbToursStopArretBus.Value;
   cv.NbMaxCasesDetectArretBus:=SpinEditNbCasesMaxArretBus.Value;
@@ -338,7 +338,7 @@ begin
  if k div 10=0 then
   for i:=1 to NBMAXARRETSBUSPARLIGNE do
    (FindComponent('SpinEdit'+IntToStr(10*k+i)) as TSpinEdit).Visible:=(i<=n)
- else  // N° arrêt de bus
+ else  // NÂ° arrÃªt de bus
   if (n=0) or (n>cv.NbArretsBus) then
    SpinEdit.Value:=0
   else
@@ -355,7 +355,7 @@ begin
               cv.ArretsBus[AncNumArretBusAMontrer-1].y].RedessineCasesArretBus(indefinie);
        end;
       NumArretBusAMontrer:=SpinEdit.Value;
-      // On bouge le curseur pour être sûr de voir l'arrêt
+      // On bouge le curseur pour Ãªtre sÃ»r de voir l'arrÃªt
       frmSimulation.DrawGridSimul.Col:=cv.ArretsBus[NumArretBusAMontrer-1].x;
       frmSimulation.DrawGridSimul.Row:=cv.ArretsBus[NumArretBusAMontrer-1].y;
      end;

@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -219,7 +219,7 @@ var e : pEtape;
 begin
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbEtapes) then
  begin
- StatusBar.SimpleText:='Aucune étape définie ou numéro incorrect';
+ StatusBar.SimpleText:='Aucune Ã©tape dÃ©finie ou numÃ©ro incorrect';
  Exit;
  end;
 e:=@(cv.Etapes[NewValue-1]);
@@ -227,10 +227,10 @@ if e.Definie then
  begin
  frmSimulation.DrawGridSimul.Col:=e.x;
  frmSimulation.DrawGridSimul.Row:=e.y;
- StatusBar.SimpleText:=Format('Etape n°%d trouvée en (%d, %d)', [NewValue, e.x, e.y]);
+ StatusBar.SimpleText:=Format('Etape nÂ°%d trouvÃ©e en (%d, %d)', [NewValue, e.x, e.y]);
  end
 else
- StatusBar.SimpleText:=Format('Etape n°%d non utilisée', [NewValue, e.x, e.y]);
+ StatusBar.SimpleText:=Format('Etape nÂ°%d non utilisÃ©e', [NewValue, e.x, e.y]);
 end;
 
 procedure TfrmRecherche.SpinEditFeuChanged(Sender: TObject;
@@ -239,7 +239,7 @@ var f : pFeu;
 begin
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbFeux) then
  begin
- StatusBar.SimpleText:='Aucun feu défini ou numéro incorrect';
+ StatusBar.SimpleText:='Aucun feu dÃ©fini ou numÃ©ro incorrect';
  Exit;
  end;
 f:=@(cv.Feux[NewValue-1]);
@@ -247,10 +247,10 @@ if f.Defini then
  begin
  frmSimulation.DrawGridSimul.Col:=f.x;
  frmSimulation.DrawGridSimul.Row:=f.y;
- StatusBar.SimpleText:=Format('Feu n°%d trouvé en (%d, %d)', [NewValue, f.x, f.y]);
+ StatusBar.SimpleText:=Format('Feu nÂ°%d trouvÃ© en (%d, %d)', [NewValue, f.x, f.y]);
  end
 else
- StatusBar.SimpleText:=Format('Feu n°%d non utilisé', [NewValue]);
+ StatusBar.SimpleText:=Format('Feu nÂ°%d non utilisÃ©', [NewValue]);
 end;
 
 
@@ -260,7 +260,7 @@ var veh : pVehicule;
 begin
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbVehicules) then
  begin
- StatusBar.SimpleText:='Aucun véhicule défini ou numéro incorrect';
+ StatusBar.SimpleText:='Aucun vÃ©hicule dÃ©fini ou numÃ©ro incorrect';
  Exit;
  end;
 veh:=@(cv.Vehicules[NewValue-1]);
@@ -268,10 +268,10 @@ if veh.Defini then
  begin
  frmSimulation.DrawGridSimul.Col:=veh.x;
  frmSimulation.DrawGridSimul.Row:=veh.y;
- StatusBar.SimpleText:=Format('Véhicule n°%d trouvé en (%d, %d)', [NewValue, veh.x, veh.y]);
+ StatusBar.SimpleText:=Format('VÃ©hicule nÂ°%d trouvÃ© en (%d, %d)', [NewValue, veh.x, veh.y]);
  end
 else
- StatusBar.SimpleText:=Format('Véhicule n°%d non utilisé', [NewValue]);
+ StatusBar.SimpleText:=Format('VÃ©hicule nÂ°%d non utilisÃ©', [NewValue]);
 end;
 
 procedure TfrmRecherche.SpinEditPietonChanged(Sender: TObject;
@@ -280,7 +280,7 @@ var p : pPieton;
 begin
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbPietons) then
  begin
- StatusBar.SimpleText:='Aucun piéton défini ou numéro incorrect';
+ StatusBar.SimpleText:='Aucun piÃ©ton dÃ©fini ou numÃ©ro incorrect';
  Exit;
  end;
 p:=@(cv.Pietons[NewValue-1]);
@@ -288,21 +288,21 @@ if p.Defini then
  begin
  frmSimulation.DrawGridSimul.Col:=p.x;
  frmSimulation.DrawGridSimul.Row:=p.y;
- StatusBar.SimpleText:=Format('Piéton n°%d trouvé en (%d, %d)', [NewValue, p.x, p.y]);
+ StatusBar.SimpleText:=Format('PiÃ©ton nÂ°%d trouvÃ© en (%d, %d)', [NewValue, p.x, p.y]);
  end
 else
  if p.NumBus>0 then
   begin
    frmSimulation.DrawGridSimul.Col:=cv.Autobus[p.NumBus-1].x;
    frmSimulation.DrawGridSimul.Row:=cv.Autobus[p.NumBus-1].y;
-   StatusBar.SimpleText:=Format( 'Piéton n°%d trouvé dans le bus n°%d (%d, %d)',
+   StatusBar.SimpleText:=Format( 'PiÃ©ton nÂ°%d trouvÃ© dans le bus nÂ°%d (%d, %d)',
                                  [ NewValue,
                                    p.Numbus,
                                    cv.Autobus[p.NumBus-1].x,
                                    cv.Autobus[p.NumBus-1].y]);
   end
  else
-  StatusBar.SimpleText:=Format('Piéton n°%d non utilisé', [NewValue]);
+  StatusBar.SimpleText:=Format('PiÃ©ton nÂ°%d non utilisÃ©', [NewValue]);
 end;
 
 procedure TfrmRecherche.FormResize(Sender: TObject);
@@ -325,7 +325,7 @@ var b : pBus;
 begin // v3.0
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbBus) then
  begin
- StatusBar.SimpleText:='Aucun bus défini ou numéro incorrect';
+ StatusBar.SimpleText:='Aucun bus dÃ©fini ou numÃ©ro incorrect';
  Exit;
  end;
 b:=@(cv.Autobus[NewValue-1]);
@@ -333,10 +333,10 @@ if b.Defini then
  begin
  frmSimulation.DrawGridSimul.Col:=b.x;
  frmSimulation.DrawGridSimul.Row:=b.y;
- StatusBar.SimpleText:=Format('Bus n°%d trouvé en (%d, %d)', [NewValue, b.x, b.y]);
+ StatusBar.SimpleText:=Format('Bus nÂ°%d trouvÃ© en (%d, %d)', [NewValue, b.x, b.y]);
  end
 else
- StatusBar.SimpleText:=Format('Bus n°%d au dépôt', [NewValue]);
+ StatusBar.SimpleText:=Format('Bus nÂ°%d au dÃ©pÃ´t', [NewValue]);
 end;
 
 procedure TfrmRecherche.SpinEditArretBusChanged(Sender: TObject;
@@ -345,7 +345,7 @@ var ab : pArretBus;
 begin // v3.0
 if (cv=nil) or (NewValue<1) or (NewValue>cv.NbArretsBus) then
  begin
- StatusBar.SimpleText:='Aucun arrêt de bus défini ou numéro incorrect';
+ StatusBar.SimpleText:='Aucun arrÃªt de bus dÃ©fini ou numÃ©ro incorrect';
  Exit;
  end;
 ab:=@(cv.ArretsBus[NewValue-1]);
@@ -353,10 +353,10 @@ if ab.Defini then
  begin
  frmSimulation.DrawGridSimul.Col:=ab.x;
  frmSimulation.DrawGridSimul.Row:=ab.y;
- StatusBar.SimpleText:=Format('Arrêt de bus n°%d trouvé en (%d, %d)', [NewValue, ab.x, ab.y]);
+ StatusBar.SimpleText:=Format('ArrÃªt de bus nÂ°%d trouvÃ© en (%d, %d)', [NewValue, ab.x, ab.y]);
  end
-else // Normalement pas possible car TOUS les arrêts de bus doivent être définis avant de lancer la simulation
- StatusBar.SimpleText:=Format('Arrêt de bus %n°d non utilisé', [NewValue]);
+else // Normalement pas possible car TOUS les arrÃªts de bus doivent Ãªtre dÃ©finis avant de lancer la simulation
+ StatusBar.SimpleText:=Format('ArrÃªt de bus %nÂ°d non utilisÃ©', [NewValue]);
 end;
 
 end.

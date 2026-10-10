@@ -45,7 +45,7 @@
 //---------------------------------------------------------------------------
 class TfrmParamTram : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TGroupBox *GroupBox1;
     TLabel *Label3;
     TLabel *Label2;
@@ -242,12 +242,12 @@ __published:	// Composants gérés par l'EDI
     
     void __fastcall CheckBoxToutClick(TObject *Sender);
   void __fastcall FormResize(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     int NbArretsTram;
     bool InitialisationEnCours;
     void RafraichitNbTrams();
     bool AppliqueChoix();
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     int NumArretTramAMontrer;
     __fastcall TfrmParamTram(TComponent* Owner);
 };

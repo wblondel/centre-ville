@@ -72,7 +72,7 @@ __published:
 private:
     int TempsEcoule;
     TBITMAP *Bitmap;
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     bool FermetureAutomatique;
     __fastcall TfrmAPropos(TComponent* Owner);
 };

@@ -161,7 +161,7 @@ void __fastcall TfrmRecherche::CSpinEditEtapeChange(TObject *Sender)
      (CSpinEditEtape->Value<1)||
      (CSpinEditEtape->Value>cv->NbEtapes))
   {
-   StatusBar->SimpleText="Aucune étape définie ou n° incorrect";
+   StatusBar->SimpleText="Aucune Ã©tape dÃ©finie ou nÂ° incorrect";
    return;
   }
  etape *e=cv->Etape+CSpinEditEtape->Value-1;
@@ -169,10 +169,10 @@ void __fastcall TfrmRecherche::CSpinEditEtapeChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=e->x;
    frmSimulation->DrawGridSimul->Row=e->y;
-   StatusBar->SimpleText=Format("Etape n°%d trouvée en (%d, %d)", ARRAYOFCONST(((int)CSpinEditEtape->Value, e->x, e->y)));
+   StatusBar->SimpleText=Format("Etape nÂ°%d trouvÃ©e en (%d, %d)", ARRAYOFCONST(((int)CSpinEditEtape->Value, e->x, e->y)));
   }
  else
-  StatusBar->SimpleText=Format("Etape n°%d non utilisée", ARRAYOFCONST(((int)CSpinEditEtape->Value)));
+  StatusBar->SimpleText=Format("Etape nÂ°%d non utilisÃ©e", ARRAYOFCONST(((int)CSpinEditEtape->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditFeuChange(TObject *Sender)
@@ -182,7 +182,7 @@ void __fastcall TfrmRecherche::CSpinEditFeuChange(TObject *Sender)
      (CSpinEditFeu->Value<1)||
      (CSpinEditFeu->Value>cv->NbFeux))
   {
-   StatusBar->SimpleText="Aucun feu défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun feu dÃ©fini ou nÂ° incorrect";
    return;
   }
  feu *f=cv->Feu+CSpinEditFeu->Value-1;
@@ -190,10 +190,10 @@ void __fastcall TfrmRecherche::CSpinEditFeuChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=f->x;
    frmSimulation->DrawGridSimul->Row=f->y;
-   StatusBar->SimpleText=Format("Feu n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditFeu->Value, f->x, f->y)));
+   StatusBar->SimpleText=Format("Feu nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditFeu->Value, f->x, f->y)));
   }
  else
-  StatusBar->SimpleText=Format("Feu n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditFeu->Value)));
+  StatusBar->SimpleText=Format("Feu nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditFeu->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditVehiculeChange(TObject *Sender)
@@ -203,7 +203,7 @@ void __fastcall TfrmRecherche::CSpinEditVehiculeChange(TObject *Sender)
      (CSpinEditVehicule->Value<1)||
      (CSpinEditVehicule->Value>cv->NbVehicules))
   {
-   StatusBar->SimpleText="Aucun véhicule défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun vÃ©hicule dÃ©fini ou nÂ° incorrect";
    return;
   }
  vehicule *veh=cv->Vehicule+CSpinEditVehicule->Value-1;
@@ -211,10 +211,10 @@ void __fastcall TfrmRecherche::CSpinEditVehiculeChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=veh->x;
    frmSimulation->DrawGridSimul->Row=veh->y;
-   StatusBar->SimpleText=Format("Véhicule n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditVehicule->Value, veh->x, veh->y)));
+   StatusBar->SimpleText=Format("VÃ©hicule nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditVehicule->Value, veh->x, veh->y)));
   }
  else
-  StatusBar->SimpleText=Format("Véhicule n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditVehicule->Value)));
+  StatusBar->SimpleText=Format("VÃ©hicule nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditVehicule->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
@@ -224,7 +224,7 @@ void __fastcall TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
      (CSpinEditPieton->Value<1)||
      (CSpinEditPieton->Value>cv->NbPietons))
   {
-   StatusBar->SimpleText="Aucun piéton défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun piÃ©ton dÃ©fini ou nÂ° incorrect";
    return;
   }
  pieton *p=cv->Pieton+CSpinEditPieton->Value-1;
@@ -232,21 +232,21 @@ void __fastcall TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=p->x;
    frmSimulation->DrawGridSimul->Row=p->y;
-   StatusBar->SimpleText=Format("Piéton n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPieton->Value, p->x, p->y)));
+   StatusBar->SimpleText=Format("PiÃ©ton nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPieton->Value, p->x, p->y)));
   }
  else
   if (p->NumBus)
    {
     frmSimulation->DrawGridSimul->Col=cv->Bus[p->NumBus-1].x;
     frmSimulation->DrawGridSimul->Row=cv->Bus[p->NumBus-1].y;
-    StatusBar->SimpleText=Format( "Piéton n°%d trouvé dans le bus n°%d (%d, %d)",
+    StatusBar->SimpleText=Format( "PiÃ©ton nÂ°%d trouvÃ© dans le bus nÂ°%d (%d, %d)",
                                   ARRAYOFCONST(( (int)CSpinEditPieton->Value,
                                                  (int)p->NumBus,
                                                  cv->Bus[p->NumBus-1].x,
                                                  cv->Bus[p->NumBus-1].y)));
    }
   else
-   StatusBar->SimpleText=Format("Piéton n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditPieton->Value)));
+   StatusBar->SimpleText=Format("PiÃ©ton nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditPieton->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::ButtonAnnulerClick(TObject *Sender)
@@ -272,7 +272,7 @@ void __fastcall TfrmRecherche::CSpinEditArretBusChange(TObject *Sender)
      (CSpinEditArretBus->Value<1)||
      (CSpinEditArretBus->Value>cv->NbArretsBus))
   {
-   StatusBar->SimpleText="Aucun arrêt de bus défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun arrÃªt de bus dÃ©fini ou nÂ° incorrect";
    return;
   }
  arret_bus *ab=cv->ArretBus+CSpinEditArretBus->Value-1;
@@ -280,10 +280,10 @@ void __fastcall TfrmRecherche::CSpinEditArretBusChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=ab->x;
    frmSimulation->DrawGridSimul->Row=ab->y;
-   StatusBar->SimpleText=Format("Arrêt de bus n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditArretBus->Value, ab->x, ab->y)));
+   StatusBar->SimpleText=Format("ArrÃªt de bus nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditArretBus->Value, ab->x, ab->y)));
   }
- else // Normalement impossible car tous les arrêts de bus doivent être définis avant de lancer la simulation
-  StatusBar->SimpleText=Format("Arrêt de bus n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditArretBus->Value)));
+ else // Normalement impossible car tous les arrÃªts de bus doivent Ãªtre dÃ©finis avant de lancer la simulation
+  StatusBar->SimpleText=Format("ArrÃªt de bus nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditArretBus->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditBusChange(TObject *Sender)
@@ -293,7 +293,7 @@ void __fastcall TfrmRecherche::CSpinEditBusChange(TObject *Sender)
      (CSpinEditBus->Value<1)||
      (CSpinEditBus->Value>cv->NbBus))
   {
-   StatusBar->SimpleText="Aucun bus défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun bus dÃ©fini ou nÂ° incorrect";
    return;
   }
  bus *b=cv->Bus+CSpinEditBus->Value-1;
@@ -301,10 +301,10 @@ void __fastcall TfrmRecherche::CSpinEditBusChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=b->x;
    frmSimulation->DrawGridSimul->Row=b->y;
-   StatusBar->SimpleText=Format("Bus n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditBus->Value, b->x, b->y)));
+   StatusBar->SimpleText=Format("Bus nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditBus->Value, b->x, b->y)));
   }
- else  // Bus encore au dépôt
-  StatusBar->SimpleText=Format("Bus n°%d au dépôt", ARRAYOFCONST(((int)CSpinEditBus->Value)));
+ else  // Bus encore au dÃ©pÃ´t
+  StatusBar->SimpleText=Format("Bus nÂ°%d au dÃ©pÃ´t", ARRAYOFCONST(((int)CSpinEditBus->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditArretTramChange(TObject *Sender)
@@ -314,7 +314,7 @@ void __fastcall TfrmRecherche::CSpinEditArretTramChange(TObject *Sender)
      (CSpinEditArretTram->Value<1)||
      (CSpinEditArretTram->Value>cv->NbArretsTram))
   {
-   StatusBar->SimpleText="Aucun arrêt de tram défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun arrÃªt de tram dÃ©fini ou nÂ° incorrect";
    return;
   }
  arret_tram *at=cv->ArretTram+CSpinEditArretTram->Value-1;
@@ -322,10 +322,10 @@ void __fastcall TfrmRecherche::CSpinEditArretTramChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=at->x;
    frmSimulation->DrawGridSimul->Row=at->y;
-   StatusBar->SimpleText=Format("Arrêt de tram n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditArretTram->Value, at->x, at->y)));
+   StatusBar->SimpleText=Format("ArrÃªt de tram nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditArretTram->Value, at->x, at->y)));
   }
- else // Normalement impossible car tous les arrêts de Tram doivent être définis avant de lancer la simulation
-  StatusBar->SimpleText=Format("Arrêt de tram n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditArretTram->Value)));
+ else // Normalement impossible car tous les arrÃªts de Tram doivent Ãªtre dÃ©finis avant de lancer la simulation
+  StatusBar->SimpleText=Format("ArrÃªt de tram nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditArretTram->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditTramChange(TObject *Sender)
@@ -335,7 +335,7 @@ void __fastcall TfrmRecherche::CSpinEditTramChange(TObject *Sender)
      (CSpinEditTram->Value<1)||
      (CSpinEditTram->Value>cv->NbTrams))
   {
-   StatusBar->SimpleText="Aucun tram défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun tram dÃ©fini ou nÂ° incorrect";
    return;
   }
  tram *t=cv->Tram+CSpinEditTram->Value-1;
@@ -343,10 +343,10 @@ void __fastcall TfrmRecherche::CSpinEditTramChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=t->x;
    frmSimulation->DrawGridSimul->Row=t->y;
-   StatusBar->SimpleText=Format("Tram n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTram->Value, t->x, t->y)));
+   StatusBar->SimpleText=Format("Tram nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTram->Value, t->x, t->y)));
   }
- else  // Tram non encore utilisé
-  StatusBar->SimpleText=Format("Tram n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditTram->Value)));
+ else  // Tram non encore utilisÃ©
+  StatusBar->SimpleText=Format("Tram nÂ°%d non utilisÃ©", ARRAYOFCONST(((int)CSpinEditTram->Value)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditTaxiChange(TObject *Sender)
@@ -356,13 +356,13 @@ void __fastcall TfrmRecherche::CSpinEditTaxiChange(TObject *Sender)
      (CSpinEditTaxi->Value<1)||
      (CSpinEditTaxi->Value>cv->NbTaxis))
   {
-   StatusBar->SimpleText="Aucun taxi défini ou n° incorrect";
+   StatusBar->SimpleText="Aucun taxi dÃ©fini ou nÂ° incorrect";
    return;
   }
  taxi *t=cv->Taxi+CSpinEditTaxi->Value-1;
  frmSimulation->DrawGridSimul->Col=t->x;
  frmSimulation->DrawGridSimul->Row=t->y;
- StatusBar->SimpleText=Format("Taxi n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTaxi->Value, t->x, t->y)));
+ StatusBar->SimpleText=Format("Taxi nÂ°%d trouvÃ© en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTaxi->Value, t->x, t->y)));
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
@@ -372,7 +372,7 @@ void __fastcall TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
      (CSpinEditPlaceTaxi->Value<1)||
      (CSpinEditPlaceTaxi->Value>cv->NbPlacesTaxi))
   {
-   StatusBar->SimpleText="Aucune place taxi définie ou n° incorrect";
+   StatusBar->SimpleText="Aucune place taxi dÃ©finie ou nÂ° incorrect";
    return;
   }
  place_taxi *pt=cv->PlaceTaxi+CSpinEditPlaceTaxi->Value-1;
@@ -380,7 +380,7 @@ void __fastcall TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
   {
    frmSimulation->DrawGridSimul->Col=pt->x;
    frmSimulation->DrawGridSimul->Row=pt->y;
-   StatusBar->SimpleText=Format("Place de taxi n°%d trouvée en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPlaceTaxi->Value, pt->x, pt->y)));
+   StatusBar->SimpleText=Format("Place de taxi nÂ°%d trouvÃ©e en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPlaceTaxi->Value, pt->x, pt->y)));
   }
 }
 //---------------------------------------------------------------------------
@@ -391,13 +391,13 @@ void __fastcall TfrmRecherche::CSpinEditFileTaxiChange(TObject *Sender)
      (CSpinEditFileTaxi->Value<1)||
      (CSpinEditFileTaxi->Value>cv->NbFilesTaxi))
   {
-   StatusBar->SimpleText="Aucune file taxi définie ou n° incorrect";
+   StatusBar->SimpleText="Aucune file taxi dÃ©finie ou nÂ° incorrect";
    return;
   }
  file_taxi *ft=cv->FileTaxi+CSpinEditFileTaxi->Value-1;
  frmSimulation->DrawGridSimul->Col=cv->PlaceTaxi[ft->NumPlaceQueue].x;
  frmSimulation->DrawGridSimul->Row=cv->PlaceTaxi[ft->NumPlaceQueue].y;
- StatusBar->SimpleText=Format( "file taxi n°%d trouvée en (%d, %d)",
+ StatusBar->SimpleText=Format( "file taxi nÂ°%d trouvÃ©e en (%d, %d)",
                                ARRAYOFCONST(( (int)CSpinEditFileTaxi->Value,
                                               cv->PlaceTaxi[ft->NumPlaceQueue].x,
                                               cv->PlaceTaxi[ft->NumPlaceQueue].y)));

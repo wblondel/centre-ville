@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------
 class TfrmParamVehlib : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
         TLabel *Label21;
         TCSpinEdit *CSpinEditNbMaxPersonnesVehlib;
         TLabel *Label22;
@@ -37,10 +37,10 @@ __published:	// Composants gérés par l'EDI
         void __fastcall CSpinEditParametresChange(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private: // Déclarations de l'utilisateur
+private: // DÃ©clarations de l'utilisateur
         bool InitialisationEnCours;
         void AppliqueChoix();
-public:	 // Déclarations de l'utilisateur
+public:	 // DÃ©clarations de l'utilisateur
         __fastcall TfrmParamVehlib(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

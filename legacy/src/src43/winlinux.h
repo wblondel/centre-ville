@@ -5,10 +5,10 @@
 #include "vclx.h"
 //---------------------------------------------------------------------------
 #ifdef CV_WINDOWS
-// Propriétés de TCSpinEdit
+// PropriÃ©tÃ©s de TCSpinEdit
 #define MINVALUE MinValue
 #define MAXVALUE MaxValue
-// Propriétés de TOpen/CloseDialog
+// PropriÃ©tÃ©s de TOpen/CloseDialog
 #define FILENAME(x) ((x)->FileName)
 // Types
 #define TBITMAP Graphics::TBitmap
@@ -18,17 +18,17 @@
 //---------------------------------------------------------------------------
 #ifdef CV_LINUX
 // Hauteur/Largeur de l'espace entre les objets/bord
-// Pour les mesures automatiques de taille de fenêtre (OnResize)
+// Pour les mesures automatiques de taille de fenÃªtre (OnResize)
 #define LH_ESPACE 8
 #define XMAX(x) ((x)->Left+(x)->Width)
 #define YMAX(y) ((y)->Top+(y)->Height)
 #define LMAX(x,y) (max(XMAX(x),XMAX(y)))
 #define HMAX(x,y) (max(YMAX(x),YMAX(y)))
 
-// Propriétés de TSpinEdit
+// PropriÃ©tÃ©s de TSpinEdit
 #define MINVALUE Min
 #define MAXVALUE Max
-// Propriétés de TOpen/CloseDialog
+// PropriÃ©tÃ©s de TOpen/CloseDialog
 #define FILENAME(x) ((AnsiString)((x)->FileName))
 // Type TBitMap
 #define TBITMAP TBitmap

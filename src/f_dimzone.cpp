@@ -62,7 +62,7 @@ void __fastcall TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
  if ((NbX>=NBXMIN)&&(NbY>=NBYMIN))
   ModalResult=mrOk;
  else
-  AfficheMessage( Format( "Vous devez spécifier une zone d'au moins %dx%d.",
+  AfficheMessage( Format( "Vous devez spÃ©cifier une zone d'au moins %dx%d.",
                           ARRAYOFCONST((NBXMIN, NBYMIN))),
                   "Zone insuffisante",
                   tmAvertissement, 0, 0);
@@ -91,7 +91,7 @@ void __fastcall TfrmDimensionsZone::FormKeyPress(TObject *Sender,
 
 void __fastcall TfrmDimensionsZone::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
+{// v5.3 (nÃ©cessite TForm:KeyPreview Ã  true)
  if (Key==112)
    AfficheAideContextuelle(this);
 }

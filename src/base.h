@@ -4,16 +4,16 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 //---------------------------------------------------------------------------
-// Propriétés de TCSpinEdit
+// PropriÃ©tÃ©s de TCSpinEdit
 #define MINVALUE MinValue
 #define MAXVALUE MaxValue
-// Propriétés de TOpen/CloseDialog
+// PropriÃ©tÃ©s de TOpen/CloseDialog
 #define FILENAME(x) ((x)->FileName)
 // Types
 #define TBITMAP Graphics::TBitmap
 #define CONTROLCOUNT ControlCount
 //----------------------------------------------------------------------------------------------------------------------
-// Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets)
+// Types Ã©numÃ©rÃ©s. /!\ v5.4 : le type char a Ã©tÃ© forcÃ© pour que l'Ã©numÃ©rÃ© ne prenne pas la taille d'un entier (4 octets)
 //----------------------------------------------------------------------------------------------------------------------
 enum type_message : char {tmInformation, tmAvertissement, tmErreur, tmQuestionNecessaire, tmQuestionFacultative};
 enum type_reponse : char {trOk, trAnnuler, trOui, trNon};
@@ -30,6 +30,6 @@ extern String stRepLocalAppData(); // v5.4
 extern type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap);
 extern void AfficheAideContextuelle(TForm *Form);
 extern void AfficheIndexAide(TForm *Form);
-extern void AfficheTutoriel(); // v5.4 (appelée par TfrmSimulation::ActionTutorielExecute
+extern void AfficheTutoriel(); // v5.4 (appelÃ©e par TfrmSimulation::ActionTutorielExecute
 #endif
 

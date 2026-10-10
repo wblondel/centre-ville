@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 class TfrmParamSimul : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TButton *ButtonOk;
     TButton *ButtonAnnuler;
     TGroupBox *GroupBoxNbElements;
@@ -74,7 +74,7 @@ __published:	// Composants gérés par l'EDI
     void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
     void __fastcall BitBtnDefVehlibsClick(TObject *Sender);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     bool NbVehiculesChange,
          NbPietonsChange, // v2.0
          NbFeuxChange,
@@ -86,7 +86,7 @@ private:	// Déclarations de l'utilisateur
          Initialisation;
     bool AppliqueChoix();
     void CalculeChoixPossiblesNbVehicules(); // v5.0
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmParamSimul(TComponent* Owner);
 };
 //---------------------------------------------------------------------------

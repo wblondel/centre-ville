@@ -17,7 +17,7 @@
 //---------------------------------------------------------------------------
 TfrmStatsVehicules *frmStatsVehicules;
 //---------------------------------------------------------------------------
-const AnsiString asTitre = "Statistique des véhicules d'une étape à l'autre [Tour %d]";
+const AnsiString asTitre = "Statistique des vÃ©hicules d'une Ã©tape Ã  l'autre [Tour %d]";
 //---------------------------------------------------------------------------
 __fastcall TfrmStatsVehicules::TfrmStatsVehicules(TComponent* Owner)
     : TForm(Owner)
@@ -36,7 +36,7 @@ void __fastcall TfrmStatsVehicules::FormShow(TObject *Sender)
  StringGridStatsVehicules->Cells[0][0]="A\\D";
  StringGridStatsVehicules->RowCount=1+ne;
  StringGridStatsVehicules->ColCount=1+ne;
- StringGridCoordEtapes->Cells[0][0]="N°";
+ StringGridCoordEtapes->Cells[0][0]="NÂ°";
  StringGridCoordEtapes->Cells[1][0]="Position";
  for(i=0; i<ne; i++)
   {
@@ -83,12 +83,12 @@ void TfrmStatsVehicules::RafraichitInfos()
                  if ((v->NumEtapeDepart==ed)&&
                      (v->NumEtapeArrivee==ea)&&
                      (!v->Defini())&&
-                     v->NbCasesParcourues) // Vehicule venant de l'étape ed et arrivé à l'étape ea
+                     v->NbCasesParcourues) // Vehicule venant de l'Ã©tape ed et arrivÃ© Ã  l'Ã©tape ea
                   { // On lit les infos et on regarde le record en cours
                    if (v->NbCasesParcourues>Maximum) Maximum=v->NbCasesParcourues;
                    if (v->NbCasesParcourues<Minimum) Minimum=v->NbCasesParcourues;
                     Record=StrToInt(AnsiString(StringGridStatsVehicules->Cells[ed][ea]));
-                   if (Maximum-Minimum>Record) // Si record battu on écrit
+                   if (Maximum-Minimum>Record) // Si record battu on Ã©crit
                     StringGridStatsVehicules->Cells[ed][ea]=Format("%4d", ARRAYOFCONST((Maximum-Minimum)));
                   }
                 }
@@ -105,12 +105,12 @@ void TfrmStatsVehicules::RafraichitInfos()
                  if ((v->NumEtapeDepart==ed)&&
                      (v->NumEtapeArrivee==ea)&&
                      (!v->Defini())&&
-                     v->TourDrnDepl) // Vehicule venant de l'étape ed et arrivé à l'étape ea
+                     v->TourDrnDepl) // Vehicule venant de l'Ã©tape ed et arrivÃ© Ã  l'Ã©tape ea
                   { // On lit les infos et on regarde le record en cours
                    if (v->TourDrnDepl>Maximum) Maximum=v->TourDrnDepl;
                    if (v->TourDrnDepl<Minimum) Minimum=v->TourDrnDepl;
                     Record=StrToInt(AnsiString(StringGridStatsVehicules->Cells[ed][ea]));
-                   if (Maximum-Minimum>Record) // Si record battu on écrit
+                   if (Maximum-Minimum>Record) // Si record battu on Ã©crit
                     StringGridStatsVehicules->Cells[ed][ea]=Format("%4d", ARRAYOFCONST((Maximum-Minimum)));
                   }
                 }

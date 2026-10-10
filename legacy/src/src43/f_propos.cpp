@@ -18,11 +18,11 @@
  #pragma resource "*.xfm"
 #endif
 //---------------------------------------------------------------------------
-// ATTENTION : LE CHANGEMENT DE VERSION DOIT ÊTRE RÉPERCUTÉ sur :
-// · Le numéro de version dans les paramètres du projet
-// · Le #define VERSION en hexadécimal (simul.h) si le format de fichier a changé
-// · La bitmap ici ImageVersion et la sous-version dans LabelSousVersion
-// · La boîte de message pour cvx (Kylix) doit avoir la bonne version
+// ATTENTION : LE CHANGEMENT DE VERSION DOIT ÃŠTRE RÃ‰PERCUTÃ‰ sur :
+// Â· Le numÃ©ro de version dans les paramÃ¨tres du projet
+// Â· Le #define VERSION en hexadÃ©cimal (simul.h) si le format de fichier a changÃ©
+// Â· La bitmap ici ImageVersion et la sous-version dans LabelSousVersion
+// Â· La boÃ®te de message pour cvx (Kylix) doit avoir la bonne version
 //---------------------------------------------------------------------------
 TfrmAPropos *frmAPropos;
 //---------------------------------------------------------------------------
@@ -109,7 +109,7 @@ void __fastcall TfrmAPropos::LabelGPL2Click(TObject *Sender)
 Centre-Ville est sous Licence GPL version 2.0.\n\
 Copyright 1998-2003, Patrice FOUQUET\n\n\
 Se reporter au fichier license.txt\n\
-(traduction non officielle en français : licence.txt).\n\n\
+(traduction non officielle en franÃ§ais : licence.txt).\n\n\
 Centre-Ville est fourni SANS AUCUNE GARANTIE.", "Licence", MB_ICONINFORMATION);
 }
 //---------------------------------------------------------------------------

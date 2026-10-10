@@ -4,18 +4,18 @@ CENTRE-VILLE pour Linux
 Copyright (C) 2001 Patrice FOUQUET
 
 Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le
-modifier conformément aux dispositions de la Licence Publique Générale GNU,
-telle que publiée par la Free Software Foundation ; version 2 de la licence,
-ou encore toute version ultérieure.
+modifier conformÃ©ment aux dispositions de la Licence Publique GÃ©nÃ©rale GNU,
+telle que publiÃ©e par la Free Software Foundation ; version 2 de la licence,
+ou encore toute version ultÃ©rieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile,
-mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION
-ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de détail,
-voir la Licence Publique Générale GNU.
+Ce programme est distribuÃ© dans l'espoir qu'il sera utile,
+mais SANS AUCUNE GARANTIE ; sans mÃªme la garantie implicite de COMMERCIALISATION
+ou D'ADAPTATION A UN OBJET PARTICULIER. Pour plus de dÃ©tail,
+voir la Licence Publique GÃ©nÃ©rale GNU.
 
-Vous devez avoir reçu un exemplaire de la Licence Publique Générale GNU en même
+Vous devez avoir reÃ§u un exemplaire de la Licence Publique GÃ©nÃ©rale GNU en mÃªme
 temps que ce programme ; si ce n'est pas le cas,
-écrivez à la Free Software Foundation Inc.,
+Ã©crivez Ã  la Free Software Foundation Inc.,
 675 Mass Ave, Cambridge, MA 02139, Etats-Unis.
 
 Pour toutes informations:
@@ -110,15 +110,15 @@ const stDebutTitreCadrePieton='                      ';
       ATTENDDSLEBUS= 4;
       DESCENDDUBUS = 5;
 
-      stPosition : array [0..2] of String = ( 'Entrée dans la case',
+      stPosition : array [0..2] of String = ( 'EntrÃ©e dans la case',
                                               'Sortie de la case',
                                               'Dans un bus');
-      stSituation: array [0..NBSITUATIONS-1] of String = ( 'Se promène',
-                                                           'Se dirige vers un passage piétons',
-                                                           'Se dirige vers un arrêt de bus',
-                                                           'Attend un bus à l''arrêt de bus',
+      stSituation: array [0..NBSITUATIONS-1] of String = ( 'Se promÃ¨ne',
+                                                           'Se dirige vers un passage piÃ©tons',
+                                                           'Se dirige vers un arrÃªt de bus',
+                                                           'Attend un bus Ã  l''arrÃªt de bus',
                                                            'Attend dans le bus',
-                                                           'Descend au prochain arrêt');
+                                                           'Descend au prochain arrÃªt');
 
 procedure TfrmInfosPieton.FormShow(Sender: TObject);
 begin
@@ -185,7 +185,7 @@ var Situation : Integer;
      frmRecherche.Visible and
      frmRecherche.RadioButtonPieton.Checked then
    NumPieton:=frmRecherche.SpinEditPieton.Value;
-  if NumPieton=0 then // Si pas de piéton suivi, on cherche parmi ceux de la case courante
+  if NumPieton=0 then // Si pas de piÃ©ton suivi, on cherche parmi ceux de la case courante
    begin
     if v.NumPieton[0]>0 then
      NumPieton:=v.NumPieton[0]

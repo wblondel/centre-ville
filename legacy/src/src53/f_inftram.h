@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 class TfrmInfosTram : public TForm
 {
-__published:	// Composants gérés par l'EDI
+__published:	// Composants gÃ©rÃ©s par l'EDI
     TButton *ButtonOk;
     TLabel *Label0;
     TLabel *LabelCoordonnees;
@@ -56,12 +56,12 @@ __published:	// Composants gérés par l'EDI
     void __fastcall ButtonAideClick(TObject *Sender);
         void __fastcall FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+private:	// DÃ©clarations de l'utilisateur
     voie *v;
     tram *Tram;
     int x, y;
     void RendreVisibleInfos(bool Visible);
-public:		// Déclarations de l'utilisateur
+public:		// DÃ©clarations de l'utilisateur
     __fastcall TfrmInfosTram(TComponent* Owner);
     void RafraichitInfos();
 };
