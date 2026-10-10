@@ -1,0 +1,103 @@
+name: Build Installer and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Publish as GitHub Release?'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-installer:
+    name: Build Inno Setup Installer
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup --no-progress
+          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+
+      - name: Package Source Zip Archive
+        shell: pwsh
+        run: |
+          # Ensure fresh source code zip archive matches repository state
+          7z a -tzip cvw-src-win64.zip src/ docs/ maps/ inno-setup/ res/ legacy/ LICENSE
+
+      - name: Verify Game Binaries
+        shell: pwsh
+        run: |
+          $bin64 = "bin/cvw.64.exe"
+          $bin32 = "bin/cvw.32.exe"
+          if (-not (Test-Path $bin64) -or -not (Test-Path $bin32)) {
+            Write-Error @"
+Game binaries not found in 'bin/':
+- $bin64
+- $bin32
+
+Because binaries are not committed to Git, they must be compiled prior to installer creation.
+To build them:
+1. Using C++Builder / RAD Studio: Run 'msbuild src/cvw.cbproj /p:Config=Release /p:Platform=Win64'
+2. Or use a Self-Hosted Windows runner with Embarcadero RAD Studio installed.
+3. Or place the compiled binaries in 'bin/' before running this workflow.
+"@
+            exit 1
+          }
+
+      - name: Compile Installer with ISCC
+        shell: cmd
+        run: |
+          cd inno-setup
+          mkdir output
+          iscc.exe inscvw95.iss
+
+      - name: Prepare Release Artifacts
+        shell: pwsh
+        run: |
+          # Rename output installer for clearer naming
+          $version = "${{ github.ref_name }}"
+          if (-not $version -or $version -eq "") {
+            $version = "v5.4.3.2"
+          }
+          $installerPath = Get-Item inno-setup/output/inscvw95.exe
+          $namedInstaller = "inno-setup/output/Centre-Ville_Setup_${version}.exe"
+          Copy-Item $installerPath.FullName $namedInstaller
+
+          # Create portable standalone zip package
+          7z a -tzip "Centre-Ville_Portable_${version}.zip" bin/ maps/ docs/ LICENSE
+
+      - name: Upload Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Centre-Ville-Setup
+          path: inno-setup/output/Centre-Ville_Setup_*.exe
+
+      - name: Upload Portable Zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Centre-Ville-Portable
+          path: Centre-Ville_Portable_*.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.create_release == true
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            inno-setup/output/Centre-Ville_Setup_*.exe
+            Centre-Ville_Portable_*.zip
+            cvw-src-win64.zip
+          name: Centre-Ville ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true

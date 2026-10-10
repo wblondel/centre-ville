@@ -1,0 +1,45 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Raw input installers & temporary extraction folders
+Installer/
+installer/
+extracted/
+source/
+
+# C++Builder / Embarcadero temporary and compiler outputs
+*.obj
+*.tds
+*.~*
+*.dcu
+*.ilc
+*.ild
+*.ilf
+*.ils
+*.map
+*.cgl
+__history/
+*.local
+*.identcache
+*.tvsconfig
+*.dsk
+*.cbproj.local
+*.groupproj.local
+
+# Inno Setup output
+inno-setup/output/
+inno-setup/*.tmp
+
+# Compiled binaries, libraries and build outputs
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+
+# CI and release archives
+*.zip
