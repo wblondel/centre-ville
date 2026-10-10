@@ -41,17 +41,10 @@ jobs:
           $bin64 = "bin/cvw.64.exe"
           $bin32 = "bin/cvw.32.exe"
           if (-not (Test-Path $bin64) -or -not (Test-Path $bin32)) {
-            Write-Error @"
-Game binaries not found in 'bin/':
-- $bin64
-- $bin32
-
-Because binaries are not committed to Git, they must be compiled prior to installer creation.
-To build them:
-1. Using C++Builder / RAD Studio: Run 'msbuild src/cvw.cbproj /p:Config=Release /p:Platform=Win64'
-2. Or use a Self-Hosted Windows runner with Embarcadero RAD Studio installed.
-3. Or place the compiled binaries in 'bin/' before running this workflow.
-"@
+            Write-Host "Game binaries not found in 'bin/': $bin64 or $bin32"
+            Write-Host "Because binaries are not committed to Git, they must be compiled prior to installer creation."
+            Write-Host "Build them with C++Builder / RAD Studio: msbuild src/cvw.cbproj /p:Config=Release /p:Platform=Win64"
+            Write-Error "Missing required game binaries in bin/."
             exit 1
           }
 
