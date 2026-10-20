@@ -3,9 +3,12 @@
 //---------------------------------------------------------------------------
 #include "chaine.h"
 #include <cctype>
+#include <clocale>
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+//---------------------------------------------------------------------------
+TFormatSettings FormatSettings; // portage
 //---------------------------------------------------------------------------
 AnsiString AnsiString::SubString(int Index, int Count) const
  { // Comme la VCL : Index à partir de 1, bornes tolérées
@@ -37,6 +40,12 @@ namespace
    {
     char Tampon[512];
     std::snprintf(Tampon, sizeof(Tampon), Gabarit, Precision, Valeur);
+    // portage : snprintf suit LC_NUMERIC (QCoreApplication appelle setlocale) :
+    // on revient au '.', remplacé ensuite par FormatSettings.DecimalSeparator
+    const char *Point=std::localeconv()->decimal_point;
+    if (Point&&Point[0]&&(Point[0]!='.')&&!Point[1])
+     for(char *c=Tampon; *c; c++)
+      if (*c==Point[0]) *c='.';
     return Tampon;
    }
   //-------------------------------------------------------------------------
@@ -176,6 +185,14 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
           case 'G': Texte=Imprime("%.*G", PrecisionDefinie?Precision:15, v); break;
           case 'N': Texte=AvecSeparateurMilliers(Imprime("%.*f", PrecisionDefinie?Precision:2, v)); break;
          }
+        { // portage : séparateurs de FormatSettings (le texte ne contient que des chiffres, signes, 'E', '.' et ',')
+         std::string Local;
+         for(char c : Texte)
+          if (c=='.') Local+=FormatSettings.DecimalSeparator;
+          else if (c==',') Local+=FormatSettings.ThousandSeparator;
+          else Local+=c;
+         Texte=Local;
+        }
         break;
        }
       case 'S':

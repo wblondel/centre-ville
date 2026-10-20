@@ -74,6 +74,7 @@ class TVarRec
   TVarRec(bool b) : Genre(vtBooleen), Entier(b) {}
   TVarRec(double d) : Genre(vtReel), Reel(d) {}
   TVarRec(float f) : Genre(vtReel), Reel(f) {}
+  TVarRec(long double d) : Genre(vtReel), Reel((double)d) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
   TVarRec(const char *c) : Genre(vtChaine), Chaine(c?c:"") {}
   TVarRec(const std::string &c) : Genre(vtChaine), Chaine(c) {}
   TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}
@@ -87,6 +88,19 @@ template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &... v)
 //---------------------------------------------------------------------------
 // ARRAYOFCONST((a, b, c)) -> TableauDeConstantes (a, b, c)
 #define ARRAYOFCONST(valeurs) TableauDeConstantes valeurs
+//---------------------------------------------------------------------------
+// portage : séparateurs utilisés par Format (SysUtils::FormatSettings). La VCL
+// les prenait dans les paramètres régionaux de Windows (',' et espace
+// insécable en français). Le moteur n'utilise que %d et %s : il garde ici les
+// valeurs neutres ('.' et ','), comme les tests ; l'application les règle
+// comme la VCL en français (app/main.cpp).
+//---------------------------------------------------------------------------
+struct TFormatSettings
+ {
+  char DecimalSeparator='.';
+  std::string ThousandSeparator=",";
+ };
+extern TFormatSettings FormatSettings;
 //---------------------------------------------------------------------------
 // Format façon SysUtils : % [index ":"] ["-"] [largeur] ["." précision] type
 // Types : d u x e f g n m s p (insensibles à la casse) et %% ; largeur,

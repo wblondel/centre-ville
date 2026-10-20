@@ -58,6 +58,18 @@ TEST_CASE("Format/ARRAYOFCONST : spécificateurs de SysUtils", "[compat][chaine]
   CHECK_THROWS_AS(Format("%d %d", ARRAYOFCONST((1))), std::invalid_argument);
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Format : séparateurs de FormatSettings (VCL en français)", "[compat][chaine]")
+ { // L'application règle les séparateurs comme la VCL en français ; le moteur garde '.'
+  TFormatSettings Sauvegarde=FormatSettings;
+  FormatSettings.DecimalSeparator=',';
+  FormatSettings.ThousandSeparator="\xC2\xA0"; // espace insécable
+  CHECK(Format("%.2f (%.2f%%)", ARRAYOFCONST((3.14159, (long double)12.5)))==AnsiString("3,14 (12,50%)"));
+  CHECK(Format("%n", ARRAYOFCONST((1234567.891)))==AnsiString("1\xC2\xA0" "234\xC2\xA0" "567,89"));
+  CHECK(Format("%d %s", ARRAYOFCONST((1000, "a.b")))==AnsiString("1000 a.b"));
+  FormatSettings=Sauvegarde;
+  CHECK(Format("%.2f", ARRAYOFCONST((3.14159)))==AnsiString("3.14"));
+ }
+//---------------------------------------------------------------------------
 TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
  { // Comportement vérifié par désassemblage de cvw 5.4.3.2 (engine/README.md)
   alea::LibereGraine();
