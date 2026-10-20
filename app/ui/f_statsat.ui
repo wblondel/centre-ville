@@ -1,0 +1,1314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_statsat.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmStatsAttenteTrafic</class>
+ <widget class="QDialog" name="frmStatsAttenteTrafic">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>368</width>
+    <height>168</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Statistiques de fluidité et de trafic</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-9</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>Small Fonts</family>
+    <pointsize>7</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>612</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsToolWindow</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPopupMenu" stdset="0">
+   <string notr="true">PopupMenu</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>11</number>
+  </property>
+  <widget class="TLabel" name="Label1">
+   <property name="text">
+    <string>Attente totale cumulée :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>81</y>
+     <width>98</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label2">
+   <property name="text">
+    <string>Attente moyenne par case :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>93</y>
+     <width>112</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label3">
+   <property name="text">
+    <string>Attente maximale enregistrée :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>105</y>
+     <width>124</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label4">
+   <property name="text">
+    <string>Trafic total cumulé :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>130</y>
+     <width>81</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label5">
+   <property name="text">
+    <string>Trafic moyen par case :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>142</y>
+     <width>95</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label6">
+   <property name="text">
+    <string>Trafic maximal enregistré :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>154</y>
+     <width>107</width>
+     <height>11</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label7">
+   <property name="text">
+    <string>Tours</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>69</y>
+     <width>31</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelAttenteCumulee">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>81</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelAttenteMoyenne">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>93</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelAttenteMaximale">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>105</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelTraficCumule">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>130</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelTraficMoyen">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>142</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelTraficMaximal">
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>154</y>
+     <width>7</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label8">
+   <property name="text">
+    <string>Véhicules</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>311</x>
+     <y>118</y>
+     <width>50</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupType">
+   <property name="title">
+    <string> Choix des statistiques à visualiser </string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupType_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>12</y>
+      <width>279</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Attente (tours pendant lesquels 1 véhicule est resté sur 1 case)</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupType_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>25</y>
+      <width>279</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Trafic (véhicules qui sont passés par 1 case)</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>3</y>
+     <width>289</width>
+     <height>42</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclItemIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBoxParkings">
+   <property name="title">
+    <string> Sélection de trajets </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>48</y>
+     <width>153</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Cocher les cases puis choisissez un n° d'étape</string>
+   </property>
+   <property name="statusTip">
+    <string>Cocher les cases puis choisissez un n° d'étape</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+   <widget class="TCSpinEdit" name="CSpinEditParkingArrivee">
+    <property name="minimum">
+     <number>-2147483647</number>
+    </property>
+    <property name="maximum">
+     <number>2147483647</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>98</x>
+      <y>35</y>
+      <width>40</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="TCheckBox" name="CheckBoxParkingArrivee">
+    <property name="text">
+     <string>Parking Arri&amp;vée</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>37</y>
+      <width>88</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+   <widget class="TCheckBox" name="CheckBoxParkingDepart">
+    <property name="text">
+     <string>Parking &amp;Départ</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>16</y>
+      <width>88</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditParkingDepart">
+    <property name="minimum">
+     <number>-2147483647</number>
+    </property>
+    <property name="maximum">
+     <number>2147483647</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>98</x>
+      <y>15</y>
+      <width>40</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBoxLegende">
+   <property name="title">
+    <string> Légende </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>115</y>
+     <width>153</width>
+     <height>49</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+   <widget class="TLabel" name="LabelMax">
+    <property name="text">
+     <string>Max</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>121</x>
+      <y>12</y>
+      <width>18</width>
+      <height>11</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label10">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>12</y>
+      <width>5</width>
+      <height>11</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TPaintBox" name="PaintBox">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>24</y>
+      <width>128</width>
+      <height>17</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn21">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn21.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn21.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>328</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn31">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn31.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn31.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>348</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn11">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn11.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn11.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>307</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn13">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn13.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn13.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>307</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>9</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn23">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn23.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn23.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>328</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn33">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn33.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn33.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>348</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>11</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn12">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn12.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn12.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>307</x>
+     <y>20</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>7</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn32">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_statsat/BitBtn32.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_statsat/BitBtn32.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>348</x>
+     <y>20</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>8</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxCoins">
+   <property name="text">
+    <string>Aller dans les &amp;coins</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>199</x>
+     <y>45</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Permettre d'utiliser les touches fléchées pour aller dans les coins</string>
+   </property>
+   <property name="statusTip">
+    <string>Permettre d'utiliser les touches fléchées pour aller dans les coins</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="QMenu" name="PopupMenu">
+   <property name="title">
+    <string />
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TPopupMenu</string>
+   </property>
+   <addaction name="RubriqueHautGauche" />
+   <addaction name="RubriqueHaut" />
+   <addaction name="RubriqueHautDroite" />
+   <addaction name="Sep1" />
+   <addaction name="RubriqueGauche" />
+   <addaction name="RubriqueDroite" />
+   <addaction name="RubriqueZoom" />
+   <addaction name="Sep2" />
+   <addaction name="RubriqueBasGauche" />
+   <addaction name="RubriqueBas" />
+   <addaction name="RubriqueBasDroite" />
+  </widget>
+  <action name="RubriqueHautGauche">
+   <property name="text">
+    <string>Haut Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>Home</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>11</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>36</number>
+   </property>
+  </action>
+  <action name="RubriqueHaut">
+   <property name="text">
+    <string>Haut</string>
+   </property>
+   <property name="shortcut">
+    <string>Up</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>21</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>38</number>
+   </property>
+  </action>
+  <action name="RubriqueHautDroite">
+   <property name="text">
+    <string>Haut Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>PgUp</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>31</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>33</number>
+   </property>
+  </action>
+  <action name="Sep1">
+   <property name="vclSeparateur" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">-</string>
+   </property>
+  </action>
+  <action name="RubriqueGauche">
+   <property name="text">
+    <string>Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>12</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>37</number>
+   </property>
+  </action>
+  <action name="RubriqueDroite">
+   <property name="text">
+    <string>Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>32</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>39</number>
+   </property>
+  </action>
+  <action name="RubriqueZoom">
+   <property name="text">
+    <string>Zoom (-/+)</string>
+   </property>
+   <property name="shortcut">
+    <string>Z</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>22</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Zoom (-/+)</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>90</number>
+   </property>
+  </action>
+  <action name="Sep2">
+   <property name="vclSeparateur" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">-</string>
+   </property>
+  </action>
+  <action name="RubriqueBasGauche">
+   <property name="text">
+    <string>Bas Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>End</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>13</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>35</number>
+   </property>
+  </action>
+  <action name="RubriqueBas">
+   <property name="text">
+    <string>Bas</string>
+   </property>
+   <property name="shortcut">
+    <string>Down</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>23</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>40</number>
+   </property>
+  </action>
+  <action name="RubriqueBasDroite">
+   <property name="text">
+    <string>Bas Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>PgDown</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>33</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>34</number>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>RadioGroupType_0</tabstop>
+  <tabstop>RadioGroupType_1</tabstop>
+  <tabstop>CheckBoxParkingDepart</tabstop>
+  <tabstop>CSpinEditParkingDepart</tabstop>
+  <tabstop>CheckBoxParkingArrivee</tabstop>
+  <tabstop>CSpinEditParkingArrivee</tabstop>
+  <tabstop>CheckBoxCoins</tabstop>
+  <tabstop>BitBtn11</tabstop>
+  <tabstop>BitBtn21</tabstop>
+  <tabstop>BitBtn31</tabstop>
+  <tabstop>BitBtn12</tabstop>
+  <tabstop>BitBtn32</tabstop>
+  <tabstop>BitBtn13</tabstop>
+  <tabstop>BitBtn23</tabstop>
+  <tabstop>BitBtn33</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioGroup</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TPaintBox</class>
+   <extends>QWidget</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TBitBtn</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,5276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_prmbus.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmParamBus</class>
+ <widget class="QDialog" name="frmParamBus">
+  <property name="geometry">
+   <rect>
+    <x>254</x>
+    <y>195</y>
+    <width>463</width>
+    <height>455</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Paramètres du réseau de bus</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>3121</number>
+  </property>
+  <property name="vclActiveControl" stdset="0">
+   <string notr="true">CheckBoxCoins</string>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TShape" name="Shape1">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>88</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clBlue</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clBlue</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape2">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>112</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clRed</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clRed</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape3">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>136</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clLime</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clLime</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape4">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>160</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clYellow</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clYellow</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape5">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>184</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clFuchsia</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clFuchsia</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape6">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>208</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clAqua</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clAqua</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape8">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>256</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <number>16711808</number>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <number>16711808</number>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape7">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>232</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clPurple</string>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <string notr="true">clPurple</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelLigne">
+   <property name="text">
+    <string>Ligne**</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>69</y>
+     <width>42</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label5">
+   <property name="text">
+    <string>Arrêts</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>52</x>
+     <y>69</y>
+     <width>34</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label6">
+   <property name="text">
+    <string>Numéros*** des arrêts dans l'ordre du parcours de chaque ligne</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>98</x>
+     <y>69</y>
+     <width>361</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TShape" name="Shape9">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>280</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <number>33023</number>
+   </property>
+   <property name="vclPenColor" stdset="0">
+    <number>33023</number>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL1">
+   <property name="text">
+    <string>1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>89</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clWhite</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL2">
+   <property name="text">
+    <string>2</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>113</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL3">
+   <property name="text">
+    <string>3</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>137</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL4">
+   <property name="text">
+    <string>4</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>161</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL5">
+   <property name="text">
+    <string>5</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>185</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL6">
+   <property name="text">
+    <string>6</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>209</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL7">
+   <property name="text">
+    <string>7</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>233</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clWhite</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL8">
+   <property name="text">
+    <string>8</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>257</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clWhite</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelL9">
+   <property name="text">
+    <string>9</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>281</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label18">
+   <property name="text">
+    <string>(***) 0 = indéfini</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>393</x>
+     <y>300</y>
+     <width>60</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label16">
+   <property name="text">
+    <string>(*) Par ligne : De 1 à 3 arrêts = 1 bus. De 4 à 6 arrêts = 2 bus. De 7 à 9 arrêts = 3 bus.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>56</x>
+     <y>300</y>
+     <width>329</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelRqCochesLignesBus">
+   <property name="text">
+    <string>(**) Cocher les lignes de bus pour visualiser le trajet qu'emprunteront les bus pendant la simulation.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>56</x>
+     <y>312</y>
+     <width>400</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TShape" name="ShapeT">
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>304</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclBrushColor" stdset="0">
+    <string notr="true">clBlack</string>
+   </property>
+   <property name="vclShape" stdset="0">
+    <string notr="true">stCircle</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelT">
+   <property name="text">
+    <string>T</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>306</y>
+     <width>16</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clWhite</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBtnFace</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox1">
+   <property name="title">
+    <string> Composition actuelle  </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>2</y>
+     <width>286</width>
+     <height>59</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <widget class="TLabel" name="LabelNbArretsBus">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>19</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label3">
+    <property name="text">
+     <string>arrêt(s) de bus définis sur</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>19</y>
+      <width>117</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>arrêts de bus maximum</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>19</y>
+      <width>107</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbMaxArretsBus">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>158</x>
+      <y>19</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label15">
+    <property name="text">
+     <string>bus* forment l'effectif total du réseau de bus</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>32</x>
+      <y>38</y>
+      <width>206</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbBus">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>19</x>
+      <y>38</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit1">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>85</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>11</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit2">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>109</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>22</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit3">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>133</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>33</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit4">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>157</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>44</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit5">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>181</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>55</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit6">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>205</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>66</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit7">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>229</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>77</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit8">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>253</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>88</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit11">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>12</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit12">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>13</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit13">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>14</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit14">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>15</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit15">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>16</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit16">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>17</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit17">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>18</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit18">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>19</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit19">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>85</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>20</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit21">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>23</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit22">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>24</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit23">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>25</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit24">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>26</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit25">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>27</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit26">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>28</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit27">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>29</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit28">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>30</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit29">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>109</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>31</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit31">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>34</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit32">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>35</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit33">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>36</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit34">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>37</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit35">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>38</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit36">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>39</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit37">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>40</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit38">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>41</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit39">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>133</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>42</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit41">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>45</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit42">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>46</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit43">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>47</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit44">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>48</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit45">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>49</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit46">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>50</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit47">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>51</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit48">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>52</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit49">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>157</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>53</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit51">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>56</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit52">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>57</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit53">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>58</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit54">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>59</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit55">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>60</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit56">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>61</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit57">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>62</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit58">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>63</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit59">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>181</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>64</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit61">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>67</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit62">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>68</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit63">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>69</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit64">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>70</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit65">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>71</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit66">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>72</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit67">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>73</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit68">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>74</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit69">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>205</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>75</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit71">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>78</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit72">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>79</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit73">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>80</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit74">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>81</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit75">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>82</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit76">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>83</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit77">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>84</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit78">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>85</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit79">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>229</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>86</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit81">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>89</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit82">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>90</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit83">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>91</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit84">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>92</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit85">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>93</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit86">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>94</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit87">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>95</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit88">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>96</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit89">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>253</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>97</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit9">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>54</x>
+     <y>277</y>
+     <width>31</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclEditorEnabled" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>99</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit91">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>97</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>100</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit92">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>101</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit93">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>177</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>102</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit94">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>103</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit95">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>257</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>104</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit96">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>105</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit97">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>337</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>106</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit98">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>377</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>107</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEdit99">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>81</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>81</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>417</x>
+     <y>277</y>
+     <width>37</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>108</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>184</x>
+     <y>415</y>
+     <width>49</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>114</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn21">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn21.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn21.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>423</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn31">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn31.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn31.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn11">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn11.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn11.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>402</x>
+     <y>0</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn13">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn13.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn13.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>402</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>7</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn23">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn23.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn23.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>423</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>8</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn33">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn33.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn33.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>40</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>9</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn12">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn12.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn12.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>402</x>
+     <y>20</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtn32">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_prmbus/BitBtn32.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_prmbus/BitBtn32.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>443</x>
+     <y>20</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="statusTip">
+    <string>Déplace dans les coins si option cochée (Pavé numérique Verr.Num. désactivé)</string>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxCoins">
+   <property name="text">
+    <string>Aller dans les &amp;coins</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>297</x>
+     <y>25</y>
+     <width>102</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Permet d'utiliser les touches fléchées pour aller dans les coins</string>
+   </property>
+   <property name="statusTip">
+    <string>Permet d'utiliser les touches fléchées pour aller dans les coins</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>415</y>
+     <width>49</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>111</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>64</x>
+     <y>415</y>
+     <width>49</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>112</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAppliquer">
+   <property name="text">
+    <string>A&amp;ppliquer</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>415</y>
+     <width>57</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>113</number>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox2">
+   <property name="title">
+    <string> Paramètres des bus </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>328</y>
+     <width>225</width>
+     <height>73</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>109</number>
+   </property>
+   <widget class="TLabel" name="Label19">
+    <property name="text">
+     <string>&amp;Stop à l'arrêt :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbToursStopArretBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>44</y>
+      <width>65</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label20">
+    <property name="text">
+     <string>tour(s)</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>153</x>
+      <y>44</y>
+      <width>29</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label21">
+    <property name="text">
+     <string>Capacité d'un &amp;bus :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbMaxPersonnesBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>22</y>
+      <width>91</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label22">
+    <property name="text">
+     <string>personnes</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>152</x>
+      <y>22</y>
+      <width>49</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbToursStopArretBus">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>105</x>
+      <y>41</y>
+      <width>44</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbMaxPersonnesBus">
+    <property name="minimum">
+     <number>10</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>100</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>105</x>
+      <y>19</y>
+      <width>44</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox3">
+   <property name="title">
+    <string> Paramètres des piétons </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>328</y>
+     <width>219</width>
+     <height>119</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>110</number>
+   </property>
+   <widget class="TLabel" name="LabelNbCasesMaxPsgPtn">
+    <property name="text">
+     <string>&amp;Détecte un arrêt jusqu'à</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbCasesMaxArretBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>22</y>
+      <width>113</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>false</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label23">
+    <property name="text">
+     <string>cases</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>184</x>
+      <y>22</y>
+      <width>28</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label24">
+    <property name="text">
+     <string>tours</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>185</x>
+      <y>66</y>
+      <width>23</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label17">
+    <property name="text">
+     <string>&amp;Attend un bus jusqu'à</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbMaxToursAttenteBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>66</y>
+      <width>102</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>false</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelProbaPsgPt">
+    <property name="text">
+     <string>&amp;Probabilité de s'y diriger :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditProbaDirArretBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>44</y>
+      <width>116</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label25">
+    <property name="text">
+     <string>%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>184</x>
+      <y>44</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label26">
+    <property name="text">
+     <string>Pro&amp;babilité arrêt demandé :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditProbaArretDmd</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>88</y>
+      <width>126</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label27">
+    <property name="text">
+     <string>%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>184</x>
+      <y>88</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbCasesMaxArretBus">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>139</x>
+      <y>19</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbMaxToursAttenteBus">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>50</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>50</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>139</x>
+      <y>63</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditProbaDirArretBus">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>50</number>
+    </property>
+    <property name="singleStep">
+     <number>5</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>139</x>
+      <y>41</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditProbaArretDmd">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+    <property name="singleStep">
+     <number>5</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>139</x>
+      <y>85</y>
+      <width>42</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox1">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>87</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox2">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>111</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>21</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox3">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>135</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>32</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox4">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>159</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>43</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox5">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>183</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>54</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox6">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>207</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>65</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox7">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>231</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>76</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox8">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>256</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>87</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBox9">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>280</y>
+     <width>16</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>98</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxTout">
+   <property name="text">
+    <string />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>304</y>
+     <width>15</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Cliquer ici pour cocher/décocher TOUTES les lignes à la fois</string>
+   </property>
+   <property name="statusTip">
+    <string>Cliquer ici pour cocher/décocher TOUTES les lignes à la fois</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>115</number>
+   </property>
+  </widget>
+  <property name="vcl_TimerClignotement" stdset="0">
+   <stringlist notr="true">
+    <string>Classe=TTimer</string>
+    <string>Interval=250</string>
+    <string>OnTimer=TimerClignotementTimer</string>
+   </stringlist>
+  </property>
+  <widget class="QMenu" name="PopupMenu">
+   <property name="title">
+    <string />
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TPopupMenu</string>
+   </property>
+   <addaction name="MenuItemHautGauche" />
+   <addaction name="MenuItemHaut" />
+   <addaction name="MenuItemHautDroite" />
+   <addaction name="Sep1" />
+   <addaction name="MenuItemGauche" />
+   <addaction name="MenuItemDroite" />
+   <addaction name="MenuItemZoom" />
+   <addaction name="Sep2" />
+   <addaction name="MenuItemBasGauche" />
+   <addaction name="MenuItemBas" />
+   <addaction name="MenuItemBasDroite" />
+  </widget>
+  <action name="MenuItemHautGauche">
+   <property name="text">
+    <string>Haut Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>Home</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>11</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>36</number>
+   </property>
+  </action>
+  <action name="MenuItemHaut">
+   <property name="text">
+    <string>Haut</string>
+   </property>
+   <property name="shortcut">
+    <string>Up</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>21</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>38</number>
+   </property>
+  </action>
+  <action name="MenuItemHautDroite">
+   <property name="text">
+    <string>Haut Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>PgUp</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>31</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Haut Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>33</number>
+   </property>
+  </action>
+  <action name="Sep1">
+   <property name="vclSeparateur" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">-</string>
+   </property>
+  </action>
+  <action name="MenuItemGauche">
+   <property name="text">
+    <string>Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>12</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>37</number>
+   </property>
+  </action>
+  <action name="MenuItemDroite">
+   <property name="text">
+    <string>Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>32</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>39</number>
+   </property>
+  </action>
+  <action name="MenuItemZoom">
+   <property name="text">
+    <string>Zoom (-/+)</string>
+   </property>
+   <property name="shortcut">
+    <string>Z</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>22</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Zoom (-/+)</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>90</number>
+   </property>
+  </action>
+  <action name="Sep2">
+   <property name="vclSeparateur" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>-</string>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">-</string>
+   </property>
+  </action>
+  <action name="MenuItemBasGauche">
+   <property name="text">
+    <string>Bas Gauche</string>
+   </property>
+   <property name="shortcut">
+    <string>End</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>13</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas Gauche</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>35</number>
+   </property>
+  </action>
+  <action name="MenuItemBas">
+   <property name="text">
+    <string>Bas</string>
+   </property>
+   <property name="shortcut">
+    <string>Down</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>23</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>40</number>
+   </property>
+  </action>
+  <action name="MenuItemBasDroite">
+   <property name="text">
+    <string>Bas Droite</string>
+   </property>
+   <property name="shortcut">
+    <string>PgDown</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+   <property name="vclClasse" stdset="0">
+    <string notr="true">TMenuItem</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>33</number>
+   </property>
+   <property name="vclCaption" stdset="0">
+    <string notr="true">Bas Droite</string>
+   </property>
+   <property name="vclShortCut" stdset="0">
+    <number>34</number>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>CheckBoxCoins</tabstop>
+  <tabstop>BitBtn11</tabstop>
+  <tabstop>BitBtn21</tabstop>
+  <tabstop>BitBtn31</tabstop>
+  <tabstop>BitBtn12</tabstop>
+  <tabstop>BitBtn32</tabstop>
+  <tabstop>BitBtn13</tabstop>
+  <tabstop>BitBtn23</tabstop>
+  <tabstop>BitBtn33</tabstop>
+  <tabstop>CheckBox1</tabstop>
+  <tabstop>CSpinEdit1</tabstop>
+  <tabstop>CSpinEdit11</tabstop>
+  <tabstop>CSpinEdit12</tabstop>
+  <tabstop>CSpinEdit13</tabstop>
+  <tabstop>CSpinEdit14</tabstop>
+  <tabstop>CSpinEdit15</tabstop>
+  <tabstop>CSpinEdit16</tabstop>
+  <tabstop>CSpinEdit17</tabstop>
+  <tabstop>CSpinEdit18</tabstop>
+  <tabstop>CSpinEdit19</tabstop>
+  <tabstop>CheckBox2</tabstop>
+  <tabstop>CSpinEdit2</tabstop>
+  <tabstop>CSpinEdit21</tabstop>
+  <tabstop>CSpinEdit22</tabstop>
+  <tabstop>CSpinEdit23</tabstop>
+  <tabstop>CSpinEdit24</tabstop>
+  <tabstop>CSpinEdit25</tabstop>
+  <tabstop>CSpinEdit26</tabstop>
+  <tabstop>CSpinEdit27</tabstop>
+  <tabstop>CSpinEdit28</tabstop>
+  <tabstop>CSpinEdit29</tabstop>
+  <tabstop>CheckBox3</tabstop>
+  <tabstop>CSpinEdit3</tabstop>
+  <tabstop>CSpinEdit31</tabstop>
+  <tabstop>CSpinEdit32</tabstop>
+  <tabstop>CSpinEdit33</tabstop>
+  <tabstop>CSpinEdit34</tabstop>
+  <tabstop>CSpinEdit35</tabstop>
+  <tabstop>CSpinEdit36</tabstop>
+  <tabstop>CSpinEdit37</tabstop>
+  <tabstop>CSpinEdit38</tabstop>
+  <tabstop>CSpinEdit39</tabstop>
+  <tabstop>CheckBox4</tabstop>
+  <tabstop>CSpinEdit4</tabstop>
+  <tabstop>CSpinEdit41</tabstop>
+  <tabstop>CSpinEdit42</tabstop>
+  <tabstop>CSpinEdit43</tabstop>
+  <tabstop>CSpinEdit44</tabstop>
+  <tabstop>CSpinEdit45</tabstop>
+  <tabstop>CSpinEdit46</tabstop>
+  <tabstop>CSpinEdit47</tabstop>
+  <tabstop>CSpinEdit48</tabstop>
+  <tabstop>CSpinEdit49</tabstop>
+  <tabstop>CheckBox5</tabstop>
+  <tabstop>CSpinEdit5</tabstop>
+  <tabstop>CSpinEdit51</tabstop>
+  <tabstop>CSpinEdit52</tabstop>
+  <tabstop>CSpinEdit53</tabstop>
+  <tabstop>CSpinEdit54</tabstop>
+  <tabstop>CSpinEdit55</tabstop>
+  <tabstop>CSpinEdit56</tabstop>
+  <tabstop>CSpinEdit57</tabstop>
+  <tabstop>CSpinEdit58</tabstop>
+  <tabstop>CSpinEdit59</tabstop>
+  <tabstop>CheckBox6</tabstop>
+  <tabstop>CSpinEdit6</tabstop>
+  <tabstop>CSpinEdit61</tabstop>
+  <tabstop>CSpinEdit62</tabstop>
+  <tabstop>CSpinEdit63</tabstop>
+  <tabstop>CSpinEdit64</tabstop>
+  <tabstop>CSpinEdit65</tabstop>
+  <tabstop>CSpinEdit66</tabstop>
+  <tabstop>CSpinEdit67</tabstop>
+  <tabstop>CSpinEdit68</tabstop>
+  <tabstop>CSpinEdit69</tabstop>
+  <tabstop>CheckBox7</tabstop>
+  <tabstop>CSpinEdit7</tabstop>
+  <tabstop>CSpinEdit71</tabstop>
+  <tabstop>CSpinEdit72</tabstop>
+  <tabstop>CSpinEdit73</tabstop>
+  <tabstop>CSpinEdit74</tabstop>
+  <tabstop>CSpinEdit75</tabstop>
+  <tabstop>CSpinEdit76</tabstop>
+  <tabstop>CSpinEdit77</tabstop>
+  <tabstop>CSpinEdit78</tabstop>
+  <tabstop>CSpinEdit79</tabstop>
+  <tabstop>CheckBox8</tabstop>
+  <tabstop>CSpinEdit8</tabstop>
+  <tabstop>CSpinEdit81</tabstop>
+  <tabstop>CSpinEdit82</tabstop>
+  <tabstop>CSpinEdit83</tabstop>
+  <tabstop>CSpinEdit84</tabstop>
+  <tabstop>CSpinEdit85</tabstop>
+  <tabstop>CSpinEdit86</tabstop>
+  <tabstop>CSpinEdit87</tabstop>
+  <tabstop>CSpinEdit88</tabstop>
+  <tabstop>CSpinEdit89</tabstop>
+  <tabstop>CheckBox9</tabstop>
+  <tabstop>CSpinEdit9</tabstop>
+  <tabstop>CSpinEdit91</tabstop>
+  <tabstop>CSpinEdit92</tabstop>
+  <tabstop>CSpinEdit93</tabstop>
+  <tabstop>CSpinEdit94</tabstop>
+  <tabstop>CSpinEdit95</tabstop>
+  <tabstop>CSpinEdit96</tabstop>
+  <tabstop>CSpinEdit97</tabstop>
+  <tabstop>CSpinEdit98</tabstop>
+  <tabstop>CSpinEdit99</tabstop>
+  <tabstop>CSpinEditNbMaxPersonnesBus</tabstop>
+  <tabstop>CSpinEditNbToursStopArretBus</tabstop>
+  <tabstop>CSpinEditNbCasesMaxArretBus</tabstop>
+  <tabstop>CSpinEditProbaDirArretBus</tabstop>
+  <tabstop>CSpinEditNbMaxToursAttenteBus</tabstop>
+  <tabstop>CSpinEditProbaArretDmd</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAppliquer</tabstop>
+  <tabstop>ButtonAide</tabstop>
+  <tabstop>CheckBoxTout</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TShape</class>
+   <extends>QWidget</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TBitBtn</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_defn.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmDefNature</class>
+ <widget class="QDialog" name="frmDefNature">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>20</y>
+    <width>247</width>
+    <height>154</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Nature de la zone sélectionnée</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>7</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>45</number>
+  </property>
+  <property name="vclHorzScrollBarRange" stdset="0">
+   <number>178</number>
+  </property>
+  <property name="vclVertScrollBarRange" stdset="0">
+   <number>93</number>
+  </property>
+  <property name="vclActiveControl" stdset="0">
+   <string notr="true">ButtonFermer</string>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true" />
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsDialog</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poMainFormCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="LabelRq">
+   <property name="text">
+    <string>(*) des cases non utilisées par les voies de circulation</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>112</y>
+     <width>241</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alBottom</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupNature">
+   <property name="title">
+    <string> Nature* </string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupNature_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>14</y>
+      <width>137</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Voies de circulation</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupNature_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>33</y>
+      <width>137</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Trottoirs</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupNature_2">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>52</y>
+      <width>137</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&amp;Immeubles</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>6</y>
+     <width>147</width>
+     <height>75</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxEcraser">
+   <property name="text">
+    <string>&amp;Ecraser si autre nature</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>89</y>
+     <width>141</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAppliquer">
+   <property name="text">
+    <string>A&amp;ppliquer</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>164</x>
+     <y>37</y>
+     <width>69</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonFermer">
+   <property name="text">
+    <string>Fermer</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>164</x>
+     <y>6</y>
+     <width>69</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>164</x>
+     <y>68</y>
+     <width>69</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxPelouse">
+   <property name="text">
+    <string>Pelouse</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>40</y>
+     <width>66</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>RadioGroupNature_0</tabstop>
+  <tabstop>RadioGroupNature_1</tabstop>
+  <tabstop>RadioGroupNature_2</tabstop>
+  <tabstop>CheckBoxEcraser</tabstop>
+  <tabstop>ButtonFermer</tabstop>
+  <tabstop>ButtonAppliquer</tabstop>
+  <tabstop>ButtonAide</tabstop>
+  <tabstop>CheckBoxPelouse</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioGroup</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

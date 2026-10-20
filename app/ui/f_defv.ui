@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_defv.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmDefVoie</class>
+ <widget class="QDialog" name="frmDefVoie">
+  <property name="geometry">
+   <rect>
+    <x>5</x>
+    <y>187</y>
+    <width>290</width>
+    <height>368</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Priorités de la case</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclFontColor" stdset="0">
+   <string notr="true">clBlack</string>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>41</number>
+  </property>
+  <property name="vclHorzScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclVertScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clTeal</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label1">
+   <property name="text">
+    <string>Coordonnées :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>69</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCoordonnees">
+   <property name="text">
+    <string>00, 00</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>8</y>
+     <width>37</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupPrioriteNord">
+   <property name="title">
+    <string> Priorité &amp;Nord </string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupPrioriteNord_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>15</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>À droite</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteNord_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>32</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cédez-le-passage</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteNord_2">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>49</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteNord_3">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>66</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Feu...</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>40</y>
+     <width>130</width>
+     <height>89</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clTeal</string>
+   </property>
+   <property name="vclItemIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupPrioriteOuest">
+   <property name="title">
+    <string> Priorité &amp;Ouest </string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupPrioriteOuest_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>15</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>À droite</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteOuest_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>32</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cédez-le-passage</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteOuest_2">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>49</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteOuest_3">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>66</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Feu...</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>136</y>
+     <width>130</width>
+     <height>89</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>3</number>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clTeal</string>
+   </property>
+   <property name="vclItemIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupPrioriteEst">
+   <property name="title">
+    <string> Priorité &amp;Est </string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupPrioriteEst_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>15</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>À droite</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteEst_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>32</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cédez-le-passage</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteEst_2">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>49</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteEst_3">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>66</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Feu...</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>152</x>
+     <y>136</y>
+     <width>130</width>
+     <height>89</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clTeal</string>
+   </property>
+   <property name="vclItemIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TRadioGroup" name="RadioGroupPrioriteSud">
+   <property name="title">
+    <string> Priorité &amp;Sud</string>
+   </property>
+   <widget class="QRadioButton" name="RadioGroupPrioriteSud_0">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>15</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>À droite</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteSud_1">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>32</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cédez-le-passage</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteSud_2">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>49</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Stop</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RadioGroupPrioriteSud_3">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>66</y>
+      <width>120</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Feu...</string>
+    </property>
+   </widget>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>231</y>
+     <width>130</width>
+     <height>89</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clTeal</string>
+   </property>
+   <property name="vclItemIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>14</x>
+     <y>334</y>
+     <width>49</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>8</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>78</x>
+     <y>334</y>
+     <width>49</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>9</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtnDefFeuN">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defv/BitBtnDefFeuN.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defv/BitBtnDefFeuN.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>136</x>
+     <y>102</y>
+     <width>22</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="toolTip">
+    <string>Définit le feu Nord</string>
+   </property>
+   <property name="statusTip">
+    <string>Définit le feu Nord</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtnDefFeuO">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defv/BitBtnDefFeuO.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defv/BitBtnDefFeuO.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>64</x>
+     <y>198</y>
+     <width>22</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="toolTip">
+    <string>Définit le feu Ouest</string>
+   </property>
+   <property name="statusTip">
+    <string>Définit le feu Ouest</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>4</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtnDefFeuE">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defv/BitBtnDefFeuE.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defv/BitBtnDefFeuE.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>208</x>
+     <y>198</y>
+     <width>22</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="toolTip">
+    <string>Définit le feu Est</string>
+   </property>
+   <property name="statusTip">
+    <string>Définit le feu Est</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TBitBtn" name="BitBtnDefFeuS">
+   <property name="text">
+    <string />
+   </property>
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defv/BitBtnDefFeuS.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defv/BitBtnDefFeuS.png</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>136</x>
+     <y>294</y>
+     <width>22</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="toolTip">
+    <string>Définit le feu Sud</string>
+   </property>
+   <property name="statusTip">
+    <string>Définit le feu Sud</string>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>3</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>7</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAppliquer">
+   <property name="text">
+    <string>&amp;Appliquer</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>142</x>
+     <y>334</y>
+     <width>57</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>214</x>
+     <y>334</y>
+     <width>57</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>11</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>RadioGroupPrioriteNord_0</tabstop>
+  <tabstop>RadioGroupPrioriteNord_1</tabstop>
+  <tabstop>RadioGroupPrioriteNord_2</tabstop>
+  <tabstop>RadioGroupPrioriteNord_3</tabstop>
+  <tabstop>BitBtnDefFeuN</tabstop>
+  <tabstop>RadioGroupPrioriteOuest_0</tabstop>
+  <tabstop>RadioGroupPrioriteOuest_1</tabstop>
+  <tabstop>RadioGroupPrioriteOuest_2</tabstop>
+  <tabstop>RadioGroupPrioriteOuest_3</tabstop>
+  <tabstop>BitBtnDefFeuO</tabstop>
+  <tabstop>RadioGroupPrioriteEst_0</tabstop>
+  <tabstop>RadioGroupPrioriteEst_1</tabstop>
+  <tabstop>RadioGroupPrioriteEst_2</tabstop>
+  <tabstop>RadioGroupPrioriteEst_3</tabstop>
+  <tabstop>BitBtnDefFeuE</tabstop>
+  <tabstop>RadioGroupPrioriteSud_0</tabstop>
+  <tabstop>RadioGroupPrioriteSud_1</tabstop>
+  <tabstop>RadioGroupPrioriteSud_2</tabstop>
+  <tabstop>RadioGroupPrioriteSud_3</tabstop>
+  <tabstop>BitBtnDefFeuS</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAppliquer</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioGroup</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TBitBtn</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_inftram.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmInfosTram</class>
+ <widget class="QDialog" name="frmInfosTram">
+  <property name="geometry">
+   <rect>
+    <x>297</x>
+    <y>432</y>
+    <width>289</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Propriétés du tram</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>672</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label0">
+   <property name="text">
+    <string>Coordonnées :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>69</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCoordonnees">
+   <property name="text">
+    <string>00, 00</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>8</y>
+     <width>37</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label17">
+   <property name="text">
+    <string>(*) 0 = Aucun.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>330</y>
+     <width>54</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label18">
+   <property name="text">
+    <string>(**) Du dernier arrêt au prochain arrêt.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>330</y>
+     <width>150</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>59</x>
+     <y>348</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonAucunTram">
+   <property name="text">
+    <string>Aucun tram</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>19</x>
+     <y>32</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabStop" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBoxTram">
+   <property name="title">
+    <string>                           </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>56</y>
+     <width>273</width>
+     <height>273</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+   <widget class="TLabel" name="Label1">
+    <property name="text">
+     <string>Direction :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>28</y>
+      <width>48</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label3">
+    <property name="text">
+     <string>Dernier arrêt* :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>60</y>
+      <width>68</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label5">
+    <property name="text">
+     <string>Tours effectifs :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>108</y>
+      <width>73</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label6">
+    <property name="text">
+     <string>Distance totale parcourue :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>124</y>
+      <width>128</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label9">
+    <property name="text">
+     <string>Parcours effectué :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>204</y>
+      <width>90</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label10">
+    <property name="text">
+     <string>Détour effectué :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>220</y>
+      <width>80</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label11">
+    <property name="text">
+     <string>Attente effectuée :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>236</y>
+      <width>88</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDernierArret">
+    <property name="text">
+     <string>0 (00, 00)  jusqu'au tour 0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>108</x>
+      <y>60</y>
+      <width>148</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelParcours">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>124</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDirection">
+    <property name="text">
+     <string />
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>251</x>
+      <y>29</y>
+      <width>5</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelTours">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>108</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelParcoursEffectue">
+    <property name="text">
+     <string>0,000%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>214</x>
+      <y>204</y>
+      <width>42</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDetour">
+    <property name="text">
+     <string>0,000%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>214</x>
+      <y>220</y>
+      <width>42</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label12">
+    <property name="text">
+     <string>Vitesse max.(cases/tours) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>252</y>
+      <width>127</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelAttente">
+    <property name="text">
+     <string>0,000%</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>214</x>
+      <y>236</y>
+      <width>42</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelVitesse">
+    <property name="text">
+     <string>0/0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>235</x>
+      <y>252</y>
+      <width>21</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>Numéro de ligne de tram :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>44</y>
+      <width>121</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNumeroLigne">
+    <property name="text">
+     <string />
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>251</x>
+      <y>44</y>
+      <width>5</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label7">
+    <property name="text">
+     <string>Distance/Temps minimal restant à parcourir** :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>172</y>
+      <width>218</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDistance">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>172</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDistanceMin">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>188</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label8">
+    <property name="text">
+     <string>Distance/Temps minimal total à parcourir** :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>188</y>
+      <width>206</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label4">
+    <property name="text">
+     <string>Prochain arrêt :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>76</y>
+      <width>72</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelProchainArret">
+    <property name="text">
+     <string>0 (00, 00) depuis le tour 0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>108</x>
+      <y>76</y>
+      <width>148</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label13">
+    <property name="text">
+     <string>Nombre de personnes :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>92</y>
+      <width>110</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbPersonnes">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>92</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label14">
+    <property name="text">
+     <string>Distance parcourue depuis le dernier arrêt :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>156</y>
+      <width>203</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelParcoursEntreArrets">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>156</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label15">
+    <property name="text">
+     <string>Tours effectifs depuis le dernier arrêt :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>140</y>
+      <width>177</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelToursEntreArrets">
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>248</x>
+      <y>140</y>
+      <width>8</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonTramNumero">
+   <property name="text">
+    <string>Tram n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>19</x>
+     <y>55</y>
+     <width>58</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>144</x>
+     <y>348</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>RadioButtonAucunTram</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

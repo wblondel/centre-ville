@@ -1,0 +1,599 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_propos.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmAPropos</class>
+ <widget class="QDialog" name="frmAPropos">
+  <property name="geometry">
+   <rect>
+    <x>617</x>
+    <y>254</y>
+    <width>259</width>
+    <height>169</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>À propos de Centre-Ville</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBlack</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>14</number>
+  </property>
+  <widget class="TLabel" name="LabelAuteur2">
+   <property name="text">
+    <string>Idée &amp;&amp; Programme de Patrice FOUQUET</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>42</y>
+     <width>104</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clOlive</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCV2">
+   <property name="text">
+    <string>Centre-Ville</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>4</y>
+     <width>104</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-19</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Impact</family>
+     <pointsize>14</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clMaroon</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCV1">
+   <property name="text">
+    <string>Centre-Ville</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>69</x>
+     <y>3</y>
+     <width>104</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-19</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Impact</family>
+     <pointsize>14</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">0x000080FF</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelAuteur1">
+   <property name="text">
+    <string>Idée &amp;&amp; Programme de Patrice FOUQUET</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>69</x>
+     <y>41</y>
+     <width>104</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clYellow</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelEMail">
+   <property name="text">
+    <string>centre-ville@patquoi.fr</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>152</y>
+     <width>259</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>true</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clAqua</string>
+   </property>
+   <property name="vclCursor" stdset="0">
+    <string notr="true">crHandPoint</string>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alBottom</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelURL">
+   <property name="text">
+    <string>http://patquoi.fr/#cvw</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>138</y>
+     <width>259</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>true</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clAqua</string>
+   </property>
+   <property name="vclCursor" stdset="0">
+    <string notr="true">crHandPoint</string>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alBottom</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelTexte">
+   <property name="text">
+    <string>Cette simulation est née le jour où j'ai constaté comme la circulation des êtres humains est imprévisible. Etant impuissants, détendons-nous et comtemplons ce phénomène. Le chaos ne peut être que comtemplé.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>24</x>
+     <y>76</y>
+     <width>212</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clLime</string>
+   </property>
+   <property name="toolTip">
+    <string>Voyons les humains comme des fourmis. Hormis que les fourmis n'ont pas de voitures.</string>
+   </property>
+   <property name="statusTip">
+    <string>Voyons les humains comme des fourmis. Hormis que les fourmis n'ont pas de voitures.</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBlack</string>
+   </property>
+  </widget>
+  <widget class="TSpeedButton" name="SpeedButtonOk">
+   <property name="autoRaise">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>48</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Cliquer sur le feu tricolore pour fermer</string>
+   </property>
+   <property name="statusTip">
+    <string>Cliquer sur le feu tricolore pour fermer</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelSousVersion">
+   <property name="text">
+    <string>,3</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>239</x>
+     <y>34</y>
+     <width>9</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clLime</string>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBlack</string>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelGPL1">
+   <property name="text">
+    <string>GPL 2.0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>185</x>
+     <y>46</y>
+     <width>57</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-16</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+     <pointsize>12</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clBlue</string>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBlack</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelGPL2">
+   <property name="text">
+    <string>GPL 2.0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>184</x>
+     <y>45</y>
+     <width>57</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-16</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Comic Sans MS</family>
+     <pointsize>12</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clSkyBlue</string>
+   </property>
+   <property name="toolTip">
+    <string>Cliquer ici pour plus d'infos...</string>
+   </property>
+   <property name="statusTip">
+    <string>Cliquer ici pour plus d'infos...</string>
+   </property>
+   <property name="vclColor" stdset="0">
+    <string notr="true">clBlack</string>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageVersion">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_propos/ImageVersion.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>183</x>
+     <y>3</y>
+     <width>56</width>
+     <height>44</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelAlignement">
+   <property name="text">
+    <string>version %d bits</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>26</y>
+     <width>107</width>
+     <height>12</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clRed</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageEditionSpeciale">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_propos/ImageEditionSpeciale.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>0</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelHDPI">
+   <property name="text">
+    <string>HDPI x</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>56</y>
+     <width>48</width>
+     <height>14</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clFuchsia</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <property name="vcl_Timer" stdset="0">
+   <stringlist notr="true">
+    <string>Classe=TTimer</string>
+    <string>Enabled=False</string>
+    <string>OnTimer=TimerTimer</string>
+   </stringlist>
+  </property>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TSpeedButton</class>
+   <extends>QToolButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TImage</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

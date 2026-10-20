@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_infptn.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmInfosPieton</class>
+ <widget class="QDialog" name="frmInfosPieton">
+  <property name="geometry">
+   <rect>
+    <x>1</x>
+    <y>3</y>
+    <width>289</width>
+    <height>401</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Propriétés du piéton</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>68</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label0">
+   <property name="text">
+    <string>Coordonnées :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>69</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCoordonnees">
+   <property name="text">
+    <string>00, 00</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>8</y>
+     <width>37</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>58</x>
+     <y>364</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonAucunPieton">
+   <property name="text">
+    <string>Aucun piéton</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>19</x>
+     <y>32</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclTabStop" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBoxPieton">
+   <property name="title">
+    <string>                           </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>56</y>
+     <width>273</width>
+     <height>296</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+   <widget class="TLabel" name="Label1">
+    <property name="text">
+     <string>Direction :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>28</y>
+      <width>48</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label3">
+    <property name="text">
+     <string>Situation :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>60</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label4">
+    <property name="text">
+     <string>Distance parcourue :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>76</y>
+      <width>99</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelSituation">
+    <property name="text">
+     <string />
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>64</x>
+      <y>60</y>
+      <width>192</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelParcours">
+    <property name="text">
+     <string>0,0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>237</x>
+      <y>76</y>
+      <width>19</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDirection">
+    <property name="text">
+     <string />
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>64</x>
+      <y>29</y>
+      <width>192</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>Position :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>44</y>
+      <width>43</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelPosition">
+    <property name="text">
+     <string />
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>64</x>
+      <y>44</y>
+      <width>192</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label5">
+    <property name="text">
+     <string>Bus/Tram/Taxi/Vehlib :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>92</y>
+      <width>112</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelBusTramTaxiVehlib">
+    <property name="text">
+     <string>0 (00, 00)</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>92</y>
+      <width>56</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label6">
+    <property name="text">
+     <string>Arrêt de bus ou tram/File taxi/vehlib :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>108</y>
+      <width>174</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelArretBusTramFileTaxiVehlib">
+    <property name="text">
+     <string>0 (00, 00)</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>108</y>
+      <width>56</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-11</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>MS Sans Serif</family>
+      <pointsize>8</pointsize>
+      <bold>true</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TGroupBox" name="GroupBoxEpidemie">
+    <property name="title">
+     <string>  </string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>134</y>
+      <width>243</width>
+      <height>147</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+    <widget class="TLabel" name="Label7">
+     <property name="text">
+      <string>Infecté </string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>24</y>
+       <width>36</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelInfecte">
+     <property name="text">
+      <string>Non</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>203</x>
+       <y>24</y>
+       <width>24</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label8">
+     <property name="text">
+      <string>Rang (premier, dernier)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>56</y>
+       <width>107</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelRangs">
+     <property name="text">
+      <string>0, 0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>204</x>
+       <y>56</y>
+       <width>23</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label9">
+     <property name="text">
+      <string>Tours d'infection (premier, dernier)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>72</y>
+       <width>159</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelTours">
+     <property name="text">
+      <string>0, 0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>204</x>
+       <y>72</y>
+       <width>23</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label10">
+     <property name="text">
+      <string>Infections (périodes discontinues)</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>40</y>
+       <width>157</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelInfections">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>219</x>
+       <y>40</y>
+       <width>8</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label11">
+     <property name="text">
+      <string>Période d'infectiosité entamée</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>88</y>
+       <width>141</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelPeriodeInfectiosite">
+     <property name="text">
+      <string>0%</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>88</y>
+       <width>17</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label13">
+     <property name="text">
+      <string>Charge virale</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>104</y>
+       <width>62</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelChargeVirale">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>219</x>
+       <y>104</y>
+       <width>8</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label12">
+     <property name="text">
+      <string>Etat à l'issue de la période :</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>16</x>
+       <y>120</y>
+       <width>129</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelEtatFinal">
+     <property name="text">
+      <string>Sain/Mort</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>120</y>
+       <width>57</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>true</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+   </widget>
+   <widget class="TCheckBox" name="CheckBoxEpidemie">
+    <property name="text">
+     <string>Epidémie activée </string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>28</x>
+      <y>134</y>
+      <width>102</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonPietonNumero">
+   <property name="text">
+    <string>Piéton n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>19</x>
+     <y>55</y>
+     <width>60</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>364</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>RadioButtonAucunPieton</tabstop>
+  <tabstop>CheckBoxEpidemie</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

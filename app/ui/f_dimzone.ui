@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_dimzone.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmDimensionsZone</class>
+ <widget class="QDialog" name="frmDimensionsZone">
+  <property name="geometry">
+   <rect>
+    <x>375</x>
+    <y>325</y>
+    <width>276</width>
+    <height>121</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dimensions de la zone</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>3111</number>
+  </property>
+  <property name="vclActiveControl" stdset="0">
+   <string notr="true">CSpinEditNbX</string>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true" />
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsDialog</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label1">
+   <property name="text">
+    <string>Colonnes (X) :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>66</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label2">
+   <property name="text">
+    <string>x lignes (Y) :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>144</x>
+     <y>8</y>
+     <width>57</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditNbX">
+   <property name="minimum">
+    <number>-2147483647</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>76</x>
+     <y>6</y>
+     <width>65</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditNbY">
+   <property name="minimum">
+    <number>-2147483647</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>204</x>
+     <y>6</y>
+     <width>65</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonCreer">
+   <property name="text">
+    <string>Créer</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>85</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>96</x>
+     <y>85</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>192</x>
+     <y>85</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxAfficherParametres">
+   <property name="text">
+    <string>Afficher les paramètres après création de la zone</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>36</y>
+     <width>250</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxGenererReseau">
+   <property name="text">
+    <string>Générer aléatoirement un réseau</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>57</y>
+     <width>177</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>CSpinEditNbX</tabstop>
+  <tabstop>CSpinEditNbY</tabstop>
+  <tabstop>ButtonCreer</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAide</tabstop>
+  <tabstop>CheckBoxAfficherParametres</tabstop>
+  <tabstop>CheckBoxGenererReseau</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

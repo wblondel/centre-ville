@@ -1,0 +1,35 @@
+Rapport de tools/dfm2ui.py (GÉNÉRÉ : ne pas modifier)
+
+f_afdistab : frmAffDistArretsBus (QDialog), 1 composants, 3 gestionnaires d'événements
+f_afdistat : frmAffDistArretsTram (QDialog), 1 composants, 3 gestionnaires d'événements
+f_afdistfp : frmAffDistFilesPark (QDialog), 3 composants, 4 gestionnaires d'événements
+f_afdistft : frmAffDistFilesTaxi (QDialog), 1 composants, 3 gestionnaires d'événements
+f_afdistp : frmAffDistParkings (QDialog), 3 composants, 4 gestionnaires d'événements
+f_afdistpv : frmAffDistPlacesVehlib (QDialog), 1 composants, 3 gestionnaires d'événements
+f_carfours : frmCarrefours (QDialog), 30 composants, 20 gestionnaires d'événements
+f_deff : frmDefFeux (QDialog), 26 composants, 14 gestionnaires d'événements
+f_deffp : frmDefFeuxPietons (QDialog), 26 composants, 13 gestionnaires d'événements
+f_defn : frmDefNature (QDialog), 7 composants, 7 gestionnaires d'événements
+f_defv : frmDefVoie (QDialog), 14 composants, 16 gestionnaires d'événements
+f_defvp : frmDefVoiePietons (QDialog), 25 composants, 12 gestionnaires d'événements
+f_dimzone : frmDimensionsZone (QDialog), 9 composants, 5 gestionnaires d'événements
+f_epidemie : frmEpidemie (QDialog), 17 composants, 3 gestionnaires d'événements
+f_genres : frmGeneration (QDialog), 16 composants, 3 gestionnaires d'événements
+f_infbus : frmInfosBus (QDialog), 41 composants, 5 gestionnaires d'événements
+f_infptn : frmInfosPieton (QDialog), 35 composants, 5 gestionnaires d'événements
+f_inftaxi : frmInfosTaxi (QDialog), 31 composants, 5 gestionnaires d'événements
+f_inftram : frmInfosTram (QDialog), 39 composants, 5 gestionnaires d'événements
+f_infveh : frmInfosVehicule (QDialog), 33 composants, 5 gestionnaires d'événements
+f_infvehlib : frmInfosVehlib (QDialog), 27 composants, 5 gestionnaires d'événements
+f_prmbus : frmParamBus (QDialog), 179 composants, 129 gestionnaires d'événements
+f_prmsim : frmParamSimul (QDialog), 41 composants, 21 gestionnaires d'événements
+f_prmtaxi : frmParamTaxi (QDialog), 20 composants, 10 gestionnaires d'événements
+f_prmtram : frmParamTram (QDialog), 179 composants, 129 gestionnaires d'événements
+f_prmvehlib : frmParamVehlib (QDialog), 18 composants, 9 gestionnaires d'événements
+f_propos : frmAPropos (QDialog), 18 composants, 15 gestionnaires d'événements
+f_rech : frmRecherche (QDialog), 37 composants, 38 gestionnaires d'événements
+f_simul : frmSimulation (QMainWindow), 357 composants, 121 gestionnaires d'événements
+f_stats : frmStatistiques (QDialog), 1 composants, 5 gestionnaires d'événements
+f_statsat : frmStatsAttenteTrafic (QDialog), 45 composants, 25 gestionnaires d'événements
+f_statsc : frmStatsComposition (QDialog), 115 composants, 3 gestionnaires d'événements
+f_statsv : frmStatsVehicules (QDialog), 5 composants, 6 gestionnaires d'événements
