@@ -1,0 +1,59 @@
+Rapport de tools/extrait_images.py (GÉNÉRÉ : ne pas modifier)
+
+615 images de collections, 75 images de composants (glyphes/TImage), 763 fichiers écrits
+  f_carfours.dfm, ImageCollection : 18 images
+  f_propos.dfm, ImageCollection : 3 images
+  f_simul.dfm, ImageCollection : 594 images
+
+VirtualImageList8x8 : 488 images (indice i -> Simulation\S<i>)
+VirtualImageList16x16 : 89 images (indice i -> Boutons\B<i>)
+VirtualImageListGlyphes : 17 images (indice i -> Glyphes\G<i+1>)
+
+Constantes IDB_* de f_simul.cpp (indices de VirtualImageList8x8) :
+  IDB_DIR          0 -> Simulation\S000
+  IDB_FEU          4 -> Simulation\S004
+  IDB_STOP        20 -> Simulation\S020
+  IDB_CLP         24 -> Simulation\S024
+  IDB_VOIE        28 -> Simulation\S028
+  IDB_CURSEUR     44 -> Simulation\S044
+  IDB_CURSERR     45 -> Simulation\S045
+  IDB_PARKING     46 -> Simulation\S046
+  IDB_SELFEU      47 -> Simulation\S047
+  IDB_DIRTD       51 -> Simulation\S051
+  IDB_VEH         55 -> Simulation\S055
+  IDB_PSGPT      127 -> Simulation\S127
+  IDB_PIETON     129 -> Simulation\S129
+  IDB_URGENCE    153 -> Simulation\S153
+  IDB_POLICE     157 -> Simulation\S157
+  IDB_VEHPU      165 -> Simulation\S165
+  IDB_NUMPRKNG   189 -> Simulation\S189
+  IDB_ARRETBUS   221 -> Simulation\S221
+  IDB_BUSTRAM    233 -> Simulation\S233
+  IDB_DEPOTBUS   341 -> Simulation\S341
+  IDB_PSGBUS     342 -> Simulation\S342
+  IDB_VOIETRAM   343 -> Simulation\S343
+  IDB_ARRETTRAM  349 -> Simulation\S349
+  IDB_PLCTAXI    355 -> Simulation\S355
+  IDB_VEHTAXI    356 -> Simulation\S356
+  IDB_TROTTOIR   368 -> Simulation\S368
+  IDB_TOITURE    384 -> Simulation\S384
+  IDB_COINTOIT   400 -> Simulation\S400
+  IDB_ARBRE      404 -> Simulation\S404
+  IDB_PELOUSE    408 -> Simulation\S408
+  IDB_SANG       409 -> Simulation\S409
+  IDB_PLCPRKG    410 -> Simulation\S410
+  IDB_FEUP       411 -> Simulation\S411
+  IDB_FEUT       423 -> Simulation\S423
+  IDB_PLCVLB     439 -> Simulation\S439
+  IDB_PLCVLBR    443 -> Simulation\S443
+  IDB_PTNSAIN    479 -> Simulation\S479
+  IDB_PTNCNTG    137 -> Simulation\S137
+  IDB_MORT       487 -> Simulation\S487
+  IDB_COINTROT   447 -> Simulation\S447
+  IDB_DIRCARF    451 -> Simulation\S451
+
+Contrôle croisé des collections avec res/png :
+  f_carfours.dfm, ImageCollection : 18 identiques à l'octet près, 0 au pixel près, 0 différentes, 0 absentes
+  f_propos.dfm, ImageCollection : 3 identiques à l'octet près, 0 au pixel près, 0 différentes, 0 absentes
+  f_simul.dfm, ImageCollection : 594 identiques à l'octet près, 0 au pixel près, 0 différentes, 0 absentes
+  Présentes dans res/png mais dans aucune collection : cv

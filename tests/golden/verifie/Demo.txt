@@ -1,0 +1,6 @@
+# centre_ville::Verifie() sur maps/Démo.cvw, après ouverture (option « Vérifier intégrité après
+# ouverture ») puis après la préparation de la simulation (« Vérifier avant simulation »).
+# Lignes suivantes (hors commentaires) : messages attendus, sous chaque titre.
+# Aucun message attendu.
+[apres ouverture]
+[avant simulation]

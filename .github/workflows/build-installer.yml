@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           # Ensure fresh source code zip archive matches repository state
-          7z a -tzip cvw-src-win64.zip src/ docs/ maps/ inno-setup/ res/ legacy/ LICENSE
+          7z a -tzip cvw-src-win64.zip src/ docs/ maps/ inno-setup/ res/ LICENSE
 
       - name: Verify Game Binaries
         shell: pwsh

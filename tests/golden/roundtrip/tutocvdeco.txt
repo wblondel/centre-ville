@@ -1,0 +1,7 @@
+# Round-trip Charge -> Sauve de docs/tutorial/tutocvdeco.cvw (format 0x530, zone 64x64)
+# Carte du tutoriel, identique à celle livrée par l'installeur officiel.
+# Vérifié par tests/test_cvw.cpp contre la conversion de référence
+# tests/support/format_reference.cpp (spécification du format, indépendante du moteur).
+# Format courant : le fichier réenregistré est identique octet pour octet à l'original.
+# Aucun feu fantôme (v5.1.1) ni parking/place indéfini (v5.1) : aucun écart avec la référence.
+# Lignes suivantes (hors commentaires) : écarts attendus, un par champ (« nom : référence -> moteur »).

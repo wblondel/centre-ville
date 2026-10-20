@@ -1,0 +1,11 @@
+# centre_ville::Verifie() sur maps/Carfours.cvw, après ouverture (option « Vérifier intégrité après
+# ouverture ») puis après la préparation de la simulation (« Vérifier avant simulation »).
+# Lignes suivantes (hors commentaires) : messages attendus, sous chaque titre.
+# ÉCART DU RÉSEAU D'ORIGINE (pas du portage) : Carfours.cvw contient 1000 véhicules pour
+# 4 parkings et aucune place de parking ; Verifie() exige un multiple de 4x3+2x0 = 12
+# (1000 = 83x12+4). Le binaire d'origine affiche le même message ; ActionMarche ne fait pas
+# ce contrôle et la simulation démarre normalement.
+[apres ouverture]
+Le nombre de véhicules ne permet pas une simulation équilibrée (1000)
+[avant simulation]
+Le nombre de véhicules ne permet pas une simulation équilibrée (1000)

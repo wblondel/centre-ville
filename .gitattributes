@@ -1,0 +1,12 @@
+# Fichiers de référence des tests et sorties générées : comparés octet pour
+# octet, ils doivent garder des fins de ligne LF sur toutes les plateformes.
+tests/golden/** text eol=lf
+app/ressources/*.h text eol=lf
+app/ressources/*.json text eol=lf
+app/ressources/*.qrc text eol=lf
+app/ressources/*.txt text eol=lf
+# Binaires
+*.cvw binary
+*.png binary
+*.bmp binary
+*.ico binary

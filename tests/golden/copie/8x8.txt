@@ -1,0 +1,11 @@
+# Golden master de « Copier vers... » (tests/support/golden.cpp)
+# carte=8x8
+selection complete (0,0,8,8) valide=1
+  copie taille=7332 empreinte=e77e8ceca5e1ec79
+  identique a Sauve=1
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=8
+selection reduite (1,1,6,6) valide=1
+  copie taille=5064 empreinte=5684153c24f5ab53
+  identique a Sauve=0
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=6
+rechargement copie reduite=1 NbX=6 NbY=6 verifie=ok
