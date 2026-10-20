@@ -4,10 +4,10 @@
 //---------------------------------------------------------------------------
 // Directives de compilation
 //---------------------------------------------------------------------------
-#pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2)
+//#pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2) // portage : pragma C++Builder neutralisé
 //---------------------------------------------------------------------------
-#include <dstring.h>
-#include <systdate.h>
+#include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
+#include "compat/temps.h" // portage : remplace <systdate.h> (TDateTime, Time)
 //---------------------------------------------------------------------------
 #define NBXDEF                    99 // v4.0 (NBX->NBXDEF)
 #define NBYDEF                    63 // v4.0 (NBY->NBYDEF)
@@ -66,8 +66,8 @@
 #define  IFEUDIR(n,d)      (cv->FeuP[(n)-1].iFeuDir[d])
 #define  IFEUOPPDIR(d)     iFeuDir[InvDir[d]-1]
 //---------------------------------------------------------------------------
-#define min(x,y) (((x)<(y))?(x):(y))
-#define max(x,y) (((x)>(y))?(x):(y))
+//#define min(x,y) (((x)<(y))?(x):(y)) // portage : inutilisée par le moteur, retirée (conflit avec la STL)
+//#define max(x,y) (((x)>(y))?(x):(y)) // portage : inutilisée par le moteur, retirée (conflit avec la STL)
 //---------------------------------------------------------------------------
 // Pour centre_ville::PrepareCopie(...)
 #define DEBUT true
@@ -126,30 +126,30 @@
 // version 5.4 : Version 32 et 64 bits
 // version 5.4.1 : Ajout de la notion d'épidémie (spécial Covid-19)
 //----------------------------------------------------------------------------------------------------------------------
-// Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets)
+// Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets) // portage : signed char, car char est non signé sur certaines plateformes (Linux ARM64) ; tailles vérifiées dans format_cvw.h
 //----------------------------------------------------------------------------------------------------------------------
-enum priorite : char {a_droite, cedez_le_passage, stop, feux};
-enum direction : char {indefinie, nord, est, sud, ouest};
-enum sens : char {indefini, horizontal, vertical}; // v2.0. Pour les passages piétons
-enum dirposs : char {aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO};
-enum diraprendre : char {gauche, devant, droite};
-enum etat_feu : char {inactif, vert, orange, rouge};
-enum dmd_vert : char {arrivee_vehicule, immediate};
-enum psg_rouge : char {prm_dmd, immediat};
-enum type_stats : char {par_nombre, par_pourcentage};
-enum compatibilite : char {version_inf_16, version_inf_20, version_courante}; // v2.0
-enum niveau_priorite : char {normal, urgence, police}; // v2.2
-enum position_arret_bus_tram : char {tete, milieu, queue}; // v3.5 (ajout de "_tram" au nom du type car communs aux deux types d'arrêt)
-enum sens_voie_tram : char {aucune_voie=0, nord_est=1, nord_sud=2, nord_ouest=4, sud_est=8, est_ouest=16, sud_ouest=32}; // v3.5
-enum sens_voie_tram_base : char {aucune_voie_base, ne, ns, no, se, eo, so};
-enum type_distance : char {type_indefini, parkings, arrets_bus, arrets_tram, files_taxi, files_park, files_vehlib}; // v3.5. v3.6 : Ajout de files_taxi. v5.0 : Ajout de files_park. v5.3 : Ajout de files_vehlib
-enum type_voie : char {tvAucun, tvRoute, tvVoieTram, tvTout}; // pour la suppression des routes et voies de tram. v3.5
-enum situation_taxi : char {stAttente, stDepart, stDepot, stRetour}; // v3.6
-enum situation_vehlib : char {svAttente, svDepart}; // v5.3
+enum priorite : signed char {a_droite, cedez_le_passage, stop, feux}; // portage : signed char
+enum direction : signed char {indefinie, nord, est, sud, ouest}; // portage : signed char
+enum sens : signed char {indefini, horizontal, vertical}; // v2.0. Pour les passages piétons // portage : signed char
+enum dirposs : signed char {aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO}; // portage : signed char
+enum diraprendre : signed char {gauche, devant, droite}; // portage : signed char
+enum etat_feu : signed char {inactif, vert, orange, rouge}; // portage : signed char
+enum dmd_vert : signed char {arrivee_vehicule, immediate}; // portage : signed char
+enum psg_rouge : signed char {prm_dmd, immediat}; // portage : signed char
+enum type_stats : signed char {par_nombre, par_pourcentage}; // portage : signed char
+enum compatibilite : signed char {version_inf_16, version_inf_20, version_courante}; // v2.0 // portage : signed char
+enum niveau_priorite : signed char {normal, urgence, police}; // v2.2 // portage : signed char
+enum position_arret_bus_tram : signed char {tete, milieu, queue}; // v3.5 (ajout de "_tram" au nom du type car communs aux deux types d'arrêt) // portage : signed char
+enum sens_voie_tram : signed char {aucune_voie=0, nord_est=1, nord_sud=2, nord_ouest=4, sud_est=8, est_ouest=16, sud_ouest=32}; // v3.5 // portage : signed char
+enum sens_voie_tram_base : signed char {aucune_voie_base, ne, ns, no, se, eo, so}; // portage : signed char
+enum type_distance : signed char {type_indefini, parkings, arrets_bus, arrets_tram, files_taxi, files_park, files_vehlib}; // v3.5. v3.6 : Ajout de files_taxi. v5.0 : Ajout de files_park. v5.3 : Ajout de files_vehlib // portage : signed char
+enum type_voie : signed char {tvAucun, tvRoute, tvVoieTram, tvTout}; // pour la suppression des routes et voies de tram. v3.5 // portage : signed char
+enum situation_taxi : signed char {stAttente, stDepart, stDepot, stRetour}; // v3.6 // portage : signed char
+enum situation_vehlib : signed char {svAttente, svDepart}; // v5.3 // portage : signed char
 enum nature { voies,
               trottoirs=0x10000, arbre=0x10010, pelouse=0x10020,  // Décors zone piétonne (v3.9)
               immeubles=0x20000};
-enum coin : char {aucun_coin, haut_droite, bas_droite, bas_gauche=4, haut_gauche=8, quatre_coins=15}; // v3.8
+enum coin : signed char {aucun_coin, haut_droite, bas_droite, bas_gauche=4, haut_gauche=8, quatre_coins=15}; // v3.8 // portage : signed char
 //---------------------------------------------------------------------------
 class centre_ville;
 //---------------------------------------------------------------------------
@@ -160,7 +160,7 @@ class infection // v5.4.1
 	  NumPrmPieton, NumDrnPieton, // Pas de patient source car patient zéro donc... vaut zéro !
 	  PrmRang, DrnRang, // 0 = patient zéro.
 	  ChargeVirale; // Est incrémenté à chaque (ré)infection dans la période contagieuse
-  public:
+  public: friend class ExportEtat; // portage : lecture de l'état complet (tests du moteur)
   infection *Svt;
   infection(const centre_ville *cv); // Patient zéro
   infection(int Tour, int NumPietonOrigine, int Rang);
@@ -1228,7 +1228,7 @@ class centre_ville
   void PrepareFeuxPietons(); // v5.2
   bool FeuPietonsPossible(int x, int y, direction d); //v5.2
   bool PassagePietonFranchissable(int x, int y, direction d); // v5.2
-  void __fastcall EffectueTourSimulation();
+  void /*__fastcall*/ EffectueTourSimulation(); // portage : convention d'appel C++Builder retirée
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);

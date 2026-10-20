@@ -43,3 +43,6 @@ bin/
 
 # CI and release archives
 *.zip
+
+# CMake (presets)
+build/

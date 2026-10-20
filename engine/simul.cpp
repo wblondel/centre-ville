@@ -1,24 +1,24 @@
 //---------------------------------------------------------------------------
-#include <vcl.h>
-#pragma hdrstop
+//#include <vcl.h> // portage : C++Builder
+//#pragma hdrstop // portage : C++Builder
 //---------------------------------------------------------------------------
 #include <stdlib.h>
 #include <time.h>
 //---------------------------------------------------------------------------
-#include "base.h"
+#include "vue.h" // portage : remplace base.h (AfficheMessage) et les fiches f_*.h
 #include "simul.h"
-#include "f_simul.h"
-#include "f_stats.h"
-#include "f_statsv.h"
-#include "f_infveh.h"
-#include "f_infptn.h"
-#include "f_infbus.h"
-#include "f_inftram.h"
-#include "f_inftaxi.h"
-#include "f_infvehlib.h"
-#include "f_rech.h"
+#include "format_cvw.h" // portage : remplace f_simul.h ; static_assert sur les types sérialisés
+#include "compat/fichier.h" // portage : remplace f_stats.h ; FileRead/FileWrite (SysUtils)
+#include "compat/alea.h" // portage : remplace f_statsv.h ; rand()/srand() de la RTL Borland (après les en-têtes système)
+//#include "f_infveh.h" // portage : remplacé par vue.h
+//#include "f_infptn.h" // portage : remplacé par vue.h
+//#include "f_infbus.h" // portage : remplacé par vue.h
+//#include "f_inftram.h" // portage : remplacé par vue.h
+//#include "f_inftaxi.h" // portage : remplacé par vue.h
+//#include "f_infvehlib.h" // portage : remplacé par vue.h
+//#include "f_rech.h" // portage : remplacé par vue.h
 //---------------------------------------------------------------------------
-#pragma package(smart_init)
+//#pragma package(smart_init) // portage : C++Builder
 //---------------------------------------------------------------------------
 #define PEUT_ETRE_INDEFINI true
 #define DOIT_ETRE_DEFINI   false
@@ -511,7 +511,7 @@ void feu::ChangeEtat()
  {
   bool ChgEtat=(Etat!=ProchainEtat);
   Etat=ProchainEtat;
-  if (ChgEtat) frmSimulation->RedessineCase(x, y, false);
+  if (ChgEtat) vue->RedessineCase(x, y, false); // portage
  }
 //-----------------------------------------------------------------------------
 void feu::DefinitProchainEtat()
@@ -864,7 +864,7 @@ void feu_pieton::ChangeEtat()
   Etat=ProchainEtat;
   if (ChgEtat)
    for(int i=0; i<NBFEUXPIETONSPARNUMERO; i++)
-    frmSimulation->RedessineCase(x[i], y[i], false);
+    vue->RedessineCase(x[i], y[i], false); // portage
  }
 //-----------------------------------------------------------------------------
 void feu_pieton::DefinitProchainEtat()
@@ -1424,7 +1424,7 @@ void vehlib::ReservePlaceVehlibCible()
   int xp=pv->x, yp=pv->y;
   pv->NumVehlibReserve=Numero;
   NumPlaceArrivee=NumPlace+1;
-  frmSimulation->RedessineCase(xp, yp, false);
+  vue->RedessineCase(xp, yp, false); // portage
  }
 //-----------------------------------------------------------------------------
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
@@ -1438,7 +1438,7 @@ void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
     p->MonteDansVehlib(Numero);
     if (!NumPlaceArrivee)
      ReservePlaceVehlibCible();
-    frmSimulation->RedessineCase(xp, yp, false);
+    vue->RedessineCase(xp, yp, false); // portage
    }
  }
 //-----------------------------------------------------------------------------
@@ -1526,7 +1526,7 @@ void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
     NbPersonnes++;
     cv->v[xp][yp].RetirePieton(NumPietonAFaireMonter);
     p->MonteDansBus(Numero); // v3.6
-    frmSimulation->RedessineCase(xp, yp, false);
+    vue->RedessineCase(xp, yp, false); // portage
    }
  }
 //-----------------------------------------------------------------------------
@@ -1792,7 +1792,7 @@ void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
     NbPersonnes++;
     cv->v[xp][yp].RetirePieton(NumPietonAFaireMonter);
     p->MonteDansTram(Numero); // v3.6
-    frmSimulation->RedessineCase(xp, yp, false);
+    vue->RedessineCase(xp, yp, false); // portage
    }
  }
 //-----------------------------------------------------------------------------
@@ -2266,7 +2266,7 @@ void taxi::FaitMonterPieton(int NumPietonAFaireMonter)
     NbPersonnes++;
     cv->v[xp][yp].RetirePieton(NumPietonAFaireMonter);
     p->MonteDansTaxi(Numero); // v3.6
-    frmSimulation->RedessineCase(xp, yp, false);
+    vue->RedessineCase(xp, yp, false); // portage
    }
  }
 //-----------------------------------------------------------------------------
@@ -2670,7 +2670,7 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
 
   NumProchVL=NumProchTaxi=NumProchTram=NumProchBus=NumProchVeh=0; // Aucun par défaut. v5.3 (vehlib)
   // 1. S'il y a un piéton, aucun ne peut arriver SAUF (v4.3) :
-  if ((!frmSimulation->SimulationSanglante)&& // Mode Sanglant OU
+  if ((!vue->SimulationSanglante())&& // Mode Sanglant OU // portage
       NbPietons&&                             // NbPietons=NbPiétonsEcrases ALORS on peut rouler dessus (v4.3)
       (NbPietons!=(NumPieton[0]&&
 				   (!cv->Pieton[NumPieton[0]-1].EstVivant()))+ // v5.4.1 : !EstVivant() au lieu de Ecrase
@@ -2864,7 +2864,7 @@ void voie::DeplaceVehiculeOuBusOuTramOuTaxi() // v3.6 (Taxis)
   if (NumProchVeh&&cv->Vehicule[NumProchVeh-1].PeutPasser())
    {  // Si le prochain véhicule peut arriver sur la case...
     cv->v[cv->Vehicule[NumProchVeh-1].x][cv->Vehicule[NumProchVeh-1].y].NumVehicule=0; // Effacée de la case d'origine
-    frmSimulation->RedessineCase(cv->Vehicule[NumProchVeh-1].x, cv->Vehicule[NumProchVeh-1].y, false);
+    vue->RedessineCase(cv->Vehicule[NumProchVeh-1].x, cv->Vehicule[NumProchVeh-1].y, false); // portage
     if (!cv->Vehicule[NumProchVeh-1].EstDestination(this)) // v5.0
      {
       cv->PlaceVehicule(x, y, NumProchVeh); // v2.2.7. Inclut les stats d'Attente/Trafic
@@ -2883,7 +2883,7 @@ void voie::DeplaceVehiculeOuBusOuTramOuTaxi() // v3.6 (Taxis)
 	cv->NbVehiculesDeplaces++;
     cv->Vehicule[NumProchVeh-1].NbCasesParcourues++;
     cv->Vehicule[NumProchVeh-1].TourDrnDepl=cv->TourCrt;
-    frmSimulation->RedessineCase(x, y, false);
+    vue->RedessineCase(x, y, false); // portage
     cv->Vehicule[NumProchVeh-1].DirDrnDepl=cv->Vehicule[NumProchVeh-1].Dir;
     NumProchVeh=0;
    }
@@ -2900,14 +2900,14 @@ void voie::DeplaceVehiculeOuBusOuTramOuTaxi() // v3.6 (Taxis)
   if (NumProchTaxi&&cv->Taxi[NumProchTaxi-1].PeutPasser()) // v3.6
    {  // Si le prochain taxi peut arriver sur la case...
     cv->v[cv->Taxi[NumProchTaxi-1].x][cv->Taxi[NumProchTaxi-1].y].NumTaxi=0; // Effacée de la case d'origine
-    frmSimulation->RedessineCase(cv->Taxi[NumProchTaxi-1].x, cv->Taxi[NumProchTaxi-1].y, false);
+    vue->RedessineCase(cv->Taxi[NumProchTaxi-1].x, cv->Taxi[NumProchTaxi-1].y, false); // portage
     cv->PlaceVehiculeTaxi(x, y, NumProchTaxi);
     NumProchTaxi=0;
    }
   if (NumProchVL&&cv->Vehlib[NumProchVL-1].PeutPasser()) // v5.3
    {  // Si le prochain vehlib peut arriver sur la case...
     cv->v[cv->Vehlib[NumProchVL-1].x][cv->Vehlib[NumProchVL-1].y].NumVehlib=0; // Effacée de la case d'origine
-    frmSimulation->RedessineCase(cv->Vehlib[NumProchVL-1].x, cv->Vehlib[NumProchVL-1].y, false);
+    vue->RedessineCase(cv->Vehlib[NumProchVL-1].x, cv->Vehlib[NumProchVL-1].y, false); // portage
     cv->PlaceVehiculeVehlib(x, y, NumProchVL);
     NumProchVL=0;
    }
@@ -3193,7 +3193,7 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 	  }
 	}
   // v5.4.1 Contamination si mode épidémique
-  if (frmSimulation->EpidemieActivee)
+  if (vue->EpidemieActivee()) // portage
    {
 	// 1. Infection par contact
 	if (NbPietonsDehors==2)
@@ -3223,7 +3223,7 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 		 }
 	   }
    }
-  frmSimulation->RedessineCase(x, y, false);
+  vue->RedessineCase(x, y, false); // portage
  }
 //-----------------------------------------------------------------------------
 void voie::RetireArretBus() // v3.0
@@ -3231,7 +3231,7 @@ void voie::RetireArretBus() // v3.0
   int Numero=NumArretBus,
 	  d;
   NumArretBus=0;
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,true);
+  if (vue) vue->RedessineCase(x,y,true); // portage
   for(d=nord; d<=ouest; d++)
    if (cv->V(x,y,d).NumArretBus==Numero)
 	cv->V(x,y,d).RetireArretBus();
@@ -3242,7 +3242,7 @@ void voie::RetireArretTram() // v3.5
   int Numero=NumArretTram,
       d;
   NumArretTram=0;
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,true);
+  if (vue) vue->RedessineCase(x,y,true); // portage
   for(d=nord; d<=ouest; d++)
    if (cv->V(x,y,d).NumArretTram==Numero)
     cv->V(x,y,d).RetireArretTram();
@@ -3251,19 +3251,19 @@ void voie::RetireArretTram() // v3.5
 void voie::RetirePlaceTaxi() // v3.6
  {
   NumPlaceTaxi=0;
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,true);
+  if (vue) vue->RedessineCase(x,y,true); // portage
  }
 //-----------------------------------------------------------------------------
 void voie::RetirePlacePark() // v5.0
  {
   NumPlacePark=0;
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,true);
+  if (vue) vue->RedessineCase(x,y,true); // portage
  }
 //-----------------------------------------------------------------------------
 void voie::RetirePlaceVehlib() // v5.3
  {
   NumPlaceVehlib=0;
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,true);
+  if (vue) vue->RedessineCase(x,y,true); // portage
  }
 //-----------------------------------------------------------------------------
 bool voie::EstTeteArretBus() // v3.0
@@ -3586,7 +3586,7 @@ void voie::DefinitArretTram(int n) // v3.5
 //-----------------------------------------------------------------------------
 void voie::RedessineCasesArretBus(direction d0) // v3.0
  {
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,false);
+  if (vue) vue->RedessineCase(x,y,false); // portage
   if (d0)
    {
     if (cv->V(x,y,d0).NumArretBus==NumArretBus)
@@ -3600,7 +3600,7 @@ void voie::RedessineCasesArretBus(direction d0) // v3.0
 //-----------------------------------------------------------------------------
 void voie::RedessineCasesArretTram(direction d0) // v3.5
  {
-  if (frmSimulation) frmSimulation->RedessineCase(x,y,false);
+  if (vue) vue->RedessineCase(x,y,false); // portage
   if (d0)
    {
     if (cv->V(x,y,d0).NumArretTram==NumArretTram)
@@ -3882,7 +3882,7 @@ void voie::DefinitNature(nature NvNature, bool Ecraser) // v3.8
         !_FEUXPIETONS) // v5.2 : on empêche la suppression des trottoirs libres (sans décors) si des feux de piétons existent
      Nature=NvNature;
     RedessineCase(true);
-    frmSimulation->SimulationModifiee=true;
+    vue->DefinitSimulationModifiee(true); // portage
    }
  }
 //-----------------------------------------------------------------------------
@@ -3906,7 +3906,7 @@ bool voie::FeuPietonsPossible() //v5.2
 //-----------------------------------------------------------------------------
 void voie::RedessineCase(bool EffaceFond) // v3.0
  {
-  frmSimulation->RedessineCase(x, y, EffaceFond);
+  vue->RedessineCase(x, y, EffaceFond); // portage
  }
 //-----------------------------------------------------------------------------
 bool voie::Charge(int hfile)
@@ -4236,7 +4236,7 @@ int centre_ville::DefinitNbPietons(int n)
 	for(i=0; i<n; i++)
 	 {
 	  Pieton[i].AffecteNumero(i+1);
-	  if ((frmSimulation->EpidemieActivee)&& // Si épidémie activée ET
+	  if ((vue->EpidemieActivee())&& // Si épidémie activée ET // portage
 		  EpidemieIterationPatientZero&& // Si patients zéro à définir ALORS
 		  (!((i+1)%EpidemieIterationPatientZero))) // On définit les patients zéro
 		Pieton[i].Infection = new infection(this);
@@ -5415,7 +5415,7 @@ void centre_ville::IncrementeAttente(int NumVehicule)
 void centre_ville::PlaceVehicule(int x, int y, int NumVehicule)
  {
   IncrementeAttente(NumVehicule);
-  if (frmSimulation->SimulationSanglante&&
+  if (vue->SimulationSanglante()&& // portage
       (x>-1)&&(y>-1)&&
       cv->v[x][y].NbPietons) // v4.3
    cv->v[x][y].TuePietons();
@@ -5487,7 +5487,7 @@ void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
    }
   b->DirAvtDrnDepl=b->DirDrnDepl;
   b->DirDrnDepl=b->Dir;
-  if (frmSimulation->SimulationSanglante&&cv->v[x][y].NbPietons) // v4.3
+  if (vue->SimulationSanglante()&&cv->v[x][y].NbPietons) // v4.3 // portage
    cv->v[x][y].TuePietons();
   b->Place(x,y);
   if (v[x][y].NumArretBus&&
@@ -5521,7 +5521,7 @@ void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
    }
   t->DirAvtDrnDepl=t->DirDrnDepl;
   t->DirDrnDepl=t->Dir;
-  if (frmSimulation->SimulationSanglante&&cv->v[x][y].NbPietons) // v4.3
+  if (vue->SimulationSanglante()&&cv->v[x][y].NbPietons) // v4.3 // portage
    cv->v[x][y].TuePietons();
   t->Place(x,y);
   if (v[x][y].NumArretTram&&
@@ -5550,7 +5550,7 @@ void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
   taxi *t=Taxi+NumTaxi-1;
   int NumPlace;
   t->DirDrnDepl=t->Dir;
-  if (frmSimulation->SimulationSanglante&&cv->v[x][y].NbPietons) // v4.3
+  if (vue->SimulationSanglante()&&cv->v[x][y].NbPietons) // v4.3 // portage
    cv->v[x][y].TuePietons();
   t->Place(x,y);
   t->NbCasesParcouruesDrnCourse++;
@@ -5585,7 +5585,7 @@ void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
   vehlib *vl=Vehlib+NumVehlib-1;
   int NumPlace;
   vl->DirDrnDepl=vl->Dir;
-  if (frmSimulation->SimulationSanglante&&cv->v[x][y].NbPietons)
+  if (vue->SimulationSanglante()&&cv->v[x][y].NbPietons) // portage
    cv->v[x][y].TuePietons();
   vl->Place(x,y);
   vl->NbCasesParcourues++;
@@ -5690,10 +5690,10 @@ bool centre_ville::PrepareTrams() // v3.5
    }
   if (!ArretTrv)
    {
-    AfficheMessage( "\n\
+    vue->AfficheMessage( "\n\
 Il n'est pas possible de placer tous les trams sur un arrêt de leur ligne respective !\n\
 Réorganisez votre réseau de trams (les lignes ou les arrêts) pour que le réseau puisse démarrer, puis réessayez !",
-                    "Impossible de placer les trams", tmAvertissement, 0, 0);
+                    "Impossible de placer les trams", tmAvertissement, 0, 0); // portage : vue->AfficheMessage
     return false;
    }
   else return true;
@@ -5771,7 +5771,7 @@ void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) // v2
       v[x][y].PassagePietons)        // Si le passage piéton est trouvé ALORS
    Pieton[NumPieton].PsgPtTrv=false; // On réactive les recherches de passages piétons
   v[x][y].AjoutePieton(NumPieton);
-  frmSimulation->RedessineCase(x, y, false);
+  vue->RedessineCase(x, y, false); // portage
  }
 
 //-----------------------------------------------------------------------------
@@ -5785,7 +5785,7 @@ bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENT
       ((!(vv->DirPoss&dp))||(!vv->Priorite[Dirdp[0][dp]-1])))
    {
     vv->DirPoss=(dirposs)(vv->DirPoss^dp);
-    frmSimulation->RedessineCase(x, y, true);
+    vue->RedessineCase(x, y, true); // portage
     return true;
    }
   else return false;
@@ -5794,60 +5794,60 @@ bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENT
 void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arrêts de bus. v3.5... Et des trams ! v3.6... Et des files de taxi !
  {
   int i;
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux parkings...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux parkings..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbParkings; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbParkings)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbParkings)))); // portage
+    vue->RepeintStatut(); // portage
     if (Parking[i].Defini())
      v[Parking[i].x][Parking[i].y].CalculeDistanceParking(i, 0, 0, indefinie);
    }
   // v3.0
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrêts de bus...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux arrêts de bus..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbArretsBus; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbArretsBus)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbArretsBus)))); // portage
+    vue->RepeintStatut(); // portage
     if (ArretBus[i].Defini())
      v[ArretBus[i].x][ArretBus[i].y].CalculeDistanceArretBus(i, 0, indefinie);
    }
   // v3.5
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux arrêts de tram...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux arrêts de tram..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbArretsTram; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbArretsTram)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbArretsTram)))); // portage
+    vue->RepeintStatut(); // portage
     if (ArretTram[i].Defini())
      v[ArretTram[i].x][ArretTram[i].y].CalculeDistanceArretTram(i, 0, indefinie);
    }
   // v3.6
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux files de taxi...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux files de taxi..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbFilesTaxi; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbFilesTaxi)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbFilesTaxi)))); // portage
+    vue->RepeintStatut(); // portage
     v[PlaceTaxi[FileTaxi[i].NumPlaceQueue].x][PlaceTaxi[FileTaxi[i].NumPlaceQueue].y].CalculeDistanceFileTaxi(i, 0, indefinie);
    }
   // v5.0
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux files de parkings...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux files de parkings..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbFilesPark; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbFilesPark)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbFilesPark)))); // portage
+    vue->RepeintStatut(); // portage
     v[PlacePark[FilePark[i].NumPlaceQueue].x][PlacePark[FilePark[i].NumPlaceQueue].y].CalculeDistanceFilePark(i, 0, 0, indefinie);
    }
   // v5.3
-  frmSimulation->StatusBar->Panels->Items[0]->Text="Calcul des distances aux places de vehlib...";
-  frmSimulation->StatusBar->Repaint();
+  vue->AfficheStatut(0, "Calcul des distances aux places de vehlib..."); // portage
+  vue->RepeintStatut(); // portage
   for(i=0; i<NbPlacesVehlib; i++)
    {
-    frmSimulation->StatusBar->Panels->Items[3]->Text=Format("%d/%d", ARRAYOFCONST((i+1, NbPlacesVehlib)));
-    frmSimulation->StatusBar->Repaint();
+    vue->AfficheStatut(3, Format("%d/%d", ARRAYOFCONST((i+1, NbPlacesVehlib)))); // portage
+    vue->RepeintStatut(); // portage
     v[PlaceVehlib[i].x][PlaceVehlib[i].y].CalculeDistancePlaceVehlib(i, 0, indefinie);
    }
  }
@@ -5860,12 +5860,12 @@ void centre_ville::RessuscitePietons() // v4.3.1
     if (p->Ecrase)
 	 {
 	  p->Ecrase=false;
-      frmSimulation->RedessineCase(p->x, p->y, true);
+      vue->RedessineCase(p->x, p->y, true); // portage
      }
 	if (p->Mort) // v5.4.1
 	 {
 	  p->SupprimeInfection();
-	  frmSimulation->RedessineCase(p->x, p->y, true);
+	  vue->RedessineCase(p->x, p->y, true); // portage
 	 }
    }
  }
@@ -5879,7 +5879,7 @@ void centre_ville::PlaceVehiculesSurPlacesPark() // v5.0
      {
       v[Veh->x][Veh->y].NumVehicule=i+1;
       PlaceVehicule(Veh->x, Veh->y, i+1); // v2.2.7. Inclut les stats d'Attente/Trafic
-      frmSimulation->RedessineCase(Veh->x, Veh->y, false);
+      vue->RedessineCase(Veh->x, Veh->y, false); // portage
       Vehicule[i].TourDepart=cv->TourCrt;
       NbVehiculesSortis++;
      }
@@ -5895,7 +5895,7 @@ void centre_ville::PlaceVehlibsSurPlaces() // v5.3
      {
       v[VL->x][VL->y].NumVehlib=i+1;
       PlaceVehiculeVehlib(VL->x, VL->y, i+1); // Inclut les stats d'Attente/Trafic
-      frmSimulation->RedessineCase(VL->x, VL->y, false);
+      vue->RedessineCase(VL->x, VL->y, false); // portage
      }
    }
  }
@@ -5948,15 +5948,15 @@ bool centre_ville::PassagePietonFranchissable(int x, int y, direction d) // v5.2
   return Possible;
  }
 //-----------------------------------------------------------------------------
-void __fastcall centre_ville::EffectueTourSimulation()
+void /*__fastcall*/ centre_ville::EffectueTourSimulation() // portage
  {
   int i, j;
   TourEnCours=true;
   NbVehiculesDeplaces=0;
-  if (frmSimulation->ResurrectionDemandee) // v4.3.1
+  if (vue->ResurrectionDemandee()) // v4.3.1 // portage
    {
     RessuscitePietons();
-    frmSimulation->ResurrectionDemandee=false;
+    vue->DefinitResurrectionDemandee(false); // portage
    }
   // 0. On déplace les piétons
   for(i=0; i<NbX; i++)
@@ -5965,7 +5965,7 @@ void __fastcall centre_ville::EffectueTourSimulation()
      v[i][j].DeplacePietons();
   NbPietonsGueris=NbPietonsInfectes=NbPietonsMorts=0L;
   // 0bis. v5.4.1 : On calcule les stats épidémiques de piétons si mode épidémie
-  if (frmSimulation->ActionEpidemie->Checked)
+  if (vue->ActionEpidemieCochee()) // portage
 	for(i=0; i<NbPietons; i++)
 	 {
 	  if (Pieton[i].Mort)
@@ -6025,48 +6025,48 @@ void __fastcall centre_ville::EffectueTourSimulation()
   // 6a. On rafraîchit les véhicules (la direction a pu changé)
   for(i=0; i<2*NbParkings; i++)
    if (Vehicule[i*(NbVehicules/NbParkings/2)].Defini())
-    frmSimulation->RedessineCase( Vehicule[i*(NbVehicules/NbParkings/2)].x,
+    vue->RedessineCase( Vehicule[i*(NbVehicules/NbParkings/2)].x, // portage
                                   Vehicule[i*(NbVehicules/NbParkings/2)].y,
                                   false);
   // 6b. Et les bus (la direction a pu changé). v3.0
   for(i=0; i<NbBus; i++)
    if (Bus[i].Defini())
-    frmSimulation->RedessineCase( Bus[i].x, Bus[i].y, false);
+    vue->RedessineCase( Bus[i].x, Bus[i].y, false); // portage
   // 6c. Et les trams (la direction a pu changé). v3.5
   for(i=0; i<NbTrams; i++)
    if (Tram[i].Defini())
-    frmSimulation->RedessineCase( Tram[i].x, Tram[i].y, false);
+    vue->RedessineCase( Tram[i].x, Tram[i].y, false); // portage
   // 6d. Et les taxis (la direction a pu changé). v3.6
   for(i=0; i<NbTaxis; i++)
-   frmSimulation->RedessineCase( Taxi[i].x, Taxi[i].y, false);
+   vue->RedessineCase( Taxi[i].x, Taxi[i].y, false); // portage
   // 6e. Et les vehlibs (la direction a pu changé). v5.3
   for(i=0; i<NbVehlibs; i++)
-   frmSimulation->RedessineCase( Vehlib[i].x, Vehlib[i].y, false);
+   vue->RedessineCase( Vehlib[i].x, Vehlib[i].y, false); // portage
 
   // 7. On affiche les stats...
   Stats[TourCrt%NbToursStats].Definit();
-  if (frmStatistiques->Visible) frmStatistiques->PaintBoxStats->Repaint();
-  if (frmStatsVehicules->Visible) frmStatsVehicules->RafraichitInfos();
-  if (frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
-  if (frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
-  if (frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
-  if (frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
-  if (frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.3
-  if (frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
-  if (frmRecherche&&frmRecherche->Visible)
+  if (vue->FicheVisible(fiStatistiques)) vue->RafraichitFiche(fiStatistiques); // portage
+  if (vue->FicheVisible(fiStatsVehicules)) vue->RafraichitFiche(fiStatsVehicules); // portage
+  if (vue->FicheVisible(fiInfosVehicule)) vue->RafraichitFiche(fiInfosVehicule); // portage
+  if (vue->FicheVisible(fiInfosBus)) vue->RafraichitFiche(fiInfosBus); // v3.0 // portage
+  if (vue->FicheVisible(fiInfosTram)) vue->RafraichitFiche(fiInfosTram); // v3.5 // portage
+  if (vue->FicheVisible(fiInfosTaxi)) vue->RafraichitFiche(fiInfosTaxi); // v3.6 // portage
+  if (vue->FicheVisible(fiInfosVehlib)) vue->RafraichitFiche(fiInfosVehlib); // v5.3 // portage
+  if (vue->FicheVisible(fiInfosPieton)) vue->RafraichitFiche(fiInfosPieton); // v3.0 // portage
+  if (vue->RechercheVisible()) // portage
    {
-    if (frmRecherche->RadioButtonVehicule->Checked)
-     frmRecherche->CSpinEditVehiculeChange(frmRecherche->CSpinEditVehicule);
-    if (frmRecherche->RadioButtonPieton->Checked)
-     frmRecherche->CSpinEditPietonChange(frmRecherche->CSpinEditPieton);
-    if (frmRecherche->RadioButtonBus->Checked) // v3.0
-     frmRecherche->CSpinEditBusChange(frmRecherche->CSpinEditBus);
-    if (frmRecherche->RadioButtonTram->Checked) // v3.5
-     frmRecherche->CSpinEditTramChange(frmRecherche->CSpinEditTram);
-    if (frmRecherche->RadioButtonTaxi->Checked) // v3.6
-     frmRecherche->CSpinEditTaxiChange(frmRecherche->CSpinEditTaxi);
-    if (frmRecherche->RadioButtonVehlib->Checked) // v5.3
-     frmRecherche->CSpinEditVehlibChange(frmRecherche->CSpinEditVehlib);
+    if (vue->RechercheCochee(orVehicule)) // portage
+     vue->RechercheActualise(orVehicule); // portage
+    if (vue->RechercheCochee(orPieton)) // portage
+     vue->RechercheActualise(orPieton); // portage
+    if (vue->RechercheCochee(orBus)) // v3.0 // portage
+     vue->RechercheActualise(orBus); // portage
+    if (vue->RechercheCochee(orTram)) // v3.5 // portage
+     vue->RechercheActualise(orTram); // portage
+    if (vue->RechercheCochee(orTaxi)) // v3.6 // portage
+     vue->RechercheActualise(orTaxi); // portage
+    if (vue->RechercheCochee(orVehlib)) // v5.3 // portage
+     vue->RechercheActualise(orVehlib); // portage
    }
 
   TourCrt+=(NbVehiculesArrives<NbVehicules);
@@ -6589,7 +6589,7 @@ bool centre_ville::CopieValide() // v4.2.1
     asMsg=asMsg+"la place de vehlib n°"+IntToStr(i+1)+" "+asCoordonnees(PlaceVehlib+i)+", ";
   if (!asMsg.IsEmpty())
    {
-    AfficheMessage("Les éléments suivants DOIVENT ÊTRE dans la sélection :\n"+asMsg+"\n\nVeuillez soit les supprimer, soit les inclure dans la sélection avant de réessayer.", "Commande de copie impossible", tmAvertissement, 0, 0);
+    vue->AfficheMessage("Les éléments suivants DOIVENT ÊTRE dans la sélection :\n"+asMsg+"\n\nVeuillez soit les supprimer, soit les inclure dans la sélection avant de réessayer.", "Commande de copie impossible", tmAvertissement, 0, 0); // portage
     return false;
    }
   else
