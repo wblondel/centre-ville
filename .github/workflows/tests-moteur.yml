@@ -1,0 +1,82 @@
+name: Tests moteur
+
+# Compile le moteur cvengine (sans Qt) et exécute ses tests sur les trois
+# systèmes : round-trip des cartes .cvw, Verifie(), golden master de la
+# simulation, génération aléatoire, « Copier vers... ». Le golden master doit
+# être identique sur toutes les plateformes.
+
+on:
+  push:
+    branches:
+      - main
+      - 'port/**'
+    paths:
+      - 'engine/**'
+      - 'tests/**'
+      - 'maps/**'
+      - 'tools/**'
+      - 'src/**'
+      - 'app/ressources/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - '.github/workflows/tests-moteur.yml'
+  pull_request:
+    paths:
+      - 'engine/**'
+      - 'tests/**'
+      - 'maps/**'
+      - 'tools/**'
+      - 'src/**'
+      - 'app/ressources/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - '.github/workflows/tests-moteur.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-moteur-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests moteur (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure (CMake preset ci)
+        run: cmake --preset ci
+
+      - name: Build
+        run: cmake --build --preset ci --parallel
+
+      - name: Run tests (CTest)
+        run: ctest --preset ci
+
+      - name: Upload golden master differences
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-ecarts-${{ matrix.os }}
+          path: build/ci/tests/sortie/golden
+          if-no-files-found: ignore
+
+  images:
+    name: Images extraites des .dfm à jour
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check tools/extrait_images.py output
+        run: python3 tools/extrait_images.py --verifie
