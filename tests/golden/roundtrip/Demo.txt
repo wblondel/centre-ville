@@ -1,0 +1,14 @@
+# Round-trip Charge -> Sauve de maps/Démo.cvw (format 0x500, zone 99x63)
+# Vérifié par tests/test_cvw.cpp contre la conversion de référence
+# tests/support/format_reference.cpp (spécification du format, indépendante du moteur).
+# Format antérieur : le moteur réenregistre au format courant 0x530 (357837 -> 507553 octets).
+# Le fichier obtenu est EXACTEMENT la conversion de référence, où les champs absents du
+# format 0x500 prennent les valeurs par défaut du constructeur de centre_ville :
+#   - en-tête : NbFeuxPieton=0, NbPlacesVehlib=0, NbVehlibs (*), paramètres vehlib 3/3/50/80 ;
+#   - chaque case : NumPlaceVehlib=0, NumSpotVehlib=0, NumFeuP[0..3]=0.
+# (*) NbVehlibs n'est initialisé ni par le constructeur de centre_ville ni par Charge pour
+#     les fichiers < 0x530 : l'original écrit une valeur indéterminée (mémoire du tas) ;
+#     les tests, dont la mémoire allouée est remise à zéro, écrivent 0. Comportement
+#     d'origine conservé (règle d'or du portage), à corriger après la bascule.
+# Aucun feu fantôme (v5.1.1) ni parking/place indéfini (v5.1) : aucun écart avec la référence.
+# Lignes suivantes (hors commentaires) : écarts attendus, un par champ (« nom : référence -> moteur »).
