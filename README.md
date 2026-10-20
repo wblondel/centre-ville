@@ -43,7 +43,6 @@ Cette version correspond à la version officielle finale **v5.4.3.2**.
 │   ├── simul.cpp / simul.h       # Moteur central de simulation (logique et IA)
 │   ├── f_simul.cpp               # Interface graphique principale
 │   └── cvw.cbproj                # Projet Embarcadero C++Builder
-├── legacy/                       # Archives historiques (portages Delphi v3.1, Kylix Linux v4.3.1)
 ├── LICENSE                       # Licence GPL v2
 └── README.md
 ```
