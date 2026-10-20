@@ -41,7 +41,7 @@ std::string FichierGolden(const std::string &asNomCarte, const config_golden &Co
 //---------------------------------------------------------------------------
 // Génération aléatoire de réseau (Fichier | Nouveau, fiche Génération) :
 // centre_ville par défaut NbX x NbY, paramètres par défaut de f_genres.dfm,
-// point de départ tiré par rand() (x, puis y, puis direction).
+// point de départ tiré par rand() (x, puis y, puis direction : ordre du binaire d'origine).
 struct config_generation
  {
   const char *Nom;

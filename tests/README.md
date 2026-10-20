@@ -8,8 +8,8 @@ Catch2 3.8.1 est utilisé s'il est installé, sinon téléchargé par `FetchCont
 
 | CTest | Étiquette Catch2 | Contenu |
 |---|---|---|
-| `moteur.compat` | `[compat]` | Couche `engine/compat` : `AnsiString`, `Format`, LCG Borland (suite connue après `srand(1)`), fichiers (dont le tampon), `TDateTime`. |
-| `moteur.cvw` | `[cvw]` | Round-trip `Charge` → `Sauve` octet par octet sur les 6 cartes, `Verifie()`, `VerifieReseau()`, feux fantômes, parkings indéfinis, version future. |
+| `moteur.compat` | `[compat]` | Couche `engine/compat` : `AnsiString`, `Format`, LCG Borland (comportement vérifié sur le binaire d'origine), fichiers (dont le tampon), `TDateTime`. |
+| `moteur.cvw` | `[cvw]` | Round-trip `Charge` → `Sauve` octet par octet sur les 6 cartes et les 3 cartes du tutoriel, `Verifie()`, `VerifieReseau()`, feux fantômes, parkings indéfinis, version future. |
 | `moteur.simulation` | `[simulation]` | Golden master : 500 tours × 6 cartes × 2 configurations, à graine fixe. |
 | `moteur.generation` | `[generation]` | Génération aléatoire de réseau à graine fixe (3 configurations). |
 | `moteur.copie` | `[copie]` | « Copier vers… » (`PrepareCopie`, `CopieValide`, `Sauve`). |
@@ -88,5 +88,6 @@ indépendamment du moteur. Le test de round-trip vérifie trois choses :
 
 - au format courant, la spécification reproduit le fichier à l'octet près ;
 - le moteur produit exactement la conversion de référence, aux écarts listés
-  près dans `golden/roundtrip/` (aucun pour les 6 cartes livrées) ;
+  près dans `golden/roundtrip/` (aucun pour les 6 cartes livrées ni pour les 3
+  cartes du tutoriel) ;
 - relire puis réenregistrer redonne le même fichier.

@@ -6,20 +6,26 @@
 //---------------------------------------------------------------------------
 namespace
  {
-  std::uint32_t GraineCrt=1; // Valeur initiale de la RTL Borland
+  std::uint32_t GraineCrt=alea::GRAINE_INITIALE; // état laissé par _boot_srand
   bool GraineForcee=false;
   std::uint32_t ValeurForcee=0;
+  //-------------------------------------------------------------------------
+  void Avance()
+   {
+    GraineCrt=GraineCrt*alea::MULTIPLICATEUR+1u;
+   }
  }
 //---------------------------------------------------------------------------
 int alea::Rand()
  {
-  GraineCrt=GraineCrt*22695477u+1u; // 0x015A4E35
+  Avance();
   return (int)((GraineCrt>>16)&0x7FFFu);
  }
 //---------------------------------------------------------------------------
 void alea::Srand(unsigned Graine)
- {
+ { // Comme la RTL : la graine est posée, puis le générateur avance d'un pas
   GraineCrt=GraineForcee?ValeurForcee:(std::uint32_t)Graine;
+  Avance();
  }
 //---------------------------------------------------------------------------
 unsigned alea::Graine()
@@ -31,7 +37,7 @@ void alea::FixeGraine(unsigned Graine)
  {
   GraineForcee=true;
   ValeurForcee=(std::uint32_t)Graine;
-  GraineCrt=ValeurForcee;
+  Srand(Graine);
  }
 //---------------------------------------------------------------------------
 void alea::LibereGraine()

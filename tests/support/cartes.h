@@ -23,10 +23,25 @@ const carte Cartes[]=
  };
 const int NB_CARTES=sizeof(Cartes)/sizeof(Cartes[0]);
 //---------------------------------------------------------------------------
+// Cartes du tutoriel (docs/tutorial, identiques à celles de l'installeur) :
+// vérifiées par le round-trip seulement
+const carte CartesTutoriel[]=
+ {
+  {"tutocv.cvw", "tutocv"},
+  {"tutocvdeco.cvw", "tutocvdeco"},
+  {"tutocvptn.cvw", "tutocvptn"},
+ };
+//---------------------------------------------------------------------------
 #ifdef CV_DOSSIER_CARTES
 inline std::string CheminCarte(const carte &c)
  {
   return std::string(CV_DOSSIER_CARTES)+"/"+c.Fichier;
+ }
+#endif
+#ifdef CV_DOSSIER_TUTORIEL
+inline std::string CheminCarteTutoriel(const carte &c)
+ {
+  return std::string(CV_DOSSIER_TUTORIEL)+"/"+c.Fichier;
  }
 #endif
 //---------------------------------------------------------------------------

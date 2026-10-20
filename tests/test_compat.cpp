@@ -59,11 +59,15 @@ TEST_CASE("Format/ARRAYOFCONST : spécificateurs de SysUtils", "[compat][chaine]
  }
 //---------------------------------------------------------------------------
 TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
- {
+ { // Comportement vérifié par désassemblage de cvw 5.4.3.2 (engine/README.md)
   alea::LibereGraine();
-  // Suite connue de rand() Borland/Turbo C après srand(1)
+  // État initial (_boot_srand) : graine 1 puis un pas
+  CHECK(alea::GRAINE_INITIALE==0x015A4E36u);
+  // srand(g) pose la graine PUIS avance d'un pas : après srand(1), rand()
+  // donne la suite Turbo C/Borland C++ (346, 130, 10982...) à partir du 2e tirage
   srand(1);
-  const int Attendu[10]={346, 130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126};
+  CHECK(alea::Graine()==alea::GRAINE_INITIALE);
+  const int Attendu[10]={130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
   for(int i=0; i<10; i++)
    CHECK(rand()==Attendu[i]);
   // Bornes : RAND_MAX Borland = 32767
@@ -75,10 +79,12 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
     Max15Bits=Max15Bits&&(r>=0)&&(r<=alea::RAND_MAX_BORLAND);
    }
   CHECK(Max15Bits);
-  // L'état est bien graine = graine*22695477+1 sur 32 bits
+  // Un pas = graine*0x15A4E35+1 sur 32 bits ; rand() = bits 30..16 après le pas
   srand(123);
-  rand();
-  CHECK(alea::Graine()==123u*22695477u+1u);
+  const unsigned Apres=123u*22695477u+1u;
+  CHECK(alea::Graine()==Apres);
+  CHECK(rand()==(int)(((Apres*22695477u+1u)>>16)&0x7FFF));
+  CHECK(alea::Graine()==Apres*22695477u+1u);
  }
 //---------------------------------------------------------------------------
 TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
@@ -90,7 +96,7 @@ TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
   CHECK(a==b);
   alea::LibereGraine();
   srand(987654);
-  CHECK(alea::Graine()==987654u);
+  CHECK(alea::Graine()==987654u*22695477u+1u);
  }
 //---------------------------------------------------------------------------
 TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]")

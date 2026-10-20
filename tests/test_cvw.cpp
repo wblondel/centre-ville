@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <stdexcept>
 #include <string>
+#include <vector>
 #include "cartes.h"
 #include "format_reference.h"
 #include "harnais.h"
@@ -67,15 +68,20 @@ namespace
    }
  }
 //---------------------------------------------------------------------------
-TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes", "[cvw][roundtrip]")
+TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes et les 3 cartes du tutoriel", "[cvw][roundtrip]")
  {
   VueNulle Vue;
   vue=&Vue;
-  for(const carte &c : Cartes)
+  struct carte_roundtrip { carte c; std::string asChemin; };
+  std::vector<carte_roundtrip> Liste;
+  for(const carte &c : Cartes) Liste.push_back({c, CheminCarte(c)});
+  for(const carte &c : CartesTutoriel) Liste.push_back({c, CheminCarteTutoriel(c)});
+  for(const carte_roundtrip &r : Liste)
    {
+    const carte &c=r.c;
     DYNAMIC_SECTION(c.Nom)
      {
-      const std::string asOrigine=harnais::LitFichier(CheminCarte(c));
+      const std::string asOrigine=harnais::LitFichier(r.asChemin);
       REQUIRE(!asOrigine.empty());
       // Spécification indépendante du moteur : conversion naïve en 0x530
       const conversion_cvw Reference=ConvertitEn530(asOrigine);
@@ -87,7 +93,7 @@ TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes", "[cvw][
         CHECK(SpecificationExacte);
        }
       // Charge -> Sauve par le moteur
-      REQUIRE(harnais::Ouvre(CheminCarte(c)));
+      REQUIRE(harnais::Ouvre(r.asChemin));
       const std::string asCopie=FichierSortie(std::string("roundtrip_")+c.Nom+".cvw");
       REQUIRE(harnais::SauveSansChaos(asCopie));
       harnais::Ferme();

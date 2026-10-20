@@ -49,6 +49,7 @@ add_executable(cvtests
 target_link_libraries(cvtests PRIVATE cvtest_support Catch2::Catch2WithMain)
 target_compile_definitions(cvtests PRIVATE
   CV_DOSSIER_CARTES="${PROJECT_SOURCE_DIR}/maps"
+  CV_DOSSIER_TUTORIEL="${PROJECT_SOURCE_DIR}/docs/tutorial"
   CV_DOSSIER_GOLDEN="${CMAKE_CURRENT_SOURCE_DIR}/golden"
   CV_DOSSIER_SORTIE="${CMAKE_CURRENT_BINARY_DIR}/sortie"
 )

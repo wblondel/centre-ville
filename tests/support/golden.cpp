@@ -127,8 +127,9 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
   // Positions par défaut des TTrackBar de f_genres.dfm
   cv->PrepareGenerationAleatoire(0, 3, 8, 8, 8);
   // f_genres.cpp : cv->Genere(rand()%cv->NbX, rand()%cv->NbY, (direction)(1+rand()%NBDIR));
-  // L'ordre d'évaluation des arguments n'est pas spécifié en C++ : on fixe ici
-  // x, puis y, puis la direction (à vérifier contre le binaire d'origine).
+  // L'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
+  // d'origine (32 et 64 bits) les évalue de gauche à droite : x, puis y, puis
+  // la direction (engine/README.md, « Vérifications sur le binaire d'origine »).
   int x=rand()%cv->NbX;
   int y=rand()%cv->NbY;
   direction d=(direction)(1+rand()%NBDIR);

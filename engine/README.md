@@ -96,28 +96,50 @@ pas créée, d'où les gardes `if (vue)` qui reproduisent les `if (frmSimulation
   ou -1. Les noms sont en UTF-8 (convertis en UTF-16 sous Windows). Un tampon
   évite un appel système par champ ; il ne change pas le comportement
   observable.
-- **`rand()`/`srand()`** : LCG de la RTL Borland (`graine = graine*22695477+1`
-  sur 32 bits, résultat = bits 30..16, `RAND_MAX = 32767`, graine initiale 1),
-  sous forme de macros définies après les en-têtes système. La suite produite
-  après `srand(1)` (346, 130, 10982, 1090, …) est celle de Turbo C/Borland C++.
-  `alea::FixeGraine(g)` force la graine utilisée par `srand()` : c'est
-  l'équivalent de `srand(g)` à la place de `srand(time(…))` dans
-  `AppelleAuChaos()`, sans toucher au moteur.
+- **`rand()`/`srand()`** : LCG de la RTL Embarcadero, conforme au binaire
+  d'origine (voir la section suivante). Un pas : `graine = graine*0x15A4E35+1`
+  sur 32 bits. `rand()` fait un pas puis renvoie les bits 30..16 (`RAND_MAX =
+  32767`). `srand(g)` pose la graine **puis fait un pas**. L'état initial est
+  celui de `_boot_srand` : 1 puis un pas (0x015A4E36). Ce sont des macros
+  définies après les en-têtes système. `alea::FixeGraine(g)` force la graine
+  utilisée par `srand()` : c'est l'équivalent de `srand(g)` à la place de
+  `srand(time(…))` dans `AppelleAuChaos()`, sans toucher au moteur.
 - **`TDateTime`** : nombre de jours en `double`. Le moteur ne s'en sert que pour
   chronométrer.
 
+## Vérifications sur le binaire d'origine
+
+Les deux exécutables de l'installeur officiel 5.4.3.2 (32 et 64 bits, compilés
+avec la RTL Embarcadero) ont été désassemblés avec `llvm-objdump`. Ils se
+comportent de la même façon.
+
+| Point | Constat | Adresses (64 bits / 32 bits) |
+|---|---|---|
+| `rand()` | `graine = graine*0x15A4E35+1` (`imul` 32 bits), puis renvoie `(graine>>16) & 0x7FFF`. | `0x767ea0` / `0x758c14` |
+| `srand(g)` | `graine = g`, mot haut de la graine = 0, **puis un pas** : `graine = graine*0x15A4E35+1`. | `0x767e50` / `0x758bd4` |
+| État initial (`_boot_srand`) | `graine = 1`, puis un pas : `0x015A4E36` (22695478). | `0x767ee0` / — |
+| `Genere(rand()%NbX, rand()%NbY, 1+rand()%NBDIR)` (`f_genres.cpp`) | Arguments évalués **de gauche à droite** : 1er tirage `% NbX` (x), 2e `% NbY` (y), 3e pour la direction. | `0x41544d` / `0x416d63` |
+
+Conséquences pour le portage :
+
+- `compat/alea` reproduit exactement ce comportement : le pas fait par
+  `srand()` et l'état initial `_boot_srand`. Le premier `rand()` après
+  `srand(1)` donne donc 130, deuxième valeur de la suite Turbo C.
+- Le golden master a été régénéré après cette correction de fidélité. Il
+  correspond désormais à un oracle instrumenté avec `srand(12345)` dans
+  `AppelleAuChaos()`.
+- Le portage de la fiche « Génération » devra séquencer explicitement x, puis
+  y, puis la direction. Le golden master de la génération
+  (`tests/support/golden.cpp`) le fait déjà.
+
 ## Points d'attention relevés pendant le portage (non corrigés)
 
-- **`rand()` à vérifier contre le binaire d'origine** : l'algorithme est celui de
-  la RTL Borland classique. Il reste à confirmer que la RTL de C++Builder 10.x
-  (Win32 et Win64), avec laquelle cvw 5.4.3.2 a été compilé, n'en diffère pas
-  (oracle instrumenté, phase 0).
 - **Ordre d'évaluation des arguments** : `f_genres.cpp` appelle
   `cv->Genere(rand()%NbX, rand()%NbY, 1+rand()%NBDIR)`. L'ordre des trois
-  `rand()` n'est pas spécifié en C++ : C++Builder évalue probablement de
-  droite à gauche, Clang de gauche à droite. À fixer explicitement lors du
-  portage de la fiche, après vérification sur l'original. Le moteur lui-même
-  ne contient pas de tel cas.
+  `rand()` n'est pas spécifié en C++ ; le binaire d'origine les évalue de
+  gauche à droite (voir la section suivante). Lors du portage de la fiche, il
+  faudra donc séquencer explicitement x, puis y, puis la direction. Le moteur
+  lui-même ne contient pas de tel cas.
 - **Champs non initialisés** : `centre_ville::NbVehlibs` (fichiers < 0x530),
   `pieton::TourAttBus/TourAttTram/TourAttTaxi`, `centre_ville::FeuP` (sans feux
   piétons). Pour les fichiers < 0x530, l'original enregistre une valeur
