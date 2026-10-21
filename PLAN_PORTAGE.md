@@ -109,7 +109,7 @@ Une implémentation `VueNulle` sert aux tests. `voie::RedessineCase` délègue �
 
 ### 4.4 Comportements implicites de la VCL à reproduire
 Ce sont eux qui cassent « l'interface intacte » s'ils sont oubliés :
-- `TCSpinEdit->Value = …` **déclenche `OnChange`** (utilisé dans `f_prmsim.cpp` et ailleurs) → connecter `QSpinBox::valueChanged` (ne pas bloquer les signaux).
+- `TCSpinEdit->Value = …` **déclenche `OnChange`** (utilisé dans `f_prmsim.cpp` et ailleurs) → `OnChange` suit le texte du champ (`QLineEdit::textChanged`, signaux non bloqués) ; comme dans `CSPIN.pas`, `MinValue`/`MaxValue` ne bornent qu'à `Value=`, aux flèches et en quittant le champ, jamais pendant la frappe.
 - `TCheckBox->Checked = …` et `TRadioButton->Checked = …` **déclenchent `OnClick`** → connecter `toggled`, pas `clicked`.
 - `Application->CreateForm` crée **toutes les fiches au démarrage** (ordre dans `cvw.cpp`) et le code teste `frmX && frmX->Visible` → instancier les fiches au lancement, dans le même ordre.
 - `TActionList` : `RafraichitActionsEdition` filtre par `Category` → stocker la catégorie dans `QAction::setProperty("categorie", …)`.
@@ -203,7 +203,7 @@ Taille relative : **S** petit, **M** moyen, **L** gros. Les phases 4 à 6 repré
 | `TSpeedButton` (`GroupIndex`) | `QToolButton` checkable + `QButtonGroup` |
 | `TButton`, `TBitBtn` | `QPushButton` (+ icône) |
 | `TLabel` | `QLabel` |
-| `TCSpinEdit` | `QSpinBox` |
+| `TCSpinEdit` | `QAbstractSpinBox` sans type de valeur : le texte fait foi, bornes de `CSPIN.pas` (`app/vcl/controles.cpp`) |
 | `TCheckBox`, `TRadioButton` | `QCheckBox`, `QRadioButton` (signal `toggled`) |
 | `TGroupBox`, `TRadioGroup` | `QGroupBox` (+ `QButtonGroup` pour `ItemIndex`) |
 | `TStringGrid` | widget maison sur `QAbstractScrollArea` (`app/vcl/grilletextes.cpp`, dessin de la VCL) |
