@@ -38,6 +38,10 @@ build/dev/app/cvw maps/Démo.cvw
 ```
 
 `cvw !` active le journal `cvw.log` (écrit à la fermeture), comme l'original.
+Comme les tests du moteur, `cvw` remet à zéro la mémoire allouée par
+`operator new` (`tests/support/allocation.cpp`) : le moteur d'origine laisse
+des champs non initialisés (`centre_ville::FeuP` sans feux piétons...), et
+poser le premier feu de piétons libérait sinon un pointeur indéterminé.
 Les fichiers vont par défaut dans le dossier équivalent à `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville\`
 (`QStandardPaths::GenericDataLocation` + `Patquoi.fr/Centre-Ville` : le même
 dossier sous Windows, `~/Library/Application Support/...` sous macOS,

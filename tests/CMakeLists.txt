@@ -91,7 +91,7 @@ set_tests_properties(preparation.dossier_sortie PROPERTIES FIXTURES_SETUP dossie
 # sur maps/Démo.cvw, captures de la fenêtre principale dans sortie/captures
 if(TARGET cvwfiches)
   find_package(Qt6 REQUIRED COMPONENTS Test)
-  add_executable(test_interface app/test_interface.cpp ${PROJECT_SOURCE_DIR}/app/ressources/images.qrc)
+  add_executable(test_interface app/test_interface.cpp ${PROJECT_SOURCE_DIR}/app/ressources/images.qrc ${CV_ALLOCATION})
   set_target_properties(test_interface PROPERTIES AUTOMOC ON AUTORCC ON)
   target_link_libraries(test_interface PRIVATE cvwfiches cvtest_support Qt6::Test)
   target_compile_definitions(test_interface PRIVATE CV_DOSSIER_GOLDEN="${CMAKE_CURRENT_SOURCE_DIR}/golden")
