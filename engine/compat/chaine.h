@@ -81,9 +81,12 @@ class TVarRec
   TVarRec(const void *p) : Genre(vtPointeur), Pointeur(p) {}
  };
 //---------------------------------------------------------------------------
+// portage : point d'extension, pour que l'interface puisse passer ses
+// propriétés (__property de la VCL) à ARRAYOFCONST
+template <class T> TVarRec VersTVarRec(const T &v) { return TVarRec(v); }
 template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &... v)
  {
-  return std::vector<TVarRec>{ TVarRec(v)... };
+  return std::vector<TVarRec>{ VersTVarRec(v)... };
  }
 //---------------------------------------------------------------------------
 // ARRAYOFCONST((a, b, c)) -> TableauDeConstantes (a, b, c)

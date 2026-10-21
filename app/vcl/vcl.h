@@ -59,6 +59,17 @@ void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(
   Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
  }
 //---------------------------------------------------------------------------
+// try/__finally de C++Builder -> garde RAII : le code est exécuté en sortie de bloc
+//---------------------------------------------------------------------------
+class Finalement
+ {
+  std::function<void()> Code;
+  public:
+  explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
+  Finalement(const Finalement &)=delete;
+  ~Finalement() { Code(); }
+ };
+//---------------------------------------------------------------------------
 // TShiftState
 //---------------------------------------------------------------------------
 enum TShiftStateElement { ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble };

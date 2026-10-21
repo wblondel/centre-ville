@@ -25,6 +25,39 @@ namespace
    };
  }
 //---------------------------------------------------------------------------
+// Align (alTop, alBottom, alLeft, alRight, alClient) : placement des contrôles
+// à chaque redimensionnement du parent, dans l'ordre de la VCL
+//---------------------------------------------------------------------------
+namespace
+ {
+  void Aligne(QWidget *Parent)
+   {
+    QRect r=Parent->contentsRect();
+    const char *Ordre[]={"alTop", "alBottom", "alLeft", "alRight", "alClient"};
+    for(const char *a : Ordre)
+     for(QObject *o : Parent->children())
+      {
+       QWidget *w=qobject_cast<QWidget *>(o);
+       if (!w||w->isWindow()||w->isHidden()||(w->property("vclAlign").toString()!=QLatin1String(a))) continue;
+       if (!std::strcmp(a, "alTop")) { w->setGeometry(r.left(), r.top(), r.width(), w->height()); r.setTop(r.top()+w->height()); }
+       else if (!std::strcmp(a, "alBottom")) { w->setGeometry(r.left(), r.bottom()+1-w->height(), r.width(), w->height()); r.setBottom(r.bottom()-w->height()); }
+       else if (!std::strcmp(a, "alLeft")) { w->setGeometry(r.left(), r.top(), w->width(), r.height()); r.setLeft(r.left()+w->width()); }
+       else if (!std::strcmp(a, "alRight")) { w->setGeometry(r.right()+1-w->width(), r.top(), w->width(), r.height()); r.setRight(r.right()-w->width()); }
+       else w->setGeometry(r);
+      }
+   }
+  class Aligneur : public QObject
+   {
+    public:
+    using QObject::QObject;
+    bool eventFilter(QObject *o, QEvent *e) override
+     {
+      if ((e->type()==QEvent::Resize)||(e->type()==QEvent::LayoutRequest)) Aligne(static_cast<QWidget *>(o));
+      return false;
+     }
+   };
+ }
+//---------------------------------------------------------------------------
 QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
  {
   QString n=QString::fromUtf8(Nom);
@@ -149,9 +182,23 @@ void LieurComposants::Termine()
      if (!p.isEmpty()) m->PopupMenu=dynamic_cast<TPopupMenu *>(Composants[p]);
     }
   // Propriétés de la VCL appliquées après setupUi
+  // (liste d'abord : PrepareVcl peut détruire des widgets internes, comme la poignée du TStatusBar)
+  std::vector<ControleVclBase *> Controles;
   for(QWidget *w : Fiche->findChildren<QWidget *>())
    if (ControleVclBase *c=dynamic_cast<ControleVclBase *>(w))
-    c->PrepareVcl();
+    Controles.push_back(c);
+  for(ControleVclBase *c : Controles)
+   c->PrepareVcl();
+  // Align des contrôles
+  for(QWidget *w : Fiche->findChildren<QWidget *>())
+   {
+    QString a=w->property("vclAlign").toString();
+    QWidget *p=w->parentWidget();
+    if (a.isEmpty()||(a=="alNone")||!p||p->property("vclAligneur").toBool()) continue;
+    p->setProperty("vclAligneur", true);
+    p->installEventFilter(new Aligneur(p));
+    Aligne(p);
+   }
   // Police de la fiche (Font.Height en pixels)
   QVariant h=Fiche->property("vclFontHeight");
   if (h.isValid())

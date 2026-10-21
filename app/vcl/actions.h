@@ -92,8 +92,11 @@ class TActionList : public QObject
  {
   public:
   std::vector<TAction *> Actions;
-  int ActionCount() const { return (int)Actions.size(); }
-  TActionList(QObject *Parent) : QObject(Parent) {}
+  Propriete<int> ActionCount;
+  TActionList(QObject *Parent) : QObject(Parent)
+   {
+    ActionCount.Definit([this]() { return (int)Actions.size(); }, [](const int &) {});
+   }
   bool IsShortCut(TShortCut Raccourci, bool Executer);
  };
 //---------------------------------------------------------------------------

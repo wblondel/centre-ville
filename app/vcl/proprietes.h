@@ -74,4 +74,8 @@ inline AnsiString operator+(const char *gauche, const Propriete<AnsiString> &dro
   return AnsiString(gauche)+droite.Valeur();
  }
 //---------------------------------------------------------------------------
+// ARRAYOFCONST((Grille->Col, ...)) : la valeur de la propriété (compat/chaine.h)
+//---------------------------------------------------------------------------
+template <class T> TVarRec VersTVarRec(const Propriete<T> &p) { return TVarRec(p.Valeur()); }
+//---------------------------------------------------------------------------
 #endif

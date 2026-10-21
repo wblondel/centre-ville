@@ -366,8 +366,8 @@ class TOpenDialog : public QObject
   protected:
   bool Enregistrement=false;
   public:
-  AnsiString FileName, Filter, Title, DefaultExt;
-  String InitialDir;
+  String FileName, InitialDir;
+  AnsiString Filter, Title, DefaultExt;
   bool OverwritePrompt=false;
   explicit TOpenDialog(QObject *Parent=nullptr) : QObject(Parent) {}
   bool Execute();
