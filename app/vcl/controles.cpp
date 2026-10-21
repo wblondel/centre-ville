@@ -8,6 +8,7 @@
 #include <QContextMenuEvent>
 #include <QDir>
 #include <QFileDialog>
+#include <QFocusEvent>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMouseEvent>
@@ -72,6 +73,11 @@ void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur)
   w->setPalette(p);
  }
 //---------------------------------------------------------------------------
+void FocusAuClic(QWidget *w)
+ { // TSpeedButton et TToolButton, jamais focalisés, passent ensuite à NoFocus
+  if (w->focusPolicy()==Qt::TabFocus) w->setFocusPolicy(Qt::StrongFocus);
+ }
+//---------------------------------------------------------------------------
 int TagDe(const TObject *Composant)
  {
   if (!Composant) return 0;
@@ -133,7 +139,7 @@ QIcon IconeGlyphe(const QPixmap &Glyphe, int NumGlyphs, qreal Echelle)
  }
 //---------------------------------------------------------------------------
 template class ControleVcl<QLabel>;
-template class ControleVcl<QSpinBox>;
+template class ControleVcl<QAbstractSpinBox>;
 template class ControleVcl<QPushButton>;
 template class ControleVcl<QCheckBox>;
 template class ControleVcl<QRadioButton>;
@@ -219,33 +225,93 @@ void TLabel::mouseReleaseEvent(QMouseEvent *e)
 //---------------------------------------------------------------------------
 // TCSpinEdit
 //---------------------------------------------------------------------------
-TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QSpinBox>(Parent)
+TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QAbstractSpinBox>(Parent)
  {
-  Value.Definit([this]() { return value(); }, [this](const int &v) { setValue(v); });
+  lineEdit()->setText("0"); // TCSpinEdit.Create : Text:='0', curseur au début
+  lineEdit()->setCursorPosition(0);
+  Value.Definit([this]()
+                 { // GetValue : StrToInt(Text), MinValue si le texte n'est pas un nombre
+                  bool Ok=false;
+                  int v=lineEdit()->text().toInt(&Ok);
+                  return Ok?v:(int)MinValue;
+                 },
+                [this](const int &v)
+                 { // SetValue : Text:=IntToStr(CheckValue(v)) ; comme WM_SETTEXT, curseur au début
+                  QString t=QString::number(CheckValue(v));
+                  if (t==lineEdit()->text()) return;
+                  lineEdit()->setText(t);
+                  lineEdit()->setCursorPosition(0);
+                 });
+  // Simples champs, mémorisés dans les propriétés « vcl... » du .ui
   MinValue.Definit([this]() { return property("vclMinValue").toInt(); },
-                   [this](const int &v)
-                    {
-                     setProperty("vclMinValue", v);
-                     int Max=property("vclMaxValue").toInt();
-                     if (v==Max) setRange(-2147483647, 2147483647); else setRange(v, Max);
-                    });
+                   [this](const int &v) { setProperty("vclMinValue", v); });
   MaxValue.Definit([this]() { return property("vclMaxValue").toInt(); },
-                   [this](const int &v)
-                    {
-                     setProperty("vclMaxValue", v);
-                     int Min=property("vclMinValue").toInt();
-                     if (v==Min) setRange(-2147483647, 2147483647); else setRange(Min, v);
-                    });
-  Increment.Definit([this]() { return singleStep(); }, [this](const int &v) { setSingleStep(v); });
-  // §4.4 : Value=... déclenche OnChange, comme la frappe
-  QObject::connect(this, &QSpinBox::valueChanged, this, [this](int) { if (OnChange) OnChange(this); });
+                   [this](const int &v) { setProperty("vclMaxValue", v); });
+  Increment.Definit([this]() { return property("vclIncrement").isValid()?property("vclIncrement").toInt():1; },
+                    [this](const int &v) { setProperty("vclIncrement", v); });
+  // §4.4 : OnChange à chaque changement du texte (TControl::SetText ne change
+  // rien si le texte est le même), par la frappe ou par Value=...
+  QObject::connect(lineEdit(), &QLineEdit::textChanged, this, [this]() { if (OnChange) OnChange(this); });
  }
 //---------------------------------------------------------------------------
 void TCSpinEdit::PrepareVcl()
  {
-  ControleVcl<QSpinBox>::PrepareVcl();
+  ControleVcl<QAbstractSpinBox>::PrepareVcl();
+  if (property("vclValue").isValid()) Value=property("vclValue").toInt(); // lu après MinValue et MaxValue
   if (property("vclEditorEnabled").isValid()&&!property("vclEditorEnabled").toBool())
    lineEdit()->setReadOnly(true); // flèches actives, saisie impossible
+ }
+//---------------------------------------------------------------------------
+int TCSpinEdit::CheckValue(int v)
+ { // Bornes appliquées seulement si MaxValue<>MinValue
+  int Min=MinValue, Max=MaxValue;
+  if (Max!=Min)
+   {
+    if (v<Min) return Min;
+    if (v>Max) return Max;
+   }
+  return v;
+ }
+//---------------------------------------------------------------------------
+void TCSpinEdit::stepBy(int steps)
+ { // Value:=Value+FIncrement (ou -), puis, comme QAbstractSpinBox, texte sélectionné
+  Value=Value+steps*Increment;
+  if (style()->styleHint(QStyle::SH_SpinBox_SelectOnStep, nullptr, this)) selectAll();
+ }
+//---------------------------------------------------------------------------
+QAbstractSpinBox::StepEnabled TCSpinEdit::stepEnabled() const
+ { // Flèches toujours actives (QAbstractSpinBox : aucune, faute de type de valeur)
+  return StepUpEnabled|StepDownEnabled;
+ }
+//---------------------------------------------------------------------------
+QValidator::State TCSpinEdit::validate(QString &input, int &pos) const
+ { // Caractères admis par IsValidChar, quel que soit le texte obtenu
+  Q_UNUSED(pos);
+  for(QChar c : input)
+   if (((c<'0')||(c>'9'))&&(c!='+')&&(c!='-')&&(c!=QLatin1Char(FormatSettings.DecimalSeparator)))
+    return QValidator::Invalid;
+  return QValidator::Acceptable;
+ }
+//---------------------------------------------------------------------------
+void TCSpinEdit::focusInEvent(QFocusEvent *e)
+ { // CMEnter (AutoSelect) : texte sélectionné en entrant dans le champ, sauf au
+   // clic ; pas quand la fenêtre retrouve l'activation (après une boîte de
+   // message, par exemple), le champ étant resté le contrôle actif de la fiche
+  ControleVcl<QAbstractSpinBox>::focusInEvent(e);
+  bool Entree=!ControleActif;
+  ControleActif=true;
+  if (Entree&&(e->reason()!=Qt::MouseFocusReason)) selectAll();
+ }
+//---------------------------------------------------------------------------
+void TCSpinEdit::focusOutEvent(QFocusEvent *e)
+ { // CMExit : seulement vers un autre contrôle de la fiche (la VCL n'envoie pas
+   // CM_EXIT quand la fenêtre perd l'activation, se ferme ou qu'un menu s'ouvre)
+  ControleVcl<QAbstractSpinBox>::focusOutEvent(e);
+  if ((e->reason()==Qt::ActiveWindowFocusReason)||(e->reason()==Qt::PopupFocusReason)||
+      (e->reason()==Qt::MenuBarFocusReason)) return;
+  ControleActif=false;
+  int v=Value;
+  if (CheckValue(v)!=v) Value=v; // SetValue(Value)
  }
 //---------------------------------------------------------------------------
 // TButton, TBitBtn
@@ -380,6 +446,7 @@ void TRadioGroup::PrepareVcl()
     if (!b) break;
     Boutons.push_back(b);
     Groupe->addButton(b, i);
+    FocusAuClic(b);
     b->installEventFilter(Filtre);
     QObject::connect(b, &QRadioButton::toggled, this, [this](bool c) { if (c&&OnClick) OnClick(this); });
    }

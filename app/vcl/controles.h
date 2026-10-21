@@ -2,12 +2,12 @@
 // vcl/controles.h - Portage de Centre-Ville : contrôles de la VCL sur Qt
 //
 // Chaque classe porte le nom du contrôle VCL qu'elle remplace et dérive du
-// widget Qt le plus proche (TLabel : QLabel, TCSpinEdit : QSpinBox...) : les
-// .ui générés par tools/dfm2ui.py les « promeuvent », et uic les instancie
+// widget Qt le plus proche (TLabel : QLabel, TCSpinEdit : QAbstractSpinBox...) :
+// les .ui générés par tools/dfm2ui.py les « promeuvent », et uic les instancie
 // directement. Elles offrent les propriétés de la VCL (Caption, Checked,
 // Value, Visible, Enabled, Tag...) et ses événements implicites
 // (PLAN_PORTAGE.md §4.4) :
-//   - TCSpinEdit::Value=... déclenche OnChange (QSpinBox::valueChanged) ;
+//   - TCSpinEdit::Value=... déclenche OnChange quand le texte change ;
 //   - TCheckBox::Checked=... déclenche OnClick (toggled, pas clicked) ;
 //   - TRadioButton::Checked=true déclenche OnClick ;
 //   - TRadioGroup::ItemIndex=... déclenche OnClick.
@@ -23,6 +23,7 @@
 #define vcl_controlesH
 //---------------------------------------------------------------------------
 #include <QAbstractScrollArea>
+#include <QAbstractSpinBox>
 #include <QCheckBox>
 #include <QFrame>
 #include <QGroupBox>
@@ -30,7 +31,6 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSlider>
-#include <QSpinBox>
 #include <QStatusBar>
 #include <QStyle>
 #include <QTimer>
@@ -48,6 +48,11 @@ class QTabBar;
 // Color / Font->Color d'un contrôle : mémorisée en propriété « vcl... » et
 // appliquée à la palette (fond rempli sauf contrôle Transparent)
 void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur);
+//---------------------------------------------------------------------------
+// Contrôle fenêtré de Windows (bouton, case à cocher, curseur...) : le clic lui
+// donne le focus, ce qui fait sortir le contrôle précédent (CMExit d'un
+// TCSpinEdit) ; sous macOS, Qt ne le leur donne qu'à la tabulation (TabFocus)
+void FocusAuClic(QWidget *w);
 //---------------------------------------------------------------------------
 // TComponent::Tag, Name et ClassName() d'un composant désigné par TComponent*
 // ou TObject* (QObject, qui n'a pas ces membres) :
@@ -103,6 +108,7 @@ template <class B> class ControleVcl : public B, public ControleVclBase
   explicit ControleVcl(QWidget *Parent=nullptr) : B(Parent)
    {
     QWidget *w=this;
+    FocusAuClic(w);
     Name.Definit([w]() { return A(w->objectName()); }, [w](const AnsiString &as) { w->setObjectName(Q(as)); });
     // Color et Font->Color : mêmes propriétés « vclColor »/« vclFontColor » que le .ui (PrepareVcl)
     Color.Definit([w]() { return w->property("vclColor").isValid()?CouleurDepuisTexte(A(w->property("vclColor").toString())):clBtnFace; },
@@ -157,13 +163,32 @@ class TLabel : public ControleVcl<QLabel>
   void mouseReleaseEvent(QMouseEvent *e) override;
  };
 //---------------------------------------------------------------------------
-class TCSpinEdit : public ControleVcl<QSpinBox>
+// TCSpinEdit (CSPIN.pas) : un champ de texte et deux flèches, dont le texte
+// fait foi. Value lit StrToInt(Text), ou MinValue si le texte n'est pas un
+// nombre ; Value=... écrit IntToStr(CheckValue(v)). MinValue et MaxValue sont
+// de simples champs (les changer ne touche ni au texte ni à OnChange), que
+// CheckValue n'applique que s'ils diffèrent : à l'affectation de Value, aux
+// flèches (Value=Value±Increment) et en quittant le champ (CMExit). La frappe
+// n'est pas bornée (IsValidChar : chiffres, signes, séparateur décimal).
+// OnChange suit le texte (EN_CHANGE) : frappe, ou Value=... qui le change.
+// Base QAbstractSpinBox et non QSpinBox : sans type de valeur, Qt ne touche
+// jamais au texte (QSpinBox le borne pendant la frappe et le remplace par sa
+// valeur interne, signaux bloqués, en quittant le champ ou sur Entrée)
+class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
  {
+  bool ControleActif=false; // contrôle actif de sa fiche (entre CM_ENTER et CM_EXIT)
+  int CheckValue(int v);
   public:
   Propriete<int> Value, MinValue, MaxValue, Increment;
   TNotifyEvent OnChange;
   explicit TCSpinEdit(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  void stepBy(int steps) override; // UpClick / DownClick (flèches, touches haut et bas)
+  QValidator::State validate(QString &input, int &pos) const override; // IsValidChar
+  protected:
+  StepEnabled stepEnabled() const override;
+  void focusInEvent(QFocusEvent *e) override; // CMEnter
+  void focusOutEvent(QFocusEvent *e) override; // CMExit
  };
 //---------------------------------------------------------------------------
 class TButton : public ControleVcl<QPushButton>

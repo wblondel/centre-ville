@@ -956,15 +956,6 @@
    </widget>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit1">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -987,15 +978,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit2">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1018,15 +1000,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit3">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1049,15 +1022,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit4">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1080,15 +1044,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit5">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1111,15 +1066,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit6">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1142,15 +1088,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit7">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1173,15 +1110,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit8">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1204,15 +1132,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit11">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1235,15 +1154,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit12">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1266,15 +1176,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit13">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1297,15 +1198,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit14">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1328,15 +1220,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit15">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1359,15 +1242,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit16">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1390,15 +1264,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit17">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1421,15 +1286,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit18">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1452,15 +1308,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit19">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1483,15 +1330,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit21">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1514,15 +1352,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit22">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1545,15 +1374,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit23">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1576,15 +1396,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit24">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1607,15 +1418,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit25">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1638,15 +1440,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit26">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1669,15 +1462,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit27">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1700,15 +1484,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit28">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1731,15 +1506,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit29">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1762,15 +1528,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit31">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1793,15 +1550,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit32">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1824,15 +1572,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit33">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1855,15 +1594,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit34">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1886,15 +1616,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit35">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1917,15 +1638,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit36">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1948,15 +1660,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit37">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -1979,15 +1682,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit38">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2010,15 +1704,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit39">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2041,15 +1726,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit41">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2072,15 +1748,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit42">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2103,15 +1770,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit43">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2134,15 +1792,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit44">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2165,15 +1814,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit45">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2196,15 +1836,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit46">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2227,15 +1858,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit47">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2258,15 +1880,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit48">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2289,15 +1902,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit49">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2320,15 +1924,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit51">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2351,15 +1946,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit52">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2382,15 +1968,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit53">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2413,15 +1990,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit54">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2444,15 +2012,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit55">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2475,15 +2034,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit56">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2506,15 +2056,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit57">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2537,15 +2078,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit58">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2568,15 +2100,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit59">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2599,15 +2122,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit61">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2630,15 +2144,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit62">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2661,15 +2166,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit63">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2692,15 +2188,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit64">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2723,15 +2210,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit65">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2754,15 +2232,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit66">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2785,15 +2254,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit67">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2816,15 +2276,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit68">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2847,15 +2298,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit69">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2878,15 +2320,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit71">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2909,15 +2342,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit72">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2940,15 +2364,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit73">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -2971,15 +2386,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit74">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3002,15 +2408,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit75">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3033,15 +2430,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit76">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3064,15 +2452,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit77">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3095,15 +2474,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit78">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3126,15 +2496,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit79">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3157,15 +2518,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit81">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3188,15 +2540,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit82">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3219,15 +2562,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit83">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3250,15 +2584,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit84">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3281,15 +2606,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit85">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3312,15 +2628,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit86">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3343,15 +2650,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit87">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3374,15 +2672,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit88">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3405,15 +2694,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit89">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3436,15 +2716,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit9">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3467,15 +2738,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit91">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3498,15 +2760,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit92">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3529,15 +2782,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit93">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3560,15 +2804,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit94">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3591,15 +2826,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit95">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3622,15 +2848,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit96">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3653,15 +2870,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit97">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3684,15 +2892,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit98">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -3715,15 +2914,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEdit99">
-   <property name="minimum">
-    <number>0</number>
-   </property>
-   <property name="maximum">
-    <number>81</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -4287,20 +3477,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbToursStopArretBus">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>3</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>3</number>
     </property>
     <property name="geometry">
      <rect>
@@ -4315,19 +3499,13 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbMaxPersonnesBus">
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>100</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>10</number>
     </property>
     <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
      <number>100</number>
     </property>
     <property name="geometry">
@@ -4525,20 +3703,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbCasesMaxArretBus">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>10</number>
-    </property>
-    <property name="value">
-     <number>3</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>10</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>3</number>
     </property>
     <property name="geometry">
      <rect>
@@ -4553,20 +3725,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbMaxToursAttenteBus">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>50</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>50</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>10</number>
     </property>
     <property name="geometry">
      <rect>
@@ -4581,23 +3747,17 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditProbaDirArretBus">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>50</number>
-    </property>
-    <property name="singleStep">
-     <number>5</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>50</number>
+    </property>
+    <property name="vclIncrement" stdset="0">
+     <number>5</number>
     </property>
     <property name="geometry">
      <rect>
@@ -4612,23 +3772,17 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditProbaArretDmd">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
-    <property name="singleStep">
-     <number>5</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclIncrement" stdset="0">
+     <number>5</number>
     </property>
     <property name="geometry">
      <rect>
@@ -5250,7 +4404,7 @@
   </customwidget>
   <customwidget>
    <class>TCSpinEdit</class>
-   <extends>QSpinBox</extends>
+   <extends>QAbstractSpinBox</extends>
    <header>vcl/controles.h</header>
   </customwidget>
   <customwidget>

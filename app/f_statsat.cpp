@@ -50,6 +50,7 @@ TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
       ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0,
       ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0,
       ts=RadioGroupType->ItemIndex;
+  if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings)) return (TColor)0; // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans l'original)
   if (m[ts]&&cv->v[x][y].Trafic&&cv->v[x][y].Attente) // v3.0
    {
     if (ts)
@@ -68,6 +69,7 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
   int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0,
       ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0,
       ts=RadioGroupType->ItemIndex;
+  if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings)) return asMsg; // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans l'original)
   if (m[ts]&&cv->v[x][y].Trafic&&cv->v[x][y].Attente)
    {
 	if (ts)

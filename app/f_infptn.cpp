@@ -154,6 +154,7 @@ void TfrmInfosPieton::RafraichitInfos()
 	  frmRecherche->Visible&&
 	  frmRecherche->RadioButtonPieton->Checked)
    NumPieton=frmRecherche->CSpinEditPieton->Value;
+  if ((NumPieton<0)||(NumPieton>cv->NbPietons)) NumPieton=0; // portage : numéro tapé hors de 1..NbPietons dans Rechercher (lecture hors de Pieton dans l'original) : pas de piéton suivi
   if (!NumPieton) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
    {
 	if (v->NumPieton[0])

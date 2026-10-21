@@ -142,6 +142,33 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
   `TPaintBox` (déjà présent) sert pour la première fois : `OnPaint` dans le
   `paintEvent`, sur un `TCanvas` persistant (`Pen` gardé d'un dessin à
   l'autre, comme le `Canvas` de la VCL).
+- `TCSpinEdit` reproduit `CSPIN.pas` : le texte fait foi (base
+  `QAbstractSpinBox` : sans type de valeur, Qt n'y touche jamais, alors que
+  `QSpinBox` le bornait pendant la frappe et le remplaçait par sa valeur
+  interne en quittant le champ). `Value` lit `StrToInt(Text)`, ou `MinValue`
+  si le texte n'est pas un nombre ; `MinValue`/`MaxValue` sont de simples
+  champs (ni le texte ni `OnChange` ne bougent) ; `CheckValue`, qui ne borne
+  que si `MinValue≠MaxValue`, s'applique à `Value=`, aux flèches
+  (`Value±Increment`, touches haut et bas comprises) et en quittant le champ
+  vers un autre contrôle (`CMExit` ; pas quand la fenêtre perd l'activation,
+  se ferme ou ouvre un menu) ; la frappe n'est pas bornée (chiffres, signes et
+  séparateur décimal, comme `IsValidChar`) ; `OnChange` suit chaque
+  changement du texte. Comme sous Windows, `Value=` (`WM_SETTEXT`) laisse le
+  curseur au début du texte, sans sélection ; entrer dans le champ autrement
+  qu'au clic sélectionne le texte (`CMEnter`, `AutoSelect`), mais pas quand la
+  fenêtre retrouve l'activation (après une boîte de message) ; les flèches ne
+  sont jamais grisées aux bornes (captures du lot 1 : seule différence, avec
+  la sélection du champ actif après `Value=`). `dfm2ui.py` écrit les valeurs
+  du `.dfm` en propriétés `vclMinValue`, `vclMaxValue`, `vclValue`
+  (appliquée après les bornes, comme au chargement) et `vclIncrement`. Les
+  contrôles fenêtrés (boutons, cases à
+  cocher, boutons radio, curseurs) prennent le focus au clic comme sous
+  Windows, y compris sous macOS, où Qt ne le leur donne qu'à la tabulation :
+  sinon, cliquer sur OK ne ferait pas sortir du champ et la valeur tapée ne
+  serait pas ramenée dans les bornes. Sous macOS, le contrôle cliqué garde
+  donc l'anneau de focus, et Tab passe aussi par les boutons, cases et
+  boutons radio, comme sous Windows, même sans l'accès clavier complet du
+  système.
 - `graphiques.*` : `TColor`, `TRect` (bords droit et bas exclus), `TCanvas`
   sur `QPainter` ; `listeimages.*` : `TVirtualImageList` (indices `IDB_*`
   inchangés), images agrandies sans lissage en HiDPI.
@@ -196,7 +223,10 @@ fiche modale, couleur de chaque case de la carte (`CouleurCase` et pixel
 dessiné) égale au calcul sur l'attente et le trafic du moteur, totaux et
 moyennes, trajets (parkings de départ et d'arrivée), détail de la case dans
 la barre d'état, boutons de déplacement (avec et sans les coins) et touches
-du menu contextuel de la fiche (flèches, Origine ; Z sans effet). Rechercher
+du menu contextuel de la fiche (flèches, Origine ; Z sans effet) ; n° d'étape
+tapé hors bornes : « Le n° d'étape est incorrect ! », cases noires et détail
+vide quand une flèche déplace le curseur depuis le champ, puis numéro ramené
+dans les bornes en quittant le champ (Tab). Rechercher
 (barre d'outils, sur un parking) reprend les numéros de la case ; chaque sorte
 d'élément fixe (parking, feu, arrêts, places et files) est retrouvée par son
 bouton et son numéro (case courante, barre d'état de la fiche), ainsi que
@@ -205,7 +235,18 @@ un véhicule, un piéton, un bus, un tram, un taxi et un vehlib (raccourcis du
 menu contextuel de la carte) : à chaque tour, la case courante est sur
 l'objet, la barre d'état de la fiche le dit, et la fiche d'informations
 ouverte montre l'objet suivi, sans clic de l'utilisateur ; Échap ferme
-Rechercher, « Suivre » la rouvre.
+Rechercher, « Suivre » la rouvre. Hors simulation, un numéro de parking
+resté au-dessus du nombre de parkings n'est ni borné ni signalé par
+`OnChange` quand `FormShow` règle `MaxValue` (la case courante ne bouge
+pas) ; tapé hors bornes, il donne « n° incorrect » à chaque chiffre, puis
+Tab le ramène au dernier parking, retrouvé.
+Couche VCL (`controleCSpinEdit`, sur un `TCSpinEdit` seul) : `MinValue=` et
+`MaxValue=` sans effet ni `OnChange` ; `Value=` borné, `OnChange` seulement si
+le texte change ; frappe hors bornes acceptée (lettres refusées), ramenée
+dans les bornes au clic sur un bouton mais pas à la perte d'activation de la
+fenêtre ; texte vide (`Value` = `MinValue`) laissé vide ; flèches ; aucune
+borne si `MinValue=MaxValue` ; `EditorEnabled=False` ; valeur du `.dfm`
+bornée au chargement.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
 principale (Démo au tour 0 et au tour 200 ; Géant en statistiques de fluidité,
 `carte_fluidite_trafic.png`, et de trafic, `carte_trafic.png`) et des fiches
@@ -231,13 +272,19 @@ Comportement :
   non appliquées sont perdues, comportement d'origine conservé). Seul écart :
   sous macOS, la console affiche alors « modalSession has been exited
   prematurely », sans effet.
-- **`TCSpinEdit`** : `MinValue`/`MaxValue` ramènent tout de suite la valeur
-  dans les bornes (`QSpinBox`), et la saisie au clavier est bornée pendant la
-  frappe ; la VCL ne bornait qu'à l'affectation de `Value` et en quittant le
-  champ. Rechercher en hérite : `FormShow` règle les `MaxValue` d'après la
-  carte, et un numéro resté au-dessus (carte précédente plus grande) est
-  ramené aussitôt dans les bornes, ce qui déclenche `OnChange` (case courante
-  sur l'élément de ce numéro, texte de la barre d'état de la fiche).
+- **Numéros tapés hors bornes** (le `TCSpinEdit` ne les borne qu'en quittant
+  le champ, comme l'original) : l'original lisait alors hors d'un tableau ;
+  le port s'en garde (`// portage`). Fluidité et trafic, n° d'étape hors de
+  `0..NbParkings` : cases noires et détail de la case vide (l'original lisait
+  hors de `Attente`/`Trafic` : violation d'accès ou couleurs quelconques,
+  par exemple quand une flèche déplace le curseur depuis le champ ; le port
+  plantait sans cette garde). Fiche Piéton pendant que Rechercher suit un
+  numéro hors de `1..NbPietons` : aucun piéton suivi (piétons de la case).
+  Paramètres des lignes de bus et de tram : un n° d'arrêt négatif est remis à
+  0, comme un numéro trop grand.
+- **Molette, Page précédente et Page suivante** dans un `TCSpinEdit` :
+  `Value±Increment` (dix fois pour les pages), comme dans les champs
+  numériques de Qt ; la VCL n'y réagissait pas.
 - **Licence, adresse, courriel** (« À propos ») : boîte `AfficheMessage`
   (sans titre sous macOS) ; l'adresse et le courriel s'ouvrent avec le
   navigateur et la messagerie par défaut (`QDesktopServices`).
@@ -371,6 +418,25 @@ Règle d'or : ces bogues de l'original sont portés tels quels (à reporter dans
 - **Fluidité et trafic** : les flèches, Origine, Fin, Page précédente et Page
   suivante (raccourcis du menu contextuel de la fiche) déplacent le curseur de
   la carte depuis n'importe quel contrôle, champs numériques compris ; Échap
-  ne ferme pas la fiche (aucun bouton Cancel). Le message « Le n° d'étape
-  est incorrect ! » est porté, mais la saisie bornée du `TCSpinEdit` (voir les
-  écarts) ne permet plus de taper un numéro de parking hors de `1..NbParkings`.
+  ne ferme pas la fiche (aucun bouton Cancel). Un n° d'étape tapé hors de
+  `0..NbParkings` affiche « Le n° d'étape est incorrect ! » (à chaque chiffre
+  qui le laisse hors bornes) ; il n'est ramené dans `1..NbParkings` qu'en
+  quittant le champ (d'ici là, `0` donne les statistiques de tous les
+  parkings).
+
+## Comportements d'origine conservés (`TCSpinEdit`)
+
+- **Entrée** (bouton par défaut) valide la valeur tapée telle quelle : la
+  VCL n'envoie pas `CM_EXIT`, le champ n'est donc pas borné (le clic sur OK,
+  lui, fait sortir du champ). La vérification d'intégrité de Marche signale
+  une partie des valeurs incorrectes (négatives, notamment).
+- **Texte vide, « - » ou « + »** : `Value` vaut `MinValue`, et le texte reste
+  tel quel en quittant le champ (`CheckValue(MinValue)` ne change rien).
+- **`MinValue` = `MaxValue`** : aucune borne, ni à l'affectation ni en
+  quittant le champ (Dimensions de la zone ; parkings de Fluidité et trafic
+  sur une carte à un seul parking).
+- **Rechercher** : `FormShow` règle les `MaxValue` d'après la carte sans
+  toucher aux numéros : un numéro resté au-dessus (carte précédente plus
+  grande) reste affiché, jusqu'à la flèche ou la sortie du champ.
+- **Bus et tram** : un n° d'arrêt trop grand, nul ou vide est remis à 0 dès la
+  frappe (`OnChange`), un arrêt non défini remplacé par le suivant.

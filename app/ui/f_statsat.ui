@@ -472,19 +472,13 @@
     <number>1</number>
    </property>
    <widget class="TCSpinEdit" name="CSpinEditParkingArrivee">
-    <property name="minimum">
-     <number>-2147483647</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>1</number>
     </property>
     <property name="vclMaxValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclValue" stdset="0">
      <number>1</number>
     </property>
     <property name="geometry">
@@ -541,19 +535,13 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditParkingDepart">
-    <property name="minimum">
-     <number>-2147483647</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>1</number>
     </property>
     <property name="vclMaxValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclValue" stdset="0">
      <number>1</number>
     </property>
     <property name="geometry">
@@ -1288,7 +1276,7 @@
   </customwidget>
   <customwidget>
    <class>TCSpinEdit</class>
-   <extends>QSpinBox</extends>
+   <extends>QAbstractSpinBox</extends>
    <header>vcl/controles.h</header>
   </customwidget>
   <customwidget>
