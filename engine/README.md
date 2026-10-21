@@ -49,6 +49,8 @@ Les tests sont décrits dans `tests/README.md`.
 - `base.h` et les 9 `f_*.h` remplacés par `vue.h`, `format_cvw.h`, `compat/fichier.h` et `compat/alea.h` ;
 - `__fastcall` retiré ;
 - **chaque accès à l'interface est remplacé un pour un**, dans le même ordre, par un appel à `vue->…`.
+- instanciation explicite de `IncrementeNombre<feu>`, appelée par `app/f_carfours.cpp` (phase 6) : sans elle, l'optimiseur peut ne garder aucune copie appelable de l'instance implicite ;
+- `voie::DefinitNature` teste `d<=ouest` avant de lire `PossDir[d]` : l'original lisait `PossDir[5]` hors du tableau, comportement indéfini que Clang exploite en `-O2` (la nature d'une sélection n'était jamais définie en Release). Le résultat est celui du binaire d'origine (sortie de boucle à `d=5`).
 
 ### Inventaire des accès à l'interface remplacés
 
