@@ -4,6 +4,18 @@
 # générés par tools/dfm2ui.py (app/ui) ; app/vcl reproduit le sous-ensemble de
 # la VCL utilisé par le code des fiches.
 
+# Qt 6.8.3 et antérieurs (FindWrapOpenGL) lient le framework AGL, retiré des
+# SDK récents de macOS : find_library(WrapOpenGL_AGL) échoue, Qt se rabat sur
+# « -framework AGL » et l'édition des liens échoue. On lui donne le framework
+# OpenGL à la place (les versions suivantes de Qt ne lient plus AGL).
+if(APPLE)
+  find_library(CV_FRAMEWORK_AGL AGL)
+  if(NOT CV_FRAMEWORK_AGL)
+    find_library(CV_FRAMEWORK_OPENGL OpenGL)
+    set(WrapOpenGL_AGL "${CV_FRAMEWORK_OPENGL}" CACHE FILEPATH "AGL absent du SDK de macOS : framework OpenGL à la place")
+  endif()
+endif()
+
 if(CV_APP STREQUAL "ON")
   find_package(Qt6 6.5 REQUIRED COMPONENTS Widgets)
 else()

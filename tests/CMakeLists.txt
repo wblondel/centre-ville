@@ -103,7 +103,9 @@ if(TARGET cvwfiches)
   add_test(NAME interface.demo COMMAND test_interface)
   set_tests_properties(interface.demo PROPERTIES
     FIXTURES_REQUIRED dossier_sortie
-    ENVIRONMENT "CV_CARTE=${PROJECT_SOURCE_DIR}/maps/Démo.cvw;CV_DOSSIER_CAPTURES=${CMAKE_CURRENT_BINARY_DIR}/sortie/captures;QT_QPA_PLATFORM=offscreen"
+    # QT_FORCE_STDERR_LOGGING : sous Windows, sans console, Qt écrirait ses
+    # messages (qWarning, qFatal) dans OutputDebugString, invisibles pour CTest
+    ENVIRONMENT "CV_CARTE=${PROJECT_SOURCE_DIR}/maps/Démo.cvw;CV_DOSSIER_CAPTURES=${CMAKE_CURRENT_BINARY_DIR}/sortie/captures;QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"
     TIMEOUT 300
   )
 endif()

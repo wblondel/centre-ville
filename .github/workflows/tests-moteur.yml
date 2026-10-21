@@ -110,6 +110,19 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
 
+      - name: Interface test diagnostics (direct run)
+        if: failure()
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+          QT_FORCE_STDERR_LOGGING: 1
+          QT_DEBUG_PLUGINS: 1
+        run: |
+          exe=$(find build/ci/tests -name 'test_interface' -o -name 'test_interface.exe' | head -1)
+          echo "Exécutable : $exe"
+          CV_CARTE="$GITHUB_WORKSPACE/maps/Démo.cvw" "$exe" -v1 2>&1 | tail -150 || true
+          echo "Code de sortie : ${PIPESTATUS[0]}"
+
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
