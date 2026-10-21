@@ -105,7 +105,7 @@ void TfrmParamTram::CSpinEditChange(TObject *Sender)
             ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
            break;
    default:// N°d'arrêt de tram
-           if ((!n)||(n>cv->NbArretsTram))
+           if ((n<=0)||(n>cv->NbArretsTram)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de ArretTram dans l'original)
             CSpinEdit->Value=0;
            else
             if (!cv->ArretTram[n-1].Defini())

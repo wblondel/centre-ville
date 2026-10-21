@@ -105,7 +105,7 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
             ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
            break;
    default:// N°d'arrêt de bus
-           if ((!n)||(n>cv->NbArretsBus))
+           if ((n<=0)||(n>cv->NbArretsBus)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de ArretBus dans l'original)
             CSpinEdit->Value=0;
            else
             if (!cv->ArretBus[n-1].Defini())
