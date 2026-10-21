@@ -140,7 +140,6 @@ template class ControleVcl<QRadioButton>;
 template class ControleVcl<QGroupBox>;
 template class ControleVcl<QToolButton>;
 template class ControleVcl<QWidget>;
-template class ControleVcl<QTableWidget>;
 template class ControleVcl<QSlider>;
 template class ControleVcl<QFrame>;
 template class ControleVcl<QStatusBar>;
@@ -173,13 +172,27 @@ TLabel::TLabel(QWidget *Parent) : ControleVcl<QLabel>(Parent)
                    {
                     asCaption=as;
                     setText(buddy()?Q(as):SansAccelerateur(Q(as)));
+                    AjusteTaille();
                    });
  }
 //---------------------------------------------------------------------------
 void TLabel::PrepareVcl()
  {
   ControleVcl<QLabel>::PrepareVcl();
+  AutoSize=!property("vclAutoSize").isValid()||property("vclAutoSize").toBool();
   Caption=A(text()); // texte du .ui = Caption de la VCL
+  Prepare=true;
+ }
+//---------------------------------------------------------------------------
+void TLabel::AjusteTaille()
+ { // TCustomLabel::AdjustBounds : DT_CALCRECT (un espace si le texte est vide)
+  if (!Prepare||!AutoSize||wordWrap()) return;
+  QString t=text();
+  if (t.isEmpty()) t=" ";
+  QSize s=fontMetrics().size(0, t);
+  int x=this->x();
+  if (alignment()&Qt::AlignRight) x+=width()-s.width();
+  setGeometry(x, y(), s.width(), s.height());
  }
 //---------------------------------------------------------------------------
 namespace
@@ -489,24 +502,7 @@ void TImage::mouseReleaseEvent(QMouseEvent *e)
   if (ClicRelache(this, e)&&OnClick) OnClick(this);
  }
 //---------------------------------------------------------------------------
-TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QTableWidget>(Parent), Cells(this)
- {
-  ColCount.Definit([this]() { return columnCount(); }, [this](const int &n) { setColumnCount(n); });
-  RowCount.Definit([this]() { return rowCount(); }, [this](const int &n) { setRowCount(n); });
- }
-//---------------------------------------------------------------------------
-AnsiString TStringGrid::LitCellule(int c, int r) const
- {
-  QTableWidgetItem *i=item(r, c);
-  return i?A(i->text()):AnsiString();
- }
-//---------------------------------------------------------------------------
-void TStringGrid::EcritCellule(int c, int r, const AnsiString &as)
- {
-  QTableWidgetItem *i=item(r, c);
-  if (!i) setItem(r, c, i=new QTableWidgetItem);
-  i->setText(Q(as));
- }
+// TStringGrid : vcl/grilletextes.cpp
 //---------------------------------------------------------------------------
 TTrackBar::TTrackBar(QWidget *Parent) : ControleVcl<QSlider>(Parent)
  {

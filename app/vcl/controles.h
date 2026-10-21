@@ -32,10 +32,11 @@
 #include <QSlider>
 #include <QSpinBox>
 #include <QStatusBar>
-#include <QTableWidget>
+#include <QStyle>
 #include <QTimer>
 #include <QToolButton>
 #include <QWidget>
+#include <map>
 #include <vector>
 #include "actions.h"
 #include "graphiques.h"
@@ -134,10 +135,20 @@ template <class B> class ControleVcl : public B, public ControleVclBase
   void PrepareVcl() override; // police, couleurs, curseur
  };
 //---------------------------------------------------------------------------
+// AutoSize (True par défaut, sauf WordWrap) : à chaque Caption=... du code, le
+// libellé prend la taille de son texte, son bord droit restant en place s'il
+// est aligné à droite (TCustomLabel::AdjustBounds) : les valeurs des fiches
+// d'informations, plus longues que celles du .dfm, restent entières. Au
+// chargement, la taille du .dfm est gardée : avec les polices de remplacement,
+// plus larges, les libellés fixes déborderaient sur leurs voisins (la VCL les
+// aurait masqués, ses TLabel étant opaques)
 class TLabel : public ControleVcl<QLabel>
  {
   AnsiString asCaption;
+  bool Prepare=false;
+  void AjusteTaille();
   public:
+  bool AutoSize=true;
   Propriete<AnsiString> Caption;
   explicit TLabel(QWidget *Parent=nullptr);
   void PrepareVcl() override;
@@ -255,7 +266,30 @@ class TImage : public ControleVcl<QLabel>
   void mouseReleaseEvent(QMouseEvent *e) override;
  };
 //---------------------------------------------------------------------------
-class TStringGrid : public ControleVcl<QTableWidget>
+//---------------------------------------------------------------------------
+// TStringGrid : grille de textes dessinée comme TCustomGrid/TStringGrid (comme
+// GrilleSimulation pour le TDrawGrid), implémentée dans vcl/grilletextes.cpp :
+//   - FixedCols/FixedRows (1 par défaut) restent en place au défilement ; les
+//     cases fixes ont le style des en-têtes du système (gdsThemed, le dessin
+//     par défaut de la VCL récente), les autres sont sur Color (clWindow),
+//     séparées par des traits de GridLineWidth pixels (clSilver) ;
+//   - Cells est creux, comme le TSparseList de la VCL : une case hors de
+//     ColCount/RowCount est mémorisée sans être affichée ; réduire RowCount ou
+//     ColCount efface les cases retirées ;
+//   - texte en (Left+2, Top+2), coupé à la case (TStringGrid::DrawCell) ; une
+//     police Symbol (SYMBOL_CHARSET) est traduite en Unicode, comme Windows
+//     le fait pour les polices symboles (flèches des tableaux de distances) ;
+//   - case courante (Col, Row), en (FixedCols, FixedRows) au départ : cadre
+//     de focus quand la grille a le focus, surlignée (clHighlight) sinon ;
+//     sélection rectangulaire avec goRangeSelect ;
+//   - défilement par cases entières (TopRow, LeftCol), barres selon
+//     ScrollBars et seulement si les cases débordent ;
+//   - clic, glisser, molette, flèches, Page préc./suiv., Début/Fin déplacent
+//     la case courante (OnClick, comme TCustomGrid::FocusCell).
+// uic l'instancie depuis le .ui (dfm2ui.py) : rowCount/columnCount y sont les
+// RowCount/ColCount du .dfm, les autres propriétés arrivent en « vcl... ».
+//---------------------------------------------------------------------------
+class TStringGrid : public ControleVcl<QAbstractScrollArea>
  {
   public:
   class Colonne
@@ -270,6 +304,7 @@ class TStringGrid : public ControleVcl<QTableWidget>
       Cellule(TStringGrid *gg, int cc, int rr) : g(gg), c(cc), r(rr) {}
       operator AnsiString() const { return g->LitCellule(c, r); }
       Cellule &operator=(const AnsiString &as) { g->EcritCellule(c, r, as); return *this; }
+      Cellule &operator=(const Cellule &x) { g->EcritCellule(c, r, (AnsiString)x); return *this; }
      };
     Cellule operator[](int r) { return Cellule(g, c, r); }
    };
@@ -280,10 +315,66 @@ class TStringGrid : public ControleVcl<QTableWidget>
     explicit Cellules(TStringGrid *gg) : g(gg) {}
     Colonne operator[](int c) { return Colonne(g, c); }
    } Cells;
-  Propriete<int> ColCount, RowCount;
+  class Tailles
+   { // ColWidths[i], RowHeights[i]
+    TStringGrid *g; bool Colonnes;
+    public:
+    class Taille
+     {
+      TStringGrid *g; bool Colonnes; int i;
+      public:
+      Taille(TStringGrid *gg, bool c, int ii) : g(gg), Colonnes(c), i(ii) {}
+      operator int() const { return g->LitTaille(Colonnes, i); }
+      Taille &operator=(int v) { g->EcritTaille(Colonnes, i, v); return *this; }
+     };
+    Tailles(TStringGrid *gg, bool c) : g(gg), Colonnes(c) {}
+    Taille operator[](int i) { return Taille(g, Colonnes, i); }
+   } ColWidths, RowHeights;
+  Propriete<int> ColCount, RowCount, FixedCols, FixedRows, DefaultColWidth, DefaultRowHeight,
+                 GridLineWidth, Col, Row, LeftCol, TopRow;
   explicit TStringGrid(QWidget *Parent=nullptr);
+  void setRowCount(int n) { RowCount=n; } // propriétés du .ui (uic)
+  void setColumnCount(int n) { ColCount=n; }
   AnsiString LitCellule(int c, int r) const;
   void EcritCellule(int c, int r, const AnsiString &as);
+  int LitTaille(bool Colonne, int i) const;
+  void EcritTaille(bool Colonne, int i, int Taille);
+  TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
+  void Repaint() { if (TCanvas::NbDessinsEnCours) viewport()->update(); else viewport()->repaint(); }
+  void Invalidate() { viewport()->update(); }
+  void PrepareVcl() override;
+  protected:
+  void paintEvent(QPaintEvent *e) override;
+  void resizeEvent(QResizeEvent *e) override;
+  void scrollContentsBy(int dx, int dy) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
+  void wheelEvent(QWheelEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
+  void focusInEvent(QFocusEvent *e) override;
+  void focusOutEvent(QFocusEvent *e) override;
+  private:
+  std::map<std::pair<int, int>, AnsiString> Donnees; // (colonne, ligne) -> texte
+  std::vector<int> Largeurs, Hauteurs;
+  int NbColonnes=5, NbLignes=5, NbFixesC=1, NbFixesL=1, LargeurDefaut=64, HauteurDefaut=24, Trait=1;
+  int ColCour=1, LigCour=1, ColAncre=1, LigAncre=1, PremCol=1, PremLig=1; // case courante, ancre, LeftCol/TopRow
+  bool PlageSelection=true, TraitsFixesH=true, TraitsFixesV=true, TraitsH=true, TraitsV=true;
+  bool SelectionEnCours=false, PoliceSymbole=false;
+  int CumulMolette=0;
+  void DefinitColonnes(int n);
+  void DefinitLignes(int n);
+  int Largeur(int c) const { return ((c>=0)&&(c<(int)Largeurs.size()))?Largeurs[(std::size_t)c]:LargeurDefaut; }
+  int Hauteur(int r) const { return ((r>=0)&&(r<(int)Hauteurs.size()))?Hauteurs[(std::size_t)r]:HauteurDefaut; }
+  int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
+  int DebutLigne(int r) const;
+  int DerniereColonneGauche() const; // LeftCol maximal (dernière colonne entièrement visible)
+  int DerniereLigneHaut() const;
+  void MetAJourDefilement();
+  void DefinitHautGauche(int Gauche, int Haut);
+  void Montre(int c, int r); // TCustomGrid::ClampInView
+  bool CaseEn(const QPoint &p, int &c, int &r) const;
+  void Deplace(int c, int r, bool DeplaceAncre, bool Clic); // MoveCurrent / FocusCell
  };
 //---------------------------------------------------------------------------
 class TTrackBar : public ControleVcl<QSlider>

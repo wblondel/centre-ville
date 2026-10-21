@@ -168,4 +168,12 @@ Conséquences pour le portage :
   - `PrepareCopie(FIN, …)` remet à zéro le paramètre `NbY` au lieu de `NbYc` ;
   - `voie::Sauve` contient un `;` au lieu de `&&` : le résultat des dernières
     écritures est ignoré ;
-  - `depot_bus::Verifie` utilise `Format("Dépot bus : ", …)` sans spécificateur.
+  - `depot_bus::Verifie` utilise `Format("Dépot bus : ", …)` sans spécificateur ;
+  - `vehlib::ReservePlaceVehlibCible` tire au hasard une place libre sans
+    limite d'essais : quand plus de vehlibs reçoivent un passager qu'il ne
+    reste de places libres, la boucle ne se termine jamais et la simulation se
+    fige. Sur Géant (29 vehlibs pour 32 places), cela dépend de la graine :
+    `cvsim maps/Géant.cvw --graine 123` ne rend pas la main (avant le tour 50),
+    de même que 135 et 136 sur les graines 100 à 139 en 300 tours ; les graines
+    1 à 7, 42 et 12345 tiennent 1500 tours. Le golden master n'y est pas
+    exposé ; le test d'interface fixe sa graine pour la même raison.

@@ -122,7 +122,7 @@
  <customwidgets>
   <customwidget>
    <class>TStringGrid</class>
-   <extends>QTableWidget</extends>
+   <extends>QAbstractScrollArea</extends>
    <header>vcl/controles.h</header>
   </customwidget>
  </customwidgets>

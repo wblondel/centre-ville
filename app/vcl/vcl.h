@@ -112,8 +112,9 @@ String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt);
 String ExtractFilePath(const AnsiString &asNomFichier);
 String ExtractFileName(const AnsiString &asNomFichier);
 int StrToInt(const AnsiString &asTexte); // texte invalide : exception (EConvertError)
-// Sous-ensemble utilisé par les fiches : « 0 », « 0.0 », « 0.00 »... (séparateur
-// décimal de FormatSettings, arrondi au plus proche)
+// Une seule section : « 0 », « # », « . » et caractères littéraux (« #.000% »,
+// « 0.0 », « ###.## »...), séparateur décimal de FormatSettings, arrondi au
+// plus proche (la moitié vers le haut), NAN/INF comme la VCL
 String FormatFloat(const AnsiString &asFormat, long double Valeur);
 //---------------------------------------------------------------------------
 // TScreen (Screen->PixelsPerInch) : résolution de l'écran principal comme la
