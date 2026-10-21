@@ -25,5 +25,32 @@ void TfrmAPropos::ChargeFiche()
   LieurComposants Lieur(this, "f_propos", Composants);
   COMPOSANTS_frmAPropos(LIE_COMPOSANT)
   FinChargement(Lieur);
+  Connecte(OnShow, this, &TfrmAPropos::FormShow);
+  Connecte(OnHide, this, &TfrmAPropos::FormHide);
+  Connecte(Timer->OnTimer, this, &TfrmAPropos::TimerTimer);
  }
+//---------------------------------------------------------------------------
+void TfrmAPropos::TimerTimer(TObject *Sender)
+ { // Fin de TimerTimer seulement (changement de glyphe et de couleur : phase 6)
+  (void)Sender;
+  TempsEcoule++;
+  if (FermetureAutomatique&&(TempsEcoule==2))
+   {
+    FermetureAutomatique=false;
+    Close();
+   }
+ }
+//---------------------------------------------------------------------------
+void TfrmAPropos::FormShow(TObject *Sender)
+{
+ (void)Sender;
+ TempsEcoule=0;
+ Timer->Enabled=true;
+}
+//---------------------------------------------------------------------------
+void TfrmAPropos::FormHide(TObject *Sender)
+{
+ (void)Sender;
+ Timer->Enabled=false;
+}
 //---------------------------------------------------------------------------

@@ -209,6 +209,8 @@ void LieurComposants::Termine()
    }
  }
 //---------------------------------------------------------------------------
+QWidget *FichePrincipaleQt=nullptr;
+//---------------------------------------------------------------------------
 int ToucheVirtuelleDe(const QKeyEvent *e)
  {
   switch(e->key())

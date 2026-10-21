@@ -9,35 +9,10 @@
 // les tests « frmDefFeux&& » du code d'origine.
 //---------------------------------------------------------------------------
 #include <QApplication>
-#include <QFileOpenEvent>
 #include <QMessageBox>
 #include <exception>
 #include "application.h"
 #include "f_simul.h"
-//---------------------------------------------------------------------------
-namespace
- {
-  // macOS : ouverture d'un .cvw depuis le Finder (QFileOpenEvent). Avant la
-  // création de frmSimulation, le fichier est mis en attente.
-  class OuvertureFichiers : public QObject
-   {
-    public:
-    QString EnAttente;
-    bool eventFilter(QObject *o, QEvent *e) override
-     {
-      if (e->type()==QEvent::FileOpen)
-       {
-        QString f=static_cast<QFileOpenEvent *>(e)->file();
-        if (frmSimulation&&frmSimulation->isVisible())
-         frmSimulation->OuvreFichierDemande(A(f));
-        else
-         EnAttente=f;
-        return true;
-       }
-      return QObject::eventFilter(o, e);
-     }
-   };
- }
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {

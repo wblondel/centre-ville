@@ -3,6 +3,8 @@
 // (partie de src/cvw.cpp commune à cvw et aux tests de l'interface)
 //---------------------------------------------------------------------------
 #include <QApplication>
+#include <QDir>
+#include <QFileOpenEvent>
 #include <QFont>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -34,6 +36,20 @@
 #include "f_infvehlib.h"
 #include "f_defn.h"
 #include "f_epidemie.h"
+//---------------------------------------------------------------------------
+bool OuvertureFichiers::eventFilter(QObject *o, QEvent *e)
+ {
+  if (e->type()==QEvent::FileOpen)
+   {
+    QString f=static_cast<QFileOpenEvent *>(e)->file();
+    if (frmSimulation&&frmSimulation->isVisible())
+     frmSimulation->OuvreFichierDemande(A(QDir::toNativeSeparators(f)));
+    else
+     EnAttente=f;
+    return true;
+   }
+  return QObject::eventFilter(o, e);
+ }
 //---------------------------------------------------------------------------
 void InitialiseApplication(QApplication &App)
  {

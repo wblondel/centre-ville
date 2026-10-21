@@ -86,3 +86,23 @@ set_tests_properties(cvsim.spaghettis_100_tours PROPERTIES FIXTURES_REQUIRED dos
 add_test(NAME preparation.dossier_sortie
   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/sortie")
 set_tests_properties(preparation.dossier_sortie PROPERTIES FIXTURES_SETUP dossier_sortie)
+
+# Tests de l'application Qt (si elle est compilée) : pilotage de l'interface
+# sur maps/Démo.cvw, captures de la fenêtre principale dans sortie/captures
+if(TARGET cvwfiches)
+  find_package(Qt6 REQUIRED COMPONENTS Test)
+  add_executable(test_interface app/test_interface.cpp ${PROJECT_SOURCE_DIR}/app/ressources/images.qrc)
+  set_target_properties(test_interface PROPERTIES AUTOMOC ON AUTORCC ON)
+  target_link_libraries(test_interface PRIVATE cvwfiches cvtest_support Qt6::Test)
+  if(MSVC)
+    target_link_options(test_interface PRIVATE /STACK:16777216)
+  elseif(APPLE)
+    target_link_options(test_interface PRIVATE -Wl,-stack_size,0x1000000)
+  endif()
+  add_test(NAME interface.demo COMMAND test_interface)
+  set_tests_properties(interface.demo PROPERTIES
+    FIXTURES_REQUIRED dossier_sortie
+    ENVIRONMENT "CV_CARTE=${PROJECT_SOURCE_DIR}/maps/Démo.cvw;CV_DOSSIER_CAPTURES=${CMAKE_CURRENT_BINARY_DIR}/sortie/captures;QT_QPA_PLATFORM=offscreen"
+    TIMEOUT 300
+  )
+endif()

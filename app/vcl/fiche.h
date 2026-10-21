@@ -67,6 +67,7 @@ class LieurComposants
 #define LIE_COMPOSANT(Classe, Nom) Lieur.Lie(#Nom, Nom);
 //---------------------------------------------------------------------------
 int ToucheVirtuelleDe(const QKeyEvent *e); // code VK de la touche (OnKeyDown)
+extern QWidget *FichePrincipaleQt; // fiche principale (parent des fiches secondaires)
 TShiftState EtatTouches(const QKeyEvent *e);
 //---------------------------------------------------------------------------
 template <class B> class TFormT : public B, public FicheVclBase
@@ -131,7 +132,6 @@ template <class B> class TFormT : public B, public FicheVclBase
     if (!p) p=FichePrincipaleQt;
     return p?p->window():nullptr;
    }
-  static inline QWidget *FichePrincipaleQt=nullptr;
   void Show()
    {
     B::show();
