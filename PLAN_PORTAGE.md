@@ -206,7 +206,7 @@ Taille relative : **S** petit, **M** moyen, **L** gros. Les phases 4 à 6 repré
 | `TCSpinEdit` | `QSpinBox` |
 | `TCheckBox`, `TRadioButton` | `QCheckBox`, `QRadioButton` (signal `toggled`) |
 | `TGroupBox`, `TRadioGroup` | `QGroupBox` (+ `QButtonGroup` pour `ItemIndex`) |
-| `TStringGrid` | `QTableWidget` |
+| `TStringGrid` | widget maison sur `QAbstractScrollArea` (`app/vcl/grilletextes.cpp`, dessin de la VCL) |
 | `TDrawGrid` | `GrilleSimulation` (widget maison, Phase 4) |
 | `TPaintBox` | widget maison avec `paintEvent` |
 | `TShape` | widget maison (rectangle/cercle) |

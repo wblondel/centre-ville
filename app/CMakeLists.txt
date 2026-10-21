@@ -36,7 +36,7 @@ add_library(cvvcl STATIC
   vcl/graphiques.h vcl/graphiques.cpp
   vcl/listeimages.h vcl/listeimages.cpp
   vcl/actions.h vcl/actions.cpp
-  vcl/controles.h vcl/controles.cpp
+  vcl/controles.h vcl/controles.cpp vcl/grilletextes.cpp
   vcl/fiche.h vcl/fiche.cpp
 )
 target_include_directories(cvvcl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/vcl

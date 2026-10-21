@@ -8,6 +8,8 @@
 #include <QScreen>
 #include <QStringList>
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 //---------------------------------------------------------------------------
 String String::UpperCase() const { return A(Q(*this).toUpper()); }
@@ -70,15 +72,88 @@ int StrToInt(const AnsiString &asTexte)
  }
 //---------------------------------------------------------------------------
 String FormatFloat(const AnsiString &asFormat, long double Valeur)
- {
+ { // SysUtils::FormatFloat, une seule section : « 0 » chiffre obligatoire, « # »
+   // chiffre facultatif, « . » séparateur décimal (omis sans décimale affichée),
+   // texte entre guillemets ou apostrophes et autres caractères (« % »...)
+   // recopiés à leur place, signe en tête. Arrondi comme FloatToDecimal : à
+   // partir de 17 chiffres significatifs, la moitié vers le haut. NAN, INF et
+   // -INF comme la VCL (FloatToTextFmt).
+  if (std::isnan(Valeur)) return String("NAN");
+  if (std::isinf(Valeur)) return String((Valeur<0)?"-INF":"INF");
   const std::string &f=asFormat.str();
-  std::size_t Point=f.find('.');
-  int Decimales=(Point==std::string::npos)?0:(int)(f.size()-Point-1);
+  // Analyse du format
+  int NbAvant=0, PremierZero=-1, Decimales=0, DecimalesMin=0;
+  bool Point=false;
+  for(std::size_t i=0; i<f.size(); i++)
+   {
+    char c=f[i];
+    if ((c=='"')||(c=='\'')) { std::size_t j=f.find(c, i+1); i=(j==std::string::npos)?f.size():j; }
+    else if ((c=='.')&&!Point) Point=true;
+    else if ((c=='0')||(c=='#'))
+     {
+      if (!Point) { if ((c=='0')&&(PremierZero<0)) PremierZero=NbAvant; NbAvant++; }
+      else { Decimales++; if (c=='0') DecimalesMin=Decimales; }
+     }
+   }
+  int EntiersMin=(PremierZero<0)?0:NbAvant-PremierZero;
+  // Chiffres : Valeur = 0,Chiffres x 10^(Exposant+1), arrondis à Decimales
   char Tampon[64];
-  std::snprintf(Tampon, sizeof(Tampon), "%.*Lf", Decimales, Valeur);
-  std::string r(Tampon);
-  std::size_t i=r.find('.');
-  if (i!=std::string::npos) r[i]=FormatSettings.DecimalSeparator;
+  std::snprintf(Tampon, sizeof(Tampon), "%.16Le", std::fabs(Valeur));
+  std::string Chiffres=std::string(1, Tampon[0])+std::string(Tampon+2, 16);
+  int Exposant=std::atoi(std::strchr(Tampon, 'e')+1);
+  int Garde=Exposant+1+Decimales;
+  if (Garde<0) Chiffres.clear();
+  else if (Garde<(int)Chiffres.size())
+   {
+    bool Haut=Chiffres[(std::size_t)Garde]>='5';
+    Chiffres.resize((std::size_t)Garde);
+    if (Haut)
+     {
+      int i=Garde-1;
+      while((i>=0)&&(Chiffres[(std::size_t)i]=='9')) Chiffres[(std::size_t)i--]='0';
+      if (i<0) { Chiffres.insert(0, "1"); Exposant++; }
+      else Chiffres[(std::size_t)i]++;
+     }
+   }
+  bool Zero=Chiffres.find_first_not_of('0')==std::string::npos;
+  std::string Entier, Fraction;
+  for(int i=0; i<Exposant+1; i++) Entier+=(i<(int)Chiffres.size())?Chiffres[(std::size_t)i]:'0';
+  for(int i=0; i<Decimales; i++)
+   {
+    int j=Exposant+1+i;
+    Fraction+=((j>=0)&&(j<(int)Chiffres.size()))?Chiffres[(std::size_t)j]:'0';
+   }
+  Entier.erase(0, qMin(Entier.find_first_not_of('0'), Entier.size()));
+  if ((int)Entier.size()<EntiersMin) Entier.insert(0, (std::size_t)(EntiersMin-(int)Entier.size()), '0');
+  while(((int)Fraction.size()>DecimalesMin)&&(Fraction.back()=='0')) Fraction.pop_back();
+  // Résultat
+  std::string r=((Valeur<0)&&!Zero)?"-":"";
+  bool EntierEcrit=false, PointVu=false;
+  std::size_t Decimale=0;
+  for(std::size_t i=0; i<f.size(); i++)
+   {
+    char c=f[i];
+    if ((c=='"')||(c=='\''))
+     {
+      std::size_t j=f.find(c, i+1);
+      if (j==std::string::npos) j=f.size();
+      r+=f.substr(i+1, j-i-1);
+      i=j;
+     }
+    else if ((c=='.')&&!PointVu)
+     {
+      PointVu=true;
+      if (!EntierEcrit) { r+=Entier; EntierEcrit=true; }
+      if (!Fraction.empty()) r+=FormatSettings.DecimalSeparator;
+     }
+    else if ((c=='0')||(c=='#'))
+     {
+      if (!PointVu) { if (!EntierEcrit) { r+=Entier; EntierEcrit=true; } }
+      else if (Decimale<Fraction.size()) r+=Fraction[Decimale++];
+     }
+    else r+=c;
+   }
+  if (!EntierEcrit) r+=Entier;
   return String(r);
  }
 //---------------------------------------------------------------------------

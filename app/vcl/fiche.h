@@ -17,7 +17,10 @@
 //     VCL (QDialog::exec, lui, s'arrêterait) ;
 //   - FindComponent par nom, ComponentCount/Components[i] dans l'ordre du .dfm.
 // Width/Height désignent la zone cliente (la VCL compte le cadre de la
-// fenêtre ; les formules du code d'origine n'utilisent que des différences).
+// fenêtre ; les formules du code d'origine n'utilisent que des différences),
+// sauf pour les fiches bsSizeToolWin (tableaux des distances), dont le code
+// fixe la hauteur en absolu : leur cadre VCL (CadreLargeur x CadreHauteur) est
+// ajouté à Width/Height et retiré des Constraints du .dfm.
 //---------------------------------------------------------------------------
 #ifndef vcl_ficheH
 #define vcl_ficheH
@@ -82,6 +85,7 @@ template <class B> class TFormT : public B, public FicheVclBase
  {
   bool PremierAffichage=true, Modale=false, EstPrincipale=false;
   int iModalResult=0;
+  int CadreLargeur=0, CadreHauteur=0; // cadre de la fenêtre compté par Width/Height (bsSizeToolWin)
   QEventLoop *BoucleModale=nullptr;
   bool BoucleTerminee=false;
   std::vector<QObject *> ListeComposants;
@@ -127,8 +131,8 @@ template <class B> class TFormT : public B, public FicheVclBase
     Caption.Definit([w]() { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
     Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
     Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
-    Width.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
-    Height.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
+    Width.Definit([this, w]() { return w->width()+CadreLargeur; }, [this, w](const int &v) { w->resize(v-CadreLargeur, w->height()); });
+    Height.Definit([this, w]() { return w->height()+CadreHauteur; }, [this, w](const int &v) { w->resize(w->width(), v-CadreHauteur); });
     ClientWidth.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
     ClientHeight.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
     ModalResult.Definit([this]() { return iModalResult; }, [this](const int &mr) { DefinitModalResult(mr); });
@@ -239,6 +243,19 @@ template <class B> class TFormT : public B, public FicheVclBase
       }
     if (f!=w->windowFlags()) w->setWindowFlags(f);
     if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
+    if (Bord=="bsSizeToolWin")
+     { // Cadre que supposent les .dfm et le code des distances : Constraints de
+       // 141 pour ClientWidth=125 ; Height=26+21*RowCount pour une grille (bord
+       // de 2 pixels) de RowCount lignes de 20 pixels plus un trait
+      CadreLargeur=16;
+      CadreHauteur=22;
+     }
+    // Constraints (taille de la fenêtre, cadre compris)
+    QVariant c=w->property("vclConstraintsMinWidth");
+    if (c.isValid()) w->setMinimumWidth(c.toInt()-CadreLargeur);
+    if ((c=w->property("vclConstraintsMaxWidth")).isValid()) w->setMaximumWidth(c.toInt()-CadreLargeur);
+    if ((c=w->property("vclConstraintsMinHeight")).isValid()) w->setMinimumHeight(c.toInt()-CadreHauteur);
+    if ((c=w->property("vclConstraintsMaxHeight")).isValid()) w->setMaximumHeight(c.toInt()-CadreHauteur);
    }
   bool Apercu(QKeyEvent *e, bool Relache)
    { // KeyPreview : OnKeyDown/OnKeyUp puis OnKeyPress de la fiche avant le contrôle actif ;

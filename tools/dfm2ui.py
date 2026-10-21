@@ -68,7 +68,7 @@ WIDGETS = OrderedDict([
     ("TSpeedButton", ("TSpeedButton", "QToolButton", "vcl/controles.h")),
     ("TShape", ("TShape", "QWidget", "vcl/controles.h")),
     ("TImage", ("TImage", "QLabel", "vcl/controles.h")),
-    ("TStringGrid", ("TStringGrid", "QTableWidget", "vcl/controles.h")),
+    ("TStringGrid", ("TStringGrid", "QAbstractScrollArea", "vcl/controles.h")),
     ("TTrackBar", ("TTrackBar", "QSlider", "vcl/controles.h")),
     ("TPanel", ("TPanel", "QFrame", "vcl/controles.h")),
     ("TBevel", ("TBevel", "QFrame", "vcl/controles.h")),
