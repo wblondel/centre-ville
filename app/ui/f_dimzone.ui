@@ -84,15 +84,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEditNbX">
-   <property name="minimum">
-    <number>-2147483647</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -115,15 +106,6 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEditNbY">
-   <property name="minimum">
-    <number>-2147483647</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>0</number>
    </property>
@@ -264,7 +246,7 @@
   </customwidget>
   <customwidget>
    <class>TCSpinEdit</class>
-   <extends>QSpinBox</extends>
+   <extends>QAbstractSpinBox</extends>
    <header>vcl/controles.h</header>
   </customwidget>
   <customwidget>

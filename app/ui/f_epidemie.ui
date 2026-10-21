@@ -223,20 +223,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditInfectiosite">
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>999</number>
-    </property>
-    <property name="value">
-     <number>100</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>10</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>999</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>100</number>
     </property>
     <property name="geometry">
      <rect>
@@ -251,20 +245,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditPatientZero">
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>999</number>
-    </property>
-    <property name="value">
-     <number>100</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>10</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>999</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>100</number>
     </property>
     <property name="geometry">
      <rect>
@@ -279,20 +267,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditChargeViraleFatale">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>10</number>
     </property>
     <property name="geometry">
      <rect>
@@ -444,7 +426,7 @@
   </customwidget>
   <customwidget>
    <class>TCSpinEdit</class>
-   <extends>QSpinBox</extends>
+   <extends>QAbstractSpinBox</extends>
    <header>vcl/controles.h</header>
   </customwidget>
   <customwidget>

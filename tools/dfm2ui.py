@@ -17,7 +17,7 @@ principale. Pour chaque fiche src/<fiche>.dfm, l'outil écrit :
 
 Correspondance des classes : chaque contrôle VCL devient un widget « promu »
 du même nom (TLabel, TCSpinEdit, TCheckBox...) déclaré dans app/vcl/controles.h
-et dérivé de la classe Qt la plus proche (QLabel, QSpinBox, QCheckBox...) : uic
+et dérivé de la classe Qt la plus proche (QLabel, QAbstractSpinBox, QCheckBox...) : uic
 instancie directement ces classes, qui reproduisent l'API et les événements
 implicites de la VCL (PLAN_PORTAGE.md, §4.4). Ce que Qt Designer ne sait pas
 représenter est conservé en propriétés dynamiques préfixées par « vcl » (par
@@ -58,7 +58,7 @@ RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Classe VCL -> (classe promue dans le .ui, classe Qt de base, en-tête)
 WIDGETS = OrderedDict([
     ("TLabel", ("TLabel", "QLabel", "vcl/controles.h")),
-    ("TCSpinEdit", ("TCSpinEdit", "QSpinBox", "vcl/controles.h")),
+    ("TCSpinEdit", ("TCSpinEdit", "QAbstractSpinBox", "vcl/controles.h")),
     ("TButton", ("TButton", "QPushButton", "vcl/controles.h")),
     ("TBitBtn", ("TBitBtn", "QPushButton", "vcl/controles.h")),
     ("TCheckBox", ("TCheckBox", "QCheckBox", "vcl/controles.h")),
@@ -427,17 +427,16 @@ class Conversion:
         return {"Caption", "Alignment", "Layout", "WordWrap", "FocusControl"}
 
     def w_TCSpinEdit(self, e, o):
+        # CSPIN.pas : MinValue, MaxValue et Increment sont de simples champs, et
+        # Value écrit le texte (borné si MinValue <> MaxValue) ; tout est appliqué
+        # par TCSpinEdit::PrepareVcl, Value après les bornes comme au chargement
         p = o.props
-        mini, maxi = p.get("MinValue", 0), p.get("MaxValue", 0)
-        if mini == maxi:  # TCSpinEdit : MinValue = MaxValue = pas de bornes
-            mini, maxi = -2147483647, 2147483647
-        prop(e, "minimum", "number", mini)
-        prop(e, "maximum", "number", maxi)
-        prop(e, "value", "number", min(max(p.get("Value", 0), mini), maxi))
-        if "Increment" in p:
-            prop(e, "singleStep", "number", p["Increment"])
         prop(e, "vclMinValue", "number", p.get("MinValue", 0), True)
         prop(e, "vclMaxValue", "number", p.get("MaxValue", 0), True)
+        if "Value" in p:
+            prop(e, "vclValue", "number", p["Value"], True)
+        if "Increment" in p:
+            prop(e, "vclIncrement", "number", p["Increment"], True)
         return {"MinValue", "MaxValue", "Value", "Increment"}
 
     def boutons(self, e, o):

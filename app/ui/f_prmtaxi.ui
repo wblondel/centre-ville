@@ -268,20 +268,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbCasesMaxPlaceTaxi">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>10</number>
-    </property>
-    <property name="value">
-     <number>3</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>10</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>3</number>
     </property>
     <property name="geometry">
      <rect>
@@ -296,20 +290,14 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditNbMaxToursAttente">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>50</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>50</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>10</number>
     </property>
     <property name="geometry">
      <rect>
@@ -324,23 +312,17 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditProbaDirPlaceTaxi">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>50</number>
-    </property>
-    <property name="singleStep">
-     <number>5</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>50</number>
+    </property>
+    <property name="vclIncrement" stdset="0">
+     <number>5</number>
     </property>
     <property name="geometry">
      <rect>
@@ -355,23 +337,17 @@
     </property>
    </widget>
    <widget class="TCSpinEdit" name="CSpinEditProbaArretDmd">
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="value">
-     <number>10</number>
-    </property>
-    <property name="singleStep">
-     <number>5</number>
-    </property>
     <property name="vclMinValue" stdset="0">
      <number>0</number>
     </property>
     <property name="vclMaxValue" stdset="0">
      <number>100</number>
+    </property>
+    <property name="vclValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclIncrement" stdset="0">
+     <number>5</number>
     </property>
     <property name="geometry">
      <rect>
@@ -475,20 +451,14 @@
    </property>
   </widget>
   <widget class="TCSpinEdit" name="CSpinEditNbMaxPersonnesTaxi">
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>9</number>
-   </property>
-   <property name="value">
-    <number>3</number>
-   </property>
    <property name="vclMinValue" stdset="0">
     <number>1</number>
    </property>
    <property name="vclMaxValue" stdset="0">
     <number>9</number>
+   </property>
+   <property name="vclValue" stdset="0">
+    <number>3</number>
    </property>
    <property name="geometry">
     <rect>
@@ -527,7 +497,7 @@
   </customwidget>
   <customwidget>
    <class>TCSpinEdit</class>
-   <extends>QSpinBox</extends>
+   <extends>QAbstractSpinBox</extends>
    <header>vcl/controles.h</header>
   </customwidget>
   <customwidget>
