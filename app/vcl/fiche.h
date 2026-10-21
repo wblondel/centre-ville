@@ -9,9 +9,13 @@
 //     (EVENEMENTS_<fiche>), puis OnCreate (OldCreateOrder=True : OnCreate
 //     avant le corps du constructeur C++) ;
 //   - Show/Hide/Visible, ShowModal/ModalResult, Close et OnCloseQuery,
-//     OnShow/OnHide, KeyPreview (OnKeyDown/OnKeyUp avant le contrôle actif),
-//     Échap = bouton Cancel ;
-//   - FindComponent par nom.
+//     OnShow/OnHide, KeyPreview (OnKeyDown/OnKeyUp avant le contrôle actif ;
+//     sans KeyPreview, seulement quand aucun contrôle n'a le focus), Échap =
+//     bouton Cancel ; ShowModal a sa propre boucle modale, que seul
+//     ModalResult termine (Close et la case de fermeture donnent mrCancel) :
+//     Hide pendant ShowModal cache la fiche sans la terminer, comme dans la
+//     VCL (QDialog::exec, lui, s'arrêterait) ;
+//   - FindComponent par nom, ComponentCount/Components[i] dans l'ordre du .dfm.
 // Width/Height désignent la zone cliente (la VCL compte le cadre de la
 // fenêtre ; les formules du code d'origine n'utilisent que des différences).
 //---------------------------------------------------------------------------
@@ -21,8 +25,11 @@
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDialog>
+#include <QEventLoop>
 #include <QKeyEvent>
 #include <QMainWindow>
+#include <QMouseEvent>
+#include <QPointer>
 #include <QScreen>
 #include <QShowEvent>
 #include <map>
@@ -42,6 +49,7 @@ class LieurComposants
   QObject *Lie(const char *Nom, const char *Classe);
   public:
   std::map<QString, QObject *> &Composants;
+  std::vector<QObject *> Ordre; // composants dans l'ordre du .dfm (TComponent::Components)
   FicheRaccourcis Raccourcis;
   LieurComposants(QWidget *f, const char *Nom, std::map<QString, QObject *> &c) : Fiche(f), Fichier(Nom), Composants(c) {}
   template <class T> void Lie(const char *Nom, T *&Membre)
@@ -74,12 +82,16 @@ template <class B> class TFormT : public B, public FicheVclBase
  {
   bool PremierAffichage=true, Modale=false, EstPrincipale=false;
   int iModalResult=0;
+  QEventLoop *BoucleModale=nullptr;
+  bool BoucleTerminee=false;
+  std::vector<QObject *> ListeComposants;
   protected:
   std::map<QString, QObject *> Composants;
   // Après setupUi : liaison, raccourcis, OnCreate (appelée par la fiche portée)
   void FinChargement(LieurComposants &Lieur)
    {
     Lieur.Termine();
+    ListeComposants=Lieur.Ordre;
     Lieur.Raccourcis.Fenetre=this;
     Lieur.Raccourcis.Principale=EstPrincipale;
     Lieur.Raccourcis.Apercu=[this](QKeyEvent *e, bool Relache) { return Apercu(e, Relache); };
@@ -100,9 +112,18 @@ template <class B> class TFormT : public B, public FicheVclBase
   std::function<void(TObject *, bool &)> OnCloseQuery;
   std::function<void(TObject *, WORD &, TShiftState)> OnKeyDown, OnKeyUp;
   std::function<void(TObject *, char &)> OnKeyPress;
+  Propriete<int> ComponentCount;
+  class TableauComposants
+   { // TComponent::Components[i]
+    const std::vector<QObject *> &Liste;
+    public:
+    explicit TableauComposants(const std::vector<QObject *> &l) : Liste(l) {}
+    TComponent *operator[](int i) const { return Liste.at((std::size_t)i); }
+   } Components{ListeComposants};
   explicit TFormT(TComponent *Owner) : B(ParentDe(Owner))
    {
     QWidget *w=this;
+    ComponentCount.Definit([this]() { return (int)ListeComposants.size(); }, [](const int &) {});
     Caption.Definit([w]() { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
     Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
     Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
@@ -122,6 +143,12 @@ template <class B> class TFormT : public B, public FicheVclBase
                          });
     Cursor.Definit([w]() { return w->cursor().shape()==Qt::WaitCursor?crHourGlass:crDefault; },
                    [w](const TCursor &c) { if (c==crHourGlass) w->setCursor(Qt::WaitCursor); else w->unsetCursor(); });
+    if constexpr (std::is_base_of_v<QDialog, B>) // done() (ModalResult, Close) : fin de la boucle modale
+     QObject::connect(this, &QDialog::finished, this, [this](int)
+      {
+       BoucleTerminee=true;
+       if (BoucleModale) BoucleModale->exit();
+      });
    }
   ~TFormT() override
    {
@@ -142,15 +169,28 @@ template <class B> class TFormT : public B, public FicheVclBase
   void Hide() { B::hide(); }
   void Close() { B::close(); }
   void Release() { B::hide(); B::deleteLater(); }
-  void Repaint() { B::repaint(); }
+  void Repaint() { if (TCanvas::NbDessinsEnCours) B::update(); else B::repaint(); } // voir ControleVcl::Repaint
   void SetFocus() { B::activateWindow(); }
   int ShowModal()
-   {
+   { // TCustomForm::ShowModal : « repeat HandleMessage until ModalResult<>0 ». La
+     // boucle ne dépend pas de la visibilité : f_prmsim cache sa fiche le temps
+     // d'une fiche fille modale, puis la réaffiche (QDialog::exec s'arrêterait au Hide)
     if constexpr (std::is_base_of_v<QDialog, B>)
      {
       iModalResult=mrNone;
       Modale=true;
-      B::exec();
+      bool EtaitModale=this->testAttribute(Qt::WA_ShowModal);
+      this->setAttribute(Qt::WA_ShowModal, true);
+      this->setResult(0);
+      QPointer<QDialog> Garde(this);
+      QEventLoop Boucle;
+      BoucleModale=&Boucle;
+      BoucleTerminee=false;
+      B::show();
+      if (!BoucleTerminee) Boucle.exec(QEventLoop::DialogExec);
+      if (!Garde) return mrCancel;
+      BoucleModale=nullptr;
+      if (!EtaitModale) this->setAttribute(Qt::WA_ShowModal, false);
       Modale=false;
       if (iModalResult==mrNone) iModalResult=mrCancel;
       return iModalResult;
@@ -183,12 +223,29 @@ template <class B> class TFormT : public B, public FicheVclBase
     Qt::WindowFlags f=w->windowFlags();
     if ((Bord=="bsToolWindow")||(Bord=="bsSizeToolWin")) f|=Qt::Tool;
     if (w->property("vclFormStyle").toString()=="fsStayOnTop") f|=Qt::WindowStaysOnTopHint;
+    if constexpr (std::is_base_of_v<QDialog, B>)
+     if (w->property("vclBorderIcons").isValid())
+      { // BorderIcons : boutons de la barre de titre (biMinimize : f_prmbus réduit sa fiche)
+       QString Icones=w->property("vclBorderIcons").toString();
+       f|=Qt::CustomizeWindowHint|Qt::WindowTitleHint;
+       f&=~(Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint|Qt::WindowMinimizeButtonHint|
+            Qt::WindowMaximizeButtonHint|Qt::WindowContextHelpButtonHint);
+       if (Icones.contains("biSystemMenu"))
+        {
+         f|=Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint;
+         if (Icones.contains("biMinimize")) f|=Qt::WindowMinimizeButtonHint;
+         if (Icones.contains("biMaximize")) f|=Qt::WindowMaximizeButtonHint;
+        }
+      }
     if (f!=w->windowFlags()) w->setWindowFlags(f);
     if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
    }
   bool Apercu(QKeyEvent *e, bool Relache)
-   { // KeyPreview : OnKeyDown/OnKeyUp puis OnKeyPress de la fiche avant le contrôle actif
-    if (!KeyPreview) return false;
+   { // KeyPreview : OnKeyDown/OnKeyUp puis OnKeyPress de la fiche avant le contrôle actif ;
+     // sans KeyPreview, la fiche ne les reçoit que si elle a elle-même le focus
+     // (aucun contrôle actif : TWinControl::DoKeyDown de la fiche)
+    QWidget *Focus=QApplication::focusWidget();
+    if (!KeyPreview&&Focus&&(Focus!=this)) return false;
     WORD Key=(WORD)ToucheVirtuelleDe(e);
     if (Key)
      {
@@ -254,6 +311,16 @@ template <class B> class TFormT : public B, public FicheVclBase
     if (Modale&&(iModalResult==mrNone)) iModalResult=mrCancel;
     B::closeEvent(e);
     if (e->isAccepted()&&EstPrincipale) QCoreApplication::quit();
+   }
+  void mousePressEvent(QMouseEvent *e) override
+   {
+    B::mousePressEvent(e);
+    if (e->button()==Qt::LeftButton) e->accept();
+   }
+  void mouseReleaseEvent(QMouseEvent *e) override
+   { // TControl::WMLButtonUp : OnClick de la fiche (clic hors des contrôles)
+    B::mouseReleaseEvent(e);
+    if ((e->button()==Qt::LeftButton)&&this->rect().contains(e->position().toPoint())&&OnClick) OnClick(this);
    }
   void keyPressEvent(QKeyEvent *e) override
    {

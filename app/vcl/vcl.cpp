@@ -4,8 +4,11 @@
 #include "vcl.h"
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QStringList>
 #include <cmath>
+#include <stdexcept>
 //---------------------------------------------------------------------------
 String String::UpperCase() const { return A(Q(*this).toUpper()); }
 String String::LowerCase() const { return A(Q(*this).toLower()); }
@@ -56,6 +59,45 @@ String ExtractFileName(const AnsiString &asNomFichier)
   QString s=Q(asNomFichier);
   int i=(int)qMax(s.lastIndexOf('/'), s.lastIndexOf('\\'));
   return A(s.mid(i+1));
+ }
+//---------------------------------------------------------------------------
+int StrToInt(const AnsiString &asTexte)
+ {
+  bool Ok=false;
+  int n=Q(asTexte).trimmed().toInt(&Ok);
+  if (!Ok) throw std::invalid_argument("'"+asTexte.str()+"' n'est pas une valeur entière correcte");
+  return n;
+ }
+//---------------------------------------------------------------------------
+String FormatFloat(const AnsiString &asFormat, long double Valeur)
+ {
+  const std::string &f=asFormat.str();
+  std::size_t Point=f.find('.');
+  int Decimales=(Point==std::string::npos)?0:(int)(f.size()-Point-1);
+  char Tampon[64];
+  std::snprintf(Tampon, sizeof(Tampon), "%.*Lf", Decimales, Valeur);
+  std::string r(Tampon);
+  std::size_t i=r.find('.');
+  if (i!=std::string::npos) r[i]=FormatSettings.DecimalSeparator;
+  return String(r);
+ }
+//---------------------------------------------------------------------------
+// TScreen
+//---------------------------------------------------------------------------
+namespace
+ {
+  TScreen EcranVcl;
+ }
+TScreen *Screen=&EcranVcl;
+//---------------------------------------------------------------------------
+TScreen::TScreen()
+ {
+  PixelsPerInch.Definit([]()
+                         {
+                          QScreen *e=QGuiApplication::primaryScreen();
+                          return e?qRound(96*e->devicePixelRatio()):96;
+                         },
+                        [](const int &) {});
  }
 //---------------------------------------------------------------------------
 // TApplication

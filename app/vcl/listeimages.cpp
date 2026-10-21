@@ -58,7 +58,11 @@ void TVirtualImageList::Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enab
 //---------------------------------------------------------------------------
 void TVirtualImageList::GetBitmap(int Index, TBitmap *Bitmap) const
  {
-  if ((Index>=0)&&(Index<Count())&&Bitmap) Bitmap->Image=Images[(std::size_t)Index];
+  if ((Index>=0)&&(Index<Count())&&Bitmap)
+   {
+    Bitmap->Image=Images[(std::size_t)Index];
+    Bitmap->Changed();
+   }
  }
 //---------------------------------------------------------------------------
 QPixmap TVirtualImageList::Pixmap(int Index) const

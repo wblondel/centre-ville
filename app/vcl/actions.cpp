@@ -463,9 +463,9 @@ namespace
           (e->type()!=QEvent::KeyRelease)) return false;
       QWidget *w=qobject_cast<QWidget *>(o);
       // Seulement au premier destinataire (le contrôle actif, ou la fenêtre
-      // si aucun contrôle n'a le focus), pas lors de la remontée aux parents
+      // si aucun de ses contrôles n'a le focus), pas lors de la remontée aux parents
       QWidget *Focus=QApplication::focusWidget();
-      if (!w||(Focus?(w!=Focus):!w->isWindow())) return false;
+      if (!w||((w!=Focus)&&!(w->isWindow()&&(!Focus||(Focus->window()!=w))))) return false;
       QKeyEvent *k=static_cast<QKeyEvent *>(e);
       if (e->type()==QEvent::KeyRelease)
        { // KeyPreview : OnKeyUp de la fiche
