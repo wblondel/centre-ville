@@ -2867,7 +2867,8 @@ void TestInterface::controleCSpinEdit()
    // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
    // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
    // le texte reste vide ; flèches : Value±Increment, borné ; sans bornes si
-   // MinValue=MaxValue ; EditorEnabled=False : flèches seulement
+   // MinValue=MaxValue ; EditorEnabled=False : flèches seulement ; texte
+   // sélectionné en entrant dans le champ (sauf au clic)
   QWidget Fiche;
   TCSpinEdit *s=new TCSpinEdit(&Fiche);
   TButton *b=new TButton(&Fiche);
@@ -2970,6 +2971,20 @@ void TestInterface::controleCSpinEdit()
   QCOMPARE(Texte->text(), QString("99999"));
   QTest::keyClick(s, Qt::Key_Down);
   QCOMPARE(Texte->text(), QString("99995"));
+  // Entrée dans le champ (CMEnter, AutoSelect) : texte sélectionné, sauf au clic
+  // et quand la fenêtre retrouve l'activation (le champ resté contrôle actif)
+  b->setFocus(Qt::TabFocusReason);
+  s->setFocus(Qt::OtherFocusReason);
+  QCOMPARE(Texte->selectedText(), QString("99995"));
+  Texte->deselect();
+  QFocusEvent Reactivation(QEvent::FocusIn, Qt::ActiveWindowFocusReason);
+  QCoreApplication::sendEvent(s, &Desactivation);
+  QCoreApplication::sendEvent(s, &Reactivation);
+  QVERIFY(!Texte->hasSelectedText());
+  b->setFocus(Qt::TabFocusReason);
+  QTest::mouseClick(Texte, Qt::LeftButton);
+  QVERIFY(s->hasFocus());
+  QVERIFY(!Texte->hasSelectedText());
   // Chargement du .dfm : Value lu après MinValue et MaxValue (CheckValue), sans
   // OnChange ; sans Value, le texte reste « 0 », même hors des bornes
   TCSpinEdit *d=new TCSpinEdit(&Fiche);

@@ -227,14 +227,21 @@ void TLabel::mouseReleaseEvent(QMouseEvent *e)
 //---------------------------------------------------------------------------
 TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QAbstractSpinBox>(Parent)
  {
-  lineEdit()->setText("0"); // TCSpinEdit.Create : Text:='0'
+  lineEdit()->setText("0"); // TCSpinEdit.Create : Text:='0', curseur au début
+  lineEdit()->setCursorPosition(0);
   Value.Definit([this]()
                  { // GetValue : StrToInt(Text), MinValue si le texte n'est pas un nombre
                   bool Ok=false;
                   int v=lineEdit()->text().toInt(&Ok);
                   return Ok?v:(int)MinValue;
                  },
-                [this](const int &v) { lineEdit()->setText(QString::number(CheckValue(v))); });
+                [this](const int &v)
+                 { // SetValue : Text:=IntToStr(CheckValue(v)) ; comme WM_SETTEXT, curseur au début
+                  QString t=QString::number(CheckValue(v));
+                  if (t==lineEdit()->text()) return;
+                  lineEdit()->setText(t);
+                  lineEdit()->setCursorPosition(0);
+                 });
   // Simples champs, mémorisés dans les propriétés « vcl... » du .ui
   MinValue.Definit([this]() { return property("vclMinValue").toInt(); },
                    [this](const int &v) { setProperty("vclMinValue", v); });
@@ -286,12 +293,23 @@ QValidator::State TCSpinEdit::validate(QString &input, int &pos) const
   return QValidator::Acceptable;
  }
 //---------------------------------------------------------------------------
+void TCSpinEdit::focusInEvent(QFocusEvent *e)
+ { // CMEnter (AutoSelect) : texte sélectionné en entrant dans le champ, sauf au
+   // clic ; pas quand la fenêtre retrouve l'activation (après une boîte de
+   // message, par exemple), le champ étant resté le contrôle actif de la fiche
+  ControleVcl<QAbstractSpinBox>::focusInEvent(e);
+  bool Entree=!ControleActif;
+  ControleActif=true;
+  if (Entree&&(e->reason()!=Qt::MouseFocusReason)) selectAll();
+ }
+//---------------------------------------------------------------------------
 void TCSpinEdit::focusOutEvent(QFocusEvent *e)
  { // CMExit : seulement vers un autre contrôle de la fiche (la VCL n'envoie pas
    // CM_EXIT quand la fenêtre perd l'activation, se ferme ou qu'un menu s'ouvre)
   ControleVcl<QAbstractSpinBox>::focusOutEvent(e);
   if ((e->reason()==Qt::ActiveWindowFocusReason)||(e->reason()==Qt::PopupFocusReason)||
       (e->reason()==Qt::MenuBarFocusReason)) return;
+  ControleActif=false;
   int v=Value;
   if (CheckValue(v)!=v) Value=v; // SetValue(Value)
  }

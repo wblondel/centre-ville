@@ -176,6 +176,7 @@ class TLabel : public ControleVcl<QLabel>
 // valeur interne, signaux bloqués, en quittant le champ ou sur Entrée)
 class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
  {
+  bool ControleActif=false; // contrôle actif de sa fiche (entre CM_ENTER et CM_EXIT)
   int CheckValue(int v);
   public:
   Propriete<int> Value, MinValue, MaxValue, Increment;
@@ -186,6 +187,7 @@ class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
   QValidator::State validate(QString &input, int &pos) const override; // IsValidChar
   protected:
   StepEnabled stepEnabled() const override;
+  void focusInEvent(QFocusEvent *e) override; // CMEnter
   void focusOutEvent(QFocusEvent *e) override; // CMExit
  };
 //---------------------------------------------------------------------------

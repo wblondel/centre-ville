@@ -153,9 +153,15 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
   vers un autre contrôle (`CMExit` ; pas quand la fenêtre perd l'activation,
   se ferme ou ouvre un menu) ; la frappe n'est pas bornée (chiffres, signes et
   séparateur décimal, comme `IsValidChar`) ; `OnChange` suit chaque
-  changement du texte. `dfm2ui.py` écrit les valeurs du `.dfm` en propriétés
-  `vclMinValue`, `vclMaxValue`, `vclValue` (appliquée après les bornes, comme
-  au chargement) et `vclIncrement`. Les contrôles fenêtrés (boutons, cases à
+  changement du texte. Comme sous Windows, `Value=` (`WM_SETTEXT`) laisse le
+  curseur au début du texte, sans sélection ; entrer dans le champ autrement
+  qu'au clic sélectionne le texte (`CMEnter`, `AutoSelect`), mais pas quand la
+  fenêtre retrouve l'activation (après une boîte de message) ; les flèches ne
+  sont jamais grisées aux bornes (captures du lot 1 : seule différence, avec
+  la sélection du champ actif après `Value=`). `dfm2ui.py` écrit les valeurs
+  du `.dfm` en propriétés `vclMinValue`, `vclMaxValue`, `vclValue`
+  (appliquée après les bornes, comme au chargement) et `vclIncrement`. Les
+  contrôles fenêtrés (boutons, cases à
   cocher, boutons radio, curseurs) prennent le focus au clic comme sous
   Windows, y compris sous macOS, où Qt ne le leur donne qu'à la tabulation :
   sinon, cliquer sur OK ne ferait pas sortir du champ et la valeur tapée ne
