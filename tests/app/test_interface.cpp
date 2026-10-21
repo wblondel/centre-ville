@@ -1227,7 +1227,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v](int k, int d) { return v->DistArretTram[k][d]; };
        return t;
       },
-     [this]() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); }},
+     []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); }},
     {"files_taxi", frmAffDistFilesTaxi, frmAffDistFilesTaxi->StringGridDistances, s->ActionDistancesFilesTaxi, nullptr,
      [](voie *v, bool)
       {
@@ -1246,7 +1246,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v, c](int k, int d) { return v->DistFilePark[k][d][c]; };
        return t;
       },
-     [this]() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); }},
+     []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); }},
     {"places_vehlib", frmAffDistPlacesVehlib, frmAffDistPlacesVehlib->StringGridDistances, s->ActionDistancesPlacesVehlib, nullptr,
      [](voie *v, bool)
       {
