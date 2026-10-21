@@ -163,6 +163,9 @@ template <class E> int IncrementeNombre(E **e, int &n) // v5.1
   *e=ee;
   return ++n;
  };
+// portage : instanciation explicite pour f_carfours.cpp (IncrementeNombre(&(cv->Feu), ...)) ;
+// sans elle, l'optimiseur peut ne garder aucune copie appelable de l'instance implicite
+template int IncrementeNombre<feu>(feu **e, int &n);
 //-----------------------------------------------------------------------------
 /* Conditions d'utilisation
 1. Exemple d'appel :  IncrementeNombre(&Feu, NbFeux)
