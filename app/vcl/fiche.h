@@ -15,7 +15,13 @@
 //     ModalResult termine (Close et la case de fermeture donnent mrCancel) :
 //     Hide pendant ShowModal cache la fiche sans la terminer, comme dans la
 //     VCL (QDialog::exec, lui, s'arrêterait) ;
-//   - FindComponent par nom, ComponentCount/Components[i] dans l'ordre du .dfm.
+//   - FindComponent par nom, ComponentCount/Components[i] dans l'ordre du .dfm ;
+//   - PopupMenu de la fiche (f_statsat) : clic droit hors des contrôles qui ont
+//     leur propre menu, et raccourcis de ses éléments (TWinControl::IsMenuKey
+//     remonte jusqu'à la fiche) ; Color fixée dans le .dfm (fond noir
+//     d'« Évolution », sarcelle des priorités) : les couleurs système
+//     (clBtnFace) suivent le thème ; ActiveControl : contrôle qui a le focus à
+//     l'affichage (f_statsv : « Vu », pas la grille, première dans l'ordre).
 // Width/Height désignent la zone cliente (la VCL compte le cadre de la
 // fenêtre ; les formules du code d'origine n'utilisent que des différences),
 // sauf pour les fiches bsSizeToolWin (tableaux des distances), dont le code
@@ -27,6 +33,7 @@
 //---------------------------------------------------------------------------
 #include <QApplication>
 #include <QCloseEvent>
+#include <QContextMenuEvent>
 #include <QDialog>
 #include <QEventLoop>
 #include <QKeyEvent>
@@ -81,7 +88,7 @@ int ToucheVirtuelleDe(const QKeyEvent *e); // code VK de la touche (OnKeyDown)
 extern QWidget *FichePrincipaleQt; // fiche principale (parent des fiches secondaires)
 TShiftState EtatTouches(const QKeyEvent *e);
 //---------------------------------------------------------------------------
-template <class B> class TFormT : public B, public FicheVclBase
+template <class B> class TFormT : public B, public FicheVclBase, public AvecMenuContextuel
  {
   bool PremierAffichage=true, Modale=false, EstPrincipale=false;
   int iModalResult=0;
@@ -242,7 +249,23 @@ template <class B> class TFormT : public B, public FicheVclBase
         }
       }
     if (f!=w->windowFlags()) w->setWindowFlags(f);
+    QVariant Couleur=w->property("vclColor");
+    if (Couleur.isValid())
+     { // Color de la fiche, si elle n'est pas une couleur système (bit 31)
+      TColor c=CouleurDepuisTexte(A(Couleur.toString()));
+      if (!(c&0xFF000000))
+       {
+        QPalette p=w->palette();
+        p.setColor(QPalette::Window, CouleurQt(c));
+        w->setPalette(p);
+        w->setAutoFillBackground(true);
+       }
+     }
     if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
+    QString Actif=w->property("vclActiveControl").toString();
+    if (!Actif.isEmpty())
+     if (QWidget *c=w->findChild<QWidget *>(Actif))
+      c->setFocus(Qt::OtherFocusReason); // fiche cachée : le focus lui sera donné à l'activation
     if (Bord=="bsSizeToolWin")
      { // Cadre que supposent les .dfm et le code des distances : Constraints de
        // 141 pour ClientWidth=125 ; Height=26+21*RowCount pour une grille (bord
@@ -338,6 +361,11 @@ template <class B> class TFormT : public B, public FicheVclBase
    { // TControl::WMLButtonUp : OnClick de la fiche (clic hors des contrôles)
     B::mouseReleaseEvent(e);
     if ((e->button()==Qt::LeftButton)&&this->rect().contains(e->position().toPoint())&&OnClick) OnClick(this);
+   }
+  void contextMenuEvent(QContextMenuEvent *e) override
+   { // TControl::WMContextMenu : menu contextuel de la fiche (les contrôles sans menu laissent passer le clic droit)
+    if (AvecMenuContextuel::PopupMenu) AvecMenuContextuel::PopupMenu->Popup(e->globalPos().x(), e->globalPos().y());
+    else B::contextMenuEvent(e);
    }
   void keyPressEvent(QKeyEvent *e) override
    {

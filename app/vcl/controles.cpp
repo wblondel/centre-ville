@@ -538,10 +538,28 @@ void TTabControl::PrepareVcl()
  {
   ControleVcl<QWidget>::PrepareVcl();
   Onglets=new QTabBar(this);
+  Onglets->setDrawBase(false); // le cadre de la page est dessiné par paintEvent
+  Onglets->setExpanding(false);
+  Onglets->setUsesScrollButtons(false);
+  Onglets->setElideMode(Qt::ElideRight);
   for(const QString &s : property("vclTabsStrings").toStringList()) Onglets->addTab(s);
   if (property("vclTabIndex").isValid()) Onglets->setCurrentIndex(property("vclTabIndex").toInt());
   Onglets->setGeometry(0, 0, width(), Onglets->sizeHint().height());
+  Onglets->lower(); // sous les contrôles de la page
   QObject::connect(Onglets, &QTabBar::currentChanged, this, [this](int) { if (OnChange) OnChange(this); });
+ }
+//---------------------------------------------------------------------------
+void TTabControl::paintEvent(QPaintEvent *)
+ { // Cadre de la page, sous les onglets (TCustomTabControl : bord de 2 pixels)
+  QPainter p(this);
+  QStyleOptionTabWidgetFrame o;
+  o.initFrom(this);
+  int h=Onglets?Onglets->height():0;
+  o.rect=rect().adjusted(0, qMax(0, h-2), 0, 0);
+  o.shape=QTabBar::RoundedNorth;
+  o.tabBarSize=Onglets?Onglets->size():QSize();
+  o.lineWidth=style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, this);
+  style()->drawPrimitive(QStyle::PE_FrameTabWidget, &o, &p, this);
  }
 //---------------------------------------------------------------------------
 // TStatusBar

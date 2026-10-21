@@ -175,8 +175,10 @@ void LieurComposants::Termine()
      b->LieAction(Action.isEmpty()?nullptr:dynamic_cast<TAction *>(Composants[Action]));
      if (!Menu.isEmpty()) b->MenuItem=dynamic_cast<TMenuItem *>(Composants[Menu]);
     }
-  // Propriétés PopupMenu des contrôles
-  for(QWidget *w : Fiche->findChildren<QWidget *>())
+  // Propriétés PopupMenu des contrôles, et de la fiche elle-même (f_statsat)
+  QList<QWidget *> AvecMenus=Fiche->findChildren<QWidget *>();
+  AvecMenus.prepend(Fiche);
+  for(QWidget *w : AvecMenus)
    if (AvecMenuContextuel *m=dynamic_cast<AvecMenuContextuel *>(w))
     {
      QString p=w->property("vclPopupMenu").toString();
