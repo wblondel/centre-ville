@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_afdistfp.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmAffDistFilesPark</class>
+ <widget class="QDialog" name="frmAffDistFilesPark">
+  <property name="geometry">
+   <rect>
+    <x>591</x>
+    <y>0</y>
+    <width>125</width>
+    <height>99</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string> </string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>644</number>
+  </property>
+  <property name="vclHorzScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclVertScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSizeToolWin</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclConstraintsMaxWidth" stdset="0">
+   <number>141</number>
+  </property>
+  <property name="vclConstraintsMinWidth" stdset="0">
+   <number>141</number>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TStringGrid" name="StringGridDistances">
+   <property name="rowCount">
+    <number>4</number>
+   </property>
+   <property name="columnCount">
+    <number>4</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>17</y>
+     <width>125</width>
+     <height>82</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Symbol</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alClient</string>
+   </property>
+   <property name="vclColCount" stdset="0">
+    <number>4</number>
+   </property>
+   <property name="vclDefaultColWidth" stdset="0">
+    <number>28</number>
+   </property>
+   <property name="vclDefaultRowHeight" stdset="0">
+    <number>20</number>
+   </property>
+   <property name="vclRowCount" stdset="0">
+    <number>4</number>
+   </property>
+   <property name="vclScrollBars" stdset="0">
+    <string notr="true">ssVertical</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclRowHeights" stdset="0">
+    <stringlist notr="true">
+     <string>20</string>
+     <string>20</string>
+     <string>20</string>
+     <string>20</string>
+    </stringlist>
+   </property>
+  </widget>
+  <widget class="TPanel" name="Panel">
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>125</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alTop</string>
+   </property>
+   <property name="vclBevelOuter" stdset="0">
+    <string notr="true">bvNone</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+   <widget class="TCheckBox" name="CheckBoxCouloirsBus">
+    <property name="text">
+     <string>Avec couloirs de bus</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>0</y>
+      <width>122</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>StringGridDistances</tabstop>
+  <tabstop>CheckBoxCouloirsBus</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TStringGrid</class>
+   <extends>QTableWidget</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TPanel</class>
+   <extends>QFrame</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

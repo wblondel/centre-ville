@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_genres.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmGeneration</class>
+ <widget class="QDialog" name="frmGeneration">
+  <property name="geometry">
+   <rect>
+    <x>218</x>
+    <y>147</y>
+    <width>687</width>
+    <height>183</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Génération aléatoire d'un réseau</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>3112</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsDialog</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="LabelRq">
+   <property name="text">
+    <string>ATTENTION : Seules les voies de circulation automobile sont générées !</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>158</y>
+     <width>414</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox">
+   <property name="title">
+    <string> Paramètres </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>673</width>
+     <height>137</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <widget class="TLabel" name="Label1">
+    <property name="text">
+     <string>Proportion des segments de routes par rapport aux dimensions de la zone :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>26</y>
+      <width>350</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>Probabilité d'aller dans une nouvelle direction (nouvelle sortie d'intersection) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>52</y>
+      <width>360</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label3">
+    <property name="text">
+     <string>Min.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>411</x>
+      <y>26</y>
+      <width>20</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label4">
+    <property name="text">
+     <string>Max.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>536</x>
+      <y>26</y>
+      <width>23</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label5">
+    <property name="text">
+     <string>Probabilité qu'un segment débouche sur une route (nouvelle entrée d'intersection) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>76</y>
+      <width>390</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label6">
+    <property name="text">
+     <string>Probabilité qu'un segment traverse une route (nouvelle entrée/sortie d'intersection) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>100</y>
+      <width>393</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TTrackBar" name="TrackBarTailleMinSegments">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="pageStep">
+     <number>2</number>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>431</x>
+      <y>18</y>
+      <width>100</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclThumbLength" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclTickMarks" stdset="0">
+     <string notr="true">tmBoth</string>
+    </property>
+   </widget>
+   <widget class="TTrackBar" name="TrackBarProbaSortieIntersection">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>8</number>
+    </property>
+    <property name="pageStep">
+     <number>2</number>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>431</x>
+      <y>45</y>
+      <width>228</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclThumbLength" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclTickMarks" stdset="0">
+     <string notr="true">tmBoth</string>
+    </property>
+   </widget>
+   <widget class="TTrackBar" name="TrackBarTailleMaxSegments">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>3</number>
+    </property>
+    <property name="pageStep">
+     <number>2</number>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>559</x>
+      <y>18</y>
+      <width>100</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclThumbLength" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclTickMarks" stdset="0">
+     <string notr="true">tmBoth</string>
+    </property>
+   </widget>
+   <widget class="TTrackBar" name="TrackBarProbaEntreeIntersection">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>8</number>
+    </property>
+    <property name="pageStep">
+     <number>2</number>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>431</x>
+      <y>69</y>
+      <width>228</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+    <property name="vclThumbLength" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclTickMarks" stdset="0">
+     <string notr="true">tmBoth</string>
+    </property>
+   </widget>
+   <widget class="TTrackBar" name="TrackBarProbaTraverseeRoute">
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>8</number>
+    </property>
+    <property name="pageStep">
+     <number>2</number>
+    </property>
+    <property name="tickInterval">
+     <number>1</number>
+    </property>
+    <property name="tickPosition">
+     <enum>QSlider::TicksBothSides</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>431</x>
+      <y>93</y>
+      <width>228</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>4</number>
+    </property>
+    <property name="vclThumbLength" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclTickMarks" stdset="0">
+     <string notr="true">tmBoth</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>517</x>
+     <y>152</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>Générer</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>432</x>
+     <y>152</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>605</x>
+     <y>152</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>TrackBarTailleMinSegments</tabstop>
+  <tabstop>TrackBarTailleMaxSegments</tabstop>
+  <tabstop>TrackBarProbaSortieIntersection</tabstop>
+  <tabstop>TrackBarProbaEntreeIntersection</tabstop>
+  <tabstop>TrackBarProbaTraverseeRoute</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TTrackBar</class>
+   <extends>QSlider</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_defvp.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmDefVoiePietons</class>
+ <widget class="QDialog" name="frmDefVoiePietons">
+  <property name="geometry">
+   <rect>
+    <x>5</x>
+    <y>187</y>
+    <width>241</width>
+    <height>289</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Feux de piétons</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>415</number>
+  </property>
+  <property name="vclHorzScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclVertScrollBarVisible" stdset="0">
+   <bool>false</bool>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clTeal</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label1">
+   <property name="text">
+    <string>Coordonnées :</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>69</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TLabel" name="LabelCoordonnees">
+   <property name="text">
+    <string>00, 00</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>8</y>
+     <width>37</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageEE">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageEE.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>168</x>
+     <y>104</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageOO">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageOO.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>104</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageSS">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageSS.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>104</x>
+     <y>168</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageNN">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageNN.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>104</x>
+     <y>40</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTransparent" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageNE">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageNE.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>136</x>
+     <y>72</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageSE">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageSE.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>136</x>
+     <y>136</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageSO">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageSO.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>72</x>
+     <y>136</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageNO">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageNO.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>72</x>
+     <y>72</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageS">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageS.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>104</x>
+     <y>136</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageO">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageO.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>72</x>
+     <y>104</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageN">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageN.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>104</x>
+     <y>72</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageE">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageE.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>136</x>
+     <y>104</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TImage" name="Image0">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/Image0.png</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>104</x>
+     <y>104</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="vclStretch" stdset="0">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="TSpeedButton" name="SpeedButtonN">
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defvp/SpeedButtonN.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defvp/SpeedButtonN.png</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>80</y>
+     <width>23</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclAllowAllUp" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclGroupIndex" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TSpeedButton" name="SpeedButtonE">
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defvp/SpeedButtonE.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defvp/SpeedButtonE.png</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>137</x>
+     <y>110</y>
+     <width>23</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclAllowAllUp" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclGroupIndex" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TSpeedButton" name="SpeedButtonO">
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defvp/SpeedButtonO.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defvp/SpeedButtonO.png</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>110</y>
+     <width>23</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>3</number>
+   </property>
+   <property name="vclAllowAllUp" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclGroupIndex" stdset="0">
+    <number>4</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TSpeedButton" name="SpeedButtonS">
+   <property name="icon">
+    <iconset resource="../ressources/images.qrc">
+     <normaloff>:/images/f_defvp/SpeedButtonS.png</normaloff>
+    </iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="vclGlyph" stdset="0">
+    <string notr="true">:/images/f_defvp/SpeedButtonS.png</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>138</y>
+     <width>23</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTag" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclAllowAllUp" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclGroupIndex" stdset="0">
+    <number>3</number>
+   </property>
+   <property name="vclNumGlyphs" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label2">
+   <property name="text">
+    <string>Chaque feu s'adresse aux piétons du côté opposé de la voie de circulation. Il y a donc toujours 2 feux de piétons.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>56</x>
+     <y>205</y>
+     <width>177</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clWhite</string>
+   </property>
+  </widget>
+  <widget class="TImage" name="ImageAttention">
+   <property name="pixmap">
+    <pixmap resource="../ressources/images.qrc">:/images/f_defvp/ImageAttention.png</pixmap>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>207</y>
+     <width>42</width>
+     <height>36</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>6</x>
+     <y>254</y>
+     <width>49</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>62</x>
+     <y>254</y>
+     <width>49</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAppliquer">
+   <property name="text">
+    <string>&amp;Appliquer</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>118</x>
+     <y>254</y>
+     <width>57</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>182</x>
+     <y>254</y>
+     <width>51</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAppliquer</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TImage</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TSpeedButton</class>
+   <extends>QToolButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

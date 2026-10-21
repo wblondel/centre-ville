@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_carfours.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmCarrefours</class>
+ <widget class="QDialog" name="frmCarrefours">
+  <property name="geometry">
+   <rect>
+    <x>219</x>
+    <y>195</y>
+    <width>415</width>
+    <height>439</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Carrefours</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>432</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsToolWindow</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label">
+   <property name="text">
+    <string>Note : vous devez sélectionner le MÊME nombre de cases que celui du carrefour souhaité.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>2</y>
+     <width>370</width>
+     <height>11</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox34">
+   <property name="title">
+    <string> Carrefours 3x4 cases </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>16</y>
+     <width>161</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <widget class="TSpeedButton" name="SpeedButton34b1">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34b1.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34b1.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>16</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3421</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton34b2">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34b2.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34b2.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>88</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3422</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton34b3">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34b3.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34b3.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>160</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3423</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton34a3">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34a3.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34a3.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>160</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3413</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton34a2">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34a2.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34a2.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>88</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3412</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton34a1">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton34a1.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton34a1.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>16</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>3411</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox43">
+   <property name="title">
+    <string> Carrefours 4x3 cases </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>264</y>
+     <width>233</width>
+     <height>167</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+   <widget class="TSpeedButton" name="SpeedButton43b1">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43b1.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43b1.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>16</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4321</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton43b2">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43b2.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43b2.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>16</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4322</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton43b3">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43b3.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43b3.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>152</x>
+      <y>16</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4323</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton43a3">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43a3.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43a3.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>152</x>
+      <y>88</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4313</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton43a2">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43a2.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43a2.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>88</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4312</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton43a1">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton43a1.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton43a1.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>88</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4311</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox44">
+   <property name="title">
+    <string> Carrefours 4x4 cases </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>176</x>
+     <y>16</y>
+     <width>233</width>
+     <height>105</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+   <widget class="TSpeedButton" name="SpeedButton44b">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton44b.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton44b.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>22</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4402</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton44c">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton44c.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton44c.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>152</x>
+      <y>22</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4403</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton44a">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton44a.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton44a.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>22</y>
+      <width>70</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>4401</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox66">
+   <property name="title">
+    <string> Carrefours 6x6 cases </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>176</x>
+     <y>123</y>
+     <width>233</width>
+     <height>134</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+   <widget class="TSpeedButton" name="SpeedButton66a">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton66a.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>96</width>
+      <height>96</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton66a.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>21</y>
+      <width>102</width>
+      <height>102</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>6601</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TSpeedButton" name="SpeedButton66b">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton66b.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>96</width>
+      <height>96</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton66b.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>21</y>
+      <width>102</width>
+      <height>102</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>6602</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox88">
+   <property name="title">
+    <string> Carrefour 8x8 cases </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>248</x>
+     <y>264</y>
+     <width>161</width>
+     <height>167</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+   <widget class="TSpeedButton" name="SpeedButton88">
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_carfours/SpeedButton88.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>128</width>
+      <height>128</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_carfours/SpeedButton88.png</string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>20</y>
+      <width>134</width>
+      <height>134</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclTag" stdset="0">
+     <number>8800</number>
+    </property>
+    <property name="vclSpacing" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string />
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>385</x>
+     <y>0</y>
+     <width>30</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Small Fonts</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TSpeedButton</class>
+   <extends>QToolButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,1209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_prmsim.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmParamSimul</class>
+ <widget class="QDialog" name="frmParamSimul">
+  <property name="geometry">
+   <rect>
+    <x>318</x>
+    <y>143</y>
+    <width>280</width>
+    <height>493</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Paramètres</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>311</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TGroupBox" name="GroupBoxNbElements">
+   <property name="title">
+    <string> Eléments de la simulation </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>0</y>
+     <width>185</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+   <widget class="TLabel" name="LabelNbVehicules">
+    <property name="text">
+     <string>Vé&amp;hicules :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbVehicules</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>26</y>
+      <width>52</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbPietons">
+    <property name="text">
+     <string>Piétons :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditNbPietons</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>50</y>
+      <width>41</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label1">
+    <property name="text">
+     <string>%*</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>155</x>
+      <y>50</y>
+      <width>12</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbArretsBus">
+    <property name="text">
+     <string>Réseau de &amp;Bus :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>BitBtnDefLignesBus</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>74</y>
+      <width>79</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbArretsTram">
+    <property name="text">
+     <string>Réseau de &amp;Tram :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>BitBtnDefLignesTram</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>98</y>
+      <width>85</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbPlacesTaxi">
+    <property name="text">
+     <string>Taxis/Vehlibs :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>BitBtnDefTaxis</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>122</y>
+      <width>70</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>(*) des véhicules.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>108</x>
+      <y>145</y>
+      <width>69</width>
+      <height>11</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-9</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>Small Fonts</family>
+      <pointsize>7</pointsize>
+      <bold>false</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbVehicules">
+    <property name="minimum">
+     <number>120</number>
+    </property>
+    <property name="maximum">
+     <number>9999</number>
+    </property>
+    <property name="value">
+     <number>120</number>
+    </property>
+    <property name="singleStep">
+     <number>120</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>120</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>9999</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>117</x>
+      <y>23</y>
+      <width>48</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclEditorEnabled" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbPietons">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>50</number>
+    </property>
+    <property name="value">
+     <number>25</number>
+    </property>
+    <property name="singleStep">
+     <number>5</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>50</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>117</x>
+      <y>47</y>
+      <width>36</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclEditorEnabled" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnDefLignesBus">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnDefLignesBus.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnDefLignesBus.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>117</x>
+      <y>71</y>
+      <width>24</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="toolTip">
+     <string>Paramétrer le réseau de bus</string>
+    </property>
+    <property name="statusTip">
+     <string>Paramétrer le réseau de bus</string>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnDefLignesTram">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnDefLignesTram.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnDefLignesTram.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>117</x>
+      <y>95</y>
+      <width>24</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="toolTip">
+     <string>Paramétrer le réseau de bus</string>
+    </property>
+    <property name="statusTip">
+     <string>Paramétrer le réseau de bus</string>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnDefTaxis">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnDefTaxis.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnDefTaxis.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>117</x>
+      <y>119</y>
+      <width>24</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnDefVehlibs">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnDefVehlibs.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnDefVehlibs.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>141</x>
+      <y>119</y>
+      <width>24</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>5</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TGroupBox" name="GroupBoxFonctionnement">
+   <property name="title">
+    <string> Paramètres de fonctionnement </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>166</y>
+     <width>265</width>
+     <height>318</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+   <widget class="TLabel" name="LabelTours">
+    <property name="text">
+     <string>Tour(s)</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>11</y>
+      <width>33</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelAttenteAvChx">
+    <property name="text">
+     <string>&amp;Attente avant choix d'un autre trajet** :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>101</y>
+      <width>182</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelNbToursParSeconde">
+    <property name="text">
+     <string>&amp;Nombre de tours par seconde :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>125</y>
+      <width>146</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDureeOrange">
+    <property name="text">
+     <string>Durée du feu &amp;Orange :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>54</y>
+      <width>106</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDureeRouge">
+    <property name="text">
+     <string>Durée du feu &amp;Rouge (par défaut) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>78</y>
+      <width>160</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="LabelDureeVert">
+    <property name="text">
+     <string>Durée du feu &amp;Vert (par défaut) :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>30</y>
+      <width>147</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label7">
+    <property name="text">
+     <string>(**) pour les véhicules (taxis compris). 2 fois moins de tours pour les piétons et  5 fois plus de tours pour les bus.</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>7</x>
+      <y>290</y>
+      <width>250</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-9</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>Small Fonts</family>
+      <pointsize>7</pointsize>
+      <bold>false</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditAttenteAvChx">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>99</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>99</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>98</y>
+      <width>36</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditNbToursParSeconde">
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>99</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>1</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>99</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>122</y>
+      <width>36</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>4</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditDureeOrange">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>50</y>
+      <width>36</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditDureeRouge">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>5</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>74</y>
+      <width>36</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditDureeVert">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="value">
+     <number>5</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>213</x>
+      <y>26</y>
+      <width>36</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclAutoSize" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnAppliqueDureeFeuVert">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnAppliqueDureeFeuVert.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnAppliqueDureeFeuVert.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>189</x>
+      <y>26</y>
+      <width>22</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Applique la durée du vert à tous les feux</string>
+    </property>
+    <property name="statusTip">
+     <string>Applique la durée du vert à tous les feux</string>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>5</number>
+    </property>
+   </widget>
+   <widget class="TBitBtn" name="BitBtnAppliqueDureeFeuRouge">
+    <property name="text">
+     <string />
+    </property>
+    <property name="icon">
+     <iconset resource="../ressources/images.qrc">
+      <normaloff>:/images/f_prmsim/BitBtnAppliqueDureeFeuRouge.png</normaloff>
+     </iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="vclGlyph" stdset="0">
+     <string notr="true">:/images/f_prmsim/BitBtnAppliqueDureeFeuRouge.png</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>189</x>
+      <y>74</y>
+      <width>22</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Applique la durée du rouge à tous les feux</string>
+    </property>
+    <property name="statusTip">
+     <string>Applique la durée du rouge à tous les feux</string>
+    </property>
+    <property name="vclNumGlyphs" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="TRadioGroup" name="RadioGroupVitesses">
+    <property name="title">
+     <string> Simulation à... </string>
+    </property>
+    <widget class="QRadioButton" name="RadioGroupVitesses_0">
+     <property name="geometry">
+      <rect>
+       <x>8</x>
+       <y>14</y>
+       <width>239</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&amp;1 vitesse (1 case par tour)</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="RadioGroupVitesses_1">
+     <property name="geometry">
+      <rect>
+       <x>8</x>
+       <y>29</y>
+       <width>239</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&amp;2 vitesses (1 case tous les 2 tours minimum)</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="RadioGroupVitesses_2">
+     <property name="geometry">
+      <rect>
+       <x>8</x>
+       <y>44</y>
+       <width>239</width>
+       <height>15</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&amp;3 vitesses (1 case tous les 3 tours minimum)</string>
+     </property>
+    </widget>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>148</y>
+      <width>249</width>
+      <height>64</height>
+     </rect>
+    </property>
+    <property name="vclItemIndex" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>7</number>
+    </property>
+   </widget>
+   <widget class="TGroupBox" name="GroupBoxPietons">
+    <property name="title">
+     <string> Piéton </string>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>213</y>
+      <width>249</width>
+      <height>74</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>8</number>
+    </property>
+    <widget class="TLabel" name="LabelNbCasesMaxPsgPtn">
+     <property name="text">
+      <string>Détecte 1 passage piétons jus&amp;qu'à</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>CSpinEditNbCasesMaxPsgPtn</cstring>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>23</y>
+       <width>163</width>
+       <height>13</height>
+      </rect>
+     </property>
+     <property name="vclFontHeight" stdset="0">
+      <number>-11</number>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>8</pointsize>
+       <bold>false</bold>
+       <italic>false</italic>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label4">
+     <property name="text">
+      <string>cases</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>215</x>
+       <y>23</y>
+       <width>28</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="LabelProbaPsgPt">
+     <property name="text">
+      <string>Probabilité de s'&amp;y diriger si détecté :</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>CSpinEditProbaPsgPt</cstring>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>48</y>
+       <width>165</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TLabel" name="Label6">
+     <property name="text">
+      <string>%</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>227</x>
+       <y>48</y>
+       <width>8</width>
+       <height>13</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="TCSpinEdit" name="CSpinEditNbCasesMaxPsgPtn">
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>5</number>
+     </property>
+     <property name="vclMinValue" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="vclMaxValue" stdset="0">
+      <number>10</number>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>177</x>
+       <y>20</y>
+       <width>36</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="vclTabOrder" stdset="0">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="TCSpinEdit" name="CSpinEditProbaPsgPt">
+     <property name="minimum">
+      <number>0</number>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>50</number>
+     </property>
+     <property name="singleStep">
+      <number>5</number>
+     </property>
+     <property name="vclMinValue" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="vclMaxValue" stdset="0">
+      <number>100</number>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>178</x>
+       <y>45</y>
+       <width>44</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="vclTabOrder" stdset="0">
+      <number>1</number>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>22</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>57</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAppliquer">
+   <property name="text">
+    <string>A&amp;ppliquer</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>94</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>208</x>
+     <y>130</y>
+     <width>58</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="statusTip">
+    <string>Pour avoir de l'aide (F1)</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAppliquer</tabstop>
+  <tabstop>CSpinEditNbVehicules</tabstop>
+  <tabstop>CSpinEditNbPietons</tabstop>
+  <tabstop>BitBtnDefLignesBus</tabstop>
+  <tabstop>BitBtnDefLignesTram</tabstop>
+  <tabstop>BitBtnDefTaxis</tabstop>
+  <tabstop>BitBtnDefVehlibs</tabstop>
+  <tabstop>CSpinEditDureeVert</tabstop>
+  <tabstop>CSpinEditDureeOrange</tabstop>
+  <tabstop>CSpinEditDureeRouge</tabstop>
+  <tabstop>CSpinEditAttenteAvChx</tabstop>
+  <tabstop>CSpinEditNbToursParSeconde</tabstop>
+  <tabstop>BitBtnAppliqueDureeFeuVert</tabstop>
+  <tabstop>BitBtnAppliqueDureeFeuRouge</tabstop>
+  <tabstop>RadioGroupVitesses_0</tabstop>
+  <tabstop>RadioGroupVitesses_1</tabstop>
+  <tabstop>RadioGroupVitesses_2</tabstop>
+  <tabstop>CSpinEditNbCasesMaxPsgPtn</tabstop>
+  <tabstop>CSpinEditProbaPsgPt</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TBitBtn</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioGroup</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

@@ -1,0 +1,1187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_rech.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmRecherche</class>
+ <widget class="QDialog" name="frmRecherche">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>223</width>
+    <height>408</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Recherche</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>65</number>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biMinimize,biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsToolWindow</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label1">
+   <property name="text">
+    <string>,</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>161</x>
+     <y>7</y>
+     <width>3</width>
+     <height>13</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonCoordonnees">
+   <property name="text">
+    <string>&amp;Coordonnées</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>6</y>
+     <width>84</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditX">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>98</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>98</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>4</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditY">
+   <property name="minimum">
+    <number>0</number>
+   </property>
+   <property name="maximum">
+    <number>62</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>62</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>167</x>
+     <y>4</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonParking">
+   <property name="text">
+    <string>&amp;Parking n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>30</y>
+     <width>73</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditParking">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>32</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>32</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>28</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonFeu">
+   <property name="text">
+    <string>&amp;Feu n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>54</y>
+     <width>54</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>5</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditFeu">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>100</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>52</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>6</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>167</x>
+     <y>109</y>
+     <width>51</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>29</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonVehicule">
+   <property name="text">
+    <string>&amp;Véhicule n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>78</y>
+     <width>76</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>7</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditVehicule">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>1000</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>1000</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>76</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>8</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditPieton">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>500</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>500</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>100</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonPieton">
+   <property name="text">
+    <string>Piét&amp;on n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>102</y>
+     <width>76</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>9</number>
+   </property>
+  </widget>
+  <widget class="TStatusBar" name="StatusBar">
+   <property name="vclPanels" stdset="0">
+    <stringlist notr="true" />
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>389</y>
+     <width>223</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="vclSimplePanel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclSizeGrip" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>167</x>
+     <y>181</y>
+     <width>50</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>30</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonArretBus">
+   <property name="text">
+    <string>&amp;Arrêt Bus n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>150</y>
+     <width>76</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>13</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditArretBus">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>148</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>14</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditBus">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>1000</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>1000</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>124</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>12</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonBus">
+   <property name="text">
+    <string>&amp;Bus n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>126</y>
+     <width>76</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>11</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonArretTram">
+   <property name="text">
+    <string>A&amp;rrêt Tram n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>198</y>
+     <width>82</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>17</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditArretTram">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>196</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>18</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonTram">
+   <property name="text">
+    <string>&amp;Tram n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>174</y>
+     <width>76</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>15</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditTram">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>1000</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>1000</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>172</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>16</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonTaxi">
+   <property name="text">
+    <string>Ta&amp;xi n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>222</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>19</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditTaxi">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>220</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>20</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonPlaceTaxi">
+   <property name="text">
+    <string>P&amp;lace Taxi n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>246</y>
+     <width>82</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>21</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditPlaceTaxi">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>244</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>22</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonFileTaxi">
+   <property name="text">
+    <string>F&amp;ile Taxi n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>270</y>
+     <width>82</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>23</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditFileTaxi">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>268</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>24</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonPlacePark">
+   <property name="text">
+    <string>Place par&amp;king n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>294</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>25</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditPlacePark">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>292</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>26</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonFilePark">
+   <property name="text">
+    <string>File parkin&amp;g n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>318</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>27</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditFilePark">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>316</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>28</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonVehlib">
+   <property name="text">
+    <string>Vehlib n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>342</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>32</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditVehlib">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>340</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>33</number>
+   </property>
+  </widget>
+  <widget class="TRadioButton" name="RadioButtonPlaceVehlib">
+   <property name="text">
+    <string>Place Vehlib n°</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>366</y>
+     <width>97</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>34</number>
+   </property>
+  </widget>
+  <widget class="TCSpinEdit" name="CSpinEditPlaceVehlib">
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>9</number>
+   </property>
+   <property name="value">
+    <number>1</number>
+   </property>
+   <property name="vclMinValue" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclMaxValue" stdset="0">
+    <number>9</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>109</x>
+     <y>364</y>
+     <width>52</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>MS Sans Serif</family>
+     <pointsize>8</pointsize>
+     <bold>true</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>35</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>CSpinEditX</tabstop>
+  <tabstop>CSpinEditY</tabstop>
+  <tabstop>CSpinEditParking</tabstop>
+  <tabstop>CSpinEditFeu</tabstop>
+  <tabstop>CSpinEditVehicule</tabstop>
+  <tabstop>CSpinEditPieton</tabstop>
+  <tabstop>CSpinEditBus</tabstop>
+  <tabstop>CSpinEditArretBus</tabstop>
+  <tabstop>CSpinEditTram</tabstop>
+  <tabstop>CSpinEditArretTram</tabstop>
+  <tabstop>CSpinEditTaxi</tabstop>
+  <tabstop>CSpinEditPlaceTaxi</tabstop>
+  <tabstop>CSpinEditFileTaxi</tabstop>
+  <tabstop>CSpinEditPlacePark</tabstop>
+  <tabstop>CSpinEditFilePark</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAide</tabstop>
+  <tabstop>CSpinEditVehlib</tabstop>
+  <tabstop>CSpinEditPlaceVehlib</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TRadioButton</class>
+   <extends>QRadioButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TStatusBar</class>
+   <extends>QStatusBar</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

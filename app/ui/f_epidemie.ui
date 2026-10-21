@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_epidemie.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmEpidemie</class>
+ <widget class="QDialog" name="frmEpidemie">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>384</width>
+    <height>205</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Paramètres de l'épidémie</string>
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>Tahoma</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>317</number>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsDialog</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poMainFormCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TLabel" name="Label7">
+   <property name="text">
+    <string>  Les paramètres doivent être modifiés avant de lancer la simulation.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>183</y>
+     <width>384</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-11</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Tahoma</family>
+     <pointsize>8</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="vclFontColor" stdset="0">
+    <string notr="true">clMaroon</string>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alBottom</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TLabel" name="Label8">
+   <property name="text">
+    <string>  (*) 0 si aucune charge virale fatale</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeft|Qt::AlignTop</set>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>165</y>
+     <width>384</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="vclAlign" stdset="0">
+    <string notr="true">alBottom</string>
+   </property>
+   <property name="vclAutoSize" stdset="0">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="TGroupBox" name="GroupBox">
+   <property name="title">
+    <string> </string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>24</y>
+     <width>289</width>
+     <height>135</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <widget class="TLabel" name="Label1">
+    <property name="text">
+     <string>&amp;Période d'infectiosité :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditInfectiosite</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>19</y>
+      <width>106</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label2">
+    <property name="text">
+     <string>&amp;Un patient 0 tous les...</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditPatientZero</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>47</y>
+      <width>111</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label3">
+    <property name="text">
+     <string>piétons</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>227</x>
+      <y>47</y>
+      <width>35</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label4">
+    <property name="text">
+     <string>&amp;Charge virale fatale* :</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="buddy">
+     <cstring>CSpinEditChargeViraleFatale</cstring>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>75</y>
+      <width>108</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label5">
+    <property name="text">
+     <string>infections</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>227</x>
+      <y>75</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TLabel" name="Label6">
+    <property name="text">
+     <string>tours</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>227</x>
+      <y>19</y>
+      <width>25</width>
+      <height>13</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditInfectiosite">
+    <property name="minimum">
+     <number>10</number>
+    </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
+    <property name="value">
+     <number>100</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>999</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>172</x>
+      <y>16</y>
+      <width>49</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditPatientZero">
+    <property name="minimum">
+     <number>10</number>
+    </property>
+    <property name="maximum">
+     <number>999</number>
+    </property>
+    <property name="value">
+     <number>100</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>10</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>999</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>172</x>
+      <y>44</y>
+      <width>49</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="TCSpinEdit" name="CSpinEditChargeViraleFatale">
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>100</number>
+    </property>
+    <property name="value">
+     <number>10</number>
+    </property>
+    <property name="vclMinValue" stdset="0">
+     <number>0</number>
+    </property>
+    <property name="vclMaxValue" stdset="0">
+     <number>100</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>172</x>
+      <y>72</y>
+      <width>49</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+   <widget class="TCheckBox" name="CheckBoxReinfections">
+    <property name="text">
+     <string>&amp;Réinfections après guérison</string>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::RightToLeft</enum>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>16</x>
+      <y>103</y>
+      <width>169</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="vclAlignment" stdset="0">
+     <string notr="true">taLeftJustify</string>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>3</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TButton" name="ButtonOk">
+   <property name="text">
+    <string>Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>38</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>1</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAnnuler">
+   <property name="text">
+    <string>Annuler</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>77</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclCancel" stdset="0">
+    <bool>true</bool>
+   </property>
+   <property name="vclModalResult" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>116</y>
+     <width>56</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="statusTip">
+    <string>Pour avoir de l'aide (F1)</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+  <widget class="TCheckBox" name="CheckBoxActiver">
+   <property name="text">
+    <string>&amp;Epidémie activée</string>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>6</y>
+     <width>106</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>4</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>CSpinEditInfectiosite</tabstop>
+  <tabstop>CSpinEditPatientZero</tabstop>
+  <tabstop>CSpinEditChargeViraleFatale</tabstop>
+  <tabstop>CheckBoxReinfections</tabstop>
+  <tabstop>ButtonOk</tabstop>
+  <tabstop>ButtonAnnuler</tabstop>
+  <tabstop>ButtonAide</tabstop>
+  <tabstop>CheckBoxActiver</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TLabel</class>
+   <extends>QLabel</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCSpinEdit</class>
+   <extends>QSpinBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>

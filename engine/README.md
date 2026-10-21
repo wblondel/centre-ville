@@ -38,7 +38,7 @@ Les tests sont décrits dans `tests/README.md`.
 `simul.h` :
 
 - `#pragma warn -pia` neutralisé, `<dstring.h>` et `<systdate.h>` remplacés par `compat/chaine.h` et `compat/temps.h` ;
-- macros `min`/`max` retirées : le moteur ne les utilise pas, et elles entrent en conflit avec la STL (l'interface les utilise dans `f_infbus.cpp`, `f_inftram.cpp`, `f_infveh.cpp` et `f_simul.cpp` ; à reprendre lors du portage de ces fiches) ;
+- macros `min`/`max` retirées : le moteur ne les utilise pas, et elles entrent en conflit avec la STL (l'interface les utilise dans `f_infbus.cpp`, `f_inftram.cpp`, `f_infveh.cpp` et `f_simul.cpp` : elles sont redéfinies en fonctions dans `app/base.h`) ;
 - les 19 énumérés `: char` passent en `: signed char`, car `char` est non signé sous Linux ARM64. Le moteur est en plus compilé en `-fsigned-char` ;
 - `__fastcall` retiré de `EffectueTourSimulation` ;
 - `friend class ExportEtat` dans `infection` : sert uniquement à l'export de l'état par les tests.
@@ -88,9 +88,15 @@ pas créée, d'où les gardes `if (vue)` qui reproduisent les `if (frmSimulation
 - **`Format`** applique les règles de SysUtils : index `%0:`, `-`, largeur,
   précision, `*`, types `d u x e f g n s p`. Les arguments surnuméraires sont
   ignorés, un argument manquant ou d'un mauvais type lève une exception (comme
-  `EConvertError`). Le séparateur décimal est `.` ; la VCL utilisait celui des
-  paramètres régionaux (`,` en français). C'est sans effet sur le moteur, qui
-  n'utilise que `%d` et `%s`, mais **à reprendre pour l'interface (phase 6)**.
+  `EConvertError`). Les séparateurs viennent du global `FormatSettings`
+  (`DecimalSeparator`, `ThousandSeparator`), comme dans SysUtils : `.` et `,`
+  par défaut (moteur et tests), `,` et espace insécable dans l'application,
+  comme la VCL en français (sprint 2). Le résultat ne dépend pas de
+  `LC_NUMERIC`. `TVarRec` accepte aussi `long double` (casts de
+  `AfficheBilan`), et `ARRAYOFCONST` passe par `VersTVarRec`, que
+  l'application surcharge pour ses propriétés (`ARRAYOFCONST((Grille->Col))`).
+  Ces trois ajouts du sprint 2 sont annotés `// portage` ; le golden master est
+  inchangé.
 - **Fichiers** : poignées `int` strictement positives, `-1` en cas d'échec,
   `FileRead`/`FileWrite` renvoient le nombre d'octets, ou 0 en fin de fichier,
   ou -1. Les noms sont en UTF-8 (convertis en UTF-16 sous Windows). Un tampon

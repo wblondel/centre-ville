@@ -13,9 +13,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(CV_TESTS "Compiler les tests du moteur" ON)
+# Application Qt : AUTO = compilée si Qt 6 est trouvé, ON = Qt 6 obligatoire, OFF = jamais
+set(CV_APP "AUTO" CACHE STRING "Compiler l'application Qt cvw (AUTO, ON ou OFF)")
+set_property(CACHE CV_APP PROPERTY STRINGS AUTO ON OFF)
 
 # Moteur de simulation (sans Qt)
 add_subdirectory(engine)
+
+# Application (Qt 6 Widgets)
+if(NOT CV_APP STREQUAL "OFF")
+  add_subdirectory(app)
+endif()
 
 if(CV_TESTS)
   enable_testing()

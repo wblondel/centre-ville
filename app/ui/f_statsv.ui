@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_statsv.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <class>frmStatsVehicules</class>
+ <widget class="QDialog" name="frmStatsVehicules">
+  <property name="geometry">
+   <rect>
+    <x>192</x>
+    <y>108</y>
+    <width>490</width>
+    <height>351</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string />
+  </property>
+  <property name="vclFontHeight" stdset="0">
+   <number>-11</number>
+  </property>
+  <property name="font">
+   <font>
+    <family>MS Sans Serif</family>
+    <pointsize>8</pointsize>
+    <bold>false</bold>
+    <italic>false</italic>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
+  <property name="vclHelpContext" stdset="0">
+   <number>62</number>
+  </property>
+  <property name="vclActiveControl" stdset="0">
+   <string notr="true">ButtonFermer</string>
+  </property>
+  <property name="vclBorderIcons" stdset="0">
+   <string notr="true">biSystemMenu</string>
+  </property>
+  <property name="vclBorderStyle" stdset="0">
+   <string notr="true">bsSingle</string>
+  </property>
+  <property name="vclColor" stdset="0">
+   <string notr="true">clBtnFace</string>
+  </property>
+  <property name="vclFormStyle" stdset="0">
+   <string notr="true">fsStayOnTop</string>
+  </property>
+  <property name="vclKeyPreview" stdset="0">
+   <bool>true</bool>
+  </property>
+  <property name="vclPosition" stdset="0">
+   <string notr="true">poScreenCenter</string>
+  </property>
+  <property name="vclTextHeight" stdset="0">
+   <number>13</number>
+  </property>
+  <widget class="TStringGrid" name="StringGridCoordParkings">
+   <property name="rowCount">
+    <number>2</number>
+   </property>
+   <property name="columnCount">
+    <number>2</number>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>8</x>
+     <y>8</y>
+     <width>98</width>
+     <height>235</height>
+    </rect>
+   </property>
+   <property name="vclFontHeight" stdset="0">
+    <number>-9</number>
+   </property>
+   <property name="font">
+    <font>
+     <family>Courier New</family>
+     <pointsize>7</pointsize>
+     <bold>false</bold>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Coordonnées des étapes</string>
+   </property>
+   <property name="statusTip">
+    <string>Coordonnées des étapes</string>
+   </property>
+   <property name="vclColCount" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclDefaultColWidth" stdset="0">
+    <number>26</number>
+   </property>
+   <property name="vclDefaultRowHeight" stdset="0">
+    <number>20</number>
+   </property>
+   <property name="vclRowCount" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclOptions" stdset="0">
+    <string notr="true">goFixedHorzLine,goFixedVertLine,goHorzLine,goVertLine</string>
+   </property>
+   <property name="vclScrollBars" stdset="0">
+    <string notr="true">ssVertical</string>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>0</number>
+   </property>
+   <property name="vclColWidths" stdset="0">
+    <stringlist notr="true">
+     <string>26</string>
+     <string>52</string>
+    </stringlist>
+   </property>
+  </widget>
+  <widget class="TButton" name="ButtonFermer">
+   <property name="text">
+    <string>&amp;Vu</string>
+   </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>264</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>1</number>
+   </property>
+  </widget>
+  <widget class="TTabControl" name="TabControl">
+   <property name="geometry">
+    <rect>
+     <x>112</x>
+     <y>8</y>
+     <width>372</width>
+     <height>336</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>2</number>
+   </property>
+   <property name="vclTabsStrings" stdset="0">
+    <stringlist notr="true">
+     <string>Nb.cases entre le + long et le + court</string>
+     <string>Nb.tours entre le + lent et le + rapide</string>
+    </stringlist>
+   </property>
+   <property name="vclTabIndex" stdset="0">
+    <number>0</number>
+   </property>
+   <widget class="TStringGrid" name="StringGridStatsVehicules">
+    <property name="rowCount">
+     <number>2</number>
+    </property>
+    <property name="columnCount">
+     <number>2</number>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>2</x>
+      <y>22</y>
+      <width>367</width>
+      <height>311</height>
+     </rect>
+    </property>
+    <property name="vclFontHeight" stdset="0">
+     <number>-9</number>
+    </property>
+    <property name="font">
+     <font>
+      <family>Courier New</family>
+      <pointsize>7</pointsize>
+      <bold>false</bold>
+      <italic>false</italic>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Etape de départ en abscisse et étape d'arrivée en ordonnée</string>
+    </property>
+    <property name="statusTip">
+     <string>Etape de départ en abscisse et étape d'arrivée en ordonnée</string>
+    </property>
+    <property name="vclColCount" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclDefaultColWidth" stdset="0">
+     <number>28</number>
+    </property>
+    <property name="vclDefaultRowHeight" stdset="0">
+     <number>20</number>
+    </property>
+    <property name="vclRowCount" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="vclOptions" stdset="0">
+     <string notr="true">goFixedHorzLine,goFixedVertLine,goHorzLine,goVertLine</string>
+    </property>
+    <property name="vclTabOrder" stdset="0">
+     <number>0</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="TButton" name="ButtonAide">
+   <property name="text">
+    <string>&amp;Aide</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>296</y>
+     <width>75</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="vclTabOrder" stdset="0">
+    <number>3</number>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>StringGridCoordParkings</tabstop>
+  <tabstop>ButtonFermer</tabstop>
+  <tabstop>TabControl</tabstop>
+  <tabstop>StringGridStatsVehicules</tabstop>
+  <tabstop>ButtonAide</tabstop>
+ </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>TStringGrid</class>
+   <extends>QTableWidget</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TButton</class>
+   <extends>QPushButton</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TTabControl</class>
+   <extends>QWidget</extends>
+   <header>vcl/controles.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ressources/images.qrc" />
+ </resources>
+ <connections />
+</ui>
