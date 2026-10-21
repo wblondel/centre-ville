@@ -1,0 +1,244 @@
+//---------------------------------------------------------------------------
+// vcl/fiche.h - Portage de Centre-Ville : TForm
+//
+// TFormT<QDialog> (TForm) et TFormT<QMainWindow> (fiche principale)
+// reproduisent le cycle de vie d'une fiche VCL :
+//   - le constructeur de la fiche portée appelle ChargeFiche() à la place du
+//     chargement du .dfm : setupUi (fiche générée par dfm2ui), liaison des
+//     membres (COMPOSANTS_<fiche>), connexion des gestionnaires
+//     (EVENEMENTS_<fiche>), puis OnCreate (OldCreateOrder=True : OnCreate
+//     avant le corps du constructeur C++) ;
+//   - Show/Hide/Visible, ShowModal/ModalResult, Close et OnCloseQuery,
+//     OnShow/OnHide, KeyPreview (OnKeyDown/OnKeyUp avant le contrôle actif),
+//     Échap = bouton Cancel ;
+//   - FindComponent par nom.
+// Width/Height désignent la zone cliente (la VCL compte le cadre de la
+// fenêtre ; les formules du code d'origine n'utilisent que des différences).
+//---------------------------------------------------------------------------
+#ifndef vcl_ficheH
+#define vcl_ficheH
+//---------------------------------------------------------------------------
+#include <QApplication>
+#include <QCloseEvent>
+#include <QDialog>
+#include <QKeyEvent>
+#include <QMainWindow>
+#include <QScreen>
+#include <QShowEvent>
+#include <map>
+#include <type_traits>
+#include "actions.h"
+#include "controles.h"
+#include "listeimages.h"
+//---------------------------------------------------------------------------
+// Liaison des composants d'une fiche (X-macro COMPOSANTS_<fiche>)
+//---------------------------------------------------------------------------
+class LieurComposants
+ {
+  QWidget *Fiche;
+  const char *Fichier; // f_simul...
+  TActionList *DerniereListe=nullptr;
+  std::map<QObject *, TMenuItem *> ElementsMenus;
+  QObject *Lie(const char *Nom, const char *Classe);
+  public:
+  std::map<QString, QObject *> &Composants;
+  FicheRaccourcis Raccourcis;
+  LieurComposants(QWidget *f, const char *Nom, std::map<QString, QObject *> &c) : Fiche(f), Fichier(Nom), Composants(c) {}
+  template <class T> void Lie(const char *Nom, T *&Membre)
+   {
+    Membre=dynamic_cast<T *>(Lie(Nom, NomClasse<T>()));
+   }
+  template <class T> static const char *NomClasse()
+   {
+    if constexpr (std::is_same_v<T, TAction>) return "TAction";
+    else if constexpr (std::is_same_v<T, TActionList>) return "TActionList";
+    else if constexpr (std::is_same_v<T, TMenuItem>) return "TMenuItem";
+    else if constexpr (std::is_same_v<T, TPopupMenu>) return "TPopupMenu";
+    else if constexpr (std::is_same_v<T, TMainMenu>) return "TMainMenu";
+    else if constexpr (std::is_same_v<T, TTimer>) return "TTimer";
+    else if constexpr (std::is_same_v<T, TSaveDialog>) return "TSaveDialog";
+    else if constexpr (std::is_same_v<T, TOpenDialog>) return "TOpenDialog";
+    else if constexpr (std::is_same_v<T, TVirtualImageList>) return "TVirtualImageList";
+    else if constexpr (std::is_same_v<T, TImageCollection>) return "TImageCollection";
+    else return "";
+   }
+  void Termine(); // arbres des menus, liens des boutons, PrepareVcl
+ };
+#define LIE_COMPOSANT(Classe, Nom) Lieur.Lie(#Nom, Nom);
+//---------------------------------------------------------------------------
+int ToucheVirtuelleDe(const QKeyEvent *e); // code VK de la touche (OnKeyDown)
+TShiftState EtatTouches(const QKeyEvent *e);
+//---------------------------------------------------------------------------
+template <class B> class TFormT : public B, public FicheVclBase
+ {
+  bool PremierAffichage=true, Modale=false, EstPrincipale=false;
+  int iModalResult=0;
+  protected:
+  std::map<QString, QObject *> Composants;
+  // Après setupUi : liaison, raccourcis, OnCreate (appelée par la fiche portée)
+  void FinChargement(LieurComposants &Lieur)
+   {
+    Lieur.Termine();
+    Lieur.Raccourcis.Fenetre=this;
+    Lieur.Raccourcis.Principale=EstPrincipale;
+    Lieur.Raccourcis.Apercu=[this](QKeyEvent *e, bool Relache) { return Apercu(e, Relache); };
+    InscritFicheRaccourcis(Lieur.Raccourcis);
+    AppliqueStyle();
+   }
+  void DefinitPrincipale() { EstPrincipale=true; }
+  public:
+  Propriete<AnsiString> Caption;
+  Propriete<int> Left, Top, Width, Height, ClientWidth, ClientHeight, ModalResult;
+  Propriete<bool> Visible, Enabled;
+  Propriete<TWindowState> WindowState;
+  Propriete<TCursor> Cursor;
+  bool KeyPreview=false;
+  int HelpContext=0, Tag=0;
+  TNotifyEvent OnCreate, OnShow, OnHide, OnDestroy, OnActivate, OnClick;
+  std::function<void(TObject *, bool &)> OnCloseQuery;
+  std::function<void(TObject *, WORD &, TShiftState)> OnKeyDown, OnKeyUp;
+  std::function<void(TObject *, char &)> OnKeyPress;
+  explicit TFormT(TComponent *Owner) : B(ParentDe(Owner))
+   {
+    QWidget *w=this;
+    Caption.Definit([w]() { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
+    Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
+    Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
+    Width.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
+    Height.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
+    ClientWidth.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
+    ClientHeight.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
+    ModalResult.Definit([this]() { return iModalResult; }, [this](const int &mr) { DefinitModalResult(mr); });
+    Visible.Definit([w]() { return w->isVisible(); }, [this](const bool &v) { if (v) Show(); else Hide(); });
+    Enabled.Definit([w]() { return w->isEnabled(); }, [w](const bool &v) { w->setEnabled(v); });
+    WindowState.Definit([w]() { return w->isMaximized()?wsMaximized:(w->isMinimized()?wsMinimized:wsNormal); },
+                        [w](const TWindowState &s)
+                         {
+                          if (s==wsMaximized) w->showMaximized();
+                          else if (s==wsMinimized) w->showMinimized();
+                          else if (w->isMaximized()||w->isMinimized()) w->showNormal();
+                         });
+    Cursor.Definit([w]() { return w->cursor().shape()==Qt::WaitCursor?crHourGlass:crDefault; },
+                   [w](const TCursor &c) { if (c==crHourGlass) w->setCursor(Qt::WaitCursor); else w->unsetCursor(); });
+   }
+  ~TFormT() override
+   {
+    DesinscritFicheRaccourcis(this);
+   }
+  static QWidget *ParentDe(TComponent *Owner)
+   { // Fiches secondaires au-dessus de la fiche principale (MainFormOnTaskBar)
+    QWidget *p=qobject_cast<QWidget *>(Owner);
+    if (!p) p=FichePrincipaleQt;
+    return p?p->window():nullptr;
+   }
+  static inline QWidget *FichePrincipaleQt=nullptr;
+  void Show()
+   {
+    B::show();
+    B::raise();
+    B::activateWindow();
+   }
+  void Hide() { B::hide(); }
+  void Close() { B::close(); }
+  void Release() { B::hide(); B::deleteLater(); }
+  void Repaint() { B::repaint(); }
+  void SetFocus() { B::activateWindow(); }
+  int ShowModal()
+   {
+    if constexpr (std::is_base_of_v<QDialog, B>)
+     {
+      iModalResult=mrNone;
+      Modale=true;
+      B::exec();
+      Modale=false;
+      if (iModalResult==mrNone) iModalResult=mrCancel;
+      return iModalResult;
+     }
+    else
+     return mrNone;
+   }
+  void DefinitModalResult(int mr) override
+   { // ModalResult<>0 pendant ShowModal : la fiche se ferme
+    iModalResult=mr;
+    if constexpr (std::is_base_of_v<QDialog, B>)
+     if (Modale&&(mr!=mrNone)) B::done(mr);
+   }
+  QObject *FindComponent(const AnsiString &asNom)
+   {
+    auto i=Composants.find(Q(asNom));
+    if (i!=Composants.end()) return i->second;
+    return B::template findChild<QObject *>(Q(asNom));
+   }
+  protected:
+  void AppliqueStyle()
+   { // BorderStyle, FormStyle (propriétés « vcl... » de la fiche)
+    QWidget *w=this;
+    KeyPreview=w->property("vclKeyPreview").toBool();
+    HelpContext=w->property("vclHelpContext").toInt();
+    QString Bord=w->property("vclBorderStyle").toString();
+    Qt::WindowFlags f=w->windowFlags();
+    if ((Bord=="bsToolWindow")||(Bord=="bsSizeToolWin")) f|=Qt::Tool;
+    if (w->property("vclFormStyle").toString()=="fsStayOnTop") f|=Qt::WindowStaysOnTopHint;
+    if (f!=w->windowFlags()) w->setWindowFlags(f);
+    if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
+   }
+  bool Apercu(QKeyEvent *e, bool Relache)
+   { // KeyPreview : OnKeyDown/OnKeyUp de la fiche avant le contrôle actif
+    if (!KeyPreview) return false;
+    WORD Key=(WORD)ToucheVirtuelleDe(e);
+    if (!Key) return false;
+    if (Relache) { if (OnKeyUp) OnKeyUp(this, Key, EtatTouches(e)); }
+    else { if (OnKeyDown) OnKeyDown(this, Key, EtatTouches(e)); }
+    return Key==0;
+   }
+  void showEvent(QShowEvent *e) override
+   {
+    B::showEvent(e);
+    if (e->spontaneous()) return;
+    if (PremierAffichage)
+     {
+      PremierAffichage=false;
+      QString Position=this->property("vclPosition").toString();
+      QWidget *Ref=(Position=="poMainFormCenter")?FichePrincipaleQt:nullptr;
+      if ((Position=="poScreenCenter")||(Ref&&(Ref!=this)))
+       {
+        QRect Zone=Ref?Ref->frameGeometry():(this->screen()?this->screen()->availableGeometry():QRect());
+        QRect g=this->frameGeometry();
+        g.moveCenter(Zone.center());
+        this->move(g.topLeft());
+       }
+     }
+    if (OnShow) OnShow(this);
+   }
+  void hideEvent(QHideEvent *e) override
+   {
+    B::hideEvent(e);
+    if (!e->spontaneous()&&OnHide) OnHide(this);
+   }
+  void closeEvent(QCloseEvent *e) override
+   { // TCustomForm::Close : CloseQuery, puis caHide (fiche secondaire) ou fin de l'application
+    bool CanClose=true;
+    if (OnCloseQuery) OnCloseQuery(this, CanClose);
+    if (!CanClose) { e->ignore(); return; }
+    if (Modale&&(iModalResult==mrNone)) iModalResult=mrCancel;
+    B::closeEvent(e);
+    if (e->isAccepted()&&EstPrincipale) QCoreApplication::quit();
+   }
+  void keyPressEvent(QKeyEvent *e) override
+   {
+    if constexpr (std::is_base_of_v<QDialog, B>)
+     if (e->key()==Qt::Key_Escape)
+      { // Échap : bouton Cancel de la fiche (rien s'il n'y en a pas)
+       for(QPushButton *p : this->template findChildren<QPushButton *>())
+        if (TButton *b=dynamic_cast<TButton *>(p))
+         if (b->Cancel&&b->isVisible()&&b->isEnabled()) { b->Click(); return; }
+       return;
+      }
+    B::keyPressEvent(e);
+   }
+ };
+//---------------------------------------------------------------------------
+typedef TFormT<QDialog> TForm;
+typedef TFormT<QMainWindow> TFormPrincipale;
+//---------------------------------------------------------------------------
+#endif
