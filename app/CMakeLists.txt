@@ -5,15 +5,14 @@
 # la VCL utilisé par le code des fiches.
 
 # Qt 6.8.3 et antérieurs (FindWrapOpenGL) lient le framework AGL, retiré des
-# SDK récents de macOS : find_library(WrapOpenGL_AGL) échoue, Qt se rabat sur
-# « -framework AGL » et l'édition des liens échoue. On lui donne le framework
-# OpenGL à la place (les versions suivantes de Qt ne lient plus AGL).
-if(APPLE)
-  find_library(CV_FRAMEWORK_AGL AGL)
-  if(NOT CV_FRAMEWORK_AGL)
-    find_library(CV_FRAMEWORK_OPENGL OpenGL)
-    set(WrapOpenGL_AGL "${CV_FRAMEWORK_OPENGL}" CACHE FILEPATH "AGL absent du SDK de macOS : framework OpenGL à la place")
-  endif()
+# SDK récents de macOS : AGL reste dans /System/Library/Frameworks, où
+# find_library(WrapOpenGL_AGL) le trouve, mais l'édition des liens se fait
+# avec le SDK, qui ne l'a plus (« framework 'AGL' not found »). Rien n'utilise
+# AGL : on lui substitue toujours le framework OpenGL (les versions suivantes
+# de Qt ne lient plus AGL et ignorent cette variable).
+if(APPLE AND NOT DEFINED CACHE{WrapOpenGL_AGL})
+  find_library(CV_FRAMEWORK_OPENGL OpenGL)
+  set(WrapOpenGL_AGL "${CV_FRAMEWORK_OPENGL}" CACHE FILEPATH "AGL retiré des SDK de macOS : framework OpenGL à la place")
 endif()
 
 if(CV_APP STREQUAL "ON")
