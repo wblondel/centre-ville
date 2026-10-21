@@ -9,8 +9,9 @@ Phase 6, lot 1 (paramètres et définitions) : les 13 fiches `f_propos`,
 portées. Lot 2 (distances et informations) : les 12 fiches `f_afdistab`,
 `f_afdistat`, `f_afdistft`, `f_afdistfp`, `f_afdistp`, `f_afdistpv`,
 `f_infveh`, `f_infptn`, `f_infbus`, `f_inftram`, `f_inftaxi` et `f_infvehlib`
-sont portées. Les 5 autres fiches secondaires (statistiques, recherche) sont
-créées et affichées depuis les `.ui` générés, mais sans leur code (lot 3).
+sont portées. Lot 3 (statistiques et recherche) : les 5 fiches `f_stats`,
+`f_statsv`, `f_statsat`, `f_statsc` et `f_rech` sont portées ; toutes les
+fiches secondaires le sont désormais.
 Comme pour le moteur, **on porte, on ne réécrit pas** : les fiches portées
 sont des copies de `src/f_*.*` (CRLF -> LF, `__fastcall` retiré), où chaque
 autre modification est annotée `// portage`. Pour lire le portage ligne à
@@ -58,7 +59,7 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
 | `f_dimzone.*`, `f_genres.*` | Portées. `Genere(rand()%NbX, rand()%NbY, ...)` est séquencé explicitement x, puis y, puis la direction, comme le binaire d'origine. |
 | `f_propos`, `f_epidemie`, `f_defn`, `f_prm*` (5), `f_defv`, `f_defvp`, `f_deff`, `f_deffp`, `f_carfours` | Portées (lot 1). `ChargeFiche()` remplace le chargement du `.dfm` ; `ShellExecute` (adresse, courriel) -> `QDesktopServices::openUrl` ; `MessageBoxW` (Licence) -> `AfficheMessage` ; `((TComponent*)Sender)->Tag`/`Name`/`ClassName()` -> `TagDe`/`NomDe`/`NomClasseDe` ; `__except` -> `catch(...)`. `f_carfours` appelle `IncrementeNombre<feu>`, instanciée explicitement dans `engine/simul.cpp`. |
 | `f_afdist*` (6), `f_inf*` (6) | Portées (lot 2) : fiches non modales au premier plan, ouvertes par les actions Distances/Détail (menus, barre d'outils, raccourcis), rafraîchies par `DrawGridSimulClick` et, pour les informations, par le moteur à chaque tour (`IVueSimulation::RafraichitFiche`). `Caption=<int>` -> `IntToStr` (`f_infptn`) ; `NumArretSvt=...` sorti de `ARRAYOFCONST` pour garder l'ordre d'évaluation de l'original (`f_infbus`, `f_inftram`). |
-| `f_stats*`, `f_rech` (5) | En-têtes portés ; fiches non portées : `.ui` généré sans gestionnaires, méthodes appelées par les autres fiches sans effet. |
+| `f_stats`, `f_statsv`, `f_statsat`, `f_statsc`, `f_rech` | Portées (lot 3). Évolution et Statistiques véhicules : non modales, au premier plan, rafraîchies par le moteur à chaque tour (`IVueSimulation::RafraichitFiche`) et fermées à l'arrêt. Composition et Fluidité et trafic : modales, créées à chaque ouverture puis libérées (`Release`) ; pendant Fluidité et trafic, `DrawGridSimulDrawCell` colore la carte par `CouleurCase` et la barre d'état détaille la case (`asMsgDetailCase`). Rechercher : non modale ; ses `CSpinEdit*Change` déplacent la case courante (`Col`/`Row`, donc `DrawGridSimulClick`), y compris à chaque tour pour l'objet suivi (bloc `frmRecherche` du moteur) : les fiches d'informations suivent ainsi l'objet. |
 | `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide ; `min`/`max`. |
 | `grille/GrilleSimulation.*` | Remplace le `TDrawGrid` : voir l'en-tête pour le comportement reproduit. |
 | `vcl/` | Sous-ensemble de la VCL au-dessus de Qt, pour garder le code des fiches tel quel. |
@@ -125,6 +126,22 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
   des `Constraints` de la fiche. `FormatFloat` : « 0 », « # », « . » et
   littéraux (« #.000% », « ###.## »...), arrondi de la moitié vers le haut,
   `NAN`/`INF`.
+- Ajouts du lot 3 : `PopupMenu` de la fiche elle-même (`f_statsat`) : clic
+  droit hors des contrôles qui ont leur propre menu, et raccourcis de ses
+  éléments, `TWinControl::IsMenuKey` remontant jusqu'à la fiche (les flèches
+  déplacent alors le curseur de la carte, même dans un champ numérique).
+  `Color` de la fiche quand le `.dfm` la fixe (fond noir d'« Évolution » ;
+  cela a aussi corrigé le fond sarcelle des priorités et le fond noir
+  d'« À propos », restés à la couleur du thème aux lots 1 et 2) ; les couleurs
+  système (`clBtnFace`) suivent toujours le thème. `ActiveControl` : focus
+  initial de la fiche (`f_statsv` : « Vu » plutôt que la première grille ;
+  aussi `f_defn`, `f_dimzone`, `f_prmbus`, `f_prmtram`, `f_prmtaxi`,
+  `f_prmvehlib`). `TTabControl` : onglets d'un `QTabBar` tous visibles
+  (texte élidé au besoin, sans boutons de défilement), cadre de la page
+  dessiné sous les contrôles. `TPen::Mode`, `RGB()` de `windows.h`.
+  `TPaintBox` (déjà présent) sert pour la première fois : `OnPaint` dans le
+  `paintEvent`, sur un `TCanvas` persistant (`Pen` gardé d'un dessin à
+  l'autre, comme le `Canvas` de la VCL).
 - `graphiques.*` : `TColor`, `TRect` (bords droit et bas exclus), `TCanvas`
   sur `QPainter` ; `listeimages.*` : `TVirtualImageList` (indices `IDB_*`
   inchangés), images agrandies sans lissage en HiDPI.
@@ -163,19 +180,47 @@ ou un piéton, montrent à chaque tour les valeurs du moteur pour la case
 courante, l'utilisateur cliquant sur l'objet quand il change de case ; « Vu »
 et Échap les ferment. À l'arrêt, la fiche ouverte garde son contenu (comme
 l'original : rien ne la rafraîchit) ; le clic suivant sur la carte la vide.
+Lot 3, en simulation à graine fixe sur des copies de Géant : Composition
+(modale, barre d'outils puis Ctrl+Maj+R, « Vu » puis Échap) affiche la
+composition calculée sur la carte (cases, routes, priorités, directions,
+parkings, arrêts, voies de tram, places) ; Évolution (barre d'outils, puis
+menu) est redessinée par le moteur à chaque tour, ses trois courbes et son
+quadrillage sont aux positions que donnent `cv->Stats` (par nombre, par
+pourcentage, quadrillage masqué, mode épidémique et sa légende) ;
+Statistiques véhicules affiche les coordonnées des parkings puis, à chaque
+tour, l'écart entre le plus long et le plus court des véhicules arrivés pour
+chaque trajet, en cases puis en tours (clic sur l'onglet) ; les deux se
+ferment à l'arrêt. Fluidité et trafic : refusée en simulation (message),
+proposée par le bilan de l'interruption (« Oui ») puis ouverte par Ctrl+Maj+F :
+fiche modale, couleur de chaque case de la carte (`CouleurCase` et pixel
+dessiné) égale au calcul sur l'attente et le trafic du moteur, totaux et
+moyennes, trajets (parkings de départ et d'arrivée), détail de la case dans
+la barre d'état, boutons de déplacement (avec et sans les coins) et touches
+du menu contextuel de la fiche (flèches, Origine ; Z sans effet). Rechercher
+(barre d'outils, sur un parking) reprend les numéros de la case ; chaque sorte
+d'élément fixe (parking, feu, arrêts, places et files) est retrouvée par son
+bouton et son numéro (case courante, barre d'état de la fiche), ainsi que
+des coordonnées ; le curseur clignote (dessiné une fois sur deux) ; « Suivre »
+un véhicule, un piéton, un bus, un tram, un taxi et un vehlib (raccourcis du
+menu contextuel de la carte) : à chaque tour, la case courante est sur
+l'objet, la barre d'état de la fiche le dit, et la fiche d'informations
+ouverte montre l'objet suivi, sans clic de l'utilisateur ; Échap ferme
+Rechercher, « Suivre » la rouvre.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
-principale (Démo au tour 0 et au tour 200) et des fiches (`fiche_*.png`).
+principale (Démo au tour 0 et au tour 200 ; Géant en statistiques de fluidité,
+`carte_fluidite_trafic.png`, et de trafic, `carte_trafic.png`) et des fiches
+(`fiche_*.png`).
 
 ## Écarts connus avec l'original
 
 Comportement :
 
-- **Fiches secondaires** : les 5 fiches du lot 3 (Statistiques, Composition,
-  Attente/trafic, Statistiques véhicules, Rechercher) sont affichées depuis
-  le `.ui` généré, sans leur code : elles restent inertes. En particulier,
-  « Suivre » ne fait pas encore suivre l'objet par la case courante (c'est
-  `frmRecherche` qui la déplace), et la fiche Piéton ne retrouve pas le
-  piéton suivi par la recherche.
+- **Évolution en mode épidémique sans piéton** (`NbPietons` nul) : rien
+  n'est tracé ; l'original divise par zéro (exception `EDivByZero` à chaque
+  dessin).
+- **« Zoom (-/+) » de Fluidité et trafic** (touche Z ou menu contextuel de la
+  fiche) : sans effet ; l'original appelle `Click()` sur un `BitBtn22` qui
+  n'existe plus depuis la v5.4 (violation d'accès, message d'erreur de la RTL).
 - **Divisions par zéro** (fiches d'informations : pourcentages de parcours,
   de détour et d'attente quand le dénominateur est nul) : `NAN`/`INF`
   affichés par `FormatFloat`, au lieu de l'exception de la RTL de
@@ -189,7 +234,10 @@ Comportement :
 - **`TCSpinEdit`** : `MinValue`/`MaxValue` ramènent tout de suite la valeur
   dans les bornes (`QSpinBox`), et la saisie au clavier est bornée pendant la
   frappe ; la VCL ne bornait qu'à l'affectation de `Value` et en quittant le
-  champ.
+  champ. Rechercher en hérite : `FormShow` règle les `MaxValue` d'après la
+  carte, et un numéro resté au-dessus (carte précédente plus grande) est
+  ramené aussitôt dans les bornes, ce qui déclenche `OnChange` (case courante
+  sur l'élément de ce numéro, texte de la barre d'état de la fiche).
 - **Licence, adresse, courriel** (« À propos ») : boîte `AfficheMessage`
   (sans titre sous macOS) ; l'adresse et le courriel s'ouvrent avec le
   navigateur et la messagerie par défaut (`QDesktopServices`).
@@ -233,8 +281,9 @@ Visuel :
 - **HiDPI** : images agrandies au plus proche voisin ; aux facteurs non entiers
   (125 %, 150 %), certains pixels sont doublés et d'autres non.
 - **Thème sombre** (macOS) : les fiches suivent l'apparence du système, sauf
-  les couleurs fixées dans les `.dfm` (fond noir d'« À propos », sarcelle des
-  priorités, couleurs des lignes de bus et de tram...).
+  les couleurs fixées dans les `.dfm` (fond noir d'« À propos » et
+  d'« Évolution », fond sarcelle des priorités, couleurs des lignes de bus et
+  de tram...).
 - **Boutons** (`TButton`/`TBitBtn`) : hauteur et rendu du style du système
   (sous macOS, boutons arrondis plus bas que les 25 pixels de la VCL).
 - **Glyphes désactivés** des `TSpeedButton` à une seule image (Carrefours) :
@@ -245,7 +294,9 @@ Visuel :
   contenu ; la VCL rendait seulement les contrôles inaccessibles.
 - **Textes longs** : avec les polices de remplacement, certains libellés à
   largeur fixe débordent ou sont coupés (texte d'« À propos », libellés de
-  Paramètres, des lignes de bus et de tram, des fiches d'informations...) ;
+  Paramètres, des lignes de bus et de tram, des fiches d'informations, de la
+  première colonne de Composition, de Fluidité et trafic, des numéros à
+  quatre chiffres de Rechercher...) ;
   les valeurs écrites par le code (`AutoSize`) restent entières, quitte à
   recouvrir la fin du libellé voisin.
 - **Tableaux de distances** (`TStringGrid`) : cases fixes au style des
@@ -256,6 +307,12 @@ Visuel :
   `Height=26+21*RowCount` donne une grille de `RowCount` lignes entières,
   comme avec le cadre que suppose le code d'origine (`src/A_FAIRE.txt`
   prévoyait de revoir ce calcul).
+- **Onglets** (`TTabControl` de Statistiques véhicules) : style du système ;
+  avec la police de remplacement, les deux libellés sont élidés (« … ») pour
+  tenir dans la largeur de la VCL.
+- **Évolution** : traits de `QPainter` ; comme GDI, `LineTo` n'allume pas le
+  point d'arrivée, mais les pixels des segments obliques peuvent différer
+  d'un pixel de ceux de Windows.
 
 ## Comportements d'origine conservés (lot 2)
 
@@ -289,3 +346,31 @@ Règle d'or : ces bogues de l'original sont portés tels quels (à reporter dans
   `DistFileTaxi[direction][file]` (indices inversés) : valeur fausse, et
   lecture hors des tableaux quand la case a plus de directions que la carte
   n'a de files de taxis.
+
+## Comportements d'origine conservés (lot 3)
+
+- **Rechercher un piéton** monté dans un taxi : la case courante va au taxi,
+  mais le texte donne les coordonnées de `cv->Bus[NumTaxi-1]` (lecture hors
+  du tableau des bus si `NumTaxi > NbBus`) ; dans un vehlib, case courante
+  et texte viennent de `cv->Bus[NumVehlib-1]` ; dans un tram, il est « non
+  utilisé » (le commentaire v5.4.1 du code cite le tram, mais ne le traite
+  pas). Comme la fiche Piéton lit `CSpinEditPieton`, elle montre le piéton
+  suivi même quand la case en contient un autre.
+- **Places de taxi, de parking et de vehlib** non définies : la barre d'état
+  de Rechercher garde le texte précédent ; « Taxi » et « Vehlib » ne testent
+  pas `Defini()`.
+- **Statistiques véhicules** : la grille n'est remplie qu'au tour qui suit
+  l'ouverture (`FormShow` n'écrit que les en-têtes) ; un trajet n'ayant
+  qu'un véhicule arrivé, ou des véhicules au même parcours, affiche 0.
+- **Évolution** : redessinée entre deux tours (fenêtre redimensionnée ou
+  découverte), son dernier segment va vers `Stats[TourCrt%NbToursStats]`,
+  les statistiques du tour à venir, pas encore calculées (celles d'il y a
+  `NbToursStats` tours). Par nombre de véhicules, le quadrillage marque tous
+  les 10 véhicules : sur Géant (plus de 2 000 véhicules), ses points forment
+  des traits verticaux continus.
+- **Fluidité et trafic** : les flèches, Origine, Fin, Page précédente et Page
+  suivante (raccourcis du menu contextuel de la fiche) déplacent le curseur de
+  la carte depuis n'importe quel contrôle, champs numériques compris ; Échap
+  ne ferme pas la fiche (aucun bouton Cancel). Le message « Le n° d'étape
+  est incorrect ! » est porté, mais la saisie bornée du `TCSpinEdit` (voir les
+  écarts) ne permet plus de taper un numéro de parking hors de `1..NbParkings`.

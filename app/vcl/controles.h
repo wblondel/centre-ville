@@ -410,6 +410,10 @@ class TPaintBox : public ControleVcl<QWidget>
   void paintEvent(QPaintEvent *e) override;
  };
 //---------------------------------------------------------------------------
+// TTabControl : onglets en haut (QTabBar), cadre de la page dessous ; les
+// contrôles de la page sont des enfants directs, comme dans le .dfm. Les
+// onglets restent tous visibles (texte élidé si la police de remplacement est
+// trop large), comme ceux de la VCL, sans boutons de défilement.
 class TTabControl : public ControleVcl<QWidget>
  {
   QTabBar *Onglets=nullptr;
@@ -418,6 +422,8 @@ class TTabControl : public ControleVcl<QWidget>
   TNotifyEvent OnChange;
   explicit TTabControl(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  protected:
+  void paintEvent(QPaintEvent *e) override;
  };
 //---------------------------------------------------------------------------
 // TStatusBar : panneaux de largeur fixe dessinés comme la VCL

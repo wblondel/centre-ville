@@ -40,6 +40,10 @@ const TColor clScrollBar=(TColor)0xFF000000, clBackground=(TColor)0xFF000001,
 QColor CouleurQt(TColor Couleur);
 TColor CouleurVcl(const QColor &Couleur);
 TColor CouleurDepuisTexte(const AnsiString &asCouleur); // "clRed", "0x00FF0080"...
+// RGB de windows.h : 0x00BBGGRR (statistiques de fluidité et de trafic)
+#ifndef RGB // macro de windows.h, si l'en-tête a déjà été inclus
+inline int RGB(int r, int g, int b) { return (r&0xFF)|((g&0xFF)<<8)|((b&0xFF)<<16); }
+#endif
 //---------------------------------------------------------------------------
 struct TPoint
  {
@@ -61,6 +65,7 @@ inline TRect Rect(int l, int t, int r, int b) { return TRect(l, t, r, b); }
 //---------------------------------------------------------------------------
 enum TBrushStyle { bsSolid, bsClear };
 enum TPenStyle { psSolid, psDash, psDot, psDashDot, psDashDotDot, psClear };
+enum TPenMode { pmBlack, pmWhite, pmNop, pmNot, pmCopy }; // seul pmCopy (le défaut) est dessiné
 enum TFontStyle { fsBold, fsItalic, fsUnderline, fsStrikeOut };
 typedef TEnsemble<TFontStyle> TFontStyles;
 //---------------------------------------------------------------------------
@@ -75,6 +80,7 @@ struct TPen
   TColor Color=clBlack;
   int Width=1;
   TPenStyle Style=psSolid;
+  TPenMode Mode=pmCopy;
  };
 //---------------------------------------------------------------------------
 struct TFont

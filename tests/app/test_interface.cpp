@@ -29,11 +29,23 @@
 //     d'informations (non modales, au premier plan) suivent tour après tour
 //     l'objet de la case courante, l'utilisateur cliquant sur lui quand il se
 //     déplace ; à l'arrêt, elles gardent leur contenu jusqu'au clic suivant
-//     sur la carte (comme l'original), qui les vide.
+//     sur la carte (comme l'original), qui les vide ;
+//   - lot 3 (statistiques et recherche), sur des copies de Géant : composition
+//     du réseau (modale) calculée sur la carte ; « Évolution » redessinée par le
+//     moteur à chaque tour, courbes et quadrillage aux positions que donnent
+//     cv->Stats ; statistiques des véhicules d'une étape à l'autre d'après les
+//     véhicules arrivés ; fluidité et trafic (modale, proposée par le bilan de
+//     l'interruption) : couleur de chaque case de la carte égale au calcul sur
+//     l'attente et le trafic du moteur, totaux, trajets, boutons et touches de
+//     déplacement ; Rechercher : chaque sorte d'élément fixe retrouvée, et
+//     « Suivre » un véhicule, un piéton, un bus, un tram, un taxi, un vehlib :
+//     curseur clignotant sur l'objet et fiche d'informations qui le suit, tour
+//     après tour, sans clic.
 // Les fiches modales sont pilotées par des étapes (QuandModale) : l'action
 // prévue est exécutée quand la fiche attendue devient la fiche modale active.
 // Les captures de la fenêtre principale et des fiches sont écrites dans le
-// dossier CV_DOSSIER_CAPTURES (Démo au tour 0 et vers le tour 200, fiche_*.png).
+// dossier CV_DOSSIER_CAPTURES (Démo au tour 0 et vers le tour 200, fiche_*.png,
+// carte_*.png pour la carte en statistiques de fluidité et de trafic).
 //---------------------------------------------------------------------------
 #include <QAbstractButton>
 #include <QApplication>
@@ -48,6 +60,7 @@
 #include <QRadioButton>
 #include <QRegularExpression>
 #include <QScrollBar>
+#include <QTabBar>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
@@ -82,11 +95,17 @@
 #include "f_prmtram.h"
 #include "f_prmvehlib.h"
 #include "f_propos.h"
+#include "f_rech.h"
 #include "f_simul.h"
+#include "f_stats.h"
+#include "f_statsat.h"
+#include "f_statsc.h"
+#include "f_statsv.h"
 #include "format_reference.h"
 #include "compat/alea.h" // après les en-têtes système
 //---------------------------------------------------------------------------
 extern TfrmGeneration *frmGeneration; // défini dans f_genres.cpp (non déclaré par f_genres.h d'origine)
+extern TfrmStatsComposition *frmStatsComposition; // défini dans f_statsc.cpp (déclaration en commentaire dans f_statsc.h)
 //---------------------------------------------------------------------------
 namespace
  {
@@ -270,6 +289,18 @@ class TestInterface : public QObject
     TRect r=g->CellRect(x, y);
     QTest::mouseClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), QPoint((r.Left+r.Right)/2, (r.Top+r.Bottom)/2));
    }
+  int TrouveCase(std::function<int(voie *)> Numero)
+   { // Premier objet trouvé sur la carte (Numero(v) > 0), cliqué par l'utilisateur
+    for(int y=0; y<cv->NbY; y++)
+     for(int x=0; x<cv->NbX; x++)
+      if (int n=Numero(&cv->v[x][y]))
+       {
+        Focalise();
+        CliqueCase(x, y);
+        return n;
+       }
+    return 0;
+   }
   void VerifieFichesDistances(const QString &asCarte, bool Captures);
   void SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours);
   void Focalise()
@@ -299,6 +330,11 @@ class TestInterface : public QObject
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
   void fichesInfos();
+  // Lot 3 des fiches secondaires (phase 6)
+  void ficheComposition();
+  void fichesEvolutionEtVehicules();
+  void ficheFluiditeTrafic();
+  void ficheRecherche();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -359,7 +395,8 @@ void TestInterface::init()
   Etapes.clear();
   Messages.clear();
   ReponseQuestions=QMessageBox::No;
-  // Simulation laissée en cours par un test en échec : arrêtée
+  // Simulation laissée en cours (ou en pause : Arrêt y est désactivé) par un test en échec : arrêtée
+  if (frmSimulation->Pause) QTest::mouseClick(frmSimulation->ToolButtonMarche, Qt::LeftButton);
   if (frmSimulation->SimulationEnCours||frmSimulation->Pause) (void)Arrete();
   alea::LibereGraine();
   Messages.clear();
@@ -1746,6 +1783,994 @@ void TestInterface::fichesInfos()
   CaptureFiche(frmInfosVehicule, "fiche_infos_vehicule_arret.png");
   Clique(frmInfosVehicule->ButtonOk);
   QVERIFY(!frmInfosVehicule->isVisible());
+ }
+//---------------------------------------------------------------------------
+// Lot 3 des fiches secondaires : statistiques et recherche
+//---------------------------------------------------------------------------
+namespace
+ {
+  // Pourcentage affiché par FormatFloat("###.##") : vide pour 0, virgule décimale
+  bool PourcentageEgal(const AnsiString &asTexte, double Attendu)
+   {
+    QString t=Q(asTexte);
+    bool Ok=true;
+    double v=t.isEmpty()?0.0:t.replace(',', '.').toDouble(&Ok);
+    return Ok&&(qAbs(v-Attendu)<0.0051);
+   }
+  // Le pixel logique (x, y) d'une capture, ou l'un de ses voisins à Rayon près,
+  // a la couleur attendue (HiDPI : pixel du milieu du pixel logique)
+  bool CouleurAutour(const QImage &Image, qreal Echelle, int x, int y, TColor Couleur, int Rayon)
+   {
+    QRgb c=CouleurQt(Couleur).rgb();
+    for(int i=-Rayon; i<=Rayon; i++)
+     for(int j=-Rayon; j<=Rayon; j++)
+      {
+       QPoint p((int)((x+i+0.5)*Echelle), (int)((y+j+0.5)*Echelle));
+       if (Image.rect().contains(p)&&(Image.pixel(p)==c)) return true;
+      }
+    return false;
+   }
+  // Dessins d'un contrôle (QEvent::Paint), pour compter les rafraîchissements
+  class CompteurDessins : public QObject
+   {
+    public:
+    int n=0;
+    bool eventFilter(QObject *, QEvent *e) override
+     {
+      if (e->type()==QEvent::Paint) n++;
+      return false;
+     }
+   };
+  //-------------------------------------------------------------------------
+  // Statistiques de fluidité et de trafic attendues pour les trajets ed -> ea
+  // (cases de route hors parkings, comme RecalculeEtVisualise)
+  struct TotauxFluidite
+   {
+    int m[2]={0, 0}, t[2]={0, 0}, n=0;
+   };
+  TotauxFluidite CalculeFluidite(int ed, int ea)
+   {
+    TotauxFluidite r;
+    for(int x=0; x<cv->NbX; x++)
+     for(int y=0; y<cv->NbY; y++)
+      {
+       voie *v=&cv->v[x][y];
+       if ((v->DirPoss<=aucune)||v->NumParking) continue;
+       r.n++;
+       if (!v->Attente||!v->Trafic) continue;
+       r.m[0]=qMax(r.m[0], v->Attente[ed][ea]);
+       r.t[0]+=v->Attente[ed][ea];
+       r.m[1]=qMax(r.m[1], v->Trafic[ed][ea]);
+       r.t[1]+=v->Trafic[ed][ea];
+      }
+    return r;
+   }
+  // Couleur d'une case : du vert (0) au rouge (maximum) en passant par le jaune
+  TColor CouleurFluidite(const TotauxFluidite &r, int ts, int ed, int ea, voie *v)
+   {
+    if (!r.m[ts]||!v->Trafic||!v->Attente) return 0;
+    int s=(127*(ts?v->Trafic[ed][ea]:v->Attente[ed][ea]))/r.m[ts],
+        Rouge=(s<64)?4*s:252, Vert=(s>=64)?252-4*(s-64):252;
+    return Rouge|(Vert<<8);
+   }
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ficheComposition()
+ { // Géant (routes, voies de tram, arrêts, places de chaque sorte) : la fiche
+   // modale, ouverte par la barre d'outils puis par le raccourci, montre la
+   // composition du réseau ; « Vu » et Échap la ferment
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_composition.cvw").isEmpty());
+  // Composition attendue, d'après le réseau
+  int Total=0, Routes=0, VoiesTram=0, Parkings=0, CasesArretsBus=0, CasesArretsTram=0,
+      Dir=0, Nord=0, Est=0, Sud=0, Ouest=0, ArretsBus=0, ArretsTram=0, PlacesTaxi=0, PlacesPark=0;
+  int Priorites[2]={0, 0}, Feux[2]={0, 0}, Clp[2]={0, 0}, Stops[2]={0, 0}; // sur route, sur voie de tram
+  for(int i=0; i<cv->NbArretsBus; i++) ArretsBus+=cv->ArretBus[i].Defini();
+  for(int i=0; i<cv->NbArretsTram; i++) ArretsTram+=cv->ArretTram[i].Defini();
+  for(int i=0; i<cv->NbPlacesTaxi; i++) PlacesTaxi+=cv->PlaceTaxi[i].Definie();
+  for(int i=0; i<cv->NbPlacesPark; i++) PlacesPark+=cv->PlacePark[i].Definie();
+  auto Compte=[&](int Sur, int p)
+   {
+    Feux[Sur]+=(p==feux);
+    Clp[Sur]+=(p==cedez_le_passage);
+    Stops[Sur]+=(p==stop);
+    Priorites[Sur]+=(p==feux)||(p==cedez_le_passage)||(p==stop);
+   };
+  for(int x=0; x<cv->NbX; x++)
+   for(int y=0; y<cv->NbY; y++)
+    {
+     voie *v=&cv->v[x][y];
+     Total++;
+     Parkings+=(v->NumParking>0);
+     CasesArretsBus+=(v->NumArretBus>0);
+     if (v->DirPoss)
+      {
+       Routes++;
+       Dir+=NbDir[v->DirPoss];
+       Nord+=!!(v->DirPoss&N); Est+=!!(v->DirPoss&E); Sud+=!!(v->DirPoss&S); Ouest+=!!(v->DirPoss&O);
+       for(int d=nord; d<=ouest; d++)
+        if (v->DirPoss&PossDir[d]) Compte(0, v->Priorite[d-1]);
+      }
+     if (v->SensVoieTram)
+      {
+       VoiesTram++;
+       CasesArretsTram+=(v->NumArretTram>0);
+       for(int d=nord; d<=ouest; d++)
+        if (v->EstDirPossSensVoieTram(indefinie, (direction)d)) Compte(1, v->Priorite[d-1]);
+      }
+    }
+  QVERIFY(Routes&&Dir&&VoiesTram&&ArretsBus&&ArretsTram&&PlacesTaxi&&PlacesPark&&Priorites[0]);
+  QStringList e;
+  bool Modale=false;
+  auto Entier=[&e](const char *Nom, TLabel *l, int Attendu) { Compare(e, Nom, l->Caption, QString::number(Attendu)); };
+  auto PC=[&e](const char *Nom, TLabel *l, double Attendu)
+   {
+    if (!PourcentageEgal(l->Caption, Attendu))
+     e<<QString::fromUtf8("%1 : « %2 » au lieu de %3").arg(QString::fromUtf8(Nom), Q(l->Caption)).arg(Attendu);
+   };
+  auto Verifie=[&]()
+   {
+    TfrmStatsComposition *c=frmStatsComposition;
+    Modale=(QApplication::activeModalWidget()==c);
+    Entier("total", c->LabelTotal, Total);
+    Entier("routes", c->LabelRoutes, Routes);
+    PC("routes %", c->LabelRoutesPC, 100.0*Routes/Total);
+    Entier("priorités", c->LabelPrioritesR, Priorites[0]);
+    PC("priorités %", c->LabelPrioritesRPC, 100.0*Priorites[0]/Routes);
+    Entier("feux", c->LabelFeuxR, Feux[0]);
+    PC("feux %", c->LabelFeuxRPC, 100.0*Feux[0]/Priorites[0]);
+    Entier("feux (maximum)", c->LabelFeuxRMax, cv->NbFeux);
+    Entier("feux (reste)", c->LabelFeuxRReste, cv->NbFeux-Feux[1]-Feux[0]);
+    Entier("cédez-le-passage", c->LabelClpR, Clp[0]);
+    PC("cédez-le-passage %", c->LabelClpRPC, 100.0*Clp[0]/Priorites[0]);
+    Entier("stops", c->LabelStopsR, Stops[0]);
+    PC("stops %", c->LabelStopsRPC, 100.0*Stops[0]/Priorites[0]);
+    Entier("parkings", c->LabelParkings, Parkings);
+    PC("parkings %", c->LabelParkingsPC, 100.0*Parkings/Routes);
+    Entier("parkings (maximum)", c->LabelParkingsMax, cv->NbParkings);
+    Entier("parkings (reste)", c->LabelParkingsReste, cv->NbParkings-Parkings);
+    Entier("directions", c->LabelDir, Dir);
+    PC("directions %", c->LabelDirPC, 100.0*Dir/Routes);
+    Entier("nord", c->LabelNord, Nord);
+    PC("nord %", c->LabelNordPC, 100.0*Nord/Dir);
+    Entier("est", c->LabelEst, Est);
+    PC("est %", c->LabelEstPC, 100.0*Est/Dir);
+    Entier("sud", c->LabelSud, Sud);
+    PC("sud %", c->LabelSudPC, 100.0*Sud/Dir);
+    Entier("ouest", c->LabelOuest, Ouest);
+    PC("ouest %", c->LabelOuestPC, 100.0*Ouest/Dir);
+    Entier("arrêts de bus", c->LabelArretsBus, ArretsBus);
+    PC("arrêts de bus %", c->LabelArretsBusPC, 100.0*CasesArretsBus/Routes);
+    Entier("arrêts de bus (maximum)", c->LabelArretsBusMax, cv->NbArretsBus);
+    Entier("arrêts de bus (reste)", c->LabelArretsBusReste, cv->NbArretsBus-ArretsBus);
+    Entier("voies de tram", c->LabelVoiesTram, VoiesTram);
+    PC("voies de tram %", c->LabelVoiesTramPC, 100.0*VoiesTram/Total);
+    Entier("arrêts de tram", c->LabelArretsTram, ArretsTram);
+    PC("arrêts de tram %", c->LabelArretsTramPC, 100.0*CasesArretsTram/VoiesTram);
+    Entier("arrêts de tram (maximum)", c->LabelArretsTramMax, cv->NbArretsTram);
+    Entier("places de taxi", c->LabelPlacesTaxi, PlacesTaxi);
+    PC("places de taxi %", c->LabelPlacesTaxiPC, 100.0*PlacesTaxi/Routes);
+    Entier("places de taxi (maximum)", c->LabelPlacesTaxiMax, cv->NbPlacesTaxi);
+    Entier("places de taxi (reste)", c->LabelPlacesTaxiReste, cv->NbPlacesTaxi-PlacesTaxi);
+    Entier("places de parking", c->LabelPlacesPark, PlacesPark);
+    PC("places de parking %", c->LabelPlacesParkPC, 100.0*PlacesPark/Routes);
+    Entier("places de parking (maximum)", c->LabelPlacesParkMax, cv->NbPlacesPark);
+    Entier("places de parking (reste)", c->LabelPlacesParkReste, cv->NbPlacesPark-PlacesPark);
+    Entier("priorités des trams", c->LabelPrioritesV, Priorites[1]);
+    PC("priorités des trams %", c->LabelPrioritesVPC, 100.0*Priorites[1]/VoiesTram);
+    if (Priorites[1])
+     {
+      Entier("feux des trams", c->LabelFeuxV, Feux[1]);
+      PC("feux des trams %", c->LabelFeuxVPC, 100.0*Feux[1]/Priorites[1]);
+      Entier("cédez-le-passage des trams", c->LabelClpV, Clp[1]);
+      Entier("stops des trams", c->LabelStopsV, Stops[1]);
+     }
+   };
+  // Barre d'outils, « Vu »
+  QuandModale([]() { return frmStatsComposition; }, [&]()
+   {
+    Verifie();
+    CaptureFiche(frmStatsComposition, "fiche_composition.png");
+    Clique(frmStatsComposition->ButtonOk);
+   });
+  Clique(frmSimulation->ToolButtonComposition);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY(Modale);
+  QVERIFY2(e.isEmpty(), qPrintable(e.join('\n')));
+  QVERIFY(!frmStatsComposition); // Release, comme l'original
+  // Raccourci Ctrl+Maj+R, Échap (« Vu » est aussi le bouton Cancel)
+  Modale=false;
+  QuandModale([]() { return frmStatsComposition; }, [&]()
+   {
+    Verifie();
+    Touche(frmStatsComposition->ButtonAide, Qt::Key_Escape);
+   });
+  Focalise();
+  QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier|Qt::ShiftModifier);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY(Modale);
+  QVERIFY2(e.isEmpty(), qPrintable(e.join('\n')));
+  QVERIFY(!frmStatsComposition);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::fichesEvolutionEtVehicules()
+ { // Géant en simulation : « Évolution » (non modale, au premier plan),
+   // redessinée par le moteur à chaque tour, courbes et quadrillage aux
+   // positions que donnent cv->Stats, par nombre puis par pourcentage ;
+   // statistiques des véhicules d'une étape à l'autre (non modale), d'après les
+   // véhicules arrivés, sur les deux onglets ; les deux se ferment à l'arrêt
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_evolution.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(AttendTour(2, 30000));
+  TfrmSimulation *s=frmSimulation;
+  // Statistiques des véhicules avant toute arrivée : rien à afficher
+  if (!cv->NbVehiculesArrives)
+   {
+    Messages.clear();
+    Clique(s->ToolButtonAffStatsEtapes);
+    QCOMPARE(Messages.size(), 1);
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("Aucune information n'est disponible.")), qPrintable(Messages.first()));
+    QVERIFY(!frmStatsVehicules->isVisible());
+    QVERIFY(!s->ActionStatsParkings->Checked);
+   }
+  //-------------------------------------------------------------------------
+  // Évolution (barre d'outils)
+  TfrmStatistiques *f=frmStatistiques;
+  TPaintBox *p=f->PaintBoxStats;
+  Clique(s->ToolButtonEvolution);
+  QVERIFY(f->isVisible());
+  QVERIFY(s->ActionEvolution->Checked);
+  QVERIFY(!f->isModal()&&!QApplication::activeModalWidget());
+  QVERIFY(f->windowFlags().testFlag(Qt::WindowStaysOnTopHint));
+  QCOMPARE(p->geometry(), f->rect()); // alClient
+  // Rafraîchissement par le moteur (PaintBoxStats->Repaint() à chaque tour)
+  {
+   CompteurDessins Compteur;
+   p->installEventFilter(&Compteur);
+   long Tour=cv->TourCrt;
+   QVERIFY(AttendTour(Tour+5, 30000));
+   p->removeEventFilter(&Compteur);
+   QVERIFY2(Compteur.n>=(int)(cv->TourCrt-Tour), qPrintable(QString("%1 dessins en %2 tours").arg(Compteur.n).arg(cv->TourCrt-Tour)));
+  }
+  QVERIFY(AttendTour(qMin(cv->NbToursStats, 60L), 60000));
+  // Courbes : points (x_i, y_i) des tours PrmTour..TourCrt-1 (LineTo n'allume
+  // pas le point d'arrivée : le dernier point, celui du tour à venir, n'est pas
+  // vérifié), tracés dans l'ordre rouge, jaune, vert ; quadrillage dessous
+  auto VerifieCourbes=[p](bool Epidemique) -> QString
+   {
+    QStringList e;
+    QImage Image=p->grab().toImage();
+    qreal Echelle=p->devicePixelRatioF();
+    bool ParNombre=(cv->TypeStats==par_nombre);
+    int NbTours=cv->NbToursStats, DrnTour=cv->TourCrt, PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1),
+        NbVehicules=cv->NbVehicules, NbPietons=cv->NbPietons,
+        xMax=p->width(), yMax=p->height(), NbPoints=DrnTour-PrmTour;
+    if (Q(p->Hint)!=QString::fromUtf8(Epidemique?"Guéris en vert ; Infectés en jaune et Morts en rouge":
+                                                 "Sortis en jaune ; Déplacés en vert et Arrivés en rouge"))
+     e<<("légende : "+Q(p->Hint));
+    if (NbPoints<5) e<<QString("%1 points seulement").arg(NbPoints);
+    int Couleurs[3]={clRed, clYellow, clGreen}, Trouves[3]={0, 0, 0}, Visibles[3]={0, 0, 0};
+    for(int i=0; i<NbPoints; i++)
+     {
+      stats &st=cv->Stats[(PrmTour+i)%NbTours];
+      int x=xMax*i/NbTours, y[3];
+      if (Epidemique)
+       {
+        y[0]=yMax-yMax*st.NbPietonsMorts/NbPietons;
+        y[1]=yMax-yMax*st.NbPietonsInfectes/NbPietons;
+        y[2]=yMax-yMax*st.NbPietonsGueris/NbPietons;
+       }
+      else
+       {
+        int NbRestants=ParNombre?NbVehicules:(st.NbVehiculesSortis-st.NbVehiculesArrives);
+        if (!NbRestants) NbRestants=100;
+        y[0]=yMax-yMax*st.NbVehiculesArrives/NbVehicules;
+        y[1]=yMax-yMax*st.NbVehiculesSortis/NbVehicules;
+        y[2]=yMax-yMax*st.NbVehiculesDeplaces/NbRestants;
+       }
+      for(int c=0; c<3; c++)
+       if ((y[c]>=0)&&(y[c]<yMax))
+        {
+         Visibles[c]++;
+         Trouves[c]+=CouleurAutour(Image, Echelle, x, y[c], Couleurs[c], 1);
+        }
+     }
+    // Vert, tracé en dernier : tous ses points ; rouge et jaune : au moins la
+    // moitié (une courbe tracée après peut passer dessus)
+    const char *Noms[3]={"rouge", "jaune", "vert"};
+    for(int c=0; c<3; c++)
+     if (Visibles[c]&&(Trouves[c]<((c==2)?Visibles[c]:(Visibles[c]+1)/2)))
+      e<<QString("courbe %1 : %2 points sur %3").arg(Noms[c]).arg(Trouves[c]).arg(Visibles[c]);
+    // Quadrillage : carrés de 2 x 2 pixels, gris sauf toutes les dix marques (blanc)
+    int dt=1+9*(NbTours>=100), NbMarques=ParNombre?(NbVehicules/10):10, NbCarres=0, CarresTrouves=0;
+    for(int i=0; i<NbTours/dt; i++)
+     for(int j=0; j<NbMarques; j++)
+      {
+       int x=dt*xMax*i/NbTours, y=ParNombre?(10*yMax*j/NbVehicules):(10*yMax*j/100);
+       if ((x<1)||(yMax-y-1<0)||(yMax-y-1>=yMax)) continue;
+       NbCarres++;
+       CarresTrouves+=CouleurAutour(Image, Echelle, x-1, yMax-y-1, ((i%10)&&(j%10))?clGray:clWhite, 0);
+      }
+    if (cv->QuadrillageStats?(CarresTrouves<NbCarres*3/4):(CarresTrouves>0))
+     e<<QString("quadrillage %1 : %2 carrés sur %3").arg(cv->QuadrillageStats?"affiché":"masqué").arg(CarresTrouves).arg(NbCarres);
+    return e.join('\n');
+   };
+  if (!cv->QuadrillageStats) s->MenuItemQuadrillageStatistiques->ElementQt()->trigger();
+  QVERIFY(cv->QuadrillageStats);
+  QVERIFY(s->ActionStatsAffQuadrillage->Checked);
+  if (cv->TypeStats!=par_nombre) s->ActionStatsAffParVehicule->Execute();
+  QString e=VerifieCourbes(false);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  CaptureFiche(f, "fiche_evolution.png");
+  // Par pourcentage (menu Affichage), sans quadrillage
+  s->MenuItemParPourcentage->ElementQt()->trigger();
+  QCOMPARE((int)cv->TypeStats, (int)par_pourcentage);
+  s->MenuItemQuadrillageStatistiques->ElementQt()->trigger();
+  QVERIFY(!cv->QuadrillageStats);
+  e=VerifieCourbes(false);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  s->MenuItemQuadrillageStatistiques->ElementQt()->trigger();
+  // Affichage épidémique : légende et courbes des piétons
+  s->ActionAfficherInfection->Execute();
+  QVERIFY(f->AffichageEpidemique);
+  e=VerifieCourbes(true);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  s->ActionAfficherInfection->Execute();
+  QVERIFY(!f->AffichageEpidemique);
+  // Fermeture par la case de la fenêtre, réouverture par le menu
+  f->close();
+  QVERIFY(!f->isVisible());
+  QVERIFY(!s->ActionEvolution->Checked);
+  s->MenuItemEvolution->ElementQt()->trigger();
+  QVERIFY(f->isVisible());
+  QVERIFY(s->ActionEvolution->Checked);
+  //-------------------------------------------------------------------------
+  // Statistiques des véhicules d'une étape à l'autre (menu Statistiques)
+  // (attente d'arrivées : deux véhicules d'un même trajet, aux parcours et aux durées différents)
+  auto DeuxArrivees=[]()
+   {
+    for(int i=0; i<cv->NbVehicules; i++)
+     for(int j=i+1; j<cv->NbVehicules; j++)
+      {
+       vehicule *a=&cv->Vehicule[i], *b=&cv->Vehicule[j];
+       if (!a->Defini()&&!b->Defini()&&a->NbCasesParcourues&&b->NbCasesParcourues&&
+           (a->NumParkingDepart==b->NumParkingDepart)&&(a->NumParkingArrivee==b->NumParkingArrivee)&&
+           (a->NumParkingDepart!=a->NumParkingArrivee)&&
+           (a->NbCasesParcourues!=b->NbCasesParcourues)&&a->TourDrnDepl&&b->TourDrnDepl&&(a->TourDrnDepl!=b->TourDrnDepl))
+        return true;
+      }
+    return false;
+   };
+  QVERIFY(QTest::qWaitFor(DeuxArrivees, 120000));
+  TfrmStatsVehicules *g=frmStatsVehicules;
+  Messages.clear();
+  s->MenuItemStatistiquesEtapes->ElementQt()->trigger();
+  QVERIFY2(g->isVisible(), qPrintable(Messages.join('\n')));
+  QVERIFY(s->ActionStatsParkings->Checked);
+  QVERIFY(!g->isModal()&&!QApplication::activeModalWidget());
+  QVERIFY(g->windowFlags().testFlag(Qt::WindowStaysOnTopHint));
+  int ne=cv->NbParkings;
+  QCOMPARE(Q(g->Caption), QString::fromUtf8("Statistique des véhicules d'une étape à l'autre [Tour %1]").arg(cv->TourCrt));
+  QCOMPARE((int)g->StringGridCoordParkings->RowCount, 1+ne);
+  QCOMPARE((int)g->StringGridStatsVehicules->RowCount, 1+ne);
+  QCOMPARE((int)g->StringGridStatsVehicules->ColCount, 1+ne);
+  QCOMPARE(Q(g->StringGridStatsVehicules->Cells[0][0]), QString("A\\D"));
+  QCOMPARE(Q(g->StringGridCoordParkings->Cells[1][0]), QString("Position"));
+  for(int i=0; i<ne; i++)
+   {
+    QCOMPARE(Q(g->StringGridCoordParkings->Cells[0][1+i]), QString::asprintf("%3d", 1+i));
+    QCOMPARE(Q(g->StringGridCoordParkings->Cells[1][1+i]), QString("%1,%2").arg(cv->Parking[i].x).arg(cv->Parking[i].y));
+    QCOMPARE(Q(g->StringGridStatsVehicules->Cells[1+i][0]), QString::asprintf("%3d", 1+i));
+   }
+  // Écart entre le plus long et le plus court (onglet 0 : cases ; 1 : tours) des
+  // véhicules arrivés, pour chaque départ (colonne) et chaque arrivée (ligne)
+  auto Ecart=[g](long Tour) -> QString
+   {
+    QStringList e;
+    Compare(e, "titre", g->Caption, QString::fromUtf8("Statistique des véhicules d'une étape à l'autre [Tour %1]").arg(Tour));
+    int n=cv->NbParkings, Onglet=g->TabControl->TabIndex, NbNonNuls=0;
+    for(int ed=1; ed<=n; ed++)
+     for(int ea=1; ea<=n; ea++)
+      if (ed!=ea)
+       {
+        int Max=0, Min=32768, Nb=0;
+        for(int i=0; i<cv->NbVehicules; i++)
+         {
+          vehicule *v=&cv->Vehicule[i];
+          int Valeur=Onglet?v->TourDrnDepl:v->NbCasesParcourues;
+          if ((v->NumParkingDepart==ed)&&(v->NumParkingArrivee==ea)&&!v->Defini()&&Valeur)
+           {
+            Max=qMax(Max, Valeur);
+            Min=qMin(Min, Valeur);
+            Nb++;
+           }
+         }
+        NbNonNuls+=(Nb&&(Max>Min));
+        Compare(e, qPrintable(QString("(%1, %2)").arg(ed).arg(ea)), g->StringGridStatsVehicules->Cells[ed][ea], QString::asprintf("%4d", Nb?Max-Min:0));
+       }
+    if (!NbNonNuls) e<<QString::fromUtf8("aucun écart non nul");
+    return e.join('\n');
+   };
+  QTabBar *Onglets=g->TabControl->findChild<QTabBar *>();
+  QVERIFY(Onglets);
+  QCOMPARE(Onglets->count(), 2);
+  QCOMPARE((int)g->TabControl->TabIndex, 0);
+  for(int i=0; i<3; i++)
+   {
+    long Tour=cv->TourCrt;
+    QVERIFY(AttendTour(Tour+1, 10000));
+    e=Ecart(cv->TourCrt-1); // rafraîchi pendant le tour, avant TourCrt++
+    QVERIFY2(e.isEmpty(), qPrintable(e));
+   }
+  CaptureFiche(g, "fiche_stats_vehicules.png");
+  // Second onglet (clic) : recalcul immédiat sur les tours
+  QTest::mouseClick(Onglets, Qt::LeftButton, Qt::KeyboardModifiers(), Onglets->tabRect(1).center());
+  QCOMPARE((int)g->TabControl->TabIndex, 1);
+  e=Ecart(cv->TourCrt);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  QVERIFY(AttendTour(cv->TourCrt+1, 10000));
+  e=Ecart(cv->TourCrt-1);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  CaptureFiche(g, "fiche_stats_vehicules_tours.png");
+  // « Vu », réouverture par la barre d'outils
+  Clique(g->ButtonFermer);
+  QVERIFY(!g->isVisible());
+  QVERIFY(!s->ActionStatsParkings->Checked);
+  Clique(s->ToolButtonAffStatsEtapes);
+  QVERIFY(g->isVisible());
+  QVERIFY(s->ActionStatsParkings->Checked);
+  // Arrêt : les deux fiches se ferment
+  QVERIFY(Arrete());
+  QVERIFY(!f->isVisible());
+  QVERIFY(!s->ActionEvolution->Checked);
+  QVERIFY(!g->isVisible());
+  QVERIFY(!s->ActionStatsParkings->Checked);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ficheFluiditeTrafic()
+ { // Géant : refusée pendant la simulation ; à l'interruption, le bilan propose
+   // de l'afficher (Oui) : fiche modale, carte colorée case par case comme le
+   // calcule le moteur (attente puis trafic), totaux, choix des trajets,
+   // déplacement du curseur par les boutons et par les touches du menu
+   // contextuel de la fiche ; puis par le raccourci, toujours en pause
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_fluidite.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(AttendTour(40, 60000));
+  TfrmSimulation *s=frmSimulation;
+  GrilleSimulation *g=s->DrawGridSimul;
+  Messages.clear();
+  Clique(s->ToolButtonFluiditeTrafic);
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("Vous devez interrompre ou arrêter la simulation en cours")), qPrintable(Messages.first()));
+  QVERIFY(!frmStatsAttenteTrafic);
+  // Fiche, totaux et couleurs pour le type de statistiques ts et les trajets ed -> ea
+  auto Verifie=[s, g](int ts, int ed, int ea) -> QString
+   {
+    TfrmStatsAttenteTrafic *f=frmStatsAttenteTrafic;
+    QStringList e;
+    TotauxFluidite r=CalculeFluidite(ed, ea);
+    auto Moyenne=[&e, &r](const char *Nom, TLabel *l, int t)
+     { // FormatFloat("0.0", t/n) ; « N/D » sans case
+      if (!r.n) { Compare(e, Nom, l->Caption, "N/D"); return; }
+      QString Texte=Q(l->Caption);
+      bool Ok=false;
+      double v=QString(Texte).replace(',', '.').toDouble(&Ok);
+      if (!Ok||!Texte.contains(',')||(qAbs(v-1.0*t/r.n)>0.0501)) e<<QString("%1 : %2 au lieu de %3").arg(Nom, Texte).arg(1.0*t/r.n);
+     };
+    Compare(e, "maximum de la légende", f->LabelMax->Caption, QString::number(r.m[ts]));
+    Compare(e, "attente cumulée", f->LabelAttenteCumulee->Caption, QString::number(r.t[0]));
+    Moyenne("attente moyenne", f->LabelAttenteMoyenne, r.t[0]);
+    Compare(e, "attente maximale", f->LabelAttenteMaximale->Caption, QString::number(r.m[0]));
+    Compare(e, "trafic cumulé", f->LabelTraficCumule->Caption, QString::number(r.t[1]));
+    Moyenne("trafic moyen", f->LabelTraficMoyen, r.t[1]);
+    Compare(e, "trafic maximal", f->LabelTraficMaximal->Caption, QString::number(r.m[1]));
+    // CouleurCase de chaque case de route, et son dessin sur la carte (milieu de
+    // la case ; hors parkings, dépôts et case courante, dessinés par-dessus)
+    QImage Image=g->viewport()->grab().toImage();
+    qreal Echelle=g->viewport()->devicePixelRatioF();
+    int NbVues=0, NbColorees=0;
+    for(int x=0; x<cv->NbX; x++)
+     for(int y=0; y<cv->NbY; y++)
+      {
+       voie *v=&cv->v[x][y];
+       if ((v->DirPoss<=aucune)||v->NumParking) continue;
+       TColor c=CouleurFluidite(r, ts, ed, ea, v);
+       if (f->CouleurCase(x, y)!=c)
+        {
+         e<<QString("CouleurCase(%1, %2) = %3 au lieu de %4").arg(x).arg(y).arg(f->CouleurCase(x, y), 6, 16).arg(c, 6, 16);
+         continue;
+        }
+       NbColorees+=(c!=0);
+       QRect Case=g->CellRect(x, y).Qt();
+       if (!g->viewport()->rect().contains(Case)||v->EstDepotBus()||((x==g->Col)&&(y==g->Row))) continue;
+       NbVues++;
+       QRgb Obtenu=Image.pixel(QPoint((int)((Case.left()+8.5)*Echelle), (int)((Case.top()+8.5)*Echelle)));
+       if (Obtenu!=CouleurQt(c).rgb())
+        e<<QString("case (%1, %2) dessinée en %3 au lieu de %4").arg(x).arg(y).arg(Obtenu&0xFFFFFF, 6, 16, QChar('0')).arg(CouleurQt(c).rgb()&0xFFFFFF, 6, 16, QChar('0'));
+      }
+    if (NbVues<100) e<<QString("%1 cases vues seulement").arg(NbVues);
+    if (!ed&&!ea&&!NbColorees) e<<QString::fromUtf8("aucune case colorée");
+    // Détail de la case courante dans la barre d'état (asMsgDetailCase, au dessin de la case)
+    g->Repaint();
+    voie *v=&cv->v[g->Col][g->Row];
+    QString Detail;
+    if (r.m[ts]&&v->Trafic&&v->Attente)
+     {
+      int Valeur=ts?v->Trafic[ed][ea]:v->Attente[ed][ea];
+      Detail=QString::fromUtf8(ts?"Trafic en (%1, %2) au tour %3 : %4 véhicules (Max. %5) soit %6%":
+                                   "Attente en (%1, %2) au tour %3 : %4 tours (Max. %5) soit %6%")
+              .arg((int)g->Col).arg((int)g->Row).arg(cv->TourCrt).arg(Valeur).arg(r.m[ts])
+              .arg(QString::number(100.0*Valeur/r.m[ts], 'f', 3).replace('.', ','));
+     }
+    Compare(e, "barre d'état", s->StatusBar->Panels->Items[0]->Text, Detail);
+    return e.join('\n');
+   };
+  // Interruption, « Oui » au bilan : fiche modale
+  QPoint Depart;
+  QString e;
+  bool Modale=false;
+  QuandModale([]() { return frmStatsAttenteTrafic; }, [&]()
+   {
+    TfrmStatsAttenteTrafic *f=frmStatsAttenteTrafic;
+    Modale=(QApplication::activeModalWidget()==f);
+    QStringList Ecarts;
+    auto Etape=[&Ecarts](const QString &Nom, const QString &Ecart) { if (!Ecart.isEmpty()) Ecarts<<(Nom+" :\n"+Ecart); };
+    Compare(Ecarts, "titre", f->Caption, QString::fromUtf8("Statistiques de fluidité et de trafic au tour n°%1").arg(cv->TourCrt));
+    if (f->AvecMenuContextuel::PopupMenu!=f->PopupMenu) Ecarts<<QString::fromUtf8("menu contextuel de la fiche non relié");
+    // Curseur sur une case de route où le trafic n'est pas nul, dans la vue
+    for(int y=2; (y<cv->NbY-2)&&Depart.isNull(); y++)
+     for(int x=2; (x<cv->NbX-2)&&Depart.isNull(); x++)
+      {
+       voie *v=&cv->v[x][y];
+       if ((v->DirPoss>aucune)&&!v->NumParking&&v->Trafic&&v->Trafic[0][0]&&
+           g->viewport()->rect().contains(g->CellRect(x+1, y+1).Qt()))
+        Depart=QPoint(x, y);
+      }
+    if (Depart.isNull()) Ecarts<<QString::fromUtf8("aucune case de route avec du trafic");
+    g->Col=Depart.x();
+    g->Row=Depart.y();
+    Etape("attente", Verifie(0, 0, 0));
+    CaptureFiche(f, "fiche_fluidite_trafic.png");
+    Capture("carte_fluidite_trafic.png");
+    // Trafic
+    CliqueChoix(f->RadioGroupType, 1);
+    Etape("trafic", Verifie(1, 0, 0));
+    Capture("carte_trafic.png");
+    // Trajets : parking de départ 1 puis 2, puis parking d'arrivée 1
+    Clique(f->CheckBoxParkingDepart);
+    if (!f->CSpinEditParkingDepart->isEnabled()) Ecarts<<QString::fromUtf8("parking de départ non modifiable");
+    Etape("départ 1", Verifie(1, 1, 0));
+    f->CSpinEditParkingDepart->Value=2;
+    Etape("départ 2", Verifie(1, 2, 0));
+    Clique(f->CheckBoxParkingArrivee);
+    Etape("départ 2, arrivée 1", Verifie(1, 2, 1));
+    Clique(f->CheckBoxParkingDepart);
+    Clique(f->CheckBoxParkingArrivee);
+    if (f->CSpinEditParkingDepart->isEnabled()||f->CSpinEditParkingArrivee->isEnabled()) Ecarts<<QString::fromUtf8("parkings encore modifiables");
+    CliqueChoix(f->RadioGroupType, 0);
+    Etape("attente (retour)", Verifie(0, 0, 0));
+    // Boutons de direction : droite, bas, gauche-haut ; dans les coins : bas-droite, haut-gauche
+    auto Curseur=[&Ecarts, g](const char *Nom, int x, int y)
+     {
+      if ((g->Col!=x)||(g->Row!=y))
+       Ecarts<<QString("%1 : curseur en (%2, %3) au lieu de (%4, %5)").arg(Nom).arg((int)g->Col).arg((int)g->Row).arg(x).arg(y);
+     };
+    int x=Depart.x(), y=Depart.y();
+    Clique(f->BitBtn32);
+    Curseur("BitBtn32", x+1, y);
+    Clique(f->BitBtn23);
+    Curseur("BitBtn23", x+1, y+1);
+    Clique(f->BitBtn11);
+    Curseur("BitBtn11", x, y);
+    Etape("détail de la case", Verifie(0, 0, 0));
+    Clique(f->CheckBoxCoins);
+    Clique(f->BitBtn33);
+    Curseur("BitBtn33 (coins)", g->ColCount-1, g->RowCount-1);
+    Clique(f->BitBtn11);
+    Curseur("BitBtn11 (coins)", 0, 0);
+    Clique(f->CheckBoxCoins);
+    g->Col=x;
+    g->Row=y;
+    // Touches du menu contextuel de la fiche (flèches, Origine) depuis n'importe quel contrôle ;
+    // « Zoom (-/+) » (Z) n'a plus de bouton depuis la v5.4
+    Touche(f->CheckBoxCoins, Qt::Key_Right);
+    Curseur("flèche droite", x+1, y);
+    Touche(f->CheckBoxCoins, Qt::Key_Down);
+    Curseur("flèche bas", x+1, y+1);
+    Touche(f->CheckBoxCoins, Qt::Key_Home);
+    Curseur("Origine (haut gauche)", x, y);
+    Touche(f->CheckBoxCoins, Qt::Key_Z);
+    Curseur("Z", x, y);
+    e=Ecarts.join('\n');
+    f->close(); // case de la fenêtre
+   });
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  Clique(s->ToolButtonPause);
+  QVERIFY(QTest::qWaitFor([this]() { return Etapes.empty()&&!frmStatsAttenteTrafic&&frmSimulation->Pause; }, 30000));
+  ReponseQuestions=QMessageBox::No;
+  QVERIFY2(Modale, qPrintable(Messages.join('\n')));
+  QVERIFY2(Messages.size()==1&&Messages.first().contains(QString::fromUtf8("Bilan au tour n°")), qPrintable(Messages.join('\n')));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  // Carte redessinée sans les statistiques (affichage d'avant)
+  {
+   g->Repaint();
+   QImage Image=g->viewport()->grab().toImage();
+   QRect Case=g->CellRect(Depart.x(), Depart.y()).Qt();
+   TotauxFluidite r=CalculeFluidite(0, 0);
+   QVERIFY(Image.pixel(QPoint((int)((Case.left()+8.5)*g->viewport()->devicePixelRatioF()), (int)((Case.top()+8.5)*g->viewport()->devicePixelRatioF())))!=
+           CouleurQt(CouleurFluidite(r, 0, 0, 0, &cv->v[Depart.x()][Depart.y()])).rgb());
+  }
+  // En pause, par le raccourci (Ctrl+Maj+F)
+  Modale=false;
+  e.clear();
+  QuandModale([]() { return frmStatsAttenteTrafic; }, [&]()
+   {
+    Modale=(QApplication::activeModalWidget()==frmStatsAttenteTrafic);
+    e=Verifie(0, 0, 0);
+    frmStatsAttenteTrafic->close();
+   });
+  Focalise();
+  QTest::keyClick(g, Qt::Key_F, Qt::ControlModifier|Qt::ShiftModifier);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY(Modale);
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  QVERIFY(!frmStatsAttenteTrafic);
+  // Arrêt désactivé en pause (ActionArret->Enabled=EnCours) : reprise, puis arrêt
+  QVERIFY(!s->ActionArret->Enabled);
+  QTest::mouseClick(s->ToolButtonMarche, Qt::LeftButton);
+  QVERIFY(s->SimulationEnCours);
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ficheRecherche()
+ { // Géant en simulation. Rechercher (non modale, au premier plan), ouverte par
+   // la barre d'outils sur un parking : numéros de la case ; chaque sorte
+   // d'élément fixe est retrouvée (curseur, barre d'état de la fiche) ;
+   // « Suivre » un véhicule, un piéton, un bus, un tram, un taxi, un vehlib : le
+   // curseur suit l'objet tour après tour en clignotant, et la fiche
+   // d'informations ouverte le suit aussi, sans clic de l'utilisateur
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_recherche.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(AttendTour(15, 30000));
+  TfrmSimulation *s=frmSimulation;
+  TfrmRecherche *r=frmRecherche;
+  GrilleSimulation *g=s->DrawGridSimul;
+  // Ouverture sur un parking : FormShow reprend la case et ses numéros
+  int NumParking=TrouveCase([](voie *v) { return v->NumParking; });
+  QVERIFY(NumParking>0);
+  int x0=g->Col, y0=g->Row;
+  Clique(s->ToolButtonRechercher);
+  QVERIFY(r->isVisible());
+  QVERIFY(s->ActionRechercher->Checked);
+  QVERIFY(!r->isModal()&&!QApplication::activeModalWidget());
+  QVERIFY(r->windowFlags().testFlag(Qt::WindowStaysOnTopHint));
+  QCOMPARE((int)r->CSpinEditX->Value, x0);
+  QCOMPARE((int)r->CSpinEditY->Value, y0);
+  QCOMPARE((int)r->CSpinEditParking->Value, NumParking);
+  QCOMPARE((int)r->CSpinEditParking->MaxValue, cv->NbParkings);
+  QCOMPARE((int)r->CSpinEditVehicule->MaxValue, cv->NbVehicules);
+  QCOMPARE((int)r->CSpinEditPieton->MaxValue, cv->NbPietons);
+  QCOMPARE((int)r->CSpinEditVehlib->MaxValue, cv->NbVehlibs);
+  QCOMPARE(g->Col, x0);
+  QCOMPARE(g->Row, y0);
+  // Curseur clignotant (TimerClignotementLocalisation, 250 ms)
+  QVERIFY(s->TimerClignotementLocalisation->Enabled);
+  int Tag=s->TimerClignotementLocalisation->Tag;
+  QVERIFY(QTest::qWaitFor([Tag]() { return frmSimulation->TimerClignotementLocalisation->Tag!=Tag; }, 2000));
+  //-------------------------------------------------------------------------
+  // Éléments fixes : bouton radio, puis numéro
+  struct Element
+   {
+    const char *Nom;
+    TRadioButton *Radio;
+    TCSpinEdit *Numero;
+    int Nb;
+    std::function<QString(int, int &, int &)> Attendu; // texte attendu, position (x<0 : curseur inchangé)
+   };
+  auto Trouve=[](const char *Format, int k, int x, int y) { return QString::fromUtf8(Format).arg(k).arg(x).arg(y); };
+  std::vector<Element> Elements=
+   {
+    {"parking", r->RadioButtonParking, r->CSpinEditParking, cv->NbParkings, [Trouve](int k, int &x, int &y)
+      {
+       parking *p=cv->Parking+k-1;
+       if (!p->Defini()) return QString::fromUtf8("Parking n°%1 non utilisé").arg(k);
+       x=p->x; y=p->y;
+       return Trouve("Parking n°%1 trouvé en (%2, %3)", k, x, y);
+      }},
+    {"feu", r->RadioButtonFeu, r->CSpinEditFeu, cv->NbFeux, [Trouve](int k, int &x, int &y)
+      {
+       feu *f=cv->Feu+k-1;
+       if (!f->Defini()) return QString::fromUtf8("Feu n°%1 non utilisé").arg(k);
+       x=f->x; y=f->y;
+       return Trouve("Feu n°%1 trouvé en (%2, %3)", k, x, y);
+      }},
+    {"arrêt de bus", r->RadioButtonArretBus, r->CSpinEditArretBus, cv->NbArretsBus, [Trouve](int k, int &x, int &y)
+      {
+       arret_bus *a=cv->ArretBus+k-1;
+       if (!a->Defini()) return QString::fromUtf8("Arrêt de bus n°%1 non utilisé").arg(k);
+       x=a->x; y=a->y;
+       return Trouve("Arrêt de bus n°%1 trouvé en (%2, %3)", k, x, y);
+      }},
+    {"arrêt de tram", r->RadioButtonArretTram, r->CSpinEditArretTram, cv->NbArretsTram, [Trouve](int k, int &x, int &y)
+      {
+       arret_tram *a=cv->ArretTram+k-1;
+       if (!a->Defini()) return QString::fromUtf8("Arrêt de tram n°%1 non utilisé").arg(k);
+       x=a->x; y=a->y;
+       return Trouve("Arrêt de tram n°%1 trouvé en (%2, %3)", k, x, y);
+      }},
+    {"place de taxi", r->RadioButtonPlaceTaxi, r->CSpinEditPlaceTaxi, cv->NbPlacesTaxi, [Trouve](int k, int &x, int &y)
+      {
+       place_taxi *p=cv->PlaceTaxi+k-1;
+       if (!p->Definie()) return QString(); // texte inchangé (code d'origine)
+       x=p->x; y=p->y;
+       return Trouve("Place de taxi n°%1 trouvée en (%2, %3)", k, x, y);
+      }},
+    {"file de taxis", r->RadioButtonFileTaxi, r->CSpinEditFileTaxi, cv->NbFilesTaxi, [Trouve](int k, int &x, int &y)
+      {
+       place_taxi *p=cv->PlaceTaxi+cv->FileTaxi[k-1].NumPlaceQueue;
+       x=p->x; y=p->y;
+       return Trouve("file de taxis n°%1 trouvée en (%2, %3)", k, x, y);
+      }},
+    {"place de parking", r->RadioButtonPlacePark, r->CSpinEditPlacePark, cv->NbPlacesPark, [Trouve](int k, int &x, int &y)
+      {
+       place_park *p=cv->PlacePark+k-1;
+       if (!p->Definie()) return QString();
+       x=p->x; y=p->y;
+       return Trouve("Place de parking n°%1 trouvée en (%2, %3)", k, x, y);
+      }},
+    {"file de parkings", r->RadioButtonFilePark, r->CSpinEditFilePark, cv->NbFilesPark, [Trouve](int k, int &x, int &y)
+      {
+       place_park *p=cv->PlacePark+cv->FilePark[k-1].NumPlaceQueue;
+       x=p->x; y=p->y;
+       return Trouve("file de parkings n°%1 trouvée en (%2, %3)", k, x, y);
+      }},
+    {"place de vehlib", r->RadioButtonPlaceVehlib, r->CSpinEditPlaceVehlib, cv->NbPlacesVehlib, [Trouve](int k, int &x, int &y)
+      {
+       place_vehlib *p=cv->PlaceVehlib+k-1;
+       if (!p->Definie()) return QString();
+       x=p->x; y=p->y;
+       return Trouve("Place de vehlib n°%1 trouvée en (%2, %3)", k, x, y);
+      }},
+   };
+  for(const Element &el : Elements)
+   {
+    QVERIFY2(el.Nb>0, el.Nom);
+    std::vector<int> Numeros={el.Nb, 1, (el.Nb+1)/2};
+    for(std::size_t i=0; i<Numeros.size(); i++)
+     {
+      int k=Numeros[i], x=-1, y=-1;
+      QString Avant=Q(r->StatusBar->SimpleText);
+      int ColAvant=g->Col, RowAvant=g->Row;
+      if (!i)
+       { // Le bouton radio active le numéro et recherche l'élément du numéro affiché
+        el.Numero->Value=k;
+        Clique(el.Radio);
+        QVERIFY2(el.Radio->Checked&&el.Numero->isEnabled()&&!r->CSpinEditX->isEnabled(), el.Nom);
+       }
+      else
+       el.Numero->Value=k;
+      QString Texte=el.Attendu(k, x, y);
+      if (Texte.isEmpty()) { Texte=Avant; x=ColAvant; y=RowAvant; }
+      QCOMPARE(Q(r->StatusBar->SimpleText), Texte);
+      if (x>=0) { QCOMPARE(g->Col, x); QCOMPARE(g->Row, y); }
+     }
+   }
+  // Numéro hors des éléments définis (MaxValue suit la carte) : sans effet sur le curseur
+  // Coordonnées
+  Clique(r->RadioButtonCoordonnees);
+  QVERIFY(r->CSpinEditX->isEnabled()&&r->CSpinEditY->isEnabled()&&!r->CSpinEditVehlib->isEnabled());
+  QCOMPARE(g->Col, (int)r->CSpinEditX->Value);
+  QCOMPARE(g->Row, (int)r->CSpinEditY->Value);
+  QCOMPARE(Q(r->StatusBar->SimpleText), QString());
+  r->CSpinEditX->Value=7;
+  r->CSpinEditY->Value=5;
+  QCOMPARE(g->Col, 7);
+  QCOMPARE(g->Row, 5);
+  // Clignotement : sur un immeuble (rien n'y bouge), le curseur n'est dessiné
+  // qu'une fois sur deux (Tag du minuteur)
+  QPoint Vide;
+  for(int y=1; (y<20)&&Vide.isNull(); y++)
+   for(int x=1; (x<30)&&Vide.isNull(); x++)
+    {
+     voie *v=&cv->v[x][y];
+     if (!v->DirPoss&&!v->SensVoieTram&&!v->NumParking&&!v->NbPietons&&(NATURE(v)==immeubles)) Vide=QPoint(x, y);
+    }
+  QVERIFY(!Vide.isNull());
+  r->CSpinEditX->Value=Vide.x();
+  r->CSpinEditY->Value=Vide.y();
+  QVERIFY(g->viewport()->rect().contains(g->CellRect(Vide.x(), Vide.y()).Qt()));
+  auto CaseCourante=[g]() { return g->viewport()->grab(g->CellRect(g->Col, g->Row).Qt()).toImage(); };
+  QVERIFY(QTest::qWaitFor([]() { return frmSimulation->TimerClignotementLocalisation->Tag==1; }, 2000));
+  QImage Allume=CaseCourante();
+  QVERIFY(QTest::qWaitFor([]() { return frmSimulation->TimerClignotementLocalisation->Tag==0; }, 2000));
+  QImage Eteint=CaseCourante();
+  QVERIFY(Allume!=Eteint);
+  QVERIFY(QTest::qWaitFor([]() { return frmSimulation->TimerClignotementLocalisation->Tag==1; }, 2000));
+  QVERIFY(CaseCourante()==Allume);
+  //-------------------------------------------------------------------------
+  // Objets mobiles : « Suivre » sur l'objet de la case (raccourci ou menu), puis
+  // fiche d'informations ; chaque tour, curseur et fiche sur l'objet suivi
+  struct Mobile
+   {
+    const char *Nom;
+    std::function<int(voie *)> Numero; // objet de la case
+    std::function<void()> Suivre; // « Suivre... » (case courante)
+    TRadioButton *Radio;
+    TCSpinEdit *Spin;
+    std::function<bool(int, int &, int &, QString &)> Attendu; // position (faux : hors de la carte) et texte attendus
+    TForm *Infos;
+    std::function<void()> OuvreInfos;
+    std::function<QString(int, int, int)> EcartInfos; // la fiche montre l'objet n en (x, y)
+    int NbTours;
+    const char *Capture;
+   };
+  auto Touches=[](Qt::Key Touche, Qt::KeyboardModifiers m) { return [Touche, m]() { QTest::keyClick(frmSimulation->DrawGridSimul, Touche, m); }; };
+  auto Groupe=[](TGroupBox *b, int n, int x, int y) -> QString
+   {
+    QStringList e;
+    Compare(e, "cadre", b->Caption, Cadre(n, x, y));
+    return e.join('\n');
+   };
+  std::vector<Mobile> Mobiles=
+   {
+    {"véhicule", [](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; },
+     Touches(Qt::Key_S, Qt::ControlModifier), r->RadioButtonVehicule, r->CSpinEditVehicule,
+     [](int n, int &x, int &y, QString &t)
+      {
+       vehicule *v=cv->Vehicule+n-1;
+       if (!v->Defini()) { t=QString::fromUtf8("Véhicule n°%1 non utilisé").arg(n); return false; }
+       x=v->x; y=v->y;
+       t=QString::fromUtf8("Véhicule n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+       return cv->v[x][y].NumVehicule==n;
+      },
+     frmInfosVehicule, Touches(Qt::Key_V, Qt::ControlModifier),
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosVehicule->GroupBoxVehicule, n, x, y); }, 8, nullptr},
+    {"piéton", [](voie *v) { return v->NumPieton[0]; },
+     Touches(Qt::Key_L, Qt::ControlModifier), r->RadioButtonPieton, r->CSpinEditPieton,
+     [](int n, int &x, int &y, QString &t)
+      { // Dans un taxi ou un vehlib, le texte (et, pour un vehlib, la position) vient de cv->Bus (code d'origine)
+       pieton *p=cv->Pieton+n-1;
+       if (p->Defini())
+        {
+         x=p->x; y=p->y;
+         t=QString::fromUtf8("Piéton n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+         return (cv->v[x][y].NumPieton[0]==n)||(cv->v[x][y].NumPieton[1]==n);
+        }
+       if (!p->NumBus&&!p->NumTaxi&&!p->NumVehlib) { t=QString::fromUtf8("Piéton n°%1 non utilisé").arg(n); return false; }
+       auto Dans=[&t, n](const char *Quoi, int Num, int xb, int yb)
+        { t=QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(n).arg(Quoi).arg(Num).arg(xb).arg(yb); };
+       if (p->NumBus) { x=cv->Bus[p->NumBus-1].x; y=cv->Bus[p->NumBus-1].y; Dans("bus", p->NumBus, x, y); }
+       if (p->NumTaxi)
+        {
+         x=cv->Taxi[p->NumTaxi-1].x; y=cv->Taxi[p->NumTaxi-1].y;
+         if (p->NumTaxi<=cv->NbBus) Dans("taxi", p->NumTaxi, cv->Bus[p->NumTaxi-1].x, cv->Bus[p->NumTaxi-1].y);
+         else t.clear(); // lecture hors de cv->Bus dans l'original : texte non vérifié
+        }
+       if (p->NumVehlib)
+        {
+         if (p->NumVehlib>cv->NbBus) { t.clear(); return false; }
+         x=cv->Bus[p->NumVehlib-1].x; y=cv->Bus[p->NumVehlib-1].y;
+         Dans("vehlib", p->NumVehlib, x, y);
+        }
+       return false; // fiche d'informations non vérifiée (cadre en coordonnées de cv->Bus, lot 2)
+      },
+     frmInfosPieton, Touches(Qt::Key_P, Qt::ControlModifier),
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosPieton->GroupBoxPieton, n, x, y); }, 8, nullptr},
+    {"bus", [](voie *v) { return v->NumBus; },
+     Touches(Qt::Key_W, Qt::ControlModifier), r->RadioButtonBus, r->CSpinEditBus,
+     [](int n, int &x, int &y, QString &t)
+      {
+       bus *b=cv->Bus+n-1;
+       if (!b->Defini()) { t=QString::fromUtf8("Bus n°%1 au dépôt").arg(n); return false; }
+       x=b->x; y=b->y;
+       t=QString::fromUtf8("Bus n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+       return cv->v[x][y].NumBus==n;
+      },
+     frmInfosBus, Touches(Qt::Key_B, Qt::ControlModifier),
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosBus->GroupBoxBus, n, x, y); }, 6, nullptr},
+    {"tram", [](voie *v) { return v->NumTram; },
+     Touches(Qt::Key_X, Qt::ControlModifier), r->RadioButtonTram, r->CSpinEditTram,
+     [](int n, int &x, int &y, QString &t)
+      {
+       tram *m=cv->Tram+n-1;
+       if (!m->Defini()) { t=QString::fromUtf8("Tram n°%1 non utilisé").arg(n); return false; }
+       x=m->x; y=m->y;
+       t=QString::fromUtf8("Tram n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+       return cv->v[x][y].NumTram==n;
+      },
+     frmInfosTram, [s]() { s->MenuItemDetailTram->ElementQt()->trigger(); },
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosTram->GroupBoxTram, n, x, y); }, 6, nullptr},
+    {"taxi", [](voie *v) { return v->NumTaxi; },
+     Touches(Qt::Key_Y, Qt::ControlModifier), r->RadioButtonTaxi, r->CSpinEditTaxi,
+     [](int n, int &x, int &y, QString &t)
+      {
+       taxi *m=cv->Taxi+n-1;
+       x=m->x; y=m->y;
+       t=QString::fromUtf8("Taxi n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+       return (x>=0)&&(y>=0)&&(cv->v[x][y].NumTaxi==n);
+      },
+     frmInfosTaxi, Touches(Qt::Key_I, Qt::ControlModifier),
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosTaxi->GroupBoxTaxi, n, x, y); }, 6, nullptr},
+    {"vehlib", [](voie *v) { return v->NumVehlib; },
+     Touches(Qt::Key_E, Qt::ControlModifier|Qt::ShiftModifier), // menu contextuel de la carte, avant Statistiques | Parkings (même raccourci)
+     r->RadioButtonVehlib, r->CSpinEditVehlib,
+     [](int n, int &x, int &y, QString &t)
+      {
+       vehlib *m=cv->Vehlib+n-1;
+       x=m->x; y=m->y;
+       t=QString::fromUtf8("Vehlib n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
+       return (x>=0)&&(y>=0)&&(cv->v[x][y].NumVehlib==n);
+      },
+     frmInfosVehlib, Touches(Qt::Key_E, Qt::ControlModifier),
+     [Groupe](int n, int x, int y) { return Groupe(frmInfosVehlib->GroupBoxVehlib, n, x, y); }, 6, "fiche_recherche.png"},
+   };
+  for(const Mobile &m : Mobiles)
+   {
+    // Plus d'objet suivi (coordonnées), puis « Suivre » sur un objet de la carte,
+    // trouvé et suivi sans laisser passer de tour
+    Clique(r->RadioButtonCoordonnees);
+    int n=0;
+    for(int Essai=0; (Essai<5)&&!n; Essai++)
+     {
+      int k=TrouveCase(m.Numero);
+      QVERIFY2(k>0, m.Nom);
+      m.Suivre();
+      if (m.Radio->Checked&&(m.Spin->Value==k)) n=k;
+     }
+    QVERIFY2(n>0, m.Nom);
+    QVERIFY(r->isVisible());
+    QVERIFY(m.Spin->isEnabled()&&!r->CSpinEditX->isEnabled());
+    // Fiche d'informations ouverte sur l'objet suivi
+    Focalise();
+    m.OuvreInfos();
+    QVERIFY2(m.Infos->isVisible(), m.Nom);
+    int NbVerifies=0;
+    for(int i=0; i<m.NbTours; i++)
+     {
+      long Tour=cv->TourCrt;
+      QVERIFY(AttendTour(Tour+1, 10000));
+      int x=-1, y=-1;
+      QString Texte;
+      bool SurLaCarte=m.Attendu(n, x, y, Texte);
+      QString Contexte=QString("%1 n°%2, tour %3").arg(QString::fromUtf8(m.Nom)).arg(n).arg(cv->TourCrt);
+      if (!Texte.isEmpty()) QVERIFY2(Q(r->StatusBar->SimpleText)==Texte, qPrintable(Contexte+" : « "+Q(r->StatusBar->SimpleText)+" » au lieu de « "+Texte+" »"));
+      if (x>=0)
+       QVERIFY2((g->Col==x)&&(g->Row==y), qPrintable(Contexte+QString(" : curseur en (%1, %2) au lieu de (%3, %4)").arg((int)g->Col).arg((int)g->Row).arg(x).arg(y)));
+      if (!SurLaCarte) continue;
+      QString e=m.EcartInfos(n, x, y);
+      QVERIFY2(e.isEmpty(), qPrintable(Contexte+" (fiche d'informations) :\n"+e));
+      NbVerifies++;
+     }
+    QVERIFY2(NbVerifies>0, m.Nom);
+    if (m.Capture) CaptureFiche(r, m.Capture);
+    Focalise();
+    m.Infos->Close();
+    QVERIFY(!m.Infos->isVisible());
+   }
+  // « Vu » (bouton Cancel : Échap) : fin du clignotement
+  Touche(r->ButtonAide, Qt::Key_Escape);
+  QVERIFY(!r->isVisible());
+  QVERIFY(!s->ActionRechercher->Checked);
+  QVERIFY(!s->TimerClignotementLocalisation->Enabled);
+  // Suivre un véhicule rouvre la fiche
+  int n=0;
+  for(int Essai=0; (Essai<5)&&!n; Essai++)
+   {
+    int k=TrouveCase([](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; });
+    QVERIFY(k>0);
+    s->MenuItemSuivreCeVehicule->ElementQt()->trigger();
+    if (r->RadioButtonVehicule->Checked&&(r->CSpinEditVehicule->Value==k)) n=k;
+   }
+  QVERIFY(n>0);
+  QVERIFY(r->isVisible());
+  QVERIFY(s->ActionRechercher->Checked);
+  Clique(r->ButtonAnnuler);
+  QVERIFY(!r->isVisible());
+  QVERIFY(!s->ActionRechercher->Checked);
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()
