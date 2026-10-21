@@ -165,7 +165,10 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
   cocher, boutons radio, curseurs) prennent le focus au clic comme sous
   Windows, y compris sous macOS, où Qt ne le leur donne qu'à la tabulation :
   sinon, cliquer sur OK ne ferait pas sortir du champ et la valeur tapée ne
-  serait pas ramenée dans les bornes.
+  serait pas ramenée dans les bornes. Sous macOS, le contrôle cliqué garde
+  donc l'anneau de focus, et Tab passe aussi par les boutons, cases et
+  boutons radio, comme sous Windows, même sans l'accès clavier complet du
+  système.
 - `graphiques.*` : `TColor`, `TRect` (bords droit et bas exclus), `TCanvas`
   sur `QPainter` ; `listeimages.*` : `TVirtualImageList` (indices `IDB_*`
   inchangés), images agrandies sans lissage en HiDPI.
