@@ -106,3 +106,36 @@ elseif(APPLE)
 elseif(MINGW)
   target_link_options(cvw PRIVATE -Wl,--stack,16777216)
 endif()
+
+# Aide HTML (phase 7) : docs/guide -> html/ et docs/tutorial -> tutocv/, à côté
+# de l'exécutable comme dans l'installeur d'origine ({app}\bin\html,
+# {app}\bin\tutocv) ; sous macOS, dans Contents/Resources du paquet (voir
+# stRepAide dans base.cpp). Recopiée quand docs/ change, dossiers vidés
+# d'abord : la compilation a la même aide que l'installation.
+get_property(CV_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+set(CV_DOSSIER_CVW ${CMAKE_CURRENT_BINARY_DIR})
+if(CV_MULTI_CONFIG)
+  string(APPEND CV_DOSSIER_CVW "/$<CONFIG>")
+endif()
+if(APPLE)
+  set(CV_DOSSIER_AIDE "${CV_DOSSIER_CVW}/cvw.app/Contents/Resources")
+else()
+  set(CV_DOSSIER_AIDE "${CV_DOSSIER_CVW}")
+endif()
+file(GLOB_RECURSE CV_FICHIERS_AIDE CONFIGURE_DEPENDS
+  ${PROJECT_SOURCE_DIR}/docs/guide/*
+  ${PROJECT_SOURCE_DIR}/docs/tutorial/*
+)
+add_custom_command(OUTPUT "${CV_DOSSIER_CVW}/aide.stamp"
+  COMMAND ${CMAKE_COMMAND} -E rm -rf "${CV_DOSSIER_AIDE}/html" "${CV_DOSSIER_AIDE}/tutocv"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/docs/guide "${CV_DOSSIER_AIDE}/html"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/docs/tutorial "${CV_DOSSIER_AIDE}/tutocv"
+  COMMAND ${CMAKE_COMMAND} -E touch "${CV_DOSSIER_CVW}/aide.stamp"
+  DEPENDS ${CV_FICHIERS_AIDE}
+  COMMENT "Aide HTML de cvw (html/, tutocv/)"
+  VERBATIM
+)
+add_custom_target(cvw_aide DEPENDS "${CV_DOSSIER_CVW}/aide.stamp")
+add_dependencies(cvw cvw_aide)
+# Pour les tests (tests/app/test_aide.cpp)
+set_target_properties(cvw PROPERTIES CV_DOSSIER_AIDE "${CV_DOSSIER_AIDE}")

@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QUrl>
@@ -239,12 +240,51 @@ int MessageDlg(const AnsiString asMessage, TMsgDlgType Type, TMsgDlgButtons Bout
   return mrCancel;
  }
 //---------------------------------------------------------------------------
+// portage : dossier de l'aide (ExtractFilePath(ParamStr(0)) de l'original) :
+// html/ et tutocv/ sont à côté de l'exécutable, comme dans l'installeur
+// d'origine ({app}\bin). Sous macOS, ils sont dans Contents/Resources du
+// paquet : Contents/MacOS ne doit contenir que du code (signature du paquet).
+//---------------------------------------------------------------------------
+String stRepAide()
+ {
+  QString stRep = QCoreApplication::applicationDirPath();
+#ifdef Q_OS_MACOS
+  if (stRep.endsWith("/Contents/MacOS"))
+	stRep = QDir::cleanPath(stRep+"/../Resources");
+#endif
+  return A(stRep+"/");
+ }
+//---------------------------------------------------------------------------
 // v5.4 : procédure privée (base.cpp) pour afficher une page HTML
-// portage : registre + CreateProcess -> QDesktopServices::openUrl (phase 7)
+// portage : registre + CreateProcess -> QDesktopServices::openUrl. Le système
+// ouvre une adresse file:// comme un document et en perd l'ancre #... (macOS :
+// constaté ; xdg-open hors GNOME et KDE la retire). Pour une telle adresse, on
+// ouvre une page de redirection, écrite dans le dossier temporaire, qui charge
+// l'adresse complète : le navigateur arrive ainsi à l'ancre, comme avec
+// l'original qui passait l'adresse au navigateur sur sa ligne de commande.
 //---------------------------------------------------------------------------
 void AffichePageHtml(const String stURL)
  {
-  QDesktopServices::openUrl(QUrl(Q(stURL)));
+  QUrl Url(Q(stURL));
+  if (Url.isLocalFile()&&Url.hasFragment())
+   {
+	QString stAncre = Url.fragment();
+	stAncre.replace(QRegularExpression("[^A-Za-z0-9_-]"), "_");
+	QFile f(QDir(QDir::tempPath()).filePath("cvw-aide-"+stAncre+".html"));
+	if (f.open(QIODevice::WriteOnly|QIODevice::Truncate))
+	 {
+	  // ' encodé : l'adresse est entre apostrophes dans content="0; url='...'"
+	  QString stCible = Url.toString(QUrl::FullyEncoded).replace("'", "%27").toHtmlEscaped();
+	  f.write(QString("<!DOCTYPE html>\n"
+					  "<html><head><meta charset=\"utf-8\">\n"
+					  "<meta http-equiv=\"refresh\" content=\"0; url='%1'\">\n"
+					  "<title>Centre-Ville</title></head>\n"
+					  "<body><a href=\"%1\">Aide de Centre-Ville</a></body></html>\n").arg(stCible).toUtf8());
+	  f.close();
+	  Url = QUrl::fromLocalFile(f.fileName());
+	 }
+   }
+  QDesktopServices::openUrl(Url);
  }
 //---------------------------------------------------------------------------
 void AfficheAideContextuelle(QWidget *Form)
@@ -253,7 +293,7 @@ void AfficheAideContextuelle(QWidget *Form)
   for(int i=0; i<NBCONTEXTESAIDE; i++)
 	if (caCorresp[i].Numero==HelpContext) // On recherche la rubrique HelpContext dans le tableau caCorresp
 	 { // v5.4 : conversion BCB6>BCBX (L"open" + String)
-	  String stURL = A(QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html").toString())+
+	  String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString())+
 					 String("#")+
 					 String(caCorresp[i].szHREF);
 	  AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
@@ -265,13 +305,13 @@ void AfficheIndexAide(QWidget *Form)
  {// v5.3 : conversion HLP > HTML
   // v5.4 : Conversion BCB6>BCBX (String + L"open")
   (void)Form;
-  String stURL = A(QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html").toString());
+  String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString());
   AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
  }
 //---------------------------------------------------------------------------
 void AfficheTutoriel() // v5.4 (appelée par TfrmSimulation::ActionTutorielExecute
  {
-  String stURL = A(QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/tutocv/index.html").toString());
+  String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"tutocv/index.html").toString());
   AffichePageHtml(stURL);
  }
 //---------------------------------------------------------------------------
