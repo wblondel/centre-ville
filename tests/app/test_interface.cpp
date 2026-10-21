@@ -299,7 +299,8 @@ int main(int argc, char *argv[])
   QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
   QApplication App(NbArgsApplication, ArgsApplication.data());
   InitialiseApplication(App);
-  ArgumentsTest<<QString::fromLocal8Bit(argv[0])<<QDir::toNativeSeparators(Copie)<<Origine;
+  // Carte : le chemin tel que passé à l'application (ParamStr(1), affiché tel quel dans le titre)
+  ArgumentsTest<<QString::fromLocal8Bit(argv[0])<<Copie<<Origine;
   DossierCaptures=qEnvironmentVariable("CV_DOSSIER_CAPTURES");
   TestInterface t;
   return QTest::qExec(&t, argc, argv);
