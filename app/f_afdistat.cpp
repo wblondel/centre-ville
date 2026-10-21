@@ -1,33 +1,84 @@
 //---------------------------------------------------------------------------
-// f_afdistat.cpp - Portage de Centre-Ville : FICHE NON PORTÉE (sprint 2)
-//
-// La fiche est créée comme dans l'original et affichée telle que générée par
-// tools/dfm2ui.py depuis src/f_afdistat.dfm, mais sans son code : aucun
-// gestionnaire d'événement n'est connecté, et les méthodes appelées par les
-// autres fiches ou par le moteur ne font rien. Le portage de src/f_afdistat.cpp
-// est prévu en phase 6 de PLAN_PORTAGE.md.
+#include "vcl/fiche.h" // portage : remplace <vcl.h>
+//#pragma hdrstop // portage
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "simul.h"
 #include "f_afdistat.h"
-#include "ui_f_afdistat.h"
-#include "f_afdistat_composants.h"
+#include "f_simul.h"
+//---------------------------------------------------------------------------
+#include "ui_f_afdistat.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
+#include "f_afdistat_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
 TfrmAffDistArretsTram *frmAffDistArretsTram;
 //---------------------------------------------------------------------------
-TfrmAffDistArretsTram::TfrmAffDistArretsTram(TComponent* Owner) : TForm(Owner)
+const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
+//---------------------------------------------------------------------------
+TfrmAffDistArretsTram::TfrmAffDistArretsTram(TComponent* Owner) : TForm(Owner) { ChargeFiche(); } // portage : chargement du .dfm, puis OnCreate
+//---------------------------------------------------------------------------
+void TfrmAffDistArretsTram::EffaceInfos()
  {
-  ChargeFiche();
-  
+  int i,
+      NbCol=StringGridDistances->ColCount,
+      NbLig=StringGridDistances->RowCount,
+      NbCases=NbCol*NbLig;
+  for(i=0; i<NbCases; i++) StringGridDistances->Cells[i%NbCol][i/NbCol]="";
  }
 //---------------------------------------------------------------------------
+void TfrmAffDistArretsTram::RafraichitInfos()
+ {
+  int i, NbCases, NbX, de,
+      x=frmSimulation->DrawGridSimul->Col,
+      y=frmSimulation->DrawGridSimul->Row;
+  voie *v=&(cv->v[x][y]);
+  EffaceInfos();
+  if (!v->DistArretTram) return;
+  NbCases=(NbX=1+v->NbDirPossSensVoieTram(indefinie))*(1+cv->NbArretsTram);
+  Caption="Arrêts tram "+Format(asFormatCoord, ARRAYOFCONST((x, y)));
+  for(i=0; i<NbCases; i++)
+   {
+    if (i)
+     {
+      if (!(i%NbX)) StringGridDistances->Cells[i%NbX][i/NbX]=Format("%5d", ARRAYOFCONST((i/NbX)));
+      if (i&&(i<NbX)) StringGridDistances->Cells[i%NbX][i/NbX]=asDir1[v->DirSensVoieTram(indefinie, i%NbX-1)];
+	  if ((i%NbX)&&(i>=NbX)) // v5.4 : conversion BCB6>BCBX (AnsiString>String)
+	   StringGridDistances->Cells[i%NbX][i/NbX]=((de=v->DistArretTram[i/NbX-1][i%NbX-1])==DIST_INDEFINIE)?String("     "):Format("%5d", ARRAYOFCONST((de)));
+	 }
+   }
+ }
+//---------------------------------------------------------------------------
+void TfrmAffDistArretsTram::FormShow(TObject *Sender)
+{
+ frmSimulation->ActionDistancesArretsTram->Checked=true;
+ StringGridDistances->RowCount=1+cv->NbArretsTram;
+ Height=(cv->NbArretsTram>10)?283:(26+21*StringGridDistances->RowCount);
+ RafraichitInfos();
+}
+//---------------------------------------------------------------------------
+void TfrmAffDistArretsTram::FormHide(TObject *Sender)
+{
+ frmSimulation->ActionDistancesArretsTram->Checked=false;
+}
+//---------------------------------------------------------------------------
+
+void TfrmAffDistArretsTram::FormKeyDown(TObject *Sender,
+      WORD &Key, TShiftState Shift)
+{// v5.3 (nécessite TForm:KeyPreview à true)
+ if (Key==112)
+   AfficheAideContextuelle(this);
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+// portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
+//---------------------------------------------------------------------------
+#define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire) Connecte(Composant->Evenement, this, &TfrmAffDistArretsTram::Gestionnaire);
 void TfrmAffDistArretsTram::ChargeFiche()
  {
   Ui::frmAffDistArretsTram().setupUi(this);
   LieurComposants Lieur(this, "f_afdistat", Composants);
   COMPOSANTS_frmAffDistArretsTram(LIE_COMPOSANT)
   FinChargement(Lieur);
+  EVENEMENTS_frmAffDistArretsTram(CONNECTE_EVENEMENT)
+  if (OnCreate) OnCreate(this);
  }
-//---------------------------------------------------------------------------
-void TfrmAffDistArretsTram::EffaceInfos() {}
-//---------------------------------------------------------------------------
-void TfrmAffDistArretsTram::RafraichitInfos() {}
 //---------------------------------------------------------------------------
