@@ -44,7 +44,11 @@
 //     ramenés dans les bornes en quittant le champ ;
 //   - couche VCL : TCSpinEdit comme CSPIN.pas (MinValue/MaxValue sans effet ni
 //     OnChange, Value= borné, frappe non bornée jusqu'à la sortie du champ,
-//     flèches, EditorEnabled).
+//     flèches, EditorEnabled) ;
+//   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
+//     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
+//     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
+//     ancres sont vérifiées par test_aide.cpp).
 // Les fiches modales sont pilotées par des étapes (QuandModale) : l'action
 // prévue est exécutée quand la fiche attendue devient la fiche modale active.
 // Les captures de la fenêtre principale et des fiches sont écrites dans le
@@ -54,6 +58,7 @@
 #include <QAbstractButton>
 #include <QApplication>
 #include <QCheckBox>
+#include <QDesktopServices>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -70,6 +75,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
+#include <QUrl>
 #include <deque>
 #include <fstream>
 #include <sstream>
@@ -316,6 +322,14 @@ class TestInterface : public QObject
     frmSimulation->DrawGridSimul->setFocus();
     QApplication::processEvents();
    }
+  QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
+  QUrl AdresseAide(const QUrl &Url)
+   { // Aide contextuelle : adresse que charge la page de redirection (base.cpp)
+    QRegularExpressionMatch m=QRegularExpression("url='([^']*)'").match(QString::fromUtf8(Contenu(Url.toLocalFile())));
+    return m.hasMatch()?QUrl(m.captured(1)):Url;
+   }
+  public slots:
+  void UrlOuverte(const QUrl &Url) { UrlsOuvertes<<Url; }
   private slots:
   void initTestCase();
   void init();
@@ -343,6 +357,8 @@ class TestInterface : public QObject
   void ficheRecherche();
   // Couche VCL
   void controleCSpinEdit();
+  // Services système (phase 7)
+  void aideContextuelle();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -2998,6 +3014,58 @@ void TestInterface::controleCSpinEdit()
   z->setProperty("vclMaxValue", 32);
   z->PrepareVcl();
   QCOMPARE(z->findChild<QLineEdit *>()->text(), QString("0"));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::aideContextuelle()
+ { // F1 ouvre l'aide à la rubrique du HelpContext de la fiche (fiche principale,
+   // Rechercher non modale, Paramètres modale), comme le bouton Aide des fiches ;
+   // Alt+Maj+F1 et le menu Sommaire ouvrent le sommaire, le menu Tutoriel le
+   // tutoriel. La rubrique passe par une page de redirection (base.cpp)
+  QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
+  QString stDossier=QCoreApplication::applicationDirPath();
+  auto Rubrique=[&stDossier](const char *Ancre)
+   {
+    QUrl u=QUrl::fromLocalFile(stDossier+"/html/index.html");
+    u.setFragment(Ancre);
+    return u;
+   };
+  QVERIFY(!OuvreDemo("aide.cvw").isEmpty());
+  Focalise();
+  UrlsOuvertes.clear();
+  QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_F1);
+  QCOMPARE(UrlsOuvertes.size(), 1);
+  QVERIFY(!UrlsOuvertes[0].hasFragment());
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLI")); // HelpContext 30
+  UrlsOuvertes.clear();
+  QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_F1, Qt::AltModifier|Qt::ShiftModifier);
+  frmSimulation->ActionSommaire->Execute();
+  frmSimulation->ActionTutoriel->Execute();
+  QUrl Sommaire=QUrl::fromLocalFile(stDossier+"/html/index.html");
+  QCOMPARE(UrlsOuvertes, QList<QUrl>({Sommaire, Sommaire, QUrl::fromLocalFile(stDossier+"/tutocv/index.html")}));
+  // Rechercher (non modale) : F1 dans un champ, puis le bouton Aide
+  frmSimulation->ActionRechercher->Execute();
+  QVERIFY(frmRecherche->isVisible());
+  UrlsOuvertes.clear();
+  Touche(frmRecherche->CSpinEditX, Qt::Key_F1);
+  Clique(frmRecherche->ButtonAide);
+  QCOMPARE(UrlsOuvertes.size(), 2);
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("RDUEDLS")); // HelpContext 65
+  QCOMPARE(AdresseAide(UrlsOuvertes[1]), Rubrique("RDUEDLS"));
+  Clique(frmRecherche->ButtonAnnuler);
+  QVERIFY(!frmRecherche->isVisible());
+  // Paramètres (modale) : F1, puis Annuler
+  UrlsOuvertes.clear();
+  QuandModale([]() { return frmParamSimul; }, [this]()
+   {
+    Touche(frmParamSimul->CSpinEditDureeVert, Qt::Key_F1);
+    Clique(frmParamSimul->ButtonAnnuler);
+   });
+  Clique(frmSimulation->ToolButtonParametres);
+  QVERIFY(!frmParamSimul); // créée à chaque ouverture, libérée à la fermeture
+  QCOMPARE(UrlsOuvertes.size(), 1);
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLS")); // HelpContext 311
+  QVERIFY(Messages.isEmpty());
+  QDesktopServices::unsetUrlHandler("file");
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()
