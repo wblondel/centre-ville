@@ -40,7 +40,11 @@
 //     déplacement ; Rechercher : chaque sorte d'élément fixe retrouvée, et
 //     « Suivre » un véhicule, un piéton, un bus, un tram, un taxi, un vehlib :
 //     curseur clignotant sur l'objet et fiche d'informations qui le suit, tour
-//     après tour, sans clic.
+//     après tour, sans clic ; numéros tapés hors bornes (Fluidité, Rechercher),
+//     ramenés dans les bornes en quittant le champ ;
+//   - couche VCL : TCSpinEdit comme CSPIN.pas (MinValue/MaxValue sans effet ni
+//     OnChange, Value= borné, frappe non bornée jusqu'à la sortie du champ,
+//     flèches, EditorEnabled).
 // Les fiches modales sont pilotées par des étapes (QuandModale) : l'action
 // prévue est exécutée quand la fiche attendue devient la fiche modale active.
 // Les captures de la fenêtre principale et des fiches sont écrites dans le
@@ -54,6 +58,8 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileOpenEvent>
+#include <QFocusEvent>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPointer>
 #include <QPushButton>
@@ -335,6 +341,8 @@ class TestInterface : public QObject
   void fichesEvolutionEtVehicules();
   void ficheFluiditeTrafic();
   void ficheRecherche();
+  // Couche VCL
+  void controleCSpinEdit();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -2232,7 +2240,9 @@ void TestInterface::ficheFluiditeTrafic()
    // de l'afficher (Oui) : fiche modale, carte colorée case par case comme le
    // calcule le moteur (attente puis trafic), totaux, choix des trajets,
    // déplacement du curseur par les boutons et par les touches du menu
-   // contextuel de la fiche ; puis par le raccourci, toujours en pause
+   // contextuel de la fiche ; n° d'étape tapé hors bornes (message, cases
+   // sans statistique), ramené dans les bornes en quittant le champ ; puis par
+   // le raccourci, toujours en pause
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_fluidite.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
@@ -2382,6 +2392,32 @@ void TestInterface::ficheFluiditeTrafic()
     Curseur("Origine (haut gauche)", x, y);
     Touche(f->CheckBoxCoins, Qt::Key_Z);
     Curseur("Z", x, y);
+    // N° d'étape tapé hors de 0..NbParkings (frappe non bornée, comme CSPIN.pas) :
+    // « Le n° d'étape est incorrect ! » ; touches de la fiche depuis le champ :
+    // case sans statistique pour ce trajet (noire, sans détail) ; en quittant le
+    // champ, numéro ramené dans les bornes et statistiques recalculées
+    Clique(f->CheckBoxParkingDepart);
+    if (!f->CSpinEditParkingDepart->hasFocus()) Ecarts<<QString::fromUtf8("parking de départ sans le focus");
+    int NbMessages=Messages.size();
+    f->CSpinEditParkingDepart->selectAll();
+    QTest::keyClicks(f->CSpinEditParkingDepart, QString::number(10*cv->NbParkings));
+    if ((Messages.size()!=NbMessages+1)||!Messages.last().contains(QString::fromUtf8("Le n° d'étape est incorrect !")))
+     Ecarts<<QString::fromUtf8("n° d'étape hors bornes : ")+Messages.mid(NbMessages).join(" / ");
+    while (Messages.size()>NbMessages) Messages.removeLast(); // vérifié ici
+    if (f->CSpinEditParkingDepart->Value!=10*cv->NbParkings) Ecarts<<QString::fromUtf8("frappe bornée");
+    f->activateWindow(); // de nouveau active après la boîte de message, le champ ayant le focus
+    if (!QTest::qWaitFor([f]() { return QApplication::activeWindow()==f; }, 3000)||!f->CSpinEditParkingDepart->hasFocus())
+     Ecarts<<QString::fromUtf8("parking de départ sans le focus après le message");
+    Touche(f->CSpinEditParkingDepart, Qt::Key_Right);
+    Curseur("flèche droite (n° hors bornes)", x+1, y);
+    if (f->CouleurCase(x+1, y)!=0) Ecarts<<QString::fromUtf8("case colorée pour un n° hors bornes");
+    g->Repaint(); // détail de la case courante, au dessin de la case
+    Compare(Ecarts, "barre d'état (n° hors bornes)", s->StatusBar->Panels->Items[0]->Text, QString());
+    QTest::keyClick(f->CSpinEditParkingDepart, Qt::Key_Tab);
+    if (f->CSpinEditParkingDepart->hasFocus()) Ecarts<<QString::fromUtf8("parking de départ toujours actif après Tab");
+    if (f->CSpinEditParkingDepart->Value!=cv->NbParkings) Ecarts<<QString::fromUtf8("n° d'étape non ramené dans les bornes en quittant le champ");
+    Etape("départ hors bornes ramené au dernier", Verifie(0, cv->NbParkings, 0));
+    Clique(f->CheckBoxParkingDepart);
     e=Ecarts.join('\n');
     f->close(); // case de la fenêtre
    });
@@ -2430,7 +2466,9 @@ void TestInterface::ficheRecherche()
    // d'élément fixe est retrouvée (curseur, barre d'état de la fiche) ;
    // « Suivre » un véhicule, un piéton, un bus, un tram, un taxi, un vehlib : le
    // curseur suit l'objet tour après tour en clignotant, et la fiche
-   // d'informations ouverte le suit aussi, sans clic de l'utilisateur
+   // d'informations ouverte le suit aussi, sans clic de l'utilisateur ; hors
+   // simulation, FormShow ne borne pas un numéro resté trop grand (MaxValue=
+   // sans OnChange), et la frappe hors bornes l'est en quittant le champ
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_recherche.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
@@ -2771,6 +2809,180 @@ void TestInterface::ficheRecherche()
   QVERIFY(!r->isVisible());
   QVERIFY(!s->ActionRechercher->Checked);
   QVERIFY(Arrete());
+  //-------------------------------------------------------------------------
+  // Hors simulation (curseur immobile) : numéro resté au-dessus du nombre
+  // d'éléments (carte précédente plus grande) ; FormShow règle MaxValue
+  // d'après la carte sans le ramener dans les bornes ni déclencher OnChange,
+  // la case courante ne bouge pas. Frappe hors bornes acceptée (« n°
+  // incorrect » à chaque chiffre), ramenée dans les bornes en quittant le champ
+  int NbParkings=cv->NbParkings;
+  r->CSpinEditParking->MaxValue=NbParkings+10;
+  r->CSpinEditParking->Value=NbParkings+5;
+  QVERIFY(TrouveCase([](voie *v) { return (v->DirPoss>aucune)&&!v->NumParking?1:0; }));
+  int xc=g->Col, yc=g->Row;
+  int NbChangeParking=0;
+  TNotifyEvent ChangeParking=r->CSpinEditParking->OnChange;
+  r->CSpinEditParking->OnChange=[&NbChangeParking, ChangeParking](TObject *Sender) { NbChangeParking++; ChangeParking(Sender); };
+  s->ActionRechercher->Execute();
+  QVERIFY(r->isVisible());
+  QCOMPARE((int)r->CSpinEditParking->MaxValue, NbParkings);
+  QCOMPARE((int)r->CSpinEditParking->Value, NbParkings+5);
+  QCOMPARE(NbChangeParking, 0);
+  QCOMPARE(g->Col, xc);
+  QCOMPARE(g->Row, yc);
+  // Fiche active (qWaitForWindowActive ne suffit pas : une fenêtre outil
+  // partage l'activation de la fenêtre principale), pour le focus de ses contrôles
+  r->activateWindow();
+  QVERIFY(QTest::qWaitFor([r]() { return QApplication::activeWindow()==r; }, 3000));
+  Clique(r->RadioButtonParking);
+  QVERIFY(r->CSpinEditParking->hasFocus());
+  QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Aucune parking défini ou n° incorrect"));
+  QCOMPARE(g->Col, xc);
+  QCOMPARE(g->Row, yc);
+  QString Frappe=QString::number(100*NbParkings);
+  r->CSpinEditParking->selectAll();
+  NbChangeParking=0;
+  QTest::keyClicks(r->CSpinEditParking, Frappe);
+  QCOMPARE((int)r->CSpinEditParking->Value, 100*NbParkings);
+  QCOMPARE(NbChangeParking, (int)Frappe.size());
+  QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Aucune parking défini ou n° incorrect"));
+  QTest::keyClick(r->CSpinEditParking, Qt::Key_Tab);
+  QVERIFY(!r->CSpinEditParking->hasFocus());
+  QCOMPARE((int)r->CSpinEditParking->Value, NbParkings);
+  QCOMPARE(NbChangeParking, (int)Frappe.size()+1);
+  parking *Dernier=cv->Parking+NbParkings-1;
+  QVERIFY(Dernier->Defini());
+  QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Parking n°%1 trouvé en (%2, %3)").arg(NbParkings).arg(Dernier->x).arg(Dernier->y));
+  QCOMPARE(g->Col, Dernier->x);
+  QCOMPARE(g->Row, Dernier->y);
+  r->CSpinEditParking->OnChange=ChangeParking;
+  Clique(r->ButtonAnnuler);
+  QVERIFY(!r->isVisible());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::controleCSpinEdit()
+ { // TCSpinEdit comme CSPIN.pas, sur un champ seul : MinValue et MaxValue sont
+   // de simples champs (ni le texte ni OnChange ne bougent) ; Value=... est
+   // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
+   // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
+   // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
+   // le texte reste vide ; flèches : Value±Increment, borné ; sans bornes si
+   // MinValue=MaxValue ; EditorEnabled=False : flèches seulement
+  QWidget Fiche;
+  TCSpinEdit *s=new TCSpinEdit(&Fiche);
+  TButton *b=new TButton(&Fiche);
+  s->setGeometry(8, 8, 60, 22);
+  b->setGeometry(8, 40, 75, 25);
+  QLineEdit *Texte=s->findChild<QLineEdit *>();
+  QVERIFY(Texte);
+  QVERIFY(b->focusPolicy()&Qt::ClickFocus); // le clic donne le focus (sous macOS aussi)
+  int NbChange=0;
+  s->OnChange=[&NbChange](TObject *) { NbChange++; };
+  QCOMPARE(Texte->text(), QString("0")); // Text:='0' du constructeur
+  // MinValue= et MaxValue= : sans OnChange, valeur laissée hors des bornes
+  s->MinValue=1;
+  s->MaxValue=10;
+  QCOMPARE(Texte->text(), QString("0"));
+  QCOMPARE((int)s->Value, 0);
+  s->Value=5;
+  QCOMPARE(Texte->text(), QString("5"));
+  QCOMPARE(NbChange, 1);
+  s->MaxValue=3;
+  QCOMPARE((int)s->Value, 5);
+  QCOMPARE(Texte->text(), QString("5"));
+  QCOMPARE(NbChange, 1);
+  // Value=... : CheckValue ; OnChange seulement si le texte change
+  s->Value=8;
+  QCOMPARE(Texte->text(), QString("3"));
+  QCOMPARE(NbChange, 2);
+  s->Value=3;
+  QCOMPARE(NbChange, 2);
+  s->Value=-4;
+  QCOMPARE((int)s->Value, 1);
+  QCOMPARE(NbChange, 3);
+  // Frappe hors bornes : acceptée telle quelle, OnChange à chaque caractère
+  Fiche.show();
+  Fiche.activateWindow();
+  QVERIFY(QTest::qWaitForWindowActive(&Fiche));
+  s->setFocus(Qt::MouseFocusReason);
+  QVERIFY(s->hasFocus());
+  s->selectAll();
+  NbChange=0;
+  QTest::keyClicks(s, "42x");
+  QCOMPARE(Texte->text(), QString("42"));
+  QCOMPARE((int)s->Value, 42);
+  QCOMPARE(NbChange, 2);
+  // Fenêtre désactivée : pas de CMExit
+  QFocusEvent Desactivation(QEvent::FocusOut, Qt::ActiveWindowFocusReason);
+  QCoreApplication::sendEvent(s, &Desactivation);
+  QCOMPARE(Texte->text(), QString("42"));
+  // Sortie du champ (clic sur le bouton) : ramenée dans les bornes, avec OnChange
+  QTest::mouseClick(b, Qt::LeftButton);
+  QVERIFY(b->hasFocus());
+  QCOMPARE(Texte->text(), QString("3"));
+  QCOMPARE(NbChange, 3);
+  // Texte vide : Value=MinValue, déjà dans les bornes : le texte reste vide
+  s->setFocus(Qt::MouseFocusReason);
+  s->selectAll();
+  QTest::keyClick(s, Qt::Key_Backspace);
+  QCOMPARE(Texte->text(), QString());
+  QCOMPARE((int)s->Value, 1);
+  QCOMPARE(NbChange, 4);
+  b->setFocus(Qt::TabFocusReason);
+  QCOMPARE(Texte->text(), QString());
+  QCOMPARE(NbChange, 4);
+  // Flèches (touches haut et bas, stepBy des boutons) : Value±Increment, borné
+  s->MinValue=0;
+  s->MaxValue=10;
+  s->Increment=4;
+  s->Value=5;
+  s->setFocus(Qt::MouseFocusReason);
+  QTest::keyClick(s, Qt::Key_Up);
+  QCOMPARE(Texte->text(), QString("9"));
+  QTest::keyClick(s, Qt::Key_Up);
+  QCOMPARE(Texte->text(), QString("10"));
+  QTest::keyClick(s, Qt::Key_Down);
+  QCOMPARE(Texte->text(), QString("6"));
+  s->stepBy(-1);
+  s->stepBy(-1);
+  QCOMPARE(Texte->text(), QString("0"));
+  // depuis une valeur tapée hors bornes : Value (non borné) + Increment, puis borné
+  s->selectAll();
+  QTest::keyClicks(s, "-9");
+  QCOMPARE((int)s->Value, -9);
+  QTest::keyClick(s, Qt::Key_Up);
+  QCOMPARE(Texte->text(), QString("0"));
+  // MinValue=MaxValue : aucune borne, ni à l'affectation ni en sortant
+  s->MinValue=7;
+  s->MaxValue=7;
+  s->Value=-12;
+  QCOMPARE(Texte->text(), QString("-12"));
+  s->selectAll();
+  QTest::keyClicks(s, "99999");
+  b->setFocus(Qt::TabFocusReason);
+  QCOMPARE(Texte->text(), QString("99999"));
+  // EditorEnabled=False : saisie impossible, flèches actives
+  s->setProperty("vclEditorEnabled", false);
+  s->PrepareVcl();
+  s->setFocus(Qt::MouseFocusReason);
+  s->selectAll();
+  QTest::keyClicks(s, "5");
+  QCOMPARE(Texte->text(), QString("99999"));
+  QTest::keyClick(s, Qt::Key_Down);
+  QCOMPARE(Texte->text(), QString("99995"));
+  // Chargement du .dfm : Value lu après MinValue et MaxValue (CheckValue), sans
+  // OnChange ; sans Value, le texte reste « 0 », même hors des bornes
+  TCSpinEdit *d=new TCSpinEdit(&Fiche);
+  d->setProperty("vclMinValue", 1);
+  d->setProperty("vclMaxValue", 32);
+  d->setProperty("vclValue", 50);
+  d->PrepareVcl();
+  QCOMPARE((int)d->Value, 32);
+  TCSpinEdit *z=new TCSpinEdit(&Fiche);
+  z->setProperty("vclMinValue", 1);
+  z->setProperty("vclMaxValue", 32);
+  z->PrepareVcl();
+  QCOMPARE(z->findChild<QLineEdit *>()->text(), QString("0"));
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()
