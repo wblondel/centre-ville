@@ -3874,10 +3874,13 @@ void voie::DefinitNature(nature NvNature, bool Ecraser) // v3.8
  {
   int d;
   if ((!Ecraser)&&(Nature>voies)) return;
+  // portage : borne testée d'abord. L'original lisait PossDir[5] (hors du tableau) avant
+  // de constater d>ouest ; ce comportement indéfini permet à l'optimiseur de supposer
+  // d<=ouest à la sortie de la boucle : en Release, la nature n'était jamais définie
   for( d=nord;
+       (d<=ouest)&&
        ((!(DirPoss&PossDir[d]))&&
-        (!(v((direction)d)->DirPoss&InvPossDir[d])))&&
-       (d<=ouest); d++);
+        (!(v((direction)d)->DirPoss&InvPossDir[d]))); d++);
   if ((d>ouest)&&(!SensVoieTram))
    {
     if ((Nature!=trottoirs)||
