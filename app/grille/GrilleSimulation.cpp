@@ -239,8 +239,8 @@ void GrilleSimulation::InvalidateCell(int ACol, int ARow)
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::Repaint()
- {
-  viewport()->repaint();
+ { // Pendant un autre dessin, Qt n'autorise pas de dessin imbriqué : différé
+  if (TCanvas::NbDessinsEnCours) viewport()->update(); else viewport()->repaint();
  }
 //---------------------------------------------------------------------------
 // Dessin

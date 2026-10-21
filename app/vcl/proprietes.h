@@ -29,6 +29,9 @@ template <class T> class Propriete
    }
   T Valeur() const { return Lit(); }
   operator T() const { return Lit(); }
+  // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
+  template <class E, typename std::enable_if<std::is_enum<E>::value, int>::type=0>
+  explicit operator E() const { return (E)Lit(); }
   Propriete &operator=(const T &v) { Ecrit(v); return *this; }
   // Affectation d'une propriété à une autre : copie de la valeur, pas des accesseurs
   Propriete &operator=(const Propriete &p) { Ecrit(p.Lit()); return *this; }

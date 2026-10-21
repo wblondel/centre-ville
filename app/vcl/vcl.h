@@ -40,6 +40,7 @@ class String : public AnsiString
   String LowerCase() const;
   String Trim() const;
  };
+typedef String UnicodeString;
 //---------------------------------------------------------------------------
 // Conversions avec Qt
 //---------------------------------------------------------------------------
@@ -110,6 +111,21 @@ String ParamStr(int Index);
 String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt);
 String ExtractFilePath(const AnsiString &asNomFichier);
 String ExtractFileName(const AnsiString &asNomFichier);
+int StrToInt(const AnsiString &asTexte); // texte invalide : exception (EConvertError)
+// Sous-ensemble utilisé par les fiches : « 0 », « 0.0 », « 0.00 »... (séparateur
+// décimal de FormatSettings, arrondi au plus proche)
+String FormatFloat(const AnsiString &asFormat, long double Valeur);
+//---------------------------------------------------------------------------
+// TScreen (Screen->PixelsPerInch) : résolution de l'écran principal comme la
+// donne Windows, 96 × facteur d'échelle (192 sur un écran Retina)
+//---------------------------------------------------------------------------
+class TScreen
+ {
+  public:
+  Propriete<int> PixelsPerInch;
+  TScreen();
+ };
+extern TScreen *Screen;
 //---------------------------------------------------------------------------
 // TApplication (Application->Title...)
 //---------------------------------------------------------------------------

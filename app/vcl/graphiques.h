@@ -92,15 +92,20 @@ struct TFont
 template <class T> class SousObjet
  {
   T Objet;
+  void Acces() { if (SurAcces) SurAcces(); }
   public:
-  T *operator->() { return &Objet; }
+  // Appelé à chaque accès qui peut modifier l'objet (->, affectation) : le
+  // contrôle propriétaire s'y fait repeindre, comme sur TBrush::OnChange
+  // (TShape->Brush->Color=... ; update() est différé, donc après la modification)
+  std::function<void()> SurAcces;
+  T *operator->() { Acces(); return &Objet; }
   const T *operator->() const { return &Objet; }
-  operator T *() { return &Objet; }
+  operator T *() { Acces(); return &Objet; }
   T &Ref() { return Objet; }
   const T &Ref() const { return Objet; }
-  SousObjet &operator=(const T *t) { Objet=*t; return *this; }
-  SousObjet &operator=(const T &t) { Objet=t; return *this; }
-  SousObjet &operator=(const SousObjet &s) { Objet=s.Objet; return *this; }
+  SousObjet &operator=(const T *t) { Objet=*t; Acces(); return *this; }
+  SousObjet &operator=(const T &t) { Objet=t; Acces(); return *this; }
+  SousObjet &operator=(const SousObjet &s) { Objet=s.Objet; Acces(); return *this; }
  };
 //---------------------------------------------------------------------------
 // TCanvas : API VCL au-dessus d'un QPainter (fourni par le paintEvent)
@@ -114,8 +119,11 @@ class TCanvas
   SousObjet<TBrush> Brush;
   SousObjet<TPen> Pen;
   SousObjet<TFont> Font;
-  void Commence(QPainter *p) { Peintre=p; }
-  void Termine() { Peintre=nullptr; }
+  // Dessins en cours (paintEvent des contrôles portés) : Qt interdit d'en
+  // imbriquer un autre (Repaint pendant OnDrawCell devient alors update)
+  static int NbDessinsEnCours;
+  void Commence(QPainter *p) { if (!Peintre&&p) NbDessinsEnCours++; Peintre=p; }
+  void Termine() { if (Peintre) NbDessinsEnCours--; Peintre=nullptr; }
   QPainter *Painter() const { return Peintre; }
   bool Actif() const { return Peintre!=nullptr; }
   void FillRect(const TRect &r);
@@ -133,12 +141,20 @@ class TCanvas
   void DrawFocusRect(const TRect &r);
  };
 //---------------------------------------------------------------------------
-// TBitmap (Graphics::TBitmap) : image, utilisée pour les glyphes
+// TBitmap (Graphics::TBitmap) : image, utilisée pour les glyphes. Comme dans
+// la VCL, une modification (Assign, GetBitmap d'une liste d'images) déclenche
+// OnChange : le bouton dont c'est le Glyph se redessine (AffecteGlyphe).
+// La copie ne transmet que l'image, pas OnChange (TBitmap::Assign).
 //---------------------------------------------------------------------------
 class TBitmap
  {
   public:
   QPixmap Image;
+  std::function<void()> OnChange;
+  TBitmap() {}
+  TBitmap(const TBitmap &b) : Image(b.Image) {}
+  TBitmap &operator=(const TBitmap &b) { Image=b.Image; Changed(); return *this; }
+  void Changed() { if (OnChange) OnChange(); }
  };
 //---------------------------------------------------------------------------
 #endif

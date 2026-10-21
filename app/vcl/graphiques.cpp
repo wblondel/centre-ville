@@ -97,6 +97,8 @@ void TCanvas::PrepareStylo()
    Peintre->setBrush(CouleurQt(Brush->Color));
  }
 //---------------------------------------------------------------------------
+int TCanvas::NbDessinsEnCours=0;
+//---------------------------------------------------------------------------
 void TCanvas::FillRect(const TRect &r)
  {
   if (!Peintre||(Brush->Style==bsClear)) return;

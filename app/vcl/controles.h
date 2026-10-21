@@ -11,6 +11,8 @@
 //   - TCheckBox::Checked=... déclenche OnClick (toggled, pas clicked) ;
 //   - TRadioButton::Checked=true déclenche OnClick ;
 //   - TRadioGroup::ItemIndex=... déclenche OnClick.
+// TSpeedButton suit la VCL : jamais le focus, Down exclusif par GroupIndex
+// (AllowAllUp), Click() n'appelle qu'OnClick (sans changer Down).
 // Les propriétés que Qt Designer ne connaît pas arrivent en propriétés
 // dynamiques « vcl... » et sont appliquées par PrepareVcl() après setupUi.
 //
@@ -42,6 +44,22 @@
 class QButtonGroup;
 class QTabBar;
 //---------------------------------------------------------------------------
+// Color / Font->Color d'un contrôle : mémorisée en propriété « vcl... » et
+// appliquée à la palette (fond rempli sauf contrôle Transparent)
+void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur);
+//---------------------------------------------------------------------------
+// TComponent::Tag, Name et ClassName() d'un composant désigné par TComponent*
+// ou TObject* (QObject, qui n'a pas ces membres) :
+// ((TComponent*)Sender)->Tag devient TagDe((TComponent*)Sender)
+//---------------------------------------------------------------------------
+int TagDe(const TObject *Composant);
+String NomDe(const TObject *Composant);
+String NomClasseDe(const TObject *Composant);
+//---------------------------------------------------------------------------
+// Glyph d'un TBitBtn ou d'un TSpeedButton : NumGlyphs images côte à côte
+// (normale, puis désactivée) -> icône Qt, agrandie sans lissage
+QIcon IconeGlyphe(const QPixmap &Glyphe, int NumGlyphs, qreal Echelle);
+//---------------------------------------------------------------------------
 // Fiche (TForm) vue des contrôles : TButton::ModalResult ferme la fiche modale
 //---------------------------------------------------------------------------
 class FicheVclBase
@@ -60,18 +78,36 @@ class ControleVclBase
   virtual void PrepareVcl() {}
  };
 //---------------------------------------------------------------------------
+// Police d'un contrôle (TControl::Font, sous-ensemble) : Font->Color colore le
+// texte du contrôle
+//---------------------------------------------------------------------------
+class PoliceControle
+ {
+  public:
+  Propriete<TColor> Color;
+ };
+//---------------------------------------------------------------------------
 // Propriétés communes à tous les contrôles (TControl / TWinControl)
 //---------------------------------------------------------------------------
 template <class B> class ControleVcl : public B, public ControleVclBase
  {
+  PoliceControle Police;
   public:
   Propriete<int> Left, Top, Width, Height, Tag;
   Propriete<bool> Visible, Enabled;
-  Propriete<AnsiString> Hint;
+  Propriete<AnsiString> Hint, Name;
+  Propriete<TColor> Color;
+  PoliceControle *const Font=&Police;
   TNotifyEvent OnClick;
   explicit ControleVcl(QWidget *Parent=nullptr) : B(Parent)
    {
     QWidget *w=this;
+    Name.Definit([w]() { return A(w->objectName()); }, [w](const AnsiString &as) { w->setObjectName(Q(as)); });
+    // Color et Font->Color : mêmes propriétés « vclColor »/« vclFontColor » que le .ui (PrepareVcl)
+    Color.Definit([w]() { return w->property("vclColor").isValid()?CouleurDepuisTexte(A(w->property("vclColor").toString())):clBtnFace; },
+                  [w](const TColor &c) { DefinitCouleurControle(w, "vclColor", c); });
+    Font->Color.Definit([w]() { return w->property("vclFontColor").isValid()?CouleurDepuisTexte(A(w->property("vclFontColor").toString())):clWindowText; },
+                        [w](const TColor &c) { DefinitCouleurControle(w, "vclFontColor", c); });
     Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
     Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
     Width.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
@@ -85,9 +121,11 @@ template <class B> class ControleVcl : public B, public ControleVclBase
     Hint.Definit([w]() { return A(w->statusTip()); },
                  [w](const AnsiString &as) { w->setStatusTip(Q(as)); w->setToolTip(Q(as)); });
    }
-  void Repaint() { B::repaint(); }
+  // TControl::Repaint : dessin immédiat, sauf pendant le dessin d'un autre
+  // contrôle (RafraichitActionsEdition depuis OnDrawCell) : dessin différé
+  void Repaint() { if (TCanvas::NbDessinsEnCours) B::update(); else B::repaint(); }
   void Invalidate() { B::update(); }
-  void Refresh() { B::repaint(); }
+  void Refresh() { Repaint(); }
   void Show() { B::show(); }
   void Hide() { B::hide(); }
   void SetFocus() { B::setFocus(); }
@@ -105,6 +143,7 @@ class TLabel : public ControleVcl<QLabel>
   void PrepareVcl() override;
   protected:
   void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
  };
 //---------------------------------------------------------------------------
 class TCSpinEdit : public ControleVcl<QSpinBox>
@@ -129,10 +168,13 @@ class TButton : public ControleVcl<QPushButton>
 //---------------------------------------------------------------------------
 class TBitBtn : public TButton
  {
+  void AfficheGlyphe();
   public:
-  SousObjet<TBitmap> Glyph;
-  explicit TBitBtn(QWidget *Parent=nullptr) : TButton(Parent) {}
+  SousObjet<TBitmap> Glyph; // Glyph=... ou GetBitmap(..., Glyph) : le bouton se redessine
+  int NumGlyphs=1;
+  explicit TBitBtn(QWidget *Parent=nullptr);
   void DefinitGlyphe(const TBitmap *b);
+  void PrepareVcl() override;
  };
 //---------------------------------------------------------------------------
 class TCheckBox : public ControleVcl<QCheckBox>
@@ -141,6 +183,9 @@ class TCheckBox : public ControleVcl<QCheckBox>
   Propriete<AnsiString> Caption;
   Propriete<bool> Checked;
   explicit TCheckBox(QWidget *Parent=nullptr);
+  protected:
+  // Zone sensible de la VCL : tout le contrôle (Qt : la case et le texte)
+  bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
  };
 //---------------------------------------------------------------------------
 class TRadioButton : public ControleVcl<QRadioButton>
@@ -149,6 +194,8 @@ class TRadioButton : public ControleVcl<QRadioButton>
   Propriete<AnsiString> Caption;
   Propriete<bool> Checked;
   explicit TRadioButton(QWidget *Parent=nullptr);
+  protected:
+  bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
  };
 //---------------------------------------------------------------------------
 class TGroupBox : public ControleVcl<QGroupBox>
@@ -171,15 +218,19 @@ class TRadioGroup : public ControleVcl<QGroupBox>
 //---------------------------------------------------------------------------
 class TSpeedButton : public ControleVcl<QToolButton>
  {
+  void AfficheGlyphe();
+  void DefinitDown(bool Valeur); // TSpeedButton::SetDown
   public:
   Propriete<bool> Down;
   int GroupIndex=0, NumGlyphs=1;
   bool AllowAllUp=false;
-  SousObjet<TBitmap> Glyph;
+  SousObjet<TBitmap> Glyph; // Glyph=... ou GetBitmap(..., Glyph) : le bouton se redessine
   explicit TSpeedButton(QWidget *Parent=nullptr);
   void DefinitGlyphe(const TBitmap *b);
-  void Click();
+  void Click(); // TControl::Click : OnClick seulement
   void PrepareVcl() override;
+  protected:
+  void nextCheckState() override; // clic : SetDown(!Down), puis OnClick (clicked)
  };
 //---------------------------------------------------------------------------
 enum TShapeType { stRectangle, stSquare, stRoundRect, stRoundSquare, stEllipse, stCircle };
@@ -189,7 +240,7 @@ class TShape : public ControleVcl<QWidget>
   SousObjet<TBrush> Brush;
   SousObjet<TPen> Pen;
   TShapeType Shape=stRectangle;
-  explicit TShape(QWidget *Parent=nullptr) : ControleVcl<QWidget>(Parent) {}
+  explicit TShape(QWidget *Parent=nullptr);
   void PrepareVcl() override;
   protected:
   void paintEvent(QPaintEvent *e) override;
@@ -201,6 +252,7 @@ class TImage : public ControleVcl<QLabel>
   explicit TImage(QWidget *Parent=nullptr);
   protected:
   void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
  };
 //---------------------------------------------------------------------------
 class TStringGrid : public ControleVcl<QTableWidget>

@@ -117,6 +117,7 @@ QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
    {
     if (o->objectName().isEmpty()) o->setObjectName(n);
     Composants[n]=o;
+    Ordre.push_back(o);
    }
   else
    qWarning("Portage : composant %s (%s) introuvable dans la fiche %s", Nom, Classe, Fichier);

@@ -10,10 +10,13 @@
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QStatusTipEvent>
+#include <QStyle>
 #include <QStyleOption>
 #include <QTabBar>
+#include <cstring>
 //---------------------------------------------------------------------------
 // Commun
 //---------------------------------------------------------------------------
@@ -48,6 +51,85 @@ template <class B> void ControleVcl<B>::PrepareVcl()
    }
   if (w->property("vclCursor").toString()==QLatin1String("crHandPoint"))
    w->setCursor(Qt::PointingHandCursor);
+ }
+//---------------------------------------------------------------------------
+void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur)
+ {
+  w->setProperty(Propriete, QString("0x%1").arg((uint)Couleur, 8, 16, QChar('0')));
+  QPalette p=w->palette();
+  QColor c=CouleurQt(Couleur);
+  if (!std::strcmp(Propriete, "vclFontColor"))
+   {
+    p.setColor(QPalette::WindowText, c);
+    p.setColor(QPalette::ButtonText, c);
+    p.setColor(QPalette::Text, c);
+   }
+  else
+   {
+    p.setColor(QPalette::Window, c);
+    if (!w->property("vclTransparent").toBool()) w->setAutoFillBackground(true);
+   }
+  w->setPalette(p);
+ }
+//---------------------------------------------------------------------------
+int TagDe(const TObject *Composant)
+ {
+  if (!Composant) return 0;
+  if (auto *m=dynamic_cast<const TMenuItem *>(Composant)) return m->Tag;
+  if (auto *a=dynamic_cast<const TAction *>(Composant)) return a->Tag;
+  if (auto *t=dynamic_cast<const TTimer *>(Composant)) return t->Tag;
+  return Composant->property("vclTag").toInt();
+ }
+//---------------------------------------------------------------------------
+String NomDe(const TObject *Composant)
+ {
+  return Composant?A(Composant->objectName()):String();
+ }
+//---------------------------------------------------------------------------
+String NomClasseDe(const TObject *Composant)
+ { // Classes dérivées avant leurs bases (TBitBtn avant TButton)
+  if (!Composant) return String();
+  if (dynamic_cast<const TBitBtn *>(Composant)) return "TBitBtn";
+  if (dynamic_cast<const TButton *>(Composant)) return "TButton";
+  if (dynamic_cast<const TSpeedButton *>(Composant)) return "TSpeedButton";
+  if (dynamic_cast<const TRadioGroup *>(Composant)) return "TRadioGroup";
+  if (dynamic_cast<const TGroupBox *>(Composant)) return "TGroupBox";
+  if (dynamic_cast<const TLabel *>(Composant)) return "TLabel";
+  if (dynamic_cast<const TCSpinEdit *>(Composant)) return "TCSpinEdit";
+  if (dynamic_cast<const TCheckBox *>(Composant)) return "TCheckBox";
+  if (dynamic_cast<const TRadioButton *>(Composant)) return "TRadioButton";
+  if (dynamic_cast<const TShape *>(Composant)) return "TShape";
+  if (dynamic_cast<const TImage *>(Composant)) return "TImage";
+  if (dynamic_cast<const TStringGrid *>(Composant)) return "TStringGrid";
+  if (dynamic_cast<const TTrackBar *>(Composant)) return "TTrackBar";
+  if (dynamic_cast<const TPanel *>(Composant)) return "TPanel";
+  if (dynamic_cast<const TBevel *>(Composant)) return "TBevel";
+  if (dynamic_cast<const TPaintBox *>(Composant)) return "TPaintBox";
+  if (dynamic_cast<const TTabControl *>(Composant)) return "TTabControl";
+  if (dynamic_cast<const TStatusBar *>(Composant)) return "TStatusBar";
+  if (dynamic_cast<const TToolBar *>(Composant)) return "TToolBar";
+  if (dynamic_cast<const TToolButton *>(Composant)) return "TToolButton";
+  if (dynamic_cast<const TTimer *>(Composant)) return "TTimer";
+  if (dynamic_cast<const TSaveDialog *>(Composant)) return "TSaveDialog";
+  if (dynamic_cast<const TOpenDialog *>(Composant)) return "TOpenDialog";
+  if (dynamic_cast<const TMenuItem *>(Composant)) return "TMenuItem";
+  if (dynamic_cast<const TPopupMenu *>(Composant)) return "TPopupMenu";
+  if (dynamic_cast<const TMainMenu *>(Composant)) return "TMainMenu";
+  if (dynamic_cast<const TAction *>(Composant)) return "TAction";
+  if (dynamic_cast<const TActionList *>(Composant)) return "TActionList";
+  if (dynamic_cast<const TVirtualImageList *>(Composant)) return "TVirtualImageList";
+  if (dynamic_cast<const TImageCollection *>(Composant)) return "TImageCollection";
+  return Composant->metaObject()->className();
+ }
+//---------------------------------------------------------------------------
+QIcon IconeGlyphe(const QPixmap &Glyphe, int NumGlyphs, qreal Echelle)
+ { // TButtonGlyph : la 1re image pour l'état normal, la 2e (si NumGlyphs>=2) désactivé
+  QIcon i;
+  if (Glyphe.isNull()) return i;
+  int n=qMax(1, NumGlyphs), w=Glyphe.width()/n, h=Glyphe.height();
+  i.addPixmap(AgranditSansLissage(Glyphe.copy(0, 0, w, h), Echelle), QIcon::Normal);
+  if (n>=2) i.addPixmap(AgranditSansLissage(Glyphe.copy(w, 0, w, h), Echelle), QIcon::Disabled);
+  return i;
  }
 //---------------------------------------------------------------------------
 template class ControleVcl<QLabel>;
@@ -100,10 +182,26 @@ void TLabel::PrepareVcl()
   Caption=A(text()); // texte du .ui = Caption de la VCL
  }
 //---------------------------------------------------------------------------
+namespace
+ { // TControl::WMLButtonUp : Click si le bouton gauche est relâché sur le
+   // contrôle ; le contrôle garde le clic (la fiche n'en est pas avertie)
+  bool ClicRelache(QWidget *w, QMouseEvent *e)
+   {
+    e->accept();
+    return (e->button()==Qt::LeftButton)&&w->rect().contains(e->position().toPoint());
+   }
+ }
+//---------------------------------------------------------------------------
 void TLabel::mousePressEvent(QMouseEvent *e)
  {
   QLabel::mousePressEvent(e);
-  if (OnClick) OnClick(this);
+  e->accept();
+ }
+//---------------------------------------------------------------------------
+void TLabel::mouseReleaseEvent(QMouseEvent *e)
+ {
+  QLabel::mouseReleaseEvent(e);
+  if (ClicRelache(this, e)&&OnClick) OnClick(this);
  }
 //---------------------------------------------------------------------------
 // TCSpinEdit
@@ -161,10 +259,34 @@ void TButton::Click()
   if (OnClick) OnClick(this);
  }
 //---------------------------------------------------------------------------
+TBitBtn::TBitBtn(QWidget *Parent) : TButton(Parent)
+ {
+  Glyph->OnChange=[this]() { AfficheGlyphe(); };
+ }
+//---------------------------------------------------------------------------
+void TBitBtn::PrepareVcl()
+ {
+  TButton::PrepareVcl();
+  NumGlyphs=qMax(1, property("vclNumGlyphs").toInt());
+  QString Glyphe=property("vclGlyph").toString();
+  if (!Glyphe.isEmpty())
+   {
+    TBitmap b;
+    b.Image=QPixmap(Glyphe);
+    DefinitGlyphe(&b);
+   }
+ }
+//---------------------------------------------------------------------------
 void TBitBtn::DefinitGlyphe(const TBitmap *b)
  {
   Glyph=b;
-  setIcon(QIcon(AgranditSansLissage(b->Image, devicePixelRatioF())));
+ }
+//---------------------------------------------------------------------------
+void TBitBtn::AfficheGlyphe()
+ {
+  const QPixmap &g=Glyph.Ref().Image;
+  if (!g.isNull()) setIconSize(QSize(g.width()/qMax(1, NumGlyphs), g.height()));
+  setIcon(IconeGlyphe(g, NumGlyphs, devicePixelRatioF()));
  }
 //---------------------------------------------------------------------------
 // TCheckBox, TRadioButton, TGroupBox, TRadioGroup
@@ -206,16 +328,46 @@ TRadioGroup::TRadioGroup(QWidget *Parent) : ControleVcl<QGroupBox>(Parent)
                      });
  }
 //---------------------------------------------------------------------------
+namespace
+ { // Éléments d'un TRadioGroup (QRadioButton créés par uic) : un clic n'importe
+   // où dans l'élément le coche, comme dans la VCL (Qt : la case et le texte)
+  class ClicElement : public QObject
+   {
+    public:
+    using QObject::QObject;
+    bool eventFilter(QObject *o, QEvent *e) override
+     {
+      if ((e->type()!=QEvent::MouseButtonPress)&&(e->type()!=QEvent::MouseButtonRelease)&&
+          (e->type()!=QEvent::MouseButtonDblClick)&&(e->type()!=QEvent::MouseMove)) return false;
+      QRadioButton *b=static_cast<QRadioButton *>(o);
+      QMouseEvent *m=static_cast<QMouseEvent *>(e);
+      QStyleOptionButton Option;
+      Option.initFrom(b);
+      Option.text=b->text();
+      QRect Zone=b->style()->subElementRect(QStyle::SE_RadioButtonClickRect, &Option, b);
+      QPoint p=m->position().toPoint();
+      if (Zone.contains(p)||!b->rect().contains(p)) return false;
+      // Même événement, au centre de la zone sensible de Qt
+      QMouseEvent Copie(m->type(), QPointF(Zone.center()), m->scenePosition(), m->globalPosition(),
+                        m->button(), m->buttons(), m->modifiers(), m->pointingDevice());
+      QCoreApplication::sendEvent(b, &Copie);
+      return true;
+     }
+   };
+ }
+//---------------------------------------------------------------------------
 void TRadioGroup::PrepareVcl()
  { // Éléments générés par dfm2ui : <Nom>_0, <Nom>_1...
   ControleVcl<QGroupBox>::PrepareVcl();
   Groupe=new QButtonGroup(this);
+  ClicElement *Filtre=new ClicElement(this);
   for(int i=0; ; i++)
    {
     QRadioButton *b=findChild<QRadioButton *>(objectName()+"_"+QString::number(i), Qt::FindDirectChildrenOnly);
     if (!b) break;
     Boutons.push_back(b);
     Groupe->addButton(b, i);
+    b->installEventFilter(Filtre);
     QObject::connect(b, &QRadioButton::toggled, this, [this](bool c) { if (c&&OnClick) OnClick(this); });
    }
  }
@@ -224,8 +376,9 @@ void TRadioGroup::PrepareVcl()
 //---------------------------------------------------------------------------
 TSpeedButton::TSpeedButton(QWidget *Parent) : ControleVcl<QToolButton>(Parent)
  {
-  Down.Definit([this]() { return isCheckable()?isChecked():isDown(); },
-               [this](const bool &b) { if (isCheckable()) setChecked(b); else setDown(b); });
+  setFocusPolicy(Qt::NoFocus); // TGraphicControl : jamais le focus
+  Down.Definit([this]() { return isChecked(); }, [this](const bool &b) { DefinitDown(b); });
+  Glyph->OnChange=[this]() { AfficheGlyphe(); };
   QObject::connect(this, &QToolButton::clicked, this, [this]() { if (OnClick) OnClick(this); });
  }
 //---------------------------------------------------------------------------
@@ -235,12 +388,12 @@ void TSpeedButton::PrepareVcl()
   GroupIndex=property("vclGroupIndex").toInt();
   AllowAllUp=property("vclAllowAllUp").toBool();
   NumGlyphs=qMax(1, property("vclNumGlyphs").toInt());
+  setCheckable(GroupIndex!=0); // GroupIndex=0 : jamais enfoncé (Down reste à false)
   QString Glyphe=property("vclGlyph").toString();
   if (!Glyphe.isEmpty())
    {
     TBitmap b;
     b.Image=QPixmap(Glyphe);
-    if (NumGlyphs>1) b.Image=b.Image.copy(0, 0, b.Image.width()/NumGlyphs, b.Image.height());
     DefinitGlyphe(&b);
    }
  }
@@ -248,16 +401,46 @@ void TSpeedButton::PrepareVcl()
 void TSpeedButton::DefinitGlyphe(const TBitmap *b)
  {
   Glyph=b;
-  setIconSize(b->Image.size());
-  setIcon(QIcon(AgranditSansLissage(b->Image, devicePixelRatioF())));
+ }
+//---------------------------------------------------------------------------
+void TSpeedButton::AfficheGlyphe()
+ {
+  const QPixmap &g=Glyph.Ref().Image;
+  if (!g.isNull()) setIconSize(QSize(g.width()/qMax(1, NumGlyphs), g.height()));
+  setIcon(IconeGlyphe(g, NumGlyphs, devicePixelRatioF()));
+ }
+//---------------------------------------------------------------------------
+void TSpeedButton::DefinitDown(bool Valeur)
+ { // TSpeedButton::SetDown : un bouton enfoncé ne remonte que si AllowAllUp ;
+   // enfoncé, il fait remonter les autres boutons du même GroupIndex (UpdateExclusive)
+  if (GroupIndex==0) Valeur=false;
+  if (Valeur==isChecked()) return;
+  if (isChecked()&&!AllowAllUp) return;
+  setChecked(Valeur);
+  if (Valeur&&parentWidget())
+   for(QObject *o : parentWidget()->children())
+    if (TSpeedButton *b=dynamic_cast<TSpeedButton *>(o))
+     if ((b!=this)&&(b->GroupIndex==GroupIndex)&&b->isChecked())
+      b->setChecked(false);
+ }
+//---------------------------------------------------------------------------
+void TSpeedButton::nextCheckState()
+ { // TSpeedButton::MouseUp : SetDown(not FDown) puis Click
+  DefinitDown(!isChecked());
  }
 //---------------------------------------------------------------------------
 void TSpeedButton::Click()
  {
-  click();
+  if (OnClick) OnClick(this);
  }
 //---------------------------------------------------------------------------
 // TShape, TImage, TStringGrid, TTrackBar
+//---------------------------------------------------------------------------
+TShape::TShape(QWidget *Parent) : ControleVcl<QWidget>(Parent)
+ { // TBrush/TPen::OnChange : Shape->Brush->Color=... repeint la forme
+  Brush.SurAcces=[this]() { update(); };
+  Pen.SurAcces=[this]() { update(); };
+ }
 //---------------------------------------------------------------------------
 void TShape::PrepareVcl()
  {
@@ -297,7 +480,13 @@ TImage::TImage(QWidget *Parent) : ControleVcl<QLabel>(Parent) {}
 void TImage::mousePressEvent(QMouseEvent *e)
  {
   QLabel::mousePressEvent(e);
-  if (OnClick) OnClick(this);
+  e->accept();
+ }
+//---------------------------------------------------------------------------
+void TImage::mouseReleaseEvent(QMouseEvent *e)
+ {
+  QLabel::mouseReleaseEvent(e);
+  if (ClicRelache(this, e)&&OnClick) OnClick(this);
  }
 //---------------------------------------------------------------------------
 TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QTableWidget>(Parent), Cells(this)
