@@ -1,8 +1,10 @@
 # `app/` : application Qt 6 `cvw`
 
 Phases 4 et 5 de `PLAN_PORTAGE.md` (sprint 2) : la grille de simulation et la
-fiche principale `TfrmSimulation` sont portées ; les 32 fiches secondaires sont
-créées et affichées depuis les `.ui` générés, mais sans leur code (phase 6).
+fiche principale `TfrmSimulation` sont portées, ainsi que les fiches
+Dimensions (`f_dimzone`) et Génération (`f_genres`) qu'utilise « Nouveau » ;
+les 30 autres fiches secondaires sont créées et affichées depuis les `.ui`
+générés, mais sans leur code (phase 6).
 Comme pour le moteur, **on porte, on ne réécrit pas** : `f_simul.cpp` et
 `f_simul.h` sont des copies de `src/f_simul.*` (CRLF), où chaque modification
 est annotée `// portage`. Pour lire le portage ligne à ligne :
@@ -41,7 +43,8 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
 |---|---|
 | `main.cpp`, `application.*` | Port de `cvw.cpp` : fiches créées au démarrage dans le même ordre ; `frmSimulation` (Visible = True dans le `.dfm`) est affichée avant la création des autres, comme dans la VCL. Ouverture depuis le Finder (`QFileOpenEvent`). |
 | `f_simul.*` | Port de la fiche principale. `VueSimulation` y implémente `IVueSimulation` (les accès du moteur à l'interface). |
-| `f_*.*` (32 autres) | En-têtes portés ; fiches non portées : `.ui` généré sans gestionnaires, méthodes appelées par les autres fiches sans effet. |
+| `f_dimzone.*`, `f_genres.*` | Portées. `Genere(rand()%NbX, rand()%NbY, ...)` est séquencé explicitement x, puis y, puis la direction, comme le binaire d'origine. |
+| `f_*.*` (30 autres) | En-têtes portés ; fiches non portées : `.ui` généré sans gestionnaires, méthodes appelées par les autres fiches sans effet. |
 | `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide ; `min`/`max`. |
 | `grille/GrilleSimulation.*` | Remplace le `TDrawGrid` : voir l'en-tête pour le comportement reproduit. |
 | `vcl/` | Sous-ensemble de la VCL au-dessus de Qt, pour garder le code des fiches tel quel. |
@@ -82,7 +85,9 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
 raccourcis selon le mode, Marche / Interruption / Arrêt par la barre d'outils
 et les menus, barre d'état, bilan (séparateur décimal `,`), puis enregistrer →
 rouvrir (comme depuis le Finder) → réenregistrer : fichier identique, et égal à
-la conversion de référence du format (`tests/support/format_reference`).
+la conversion de référence du format (`tests/support/format_reference`) ;
+enfin Nouveau → Dimensions → Génération à graine fixe : même réseau que le
+golden master `tests/golden/generation/defaut_12345.txt`.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
 principale (Démo au tour 0 et au tour 200).
 
@@ -90,11 +95,11 @@ principale (Démo au tour 0 et au tour 200).
 
 Comportement :
 
-- **Fiches secondaires** : affichées depuis le `.ui` généré, sans leur code
-  (phase 6). « Nouveau » ouvre la fiche Dimensions et s'arrête comme si l'on
-  avait annulé ; Paramètres, Composition, Carrefours, Épidémie... montrent leur
-  fiche inerte. L'écran « À propos » du démarrage se ferme après 2 s mais sans
-  son animation.
+- **Fiches secondaires** : sauf Dimensions et Génération, affichées depuis le
+  `.ui` généré, sans leur code (phase 6) : Paramètres, Composition,
+  Carrefours, Épidémie, Rechercher, Infos, Distances... montrent leur fiche
+  inerte. L'écran « À propos » du démarrage se ferme après 2 s mais sans son
+  animation.
 - **Raccourcis sous macOS** : « Ctrl » de la VCL est affiché ⌘ (convention de
   Qt) ; la touche Control physique est aussi acceptée. ⌘Q et ⌘H restent au
   système (Quitter, Masquer) : Carrefours (Ctrl+Q) et Rechercher (Ctrl+H) se

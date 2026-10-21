@@ -83,6 +83,7 @@ template <class B> class TFormT : public B, public FicheVclBase
     Lieur.Raccourcis.Fenetre=this;
     Lieur.Raccourcis.Principale=EstPrincipale;
     Lieur.Raccourcis.Apercu=[this](QKeyEvent *e, bool Relache) { return Apercu(e, Relache); };
+    Lieur.Raccourcis.ToucheDialogue=[this](QKeyEvent *e) { return ToucheDialogue(e); };
     InscritFicheRaccourcis(Lieur.Raccourcis);
     AppliqueStyle();
    }
@@ -158,10 +159,13 @@ template <class B> class TFormT : public B, public FicheVclBase
      return mrNone;
    }
   void DefinitModalResult(int mr) override
-   { // ModalResult<>0 pendant ShowModal : la fiche se ferme
+   { // ModalResult<>0 pendant ShowModal : la boucle modale ferme la fiche après le
+     // traitement du message en cours (le gestionnaire OnClick va jusqu'au bout)
     iModalResult=mr;
     if constexpr (std::is_base_of_v<QDialog, B>)
-     if (Modale&&(mr!=mrNone)) B::done(mr);
+     if (Modale&&(mr!=mrNone))
+      QMetaObject::invokeMethod(this, [this]() { if (Modale&&(iModalResult!=mrNone)) B::done(iModalResult); },
+                                Qt::QueuedConnection);
    }
   QObject *FindComponent(const AnsiString &asNom)
    {
@@ -183,13 +187,40 @@ template <class B> class TFormT : public B, public FicheVclBase
     if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
    }
   bool Apercu(QKeyEvent *e, bool Relache)
-   { // KeyPreview : OnKeyDown/OnKeyUp de la fiche avant le contrôle actif
+   { // KeyPreview : OnKeyDown/OnKeyUp puis OnKeyPress de la fiche avant le contrôle actif
     if (!KeyPreview) return false;
     WORD Key=(WORD)ToucheVirtuelleDe(e);
-    if (!Key) return false;
-    if (Relache) { if (OnKeyUp) OnKeyUp(this, Key, EtatTouches(e)); }
-    else { if (OnKeyDown) OnKeyDown(this, Key, EtatTouches(e)); }
-    return Key==0;
+    if (Key)
+     {
+      if (Relache) { if (OnKeyUp) OnKeyUp(this, Key, EtatTouches(e)); }
+      else { if (OnKeyDown) OnKeyDown(this, Key, EtatTouches(e)); }
+      if (!Key) return true;
+     }
+    if (!Relache&&OnKeyPress&&!e->text().isEmpty()&&(e->text().at(0).unicode()<256))
+     {
+      char c=(char)e->text().at(0).unicode();
+      OnKeyPress(this, c);
+      if (!c) return true;
+     }
+    return false;
+   }
+  bool ToucheDialogue(QKeyEvent *e)
+   { // TButton::CMDialogKey : Entrée = bouton qui a le focus, sinon bouton Default ;
+     // Échap = premier bouton Cancel ; sans bouton concerné, la touche continue
+    if (e->modifiers()&~(Qt::KeypadModifier)) return false;
+    bool Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter), Echap=(e->key()==Qt::Key_Escape);
+    if (!Entree&&!Echap) return false;
+    if (Entree)
+     if (TButton *b=dynamic_cast<TButton *>(QApplication::focusWidget()))
+      if (b->window()==this) { b->Click(); return true; }
+    for(QPushButton *p : this->template findChildren<QPushButton *>())
+     if (TButton *b=dynamic_cast<TButton *>(p))
+      if ((Entree?b->Default:b->Cancel)&&b->isVisible()&&b->isEnabled())
+       {
+        b->Click();
+        return true;
+       }
+    return false;
    }
   void showEvent(QShowEvent *e) override
    {
@@ -227,13 +258,8 @@ template <class B> class TFormT : public B, public FicheVclBase
   void keyPressEvent(QKeyEvent *e) override
    {
     if constexpr (std::is_base_of_v<QDialog, B>)
-     if (e->key()==Qt::Key_Escape)
-      { // Échap : bouton Cancel de la fiche (rien s'il n'y en a pas)
-       for(QPushButton *p : this->template findChildren<QPushButton *>())
-        if (TButton *b=dynamic_cast<TButton *>(p))
-         if (b->Cancel&&b->isVisible()&&b->isEnabled()) { b->Click(); return; }
-       return;
-      }
+     if ((e->key()==Qt::Key_Escape)||(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter))
+      return; // touches de dialogue déjà traitées (ToucheDialogue) : pas de reject() de QDialog
     B::keyPressEvent(e);
    }
  };

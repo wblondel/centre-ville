@@ -91,6 +91,7 @@ template <class B> class ControleVcl : public B, public ControleVclBase
   void Show() { B::show(); }
   void Hide() { B::hide(); }
   void SetFocus() { B::setFocus(); }
+  bool Focused() const { return B::hasFocus(); }
   void BringToFront() { B::raise(); }
   void PrepareVcl() override; // police, couleurs, curseur
  };

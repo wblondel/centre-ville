@@ -182,6 +182,8 @@ struct FicheRaccourcis
   bool Principale=false;
   // KeyPreview : OnKeyDown/OnKeyUp de la fiche ; vrai si la touche est absorbée (Key=0)
   std::function<bool(QKeyEvent *, bool Relache)> Apercu;
+  // CM_DIALOGKEY : Entrée = bouton actif ou Default, Échap = bouton Cancel (avant KeyPreview)
+  std::function<bool(QKeyEvent *)> ToucheDialogue;
   bool IsShortCut(TShortCut Raccourci, bool Executer); // TCustomForm::IsShortCut
  };
 void InscritFicheRaccourcis(const FicheRaccourcis &Fiche);

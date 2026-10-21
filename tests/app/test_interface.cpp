@@ -12,7 +12,9 @@
 //   - Marche / Interruption / Arrêt, par la barre d'outils et par les menus,
 //     et la mise à jour de la barre d'état ;
 //   - l'enregistrement : enregistrer puis rouvrir et réenregistrer donne le
-//     même fichier, identique à la conversion de référence du format.
+//     même fichier, identique à la conversion de référence du format ;
+//   - Nouveau puis génération aléatoire (fiches Dimensions et Génération) à
+//     graine fixe : même réseau que le golden master de la génération.
 // Les captures de la fenêtre principale sont écrites dans le dossier
 // CV_DOSSIER_CAPTURES (Démo au tour 0 et vers le tour 200).
 //---------------------------------------------------------------------------
@@ -27,10 +29,17 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
+#include <fstream>
+#include <sstream>
 #include "application.h"
+#include "f_dimzone.h"
+#include "f_genres.h"
 #include "f_infbus.h"
 #include "f_simul.h"
 #include "format_reference.h"
+#include "compat/alea.h" // après les en-têtes système
+//---------------------------------------------------------------------------
+extern TfrmGeneration *frmGeneration; // défini dans f_genres.cpp (non déclaré par f_genres.h d'origine)
 //---------------------------------------------------------------------------
 namespace
  {
@@ -73,6 +82,7 @@ class TestInterface : public QObject
   void raccourcisSelonLeMode();
   void marcheInterruptionArret();
   void enregistrementIdentique();
+  void nouveauEtGeneration();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -82,7 +92,20 @@ void TestInterface::initTestCase()
   Repondeur.setInterval(20);
   QObject::connect(&Repondeur, &QTimer::timeout, this, [this]()
    {
-    QMessageBox *b=qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+    QWidget *Modale=QApplication::activeModalWidget();
+    if (frmDimensionsZone&&(Modale==frmDimensionsZone))
+     { // Nouveau : dimensions proposées, génération aléatoire, sans les paramètres
+      frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
+      frmDimensionsZone->CheckBoxGenererReseau->Checked=true;
+      QTest::mouseClick(frmDimensionsZone->ButtonCreer, Qt::LeftButton);
+      return;
+     }
+    if (frmGeneration&&(Modale==frmGeneration))
+     {
+      QTest::mouseClick(frmGeneration->ButtonOk, Qt::LeftButton);
+      return;
+     }
+    QMessageBox *b=qobject_cast<QMessageBox *>(Modale);
     if (!b) return;
     Messages<<(b->windowTitle()+" : "+b->text());
     QAbstractButton *r=b->button(QMessageBox::No);
@@ -214,6 +237,46 @@ void TestInterface::enregistrementIdentique()
   conversion_cvw Reference=ConvertitEn530(Contenu(Origine).toStdString());
   QVERIFY(Reference.Ok);
   QVERIFY(o1.toStdString()==Reference.Octets);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::nouveauEtGeneration()
+ { // f_simul : ActionNouveauExecute -> f_dimzone -> f_genres (ButtonOkClick), graine 12345
+  alea::FixeGraine(12345);
+  Messages.clear();
+  QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  alea::LibereGraine();
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville"));
+  QCOMPARE(cv->NbX, NBXDEF);
+  QCOMPARE(cv->NbY, NBYDEF);
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QVERIFY(!frmDimensionsZone);
+  QVERIFY(!frmGeneration);
+  // Réseau généré = golden master « defaut_12345 » (tests/golden/generation)
+  std::ifstream f(std::string(CV_DOSSIER_GOLDEN)+"/generation/defaut_12345.txt");
+  QVERIFY(f.good());
+  std::string Ligne, Attendu, Obtenu;
+  bool Carte=false;
+  while(std::getline(f, Ligne))
+   {
+    if (Ligne.rfind("DirPoss", 0)==0) { Carte=true; continue; }
+    if (Carte&&(Ligne.rfind("etat=", 0)==0)) break;
+    if (Carte) Attendu+=Ligne+"\n";
+   }
+  char Tampon[4];
+  for(int j=0; j<cv->NbY; j++)
+   {
+    for(int i=0; i<cv->NbX; i++)
+     {
+      std::snprintf(Tampon, sizeof(Tampon), "%x", (int)cv->v[i][j].DirPoss);
+      Obtenu+=Tampon;
+     }
+    Obtenu+="\n";
+   }
+  QVERIFY(!Attendu.empty());
+  QVERIFY(Obtenu==Attendu);
+  frmSimulation->DrawGridSimul->Repaint();
+  Capture("generation_12345.png");
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()

@@ -477,6 +477,7 @@ namespace
        {
         if (e->type()!=QEvent::KeyPress) return false;
         FicheRaccourcis *f=FicheDe(w);
+        if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) return true;
         return f&&f->Apercu&&f->Apercu(k, false);
        }
       if (e->type()==QEvent::ShortcutOverride)
@@ -488,9 +489,10 @@ namespace
          }
         return false;
        }
-      // Raccourci (IsMenuKey), sinon KeyPreview : OnKeyDown de la fiche
+      // Raccourci (IsMenuKey), touche de dialogue (CM_DIALOGKEY), puis KeyPreview
       if (TraiteRaccourci(w, sc, true)) return true;
       FicheRaccourcis *f=FicheDe(w);
+      if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) return true;
       return f&&f->Apercu&&f->Apercu(k, false);
      }
    };
