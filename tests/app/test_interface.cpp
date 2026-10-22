@@ -2098,6 +2098,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   TPaintBox *p=f->PaintBoxStats;
   Clique(s->ToolButtonEvolution);
   QVERIFY(f->isVisible());
+  QVERIFY(QTest::qWaitForWindowExposed(f)); // affichage natif : la fiche n'est dessinée qu'une fois à l'écran
   QVERIFY(s->ActionEvolution->Checked);
   QVERIFY(!f->isModal()&&!QApplication::activeModalWidget());
   QVERIFY(f->windowFlags().testFlag(Qt::WindowStaysOnTopHint));

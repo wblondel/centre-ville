@@ -24,6 +24,8 @@ name: Recette Windows
 # Job « fiches » : le test d'interface (tests/app/test_interface.cpp), lancé
 # avec l'affichage natif de Windows, capture chacune des fiches (la CI les
 # capture en « offscreen », où Windows n'a pas de polices : texte illisible).
+# À regarder : libellés entiers (Microsoft Sans Serif pour MS Sans Serif),
+# valeurs des champs numériques visibles (style « windowsvista »).
 # Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
 # public, ARM64.
 #
