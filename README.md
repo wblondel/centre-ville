@@ -102,6 +102,7 @@ Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` 
 ### 3. Intégration continue
 * `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification.
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
+* `.github/workflows/recette-windows.yml` : à la main, installe le paquet Windows d'une release sur une machine Windows de GitHub, ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
 
 ### 4. Publier une version

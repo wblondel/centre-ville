@@ -10,6 +10,13 @@ l'installation, le système de fichiers, ni les navigateurs. Noter chaque
 
 Paquet : `Centre-Ville-<version>-Windows-x64-Setup.exe`.
 
+Sans machine Windows : le workflow « Recette Windows »
+(`.github/workflows/recette-windows.yml`, lancé à la main sur un tag) refait
+sur une machine Windows de GitHub l'installation, l'ouverture d'un `.cvw` par
+son association, F1, « À propos » et la désinstallation, et joint des
+captures d'écran au run. Il ne couvre ni SmartScreen, ni la mise à jour d'une
+5.4.3.2, ni Windows 10/11 grand public, ni ARM64.
+
 Installation neuve (machine sans Centre-Ville) :
 
 - [ ] SmartScreen : « Informations complémentaires », puis « Exécuter quand même ».
