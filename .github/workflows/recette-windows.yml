@@ -25,7 +25,8 @@ name: Recette Windows
 # avec l'affichage natif de Windows, capture chacune des fiches (la CI les
 # capture en « offscreen », où Windows n'a pas de polices : texte illisible).
 # À regarder : libellés entiers (Microsoft Sans Serif pour MS Sans Serif),
-# valeurs des champs numériques visibles (style « windowsvista »).
+# valeurs des champs numériques visibles (style « windowsvista ») ; le test
+# policesEtStyleWindows, actif seulement en affichage natif, les vérifie.
 # Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
 # public, ARM64.
 #

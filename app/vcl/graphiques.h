@@ -83,6 +83,10 @@ struct TPen
   TPenMode Mode=pmCopy;
  };
 //---------------------------------------------------------------------------
+// Familles Qt d'une police de la VCL : les polices « raster » de Windows
+// (MS Sans Serif, Small Fonts) ont leurs équivalents TrueType devant
+QStringList FamillesQt(const QString &Famille);
+//---------------------------------------------------------------------------
 struct TFont
  {
   AnsiString Name="MS Sans Serif";

@@ -56,9 +56,24 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
   return (TColor)std::stoul(asCouleur.str(), nullptr, 0);
  }
 //---------------------------------------------------------------------------
+// MS Sans Serif et Small Fonts, polices « raster » des fiches, ne sont pas
+// dessinées par Qt, même sous Windows où il les trouve (il prend alors une
+// police de secours plus large : libellés coupés). Leurs équivalents
+// TrueType passent devant : Microsoft Sans Serif (aux mêmes mesures, fournie
+// par Windows), Verdana ou Tahoma ; absents, les substitutions de
+// InitialiseApplication (application.cpp) s'appliquent.
+//---------------------------------------------------------------------------
+QStringList FamillesQt(const QString &Famille)
+ {
+  if (Famille==QLatin1String("MS Sans Serif")) return {"Microsoft Sans Serif", Famille};
+  if (Famille==QLatin1String("Small Fonts")) return {"Verdana", "Tahoma", Famille};
+  return {Famille};
+ }
+//---------------------------------------------------------------------------
 QFont TFont::Qt() const
  {
-  QFont f(Q(Name));
+  QFont f;
+  f.setFamilies(FamillesQt(Q(Name)));
   if (Height<0)
    f.setPixelSize(-Height); // Font.Height négatif = hauteur des caractères en pixels
   else

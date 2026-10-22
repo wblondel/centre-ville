@@ -210,6 +210,20 @@ void LieurComposants::Termine()
     f.setPixelSize(qAbs(h.toInt()));
     Fiche->setFont(f);
    }
+  // Polices « raster » de la fiche et de ses contrôles : équivalents TrueType (FamillesQt)
+  QList<QWidget *> AvecPolice=Fiche->findChildren<QWidget *>();
+  AvecPolice.prepend(Fiche);
+  for(QWidget *w : AvecPolice)
+   if (w->testAttribute(Qt::WA_SetFont))
+    {
+     QStringList Familles=FamillesQt(w->font().families().value(0));
+     if (Familles.size()>1)
+      {
+       QFont f=w->font();
+       f.setFamilies(Familles);
+       w->setFont(f);
+      }
+    }
  }
 //---------------------------------------------------------------------------
 QWidget *FichePrincipaleQt=nullptr;

@@ -68,6 +68,8 @@
 #include <QFile>
 #include <QFileOpenEvent>
 #include <QFocusEvent>
+#include <QFontDatabase>
+#include <QFontInfo>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPointer>
@@ -395,6 +397,8 @@ class TestInterface : public QObject
   void controleCSpinEdit();
   // Services système (phase 7)
   void aideContextuelle();
+  // Affichage natif de Windows (recette)
+  void policesEtStyleWindows();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -3115,6 +3119,21 @@ void TestInterface::aideContextuelle()
   QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLS")); // HelpContext 311
   QVERIFY(Messages.isEmpty());
   QDesktopServices::unsetUrlHandler("file");
+ }
+//---------------------------------------------------------------------------
+void TestInterface::policesEtStyleWindows()
+ { // Affichage natif de Windows (recette, pas la CI en « offscreen ») : les
+   // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
+   // (libellés entiers), avec le style « windowsvista » (valeur des champs
+   // numériques visible)
+  if (QGuiApplication::platformName()!=QLatin1String("windows")) QSKIP("affichage natif de Windows seulement");
+  QFont Police=frmRecherche->RadioButtonParking->font();
+  QString Diagnostic=QString("police de Rechercher : %1 (%2) ; MS Sans Serif trouvée : %3 ; Microsoft Sans Serif trouvée : %4 ; style : %5")
+                     .arg(QFontInfo(Police).family(), Police.families().join(", "))
+                     .arg(QFontDatabase::hasFamily("MS Sans Serif")).arg(QFontDatabase::hasFamily("Microsoft Sans Serif"))
+                     .arg(QApplication::style()->name());
+  QVERIFY2(QFontInfo(Police).family()==QLatin1String("Microsoft Sans Serif"), qPrintable(Diagnostic));
+  QVERIFY2(QApplication::style()->name()==QLatin1String("windowsvista"), qPrintable(Diagnostic));
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()
