@@ -21,6 +21,9 @@ name: Recette Windows
 #     cvw.exe 5.4.3.2 d'origine.
 # Les captures d'écran (fenêtre principale, aide, « À propos ») sont jointes
 # au run, avec les journaux d'installation, pour un contrôle à l'œil.
+# Job « fiches » : le test d'interface (tests/app/test_interface.cpp), lancé
+# avec l'affichage natif de Windows, capture chacune des fiches (la CI les
+# capture en « offscreen », où Windows n'a pas de polices : texte illisible).
 # Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
 # public, ARM64.
 #
@@ -61,6 +64,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Download the installer of the release
         run: |
@@ -264,3 +269,45 @@ jobs:
             interop
             desinstallation.log
           if-no-files-found: ignore
+
+  fiches:
+    name: Fiches (affichage natif de Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          cache: true
+
+      - name: Configure and build the interface test
+        run: |
+          cmake --preset ci -DCV_APP=ON -DCV_TESTS=ON
+          cmake --build --preset ci --target test_interface --parallel
+
+      # Les captures sont le résultat attendu : le test en échec ne les retient pas
+      - name: Interface test with the native Windows platform (screenshots)
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CV_CARTE: ${{ github.workspace }}\maps\Démo.cvw
+          CV_DOSSIER_CAPTURES: ${{ github.workspace }}\captures-natives
+          QT_FORCE_STDERR_LOGGING: 1
+        run: |
+          $test = (Get-ChildItem -Recurse build\ci -Filter test_interface.exe | Select-Object -First 1).FullName
+          & $test 2>&1 | Select-String -Pattern '^(PASS|FAIL|Totals)|Loc:' | ForEach-Object { $_.Line }
+          if ($LASTEXITCODE -ne 0) { throw "test d'interface : code $LASTEXITCODE" }
+
+      - name: Upload native screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiches-windows-natives
+          path: captures-natives
+          if-no-files-found: warn
