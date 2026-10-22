@@ -1,95 +1,254 @@
-name: Build Installer and Release
+name: Installeurs
+
+# Compile l'application Qt 6 (cvw) depuis les sources sur les trois systèmes
+# (phase 8 de PLAN_PORTAGE.md) et produit :
+#   - Windows : installeur Inno Setup (inno-setup/inscvw95.iss) sur le
+#     contenu de « cmake --install » (windeployqt, DLL de MSVC, aide) ;
+#   - macOS   : image disque .dmg (Centre-Ville.app universel arm64 + x86_64,
+#     macdeployqt, CPack) ;
+#   - Linux   : AppImage x86_64 (linuxdeploy et linuxdeploy-plugin-qt) ;
+#   - archives des sources.
+# Sur un tag v*, les paquets sont joints à une release GitHub ; lancé à la
+# main, il ne produit que les artefacts du workflow. Ni signature ni
+# notarisation : avertissements de SmartScreen et de Gatekeeper.
+# Le numéro de version est celui de project(VERSION) dans CMakeLists.txt.
 
 on:
   push:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      create_release:
-        description: 'Publish as GitHub Release?'
-        required: true
-        type: boolean
-        default: false
 
 permissions:
-  contents: write
+  contents: read
+
+env:
+  QT_VERSION: '6.8.*'
 
 jobs:
-  build-installer:
-    name: Build Inno Setup Installer
+  sources:
+    name: Archives des sources
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Version (CMakeLists.txt)
+        run: |
+          cmake --preset ci -DCV_APP=OFF -DCV_TESTS=OFF
+          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
+
+      - name: Archive sources
+        run: |
+          git archive --format=tar.gz --prefix="Centre-Ville-$VERSION/" -o "Centre-Ville-$VERSION-sources.tar.gz" HEAD
+          git archive --format=zip --prefix="Centre-Ville-$VERSION/" -o "Centre-Ville-$VERSION-sources.zip" HEAD
+
+      - name: Upload sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: sources
+          path: Centre-Ville-*-sources.*
+          if-no-files-found: error
+
+  windows:
+    name: Installeur Windows
     runs-on: windows-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      - name: Configure (CMake preset ci, MSVC)
+        run: cmake --preset ci -DCV_APP=ON -DCV_TESTS=OFF
+
+      - name: Build
+        run: cmake --build --preset ci --parallel
+
+      - name: Install (windeployqt, MSVC runtime, help)
+        run: cmake --install build/ci --config Release --prefix build/installeur
+
+      - name: Check installed files
+        shell: bash
+        run: |
+          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
+          for f in bin/cvw.exe bin/qt.conf bin/Qt6Core.dll bin/Qt6Widgets.dll bin/vcruntime140.dll \
+                   plugins/platforms/qwindows.dll translations/qt_fr.qm \
+                   bin/html/index.html bin/tutocv/index.html; do
+            test -f "build/installeur/$f" || { echo "absent : $f"; exit 1; }
+          done
+
+      - name: Archive sources for the installer (cvw-src-win64.zip)
+        run: git archive --format=zip -o cvw-src-win64.zip HEAD
+
       - name: Install Inno Setup
-        run: |
-          choco install innosetup --no-progress
-          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+        run: choco install innosetup --no-progress -y
 
-      - name: Package Source Zip Archive
+      # Inno Setup 6 (32 bits, Program Files (x86)) ou 7 (édition 64 bits,
+      # Program Files) : le script compile avec 6.3 et plus (essayé : 6.7.3, 7.1.0)
+      - name: Compile installer (ISCC)
         shell: pwsh
         run: |
-          # Ensure fresh source code zip archive matches repository state
-          7z a -tzip cvw-src-win64.zip src/ docs/ maps/ inno-setup/ res/ LICENSE
+          $iscc = Get-ChildItem "$env:ProgramFiles\Inno Setup *\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup *\ISCC.exe" -ErrorAction SilentlyContinue |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $iscc) { Write-Error "ISCC.exe introuvable"; exit 1 }
+          & $iscc.FullName "/DStaging=$PWD\build\installeur" inno-setup\inscvw95.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item inno-setup\output\inscvw95.exe "Centre-Ville-$env:VERSION-Windows-x64-Setup.exe"
 
-      - name: Verify Game Binaries
-        shell: pwsh
-        run: |
-          $bin64 = "bin/cvw.64.exe"
-          $bin32 = "bin/cvw.32.exe"
-          if (-not (Test-Path $bin64) -or -not (Test-Path $bin32)) {
-            Write-Host "Game binaries not found in 'bin/': $bin64 or $bin32"
-            Write-Host "Because binaries are not committed to Git, they must be compiled prior to installer creation."
-            Write-Host "Build them with C++Builder / RAD Studio: msbuild src/cvw.cbproj /p:Config=Release /p:Platform=Win64"
-            Write-Error "Missing required game binaries in bin/."
-            exit 1
-          }
-
-      - name: Compile Installer with ISCC
-        shell: cmd
-        run: |
-          cd inno-setup
-          mkdir output
-          iscc.exe inscvw95.iss
-
-      - name: Prepare Release Artifacts
-        shell: pwsh
-        run: |
-          # Rename output installer for clearer naming
-          $version = "${{ github.ref_name }}"
-          if (-not $version -or $version -eq "") {
-            $version = "v5.4.3.2"
-          }
-          $installerPath = Get-Item inno-setup/output/inscvw95.exe
-          $namedInstaller = "inno-setup/output/Centre-Ville_Setup_${version}.exe"
-          Copy-Item $installerPath.FullName $namedInstaller
-
-          # Create portable standalone zip package
-          7z a -tzip "Centre-Ville_Portable_${version}.zip" bin/ maps/ docs/ LICENSE
-
-      - name: Upload Installer Artifact
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
-          name: Centre-Ville-Setup
-          path: inno-setup/output/Centre-Ville_Setup_*.exe
+          name: windows
+          path: Centre-Ville-*-Windows-x64-Setup.exe
+          if-no-files-found: error
 
-      - name: Upload Portable Zip Artifact
+  macos:
+    name: Image disque macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      # Qt 6.8 : macOS 12 au minimum ; ses frameworks sont universels
+      - name: Configure (CMake preset ci, universal binary)
+        run: >
+          cmake --preset ci -DCV_APP=ON -DCV_TESTS=OFF
+          -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0
+
+      - name: Build
+        run: cmake --build --preset ci --parallel
+
+      # cpack installe Centre-Ville.app (macdeployqt, signature ad hoc) puis
+      # crée l'image avec hdiutil, qui échoue parfois (« Resource busy ») sur
+      # les machines de GitHub : jusqu'à trois essais
+      - name: Package (CPack DragNDrop)
+        working-directory: build/ci
+        run: |
+          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' CMakeCache.txt)" >> "$GITHUB_ENV"
+          for essai in 1 2 3; do
+            if cpack; then exit 0; fi
+            sleep 20
+          done
+          exit 1
+
+      - name: Check disk image
+        run: |
+          volume=$(hdiutil attach -nobrowse -readonly "build/ci/Centre-Ville-$VERSION-macOS.dmg" | tail -1 | cut -f3-)
+          app="$volume/Centre-Ville.app"
+          codesign --verify --deep --strict "$app"
+          lipo -archs "$app/Contents/MacOS/Centre-Ville"
+          for f in Contents/Resources/html/index.html Contents/Resources/tutocv/index.html \
+                   Contents/Resources/translations/qtbase_fr.qm Contents/PlugIns/platforms/libqcocoa.dylib; do
+            test -f "$app/$f" || { echo "absent : $f"; exit 1; }
+          done
+          test -f "$volume/Cartes/Démo.cvw"
+          hdiutil detach "$volume"
+
+      - name: Upload disk image
         uses: actions/upload-artifact@v4
         with:
-          name: Centre-Ville-Portable
-          path: Centre-Ville_Portable_*.zip
+          name: macos
+          path: build/ci/Centre-Ville-*-macOS.dmg
+          if-no-files-found: error
+
+  linux:
+    name: AppImage Linux
+    # Ubuntu 22.04 : glibc 2.35, l'AppImage tourne aussi sur les systèmes plus anciens que 24.04
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies of Qt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++-12 libgl1-mesa-dev libegl1 libopengl0 libxkbcommon-dev libxkbcommon-x11-0 \
+            libfontconfig1-dev libfreetype-dev libdbus-1-3 libxcb-cursor0 libxcb-icccm4 libxcb-image0 \
+            libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      - name: Configure (CMake preset ci, GCC 12)
+        run: cmake --preset ci -DCV_APP=ON -DCV_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_CXX_COMPILER=g++-12
+
+      - name: Build
+        run: cmake --build --preset ci --parallel
+
+      - name: Install into AppDir
+        run: |
+          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
+          DESTDIR="$PWD/AppDir" cmake --install build/ci
+
+      - name: Build AppImage (linuxdeploy, Qt plugin)
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          base=https://github.com/linuxdeploy
+          wget -q "$base/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          wget -q "$base/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x linuxdeploy*.AppImage
+          # cvw installé n'a plus le RPATH de la compilation : Qt par LD_LIBRARY_PATH
+          export QMAKE="$QT_ROOT_DIR/bin/qmake" LD_LIBRARY_PATH="$QT_ROOT_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export OUTPUT="Centre-Ville-$VERSION-x86_64.AppImage" LDAI_OUTPUT="Centre-Ville-$VERSION-x86_64.AppImage"
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/fr.patquoi.CentreVille.desktop \
+            --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/centre-ville.png \
+            --plugin qt --output appimage
+
+      - name: Check AppImage
+        run: |
+          ./Centre-Ville-$VERSION-x86_64.AppImage --appimage-extract > /dev/null
+          for f in usr/bin/cvw usr/bin/qt.conf usr/bin/html/index.html usr/bin/tutocv/index.html \
+                   usr/plugins/platforms/libqxcb.so usr/translations/qtbase_fr.qm \
+                   usr/share/mime/packages/fr.patquoi.CentreVille.xml; do
+            test -e "squashfs-root/$f" || { echo "absent : $f"; exit 1; }
+          done
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: Centre-Ville-*-x86_64.AppImage
+          if-no-files-found: error
+
+  release:
+    name: Release GitHub
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [sources, windows, macos, linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: paquets
+          merge-multiple: true
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') || inputs.create_release == true
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            inno-setup/output/Centre-Ville_Setup_*.exe
-            Centre-Ville_Portable_*.zip
-            cvw-src-win64.zip
+          files: paquets/*
           name: Centre-Ville ${{ github.ref_name }}
           draft: false
           prerelease: false
