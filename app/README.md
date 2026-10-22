@@ -259,6 +259,15 @@ les actions d'édition) ; Paramètres et ses quatre fiches filles modales
 d'édition) ; Carrefours 4x4 à feux. Paramètres et Carrefours : enregistrer
 puis rouvrir conserve les valeurs. Les fiches modales sont pilotées par
 étapes (`QuandModale`).
+Les simulations des tests (lots 2 et 3, aide) sont jouées pas à pas, à graine
+fixe : `Demarre` arrête le minuteur `TimerSimul` et le test joue chaque tour
+par son gestionnaire (`JoueTour`), puis traite les événements comme la boucle
+de l'application ; aucun tour ne peut ainsi tomber entre ce que le test
+observe et ce qu'il vérifie (des vérifications échouaient de temps en temps
+sous macOS en CI). Arrêt et Interruption, traités au tic suivant du minuteur,
+le relancent. Seul le test Marche / Interruption / Arrêt garde le temps réel.
+Un clic sur une case est suivi de son dessin, qui règle l'état des actions
+(« Suivre... ») avant la touche suivante, comme pour l'utilisateur.
 Lot 2, en simulation à graine fixe sur des copies de Géant (arrêts, files et
 places de chaque sorte) et de Démo (parkings seulement) : les six fiches de distances,
 ouvertes par menu, menu contextuel, raccourci ou action sur une case de
