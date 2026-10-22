@@ -6,7 +6,7 @@
 
 **Centre-Ville** est un logiciel de simulation de circulation urbaine complet, interactif et pédagogique créé par **Patrice Fouquet** ([patquoi.fr](http://patquoi.fr#cvw)). Initialement développé pour Windows (Windows 95/XP jusqu'à Windows 10/11), il est distribué sous licence **GNU General Public License v2.0 (GPLv2)**.
 
-Cette version correspond à la version officielle finale **v5.4.3.2**, portée vers **C++20, CMake et Qt 6** pour Windows, macOS et Linux (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)) : même moteur de simulation, mêmes fenêtres, même format de fichier `.cvw`.
+La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C++Builder (Windows seulement) vers **C++20, CMake et Qt 6**, et native sous Windows, macOS et Linux : même moteur de simulation, mêmes fenêtres, menus et raccourcis, même aide, même format de fichier `.cvw` (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md) et [`CHANGELOG.md`](CHANGELOG.md)).
 
 ---
 
@@ -40,11 +40,13 @@ Cette version correspond à la version officielle finale **v5.4.3.2**, portée v
 ├── docs/                         # Documentation en ligne (Guide & Tutoriels)
 │   ├── index.html                # Portail d'accueil moderne
 │   ├── guide/                    # Manuel complet d'utilisation (HTML), aide F1 de l'application
-│   └── tutorial/                 # Tutoriel pas-à-pas illustré
+│   ├── tutorial/                 # Tutoriel pas-à-pas illustré
+│   └── RECETTE.md                # Liste de recette d'une version (Windows, macOS, Linux)
 ├── inno-setup/                   # Script d'installation Inno Setup (inscvw95.iss)
 ├── maps/                         # Cartes de simulation d'exemple (*.cvw)
 ├── res/                          # Icônes et bitmaps graphiques haute résolution
-├── src/                          # Code source d'origine C++Builder VCL (référence du portage, lecture seule)
+├── src/                          # Code VCL d'origine (C++Builder), en lecture seule : voir plus bas
+├── CHANGELOG.md                  # Journal des versions (notes des releases), bogues d'origine conservés
 ├── CMakeLists.txt                # Projet CMake (numéro de version)
 ├── CMakePresets.json
 ├── PLAN_PORTAGE.md               # Plan et état du portage
@@ -56,10 +58,10 @@ Cette version correspond à la version officielle finale **v5.4.3.2**, portée v
 
 ## 🚀 Installation & Exécution
 
-Les paquets sont joints aux [Releases](../../releases) (sans signature : le système affiche un avertissement au premier lancement).
+Les paquets sont joints aux [Releases](../../releases) (sans signature : le système affiche un avertissement au premier lancement). Les versions marquées « Pre-release » (par exemple `6.0.0-rc1`) sont des versions candidates, à essayer avant la version finale.
 
 ### Windows 10 / 11 (64 bits)
-Téléchargez `Centre-Ville-<version>-Windows-x64-Setup.exe` et suivez l'assistant Inno Setup : il installe Centre-Ville, son aide et ses cartes d'exemple (dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`) et associe les fichiers `.cvw`. Il remplace une version 5.4.3.2 d'origine déjà installée. Si SmartScreen bloque l'installeur : « Informations complémentaires », puis « Exécuter quand même ». La version 32 bits n'existe plus (Qt 6) ; Windows ARM64 exécute la version x64.
+Téléchargez `Centre-Ville-<version>-Windows-x64-Setup.exe` et suivez l'assistant Inno Setup : il installe Centre-Ville, son aide et ses cartes d'exemple (dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`) et associe les fichiers `.cvw`. Il met à jour une version 5.4.3.2 d'origine déjà installée (même identifiant d'application). Si SmartScreen bloque l'installeur : « Informations complémentaires », puis « Exécuter quand même ». La version 32 bits n'existe plus (Qt 6) ; Windows ARM64 exécute la version x64.
 
 ### macOS 12 ou plus récent (Apple Silicon et Intel)
 Ouvrez `Centre-Ville-<version>-macOS.dmg` et glissez **Centre-Ville** dans **Applications** ; le dossier `Cartes` contient les cartes d'exemple. L'application n'étant pas notarisée, macOS refuse le premier lancement : ouvrez **Réglages Système › Confidentialité et sécurité**, puis « Ouvrir quand même », ou retirez la quarantaine :
@@ -73,7 +75,7 @@ Téléchargez `Centre-Ville-<version>-x86_64.AppImage`, rendez-la exécutable et
 chmod +x Centre-Ville-*-x86_64.AppImage
 ./Centre-Ville-*-x86_64.AppImage
 ```
-Les cartes d'exemple sont dans le dossier `maps/` de l'archive des sources. Sans FUSE, ajoutez l'option `--appimage-extract-and-run`. L'association des fichiers `.cvw` demande un outil d'intégration des AppImage (AppImageLauncher, Gear Lever) ou une installation par CMake (ci-dessous).
+Au premier lancement, l'AppImage copie les cartes d'exemple dans `~/.local/share/Patquoi.fr/Centre-Ville` (sans écraser un fichier existant), où « Ouvrir » et « Enregistrer » démarrent, comme l'installeur Windows dans `%LOCALAPPDATA%`. Il faut une distribution x86_64 avec glibc 2.35 ou plus récente (Ubuntu 22.04, Debian 12…). Sans FUSE, ajoutez l'option `--appimage-extract-and-run`. L'association des fichiers `.cvw` demande un outil d'intégration des AppImage (AppImageLauncher, Gear Lever) ou une installation par CMake (ci-dessous). Avec un navigateur confiné (snap ou Flatpak, comme le Firefox d'Ubuntu), l'aide de l'AppImage ne s'ouvre pas : utilisez un navigateur installé autrement, ou l'aide en ligne.
 
 ---
 
@@ -93,17 +95,44 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt /
 ```
 * **Windows** : `iscc /DStaging=<chemin absolu de build\installeur> inno-setup\inscvw95.iss` (Inno Setup ≥ 6.3).
 * **macOS** : `cd build/release && cpack` produit `Centre-Ville-<version>-macOS.dmg`.
-* **Linux** : AppImage avec [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) et son greffon Qt, comme dans `build-installer.yml` ; ou installation dans un préfixe dédié (`--prefix /opt/centre-ville`), avec entrée de bureau et type MIME des fichiers `.cvw`.
+* **Linux** : AppImage avec [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) et son greffon Qt, comme dans `build-installer.yml` (le crochet `app/linux/apprun-hooks/centre-ville-cartes.sh` copie les cartes au premier lancement) ; ou installation dans un préfixe dédié (`--prefix /opt/centre-ville`), avec entrée de bureau, type MIME des fichiers `.cvw` et cartes dans `share/centre-ville/cartes`.
 
-Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt`.
+Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,0 »).
 
 ### 3. Intégration continue
 * `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification.
-* `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub.
+* `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
 
-### 4. Code d'origine (C++Builder)
-Le code VCL d'origine reste dans `src/` (référence du portage) : `src/cvw.cbproj` s'ouvre dans Embarcadero C++Builder (RAD Studio 10.3 / 10.4).
+### 4. Publier une version
+1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).
+2. Pousser un tag : `v<version>-rc1` (ou tout autre suffixe) publie une **pré-release**, `v<version>` une release. Un tag qui ne correspond pas à `project(VERSION)`, ou une version sans section dans `CHANGELOG.md`, arrête le workflow avant toute compilation.
+3. Faire la recette des paquets : [`docs/RECETTE.md`](docs/RECETTE.md).
+
+### 5. Code d'origine (`src/`)
+`src/` contient le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4). Il est en **lecture seule** : on ne le modifie pas, mais il sert encore de source au portage :
+* `tools/dfm2ui.py` produit les fiches Qt (`app/ui/*.ui`) depuis ses `.dfm` ;
+* `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
+* le test de l'aide (`tests/app/test_aide.cpp`) lit la table des rubriques de `src/base.cpp` ;
+* deux contrôles de la CI (`tests-moteur.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
+
+Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` montre le portage ligne à ligne.
+
+---
+
+## 📊 État du portage
+
+| Phase ([`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)) | État |
+|---|---|
+| 0. Préparation et oracle | En partie : binaire officiel désassemblé (générateur aléatoire, ordre des tirages) ; pas d'original instrumenté. |
+| 1-2. Moteur autonome et tests (golden master) | Fait (`engine/`, `tests/`). |
+| 3-5. Ressources, grille de simulation, fiche principale | Fait. |
+| 6. Les 32 fiches secondaires | Fait (les 33 fiches sont portées). |
+| 7. Services système (aide F1, journal) | Fait. |
+| 8. Build, CI et distribution | Fait : installeurs Windows, macOS et Linux compilés par la CI. |
+| 9. Recette et bascule | En cours : version 6.0.0, pré-release `6.0.0-rc1` à recetter ([`docs/RECETTE.md`](docs/RECETTE.md)). |
+
+Les écarts avec l'original et les bogues d'origine conservés sont listés dans [`CHANGELOG.md`](CHANGELOG.md) et [`app/README.md`](app/README.md).
 
 ---
 
@@ -114,7 +143,10 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Découplage complet du moteur de simulation de la couche VCL.
 * [x] Portage vers un framework multiplateforme moderne (**Qt 6** avec CMake).
 * [x] Compilation native sous Linux et macOS sans émulation Wine.
-* [ ] Recette complète et bascule (phase 9 du plan de portage).
+* [x] Installeurs Windows, macOS et Linux compilés depuis les sources.
+* [ ] Recette de la version 6.0.0 sur les trois systèmes, puis bascule (phase 9).
+* [ ] Après la bascule : corriger les bogues d'origine conservés ([`CHANGELOG.md`](CHANGELOG.md)), dont le blocage des vehlibs sur Géant.
+* [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.
 

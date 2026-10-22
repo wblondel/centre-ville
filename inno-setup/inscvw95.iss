@@ -6,8 +6,8 @@
 ; DLL de Qt et de MSVC, bin\qt.conf, plugins\ et translations\ (windeployqt),
 ; aide bin\html et bin\tutocv. Qt 6 n'existant pas en 32 bits, cvw.32.exe est
 ; abandonné : Windows 10/11 x64, ou ARM64 avec l'émulation x64. Le numéro de
-; version est lu dans les ressources de cvw.exe (project(VERSION) de
-; CMakeLists.txt). Même AppId que l'installeur d'origine : il le met à jour.
+; version est lu dans les ressources de cvw.exe (FileVersion : project(VERSION)
+; de CMakeLists.txt). Même AppId que l'installeur d'origine : il le met à jour.
 ;
 ;   iscc inscvw95.iss                          (Staging : ..\build\installeur)
 ;   iscc /DStaging=C:\chemin\absolu inscvw95.iss
@@ -20,7 +20,7 @@
 #ifndef Staging
   #define Staging AddBackslash(SourcePath) + "..\build\installeur"
 #endif
-#define MyAppVersion GetVersionNumbersString(Staging + "\bin\cvw.exe")
+#define MyAppVersion GetStringFileInfo(Staging + "\bin\cvw.exe", "FileVersion")
 #if MyAppVersion == ""
   #error cvw.exe introuvable dans Staging\bin ou sans numéro de version (cmake --install)
 #endif

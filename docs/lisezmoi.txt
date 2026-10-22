@@ -32,6 +32,14 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.0] 
+ - Portage de la version 5.4.3.2 vers C++20, CMake et Qt 6 : Centre-Ville
+   fonctionne nativement sous Windows 10/11 (64 bits), macOS 12 ou plus
+   récent et Linux (AppImage).
+ - Même moteur de simulation, mêmes fenêtres, même format de fichier .cvw.
+ - Fin de la version 32 bits (Qt 6 n'existe qu'en 64 bits).
+ - Code source : https://github.com/wblondel/centre-ville
+
 [Version 5.4.3] 
  - Icônes en haute résolution.
  - Aide en ligne mise à jour (icône associée aux parties sauvegardées).

@@ -130,4 +130,18 @@ if(TARGET cvwfiches)
   set_tests_properties(interface.aide PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"
   )
+
+  # Cartes d'exemple de l'AppImage (phase 9) : copiées au premier lancement
+  # dans le dossier de stRepLocalAppData (app/linux/apprun-hooks)
+  add_executable(test_cartes app/test_cartes.cpp)
+  set_target_properties(test_cartes PROPERTIES AUTOMOC ON)
+  target_link_libraries(test_cartes PRIVATE cvwfiches Qt6::Test)
+  target_compile_definitions(test_cartes PRIVATE
+    CV_SCRIPT_CARTES="${PROJECT_SOURCE_DIR}/app/linux/apprun-hooks/centre-ville-cartes.sh"
+    CV_DOSSIER_CARTES="${PROJECT_SOURCE_DIR}/maps"
+  )
+  add_test(NAME interface.cartes COMMAND test_cartes)
+  set_tests_properties(interface.cartes PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"
+  )
 endif()

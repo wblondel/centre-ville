@@ -25,6 +25,15 @@ else()
   endif()
 endif()
 
+# Numéro de version : project(VERSION) du CMakeLists.txt racine ; les numéros
+# absents (6.0.0 n'a pas de 4e numéro) valent 0
+foreach(partie PATCH TWEAK)
+  set(CV_VERSION_${partie} "${PROJECT_VERSION_${partie}}")
+  if("${CV_VERSION_${partie}}" STREQUAL "")
+    set(CV_VERSION_${partie} 0)
+  endif()
+endforeach()
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -70,6 +79,12 @@ add_library(cvwfiches STATIC
 )
 target_include_directories(cvwfiches PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ui ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(cvwfiches PUBLIC cvvcl)
+# Version affichée par « À propos » (ImageVersion, LabelSousVersion) : project(VERSION)
+target_compile_definitions(cvwfiches PUBLIC
+  CV_VERSION_MAJEURE=${PROJECT_VERSION_MAJOR}
+  CV_VERSION_MINEURE=${PROJECT_VERSION_MINOR}
+  CV_VERSION_CORRECTIVE=${CV_VERSION_PATCH}
+)
 if(MSVC)
   target_compile_options(cvwfiches PRIVATE /bigobj)
 endif()
@@ -173,7 +188,8 @@ add_dependencies(cvw cvw_aide)
 #             l'installeur (inno-setup/inscvw95.iss) ;
 #   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
 #   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
-#             fichiers .cvw, icônes ; Qt est déployé par linuxdeploy (AppImage).
+#             fichiers .cvw, icônes, cartes d'exemple (share/centre-ville/cartes) ;
+#             Qt est déployé par linuxdeploy (AppImage).
 include(GNUInstallDirs)
 if(APPLE)
   install(TARGETS cvw BUNDLE DESTINATION .)
@@ -192,6 +208,10 @@ if(UNIX AND NOT APPLE)
           DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps)
   install(FILES ressources/icones/application-x-centre-ville.png
           DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/mimetypes)
+  # Cartes d'exemple, copiées au premier lancement de l'AppImage dans le dossier
+  # de stRepLocalAppData (linux/apprun-hooks/centre-ville-cartes.sh)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/maps/ DESTINATION ${CMAKE_INSTALL_DATADIR}/centre-ville/cartes
+          FILES_MATCHING PATTERN "*.cvw")
 endif()
 
 if(WIN32 OR APPLE)
