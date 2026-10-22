@@ -25,6 +25,15 @@ else()
   endif()
 endif()
 
+# Numéro de version : project(VERSION) du CMakeLists.txt racine ; les numéros
+# absents (6.0.0 n'a pas de 4e numéro) valent 0
+foreach(partie PATCH TWEAK)
+  set(CV_VERSION_${partie} "${PROJECT_VERSION_${partie}}")
+  if("${CV_VERSION_${partie}}" STREQUAL "")
+    set(CV_VERSION_${partie} 0)
+  endif()
+endforeach()
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -70,6 +79,12 @@ add_library(cvwfiches STATIC
 )
 target_include_directories(cvwfiches PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/ui ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(cvwfiches PUBLIC cvvcl)
+# Version affichée par « À propos » (ImageVersion, LabelSousVersion) : project(VERSION)
+target_compile_definitions(cvwfiches PUBLIC
+  CV_VERSION_MAJEURE=${PROJECT_VERSION_MAJOR}
+  CV_VERSION_MINEURE=${PROJECT_VERSION_MINOR}
+  CV_VERSION_CORRECTIVE=${CV_VERSION_PATCH}
+)
 if(MSVC)
   target_compile_options(cvwfiches PRIVATE /bigobj)
 endif()

@@ -19,6 +19,7 @@
 //#include <Vcl.VirtualImageList.hpp> // portage
 //#include <System.ImageList.hpp> // portage
 //---------------------------------------------------------------------------
+class QPixmap; // portage
 class TfrmAPropos : public TForm
 {
 public: // portage : __published
@@ -58,5 +59,7 @@ public:		// Déclarations de l'utilisateur
 };
 //---------------------------------------------------------------------------
 extern TfrmAPropos *frmAPropos;
+// portage : image « majeure,mineure » de ImageVersion, dessinée comme la bitmap d'origine
+extern QPixmap ImageDeVersion(int Majeure, int Mineure);
 //---------------------------------------------------------------------------
 #endif

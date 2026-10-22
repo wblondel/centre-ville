@@ -471,6 +471,20 @@ void TestInterface::aProposAuDemarrage()
   QVERIFY(frmAPropos->FermetureAutomatique);
   QVERIFY(frmAPropos->Timer->Enabled);
   QCOMPARE(Q(frmAPropos->LabelAlignement->Caption), QString("version 64 bits"));
+  // Version de project(VERSION) : ImageVersion (« majeure,mineure », dessinée
+  // comme la bitmap d'origine « 5,4 », redessinée ici à l'identique) et
+  // LabelSousVersion (« ,corrective »)
+  auto ImageARGB=[](const QPixmap &p)
+   { // pixels seulement (QImage::operator== compare aussi l'espace colorimétrique du PNG)
+    QImage i=p.toImage().convertToFormat(QImage::Format_ARGB32);
+    QList<QRgb> Pixels;
+    for(int y=0; y<i.height(); y++)
+     for(int x=0; x<i.width(); x++) Pixels<<i.pixel(x, y);
+    return QPair<QSize, QList<QRgb>>(i.size(), Pixels);
+   };
+  QCOMPARE(ImageARGB(ImageDeVersion(5, 4)), ImageARGB(QPixmap(":/images/f_propos/ImageVersion.png")));
+  QCOMPARE(ImageARGB(frmAPropos->ImageVersion->pixmap()), ImageARGB(ImageDeVersion(CV_VERSION_MAJEURE, CV_VERSION_MINEURE)));
+  QCOMPARE(Q(frmAPropos->LabelSousVersion->Caption), QString(",%1").arg(CV_VERSION_CORRECTIVE));
   QVERIFY2(QRegularExpression("^HDPI x\\d,\\d$").match(Q(frmAPropos->LabelHDPI->Caption)).hasMatch(),
            qPrintable(Q(frmAPropos->LabelHDPI->Caption)));
   QVERIFY(frmAPropos->SpeedButtonOk->Glyph.Ref().Image.toImage()==frmAPropos->VirtualImageList->Pixmap(0).toImage());

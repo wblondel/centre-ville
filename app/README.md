@@ -89,9 +89,12 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 5.4.3.2)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.0)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
-lues par l'installeur Inno Setup, noms des paquets).
+lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
+`ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
+`ImageDeVersion`, et `LabelSousVersion` « ,0 »). Le format des fichiers
+`.cvw` ne change pas (`VERSION 0x530`).
 
 ```bash
 cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
