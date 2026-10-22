@@ -93,7 +93,8 @@ jobs:
         run: |
           New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge -Force | Out-Null
           Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge -Name HideFirstRunExperience -Value 1 -Type DWord
-          cmd /c "assoc .html & assoc .cvw"
+          # (pour information ; .cvw n'est pas encore associé)
+          cmd /c "assoc .html & ftype htmlfile & assoc .cvw & exit /b 0"
           Get-ComputerInfo -Property OsName, OsVersion | Format-List
 
       # Mise à jour : la 5.4.3.2 d'origine d'abord (patquoi.free.fr), même AppId
