@@ -200,6 +200,13 @@ jobs:
             test -f "$app/$f" || { echo "absent : $f"; exit 1; }
           done
           test -f "$volume/Cartes/Démo.cvw"
+          # Lancement : l'application doit tourner encore après 15 s (une
+          # bibliothèque introuvable l'arrête aussitôt)
+          "$app/Contents/MacOS/Centre-Ville" > lancement.log 2>&1 &
+          pid=$!
+          sleep 15
+          if ! kill -0 $pid 2>/dev/null; then cat lancement.log; echo "::error::Centre-Ville.app ne démarre pas"; exit 1; fi
+          kill $pid
           hdiutil detach "$volume"
 
       - name: Upload disk image
@@ -224,7 +231,7 @@ jobs:
       - name: Install Linux dependencies of Qt
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-12 libgl1-mesa-dev libegl1 libopengl0 libxkbcommon-dev libxkbcommon-x11-0 \
+          sudo apt-get install -y g++-12 xvfb libgl1-mesa-dev libegl1 libopengl0 libxkbcommon-dev libxkbcommon-x11-0 \
             libfontconfig1-dev libfreetype-dev libdbus-1-3 libxcb-cursor0 libxcb-icccm4 libxcb-image0 \
             libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1
 
@@ -273,6 +280,20 @@ jobs:
             test -e "squashfs-root/$f" || { echo "absent : $f"; exit 1; }
           done
           grep -q centre-ville-cartes.sh squashfs-root/AppRun || { echo "AppRun ne lit pas le crochet des cartes"; exit 1; }
+
+      # Lancement sous Xvfb, avec un dossier personnel vierge : l'application
+      # tourne encore après 20 s et les 6 cartes d'exemple ont été copiées
+      - name: Launch AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          export HOME="$RUNNER_TEMP/utilisateur"
+          mkdir -p "$HOME"
+          code=0
+          timeout 20 xvfb-run -a "./Centre-Ville-$PAQUET-x86_64.AppImage" > lancement.log 2>&1 || code=$?
+          if [ "$code" -ne 124 ]; then cat lancement.log; echo "::error::l'AppImage ne démarre pas (code $code)"; exit 1; fi
+          ls "$HOME/.local/share/Patquoi.fr/Centre-Ville"
+          test "$(ls "$HOME/.local/share/Patquoi.fr/Centre-Ville"/*.cvw | wc -l)" -eq 6
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
