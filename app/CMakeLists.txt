@@ -133,10 +133,15 @@ if(WIN32)
   target_sources(cvw PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/cvw.rc)
 elseif(APPLE)
   # Paquet Centre-Ville.app ; icônes .icns produites depuis les PNG de
-  # app/ressources/icones (tools/extrait_icones.py)
+  # app/ressources/icones (tools/extrait_icones.py). Le Qt officiel désigne ses
+  # frameworks par @rpath : le paquet installé les cherche dans
+  # Contents/Frameworks (où macdeployqt les copie), CMake retirant à
+  # l'installation le chemin de la compilation et macdeployqt n'en ajoutant
+  # pas (sans cela : « Library not loaded: @rpath/QtWidgets.framework »)
   set_target_properties(cvw PROPERTIES
     OUTPUT_NAME "Centre-Ville"
     MACOSX_BUNDLE_ICON_FILE centre-ville.icns
+    INSTALL_RPATH "@executable_path/../Frameworks"
   )
   foreach(icone centre-ville application-x-centre-ville)
     set(icns ${CMAKE_CURRENT_BINARY_DIR}/icones/${icone}.icns)
