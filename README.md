@@ -131,7 +131,7 @@ Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-in
 | 6. Les 32 fiches secondaires | Fait (les 33 fiches sont portées). |
 | 7. Services système (aide F1, journal) | Fait. |
 | 8. Build, CI et distribution | Fait : installeurs Windows, macOS et Linux compilés par la CI. |
-| 9. Recette et bascule | En cours : version 6.0.0, pré-release `6.0.0-rc1` à recetter ([`docs/RECETTE.md`](docs/RECETTE.md)). |
+| 9. Recette et bascule | Fait : version 6.0.0 après trois pré-releases. Recette automatisée sous Windows (installation, mise à jour d'une 5.4.3.2, interopérabilité avec l'original, fiches en affichage natif : workflow « Recette Windows »), sous macOS et sous Linux ; restent à faire à la main, sur de vrais postes, les points de [`docs/RECETTE.md`](docs/RECETTE.md) que ces machines ne couvrent pas (SmartScreen, Gatekeeper, Windows 10/11 grand public et ARM64). |
 
 Les écarts avec l'original et les bogues d'origine conservés sont listés dans [`CHANGELOG.md`](CHANGELOG.md) et [`app/README.md`](app/README.md).
 
@@ -145,7 +145,7 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Portage vers un framework multiplateforme moderne (**Qt 6** avec CMake).
 * [x] Compilation native sous Linux et macOS sans émulation Wine.
 * [x] Installeurs Windows, macOS et Linux compilés depuis les sources.
-* [ ] Recette de la version 6.0.0 sur les trois systèmes, puis bascule (phase 9).
+* [x] Recette de la version 6.0.0 sur les trois systèmes, puis bascule (phase 9).
 * [ ] Après la bascule : corriger les bogues d'origine conservés ([`CHANGELOG.md`](CHANGELOG.md)), dont le blocage des vehlibs sur Géant.
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
