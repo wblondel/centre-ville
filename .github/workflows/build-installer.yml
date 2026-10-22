@@ -1,17 +1,21 @@
 name: Installeurs
 
 # Compile l'application Qt 6 (cvw) depuis les sources sur les trois systèmes
-# (phase 8 de PLAN_PORTAGE.md) et produit :
+# (phases 8 et 9 de PLAN_PORTAGE.md) et produit :
 #   - Windows : installeur Inno Setup (inno-setup/inscvw95.iss) sur le
 #     contenu de « cmake --install » (windeployqt, DLL de MSVC, aide) ;
 #   - macOS   : image disque .dmg (Centre-Ville.app universel arm64 + x86_64,
 #     macdeployqt, CPack) ;
-#   - Linux   : AppImage x86_64 (linuxdeploy et linuxdeploy-plugin-qt) ;
+#   - Linux   : AppImage x86_64 (linuxdeploy et linuxdeploy-plugin-qt), qui
+#     copie les cartes d'exemple au premier lancement ;
 #   - archives des sources.
-# Sur un tag v*, les paquets sont joints à une release GitHub ; lancé à la
-# main, il ne produit que les artefacts du workflow. Ni signature ni
-# notarisation : avertissements de SmartScreen et de Gatekeeper.
 # Le numéro de version est celui de project(VERSION) dans CMakeLists.txt.
+# Sur un tag v<version> (release) ou v<version>-<suffixe> (pré-release, par
+# exemple v6.0.0-rc1), les paquets, nommés d'après le tag, sont joints à une
+# release GitHub dont les notes sont la section de la version dans
+# CHANGELOG.md ; un tag qui ne correspond pas à la version arrête tout. Lancé
+# à la main, le workflow ne produit que ses artefacts. Ni signature ni
+# notarisation : avertissements de SmartScreen et de Gatekeeper.
 
 on:
   push:
@@ -26,23 +30,52 @@ env:
   QT_VERSION: '6.8.*'
 
 jobs:
-  sources:
-    name: Archives des sources
+  version:
+    name: Version
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      paquet: ${{ steps.version.outputs.paquet }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Version (CMakeLists.txt)
+      - name: Version of CMakeLists.txt, tag and CHANGELOG.md
+        id: version
         run: |
-          cmake --preset ci -DCV_APP=OFF -DCV_TESTS=OFF
-          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
+          cmake --preset ci -DCV_APP=OFF -DCV_TESTS=OFF > /dev/null
+          version=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)
+          paquet=$version
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            tag=${GITHUB_REF_NAME#v}
+            case "$tag" in
+              "$version"|"$version"-*) paquet=$tag ;;
+              *) echo "::error::Le tag $GITHUB_REF_NAME ne correspond pas à project(VERSION $version) de CMakeLists.txt"; exit 1 ;;
+            esac
+          fi
+          grep -q "^## \[$version\]" CHANGELOG.md || { echo "::error::CHANGELOG.md n'a pas de section « ## [$version] »"; exit 1; }
+          prerelease=false
+          [ "$paquet" != "$version" ] && prerelease=true
+          echo "Version $version, paquets $paquet, pré-release : $prerelease"
+          { echo "version=$version"; echo "paquet=$paquet"; echo "prerelease=$prerelease"; } >> "$GITHUB_OUTPUT"
+
+  sources:
+    name: Archives des sources
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      PAQUET: ${{ needs.version.outputs.paquet }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Archive sources
         run: |
-          git archive --format=tar.gz --prefix="Centre-Ville-$VERSION/" -o "Centre-Ville-$VERSION-sources.tar.gz" HEAD
-          git archive --format=zip --prefix="Centre-Ville-$VERSION/" -o "Centre-Ville-$VERSION-sources.zip" HEAD
+          git archive --format=tar.gz --prefix="Centre-Ville-$PAQUET/" -o "Centre-Ville-$PAQUET-sources.tar.gz" HEAD
+          git archive --format=zip --prefix="Centre-Ville-$PAQUET/" -o "Centre-Ville-$PAQUET-sources.zip" HEAD
 
       - name: Upload sources
         uses: actions/upload-artifact@v4
@@ -53,7 +86,10 @@ jobs:
 
   windows:
     name: Installeur Windows
+    needs: version
     runs-on: windows-latest
+    env:
+      PAQUET: ${{ needs.version.outputs.paquet }}
 
     steps:
       - name: Checkout repository
@@ -78,7 +114,6 @@ jobs:
       - name: Check installed files
         shell: bash
         run: |
-          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
           for f in bin/cvw.exe bin/qt.conf bin/Qt6Core.dll bin/Qt6Widgets.dll bin/vcruntime140.dll \
                    plugins/platforms/qwindows.dll translations/qt_fr.qm \
                    bin/html/index.html bin/tutocv/index.html; do
@@ -101,7 +136,7 @@ jobs:
           if (-not $iscc) { Write-Error "ISCC.exe introuvable"; exit 1 }
           & $iscc.FullName "/DStaging=$PWD\build\installeur" inno-setup\inscvw95.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Move-Item inno-setup\output\inscvw95.exe "Centre-Ville-$env:VERSION-Windows-x64-Setup.exe"
+          Move-Item inno-setup\output\inscvw95.exe "Centre-Ville-$env:PAQUET-Windows-x64-Setup.exe"
 
       - name: Upload installer
         uses: actions/upload-artifact@v4
@@ -112,7 +147,11 @@ jobs:
 
   macos:
     name: Image disque macOS
+    needs: version
     runs-on: macos-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      PAQUET: ${{ needs.version.outputs.paquet }}
 
     steps:
       - name: Checkout repository
@@ -135,23 +174,27 @@ jobs:
 
       # cpack installe Centre-Ville.app (macdeployqt, signature ad hoc) puis
       # crée l'image avec hdiutil, qui échoue parfois (« Resource busy ») sur
-      # les machines de GitHub : jusqu'à trois essais
+      # les machines de GitHub : jusqu'à trois essais. L'image porte le nom
+      # de la version (CPack), renommée d'après le tag d'une pré-release.
       - name: Package (CPack DragNDrop)
         working-directory: build/ci
         run: |
-          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' CMakeCache.txt)" >> "$GITHUB_ENV"
           for essai in 1 2 3; do
-            if cpack; then exit 0; fi
+            if cpack; then
+              [ "$PAQUET" = "$VERSION" ] || mv "Centre-Ville-$VERSION-macOS.dmg" "Centre-Ville-$PAQUET-macOS.dmg"
+              exit 0
+            fi
             sleep 20
           done
           exit 1
 
       - name: Check disk image
         run: |
-          volume=$(hdiutil attach -nobrowse -readonly "build/ci/Centre-Ville-$VERSION-macOS.dmg" | tail -1 | cut -f3-)
+          volume=$(hdiutil attach -nobrowse -readonly "build/ci/Centre-Ville-$PAQUET-macOS.dmg" | tail -1 | cut -f3-)
           app="$volume/Centre-Ville.app"
           codesign --verify --deep --strict "$app"
           lipo -archs "$app/Contents/MacOS/Centre-Ville"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" = "$VERSION"
           for f in Contents/Resources/html/index.html Contents/Resources/tutocv/index.html \
                    Contents/Resources/translations/qtbase_fr.qm Contents/PlugIns/platforms/libqcocoa.dylib; do
             test -f "$app/$f" || { echo "absent : $f"; exit 1; }
@@ -168,8 +211,11 @@ jobs:
 
   linux:
     name: AppImage Linux
+    needs: version
     # Ubuntu 22.04 : glibc 2.35, l'AppImage tourne aussi sur les systèmes plus anciens que 24.04
     runs-on: ubuntu-22.04
+    env:
+      PAQUET: ${{ needs.version.outputs.paquet }}
 
     steps:
       - name: Checkout repository
@@ -194,10 +240,12 @@ jobs:
       - name: Build
         run: cmake --build --preset ci --parallel
 
+      # Le crochet des cartes d'exemple est lu par l'AppRun de linuxdeploy
       - name: Install into AppDir
         run: |
-          echo "VERSION=$(sed -n 's/^CMAKE_PROJECT_VERSION:STATIC=//p' build/ci/CMakeCache.txt)" >> "$GITHUB_ENV"
           DESTDIR="$PWD/AppDir" cmake --install build/ci
+          mkdir -p AppDir/apprun-hooks
+          cp app/linux/apprun-hooks/centre-ville-cartes.sh AppDir/apprun-hooks/
 
       - name: Build AppImage (linuxdeploy, Qt plugin)
         env:
@@ -209,7 +257,7 @@ jobs:
           chmod +x linuxdeploy*.AppImage
           # cvw installé n'a plus le RPATH de la compilation : Qt par LD_LIBRARY_PATH
           export QMAKE="$QT_ROOT_DIR/bin/qmake" LD_LIBRARY_PATH="$QT_ROOT_DIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-          export OUTPUT="Centre-Ville-$VERSION-x86_64.AppImage" LDAI_OUTPUT="Centre-Ville-$VERSION-x86_64.AppImage"
+          export OUTPUT="Centre-Ville-$PAQUET-x86_64.AppImage" LDAI_OUTPUT="Centre-Ville-$PAQUET-x86_64.AppImage"
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --desktop-file AppDir/usr/share/applications/fr.patquoi.CentreVille.desktop \
             --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/centre-ville.png \
@@ -217,12 +265,14 @@ jobs:
 
       - name: Check AppImage
         run: |
-          ./Centre-Ville-$VERSION-x86_64.AppImage --appimage-extract > /dev/null
+          ./Centre-Ville-$PAQUET-x86_64.AppImage --appimage-extract > /dev/null
           for f in usr/bin/cvw usr/bin/qt.conf usr/bin/html/index.html usr/bin/tutocv/index.html \
                    usr/plugins/platforms/libqxcb.so usr/translations/qtbase_fr.qm \
-                   usr/share/mime/packages/fr.patquoi.CentreVille.xml; do
+                   usr/share/mime/packages/fr.patquoi.CentreVille.xml \
+                   usr/share/centre-ville/cartes/Démo.cvw apprun-hooks/centre-ville-cartes.sh; do
             test -e "squashfs-root/$f" || { echo "absent : $f"; exit 1; }
           done
+          grep -q centre-ville-cartes.sh squashfs-root/AppRun || { echo "AppRun ne lit pas le crochet des cartes"; exit 1; }
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
@@ -234,12 +284,23 @@ jobs:
   release:
     name: Release GitHub
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [sources, windows, macos, linux]
+    needs: [version, sources, windows, macos, linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Notes : section « ## [<version>] » de CHANGELOG.md, jusqu'à la suivante
+      - name: Release notes (CHANGELOG.md)
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          awk -v titre="## [$VERSION]" 'index($0, titre)==1 { dedans=1; next } /^## \[/ { if (dedans) exit } dedans' CHANGELOG.md > notes.md
+          test -s notes.md
+
       - name: Download packages
         uses: actions/download-artifact@v4
         with:
@@ -250,7 +311,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: paquets/*
-          name: Centre-Ville ${{ github.ref_name }}
+          name: Centre-Ville ${{ needs.version.outputs.paquet }}
+          body_path: notes.md
           draft: false
-          prerelease: false
-          generate_release_notes: true
+          prerelease: ${{ needs.version.outputs.prerelease == 'true' }}
