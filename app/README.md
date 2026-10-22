@@ -105,7 +105,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # préfixe abso
 |---|---|---|
 | Windows | `bin/cvw.exe` (icônes `Icon_0` et `Icon_1`, version : `cvw.rc.in`), DLL de Qt et de MSVC, `bin/qt.conf`, `plugins/`, `translations/` (windeployqt, par `qt_generate_deploy_app_script`), `bin/html`, `bin/tutocv` | `inno-setup/inscvw95.iss` (même `AppId`, association `.cvw`, cartes dans `{localappdata}\Patquoi.fr\Centre-Ville`) : `iscc /DStaging=<dossier installé> inno-setup\inscvw95.iss` |
 | macOS | `Centre-Ville.app` (macdeployqt), aide et `qtbase_fr.qm` dans `Contents/Resources`, icônes `.icns` (`icones_macos.cmake`), type `.cvw` exporté (`Info.plist.in`), signature ad hoc | `cpack` dans le dossier de compilation : `Centre-Ville-<version>-macOS.dmg` (avec `Applications`, `Cartes/` et `licence.txt`) |
-| Linux | `bin/cvw`, `bin/html`, `bin/tutocv`, `share/applications/fr.patquoi.CentreVille.desktop`, type MIME `application/x-centre-ville` (`*.cvw`), icônes (`linux/`, `ressources/icones`) | AppImage : linuxdeploy et linuxdeploy-plugin-qt sur `DESTDIR=AppDir cmake --install` (`.github/workflows/build-installer.yml`) |
+| Linux | `bin/cvw`, `bin/html`, `bin/tutocv`, `share/applications/fr.patquoi.CentreVille.desktop`, type MIME `application/x-centre-ville` (`*.cvw`), icônes (`linux/`, `ressources/icones`), cartes d'exemple (`share/centre-ville/cartes`) | AppImage : linuxdeploy et linuxdeploy-plugin-qt sur `DESTDIR=AppDir cmake --install`, plus le crochet `linux/apprun-hooks/centre-ville-cartes.sh` (`.github/workflows/build-installer.yml`) : au premier lancement, les cartes sont copiées, sans écraser un fichier existant, dans `~/.local/share/Patquoi.fr/Centre-Ville`, le dossier de `stRepLocalAppData` où Ouvrir et Enregistrer démarrent (comme l'installeur Windows dans `%LOCALAPPDATA%`) |
 
 Les icônes viennent de `res/ico` (`tools/extrait_icones.py` en extrait les
 images PNG de 256 × 256 : les PNG de `res/ico` ont une vignette parasite).
@@ -335,6 +335,13 @@ ancre existe dans `docs/guide/index.html` ; tous les `HelpContext` des `.ui`
 ont leur rubrique ; un `HelpContext` inconnu n'ouvre rien ; `html/` et
 `tutocv/` copiés à côté de `cvw` (dans le paquet sous macOS) sont identiques
 à `docs/`.
+`tests/app/test_cartes.cpp` (CTest `interface.cartes`) : le crochet des
+cartes de l'AppImage, lancé comme par son `AppRun` (`sh`, `set -e`) sur une
+AppDir et un `XDG_DATA_HOME` temporaires, copie les cartes de `maps/` sans
+écraser une carte modifiée, une seule fois ; sous Linux, le dossier est celui
+de `stRepLocalAppData` (Ouvrir et Enregistrer y démarrent : `interface.demo`).
+« À propos » (`interface.demo`) : `ImageDeVersion(5, 4)` redessine la bitmap
+d'origine au pixel près, et la fiche montre la version de `project(VERSION)`.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
 principale (Démo au tour 0 et au tour 200 ; Géant en statistiques de fluidité,
 `carte_fluidite_trafic.png`, et de trafic, `carte_trafic.png`) et des fiches
@@ -464,8 +471,8 @@ Visuel :
 
 ## Comportements d'origine conservés (lot 2)
 
-Règle d'or : ces bogues de l'original sont portés tels quels (à reporter dans
-`src/A_FAIRE.txt` après la bascule).
+Règle d'or : ces bogues de l'original sont portés tels quels ; ils sont repris
+dans `CHANGELOG.md` (version 6.0.0), à corriger après la bascule.
 
 - **Fiches d'informations à l'arrêt** : rien ne les rafraîchit ; elles
   montrent le dernier objet jusqu'au prochain clic sur la carte rechargée.
