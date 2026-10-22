@@ -1,0 +1,43 @@
+#pragma code_page(65001)
+// cvw.rc - GÉNÉRÉ par CMake depuis app/cvw.rc.in (ne pas modifier)
+//
+// Icônes de src/cvw_resources.rc : Icon_0 (application) et Icon_1 (fichiers
+// .cvw, « {app}\bin\cvw.exe,1 » dans inno-setup/inscvw95.iss).
+// Informations de version de src/cvw.cbproj (VerInfo_Keys, VerInfo_Locale
+// 1036) ; numéro de version : project(VERSION) de CMakeLists.txt.
+#include <winver.h>
+
+Icon_0 ICON "@CV_ICONE_APPLICATION@"
+Icon_1 ICON "@CV_ICONE_DOCUMENT@"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
+ PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,@PROJECT_VERSION_TWEAK@
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040C04B0"
+    BEGIN
+      VALUE "CompanyName", "Patquoi.fr"
+      VALUE "FileDescription", "cvw"
+      VALUE "FileVersion", "@PROJECT_VERSION@"
+      VALUE "InternalName", ""
+      VALUE "LegalCopyright", ""
+      VALUE "LegalTrademarks", ""
+      VALUE "OriginalFilename", ""
+      VALUE "ProgramID", "com.patquoi.cvw"
+      VALUE "ProductName", "cvw"
+      VALUE "ProductVersion", "@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@"
+      VALUE "Comments", "Licence Publique Générale 2"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x040C, 1200
+  END
+END

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Centre-Ville
+GenericName=Simulation de circulation urbaine
+Comment=La simulation de circulation urbaine
+Exec=cvw %f
+Icon=centre-ville
+Terminal=false
+Categories=Education;Game;Simulation;
+Keywords=circulation;trafic;ville;feux;bus;tram;
+MimeType=application/x-centre-ville;

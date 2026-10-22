@@ -2,11 +2,11 @@
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/Docs-GitHub%20Pages-success.svg)](https://wblondel.github.io/ProjetCentreVille/)
-[![Platform: Windows](https://img.shields.io/badge/Platform-Windows%20%7C%20Wine-0078D6.svg)](#installation--running)
+[![Platform: Windows | macOS | Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D6.svg)](#-installation--ex%C3%A9cution)
 
 **Centre-Ville** est un logiciel de simulation de circulation urbaine complet, interactif et pédagogique créé par **Patrice Fouquet** ([patquoi.fr](http://patquoi.fr#cvw)). Initialement développé pour Windows (Windows 95/XP jusqu'à Windows 10/11), il est distribué sous licence **GNU General Public License v2.0 (GPLv2)**.
 
-Cette version correspond à la version officielle finale **v5.4.3.2**.
+Cette version correspond à la version officielle finale **v5.4.3.2**, portée vers **C++20, CMake et Qt 6** pour Windows, macOS et Linux (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)) : même moteur de simulation, mêmes fenêtres, même format de fichier `.cvw`.
 
 ---
 
@@ -30,19 +30,24 @@ Cette version correspond à la version officielle finale **v5.4.3.2**.
 .
 ├── .github/
 │   └── workflows/
-│       ├── build-installer.yml   # CI Windows : compilation Inno Setup & Release
+│       ├── tests-moteur.yml      # CI : tests du moteur et de l'application sur les 3 systèmes
+│       ├── build-installer.yml   # Installeurs (Windows, macOS, Linux) et release sur tag v*
 │       └── deploy-docs.yml       # CI Pages : déploiement automatique de la documentation
+├── app/                          # Application Qt 6 (cvw) : les 33 fiches portées, couche VCL (app/vcl)
+├── engine/                       # Moteur de simulation (C++20, sans Qt)
+├── tests/                        # Tests du moteur (golden master) et de l'interface
+├── tools/                        # Conversion des .dfm (dfm2ui.py), extraction des images et icônes
 ├── docs/                         # Documentation en ligne (Guide & Tutoriels)
 │   ├── index.html                # Portail d'accueil moderne
-│   ├── guide/                    # Manuel complet d'utilisation (HTML)
+│   ├── guide/                    # Manuel complet d'utilisation (HTML), aide F1 de l'application
 │   └── tutorial/                 # Tutoriel pas-à-pas illustré
 ├── inno-setup/                   # Script d'installation Inno Setup (inscvw95.iss)
 ├── maps/                         # Cartes de simulation d'exemple (*.cvw)
 ├── res/                          # Icônes et bitmaps graphiques haute résolution
-├── src/                          # Code source complet C++ (C++Builder VCL)
-│   ├── simul.cpp / simul.h       # Moteur central de simulation (logique et IA)
-│   ├── f_simul.cpp               # Interface graphique principale
-│   └── cvw.cbproj                # Projet Embarcadero C++Builder
+├── src/                          # Code source d'origine C++Builder VCL (référence du portage, lecture seule)
+├── CMakeLists.txt                # Projet CMake (numéro de version)
+├── CMakePresets.json
+├── PLAN_PORTAGE.md               # Plan et état du portage
 ├── LICENSE                       # Licence GPL v2
 └── README.md
 ```
@@ -51,55 +56,65 @@ Cette version correspond à la version officielle finale **v5.4.3.2**.
 
 ## 🚀 Installation & Exécution
 
-### Sous Windows (XP, Vista, 7, 8, 10, 11)
-1. **Via l'installeur :** Téléchargez le fichier `Centre-Ville_Setup_v5.4.3.2.exe` depuis la section [Releases](../../releases) et suivez l'assistant Inno Setup.
-2. **Version portable :** Téléchargez l'archive `Centre-Ville_Portable_v5.4.3.2.zip`, décompressez-la et lancez `bin/cvw.64.exe` (ou `bin/cvw.32.exe` sur les systèmes 32 bits).
+Les paquets sont joints aux [Releases](../../releases) (sans signature : le système affiche un avertissement au premier lancement).
 
-### Sous macOS / Linux (via Wine)
-Centre-Ville fonctionne parfaitement sous Wine, Bottles ou Whisky :
+### Windows 10 / 11 (64 bits)
+Téléchargez `Centre-Ville-<version>-Windows-x64-Setup.exe` et suivez l'assistant Inno Setup : il installe Centre-Ville, son aide et ses cartes d'exemple (dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`) et associe les fichiers `.cvw`. Il remplace une version 5.4.3.2 d'origine déjà installée. Si SmartScreen bloque l'installeur : « Informations complémentaires », puis « Exécuter quand même ». La version 32 bits n'existe plus (Qt 6) ; Windows ARM64 exécute la version x64.
+
+### macOS 12 ou plus récent (Apple Silicon et Intel)
+Ouvrez `Centre-Ville-<version>-macOS.dmg` et glissez **Centre-Ville** dans **Applications** ; le dossier `Cartes` contient les cartes d'exemple. L'application n'étant pas notarisée, macOS refuse le premier lancement : ouvrez **Réglages Système › Confidentialité et sécurité**, puis « Ouvrir quand même », ou retirez la quarantaine :
 ```bash
-# Exemple avec Wine sur macOS / Linux
-wine bin/cvw.exe
+xattr -dr com.apple.quarantine /Applications/Centre-Ville.app
 ```
+
+### Linux (x86_64)
+Téléchargez `Centre-Ville-<version>-x86_64.AppImage`, rendez-la exécutable et lancez-la :
+```bash
+chmod +x Centre-Ville-*-x86_64.AppImage
+./Centre-Ville-*-x86_64.AppImage
+```
+Les cartes d'exemple sont dans le dossier `maps/` de l'archive des sources. Sans FUSE, ajoutez l'option `--appimage-extract-and-run`. L'association des fichiers `.cvw` demande un outil d'intégration des AppImage (AppImageLauncher, Gear Lever) ou une installation par CMake (ci-dessous).
 
 ---
 
 ## 🛠️ Compilation & Intégration Continue (CI/CD)
 
-### 1. Documentation en ligne (GitHub Pages)
-Le workflow `.github/workflows/deploy-docs.yml` publie automatiquement le contenu du dossier `docs/` sur **GitHub Pages** à chaque mise à jour de la branche principale `main`.
-* **Guide complet :** `<url-pages>/guide/index.html`
-* **Tutoriel :** `<url-pages>/tutorial/index.html`
-
-### 2. Installeur Inno Setup
-Le workflow `.github/workflows/build-installer.yml` s'exécute sur `windows-latest` lors de la publication d'un tag (`v*`) ou via déclenchement manuel :
-1. Installe Inno Setup.
-2. Génère l'archive source `cvw-src-win64.zip`.
-3. Compile l'installeur `Centre-Ville_Setup_*.exe`.
-4. Crée la release GitHub avec l'installeur et le paquet portable.
-
-Pour compiler l'installeur localement sous Windows :
-```cmd
-cd inno-setup
-iscc.exe inscvw95.iss
+### 1. Compilation depuis les sources
+Prérequis : compilateur C++20 (Clang, GCC 12 ou plus, MSVC 2022), CMake ≥ 3.25, Ninja (préréglages `dev` et `release`) et **Qt 6.5 ou plus récent** (Widgets ; Qt 6.8 LTS en CI ; macOS : `brew install qt`).
+```bash
+cmake --preset dev && cmake --build --preset dev && ctest --preset dev
 ```
+L'application est `build/dev/app/cvw` (`cvw.exe` sous Windows, `Centre-Ville.app` sous macOS) ; son aide (`html/`, `tutocv/`) est copiée à côté. Le moteur seul se compile sans Qt (`-DCV_APP=OFF`). Détails : [`app/README.md`](app/README.md) et [`engine/README.md`](engine/README.md).
 
-### 3. Compilation du code source C++
-Le code source natif utilise **Embarcadero C++Builder** (RAD Studio 10.3 / 10.4) avec le framework VCL :
-* Ouvrez `src/cvw.cbproj` dans C++Builder.
-* Sélectionnez la plateforme cible (`Win64` ou `Win32`) et la configuration `Release`.
-* Lancez la compilation (`Shift + F9`).
+### 2. Installation et paquets
+```bash
+cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
+cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt / macdeployqt (préfixe absolu)
+```
+* **Windows** : `iscc /DStaging=<chemin absolu de build\installeur> inno-setup\inscvw95.iss` (Inno Setup ≥ 6.3).
+* **macOS** : `cd build/release && cpack` produit `Centre-Ville-<version>-macOS.dmg`.
+* **Linux** : AppImage avec [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) et son greffon Qt, comme dans `build-installer.yml` ; ou installation dans un préfixe dédié (`--prefix /opt/centre-ville`), avec entrée de bureau et type MIME des fichiers `.cvw`.
+
+Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt`.
+
+### 3. Intégration continue
+* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification.
+* `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub.
+* `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
+
+### 4. Code d'origine (C++Builder)
+Le code VCL d'origine reste dans `src/` (référence du portage) : `src/cvw.cbproj` s'ouvre dans Embarcadero C++Builder (RAD Studio 10.3 / 10.4).
 
 ---
 
 ## 🗺️ Feuille de Route & Modernisation
 
-Le cœur de simulation ([`src/simul.cpp`](src/simul.cpp) / [`src/simul.h`](src/simul.h)) est écrit en C++ standard et découplable de l'interface propriétaire VCL.
+Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/simul.cpp`](src/simul.cpp)) est découplé de l'interface ; l'interface est portée sur Qt 6 ([`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)).
 
-Les objectifs futurs de modernisation comprennent :
-* [ ] Découplage complet du moteur de simulation de la couche VCL.
-* [ ] Portage vers un framework multiplateforme moderne (**SDL2**, **Raylib** ou **wxWidgets** avec CMake).
-* [ ] Compilation native sous Linux et macOS sans émulation Wine.
+* [x] Découplage complet du moteur de simulation de la couche VCL.
+* [x] Portage vers un framework multiplateforme moderne (**Qt 6** avec CMake).
+* [x] Compilation native sous Linux et macOS sans émulation Wine.
+* [ ] Recette complète et bascule (phase 9 du plan de portage).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.
 

@@ -4,6 +4,7 @@
 <dict>
   <key>CFBundleDevelopmentRegion</key><string>fr</string>
   <key>CFBundleExecutable</key><string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+  <key>CFBundleIconFile</key><string>${MACOSX_BUNDLE_ICON_FILE}</string>
   <key>CFBundleIdentifier</key><string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>CFBundleName</key><string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
@@ -17,8 +18,23 @@
     <dict>
       <key>CFBundleTypeName</key><string>Simulation Centre-Ville</string>
       <key>CFBundleTypeRole</key><string>Editor</string>
+      <key>CFBundleTypeIconFile</key><string>application-x-centre-ville.icns</string>
       <key>CFBundleTypeExtensions</key><array><string>cvw</string></array>
+      <key>LSItemContentTypes</key><array><string>fr.patquoi.centre-ville.cvw</string></array>
       <key>LSHandlerRank</key><string>Owner</string>
+    </dict>
+  </array>
+  <key>UTExportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeIdentifier</key><string>fr.patquoi.centre-ville.cvw</string>
+      <key>UTTypeDescription</key><string>Simulation Centre-Ville</string>
+      <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+      <key>UTTypeIconFile</key><string>application-x-centre-ville.icns</string>
+      <key>UTTypeTagSpecification</key>
+      <dict>
+        <key>public.filename-extension</key><array><string>cvw</string></array>
+      </dict>
     </dict>
   </array>
 </dict>

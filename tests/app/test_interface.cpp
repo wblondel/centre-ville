@@ -44,9 +44,17 @@
 //     ramenés dans les bornes en quittant le champ ;
 //   - couche VCL : TCSpinEdit comme CSPIN.pas (MinValue/MaxValue sans effet ni
 //     OnChange, Value= borné, frappe non bornée jusqu'à la sortie du champ,
-//     flèches, EditorEnabled).
+//     flèches, EditorEnabled) ;
+//   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
+//     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
+//     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
+//     ancres sont vérifiées par test_aide.cpp).
 // Les fiches modales sont pilotées par des étapes (QuandModale) : l'action
 // prévue est exécutée quand la fiche attendue devient la fiche modale active.
+// Simulations pas à pas (Demarre) : le minuteur de la simulation est arrêté et
+// le test joue lui-même chaque tour (JoueTour), pour qu'aucun tour ne tombe
+// entre ce qu'il observe et ce qu'il vérifie ; marcheInterruptionArret seule
+// laisse tourner le minuteur (temps réel).
 // Les captures de la fenêtre principale et des fiches sont écrites dans le
 // dossier CV_DOSSIER_CAPTURES (Démo au tour 0 et vers le tour 200, fiche_*.png,
 // carte_*.png pour la carte en statistiques de fluidité et de trafic).
@@ -54,6 +62,7 @@
 #include <QAbstractButton>
 #include <QApplication>
 #include <QCheckBox>
+#include <QDesktopServices>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -70,6 +79,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
+#include <QUrl>
 #include <deque>
 #include <fstream>
 #include <sstream>
@@ -263,6 +273,32 @@ class TestInterface : public QObject
    {
     return QTest::qWaitFor([Tour]() { return cv&&(cv->TourCrt>=Tour); }, DelaiMs);
    }
+  // Simulation pas à pas : un tic du minuteur de la simulation (TimerSimulTimer,
+  // par OnTimer comme le QTimer), puis les événements en attente (dessins), comme
+  // dans la boucle de l'application ; le minuteur, arrêté par Demarre, ne joue
+  // aucun tour pendant que le test clique et vérifie
+  void JoueTour()
+   {
+    frmSimulation->TimerSimul->OnTimer(frmSimulation->TimerSimul);
+    QApplication::processEvents();
+   }
+  // Tours joués jusqu'à ce que Fin() soit vraie (au plus NbMax tours)
+  bool JoueTours(std::function<bool()> Fin, int NbMax)
+   {
+    for(int i=0; (i<NbMax)&&!Fin()&&frmSimulation->SimulationEnCours; i++) JoueTour();
+    return Fin();
+   }
+  bool JoueJusquAuTour(long Tour)
+   {
+    return JoueTours([Tour]() { return cv->TourCrt>=Tour; }, 10000);
+   }
+  // Arrêt et Interruption ne sont traités qu'au tic suivant du minuteur
+  // (TypeDemande) : relancé après la demande, son premier tic la traite sans
+  // jouer de tour
+  void RelanceMinuteur()
+   {
+    if (frmSimulation->SimulationEnCours) frmSimulation->TimerSimul->Enabled=true;
+   }
   QString OuvreCarte(const QString &asCarte, const QString &asNom)
    { // Copie neuve de maps/<asCarte>, ouverte
     QString f=QFileInfo(Carte).absolutePath()+"/"+asNom;
@@ -277,23 +313,29 @@ class TestInterface : public QObject
      // sans fin dans vehlib::ReservePlaceVehlibCible quand plus aucune place de
      // vehlib n'est libre, ce qui arrive selon la graine (123 : avant le tour 50) ;
      // la graine 1 tient plus de 1500 tours (cvsim)
+    // Simulation pas à pas ensuite : minuteur arrêté, tours joués par JoueTour
     alea::FixeGraine(1);
     Messages.clear();
     QTest::mouseClick(frmSimulation->ToolButtonMarche, Qt::LeftButton);
+    frmSimulation->TimerSimul->Enabled=false;
     return frmSimulation->SimulationEnCours&&cv->DistancesCalculees;
    }
   bool Arrete()
    { // Arrêt par la barre d'outils : bilan, puis rechargement du réseau
     QTest::mouseClick(frmSimulation->ToolButtonArret, Qt::LeftButton);
+    RelanceMinuteur();
     return QTest::qWaitFor([]() { return !frmSimulation->SimulationEnCours&&!frmSimulation->Pause&&(cv->TourCrt==0); }, 10000);
    }
   void CliqueCase(int x, int y)
-   { // Clic de l'utilisateur sur la case (x, y), amenée dans la vue
+   { // Clic de l'utilisateur sur la case (x, y), amenée dans la vue, puis le
+     // dessin qui le suit avant toute autre action de l'utilisateur : OnDrawCell
+     // de la case courante règle l'état des actions (« Suivre... »)
     GrilleSimulation *g=frmSimulation->DrawGridSimul;
     g->LeftCol=qMax(0, x-4);
     g->TopRow=qMax(0, y-4);
     TRect r=g->CellRect(x, y);
     QTest::mouseClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), QPoint((r.Left+r.Right)/2, (r.Top+r.Bottom)/2));
+    g->Repaint();
    }
   int TrouveCase(std::function<int(voie *)> Numero)
    { // Premier objet trouvé sur la carte (Numero(v) > 0), cliqué par l'utilisateur
@@ -316,6 +358,14 @@ class TestInterface : public QObject
     frmSimulation->DrawGridSimul->setFocus();
     QApplication::processEvents();
    }
+  QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
+  QUrl AdresseAide(const QUrl &Url)
+   { // Aide contextuelle : adresse que charge la page de redirection (base.cpp)
+    QRegularExpressionMatch m=QRegularExpression("url='([^']*)'").match(QString::fromUtf8(Contenu(Url.toLocalFile())));
+    return m.hasMatch()?QUrl(m.captured(1)):Url;
+   }
+  public slots:
+  void UrlOuverte(const QUrl &Url) { UrlsOuvertes<<Url; }
   private slots:
   void initTestCase();
   void init();
@@ -343,6 +393,8 @@ class TestInterface : public QObject
   void ficheRecherche();
   // Couche VCL
   void controleCSpinEdit();
+  // Services système (phase 7)
+  void aideContextuelle();
   void cleanupTestCase();
  };
 //---------------------------------------------------------------------------
@@ -1239,7 +1291,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
   QVERIFY(!Copie.isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
-  QVERIFY(AttendTour(2, 30000));
+  QVERIFY(JoueJusquAuTour(2));
   TfrmSimulation *s=frmSimulation;
   std::vector<FicheDistances> Fiches=
    {
@@ -1456,7 +1508,8 @@ void TestInterface::SuitObjet(const char *Type, std::function<QString(long)> Eca
   for(int i=0; i<NbTours; i++)
    {
     long Tour=cv->TourCrt;
-    QVERIFY(AttendTour(Tour+1, 10000));
+    JoueTour();
+    QCOMPARE((long)cv->TourCrt, Tour+1);
     QString e=Ecart(cv->TourCrt-1); // rafraîchissement en fin de tour, avant TourCrt++
     QVERIFY2(e.isEmpty(), qPrintable(QString("%1, tour %2 :\n%3").arg(Type).arg(cv->TourCrt).arg(e)));
     int x, y;
@@ -1478,7 +1531,7 @@ void TestInterface::fichesInfos()
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot2_infos.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
-  QVERIFY(AttendTour(15, 30000));
+  QVERIFY(JoueJusquAuTour(15));
   auto Case=[]() { return &cv->v[frmSimulation->DrawGridSimul->Col][frmSimulation->DrawGridSimul->Row]; };
   auto Coordonnees=[]() { return QString::asprintf("%02d, %02d", (int)frmSimulation->DrawGridSimul->Col, (int)frmSimulation->DrawGridSimul->Row); };
   // Premier objet trouvé sur la carte (Numero(v) > 0), case courante
@@ -2009,7 +2062,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_evolution.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
-  QVERIFY(AttendTour(2, 30000));
+  QVERIFY(JoueJusquAuTour(2));
   TfrmSimulation *s=frmSimulation;
   // Statistiques des véhicules avant toute arrivée : rien à afficher
   if (!cv->NbVehiculesArrives)
@@ -2036,11 +2089,11 @@ void TestInterface::fichesEvolutionEtVehicules()
    CompteurDessins Compteur;
    p->installEventFilter(&Compteur);
    long Tour=cv->TourCrt;
-   QVERIFY(AttendTour(Tour+5, 30000));
+   QVERIFY(JoueJusquAuTour(Tour+5));
    p->removeEventFilter(&Compteur);
    QVERIFY2(Compteur.n>=(int)(cv->TourCrt-Tour), qPrintable(QString("%1 dessins en %2 tours").arg(Compteur.n).arg(cv->TourCrt-Tour)));
   }
-  QVERIFY(AttendTour(qMin(cv->NbToursStats, 60L), 60000));
+  QVERIFY(JoueJusquAuTour(qMin(cv->NbToursStats, 60L)));
   // Courbes : points (x_i, y_i) des tours PrmTour..TourCrt-1 (LineTo n'allume
   // pas le point d'arrivée : le dernier point, celui du tour à venir, n'est pas
   // vérifié), tracés dans l'ordre rouge, jaune, vert ; quadrillage dessous
@@ -2149,7 +2202,7 @@ void TestInterface::fichesEvolutionEtVehicules()
       }
     return false;
    };
-  QVERIFY(QTest::qWaitFor(DeuxArrivees, 120000));
+  QVERIFY(JoueTours(DeuxArrivees, 1500)); // graine 1 : sans blocage des vehlibs sur 1500 tours (Demarre)
   TfrmStatsVehicules *g=frmStatsVehicules;
   Messages.clear();
   s->MenuItemStatistiquesEtapes->ElementQt()->trigger();
@@ -2205,8 +2258,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   QCOMPARE((int)g->TabControl->TabIndex, 0);
   for(int i=0; i<3; i++)
    {
-    long Tour=cv->TourCrt;
-    QVERIFY(AttendTour(Tour+1, 10000));
+    JoueTour();
     e=Ecart(cv->TourCrt-1); // rafraîchi pendant le tour, avant TourCrt++
     QVERIFY2(e.isEmpty(), qPrintable(e));
    }
@@ -2216,7 +2268,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   QCOMPARE((int)g->TabControl->TabIndex, 1);
   e=Ecart(cv->TourCrt);
   QVERIFY2(e.isEmpty(), qPrintable(e));
-  QVERIFY(AttendTour(cv->TourCrt+1, 10000));
+  JoueTour();
   e=Ecart(cv->TourCrt-1);
   QVERIFY2(e.isEmpty(), qPrintable(e));
   CaptureFiche(g, "fiche_stats_vehicules_tours.png");
@@ -2246,7 +2298,7 @@ void TestInterface::ficheFluiditeTrafic()
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_fluidite.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
-  QVERIFY(AttendTour(40, 60000));
+  QVERIFY(JoueJusquAuTour(40));
   TfrmSimulation *s=frmSimulation;
   GrilleSimulation *g=s->DrawGridSimul;
   Messages.clear();
@@ -2424,6 +2476,7 @@ void TestInterface::ficheFluiditeTrafic()
   ReponseQuestions=QMessageBox::Yes;
   Messages.clear();
   Clique(s->ToolButtonPause);
+  RelanceMinuteur();
   QVERIFY(QTest::qWaitFor([this]() { return Etapes.empty()&&!frmStatsAttenteTrafic&&frmSimulation->Pause; }, 30000));
   ReponseQuestions=QMessageBox::No;
   QVERIFY2(Modale, qPrintable(Messages.join('\n')));
@@ -2472,7 +2525,7 @@ void TestInterface::ficheRecherche()
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_recherche.cvw").isEmpty());
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
-  QVERIFY(AttendTour(15, 30000));
+  QVERIFY(JoueJusquAuTour(15));
   TfrmSimulation *s=frmSimulation;
   TfrmRecherche *r=frmRecherche;
   GrilleSimulation *g=s->DrawGridSimul;
@@ -2747,18 +2800,13 @@ void TestInterface::ficheRecherche()
    };
   for(const Mobile &m : Mobiles)
    {
-    // Plus d'objet suivi (coordonnées), puis « Suivre » sur un objet de la carte,
-    // trouvé et suivi sans laisser passer de tour
+    // Plus d'objet suivi (coordonnées), puis « Suivre » sur un objet de la carte
     Clique(r->RadioButtonCoordonnees);
-    int n=0;
-    for(int Essai=0; (Essai<5)&&!n; Essai++)
-     {
-      int k=TrouveCase(m.Numero);
-      QVERIFY2(k>0, m.Nom);
-      m.Suivre();
-      if (m.Radio->Checked&&(m.Spin->Value==k)) n=k;
-     }
+    int n=TrouveCase(m.Numero);
     QVERIFY2(n>0, m.Nom);
+    m.Suivre();
+    QVERIFY2(m.Radio->Checked, m.Nom);
+    QCOMPARE((int)m.Spin->Value, n);
     QVERIFY(r->isVisible());
     QVERIFY(m.Spin->isEnabled()&&!r->CSpinEditX->isEnabled());
     // Fiche d'informations ouverte sur l'objet suivi
@@ -2768,8 +2816,7 @@ void TestInterface::ficheRecherche()
     int NbVerifies=0;
     for(int i=0; i<m.NbTours; i++)
      {
-      long Tour=cv->TourCrt;
-      QVERIFY(AttendTour(Tour+1, 10000));
+      JoueTour();
       int x=-1, y=-1;
       QString Texte;
       bool SurLaCarte=m.Attendu(n, x, y, Texte);
@@ -2794,15 +2841,11 @@ void TestInterface::ficheRecherche()
   QVERIFY(!s->ActionRechercher->Checked);
   QVERIFY(!s->TimerClignotementLocalisation->Enabled);
   // Suivre un véhicule rouvre la fiche
-  int n=0;
-  for(int Essai=0; (Essai<5)&&!n; Essai++)
-   {
-    int k=TrouveCase([](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; });
-    QVERIFY(k>0);
-    s->MenuItemSuivreCeVehicule->ElementQt()->trigger();
-    if (r->RadioButtonVehicule->Checked&&(r->CSpinEditVehicule->Value==k)) n=k;
-   }
+  int n=TrouveCase([](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; });
   QVERIFY(n>0);
+  s->MenuItemSuivreCeVehicule->ElementQt()->trigger();
+  QVERIFY(r->RadioButtonVehicule->Checked);
+  QCOMPARE((int)r->CSpinEditVehicule->Value, n);
   QVERIFY(r->isVisible());
   QVERIFY(s->ActionRechercher->Checked);
   Clique(r->ButtonAnnuler);
@@ -2998,6 +3041,61 @@ void TestInterface::controleCSpinEdit()
   z->setProperty("vclMaxValue", 32);
   z->PrepareVcl();
   QCOMPARE(z->findChild<QLineEdit *>()->text(), QString("0"));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::aideContextuelle()
+ { // F1 ouvre l'aide à la rubrique du HelpContext de la fiche (fiche principale,
+   // Rechercher non modale, Paramètres modale), comme le bouton Aide des fiches ;
+   // Alt+Maj+F1 et le menu Sommaire ouvrent le sommaire, le menu Tutoriel le
+   // tutoriel. La rubrique passe par une page de redirection (base.cpp)
+  QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
+  QString stDossier=QCoreApplication::applicationDirPath();
+  auto Rubrique=[&stDossier](const char *Ancre)
+   {
+    QUrl u=QUrl::fromLocalFile(stDossier+"/html/index.html");
+    u.setFragment(Ancre);
+    return u;
+   };
+  QVERIFY(!OuvreDemo("aide.cvw").isEmpty());
+  Focalise();
+  UrlsOuvertes.clear();
+  QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_F1);
+  QCOMPARE(UrlsOuvertes.size(), 1);
+  QVERIFY(!UrlsOuvertes[0].hasFragment());
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLI")); // HelpContext 30
+  UrlsOuvertes.clear();
+  QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_F1, Qt::AltModifier|Qt::ShiftModifier);
+  frmSimulation->ActionSommaire->Execute();
+  frmSimulation->ActionTutoriel->Execute();
+  QUrl Sommaire=QUrl::fromLocalFile(stDossier+"/html/index.html");
+  QCOMPARE(UrlsOuvertes, QList<QUrl>({Sommaire, Sommaire, QUrl::fromLocalFile(stDossier+"/tutocv/index.html")}));
+  // Rechercher (non modale) : F1 dans un champ, puis le bouton Aide ; fermée
+  // d'abord, si un test précédent en échec l'a laissée ouverte
+  if (frmRecherche->isVisible()) Clique(frmRecherche->ButtonAnnuler);
+  frmSimulation->ActionRechercher->Checked=false;
+  frmSimulation->ActionRechercher->Execute();
+  QVERIFY(frmRecherche->isVisible());
+  UrlsOuvertes.clear();
+  Touche(frmRecherche->CSpinEditX, Qt::Key_F1);
+  Clique(frmRecherche->ButtonAide);
+  QCOMPARE(UrlsOuvertes.size(), 2);
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("RDUEDLS")); // HelpContext 65
+  QCOMPARE(AdresseAide(UrlsOuvertes[1]), Rubrique("RDUEDLS"));
+  Clique(frmRecherche->ButtonAnnuler);
+  QVERIFY(!frmRecherche->isVisible());
+  // Paramètres (modale) : F1, puis Annuler
+  UrlsOuvertes.clear();
+  QuandModale([]() { return frmParamSimul; }, [this]()
+   {
+    Touche(frmParamSimul->CSpinEditDureeVert, Qt::Key_F1);
+    Clique(frmParamSimul->ButtonAnnuler);
+   });
+  Clique(frmSimulation->ToolButtonParametres);
+  QVERIFY(!frmParamSimul); // créée à chaque ouverture, libérée à la fermeture
+  QCOMPARE(UrlsOuvertes.size(), 1);
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLS")); // HelpContext 311
+  QVERIFY(Messages.isEmpty());
+  QDesktopServices::unsetUrlHandler("file");
  }
 //---------------------------------------------------------------------------
 void TestInterface::cleanupTestCase()

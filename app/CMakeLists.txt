@@ -106,3 +106,137 @@ elseif(APPLE)
 elseif(MINGW)
   target_link_options(cvw PRIVATE -Wl,--stack,16777216)
 endif()
+
+# Icônes et version (phase 8). Le numéro de version n'est écrit qu'une fois :
+# project(VERSION) du CMakeLists.txt racine (Info.plist, ressources de version
+# de cvw.exe, d'où l'installeur Inno Setup le lit, noms des paquets).
+if(WIN32)
+  # Icon_0 (application) et Icon_1 (fichiers .cvw), comme src/cvw_resources.rc
+  set(CV_ICONE_APPLICATION ${PROJECT_SOURCE_DIR}/res/ico/cvw.ico)
+  set(CV_ICONE_DOCUMENT ${PROJECT_SOURCE_DIR}/res/ico/Newdoc_cvw.ico)
+  configure_file(cvw.rc.in ${CMAKE_CURRENT_BINARY_DIR}/cvw.rc @ONLY)
+  target_sources(cvw PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/cvw.rc)
+elseif(APPLE)
+  # Paquet Centre-Ville.app ; icônes .icns produites depuis les PNG de
+  # app/ressources/icones (tools/extrait_icones.py)
+  set_target_properties(cvw PROPERTIES
+    OUTPUT_NAME "Centre-Ville"
+    MACOSX_BUNDLE_ICON_FILE centre-ville.icns
+  )
+  foreach(icone centre-ville application-x-centre-ville)
+    set(icns ${CMAKE_CURRENT_BINARY_DIR}/icones/${icone}.icns)
+    add_custom_command(OUTPUT ${icns}
+      COMMAND ${CMAKE_COMMAND} -DPNG=${CMAKE_CURRENT_SOURCE_DIR}/ressources/icones/${icone}.png -DICNS=${icns}
+              -P ${CMAKE_CURRENT_SOURCE_DIR}/icones_macos.cmake
+      DEPENDS ressources/icones/${icone}.png icones_macos.cmake
+      VERBATIM
+    )
+    target_sources(cvw PRIVATE ${icns})
+    set_source_files_properties(${icns} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  endforeach()
+endif()
+
+# Aide HTML (phase 7) : docs/guide -> html/ et docs/tutorial -> tutocv/, à côté
+# de l'exécutable comme dans l'installeur d'origine ({app}\bin\html,
+# {app}\bin\tutocv) ; sous macOS, dans Contents/Resources du paquet (voir
+# stRepAide dans base.cpp). Recopiée quand docs/ change, dossiers vidés
+# d'abord : la compilation a la même aide que l'installation.
+get_property(CV_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+set(CV_DOSSIER_CVW ${CMAKE_CURRENT_BINARY_DIR})
+if(CV_MULTI_CONFIG)
+  string(APPEND CV_DOSSIER_CVW "/$<CONFIG>")
+endif()
+if(APPLE)
+  set(CV_DOSSIER_AIDE "${CV_DOSSIER_CVW}/Centre-Ville.app/Contents/Resources")
+else()
+  set(CV_DOSSIER_AIDE "${CV_DOSSIER_CVW}")
+endif()
+file(GLOB_RECURSE CV_FICHIERS_AIDE CONFIGURE_DEPENDS
+  ${PROJECT_SOURCE_DIR}/docs/guide/*
+  ${PROJECT_SOURCE_DIR}/docs/tutorial/*
+)
+add_custom_command(OUTPUT "${CV_DOSSIER_CVW}/aide.stamp"
+  COMMAND ${CMAKE_COMMAND} -E rm -rf "${CV_DOSSIER_AIDE}/html" "${CV_DOSSIER_AIDE}/tutocv"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/docs/guide "${CV_DOSSIER_AIDE}/html"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/docs/tutorial "${CV_DOSSIER_AIDE}/tutocv"
+  COMMAND ${CMAKE_COMMAND} -E touch "${CV_DOSSIER_CVW}/aide.stamp"
+  DEPENDS ${CV_FICHIERS_AIDE}
+  COMMENT "Aide HTML de cvw (html/, tutocv/)"
+  VERBATIM
+)
+add_custom_target(cvw_aide DEPENDS "${CV_DOSSIER_CVW}/aide.stamp")
+add_dependencies(cvw cvw_aide)
+
+# Installation (phase 8) : cmake --install <build> --prefix <dossier>
+#   Windows : bin/cvw.exe, DLL de Qt et de MSVC, bin/qt.conf, plugins/ et
+#             translations/ (windeployqt), bin/html, bin/tutocv : contenu de
+#             l'installeur (inno-setup/inscvw95.iss) ;
+#   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
+#   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
+#             fichiers .cvw, icônes ; Qt est déployé par linuxdeploy (AppImage).
+include(GNUInstallDirs)
+if(APPLE)
+  install(TARGETS cvw BUNDLE DESTINATION .)
+  set(CV_INSTALL_AIDE Centre-Ville.app/Contents/Resources)
+else()
+  install(TARGETS cvw RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  set(CV_INSTALL_AIDE ${CMAKE_INSTALL_BINDIR})
+endif()
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/guide/ DESTINATION ${CV_INSTALL_AIDE}/html)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/tutorial/ DESTINATION ${CV_INSTALL_AIDE}/tutocv)
+
+if(UNIX AND NOT APPLE)
+  install(FILES linux/fr.patquoi.CentreVille.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+  install(FILES linux/fr.patquoi.CentreVille.xml DESTINATION ${CMAKE_INSTALL_DATADIR}/mime/packages)
+  install(FILES ressources/icones/centre-ville.png
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps)
+  install(FILES ressources/icones/application-x-centre-ville.png
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/mimetypes)
+endif()
+
+if(WIN32 OR APPLE)
+  # Bibliothèques d'exécution de MSVC à côté de cvw.exe (InstallRequiredSystemLibraries)
+  # plutôt que vc_redist.x64.exe, que windeployqt ne trouve qu'avec VCINSTALLDIR
+  if(MSVC)
+    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${CMAKE_INSTALL_BINDIR})
+    include(InstallRequiredSystemLibraries)
+  endif()
+  # windeployqt (DLL, greffons et traductions de Qt) ou macdeployqt (frameworks
+  # et greffons dans le paquet)
+  qt_generate_deploy_app_script(
+    TARGET cvw
+    OUTPUT_SCRIPT CV_SCRIPT_DEPLOIEMENT
+    NO_COMPILER_RUNTIME
+    NO_UNSUPPORTED_PLATFORM_ERROR
+  )
+  install(SCRIPT ${CV_SCRIPT_DEPLOIEMENT})
+endif()
+
+if(APPLE)
+  # macdeployqt ne copie pas les traductions de Qt : qtbase_fr.qm (boutons des
+  # boîtes de dialogue en français, application.cpp) va dans
+  # Contents/Resources/translations, que l'on ajoute au qt.conf de macdeployqt
+  find_file(CV_QTBASE_FR qtbase_fr.qm
+    PATHS "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_TRANSLATIONS}"
+    NO_DEFAULT_PATH
+  )
+  if(CV_QTBASE_FR)
+    install(FILES ${CV_QTBASE_FR} DESTINATION Centre-Ville.app/Contents/Resources/translations)
+  else()
+    message(WARNING "qtbase_fr.qm introuvable : boîtes de dialogue en anglais dans Centre-Ville.app")
+  endif()
+  # Puis signature ad hoc de tout le paquet (pas de compte Apple Developer) :
+  # macdeployqt a modifié les bibliothèques copiées, et ce qui est ajouté après
+  # lui romprait le sceau des ressources (« paquet endommagé » pour Gatekeeper)
+  install(CODE [[
+    set(paquet "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Centre-Ville.app")
+    file(READ "${paquet}/Contents/Resources/qt.conf" contenu)
+    if(NOT contenu MATCHES "Translations")
+      file(APPEND "${paquet}/Contents/Resources/qt.conf" "Translations = Resources/translations\n")
+    endif()
+    execute_process(COMMAND codesign --force --deep --sign - "${paquet}" RESULT_VARIABLE resultat)
+    if(resultat)
+      message(FATAL_ERROR "codesign a échoué (${resultat}) sur ${paquet}")
+    endif()
+  ]])
+endif()

@@ -11,7 +11,10 @@ portées. Lot 2 (distances et informations) : les 12 fiches `f_afdistab`,
 `f_infveh`, `f_infptn`, `f_infbus`, `f_inftram`, `f_inftaxi` et `f_infvehlib`
 sont portées. Lot 3 (statistiques et recherche) : les 5 fiches `f_stats`,
 `f_statsv`, `f_statsat`, `f_statsc` et `f_rech` sont portées ; toutes les
-fiches secondaires le sont désormais.
+fiches secondaires le sont désormais. Phase 7 (services système) : aide HTML
+à côté de l'exécutable, F1 à la bonne rubrique ; phase 8 : règles
+d'installation, installeur Windows, `.dmg` macOS, AppImage Linux (voir
+« Installation et paquets »).
 Comme pour le moteur, **on porte, on ne réécrit pas** : les fiches portées
 sont des copies de `src/f_*.*` (CRLF -> LF, `__fastcall` retiré), où chaque
 autre modification est annotée `// portage`. Pour lire le portage ligne à
@@ -34,8 +37,8 @@ cmake --preset dev && cmake --build --preset dev && ctest --preset dev
 trouvé), `ON` pour exiger Qt, `OFF` pour ne compiler que le moteur.
 
 ```bash
-# macOS (paquet .app, avec l'association des fichiers .cvw pour le Finder)
-build/dev/app/cvw.app/Contents/MacOS/cvw maps/Démo.cvw
+# macOS (paquet Centre-Ville.app, avec l'association des fichiers .cvw pour le Finder)
+build/dev/app/Centre-Ville.app/Contents/MacOS/Centre-Ville maps/Démo.cvw
 # Linux / Windows
 build/dev/app/cvw maps/Démo.cvw
 ```
@@ -48,7 +51,68 @@ poser le premier feu de piétons libérait sinon un pointeur indéterminé.
 Les fichiers vont par défaut dans le dossier équivalent à `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville\`
 (`QStandardPaths::GenericDataLocation` + `Patquoi.fr/Centre-Ville` : le même
 dossier sous Windows, `~/Library/Application Support/...` sous macOS,
-`~/.local/share/...` sous Linux).
+`~/.local/share/...` sous Linux) ; `cvw.log` aussi (`stRepLocalAppData`, comme
+l'original).
+
+### Aide
+
+La compilation copie `docs/guide` dans `html/` et `docs/tutorial` dans
+`tutocv/`, à côté de l'exécutable comme l'installeur d'origine
+(`{app}\bin\html`, `{app}\bin\tutocv`), et sous macOS dans
+`Centre-Ville.app/Contents/Resources` (`stRepAide` dans `base.cpp` ;
+`Contents/MacOS` ne doit contenir que du code, sinon la signature du paquet
+échoue). La copie est refaite quand `docs/` change ; l'installation met la
+même arborescence au même endroit. F1 (`HelpContext` de la fiche, table
+`caCorresp` inchangée, 57 rubriques), Alt+Maj+F1 et « Sommaire » (index),
+« Tutoriel » ouvrent la page dans le navigateur par défaut
+(`QDesktopServices::openUrl`).
+
+L'ancre `#...` ne survit pas à `openUrl` sur une adresse `file://` : le
+système ouvre le fichier comme un document. Constaté sous macOS (Qt 6.11,
+Edge par défaut : la page s'ouvre en haut) et sous Linux (Ubuntu 22.04 sans
+bureau : `xdg-open`, en mode générique, retire `#...` des adresses
+`file://` et ne passe que le chemin ; GNOME et KDE peuvent la garder) ;
+sous Windows, d'après les sources de Qt 6.8, l'adresse et son ancre vont au
+navigateur associé à `http` (`QWindowsServices::openUrl`), comme
+l'original. Pour une solution
+identique partout, `AffichePageHtml` écrit, pour une adresse locale avec
+ancre, une petite page de redirection dans le dossier temporaire
+(`cvw-aide-<ANCRE>.html`, `<meta http-equiv="refresh">` vers l'adresse
+complète) et ouvre celle-ci : vérifié sous macOS avec Edge, Safari et Chrome
+(le navigateur arrive à l'ancre), et de bout en bout avec le code de `cvw`
+(F1 sur la fiche principale et dans Paramètres, Sommaire, Tutoriel) ; sous
+Linux, avec l'AppImage sous Xvfb, F1 donne au navigateur la page de
+redirection vers `usr/bin/html/index.html#PDLI` (le navigateur était factice :
+le suivi de la redirection par un vrai navigateur sous Linux n'est pas
+vérifié). Une visionneuse intégrée (`QTextBrowser`) aurait changé
+l'interface.
+
+## Installation et paquets
+
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 5.4.3.2)` du
+`CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
+lues par l'installeur Inno Setup, noms des paquets).
+
+```bash
+cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
+cmake --install build/release --prefix "$PWD/build/installeur"   # préfixe absolu (script de déploiement de Qt)
+```
+
+| Système | Contenu installé | Paquet |
+|---|---|---|
+| Windows | `bin/cvw.exe` (icônes `Icon_0` et `Icon_1`, version : `cvw.rc.in`), DLL de Qt et de MSVC, `bin/qt.conf`, `plugins/`, `translations/` (windeployqt, par `qt_generate_deploy_app_script`), `bin/html`, `bin/tutocv` | `inno-setup/inscvw95.iss` (même `AppId`, association `.cvw`, cartes dans `{localappdata}\Patquoi.fr\Centre-Ville`) : `iscc /DStaging=<dossier installé> inno-setup\inscvw95.iss` |
+| macOS | `Centre-Ville.app` (macdeployqt), aide et `qtbase_fr.qm` dans `Contents/Resources`, icônes `.icns` (`icones_macos.cmake`), type `.cvw` exporté (`Info.plist.in`), signature ad hoc | `cpack` dans le dossier de compilation : `Centre-Ville-<version>-macOS.dmg` (avec `Applications`, `Cartes/` et `licence.txt`) |
+| Linux | `bin/cvw`, `bin/html`, `bin/tutocv`, `share/applications/fr.patquoi.CentreVille.desktop`, type MIME `application/x-centre-ville` (`*.cvw`), icônes (`linux/`, `ressources/icones`) | AppImage : linuxdeploy et linuxdeploy-plugin-qt sur `DESTDIR=AppDir cmake --install` (`.github/workflows/build-installer.yml`) |
+
+Les icônes viennent de `res/ico` (`tools/extrait_icones.py` en extrait les
+images PNG de 256 × 256 : les PNG de `res/ico` ont une vignette parasite).
+Sous Linux, l'aide est à côté de `cvw` comme ailleurs : pour une
+installation hors AppImage, choisir un préfixe dédié (`/opt/centre-ville`).
+`.github/workflows/build-installer.yml` compile sur les trois systèmes, sur
+un tag `v*` ou à la main, et produit l'installeur Windows, le `.dmg`
+(universel arm64 et x86_64, macOS 12 ou plus récent), l'AppImage x86_64
+(construite sous Ubuntu 22.04) et les archives des sources ; il les joint à
+une release seulement sur un tag. Ni signature ni notarisation.
 
 ## Organisation
 
@@ -60,11 +124,12 @@ dossier sous Windows, `~/Library/Application Support/...` sous macOS,
 | `f_propos`, `f_epidemie`, `f_defn`, `f_prm*` (5), `f_defv`, `f_defvp`, `f_deff`, `f_deffp`, `f_carfours` | Portées (lot 1). `ChargeFiche()` remplace le chargement du `.dfm` ; `ShellExecute` (adresse, courriel) -> `QDesktopServices::openUrl` ; `MessageBoxW` (Licence) -> `AfficheMessage` ; `((TComponent*)Sender)->Tag`/`Name`/`ClassName()` -> `TagDe`/`NomDe`/`NomClasseDe` ; `__except` -> `catch(...)`. `f_carfours` appelle `IncrementeNombre<feu>`, instanciée explicitement dans `engine/simul.cpp`. |
 | `f_afdist*` (6), `f_inf*` (6) | Portées (lot 2) : fiches non modales au premier plan, ouvertes par les actions Distances/Détail (menus, barre d'outils, raccourcis), rafraîchies par `DrawGridSimulClick` et, pour les informations, par le moteur à chaque tour (`IVueSimulation::RafraichitFiche`). `Caption=<int>` -> `IntToStr` (`f_infptn`) ; `NumArretSvt=...` sorti de `ARRAYOFCONST` pour garder l'ordre d'évaluation de l'original (`f_infbus`, `f_inftram`). |
 | `f_stats`, `f_statsv`, `f_statsat`, `f_statsc`, `f_rech` | Portées (lot 3). Évolution et Statistiques véhicules : non modales, au premier plan, rafraîchies par le moteur à chaque tour (`IVueSimulation::RafraichitFiche`) et fermées à l'arrêt. Composition et Fluidité et trafic : modales, créées à chaque ouverture puis libérées (`Release`) ; pendant Fluidité et trafic, `DrawGridSimulDrawCell` colore la carte par `CouleurCase` et la barre d'état détaille la case (`asMsgDetailCase`). Rechercher : non modale ; ses `CSpinEdit*Change` déplacent la case courante (`Col`/`Row`, donc `DrawGridSimulClick`), y compris à chaque tour pour l'objet suivi (bloc `frmRecherche` du moteur) : les fiches d'informations suivent ainsi l'objet. |
-| `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide ; `min`/`max`. |
+| `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide (`stRepAide`, page de redirection pour l'ancre) ; `min`/`max`. |
 | `grille/GrilleSimulation.*` | Remplace le `TDrawGrid` : voir l'en-tête pour le comportement reproduit. |
 | `vcl/` | Sous-ensemble de la VCL au-dessus de Qt, pour garder le code des fiches tel quel. |
 | `ui/` | GÉNÉRÉ par `tools/dfm2ui.py` : `.ui` des 33 fiches et `<fiche>_composants.h`. |
-| `ressources/` | GÉNÉRÉ par `tools/extrait_images.py` : images des `.dfm` et index des `TVirtualImageList`. |
+| `ressources/` | GÉNÉRÉ par `tools/extrait_images.py` : images des `.dfm` et index des `TVirtualImageList` ; `ressources/icones` : GÉNÉRÉ par `tools/extrait_icones.py`. |
+| `Info.plist.in`, `icones_macos.cmake`, `cvw.rc.in`, `linux/` | Paquet macOS (type `.cvw`, icônes), ressources Windows (icônes, version), entrée de bureau et type MIME Linux. |
 
 ### Couche `vcl/`
 
@@ -194,6 +259,15 @@ les actions d'édition) ; Paramètres et ses quatre fiches filles modales
 d'édition) ; Carrefours 4x4 à feux. Paramètres et Carrefours : enregistrer
 puis rouvrir conserve les valeurs. Les fiches modales sont pilotées par
 étapes (`QuandModale`).
+Les simulations des tests (lots 2 et 3, aide) sont jouées pas à pas, à graine
+fixe : `Demarre` arrête le minuteur `TimerSimul` et le test joue chaque tour
+par son gestionnaire (`JoueTour`), puis traite les événements comme la boucle
+de l'application ; aucun tour ne peut ainsi tomber entre ce que le test
+observe et ce qu'il vérifie (des vérifications échouaient de temps en temps
+sous macOS en CI). Arrêt et Interruption, traités au tic suivant du minuteur,
+le relancent. Seul le test Marche / Interruption / Arrêt garde le temps réel.
+Un clic sur une case est suivi de son dessin, qui règle l'état des actions
+(« Suivre... ») avant la touche suivante, comme pour l'utilisateur.
 Lot 2, en simulation à graine fixe sur des copies de Géant (arrêts, files et
 places de chaque sorte) et de Démo (parkings seulement) : les six fiches de distances,
 ouvertes par menu, menu contextuel, raccourci ou action sur une case de
@@ -247,6 +321,17 @@ dans les bornes au clic sur un bouton mais pas à la perte d'activation de la
 fenêtre ; texte vide (`Value` = `MinValue`) laissé vide ; flèches ; aucune
 borne si `MinValue=MaxValue` ; `EditorEnabled=False` ; valeur du `.dfm`
 bornée au chargement.
+Aide (phase 7) : F1 sur la fiche principale, sur Rechercher (non modale) et
+sur Paramètres (modale), bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
+ouvrent la bonne page à la bonne rubrique (`QDesktopServices::openUrl`
+intercepté par `setUrlHandler("file")`).
+`tests/app/test_aide.cpp` (CTest `interface.aide`) : les 57 entrées de
+`caCorresp`, lues dans `src/base.cpp` (l'original), ouvrent la page de
+redirection vers `html/index.html#ANCRE` à côté de l'exécutable, et chaque
+ancre existe dans `docs/guide/index.html` ; tous les `HelpContext` des `.ui`
+ont leur rubrique ; un `HelpContext` inconnu n'ouvre rien ; `html/` et
+`tutocv/` copiés à côté de `cvw` (dans le paquet sous macOS) sont identiques
+à `docs/`.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
 principale (Démo au tour 0 et au tour 200 ; Géant en statistiques de fluidité,
 `carte_fluidite_trafic.png`, et de trafic, `carte_trafic.png`) et des fiches
@@ -309,6 +394,19 @@ Comportement :
   des minuteries dépend du système : la vitesse maximale perçue peut varier
   (sans effet sur la simulation, tour par tour).
 - **Fichiers** : filtre « Tous fichiers » en `*` au lieu de `*.*`.
+- **Aide contextuelle** : le navigateur reçoit d'abord une page de
+  redirection (`cvw-aide-<ANCRE>.html` du dossier temporaire), qui charge
+  aussitôt la rubrique (voir « Aide »). Sous Windows, cette page s'ouvre avec
+  l'application associée aux fichiers `.html` ; l'original lançait le
+  navigateur associé à `http` (`HKCR\http\shell\open\command`).
+- **Linux, aide de l'AppImage** (non vérifié) : un navigateur confiné (snap ou
+  Flatpak, comme le Firefox d'Ubuntu) a son propre `/tmp` et ne lit ni l'aide
+  de l'AppImage, montée sous `/tmp/.mount_*`, ni la page de redirection.
+- **Distribution** : `cvw.32.exe` est abandonné (Qt 6 n'existe pas en
+  32 bits) : Windows 10/11 x64, ou ARM64 avec l'émulation x64. Sous macOS,
+  l'application est `Centre-Ville.app` (exécutable `Centre-Ville`).
+  Traductions de Qt : `qt_fr.qm` dans le dossier de windeployqt, qui y fusionne
+  `qtbase_fr.qm` (`application.cpp` essaie l'un puis l'autre).
 
 Visuel :
 

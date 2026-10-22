@@ -58,8 +58,11 @@ void InitialiseApplication(QApplication &App)
   FormatSettings.DecimalSeparator=',';
   FormatSettings.ThousandSeparator="\xC2\xA0";
   // Boutons des boîtes de dialogue en français (« Oui », « Non », « Annuler »)
+  // (qtbase_fr.qm, ou qt_fr.qm où windeployqt fusionne les traductions de Qt)
   static QTranslator Traduction;
-  if (Traduction.load(QLocale(QLocale::French), "qtbase", "_", QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
+  QString stTraductions=QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+  if (Traduction.load(QLocale(QLocale::French), "qtbase", "_", stTraductions)||
+      Traduction.load(QLocale(QLocale::French), "qt", "_", stTraductions))
    App.installTranslator(&Traduction);
   // Polices de Windows absentes ailleurs
   QFont::insertSubstitution("MS Sans Serif", QFont().defaultFamily());

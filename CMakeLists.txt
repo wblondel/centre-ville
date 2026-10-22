@@ -29,3 +29,21 @@ if(CV_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+# Image disque macOS (phase 8) : après cmake --build, « cpack --config
+# <build>/CPackConfig.cmake » produit Centre-Ville-<version>-macOS.dmg :
+# Centre-Ville.app (règles d'installation de app/), raccourci vers
+# Applications, cartes d'exemple (maps/) et licence. Les autres paquets
+# (installeur Windows, AppImage) : voir .github/workflows/build-installer.yml.
+if(APPLE AND TARGET cvw)
+  install(DIRECTORY maps/ DESTINATION Cartes COMPONENT dmg EXCLUDE_FROM_ALL)
+  install(FILES docs/licence.txt DESTINATION . COMPONENT dmg EXCLUDE_FROM_ALL)
+  set(CPACK_GENERATOR DragNDrop)
+  set(CPACK_PACKAGE_NAME "Centre-Ville")
+  set(CPACK_PACKAGE_VENDOR "Patquoi.fr")
+  set(CPACK_PACKAGE_FILE_NAME "Centre-Ville-${PROJECT_VERSION}-macOS")
+  set(CPACK_DMG_VOLUME_NAME "Centre-Ville ${PROJECT_VERSION}")
+  set(CPACK_COMPONENTS_ALL Unspecified dmg)
+  set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
+  include(CPack)
+endif()
