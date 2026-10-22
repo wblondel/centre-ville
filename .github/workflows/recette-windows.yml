@@ -1,0 +1,316 @@
+name: Recette Windows
+
+# Recette de l'installeur Windows d'une release ou pré-release publiée
+# (docs/RECETTE.md, partie Windows), sur une machine Windows de GitHub
+# (Windows Server x64), pour qui n'a pas de Windows sous la main, en deux
+# scénarios : installation sur une machine neuve, et mise à jour d'une 5.4.3.2
+# installée par l'installeur d'origine (http://patquoi.free.fr/INSCVW95.EXE,
+# même AppId) ; dans les deux cas :
+#   - installation silencieuse : fichiers, cartes d'exemple dans
+#     %LOCALAPPDATA%\Patquoi.fr\Centre-Ville, menu Démarrer, entrée des
+#     applications installées (version, une seule entrée), association des
+#     .cvw et icônes ;
+#   - ouverture d'un .cvw comme par un double-clic dans l'Explorateur : la
+#     fenêtre « Centre-Ville - …Démo.cvw » apparaît (aucune DLL ne manque) ;
+#   - F1 : page de redirection vers la rubrique (html\index.html#PDLI) ouverte
+#     dans le navigateur ; « À propos » (Alt+F1) ;
+#   - désinstallation : programme retiré, fichiers de l'utilisateur gardés ;
+#   - mise à jour seulement, interopérabilité : des cartes enregistrées par la
+#     6.0.0 (cvsim, même code d'enregistrement que l'application : formats
+#     anciens convertis en 0x530, état après 300 tours) s'ouvrent dans le
+#     cvw.exe 5.4.3.2 d'origine.
+# Les captures d'écran (fenêtre principale, aide, « À propos ») sont jointes
+# au run, avec les journaux d'installation, pour un contrôle à l'œil.
+# Job « fiches » : le test d'interface (tests/app/test_interface.cpp), lancé
+# avec l'affichage natif de Windows, capture chacune des fiches (la CI les
+# capture en « offscreen », où Windows n'a pas de polices : texte illisible).
+# À regarder : libellés entiers (Microsoft Sans Serif pour MS Sans Serif),
+# valeurs des champs numériques visibles (style « windowsvista ») ; le test
+# policesEtStyleWindows, actif seulement en affichage natif, les vérifie.
+# Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
+# public, ARM64.
+#
+# Lancement : à la main (tag à essayer ; par défaut la plus récente release
+# ou pré-release), ou au push de ce fichier hors de main (mise au point).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag de la release à essayer (vide : la plus récente, pré-releases comprises)'
+        required: false
+        default: ''
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - '.github/workflows/recette-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  recette:
+    name: Recette Windows (${{ matrix.scenario }})
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [installation, mise-a-jour]
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      APP: C:\Program Files\Patquoi.fr\Centre-Ville
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Download the installer of the release
+        run: |
+          $tag = '${{ inputs.tag }}'
+          if (-not $tag) { $tag = gh release list -R $env:GITHUB_REPOSITORY --limit 1 --json tagName --jq '.[0].tagName' }
+          "Release essayée : $tag"
+          gh release download $tag -R $env:GITHUB_REPOSITORY -p '*Windows-x64-Setup.exe' -D paquet
+          $setup = (Get-ChildItem paquet\*.exe).FullName
+          "SETUP=$setup" >> $env:GITHUB_ENV
+          New-Item -ItemType Directory captures | Out-Null
+          # Outils communs : capture de l'écran, fenêtre de cvw au premier plan
+          @'
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          function Capture([string]$Nom) {
+            $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+            $i = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+            [System.Drawing.Graphics]::FromImage($i).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+            $i.Save("captures\$Nom.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          }
+          function Installe([string]$Installeur, [string]$Journal) {
+            $p = Start-Process -PassThru -FilePath $Installeur -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$PWD\$Journal"
+            if (-not $p.WaitForExit(600000)) { Stop-Process $p -Force; throw "$Installeur : pas fini en 10 min" }
+            if ($p.ExitCode -ne 0) { Get-Content $Journal -Tail 30; throw "$Installeur : code $($p.ExitCode)" }
+          }
+          function EntreesCentreVille {
+            Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall' |
+              Get-ItemProperty | Where-Object { $_.DisplayName -like 'Centre-Ville*' }
+          }
+          function Active($Processus) {
+            (New-Object -ComObject WScript.Shell).AppActivate($Processus.Id) | Out-Null
+            Start-Sleep -Seconds 1
+          }
+          '@ | Set-Content "$env:RUNNER_TEMP\outils.ps1"
+
+      # Navigateur : pas d'écran de premier lancement d'Edge sur la machine neuve
+      - name: Prepare Windows (Edge, associations)
+        run: |
+          New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge -Force | Out-Null
+          Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge -Name HideFirstRunExperience -Value 1 -Type DWord
+          # (pour information ; .cvw n'est pas encore associé)
+          cmd /c "assoc .html & ftype htmlfile & assoc .cvw & exit /b 0"
+          Get-ComputerInfo -Property OsName, OsVersion | Format-List
+
+      # Mise à jour : la 5.4.3.2 d'origine d'abord (patquoi.free.fr), même AppId
+      - name: Install the original 5.4.3.2 (update scenario)
+        if: matrix.scenario == 'mise-a-jour'
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          Invoke-WebRequest -Uri http://patquoi.free.fr/INSCVW95.EXE -OutFile origine.exe
+          "Installeur d'origine : $((Get-Item origine.exe).Length) octets"
+          Installe "$PWD\origine.exe" installation-origine.log
+          $v = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
+          "Installé : cvw.exe $($v.FileVersion) ; applications installées : $((EntreesCentreVille | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', ')"
+          "Fichiers : $((Get-ChildItem -Recurse -File $env:APP).Count)"
+          if (-not $v.FileVersion.StartsWith('5.')) { throw "version d'origine inattendue : $($v.FileVersion)" }
+          # cvw.exe d'origine gardé pour l'interopérabilité (exécutable autonome)
+          New-Item -ItemType Directory "$env:RUNNER_TEMP\origine" | Out-Null
+          Copy-Item "$env:APP\bin\cvw.exe" "$env:RUNNER_TEMP\origine\cvw.exe"
+
+      - name: Install (silent)
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          Installe $env:SETUP installation.log
+
+      - name: Check installed files, maps, shortcuts and registry
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          $erreurs = @()
+          foreach ($f in 'bin\cvw.exe', 'bin\qt.conf', 'bin\Qt6Core.dll', 'bin\Qt6Gui.dll', 'bin\Qt6Widgets.dll', 'bin\vcruntime140.dll',
+                         'plugins\platforms\qwindows.dll', 'translations\qt_fr.qm', 'bin\html\index.html', 'bin\tutocv\index.html',
+                         'licence.txt', 'license.txt', 'lisezmoi.txt', 'Uninstall.ico', 'unins000.exe') {
+            if (-not (Test-Path "$env:APP\$f")) { $erreurs += "absent : $f" }
+          }
+          $version = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
+          "cvw.exe : FileVersion $($version.FileVersion), ProductVersion $($version.ProductVersion)"
+          $cartes = Get-ChildItem "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\*.cvw"
+          "Cartes d'exemple : $($cartes.Name -join ', ')"
+          if ($cartes.Count -ne 6) { $erreurs += "$($cartes.Count) cartes au lieu de 6" }
+          $menu = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Patquoi.fr\Centre-Ville"
+          "Menu Démarrer : $((Get-ChildItem $menu).Name -join ', ')"
+          if (-not (Test-Path "$menu\Centre-Ville.lnk")) { $erreurs += 'raccourci Centre-Ville absent' }
+          $desinst = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CDE3626F-3D04-4E11-9771-FBE0A4F8579B}_is1'
+          "Applications installées : $($desinst.DisplayName) $($desinst.DisplayVersion) ($($desinst.Publisher))"
+          if ($desinst.DisplayVersion -ne $version.FileVersion) { $erreurs += "version installée $($desinst.DisplayVersion) au lieu de $($version.FileVersion)" }
+          $entrees = @(EntreesCentreVille)
+          "Entrées « Centre-Ville » : $($entrees.Count) ($(($entrees | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', '))"
+          if ($entrees.Count -ne 1) { $erreurs += "$($entrees.Count) entrées « Centre-Ville » dans les applications installées" }
+          "Dossier : $((Get-ChildItem $env:APP -Name) -join ', ') ; bin : $((Get-ChildItem "$env:APP\bin" -File -Name) -join ', ')"
+          New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
+          $assoc = (Get-ItemProperty 'HKCR:\.cvw').'(default)'
+          $commande = (Get-ItemProperty 'HKCR:\Cvw\shell\open\command').'(default)'
+          $icone = (Get-ItemProperty 'HKCR:\Cvw\DefaultIcon').'(default)'
+          ".cvw -> $assoc ; ouverture : $commande ; icône : $icone"
+          if ($assoc -ne 'Cvw') { $erreurs += '.cvw non associé' }
+          if ($commande -notlike "*$env:APP\bin\cvw.exe*") { $erreurs += "commande d'ouverture : $commande" }
+          # Deux icônes dans cvw.exe : 0 (application), 1 (fichiers .cvw, DefaultIcon « cvw.exe,1 »)
+          Add-Type -Namespace Win32 -Name Shell -MemberDefinition '[DllImport("shell32.dll", CharSet=CharSet.Unicode)] public static extern uint ExtractIconEx(string f, int i, IntPtr[] g, IntPtr[] p, uint n);'
+          $nbIcones = [Win32.Shell]::ExtractIconEx("$env:APP\bin\cvw.exe", -1, $null, $null, 0)
+          "Icônes dans cvw.exe : $nbIcones"
+          if ($nbIcones -lt 2) { $erreurs += "$nbIcones icône(s) dans cvw.exe" }
+          if ($erreurs) { $erreurs; throw 'recette : installation' }
+
+      # Comme un double-clic dans l'Explorateur : verbe « open » de l'association
+      - name: Open a .cvw through its association
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          Start-Process "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Démo.cvw"
+          $fenetre = $null
+          for ($i = 0; ($i -lt 60) -and -not $fenetre; $i++) {
+            Start-Sleep -Seconds 1
+            $fenetre = Get-Process cvw -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like 'Centre-Ville - *Démo.cvw*' }
+          }
+          Get-Process cvw -ErrorAction SilentlyContinue | Format-Table Id, MainWindowTitle -AutoSize
+          Capture '1-ouverture-demo'
+          if (-not $fenetre) { throw 'la fenêtre « Centre-Ville - …Démo.cvw » ne s''est pas ouverte' }
+          Start-Sleep -Seconds 3 # fermeture de l'écran « À propos » du démarrage
+          Active $fenetre
+          Capture '2-fenetre-principale'
+
+      - name: F1 (contextual help) and About
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          $cvw = Get-Process cvw | Where-Object { $_.MainWindowTitle -like 'Centre-Ville - *' } | Select-Object -First 1
+          $page = "$env:TEMP\cvw-aide-PDLI.html"
+          Remove-Item $page -ErrorAction SilentlyContinue
+          Active $cvw
+          [System.Windows.Forms.SendKeys]::SendWait('{F1}')
+          for ($i = 0; ($i -lt 20) -and -not (Test-Path $page); $i++) { Start-Sleep -Seconds 1 }
+          if (-not (Test-Path $page)) { throw 'F1 : page de redirection absente' }
+          $contenu = Get-Content $page -Raw
+          $contenu
+          if ($contenu -notmatch [regex]::Escape(([Uri]"$env:APP\bin\html\index.html").AbsoluteUri.Replace(' ', '%20')) + '#PDLI') { throw 'F1 : la page ne mène pas à html/index.html#PDLI' }
+          Start-Sleep -Seconds 12
+          Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*cvw-aide-PDLI*' } | Select-Object Name, CommandLine | Format-List
+          Capture '3-aide-F1'
+          Active $cvw
+          [System.Windows.Forms.SendKeys]::SendWait('%{F1}')
+          Start-Sleep -Seconds 3
+          Capture '4-a-propos'
+          Get-Process cvw | Stop-Process -Force
+
+      # Fichiers écrits par le code d'enregistrement de la 6.0.0 (cvsim : moteur
+      # de l'application, sans interface), ouverts par le cvw.exe d'origine
+      # comme par « cvw fichier.cvw » : la fenêtre doit afficher le fichier
+      - name: Interoperability (files written by 6.0.0, opened by the original 5.4.3.2)
+        if: matrix.scenario == 'mise-a-jour'
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          cmake -S . -B build\interop -DCV_APP=OFF -DCV_TESTS=ON | Out-Null
+          cmake --build build\interop --config Release --target cvsim -- /verbosity:minimal | Select-Object -Last 2
+          $cvsim = (Get-ChildItem -Recurse build\interop -Filter cvsim.exe | Select-Object -First 1).FullName
+          New-Item -ItemType Directory interop | Out-Null
+          & $cvsim maps\Spaghettis.cvw --tours 0 --sauve interop\spaghettis-6.0.0.cvw
+          & $cvsim maps\Spaghettis.cvw --tours 300 --graine 1 --sauve interop\spaghettis-6.0.0-300-tours.cvw
+          & $cvsim maps\Colimasson.cvw --tours 0 --sauve interop\colimasson-6.0.0.cvw
+          $erreurs = @()
+          foreach ($f in Get-ChildItem interop\*.cvw) {
+            $avant = Get-Content $f.FullName -AsByteStream -TotalCount 4
+            "$($f.Name) : $($f.Length) octets, en-tête $(($avant | ForEach-Object { $_.ToString('X2') }) -join ' ')"
+            $p = Start-Process -PassThru "$env:RUNNER_TEMP\origine\cvw.exe" -ArgumentList "`"$($f.FullName)`""
+            $ouvert = $false
+            for ($i = 0; ($i -lt 30) -and -not $ouvert; $i++) {
+              Start-Sleep -Seconds 1
+              $p.Refresh()
+              $ouvert = $p.MainWindowTitle -like "*$($f.Name)*"
+            }
+            "  fenêtre de la 5.4.3.2 : « $($p.MainWindowTitle) »"
+            Start-Sleep -Seconds 3
+            Capture "5-origine-ouvre-$($f.BaseName)"
+            if (-not $ouvert) { $erreurs += "$($f.Name) non ouvert par la 5.4.3.2" }
+            Stop-Process $p -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 1
+          }
+          if ($erreurs) { $erreurs; throw 'interopérabilité' }
+
+      - name: Uninstall (silent)
+        run: |
+          # Une carte de l'utilisateur, à garder ; les cartes installées sont retirées comme par l'original
+          Copy-Item "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Démo.cvw" "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Ma carte.cvw"
+          $p = Start-Process -Wait -PassThru -FilePath "$env:APP\unins000.exe" -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$PWD\desinstallation.log"
+          "Désinstallation : code $($p.ExitCode)"
+          # unins000.exe se relance depuis une copie temporaire et rend la main aussitôt
+          for ($i = 0; ($i -lt 60) -and (Test-Path "$env:APP\bin\cvw.exe"); $i++) { Start-Sleep -Seconds 1 }
+          Start-Sleep -Seconds 3
+          if (Test-Path "$env:APP\bin\cvw.exe") { throw 'cvw.exe toujours présent' }
+          "Restent dans %LOCALAPPDATA% : $((Get-ChildItem "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville").Name -join ', ')"
+          if (-not (Test-Path "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Ma carte.cvw")) { throw 'carte de l''utilisateur supprimée' }
+          $desinst = Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CDE3626F-3D04-4E11-9771-FBE0A4F8579B}_is1'
+          "Entrée des applications installées encore présente : $desinst"
+          if ($desinst) { throw 'entrée de désinstallation toujours présente' }
+
+      - name: Upload screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recette-windows-${{ matrix.scenario }}
+          path: |
+            captures
+            installation-origine.log
+            installation.log
+            interop
+            desinstallation.log
+          if-no-files-found: ignore
+
+  fiches:
+    name: Fiches (affichage natif de Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          cache: true
+
+      - name: Configure and build the interface test
+        run: |
+          cmake --preset ci -DCV_APP=ON -DCV_TESTS=ON
+          cmake --build --preset ci --target test_interface --parallel
+
+      # Les captures sont le résultat attendu : le test en échec ne les retient pas
+      - name: Interface test with the native Windows platform (screenshots)
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CV_CARTE: ${{ github.workspace }}\maps\Démo.cvw
+          CV_DOSSIER_CAPTURES: ${{ github.workspace }}\captures-natives
+          QT_FORCE_STDERR_LOGGING: 1
+        run: |
+          $test = (Get-ChildItem -Recurse build\ci -Filter test_interface.exe | Select-Object -First 1).FullName
+          & $test 2>&1 | Select-String -Pattern '^(PASS|FAIL|Totals)|Loc:' | ForEach-Object { $_.Line }
+          if ($LASTEXITCODE -ne 0) { throw "test d'interface : code $LASTEXITCODE" }
+
+      - name: Upload native screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiches-windows-natives
+          path: captures-natives
+          if-no-files-found: warn

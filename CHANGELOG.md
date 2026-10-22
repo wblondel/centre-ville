@@ -36,10 +36,13 @@ ceux d'une installation 32 bits s'ouvrent comme les autres.
 - **Paquets non signés** : SmartScreen (Windows) et Gatekeeper (macOS)
   avertissent au premier lancement ; voir le README pour les ouvrir quand
   même.
-- **Polices** : MS Sans Serif et Small Fonts n'existent pas hors de
-  Windows ; avec les polices de remplacement, certains libellés sont coupés
-  ou débordent. Les boutons et les cadres suivent le style du système, et le
-  thème sombre de macOS.
+- **Polices** : MS Sans Serif et Small Fonts, polices « raster » que Qt ne
+  dessine pas, sont remplacées par Microsoft Sans Serif (aux mêmes mesures,
+  sous Windows et macOS) et par Verdana ou Tahoma ; sous Linux, par la
+  police du système. Quelques libellés restent coupés (Fluidité et trafic,
+  exposants de Composition). Les boutons et les cadres suivent le style du
+  système (sous Windows, celui de Windows 10, « windowsvista », dont les
+  champs numériques sont lisibles), et le thème sombre de macOS.
 - **macOS** : menus dans la barre du système ; « Ctrl » des raccourcis
   devient ⌘, sauf ⌘Q et ⌘H, réservés au système : Carrefours et Rechercher
   se font avec Control+Q et Control+H ; Ctrl+flèches et Ctrl+Espace se font
