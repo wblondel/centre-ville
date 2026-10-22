@@ -95,7 +95,7 @@ lues par l'installeur Inno Setup, noms des paquets).
 
 ```bash
 cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
-cmake --install build/release --prefix build/installeur
+cmake --install build/release --prefix "$PWD/build/installeur"   # préfixe absolu (script de déploiement de Qt)
 ```
 
 | Système | Contenu installé | Paquet |

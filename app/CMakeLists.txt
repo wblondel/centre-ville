@@ -166,8 +166,6 @@ add_custom_command(OUTPUT "${CV_DOSSIER_CVW}/aide.stamp"
 )
 add_custom_target(cvw_aide DEPENDS "${CV_DOSSIER_CVW}/aide.stamp")
 add_dependencies(cvw cvw_aide)
-# Pour les tests (tests/app/test_aide.cpp)
-set_target_properties(cvw PROPERTIES CV_DOSSIER_AIDE "${CV_DOSSIER_AIDE}")
 
 # Installation (phase 8) : cmake --install <build> --prefix <dossier>
 #   Windows : bin/cvw.exe, DLL de Qt et de MSVC, bin/qt.conf, plugins/ et

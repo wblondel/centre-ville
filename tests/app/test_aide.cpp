@@ -180,6 +180,7 @@ void TestAide::aideCopieeACoteDeCvw()
   for(const auto &d : Dossiers)
    {
     QString stCopie=QString(CV_DOSSIER_AIDE_CVW)+"/"+d.Copie, stSource=QString(CV_DOSSIER_DOCS)+"/"+d.Source;
+    QVERIFY2(QDir(stCopie).exists(), qPrintable("Dossier absent : "+stCopie));
     QStringList Copies=Fichiers(stCopie);
     QCOMPARE(Copies, Fichiers(stSource));
     QVERIFY(Copies.contains("index.html"));

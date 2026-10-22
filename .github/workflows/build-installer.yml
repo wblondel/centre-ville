@@ -72,7 +72,8 @@ jobs:
         run: cmake --build --preset ci --parallel
 
       - name: Install (windeployqt, MSVC runtime, help)
-        run: cmake --install build/ci --config Release --prefix build/installeur
+        # préfixe absolu : exigé par le script de déploiement de Qt (qt.conf)
+        run: cmake --install build/ci --config Release --prefix "${{ github.workspace }}/build/installeur"
 
       - name: Check installed files
         shell: bash

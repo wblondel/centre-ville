@@ -89,7 +89,7 @@ L'application est `build/dev/app/cvw` (`cvw.exe` sous Windows, `Centre-Ville.app
 ### 2. Installation et paquets
 ```bash
 cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
-cmake --install build/release --prefix build/installeur   # windeployqt / macdeployqt
+cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt / macdeployqt (préfixe absolu)
 ```
 * **Windows** : `iscc /DStaging=<chemin absolu de build\installeur> inno-setup\inscvw95.iss` (Inno Setup ≥ 6.3).
 * **macOS** : `cd build/release && cpack` produit `Centre-Ville-<version>-macOS.dmg`.

@@ -110,6 +110,12 @@ if(TARGET cvwfiches)
   )
 
   # Aide HTML (phase 7) : HelpContext -> page et ancre, aide copiée à côté de cvw
+  # (dans Contents/Resources du paquet sous macOS)
+  if(APPLE)
+    set(CV_AIDE_CVW "$<TARGET_BUNDLE_CONTENT_DIR:cvw>/Resources")
+  else()
+    set(CV_AIDE_CVW "$<TARGET_FILE_DIR:cvw>")
+  endif()
   add_executable(test_aide app/test_aide.cpp)
   set_target_properties(test_aide PROPERTIES AUTOMOC ON)
   target_link_libraries(test_aide PRIVATE cvwfiches Qt6::Test)
@@ -117,7 +123,7 @@ if(TARGET cvwfiches)
     CV_SOURCE_BASE="${PROJECT_SOURCE_DIR}/src/base.cpp"
     CV_DOSSIER_DOCS="${PROJECT_SOURCE_DIR}/docs"
     CV_DOSSIER_UI="${PROJECT_SOURCE_DIR}/app/ui"
-    CV_DOSSIER_AIDE_CVW="$<TARGET_PROPERTY:cvw,CV_DOSSIER_AIDE>"
+    CV_DOSSIER_AIDE_CVW="${CV_AIDE_CVW}"
   )
   add_dependencies(test_aide cvw)
   add_test(NAME interface.aide COMMAND test_aide)

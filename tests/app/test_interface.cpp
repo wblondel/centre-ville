@@ -3042,7 +3042,10 @@ void TestInterface::aideContextuelle()
   frmSimulation->ActionTutoriel->Execute();
   QUrl Sommaire=QUrl::fromLocalFile(stDossier+"/html/index.html");
   QCOMPARE(UrlsOuvertes, QList<QUrl>({Sommaire, Sommaire, QUrl::fromLocalFile(stDossier+"/tutocv/index.html")}));
-  // Rechercher (non modale) : F1 dans un champ, puis le bouton Aide
+  // Rechercher (non modale) : F1 dans un champ, puis le bouton Aide ; fermée
+  // d'abord, si un test précédent en échec l'a laissée ouverte
+  if (frmRecherche->isVisible()) Clique(frmRecherche->ButtonAnnuler);
+  frmSimulation->ActionRechercher->Checked=false;
   frmSimulation->ActionRechercher->Execute();
   QVERIFY(frmRecherche->isVisible());
   UrlsOuvertes.clear();
