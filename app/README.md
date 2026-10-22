@@ -14,7 +14,10 @@ sont portées. Lot 3 (statistiques et recherche) : les 5 fiches `f_stats`,
 fiches secondaires le sont désormais. Phase 7 (services système) : aide HTML
 à côté de l'exécutable, F1 à la bonne rubrique ; phase 8 : règles
 d'installation, installeur Windows, `.dmg` macOS, AppImage Linux (voir
-« Installation et paquets »).
+« Installation et paquets »). Phase 9 (recette et bascule) : version 6.0.0,
+après les pré-releases rc1 à rc3 ; recette Windows automatisée
+(`.github/workflows/recette-windows.yml`), liste de recette dans
+`docs/RECETTE.md`, bogues d'origine conservés dans `CHANGELOG.md`.
 Comme pour le moteur, **on porte, on ne réécrit pas** : les fiches portées
 sont des copies de `src/f_*.*` (CRLF -> LF, `__fastcall` retiré), où chaque
 autre modification est annotée `// portage`. Pour lire le portage ligne à
