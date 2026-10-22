@@ -340,6 +340,10 @@ cartes de l'AppImage, lancé comme par son `AppRun` (`sh`, `set -e`) sur une
 AppDir et un `XDG_DATA_HOME` temporaires, copie les cartes de `maps/` sans
 écraser une carte modifiée, une seule fois ; sous Linux, le dossier est celui
 de `stRepLocalAppData` (Ouvrir et Enregistrer y démarrent : `interface.demo`).
+Affichage natif de Windows (`policesEtStyleWindows`, sauté en « offscreen ») :
+police Microsoft Sans Serif obtenue par les fiches, style « windowsvista » ;
+le workflow « Recette Windows » lance le test dans cet affichage et joint les
+captures de chaque fiche (en « offscreen », Windows n'a pas de polices).
 « À propos » (`interface.demo`) : `ImageDeVersion(5, 4)` redessine la bitmap
 d'origine au pixel près, et la fiche montre la version de `project(VERSION)`.
 `CV_DOSSIER_CAPTURES=<dossier>` enregistre les captures de la fenêtre
@@ -420,9 +424,17 @@ Comportement :
 
 Visuel :
 
-- **Polices** : MS Sans Serif et Small Fonts n'existent pas hors de Windows :
-  police système et Verdana/Tahoma à la place (barre d'état, numéros d'arrêts
-  sur la carte, fiches) ; les tailles en pixels de la VCL sont conservées.
+- **Polices** : MS Sans Serif et Small Fonts sont des polices « raster » que
+  Qt ne dessine pas, même sous Windows (où il les trouve, puis prend une
+  police de secours plus large). `FamillesQt` (`vcl/graphiques.cpp`) met
+  devant leurs équivalents TrueType : Microsoft Sans Serif, aux mêmes mesures
+  (fournie par Windows et par macOS), et Verdana ou Tahoma pour Small Fonts
+  (barre d'état, numéros d'arrêts sur la carte) ; sous Linux, police du
+  système (substitutions de `application.cpp`). Les tailles en pixels de la
+  VCL sont conservées.
+- **Style sous Windows** : « windowsvista » (contrôles de Windows 10) plutôt
+  que « windows11 », le style par défaut de Qt sous Windows 11, dont les
+  flèches côte à côte cachaient la valeur des champs numériques étroits.
 - **Menu principal** : dans la barre de menus du système sous macOS (hors de
   la fenêtre, qui est donc moins haute) ; icônes et raccourcis rendus par le
   système.
