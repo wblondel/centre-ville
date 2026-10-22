@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Type MIME des fichiers de simulation .cvw (association des fichiers de
+     inno-setup/inscvw95.iss : « Cvw », « Simulation Centre-Ville ») -->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-centre-ville">
+    <comment>Simulation Centre-Ville</comment>
+    <icon name="application-x-centre-ville"/>
+    <glob pattern="*.cvw"/>
+  </mime-type>
+</mime-info>
