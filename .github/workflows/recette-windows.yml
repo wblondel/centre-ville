@@ -14,7 +14,11 @@ name: Recette Windows
 #     fenêtre « Centre-Ville - …Démo.cvw » apparaît (aucune DLL ne manque) ;
 #   - F1 : page de redirection vers la rubrique (html\index.html#PDLI) ouverte
 #     dans le navigateur ; « À propos » (Alt+F1) ;
-#   - désinstallation : programme retiré, fichiers de l'utilisateur gardés.
+#   - désinstallation : programme retiré, fichiers de l'utilisateur gardés ;
+#   - mise à jour seulement, interopérabilité : des cartes enregistrées par la
+#     6.0.0 (cvsim, même code d'enregistrement que l'application : formats
+#     anciens convertis en 0x530, état après 300 tours) s'ouvrent dans le
+#     cvw.exe 5.4.3.2 d'origine.
 # Les captures d'écran (fenêtre principale, aide, « À propos ») sont jointes
 # au run, avec les journaux d'installation, pour un contrôle à l'œil.
 # Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
@@ -55,6 +59,9 @@ jobs:
         shell: pwsh
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download the installer of the release
         run: |
           $tag = '${{ inputs.tag }}'
@@ -109,6 +116,9 @@ jobs:
           "Installé : cvw.exe $($v.FileVersion) ; applications installées : $((EntreesCentreVille | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', ')"
           "Fichiers : $((Get-ChildItem -Recurse -File $env:APP).Count)"
           if (-not $v.FileVersion.StartsWith('5.')) { throw "version d'origine inattendue : $($v.FileVersion)" }
+          # cvw.exe d'origine gardé pour l'interopérabilité (exécutable autonome)
+          New-Item -ItemType Directory "$env:RUNNER_TEMP\origine" | Out-Null
+          Copy-Item "$env:APP\bin\cvw.exe" "$env:RUNNER_TEMP\origine\cvw.exe"
 
       - name: Install (silent)
         run: |
@@ -192,6 +202,40 @@ jobs:
           Capture '4-a-propos'
           Get-Process cvw | Stop-Process -Force
 
+      # Fichiers écrits par le code d'enregistrement de la 6.0.0 (cvsim : moteur
+      # de l'application, sans interface), ouverts par le cvw.exe d'origine
+      # comme par « cvw fichier.cvw » : la fenêtre doit afficher le fichier
+      - name: Interoperability (files written by 6.0.0, opened by the original 5.4.3.2)
+        if: matrix.scenario == 'mise-a-jour'
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          cmake -S . -B build\interop -DCV_APP=OFF -DCV_TESTS=ON | Out-Null
+          cmake --build build\interop --config Release --target cvsim -- /verbosity:minimal | Select-Object -Last 2
+          $cvsim = (Get-ChildItem -Recurse build\interop -Filter cvsim.exe | Select-Object -First 1).FullName
+          New-Item -ItemType Directory interop | Out-Null
+          & $cvsim maps\Spaghettis.cvw --tours 0 --sauve interop\spaghettis-6.0.0.cvw
+          & $cvsim maps\Spaghettis.cvw --tours 300 --graine 1 --sauve interop\spaghettis-6.0.0-300-tours.cvw
+          & $cvsim maps\Colimasson.cvw --tours 0 --sauve interop\colimasson-6.0.0.cvw
+          $erreurs = @()
+          foreach ($f in Get-ChildItem interop\*.cvw) {
+            $avant = Get-Content $f.FullName -AsByteStream -TotalCount 4
+            "$($f.Name) : $($f.Length) octets, en-tête $(($avant | ForEach-Object { $_.ToString('X2') }) -join ' ')"
+            $p = Start-Process -PassThru "$env:RUNNER_TEMP\origine\cvw.exe" -ArgumentList "`"$($f.FullName)`""
+            $ouvert = $false
+            for ($i = 0; ($i -lt 30) -and -not $ouvert; $i++) {
+              Start-Sleep -Seconds 1
+              $p.Refresh()
+              $ouvert = $p.MainWindowTitle -like "*$($f.Name)*"
+            }
+            "  fenêtre de la 5.4.3.2 : « $($p.MainWindowTitle) »"
+            Start-Sleep -Seconds 3
+            Capture "5-origine-ouvre-$($f.BaseName)"
+            if (-not $ouvert) { $erreurs += "$($f.Name) non ouvert par la 5.4.3.2" }
+            Stop-Process $p -Force -ErrorAction SilentlyContinue
+            Start-Sleep -Seconds 1
+          }
+          if ($erreurs) { $erreurs; throw 'interopérabilité' }
+
       - name: Uninstall (silent)
         run: |
           # Une carte de l'utilisateur, à garder ; les cartes installées sont retirées comme par l'original
@@ -217,5 +261,6 @@ jobs:
             captures
             installation-origine.log
             installation.log
+            interop
             desinstallation.log
           if-no-files-found: ignore
