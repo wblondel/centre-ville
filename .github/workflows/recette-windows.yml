@@ -2,10 +2,14 @@ name: Recette Windows
 
 # Recette de l'installeur Windows d'une release ou pré-release publiée
 # (docs/RECETTE.md, partie Windows), sur une machine Windows de GitHub
-# (Windows Server x64), pour qui n'a pas de Windows sous la main :
+# (Windows Server x64), pour qui n'a pas de Windows sous la main, en deux
+# scénarios : installation sur une machine neuve, et mise à jour d'une 5.4.3.2
+# installée par l'installeur d'origine (http://patquoi.free.fr/INSCVW95.EXE,
+# même AppId) ; dans les deux cas :
 #   - installation silencieuse : fichiers, cartes d'exemple dans
 #     %LOCALAPPDATA%\Patquoi.fr\Centre-Ville, menu Démarrer, entrée des
-#     applications installées (version), association des .cvw et icônes ;
+#     applications installées (version, une seule entrée), association des
+#     .cvw et icônes ;
 #   - ouverture d'un .cvw comme par un double-clic dans l'Explorateur : la
 #     fenêtre « Centre-Ville - …Démo.cvw » apparaît (aucune DLL ne manque) ;
 #   - F1 : page de redirection vers la rubrique (html\index.html#PDLI) ouverte
@@ -13,8 +17,8 @@ name: Recette Windows
 #   - désinstallation : programme retiré, fichiers de l'utilisateur gardés.
 # Les captures d'écran (fenêtre principale, aide, « À propos ») sont jointes
 # au run, avec les journaux d'installation, pour un contrôle à l'œil.
-# Non couvert : mise à jour d'une 5.4.3.2 d'origine, SmartScreen (installation
-# silencieuse), Windows 10/11 grand public, ARM64.
+# Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
+# public, ARM64.
 #
 # Lancement : à la main (tag à essayer ; par défaut la plus récente release
 # ou pré-release), ou au push de ce fichier hors de main (mise au point).
@@ -37,7 +41,11 @@ permissions:
 
 jobs:
   recette:
-    name: Recette Windows
+    name: Recette Windows (${{ matrix.scenario }})
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [installation, mise-a-jour]
     runs-on: windows-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -65,6 +73,15 @@ jobs:
             [System.Drawing.Graphics]::FromImage($i).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
             $i.Save("captures\$Nom.png", [System.Drawing.Imaging.ImageFormat]::Png)
           }
+          function Installe([string]$Installeur, [string]$Journal) {
+            $p = Start-Process -PassThru -FilePath $Installeur -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$PWD\$Journal"
+            if (-not $p.WaitForExit(600000)) { Stop-Process $p -Force; throw "$Installeur : pas fini en 10 min" }
+            if ($p.ExitCode -ne 0) { Get-Content $Journal -Tail 30; throw "$Installeur : code $($p.ExitCode)" }
+          }
+          function EntreesCentreVille {
+            Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall' |
+              Get-ItemProperty | Where-Object { $_.DisplayName -like 'Centre-Ville*' }
+          }
           function Active($Processus) {
             (New-Object -ComObject WScript.Shell).AppActivate($Processus.Id) | Out-Null
             Start-Sleep -Seconds 1
@@ -79,13 +96,27 @@ jobs:
           cmd /c "assoc .html & assoc .cvw"
           Get-ComputerInfo -Property OsName, OsVersion | Format-List
 
+      # Mise à jour : la 5.4.3.2 d'origine d'abord (patquoi.free.fr), même AppId
+      - name: Install the original 5.4.3.2 (update scenario)
+        if: matrix.scenario == 'mise-a-jour'
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          Invoke-WebRequest -Uri http://patquoi.free.fr/INSCVW95.EXE -OutFile origine.exe
+          "Installeur d'origine : $((Get-Item origine.exe).Length) octets"
+          Installe "$PWD\origine.exe" installation-origine.log
+          $v = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
+          "Installé : cvw.exe $($v.FileVersion) ; applications installées : $((EntreesCentreVille | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', ')"
+          "Fichiers : $((Get-ChildItem -Recurse -File $env:APP).Count)"
+          if (-not $v.FileVersion.StartsWith('5.')) { throw "version d'origine inattendue : $($v.FileVersion)" }
+
       - name: Install (silent)
         run: |
-          $p = Start-Process -Wait -PassThru -FilePath $env:SETUP -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$PWD\installation.log"
-          if ($p.ExitCode -ne 0) { Get-Content installation.log -Tail 30; throw "installeur : code $($p.ExitCode)" }
+          . "$env:RUNNER_TEMP\outils.ps1"
+          Installe $env:SETUP installation.log
 
       - name: Check installed files, maps, shortcuts and registry
         run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
           $erreurs = @()
           foreach ($f in 'bin\cvw.exe', 'bin\qt.conf', 'bin\Qt6Core.dll', 'bin\Qt6Gui.dll', 'bin\Qt6Widgets.dll', 'bin\vcruntime140.dll',
                          'plugins\platforms\qwindows.dll', 'translations\qt_fr.qm', 'bin\html\index.html', 'bin\tutocv\index.html',
@@ -103,6 +134,10 @@ jobs:
           $desinst = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{CDE3626F-3D04-4E11-9771-FBE0A4F8579B}_is1'
           "Applications installées : $($desinst.DisplayName) $($desinst.DisplayVersion) ($($desinst.Publisher))"
           if ($desinst.DisplayVersion -ne $version.FileVersion) { $erreurs += "version installée $($desinst.DisplayVersion) au lieu de $($version.FileVersion)" }
+          $entrees = @(EntreesCentreVille)
+          "Entrées « Centre-Ville » : $($entrees.Count) ($(($entrees | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', '))"
+          if ($entrees.Count -ne 1) { $erreurs += "$($entrees.Count) entrées « Centre-Ville » dans les applications installées" }
+          "Dossier : $((Get-ChildItem $env:APP -Name) -join ', ') ; bin : $((Get-ChildItem "$env:APP\bin" -File -Name) -join ', ')"
           New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
           $assoc = (Get-ItemProperty 'HKCR:\.cvw').'(default)'
           $commande = (Get-ItemProperty 'HKCR:\Cvw\shell\open\command').'(default)'
@@ -176,9 +211,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: recette-windows
+          name: recette-windows-${{ matrix.scenario }}
           path: |
             captures
+            installation-origine.log
             installation.log
             desinstallation.log
           if-no-files-found: ignore
