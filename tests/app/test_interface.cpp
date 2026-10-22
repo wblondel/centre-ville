@@ -503,6 +503,10 @@ void TestInterface::ouvertureParLigneDeCommande()
   QCOMPARE((int)frmSimulation->DrawGridSimul->ColCount, cv->NbX);
   QCOMPARE((int)frmSimulation->DrawGridSimul->RowCount, cv->NbY);
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+  // Ouvrir et Enregistrer démarrent dans le dossier des fichiers de Centre-Ville
+  // (où l'installeur Windows et l'AppImage copient les cartes d'exemple)
+  QCOMPARE(Q(frmSimulation->OpenDialog->InitialDir), Q(stRepLocalAppData()));
+  QCOMPARE(Q(frmSimulation->SaveDialog->InitialDir), Q(stRepLocalAppData()));
   QVERIFY(!frmSimulation->SimulationModifiee);
   QVERIFY(frmSimulation->ActionMarche->Enabled);
   QVERIFY(!frmSimulation->ActionArret->Enabled);

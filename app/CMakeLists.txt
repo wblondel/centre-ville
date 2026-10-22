@@ -188,7 +188,8 @@ add_dependencies(cvw cvw_aide)
 #             l'installeur (inno-setup/inscvw95.iss) ;
 #   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
 #   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
-#             fichiers .cvw, icônes ; Qt est déployé par linuxdeploy (AppImage).
+#             fichiers .cvw, icônes, cartes d'exemple (share/centre-ville/cartes) ;
+#             Qt est déployé par linuxdeploy (AppImage).
 include(GNUInstallDirs)
 if(APPLE)
   install(TARGETS cvw BUNDLE DESTINATION .)
@@ -207,6 +208,10 @@ if(UNIX AND NOT APPLE)
           DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps)
   install(FILES ressources/icones/application-x-centre-ville.png
           DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/mimetypes)
+  # Cartes d'exemple, copiées au premier lancement de l'AppImage dans le dossier
+  # de stRepLocalAppData (linux/apprun-hooks/centre-ville-cartes.sh)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/maps/ DESTINATION ${CMAKE_INSTALL_DATADIR}/centre-ville/cartes
+          FILES_MATCHING PATTERN "*.cvw")
 endif()
 
 if(WIN32 OR APPLE)
