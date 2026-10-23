@@ -3972,7 +3972,7 @@ bool voie::Sauve(int hfile)
      FileWrite(hfile, &Nature, sizeof(Nature))&&
      FileWrite(hfile, &NumParking, sizeof(NumParking))&&
      FileWrite(hfile, &ToutDroit, sizeof(ToutDroit))&&
-     FileWrite(hfile, &PassagePietons, sizeof(PassagePietons)); // v2.0
+     FileWrite(hfile, &PassagePietons, sizeof(PassagePietons))&& // v2.0. v6.0.1 : « ; » à la place de « && » dans l'original (fin de la chaîne ignorée)
      FileWrite(hfile, &PassageBus, sizeof(PassageBus))&& // v3.0
      FileWrite(hfile, &NumArretBus, sizeof(NumArretBus))&& // v3.0
      FileWrite(hfile, &NumArretTram, sizeof(NumArretTram))&& // v3.5
@@ -6394,7 +6394,7 @@ bool centre_ville::Sauve(int hfile)
   for(i=0; Ok&&(i<NbFeux); i++) Ok=Feu[i].Sauve(hfile);
   for(i=0; Ok&&(i<NbFeuxPieton); i++) Ok=FeuP[i].Sauve(hfile); // v5.2
   for(i=0; Ok&&(i<NbParkings); i++) Ok=Parking[i].Sauve(hfile);
-  Ok=DepotBus.Sauve(hfile);
+  Ok=Ok&&DepotBus.Sauve(hfile); // v6.0.1 : Manquait Ok&& (comme dans Charge avant la v5.2)
   for(i=0; Ok&&(i<NbArretsBus); i++) Ok=ArretBus[i].Sauve(hfile); // v3.0
   for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) Ok=LigneBus[i].Sauve(hfile); // v3.0. Attention : tableau statique
   for(i=0; Ok&&(i<NbArretsTram); i++) Ok=ArretTram[i].Sauve(hfile); // v3.5
@@ -6410,7 +6410,7 @@ bool centre_ville::Sauve(int hfile)
    for(i=0; Ok&&(i<NbX); i++)
     for(j=0; Ok&&(j<NbY); j++)
      Ok=v[i][j].Sauve(hfile);
-  return Ok;
+  return Ok&&FileFlush(hfile); // v6.0.1 : FileWrite renvoie -1 (vrai) en cas d'erreur et écrit par un tampon : erreurs vues ici
  }
 //-----------------------------------------------------------------------------
 void centre_ville::Verifie(AnsiString &asMsgErr)

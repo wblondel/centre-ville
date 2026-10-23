@@ -7,6 +7,10 @@
 //  - FileOpen/FileCreate renvoient -1 en cas d'échec (INVALID_HANDLE_VALUE) ;
 //  - FileRead/FileWrite renvoient le nombre d'octets lus/écrits (0 en fin de
 //    fichier) ou -1 en cas d'erreur ;
+//  - les écritures passent par un tampon : une erreur n'est connue qu'en le
+//    vidant. Après un échec, les écritures suivantes échouent aussi (le
+//    fichier est déjà incomplet), et FileFlush, absente de SysUtils, vide le
+//    tampon et dit si toutes les écritures ont abouti (v6.0.1) ;
 //  - les fichiers sont toujours ouverts en binaire ;
 //  - les noms de fichiers sont en UTF-8 (convertis en UTF-16 sous Windows).
 //---------------------------------------------------------------------------
@@ -30,6 +34,7 @@ int FileCreate(const AnsiString &asNomFichier);
 int FileRead(int Handle, void *Tampon, unsigned NbOctets);
 int FileWrite(int Handle, const void *Tampon, unsigned NbOctets);
 int FileSeek(int Handle, int Decalage, int Origine); // Origine : 0 début, 1 courant, 2 fin
+bool FileFlush(int Handle); // false si une écriture a échoué depuis l'ouverture (v6.0.1)
 void FileClose(int Handle);
 //---------------------------------------------------------------------------
 #endif

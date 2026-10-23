@@ -6,9 +6,15 @@
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
 #include <string>
+#ifndef _WIN32
+ #include <csignal>
+ #include <sys/resource.h>
+#endif
 #include "cartes.h"
 #include "harnais.h"
+#include "sortie.h"
 #include "vue.h"
+#include "compat/fichier.h"
 #include "compat/alea.h"
 //---------------------------------------------------------------------------
 namespace
@@ -72,6 +78,52 @@ TEST_CASE("Vehlibs : sans place libre, le vehlib attend au lieu de figer la simu
   CHECK(Vue.Messages.empty());
   harnais::Ferme();
   alea::LibereGraine();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corrections][sauvegarde]")
+ { // L'original ignorait les erreurs d'écriture : FileWrite renvoie -1, vrai
+   // dans les chaînes de &&, et voie::Sauve contenait un « ; » au lieu d'un
+   // « && » ; compat/fichier ne voyait l'erreur qu'en vidant son tampon (tous
+   // les 64 Ko ou à la fermeture)
+  VueNulle Vue;
+  vue=&Vue;
+  for(int c : {0, 4}) // 8x8 (7 Ko, moins qu'un tampon) et Géant (470 Ko)
+   {
+    DYNAMIC_SECTION(Cartes[c].Nom)
+     {
+      REQUIRE(harnais::Ouvre(CheminCarte(Cartes[c])));
+      // Fichier ouvert en lecture seule : aucune écriture n'aboutit
+      const std::string asLectureSeule=FichierSortie(std::string("lecture_seule_")+Cartes[c].Nom+".cvw");
+      int h=FileCreate(asLectureSeule.c_str());
+      REQUIRE(h>0);
+      FileClose(h);
+      REQUIRE((h=FileOpen(asLectureSeule.c_str(), fmOpenRead))>0);
+      CHECK_FALSE(cv->Sauve(h));
+      FileClose(h);
+      // Poignée invalide (FileCreate a échoué)
+      CHECK_FALSE(cv->Sauve(-1));
+#ifndef _WIN32
+      // Taille de fichier limitée à 1000 octets, comme un disque plein :
+      // l'écriture échoue en cours de route
+      const std::string asLimite=FichierSortie(std::string("limite_")+Cartes[c].Nom+".cvw");
+      struct rlimit Ancienne, Limite;
+      REQUIRE(getrlimit(RLIMIT_FSIZE, &Ancienne)==0);
+      Limite=Ancienne;
+      Limite.rlim_cur=1000;
+      void (*AncienSignal)(int)=std::signal(SIGXFSZ, SIG_IGN);
+      REQUIRE(setrlimit(RLIMIT_FSIZE, &Limite)==0);
+      const bool Enregistre=harnais::SauveSansChaos(asLimite);
+      setrlimit(RLIMIT_FSIZE, &Ancienne);
+      std::signal(SIGXFSZ, AncienSignal);
+      CHECK_FALSE(Enregistre);
+#endif
+      // Sans erreur, l'enregistrement aboutit toujours
+      CHECK(harnais::SauveSansChaos(FichierSortie(std::string("sans_erreur_")+Cartes[c].Nom+".cvw")));
+      harnais::Ferme();
+     }
+   }
+  CHECK(Vue.Messages.empty());
   vue=nullptr;
  }
 //---------------------------------------------------------------------------

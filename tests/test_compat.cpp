@@ -200,3 +200,38 @@ TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écrit
   FileClose(h);
  }
 //---------------------------------------------------------------------------
+TEST_CASE("FileWrite/FileFlush : erreurs d'écriture (v6.0.1)", "[compat][fichier]")
+ { // Le tampon ne voit une erreur d'écriture qu'en se vidant : FileFlush la
+   // signale, et les écritures qui suivent un échec échouent aussi
+  const AnsiString asNom=FichierSortie("compat_erreur.bin");
+  int h=FileCreate(asNom);
+  REQUIRE(h>0);
+  int Valeur=0x530;
+  CHECK(FileWrite(h, &Valeur, sizeof(Valeur))==(int)sizeof(Valeur));
+  CHECK(FileFlush(h));
+  FileClose(h);
+  // Ouvert en lecture seule : l'écriture est acceptée par le tampon, refusée par le système
+  h=FileOpen(asNom, fmOpenRead);
+  REQUIRE(h>0);
+  CHECK(FileWrite(h, &Valeur, sizeof(Valeur))==(int)sizeof(Valeur));
+  CHECK_FALSE(FileFlush(h));
+  CHECK(FileWrite(h, &Valeur, sizeof(Valeur))==-1);
+  CHECK_FALSE(FileFlush(h));
+  int Lu=0;
+  CHECK(FileSeek(h, 0, 0)==0); // lecture toujours possible
+  CHECK(FileRead(h, &Lu, sizeof(Lu))==(int)sizeof(Lu));
+  CHECK(Lu==0x530);
+  FileClose(h);
+  // Gros volume : l'échec survient en cours d'écriture, quand le tampon est plein
+  h=FileOpen(asNom, fmOpenRead);
+  REQUIRE(h>0);
+  std::string Gros(200000, 'x');
+  CHECK(FileWrite(h, Gros.data(), (unsigned)Gros.size())==-1);
+  CHECK(FileWrite(h, &Valeur, sizeof(Valeur))==-1);
+  CHECK_FALSE(FileFlush(h));
+  FileClose(h);
+  // Poignée invalide
+  CHECK_FALSE(FileFlush(-1));
+  CHECK_FALSE(FileFlush(9999));
+ }
+//---------------------------------------------------------------------------
