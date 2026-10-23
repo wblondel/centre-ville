@@ -4,6 +4,66 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.1] — bogues d'origine du moteur corrigés
+
+Première version corrective : la règle du portage (« on porte, on ne corrige
+pas ») est levée. Cette version corrige les bogues du moteur de l'original
+que la 6.0.0 avait conservés ; ceux de l'interface viendront ensuite. Le
+format des fichiers `.cvw` ne change pas (0x530) : un fichier enregistré par
+la 6.0.1 s'ouvre toujours dans la 5.4.3.2, et inversement.
+
+### Bogues corrigés
+
+- **Blocage des vehlibs** : quand aucune place de vehlib n'était libre, la
+  simulation se figeait (sur Géant, 29 vehlibs pour 32 places, selon le
+  tirage : 10 graines sur 60 avant le tour 2000). Un vehlib ne part plus sans
+  place d'arrivée réservée : faute de place libre, il attend à la sienne et
+  réessaie au tour suivant, et le piéton qui l'attend reste dehors. Quand une
+  place est libre, la simulation est celle de l'original.
+- **Erreurs d'enregistrement** : une erreur d'écriture (disque plein, fichier
+  en lecture seule, fichier impossible à créer) affiche « Erreur de données
+  dans le fichier » et « Enregistrement NON effectué. » au lieu d'annoncer
+  « Enregistrement effectué. » (`voie::Sauve` contenait un `;` au lieu de
+  `&&`, et le résultat des écritures n'était jamais vérifié).
+- **Vérification d'intégrité** : les contrôles de position, de direction, de
+  priorité, de directions possibles, d'état de feu et de type de demande du
+  vert ou de passage au rouge rendent leurs messages (`Verifie*()` les
+  recevaient par valeur et les perdaient). Les feux supprimés, qui laissent
+  une place libre dans la liste des feux, ne sont pas signalés. Le message
+  d'erreur du dépôt de bus donne ses coordonnées.
+- **Copier vers…** : un élément non défini (dépôt de bus absent, feu
+  supprimé, place de taxi non placée…) garde ses coordonnées -1 dans la copie,
+  au lieu de -1 moins le coin de la sélection (-2 pour une sélection en
+  (1,1)), que la vérification d'intégrité signalerait à la réouverture ; la
+  fin de la copie remet bien toute la sélection à zéro (`PrepareCopie(FIN, …)`
+  remettait `NbY` au lieu de `NbYc`).
+- **Champs non initialisés** : le moteur initialise lui-même le nombre de
+  vehlibs (fichiers antérieurs au format 0x530), la liste des feux de
+  piétons, les durées par défaut du vert et du rouge d'un nouveau réseau, et
+  les tours d'attente d'un piéton. Il ne dépend plus de la remise à zéro de la
+  mémoire faite par l'application et les tests.
+- **Lectures hors tableau** (même motif que `voie::DefinitNature`, corrigé en
+  6.0.0 : borne testée après l'accès) : recherche de l'arrêt suivant d'un bus
+  ou d'un tram, ajout et retrait d'un piéton sur une case, descente des
+  passagers d'un vehlib. Aucune ne se produisait sur les cartes livrées.
+
+Détail : `engine/README.md`, « Corrections de la 6.0.1 ».
+
+### Restent à corriger
+
+- **Moteur, trouvé en 6.0.1** : les passagers d'un vehlib n'en descendent
+  jamais (`vehlib::FaitDescendrePietons` cherche un trottoir depuis la case
+  du vehlib, toujours occupée par lui, et `voie::FaitDescendrePieton` ne
+  gère pas les vehlibs). Un vehlib qui a pris un passager repart donc dès
+  qu'il arrive.
+- **Interface** : la liste « Bogues d'origine conservés » de la 6.0.0 (dans
+  `CHANGELOG.md`), et `f_simul.cpp` qui
+  teste `if ((hfile=FileCreate(…)))` et `if ((hfile=FileOpen(…)))` alors que
+  l'échec vaut -1 : un fichier impossible à créer est signalé comme une
+  erreur de données ; un fichier impossible à ouvrir donne une carte vide
+  (`centre_ville::Charge` ne voit pas les erreurs de lecture, -1, seulement
+  une fin de fichier prématurée).
+
 ## [6.0.0] — portage Qt 6
 
 Centre-Ville 6.0.0 est la version 5.4.3.2 de Patrice Fouquet
@@ -66,24 +126,7 @@ Détail : `app/README.md`, « Écarts connus avec l'original ».
 
 ### Bogues d'origine conservés, à corriger après la bascule
 
-Moteur (`engine/`, identique à l'original) :
-
-- **Blocage des vehlibs** : `vehlib::ReservePlaceVehlibCible` tire au hasard
-  une place libre sans limite d'essais. Quand plus de vehlibs reçoivent un
-  passager qu'il ne reste de places libres, la simulation se fige. Sur
-  Géant (29 vehlibs pour 32 places), cela dépend du tirage : par exemple
-  avant le tour 50 avec la graine 123.
-- `Verifie*()` reçoivent `asMsgErr` par valeur : leurs messages sont perdus.
-- `PrepareCopie(FIN, …)` (« Copier vers… ») remet à zéro `NbY` au lieu de
-  `NbYc`.
-- `voie::Sauve` contient un `;` au lieu de `&&` : le résultat des dernières
-  écritures est ignoré.
-- `depot_bus::Verifie` appelle `Format("Dépot bus : ", …)` sans
-  spécificateur.
-- Champs non initialisés : `centre_ville::NbVehlibs` (fichiers antérieurs
-  au format 0x530, enregistré tel quel), `pieton::TourAttBus`,
-  `TourAttTram`, `TourAttTaxi`, `centre_ville::FeuP` sans feux piétons (le
-  portage remet la mémoire à zéro).
+Moteur : corrigés en 6.0.1 (voir plus haut).
 
 Interface :
 

@@ -32,6 +32,13 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.1] 
+ - La simulation ne se fige plus quand aucune place de vehlib n'est libre :
+   le vehlib attend qu'une place se libère.
+ - Une erreur d'écriture lors de l'enregistrement est signalée.
+ - La vérification d'intégrité affiche toutes les erreurs trouvées.
+ - Corrections de la commande "Copier vers...".
+
 [Version 6.0.0] 
  - Portage de la version 5.4.3.2 vers C++20, CMake et Qt 6 : Centre-Ville
    fonctionne nativement sous Windows 10/11 (64 bits), macOS 12 ou plus
