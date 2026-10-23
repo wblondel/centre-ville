@@ -30,6 +30,8 @@
 #define AUCUN_FEU ((x==-1)&&(y==-1)&&(Dir==indefinie))
 #define REMET_A_ZERO Definit(-1, -1, 0)
 #define NUMVEHLIBPLACE(x) ((int)(0.5+(x)*(TauxRemplissageVehlib/100.0)))
+// v6.0.1 : coordonnée enregistrée par « Copier vers... » : une coordonnée non définie (-1) le reste
+#define COORDCOPIE(c, c0) (((c)>-1)?(c)-(c0):(c))
 //---------------------------------------------------------------------------
 
 // v3.5 : remplacement des [5] par [NBDIR+1] et des [4] par [NBDIR]
@@ -698,7 +700,7 @@ bool feu::Charge(int hfile)
 bool feu::Sauve(int hfile)
  {
   int i, Ok,
-      xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+      xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   Ok=FileWrite(hfile, &Numero, sizeof(Numero))&&
      FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
      FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&& // v4.0.1
@@ -1003,8 +1005,8 @@ bool feu_pieton::Charge(int hfile)
 bool feu_pieton::Sauve(int hfile)
  {
   int i, Ok, // xc,yc : gestion copie vers fichier (v4.0.1)
-      xc[NBFEUXPIETONSPARNUMERO]={x[0]-cv->Xc, x[1]-cv->Xc},
-      yc[NBFEUXPIETONSPARNUMERO]={y[0]-cv->Yc, y[1]-cv->Yc};
+      xc[NBFEUXPIETONSPARNUMERO]={COORDCOPIE(x[0], cv->Xc), COORDCOPIE(x[1], cv->Xc)}, // v6.0.1 : COORDCOPIE
+      yc[NBFEUXPIETONSPARNUMERO]={COORDCOPIE(y[0], cv->Yc), COORDCOPIE(y[1], cv->Yc)};
   Ok=FileWrite(hfile, &Numero, sizeof(Numero))&&
      FileWrite(hfile, cv->CopieEnCours?xc:x, NBFEUXPIETONSPARNUMERO*sizeof(x[0]))&&
      FileWrite(hfile, cv->CopieEnCours?yc:y, NBFEUXPIETONSPARNUMERO*sizeof(y[0]))&&
@@ -1050,7 +1052,7 @@ bool parking::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool parking::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -1246,7 +1248,7 @@ bool place_vehlib::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_vehlib::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -1513,7 +1515,7 @@ bool depot_bus::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool depot_bus::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)); // v4.0.1
  }
@@ -1724,7 +1726,7 @@ bool arret_bus::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool arret_bus::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&&
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&&
@@ -1997,7 +1999,7 @@ bool arret_tram::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool arret_tram::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&& // v4.0.1
@@ -2077,7 +2079,7 @@ bool place_taxi::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_taxi::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -2317,7 +2319,7 @@ bool place_park::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_park::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc;
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&&
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));

@@ -5,7 +5,7 @@ selection complete (0,0,99,63) valide=1
   identique a Sauve=1
   apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 selection reduite (1,1,97,61) valide=1
-  copie taille=481497 empreinte=fe6ed1c6c4b7c97c
+  copie taille=481497 empreinte=2560b39f1f02524c
   identique a Sauve=0
   apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 rechargement copie reduite=1 NbX=97 NbY=61 verifie=ok

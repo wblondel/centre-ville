@@ -11,6 +11,7 @@
  #include <sys/resource.h>
 #endif
 #include "cartes.h"
+#include "format_reference.h"
 #include "harnais.h"
 #include "sortie.h"
 #include "vue.h"
@@ -19,6 +20,23 @@
 //---------------------------------------------------------------------------
 namespace
  {
+  int LitEntier(const std::string &o, const champ_cvw &ch)
+   {
+    unsigned u=0;
+    for(int i=3; i>=0; i--) u=(u<<8)|(unsigned char)o[ch.Debut+(std::size_t)i];
+    return (int)u;
+   }
+  //-------------------------------------------------------------------------
+  // Champ de coordonnée d'un élément (feu1.x, feup2.y[1], depot.x...), hors cases
+  bool EstCoordonnee(const std::string &Nom)
+   {
+    if (Nom.rfind("case(", 0)==0) return false;
+    std::size_t p=Nom.rfind('.');
+    if (p==std::string::npos) return false;
+    std::string Fin=Nom.substr(p+1);
+    return (Fin=="x")||(Fin=="y")||(Fin.rfind("x[", 0)==0)||(Fin.rfind("y[", 0)==0);
+   }
+  //-------------------------------------------------------------------------
   // Une place que le vehlib n°NumVehlib pourrait réserver (libre, autre que sa place de départ)
   bool ExistePlaceReservable(int NumVehlib)
    {
@@ -145,6 +163,47 @@ TEST_CASE("Copier vers... : PrepareCopie(FIN) remet toute la sélection à zéro
   CHECK(cv->NbXc==0);
   CHECK(cv->NbYc==0);
   harnais::Ferme();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Copier vers... : un élément non défini reste non défini (-1) dans la copie", "[corrections][copie]")
+ { // L'original enregistrait x-Xc et y-Yc même pour un élément non défini
+   // (x=y=-1 : dépôt de bus absent, feu supprimé...), soit -2 avec une
+   // sélection qui commence en (1,1), que la vérification d'intégrité signale
+  VueNulle Vue;
+  vue=&Vue;
+  for(const carte &c : Cartes)
+   {
+    DYNAMIC_SECTION(c.Nom)
+     {
+      REQUIRE(harnais::Ouvre(CheminCarte(c)));
+      const std::string asOrigine=FichierSortie(std::string("copie_indefinis_")+c.Nom+"_origine.cvw"),
+                        asCopie=FichierSortie(std::string("copie_indefinis_")+c.Nom+".cvw");
+      REQUIRE(harnais::SauveSansChaos(asOrigine));
+      cv->PrepareCopie(DEBUT, 1, 1, cv->NbX-2, cv->NbY-2);
+      REQUIRE(cv->CopieValide());
+      REQUIRE(harnais::SauveSansChaos(asCopie));
+      cv->PrepareCopie(FIN, 0, 0, 0, 0);
+      harnais::Ferme();
+      const std::string asOctetsOrigine=harnais::LitFichier(asOrigine), asOctetsCopie=harnais::LitFichier(asCopie);
+      const conversion_cvw Origine=ConvertitEn530(asOctetsOrigine), Copie=ConvertitEn530(asOctetsCopie);
+      REQUIRE(Origine.Ok);
+      REQUIRE(Copie.Ok);
+      int NbIndefinis=0;
+      for(const champ_cvw &ch : Origine.Champs)
+       if (EstCoordonnee(ch.Nom)&&(LitEntier(asOctetsOrigine, ch)<0))
+        {
+         NbIndefinis++;
+         const champ_cvw *chc=nullptr;
+         for(const champ_cvw &k : Copie.Champs) if (k.Nom==ch.Nom) { chc=&k; break; }
+         REQUIRE(chc);
+         INFO(ch.Nom);
+         CHECK(LitEntier(asOctetsCopie, *chc)==-1);
+        }
+      CHECK(NbIndefinis>0); // chaque carte a des éléments non définis
+     }
+   }
+  CHECK(Vue.Messages.empty());
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
