@@ -3,9 +3,9 @@
 selection complete (0,0,128,80) valide=1
   copie taille=845996 empreinte=850462342d15a1bb
   identique a Sauve=1
-  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=80
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 selection reduite (1,1,126,78) valide=1
   copie taille=812624 empreinte=4c8778698bc248a2
   identique a Sauve=0
-  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=78
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 rechargement copie reduite=1 NbX=126 NbY=78 verifie=ok

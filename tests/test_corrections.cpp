@@ -127,3 +127,24 @@ TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corre
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Copier vers... : PrepareCopie(FIN) remet toute la sélection à zéro", "[corrections][copie]")
+ { // L'original remettait à zéro le paramètre NbY au lieu de NbYc
+  VueNulle Vue;
+  vue=&Vue;
+  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[0])));
+  cv->PrepareCopie(DEBUT, 1, 2, 3, 4);
+  CHECK(cv->CopieEnCours);
+  CHECK(cv->Xc==1);
+  CHECK(cv->Yc==2);
+  CHECK(cv->NbXc==3);
+  CHECK(cv->NbYc==4);
+  cv->PrepareCopie(FIN, 0, 0, 0, 0);
+  CHECK_FALSE(cv->CopieEnCours);
+  CHECK(cv->Xc==0);
+  CHECK(cv->Yc==0);
+  CHECK(cv->NbXc==0);
+  CHECK(cv->NbYc==0);
+  harnais::Ferme();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------

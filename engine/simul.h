@@ -1251,7 +1251,7 @@ class centre_ville
 	if ((CopieEnCours=EnCours))
      { Xc=x; Yc=y; NbXc=NbX; NbYc=NbY; }
     else
-     Xc=Yc=NbXc=NbY=0;
+     Xc=Yc=NbXc=NbYc=0; // v6.0.1 : NbY (le paramètre) dans l'original
    };
   template <class C> bool DansSelectionEnCours(C *c) // v4.0.1
    {
