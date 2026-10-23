@@ -5,7 +5,10 @@
 // délai de CTest le fait échouer) sur le moteur 6.0.0, identique à l'original.
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <algorithm>
+#include <cstdlib>
 #include <string>
+#include <vector>
 #ifndef _WIN32
  #include <csignal>
  #include <sys/resource.h>
@@ -97,6 +100,7 @@ TEST_CASE("Vehlibs : sans place libre, le vehlib attend au lieu de figer la simu
      {
       const vehlib &vl=cv->Vehlib[i];
       INFO("Tour " << t << ", vehlib n°" << i+1);
+      REQUIRE(vl.NumPlaceDepart>0);
       // Un vehlib ne part que vers une place réservée pour lui
       if (vl.Situation==svDepart) REQUIRE(vl.NumPlaceArrivee>0);
       if (vl.NumPlaceArrivee) REQUIRE(cv->PlaceVehlib[vl.NumPlaceArrivee-1].NumVehlibReserve==i+1);
@@ -115,6 +119,128 @@ TEST_CASE("Vehlibs : sans place libre, le vehlib attend au lieu de figer la simu
    }
   CHECK(cv->TourCrt==300);
   CHECK(NbAttentesSansPlace>0); // le cas est bien exercé
+  CHECK(Vue.Messages.empty());
+  harnais::Ferme();
+  alea::LibereGraine();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des piétons", "[corrections][vehlibs]")
+ { // L'original cherchait le trottoir depuis la case du vehlib (toujours
+   // occupée par lui) et voie::FaitDescendrePieton ne gérait pas les vehlibs :
+   // aucun passager ne descendait, le vehlib repartait dès son arrivée et ses
+   // passagers n'étaient plus jamais simulés
+  VueNulle Vue;
+  vue=&Vue;
+  alea::FixeGraine(12345);
+  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant
+  AnsiString asMsgErr;
+  REQUIRE(harnais::Demarre(asMsgErr));
+  REQUIRE(cv->NbVehlibs==29);
+  auto Ecart=[](int a, int b, int n) { int e=std::abs(a-b); return std::min(e, n-e); }; // la carte est un tore
+  std::vector<int> VehlibAvant(cv->NbPietons), xAvant(cv->NbPietons), yAvant(cv->NbPietons), ArriveeAvant(cv->NbVehlibs);
+  std::vector<long> DemiCasesALaDescente(cv->NbPietons, -1); // -1 : pas descendu, ou déjà reparti à pied
+  int NbArrivees=0, NbDescentes=0, NbRestesABord=0, NbRepartis=0;
+  for(int t=1; t<=600; t++)
+   {
+    for(int p=0; p<cv->NbPietons; p++)
+     {
+      VehlibAvant[p]=cv->Pieton[p].NumVehlib;
+      xAvant[p]=cv->Pieton[p].x;
+      yAvant[p]=cv->Pieton[p].y;
+     }
+    for(int i=0; i<cv->NbVehlibs; i++) ArriveeAvant[i]=cv->Vehlib[i].NumPlaceArrivee;
+    REQUIRE(harnais::Tick());
+    for(int i=0; i<cv->NbVehlibs; i++)
+     {
+      const vehlib &vl=cv->Vehlib[i];
+      INFO("Tour " << t << ", vehlib n°" << i+1);
+      REQUIRE(vl.NumPlaceDepart>0);
+      // Chaque passager était déjà à bord, ou à pied à côté de la place de départ
+      // (il y arrive, puis monte, pendant le même tour)
+      const place_vehlib &pd=cv->PlaceVehlib[vl.NumPlaceDepart-1];
+      int NbPassagers=0;
+      for(int p=0; p<cv->NbPietons; p++)
+       if (cv->Pieton[p].NumVehlib==i+1)
+        {
+         NbPassagers++;
+         INFO("piéton n°" << p+1);
+         if (VehlibAvant[p]!=i+1)
+          {
+           REQUIRE(VehlibAvant[p]==0);
+           REQUIRE(Ecart(xAvant[p], pd.x, cv->NbX)+Ecart(yAvant[p], pd.y, cv->NbY)<=2);
+          }
+        }
+      REQUIRE(vl.NbPersonnes==NbPassagers);
+      REQUIRE(vl.NbPersonnes<=cv->NbMaxPersonnesVehlib);
+      if (vl.Situation==svDepart)
+       { // Il roule, avec au moins un passager, vers la place réservée pour lui
+        REQUIRE(vl.NbPersonnes>0);
+        REQUIRE(vl.NumPlaceArrivee>0);
+        REQUIRE(cv->PlaceVehlib[vl.NumPlaceArrivee-1].NumVehlibReserve==i+1);
+       }
+      else
+       { // Il attend à sa place de départ
+        REQUIRE(vl.NumPlaceArrivee==0);
+        REQUIRE(pd.x==vl.x);
+        REQUIRE(pd.y==vl.y);
+       }
+      if (ArriveeAvant[i]&&(vl.NumPlaceDepart==ArriveeAvant[i]))
+       { // Arrivé pendant ce tour : sa place d'arrivée est devenue sa place de départ
+        NbArrivees++;
+        const place_vehlib &pv=cv->PlaceVehlib[ArriveeAvant[i]-1];
+        REQUIRE(pv.NumVehlibReserve==0);
+        for(int p=0; p<cv->NbPietons; p++)
+         if (VehlibAvant[p]==i+1)
+          {
+           pieton &pt=cv->Pieton[p];
+           INFO("piéton n°" << p+1);
+           if (pt.NumVehlib)
+            { // Aucun trottoir voisin ne pouvait l'accueillir : il reste à bord et
+              // descendra à la place suivante (le vehlib repart, ou attend une place libre)
+             NbRestesABord++;
+             REQUIRE(pt.NumVehlib==i+1);
+             REQUIRE(((vl.Situation==svDepart)||!ExistePlaceReservable(i+1)));
+            }
+           else
+            { // Descendu sur un trottoir voisin de la place (ou à côté de celui-ci)
+             NbDescentes++;
+             REQUIRE(pt.Defini());
+             REQUIRE(Ecart(pt.x, pv.x, cv->NbX)+Ecart(pt.y, pv.y, cv->NbY)<=2);
+             const voie &v=cv->v[pt.x][pt.y];
+             REQUIRE(((v.NumPieton[0]==p+1)||(v.NumPieton[1]==p+1)));
+             REQUIRE_FALSE(pt.AttendVehlib);
+             DemiCasesALaDescente[p]=pt.DemiCasesParcourues;
+            }
+          }
+       }
+     }
+    for(int p=0; p<cv->NbPietons; p++)
+     {
+      pieton &pt=cv->Pieton[p];
+      if (pt.NumVehlib)
+       {
+        INFO("Tour " << t << ", piéton n°" << p+1);
+        REQUIRE_FALSE(pt.Defini());
+       }
+      else
+       if ((DemiCasesALaDescente[p]>=0)&&(pt.DemiCasesParcourues>DemiCasesALaDescente[p]))
+        { // Redevenu un piéton simulé : il marche
+         NbRepartis++;
+         DemiCasesALaDescente[p]=-1;
+        }
+     }
+    for(int p=0; p<cv->NbPlacesVehlib; p++)
+     if (int n=cv->PlaceVehlib[p].NumVehlibReserve)
+      {
+       INFO("Tour " << t << ", place de vehlib n°" << p+1);
+       REQUIRE(cv->Vehlib[n-1].NumPlaceArrivee==p+1);
+      }
+   }
+  INFO(NbArrivees << " arrivées, " << NbDescentes << " descentes, " << NbRestesABord << " restés à bord, " << NbRepartis << " repartis à pied");
+  CHECK(NbDescentes>NbArrivees/2); // l'original : aucune
+  CHECK(NbRepartis>NbDescentes/2);
+  CHECK(NbRestesABord>0); // le cas est bien exercé
   CHECK(Vue.Messages.empty());
   harnais::Ferme();
   alea::LibereGraine();

@@ -1403,9 +1403,9 @@ bool vehlib::PeutPasser()
 void vehlib::FaitDescendrePietons()
  {
   int i, d;
-  voie *vl=&(cv->v[x][y]);
-  for(d=nord; (d<=ouest)&&(!vl->PietonPeutAller((direction)d)); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis ! v6.0.1 : borne testée d'abord
-  if ((d<=ouest)&&vl->PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même ! v6.0.1 : l'original appelait PietonPeutAller(5)
+  // v6.0.1 : l'original testait la case du vehlib (cv->v[x][y]), qu'il occupe : aucun passager ne descendait
+  for(d=nord; (d<=ouest)&&(!cv->V(x,y,d).PietonPeutAller((direction)d)); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis ! v6.0.1 : borne testée d'abord
+  if ((d<=ouest)&&cv->V(x,y,d).PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même ! v6.0.1 : l'original appelait PietonPeutAller(5)
    {
     voie *v=&cv->V(x,y,d);
     pieton *p;
@@ -2972,6 +2972,11 @@ bool voie::FaitDescendrePieton(direction DirDescente, int NumPietonAFaireDescend
      {
       cv->Taxi[p->NumTaxi-1].NbPersonnes--;
       p->NumTaxi=0;
+     }
+    if (p->NumVehlib) // v6.0.1 : l'original ne gérait pas les vehlibs (le piéton restait à bord)
+     {
+      cv->Vehlib[p->NumVehlib-1].NbPersonnes--;
+      p->NumVehlib=0;
      }
     p->x=x; p->y=y; p->VeutDescendre=false;
     RedessineCase(false);
