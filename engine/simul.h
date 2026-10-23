@@ -244,6 +244,7 @@ class pieton // v2.0
 	Dir=indefinie;
 	NumVehlib=NumPlaceVehlib=NumFeuP=NumTaxi=NumTram=NumBus=NumFileTaxi=NumArretTram=NumArretBus=DemiCase=0; // v3.6 (NumTaxi, NumFileTaxi), v5.2 (NumFeuP), v5.3 (vehlib)
 	DemiCasesParcourues=TourDrnAff=TourDrnDepl=0L;
+	TourAttTaxi=TourAttTram=TourAttBus=0L; // v6.0.1 : indéterminés tant que le piéton n'a rien attendu
 	Mort=Ecrase=VeutDescendre=AttendFeuP=AttendVehlib=AttendTaxi=AttendTram=AttendBus=PlaceVehlibTrv=FileTaxiTrv=ArretTramTrv=ArretBusTrv=PsgPtTrv=false; // v4.3 (Ecrase), v5.2 (AttendFeuP), v5.3 (vehlib), v5.4.1 (Mort)
     Infection=NULL;
    };
@@ -848,7 +849,7 @@ class vehlib // v5.3 instances créées au lancement de la simulation
   direction ProchaineDirectionAuCarrefour();
   bool PeutPasser();
   void FaitDescendrePietons();
-  void ReservePlaceVehlibCible();
+  bool ReservePlaceVehlibCible(); // v6.0.1 : false si aucune place n'est libre
   void FaitMonterPieton(int NumPietonAFaireMonter);
   int NbPietonsQuiSontMontes(); // retourne true si des piétons attendaient et sont montés
   void Verifie(AnsiString &asMsgErr);
@@ -1251,7 +1252,7 @@ class centre_ville
 	if ((CopieEnCours=EnCours))
      { Xc=x; Yc=y; NbXc=NbX; NbYc=NbY; }
     else
-     Xc=Yc=NbXc=NbY=0;
+     Xc=Yc=NbXc=NbYc=0; // v6.0.1 : NbY (le paramètre) dans l'original
    };
   template <class C> bool DansSelectionEnCours(C *c) // v4.0.1
    {

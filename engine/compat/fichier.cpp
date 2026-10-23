@@ -31,6 +31,7 @@ namespace
     std::vector<char> Lecture; // octets lus d'avance
     std::size_t PosLecture=0;  // prochain octet à rendre dans Lecture
     std::vector<char> Ecriture; // octets en attente d'écriture
+    bool Erreur=false; // une écriture a échoué : les suivantes échouent aussi
    };
   std::mutex Verrou;
   std::vector<fichier> Fichiers;
@@ -99,6 +100,7 @@ namespace
     if (!f->Ecriture.empty())
      {
       Ok=EcritSysteme(f->fd, f->Ecriture.data(), f->Ecriture.size());
+      if (!Ok) f->Erreur=true;
       f->Ecriture.clear();
      }
     std::size_t Restant=f->Lecture.size()-f->PosLecture;
@@ -195,7 +197,7 @@ int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
  {
   std::lock_guard<std::mutex> g(Verrou);
   fichier *f=Trouve(Handle);
-  if (!f) return -1;
+  if ((!f)||f->Erreur) return -1;
   if ((f->PosLecture!=f->Lecture.size())||!f->Lecture.empty()) Synchronise(f);
   f->Ecriture.insert(f->Ecriture.end(), (const char*)Tampon, (const char*)Tampon+NbOctets);
   if ((f->Ecriture.size()>=TAILLE_TAMPON)&&!Synchronise(f)) return -1;
@@ -210,6 +212,15 @@ int FileSeek(int Handle, int Decalage, int Origine)
   if (!Synchronise(f)) return -1;
   long long p=DeplaceSysteme(f->fd, Decalage, Origine);
   return (p<0)?-1:(int)p;
+ }
+//---------------------------------------------------------------------------
+bool FileFlush(int Handle)
+ {
+  std::lock_guard<std::mutex> g(Verrou);
+  fichier *f=Trouve(Handle);
+  if (!f) return false;
+  Synchronise(f);
+  return !f->Erreur;
  }
 //---------------------------------------------------------------------------
 void FileClose(int Handle)

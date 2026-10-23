@@ -13,6 +13,8 @@ Catch2 3.8.1 est utilisé s'il est installé, sinon téléchargé par `FetchCont
 | `moteur.simulation` | `[simulation]` | Golden master : 500 tours × 6 cartes × 2 configurations, à graine fixe. |
 | `moteur.generation` | `[generation]` | Génération aléatoire de réseau à graine fixe (3 configurations). |
 | `moteur.copie` | `[copie]` | « Copier vers… » (`PrepareCopie`, `CopieValide`, `Sauve`). |
+| `moteur.corrections` | `[corrections]` | Bogues d'origine corrigés en 6.0.1 (`test_corrections.cpp`) : blocage des vehlibs (Géant, graine 123), erreurs d'écriture, « Copier vers… », messages de `Verifie()`. Délai de 120 s : le moteur 6.0.0 ne rendait pas la main. |
+| `moteur.memoire` | tous sauf `[compat]` et `[corrections]` | `cvtests_motif` : round-trip, vérification, golden master, génération et copie avec une mémoire remplie de `0xA5` au lieu d'être remise à zéro, et champs que l'original laissait indéterminés (`test_memoire.cpp`). |
 | `cvsim.spaghettis_100_tours` | — | Critère de fin de la phase 1 : charger une carte, simuler 100 tours, sauvegarder. |
 
 ## Harnais (`support/harnais.*`)
@@ -75,8 +77,11 @@ Cette commande régénère `golden/standard`, `golden/epidemie`,
 ## Déterminisme
 
 - `support/allocation.cpp` remplace `operator new` par une version qui remet la
-  mémoire à zéro, car le moteur d'origine lit quelques champs non initialisés
-  (voir `engine/README.md`).
+  mémoire à zéro, car le moteur d'origine lisait quelques champs non
+  initialisés (voir `engine/README.md`). Depuis la 6.0.1, le moteur les
+  initialise : `cvtests_motif` (`moteur.memoire`) refait les tests avec
+  `support/allocation_motif.cpp`, qui remplit au contraire la mémoire de
+  `0xA5`, et doit obtenir les mêmes résultats.
 - Le golden master est identique avec Apple Clang (Debug, Release, ASan+UBSan)
   et avec GCC 12 sous Linux ARM64 (où `char` est non signé). Windows (MSVC) est
   couvert par la CI.

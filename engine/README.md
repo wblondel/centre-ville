@@ -2,13 +2,14 @@
 
 Phases 1 et 2 de `PLAN_PORTAGE.md`. Le moteur de Centre-Ville 5.4.3.2 est
 **recompilé, pas réécrit** : `simul.cpp` et `simul.h` sont des copies de
-`src/simul.cpp` et `src/simul.h` (qui restent la référence, en lecture seule).
-Chaque modification porte la mention `// portage` et **aucune ligne n'a été
-ajoutée ni retirée** : les fichiers ont le même nombre de lignes que l'original,
-avec les mêmes fins de ligne (CRLF). Pour lire le portage ligne à ligne :
+`src/simul.cpp` et `src/simul.h` (qui restent la référence, en lecture seule),
+en fins de ligne LF. Chaque modification du portage (6.0.0) porte la mention
+`// portage` ; chaque correction d'un bogue d'origine (6.0.1), la mention
+`// v6.0.1`, comme l'auteur annotait ses versions (`// v5.3`...). Pour lire
+les écarts avec l'original ligne à ligne :
 
 ```bash
-git diff --no-index --word-diff src/simul.cpp engine/simul.cpp
+git diff --no-index --ignore-cr-at-eol --word-diff src/simul.cpp engine/simul.cpp
 ```
 
 ## Construction et tests
@@ -17,8 +18,9 @@ git diff --no-index --word-diff src/simul.cpp engine/simul.cpp
 cmake --preset dev && cmake --build --preset dev && ctest --preset dev
 ```
 
-Autres préréglages : `release`, `asan` (AddressSanitizer + UBSan), `ci`
-(générateur par défaut, utilisé par GitHub Actions) et `msvc` (Visual Studio).
+Autres préréglages : `release`, `asan` et `asan-release` (AddressSanitizer +
+UBSan, en Debug et en Release), `ci` (générateur par défaut, utilisé par
+GitHub Actions) et `msvc` (Visual Studio).
 Les tests sont décrits dans `tests/README.md`.
 
 ## Fichiers
@@ -43,7 +45,8 @@ Les tests sont décrits dans `tests/README.md`.
 - `__fastcall` retiré de `EffectueTourSimulation` ;
 - `friend class ExportEtat` dans `infection` : sert uniquement à l'export de l'état par les tests.
 
-`simul.cpp` :
+`simul.cpp` (numéros de ligne : ceux de `src/simul.cpp` ; ceux de
+`engine/simul.cpp` sont décalés par les lignes ajoutées) :
 
 - `#include <vcl.h>`, `#pragma hdrstop` et `#pragma package` neutralisés ;
 - `base.h` et les 9 `f_*.h` remplacés par `vue.h`, `format_cvw.h`, `compat/fichier.h` et `compat/alea.h` ;
@@ -54,7 +57,7 @@ Les tests sont décrits dans `tests/README.md`.
 
 ### Inventaire des accès à l'interface remplacés
 
-Les numéros de ligne sont identiques dans `src/simul.cpp` et `engine/simul.cpp`. Le code en commentaire n'a pas été touché (`Genere()`, lignes 6606-6609, 6628, 6653 et 6665-6667).
+Les numéros de ligne sont ceux de `src/simul.cpp`. Le code en commentaire n'a pas été touché (`Genere()`, lignes 6606-6609, 6628, 6653 et 6665-6667).
 
 | Nb | Original | Remplacement | Lignes |
 |---:|---|---|---|
@@ -103,7 +106,11 @@ pas créée, d'où les gardes `if (vue)` qui reproduisent les `if (frmSimulation
   `FileRead`/`FileWrite` renvoient le nombre d'octets, ou 0 en fin de fichier,
   ou -1. Les noms sont en UTF-8 (convertis en UTF-16 sous Windows). Un tampon
   évite un appel système par champ ; il ne change pas le comportement
-  observable.
+  observable, sauf pour les erreurs d'écriture, qui ne sont connues qu'en le
+  vidant : depuis la 6.0.1, après un échec, les écritures suivantes de la
+  poignée échouent aussi, et `FileFlush` (absente de SysUtils) vide le tampon
+  et dit si toutes les écritures ont abouti. `centre_ville::Sauve` l'appelle
+  en dernier.
 - **`rand()`/`srand()`** : LCG de la RTL Embarcadero, conforme au binaire
   d'origine (voir la section suivante). Un pas : `graine = graine*0x15A4E35+1`
   sur 32 bits. `rand()` fait un pas puis renvoie les bits 30..16 (`RAND_MAX =
@@ -140,19 +147,114 @@ Conséquences pour le portage :
   y, puis la direction. Le golden master de la génération
   (`tests/support/golden.cpp`) le fait déjà.
 
-## Points d'attention relevés pendant le portage (non corrigés)
+## Corrections de la 6.0.1 (annotées `// v6.0.1`)
+
+La règle « on porte, on ne corrige pas » est levée à partir de la 6.0.1.
+Chaque correction d'un bogue listé dans le `CHANGELOG.md` de la 6.0.0 a son
+commit et un test qui échoue sur le moteur 6.0.0 (`tests/test_corrections.cpp`,
+`tests/test_memoire.cpp`, `test_compat.cpp`, et deux tests de l'interface) ;
+l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
+
+- **Blocage des vehlibs** : `vehlib::ReservePlaceVehlibCible` tirait au
+  hasard une place libre sans limite d'essais ; sans place libre, la
+  simulation se figeait (Géant, 29 vehlibs pour 32 places : 10 graines sur 60
+  avant le tour 2000, la graine 123 avant le tour 50). Elle renvoie
+  désormais `false`, sans tirage, si aucune place autre que la place de
+  départ n'est libre. Le piéton ne monte (`FaitMonterPieton`) et le vehlib
+  ne part (`CalculeProchaineDirection`) qu'avec une place d'arrivée
+  réservée ; sinon le vehlib reste en `svAttente` et réessaie au tour
+  suivant. C'est l'intention de l'original : `NbPietonsQuiSontMontes` ne
+  fait monter les piétons que « s'il y a des places libres dans la
+  simulation » (test global `NbVehlibs<NbPlacesVehlib`, qui ne voyait pas
+  qu'un vehlib qui part occupe encore sa place de départ), et un vehlib ne
+  roule jamais sans destination. Quand une place est libre, les tirages sont
+  ceux de l'original. Graines 1 à 80, 100 à 140 et 12345 : 2000 tours sur
+  Géant.
+- **Erreurs d'écriture** : `voie::Sauve` contenait un `;` au lieu de `&&`,
+  `centre_ville::Sauve` écrasait `Ok` par le résultat de `DepotBus.Sauve`, et
+  surtout `FileWrite` renvoie -1 (vrai dans les chaînes de `&&`) en cas
+  d'erreur. `centre_ville::Sauve` se termine par `FileFlush` : toute erreur
+  d'écriture le fait échouer, et l'application affiche « Erreur de données
+  dans le fichier ».
+- **`Verifie*()`** : `VerifiePosition`, `VerifieDirection`, `VerifiePriorite`,
+  `VerifieDirPoss`, `VerifieEtat`, `VerifieDmdVert` et `VerifiePsgRouge`
+  reçoivent `asMsgErr` par référence. Une fois leurs messages rendus, chaque
+  place libre du tableau des feux (feu supprimé, `x=y=-1`, que
+  `NumeroFeuLibre` réutilise) était signalée : `centre_ville::Verifie` ne
+  vérifie plus que les feux définis.
+- **`depot_bus::Verifie`** : `Format("Dépot bus (%d,%d)", …)` au lieu de
+  `Format("Dépot bus : ", …)`, sans spécificateur.
+- **« Copier vers… »** : `PrepareCopie(FIN, …)` remet `NbYc` à zéro (et non
+  le paramètre `NbY`) ; `COORDCOPIE` garde -1 pour une coordonnée non
+  définie au lieu d'enregistrer `-1-Xc` (-2 pour une sélection en (1,1)),
+  que la vérification d'intégrité signalait à la réouverture de la copie.
+- **Champs non initialisés** : `centre_ville::NbVehlibs` (fichiers
+  antérieurs à 0x530), `centre_ville::FeuP` (libéré par `IncrementeNombre`
+  au premier feu de piétons), `centre_ville::DureeVert` et `DureeRouge`
+  (nouveau réseau), `pieton::TourAttBus/TourAttTram/TourAttTaxi` valent 0
+  (ou `NULL`), comme dans la 6.0.0 qui remettait la mémoire à zéro. Le test
+  `moteur.memoire` (`cvtests_motif`) refait le round-trip, la vérification,
+  le golden master, la génération et la copie avec une mémoire remplie de
+  `0xA5` : le moteur ne dépend plus de la remise à zéro.
+
+Golden master : seuls `tests/golden/copie/*.txt` changent (`NbYc=0` après
+« Copier vers… », empreinte de la copie réduite) ; la simulation
+(`standard`, `epidemie`), la génération et `verifie/` sont inchangés.
+
+### Audit des lectures hors tableau
+
+Même motif que `voie::DefinitNature` (corrigé en 6.0.0) : une condition de
+boucle qui utilise l'indice (tableau, appel, case voisine) avant le terme
+qui le borne, ou un indice réutilisé après une boucle de recherche sortie à
+la borne. Toutes les conditions `for`, `while` et `if` de `engine/` ont été
+recensées par `tools/audit_bornes.py` (qui retrouve aussi `DefinitNature` dans
+`src/simul.cpp`), et les boucles de recherche relues une à une. Cinq lisaient
+hors du tableau à la borne ; la borne y est désormais testée d'abord, avec le
+résultat de l'original :
+
+| Fonction | Accès hors du tableau |
+|---|---|
+| `vehlib::FaitDescendrePietons` (`src/simul.cpp:1401`, `engine/simul.cpp:1404` en 6.0.0) | `PietonPeutAller(5)`, en sortie de boucle puis dans le `if` qui suit |
+| `bus::NumeroArretSuivant`, `tram::NumeroArretSuivant` | `NumArret[NbArrets]`, hors du tableau pour une ligne de 9 arrêts si l'arrêt cherché n'y est pas |
+| `voie::AjoutePieton` | lecture puis **écriture** de `NumPieton[2]` (sur le pointeur `DistParking` qui suit) si `NbPietons` ne correspond pas aux places occupées : renvoie désormais `false` |
+| `voie::RetirePieton` | lecture de `NumPieton[2]` si le piéton n'est pas sur la case |
+
+Écartés : `voie::NumDirPossSensVoieTram` compare `DirCrt=5` sans accéder à un
+tableau ; les cases voisines (`V`, `V_`, `_V_`) sont prises modulo la taille
+de la carte ; les autres conditions testent un drapeau ou une borne basse.
+Dans l'interface, `app/f_simul.cpp` a le même motif (`PietonPeutAller` avant
+`d<=ouest`, lot de l'interface). Hors de ce motif, le moteur fait confiance
+aux valeurs lues dans le fichier : des directions possibles invalides
+(`DirPoss` > 15) font lire hors de `NbDir` (par exemple dans `~voie()`) ;
+`Verifie()` les signale, sans les corriger.
+
+Aucune de ces lectures ne se produit sur les cartes livrées. Les 6 cartes de
+`maps/` et les 3 de `docs/tutorial/` ont tourné sous ASan et UBSan (rapports
+dans le journal, `UBSAN_OPTIONS=print_stacktrace=1`), en configuration
+standard et en épidémie + mode sanglant + résurrection à mi-parcours, avec
+`cvsim --graine G` :
+
+| Moteur | Build | Graines | Tours | Simulations | Rapports |
+|---|---|---|---|---|---|
+| avant l'audit | `asan-release` | 1 à 30 | 1000 | 540 | aucun |
+| 6.0.1 | `asan-release` | 1 à 40 | 2000 | 720 | aucun |
+| 6.0.1 | `asan` (Debug) | 1 à 20 | 1000 | 360 | aucun |
+
+Un programme témoin du motif de `voie::AjoutePieton` est bien signalé par
+UBSan (`index 2 out of bounds for type 'int[2]'`). `ctest --preset asan`
+(moteur, aide, cartes) et `ctest --preset asan-release` (moteur) passent sans
+rapport. Sous ASan, `interface.demo` s'arrête sur un bogue connu de
+l'interface (fiche Taxi, `f_inftaxi.cpp:87` : indices de `DistFileTaxi`
+inversés, lecture hors du tableau ; lot de l'interface).
+
+## Points d'attention (non corrigés)
 
 - **Ordre d'évaluation des arguments** : `f_genres.cpp` appelle
   `cv->Genere(rand()%NbX, rand()%NbY, 1+rand()%NBDIR)`. L'ordre des trois
   `rand()` n'est pas spécifié en C++ ; le binaire d'origine les évalue de
-  gauche à droite (voir la section suivante). Lors du portage de la fiche, il
+  gauche à droite (voir « Vérifications sur le binaire d'origine »). Lors du portage de la fiche, il
   faudra donc séquencer explicitement x, puis y, puis la direction. Le moteur
   lui-même ne contient pas de tel cas.
-- **Champs non initialisés** : `centre_ville::NbVehlibs` (fichiers < 0x530),
-  `pieton::TourAttBus/TourAttTram/TourAttTaxi`, `centre_ville::FeuP` (sans feux
-  piétons). Pour les fichiers < 0x530, l'original enregistre une valeur
-  indéterminée de `NbVehlibs`. Les tests remettent la mémoire à zéro pour être
-  déterministes (`tests/support/allocation.cpp`).
 - **Pile** : le calcul des distances (`voie::CalculeDistance*`) est récursif. Il
   demande entre 256 et 512 Ko de pile avec Clang, davantage en Debug MSVC ou
   sous ASan. L'original tournait avec la pile par défaut de 1 Mo. Les
@@ -162,18 +264,22 @@ Conséquences pour le portage :
   une simulation équilibrée (1000) » (1000 n'est pas multiple de 4×3). C'est
   le réseau d'origine qui est en cause, pas le portage : le message est figé
   dans `tests/golden/verifie/Carfours.txt`.
-- Bogues d'origine conservés (règle d'or), à reporter dans `src/A_FAIRE.txt`
-  après la bascule :
-  - `Verifie*()` reçoivent `asMsgErr` par valeur : leurs messages sont perdus ;
-  - `PrepareCopie(FIN, …)` remet à zéro le paramètre `NbY` au lieu de `NbYc` ;
-  - `voie::Sauve` contient un `;` au lieu de `&&` : le résultat des dernières
-    écritures est ignoré ;
-  - `depot_bus::Verifie` utilise `Format("Dépot bus : ", …)` sans spécificateur ;
-  - `vehlib::ReservePlaceVehlibCible` tire au hasard une place libre sans
-    limite d'essais : quand plus de vehlibs reçoivent un passager qu'il ne
-    reste de places libres, la boucle ne se termine jamais et la simulation se
-    fige. Sur Géant (29 vehlibs pour 32 places), cela dépend de la graine :
-    `cvsim maps/Géant.cvw --graine 123` ne rend pas la main (avant le tour 50),
-    de même que 135 et 136 sur les graines 100 à 139 en 300 tours ; les graines
-    1 à 7, 42 et 12345 tiennent 1500 tours. Le golden master n'y est pas
-    exposé ; le test d'interface fixe sa graine pour la même raison.
+- **Passagers des vehlibs** (trouvé en 6.0.1, non corrigé) : ils ne
+  descendent jamais. `vehlib::FaitDescendrePietons` cherche une direction où
+  le piéton peut aller depuis la case du vehlib (`vl->PietonPeutAller(d)`),
+  toujours fausse puisque le vehlib l'occupe, au lieu de la case voisine ; et
+  `voie::FaitDescendrePieton` ne remet pas `pieton::NumVehlib` à zéro ni ne
+  décrémente `vehlib::NbPersonnes` (il ne gère que les bus, trams et taxis).
+  Un vehlib qui a pris un passager repart donc dès son arrivée (« Des fois
+  les piétons restent dans le vehlib... », dit le code), ce qui use les
+  places libres ; le piéton n'est plus jamais simulé. Le corriger change la
+  simulation de toutes les cartes à vehlibs (golden master de Géant).
+- **Erreurs de lecture** : `FileRead` renvoie -1 en cas d'erreur, vrai dans
+  les chaînes de `&&` de `Charge` : seule une fin de fichier prématurée (0)
+  est vue. `Charge(-1)` réussit et donne une carte vide de 99×63 ; c'est ce
+  qu'obtient l'application, qui teste `if ((hfile=FileOpen(…)))` (lot de
+  l'interface).
+- **Libérations** : `~centre_ville` ne libère ni `FeuP`, ni `Bus`, ni `Tram`
+  (fuite à chaque fermeture d'un réseau). Le constructeur
+  `pieton(int, int, direction, int)`, inutilisé, n'appelle pas
+  `Initialise()`.

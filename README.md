@@ -6,7 +6,7 @@
 
 **Centre-Ville** est un logiciel de simulation de circulation urbaine complet, interactif et pédagogique créé par **Patrice Fouquet** ([patquoi.fr](http://patquoi.fr#cvw)). Initialement développé pour Windows (Windows 95/XP jusqu'à Windows 10/11), il est distribué sous licence **GNU General Public License v2.0 (GPLv2)**.
 
-La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C++Builder (Windows seulement) vers **C++20, CMake et Qt 6**, et native sous Windows, macOS et Linux : même moteur de simulation, mêmes fenêtres, menus et raccourcis, même aide, même format de fichier `.cvw` (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md) et [`CHANGELOG.md`](CHANGELOG.md)).
+La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C++Builder (Windows seulement) vers **C++20, CMake et Qt 6**, et native sous Windows, macOS et Linux : même moteur de simulation, mêmes fenêtres, menus et raccourcis, même aide, même format de fichier `.cvw` (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md) et [`CHANGELOG.md`](CHANGELOG.md)). La version **6.0.1** corrige les bogues d'origine du moteur, dont le blocage de la simulation par les vehlibs.
 
 ---
 
@@ -36,7 +36,7 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 ├── app/                          # Application Qt 6 (cvw) : les 33 fiches portées, couche VCL (app/vcl)
 ├── engine/                       # Moteur de simulation (C++20, sans Qt)
 ├── tests/                        # Tests du moteur (golden master) et de l'interface
-├── tools/                        # Conversion des .dfm (dfm2ui.py), extraction des images et icônes
+├── tools/                        # Conversion des .dfm (dfm2ui.py), extraction des images et icônes, audit des bornes (audit_bornes.py)
 ├── docs/                         # Documentation en ligne (Guide & Tutoriels)
 │   ├── index.html                # Portail d'accueil moderne
 │   ├── guide/                    # Manuel complet d'utilisation (HTML), aide F1 de l'application
@@ -133,7 +133,7 @@ Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-in
 | 8. Build, CI et distribution | Fait : installeurs Windows, macOS et Linux compilés par la CI. |
 | 9. Recette et bascule | Fait : version 6.0.0 après trois pré-releases. Recette automatisée sous Windows (installation, mise à jour d'une 5.4.3.2, interopérabilité avec l'original, fiches en affichage natif : workflow « Recette Windows »), sous macOS et sous Linux ; restent à faire à la main, sur de vrais postes, les points de [`docs/RECETTE.md`](docs/RECETTE.md) que ces machines ne couvrent pas (SmartScreen, Gatekeeper, Windows 10/11 grand public et ARM64). |
 
-Les écarts avec l'original et les bogues d'origine conservés sont listés dans [`CHANGELOG.md`](CHANGELOG.md) et [`app/README.md`](app/README.md).
+Les écarts avec l'original, les bogues d'origine corrigés (moteur, 6.0.1) et ceux qui restent (interface) sont listés dans [`CHANGELOG.md`](CHANGELOG.md), [`engine/README.md`](engine/README.md) et [`app/README.md`](app/README.md).
 
 ---
 
@@ -146,7 +146,8 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Compilation native sous Linux et macOS sans émulation Wine.
 * [x] Installeurs Windows, macOS et Linux compilés depuis les sources.
 * [x] Recette de la version 6.0.0 sur les trois systèmes, puis bascule (phase 9).
-* [ ] Après la bascule : corriger les bogues d'origine conservés ([`CHANGELOG.md`](CHANGELOG.md)), dont le blocage des vehlibs sur Géant.
+* [x] Après la bascule : corriger les bogues d'origine du moteur, dont le blocage des vehlibs sur Géant (version 6.0.1).
+* [ ] Corriger les bogues d'origine de l'interface ([`CHANGELOG.md`](CHANGELOG.md)).
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.

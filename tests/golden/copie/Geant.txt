@@ -3,9 +3,9 @@
 selection complete (0,0,97,60) valide=1
   copie taille=481522 empreinte=211cc92f42fdfd2b
   identique a Sauve=1
-  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=60
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 selection reduite (1,1,95,58) valide=1
-  copie taille=456412 empreinte=537e741e61f038ce
+  copie taille=456412 empreinte=505685f83ed28d9e
   identique a Sauve=0
-  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=58
+  apres FIN : CopieEnCours=0 Xc=0 Yc=0 NbXc=0 NbYc=0
 rechargement copie reduite=1 NbX=95 NbY=58 verifie=ok

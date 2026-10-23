@@ -30,6 +30,8 @@
 #define AUCUN_FEU ((x==-1)&&(y==-1)&&(Dir==indefinie))
 #define REMET_A_ZERO Definit(-1, -1, 0)
 #define NUMVEHLIBPLACE(x) ((int)(0.5+(x)*(TauxRemplissageVehlib/100.0)))
+// v6.0.1 : coordonnée enregistrée par « Copier vers... » : une coordonnée non définie (-1) le reste
+#define COORDCOPIE(c, c0) (((c)>-1)?(c)-(c0):(c))
 //---------------------------------------------------------------------------
 
 // v3.5 : remplacement des [5] par [NBDIR+1] et des [4] par [NBDIR]
@@ -207,15 +209,16 @@ void AppelleAuChaos()
 //-----------------------------------------------------------------------------
 // Routines privées
 //-----------------------------------------------------------------------------
-void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y);
-void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie);
-void VerifiePriorite(AnsiString asMsgErr, AnsiString asSource, priorite p);
-void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp);
-void VerifieEtat(AnsiString asMsgErr, AnsiString asSource, etat_feu e);
-void VerifieDmdVert(AnsiString asMsgErr, AnsiString asSource, dmd_vert dv);
-void VerifiePsgRouge(AnsiString asMsgErr, AnsiString asSource, psg_rouge pr);
+// v6.0.1 : asMsgErr par référence (par valeur dans l'original : les messages étaient perdus)
+void VerifiePosition(AnsiString &asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie); // v6.0.1 : prototype conforme à la définition
+void VerifieDirection(AnsiString &asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie);
+void VerifiePriorite(AnsiString &asMsgErr, AnsiString asSource, priorite p);
+void VerifieDirPoss(AnsiString &asMsgErr, AnsiString asSource, dirposs dp);
+void VerifieEtat(AnsiString &asMsgErr, AnsiString asSource, etat_feu e);
+void VerifieDmdVert(AnsiString &asMsgErr, AnsiString asSource, dmd_vert dv);
+void VerifiePsgRouge(AnsiString &asMsgErr, AnsiString asSource, psg_rouge pr);
 //-----------------------------------------------------------------------------
-void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie)
+void VerifiePosition(AnsiString &asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie)
  {
   if (((x<-1)&&(PeutEtreIndefinie))||
       ((x<0)&&(!PeutEtreIndefinie))||
@@ -227,7 +230,7 @@ void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y, boo
    asMsgErr+=asSource+Format(": ordonnée incorrecte (%d)\n", ARRAYOFCONST((y)));
  }
 //-----------------------------------------------------------------------------
-void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie)
+void VerifieDirection(AnsiString &asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie)
  {
   if (((d<indefinie)&&(PeutEtreIndefinie))||
       ((d<=indefinie)&&(!PeutEtreIndefinie))||
@@ -235,31 +238,31 @@ void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, boo
    asMsgErr+=asSource+Format(": direction incorrecte (%d)\n", ARRAYOFCONST(((int)d))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifiePriorite(AnsiString asMsgErr, AnsiString asSource, priorite p)
+void VerifiePriorite(AnsiString &asMsgErr, AnsiString asSource, priorite p)
  {
   if ((p<a_droite)||(p>feux))
    asMsgErr+=asSource+Format(": priorité incorrecte (%d)\n", ARRAYOFCONST(((int)p))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp)
+void VerifieDirPoss(AnsiString &asMsgErr, AnsiString asSource, dirposs dp)
  {
   if ((dp<aucune)||(dp>NESO))
    asMsgErr+=asSource+Format(": directions possibles incorrectes (%d)\n", ARRAYOFCONST(((int)dp))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieEtat(AnsiString asMsgErr, AnsiString asSource, etat_feu e)
+void VerifieEtat(AnsiString &asMsgErr, AnsiString asSource, etat_feu e)
  {
   if ((e<inactif)||(e>rouge))
    asMsgErr+=asSource+Format(": état incorrect (%d)\n", ARRAYOFCONST(((int)e))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieDmdVert(AnsiString asMsgErr, AnsiString asSource, dmd_vert dv)
+void VerifieDmdVert(AnsiString &asMsgErr, AnsiString asSource, dmd_vert dv)
  {
   if ((dv<arrivee_vehicule)||(dv>immediate))
    asMsgErr+=asSource+Format(": type de demande du vert incorrect (%d)\n", ARRAYOFCONST(((int)dv))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifiePsgRouge(AnsiString asMsgErr, AnsiString asSource, psg_rouge pr)
+void VerifiePsgRouge(AnsiString &asMsgErr, AnsiString asSource, psg_rouge pr)
  {
   if ((pr<prm_dmd)||(pr>immediat))
    asMsgErr+=asSource+Format(": type de passage au rouge incorrect (%d)\n", ARRAYOFCONST(((int)pr))); // v5.4 enum as char type (cast int)
@@ -698,7 +701,7 @@ bool feu::Charge(int hfile)
 bool feu::Sauve(int hfile)
  {
   int i, Ok,
-      xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+      xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   Ok=FileWrite(hfile, &Numero, sizeof(Numero))&&
      FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
      FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&& // v4.0.1
@@ -1003,8 +1006,8 @@ bool feu_pieton::Charge(int hfile)
 bool feu_pieton::Sauve(int hfile)
  {
   int i, Ok, // xc,yc : gestion copie vers fichier (v4.0.1)
-      xc[NBFEUXPIETONSPARNUMERO]={x[0]-cv->Xc, x[1]-cv->Xc},
-      yc[NBFEUXPIETONSPARNUMERO]={y[0]-cv->Yc, y[1]-cv->Yc};
+      xc[NBFEUXPIETONSPARNUMERO]={COORDCOPIE(x[0], cv->Xc), COORDCOPIE(x[1], cv->Xc)}, // v6.0.1 : COORDCOPIE
+      yc[NBFEUXPIETONSPARNUMERO]={COORDCOPIE(y[0], cv->Yc), COORDCOPIE(y[1], cv->Yc)};
   Ok=FileWrite(hfile, &Numero, sizeof(Numero))&&
      FileWrite(hfile, cv->CopieEnCours?xc:x, NBFEUXPIETONSPARNUMERO*sizeof(x[0]))&&
      FileWrite(hfile, cv->CopieEnCours?yc:y, NBFEUXPIETONSPARNUMERO*sizeof(y[0]))&&
@@ -1050,7 +1053,7 @@ bool parking::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool parking::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -1246,7 +1249,7 @@ bool place_vehlib::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_vehlib::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -1294,10 +1297,10 @@ void vehlib::CalculeProchaineDirection()
       i, j, ndp=NbDir[v->DirPoss];
 
   if ((Situation==svAttente)&&  // Si le vehlib attend,
-      (NbPietonsQuiSontMontes())) // On regarde déjà s'il y a des piétons qui veulent monter...
+      (NbPietonsQuiSontMontes())&& // On regarde déjà s'il y a des piétons qui veulent monter...
+      (NumPlaceArrivee|| // Des fois les piétons restent dans le vehlib...
+       ReservePlaceVehlibCible())) // v6.0.1 : sans place libre, le vehlib attend (nouvel essai au tour suivant)
    { // pour pouvoir partir...
-    if (!NumPlaceArrivee) // Des fois les piétons restent dans le vehlib...
-     ReservePlaceVehlibCible();
     Situation=svDepart;
     TourDepart=cv->TourCrt;
 	//DebugEcrit(Format("Vehlib(%d)::CalculeProchaineDirection(): Situation=svDepart; TourDepart=%d", ARRAYOFCONST((Numero,cv->TourCrt))));
@@ -1401,8 +1404,8 @@ void vehlib::FaitDescendrePietons()
  {
   int i, d;
   voie *vl=&(cv->v[x][y]);
-  for(d=nord; (!vl->PietonPeutAller((direction)d))&&(d<=ouest); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis !
-  if (vl->PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même !
+  for(d=nord; (d<=ouest)&&(!vl->PietonPeutAller((direction)d)); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis ! v6.0.1 : borne testée d'abord
+  if ((d<=ouest)&&vl->PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même ! v6.0.1 : l'original appelait PietonPeutAller(5)
    {
     voie *v=&cv->V(x,y,d);
     pieton *p;
@@ -1415,9 +1418,13 @@ void vehlib::FaitDescendrePietons()
    }
  }
 //-----------------------------------------------------------------------------
-void vehlib::ReservePlaceVehlibCible()
+bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s'il n'y a aucune place libre
  {
   int NumPlace; // 0 < NumPlace <= NbPlacesVehlib
+  // v6.0.1 : l'original tirait sans fin quand aucune place n'était libre (simulation figée)
+  for(NumPlace=0; (NumPlace<cv->NbPlacesVehlib)&&
+                  ((NumPlace+1==NumPlaceDepart)||(!cv->PlaceVehlib[NumPlace].EstLibre())); NumPlace++);
+  if (NumPlace==cv->NbPlacesVehlib) return false;
   do // On choisit une place libre
    {
     NumPlace=rand()%cv->NbPlacesVehlib;
@@ -1428,19 +1435,19 @@ void vehlib::ReservePlaceVehlibCible()
   pv->NumVehlibReserve=Numero;
   NumPlaceArrivee=NumPlace+1;
   vue->RedessineCase(xp, yp, false); // portage
+  return true;
  }
 //-----------------------------------------------------------------------------
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
   int xp=p->x, yp=p->y;
-  if (NbPersonnes<cv->NbMaxPersonnesVehlib)
+  if ((NbPersonnes<cv->NbMaxPersonnesVehlib)&&
+      (NumPlaceArrivee||ReservePlaceVehlibCible())) // v6.0.1 : le piéton ne monte que si une place d'arrivée est réservée (sinon il attend)
    {
     NbPersonnes++;
     cv->v[xp][yp].RetirePieton(NumPietonAFaireMonter);
     p->MonteDansVehlib(Numero);
-    if (!NumPlaceArrivee)
-     ReservePlaceVehlibCible();
     vue->RedessineCase(xp, yp, false); // portage
    }
  }
@@ -1509,14 +1516,14 @@ bool depot_bus::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool depot_bus::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)); // v4.0.1
  }
 //-----------------------------------------------------------------------------
 void depot_bus::Verifie(AnsiString &asMsgErr) // v3.03
  {
-  AnsiString asSource=Format("Dépot bus : ", ARRAYOFCONST((x, y)));
+  AnsiString asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
@@ -1635,8 +1642,8 @@ int bus::NumeroArretSuivant() // v3.0
  {
   int i;
   for( i=0;
-       (NumArretSvt!=cv->LigneBus[NumLigne-1].NumArret[i])&&
-       (i<cv->LigneBus[NumLigne-1].NbArrets);
+       (i<cv->LigneBus[NumLigne-1].NbArrets)&& // v6.0.1 : borne testée d'abord (NumArret[NbArrets] lu par l'original)
+       (NumArretSvt!=cv->LigneBus[NumLigne-1].NumArret[i]);
        i++);
   if (i<cv->LigneBus[NumLigne-1].NbArrets)
    return cv->LigneBus[NumLigne-1].NumArret[(i+1)%cv->LigneBus[NumLigne-1].NbArrets];
@@ -1720,7 +1727,7 @@ bool arret_bus::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool arret_bus::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&&
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&&
@@ -1908,8 +1915,8 @@ int tram::NumeroArretSuivant() // v3.0
  {
   int i;
   for( i=0;
-       (NumArretSvt!=cv->LigneTram[NumLigne-1].NumArret[i])&&
-       (i<cv->LigneTram[NumLigne-1].NbArrets);
+       (i<cv->LigneTram[NumLigne-1].NbArrets)&& // v6.0.1 : borne testée d'abord (NumArret[NbArrets] lu par l'original)
+       (NumArretSvt!=cv->LigneTram[NumLigne-1].NumArret[i]);
        i++);
   if (i<cv->LigneTram[NumLigne-1].NbArrets)
    return cv->LigneTram[NumLigne-1].NumArret[(i+1)%cv->LigneTram[NumLigne-1].NbArrets];
@@ -1993,7 +2000,7 @@ bool arret_tram::Charge(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 bool arret_tram::Sauve(int hfile) // v3.0
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y))&& // v4.0.1
@@ -2073,7 +2080,7 @@ bool place_taxi::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_taxi::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc; // v4.0.1
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&& // v4.0.1
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));  // v4.0.1
@@ -2313,7 +2320,7 @@ bool place_park::Charge(int hfile)
 //-----------------------------------------------------------------------------
 bool place_park::Sauve(int hfile)
  {
-  int xc=x-cv->Xc, yc=y-cv->Yc;
+  int xc=COORDCOPIE(x, cv->Xc), yc=COORDCOPIE(y, cv->Yc); // v6.0.1 : COORDCOPIE
   return FileWrite(hfile, &Numero, sizeof(Numero))&&
          FileWrite(hfile, cv->CopieEnCours?&xc:&x, sizeof(x))&&
          FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y));
@@ -2989,7 +2996,8 @@ bool voie::AjoutePieton(int NumPietonAAjouter) //v2.0
   int i;
   if (NbPietons<NBMAXPIETONSPARCASE)
    {
-    for(i=0; NumPieton[i]&&(i<NBMAXPIETONSPARCASE); i++);
+    for(i=0; (i<NBMAXPIETONSPARCASE)&&NumPieton[i]; i++); // v6.0.1 : borne testée d'abord
+    if (i==NBMAXPIETONSPARCASE) return false; // v6.0.1 : NbPietons incohérent ; l'original écrivait hors du tableau
     NumPieton[i]=NumPietonAAjouter+1;
     NbPietons++;
     return true;
@@ -3003,7 +3011,7 @@ bool voie::RetirePieton(int NumPietonARetirer) //v2.0
   int i;
   if (NbPietons)
    {
-    for(i=0; (NumPieton[i]!=NumPietonARetirer+1)&&(i<NBMAXPIETONSPARCASE); i++);
+    for(i=0; (i<NBMAXPIETONSPARCASE)&&(NumPieton[i]!=NumPietonARetirer+1); i++); // v6.0.1 : borne testée d'abord
     if (i<NBMAXPIETONSPARCASE)
      {
       NumPieton[i]=0;
@@ -3968,7 +3976,7 @@ bool voie::Sauve(int hfile)
      FileWrite(hfile, &Nature, sizeof(Nature))&&
      FileWrite(hfile, &NumParking, sizeof(NumParking))&&
      FileWrite(hfile, &ToutDroit, sizeof(ToutDroit))&&
-     FileWrite(hfile, &PassagePietons, sizeof(PassagePietons)); // v2.0
+     FileWrite(hfile, &PassagePietons, sizeof(PassagePietons))&& // v2.0. v6.0.1 : « ; » à la place de « && » dans l'original (fin de la chaîne ignorée)
      FileWrite(hfile, &PassageBus, sizeof(PassageBus))&& // v3.0
      FileWrite(hfile, &NumArretBus, sizeof(NumArretBus))&& // v3.0
      FileWrite(hfile, &NumArretTram, sizeof(NumArretTram))&& // v3.5
@@ -4054,6 +4062,7 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
   NbVehiculesSortis=NbVehiculesDeplaces=NbVehiculesArrives=0L;
   NbPietonsGueris=NbPietonsInfectes=NbPietonsMorts=0L; // v5.4.1 : stats épidémiques des piétons
   DureeOrange=NbParkings=NbTrams=NbBus=NbVehicules=NbFeux=NbFeuxPieton=0L; // v3.0 (NbBus) v3.5 (NbTrams), v5.2 (NbFeuxPieton)
+  DureeVert=DureeRouge=0L; // v6.0.1 : indéterminées pour un nouveau réseau (avant la fiche Paramètres)
   AttenteMaxVeh=10L;
   NbVitesses=1;
   NbToursStats=100;
@@ -4070,8 +4079,9 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
   NbMaxToursAttenteTaxi=NbMaxToursAttenteTram=NbMaxToursAttenteBus=25; // v3.6 (taxi) v5.3 (vehlib)
   VerifOk=DistancesCalculees=QuadrillageStats=false;
   NbFilesPark=NbPlacesPark=0L; // v5.0
-  NbPlacesVehlib=0L; // v5.3
+  NbVehlibs=NbPlacesVehlib=0L; // v5.3. v6.0.1 : NbVehlibs (indéterminé pour un fichier antérieur à 0x530)
   Feu=NULL;
+  FeuP=NULL; // v6.0.1 : indéterminé sans feux de piétons (libéré par IncrementeNombre au premier ajout)
   Parking=NULL;
   Vehicule=NULL;
   Vehlib=NULL; // v5.3
@@ -6390,7 +6400,7 @@ bool centre_ville::Sauve(int hfile)
   for(i=0; Ok&&(i<NbFeux); i++) Ok=Feu[i].Sauve(hfile);
   for(i=0; Ok&&(i<NbFeuxPieton); i++) Ok=FeuP[i].Sauve(hfile); // v5.2
   for(i=0; Ok&&(i<NbParkings); i++) Ok=Parking[i].Sauve(hfile);
-  Ok=DepotBus.Sauve(hfile);
+  Ok=Ok&&DepotBus.Sauve(hfile); // v6.0.1 : Manquait Ok&& (comme dans Charge avant la v5.2)
   for(i=0; Ok&&(i<NbArretsBus); i++) Ok=ArretBus[i].Sauve(hfile); // v3.0
   for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) Ok=LigneBus[i].Sauve(hfile); // v3.0. Attention : tableau statique
   for(i=0; Ok&&(i<NbArretsTram); i++) Ok=ArretTram[i].Sauve(hfile); // v3.5
@@ -6406,7 +6416,7 @@ bool centre_ville::Sauve(int hfile)
    for(i=0; Ok&&(i<NbX); i++)
     for(j=0; Ok&&(j<NbY); j++)
      Ok=v[i][j].Sauve(hfile);
-  return Ok;
+  return Ok&&FileFlush(hfile); // v6.0.1 : FileWrite renvoie -1 (vrai) en cas d'erreur et écrit par un tampon : erreurs vues ici
  }
 //-----------------------------------------------------------------------------
 void centre_ville::Verifie(AnsiString &asMsgErr)
@@ -6472,7 +6482,8 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
    for(j=0; j<NbY; j++)
     v[i][j].Verifie(asMsgErr);
   for(i=0; i<NbFeux; i++)
-   Feu[i].Verifie(asMsgErr, Format("Feu n°%d", ARRAYOFCONST((i+1))));
+   if (Feu[i].Defini()) // v6.0.1 : un feu supprimé laisse une place libre (NumeroFeuLibre), qui n'est pas une erreur
+    Feu[i].Verifie(asMsgErr, Format("Feu n°%d", ARRAYOFCONST((i+1))));
   for(i=0; i<NbParkings; i++)
    Parking[i].Verifie(asMsgErr);
   if (Vehicule)

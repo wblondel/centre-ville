@@ -12,7 +12,10 @@
 //   - Marche / Interruption / Arrêt, par la barre d'outils et par les menus,
 //     et la mise à jour de la barre d'état ;
 //   - l'enregistrement : enregistrer puis rouvrir et réenregistrer donne le
-//     même fichier, identique à la conversion de référence du format ;
+//     même fichier, identique à la conversion de référence du format ; un
+//     fichier impossible à créer ou à écrire est signalé (v6.0.1) ;
+//   - la vérification d'intégrité après ouverture affiche les erreurs des
+//     contrôles de champs (v6.0.1) ;
 //   - Nouveau puis génération aléatoire (fiches Dimensions et Génération) à
 //     graine fixe : même réseau que le golden master de la génération ;
 //   - lot 1 des fiches secondaires (paramètres et définitions), sur une copie
@@ -85,6 +88,10 @@
 #include <deque>
 #include <fstream>
 #include <sstream>
+#ifndef _WIN32
+ #include <csignal>
+ #include <sys/resource.h>
+#endif
 #include "application.h"
 #include "f_afdistab.h"
 #include "f_afdistat.h"
@@ -311,10 +318,9 @@ class TestInterface : public QObject
    }
   bool Demarre()
    { // Marche par la barre d'outils : vérification, calcul des distances, enregistrement.
-     // Graine fixe (srand de AppelleAuChaos) : sur Géant, le moteur d'origine boucle
-     // sans fin dans vehlib::ReservePlaceVehlibCible quand plus aucune place de
-     // vehlib n'est libre, ce qui arrive selon la graine (123 : avant le tour 50) ;
-     // la graine 1 tient plus de 1500 tours (cvsim)
+     // Graine fixe (srand de AppelleAuChaos) : simulation reproductible. Jusqu'à la
+     // 6.0.0, elle évitait aussi le blocage des vehlibs de Géant (sans place libre,
+     // vehlib::ReservePlaceVehlibCible tirait sans fin), corrigé en 6.0.1
     // Simulation pas à pas ensuite : minuteur arrêté, tours joués par JoueTour
     alea::FixeGraine(1);
     Messages.clear();
@@ -376,6 +382,8 @@ class TestInterface : public QObject
   void raccourcisSelonLeMode();
   void marcheInterruptionArret();
   void enregistrementIdentique();
+  void enregistrementImpossible();
+  void verificationApresOuverture();
   void nouveauEtGeneration();
   // Lot 1 des fiches secondaires (phase 6)
   void ficheAPropos();
@@ -621,6 +629,74 @@ void TestInterface::enregistrementIdentique()
   conversion_cvw Reference=ConvertitEn530(Contenu(Origine).toStdString());
   QVERIFY(Reference.Ok);
   QVERIFY(o1.toStdString()==Reference.Octets);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::enregistrementImpossible()
+ { // Une erreur d'enregistrement est signalée : jusqu'à la 6.0.0 (comme
+   // l'original), les erreurs d'écriture étaient ignorées et la barre d'état
+   // annonçait « Enregistrement effectué. »
+  QString Dossier=QFileInfo(Carte).absolutePath();
+  AnsiString asPrecedent=frmSimulation->SaveDialog->FileName;
+  // Dossier inexistant : le fichier ne peut pas être créé
+  Messages.clear();
+  Enregistre(Dossier+"/inexistant/enregistrement.cvw");
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Q(frmSimulation->StatusBar->Panels->Items[0]->Text).startsWith(QString::fromUtf8("Enregistrement non effectué"), Qt::CaseInsensitive),
+           qPrintable(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)));
+#ifndef _WIN32
+  // Taille de fichier limitée à 1000 octets, comme un disque plein : l'écriture échoue en cours de route
+  QString f=Dossier+"/enregistrement_limite.cvw";
+  QFile::remove(f);
+  struct rlimit Ancienne, Limite;
+  QVERIFY(getrlimit(RLIMIT_FSIZE, &Ancienne)==0);
+  Limite=Ancienne;
+  Limite.rlim_cur=1000;
+  void (*AncienSignal)(int)=std::signal(SIGXFSZ, SIG_IGN);
+  Messages.clear();
+  QVERIFY(setrlimit(RLIMIT_FSIZE, &Limite)==0);
+  Enregistre(f);
+  setrlimit(RLIMIT_FSIZE, &Ancienne);
+  std::signal(SIGXFSZ, AncienSignal);
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("Erreur de données dans le fichier")), qPrintable(Messages.first()));
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement NON effectué."));
+#endif
+  frmSimulation->SaveDialog->FileName=asPrecedent;
+ }
+//---------------------------------------------------------------------------
+void TestInterface::verificationApresOuverture()
+ { // « Vérifier intégrité après ouverture » : les erreurs trouvées par les
+   // contrôles de champs (ici VerifieDmdVert) sont affichées. Jusqu'à la
+   // 6.0.0 (comme l'original), ces contrôles recevaient le message par valeur
+   // et rien n'était affiché
+  conversion_cvw Reference=ConvertitEn530(Contenu(ArgumentsTest.value(2)).toStdString());
+  QVERIFY(Reference.Ok);
+  std::string Octets=Reference.Octets;
+  auto Debut=[&Reference](const std::string &Nom) -> long long
+   {
+    for(const champ_cvw &ch : Reference.Champs) if (ch.Nom==Nom) return (long long)ch.Debut;
+    return -1;
+   };
+  int NumFeu=1; // premier feu défini (x>=0) : les places libres ne sont pas vérifiées
+  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&(Octets[(std::size_t)d+3]&0x80); NumFeu++);
+  const long long DmdVert=Debut("feu"+std::to_string(NumFeu)+".TypeDmdVert");
+  QVERIFY(DmdVert>=0);
+  Octets[(std::size_t)DmdVert]=9;
+  QString f=QFileInfo(Carte).absolutePath()+"/verification.cvw";
+  QFile Fichier(f);
+  QVERIFY(Fichier.open(QIODevice::WriteOnly|QIODevice::Truncate));
+  QCOMPARE(Fichier.write(Octets.data(), (qint64)Octets.size()), (qint64)Octets.size());
+  Fichier.close();
+  QVERIFY(!VerifierApresOuverture);
+  frmSimulation->ActionVerifierApresOuverture->Execute();
+  QVERIFY(VerifierApresOuverture);
+  Messages.clear();
+  OuvreFichier(f);
+  frmSimulation->ActionVerifierApresOuverture->Execute();
+  QVERIFY(!VerifierApresOuverture);
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("Feu n°%1: type de demande du vert incorrect (9)").arg(NumFeu)), qPrintable(Messages.first()));
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué MAIS erreur(s) d'intégrité trouvée(s)"));
  }
 //---------------------------------------------------------------------------
 void TestInterface::nouveauEtGeneration()

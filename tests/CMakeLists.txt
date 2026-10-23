@@ -44,6 +44,7 @@ add_executable(cvtests
   test_cvw.cpp
   test_golden.cpp
   test_generation.cpp
+  test_corrections.cpp
   ${CV_ALLOCATION}
 )
 target_link_libraries(cvtests PRIVATE cvtest_support Catch2::Catch2WithMain)
@@ -57,11 +58,32 @@ if(MSVC)
   target_compile_options(cvtests PRIVATE /bigobj)
 endif()
 
+# Les mêmes tests (sauf compat et corrections), mémoire remplie d'un motif au
+# lieu d'être remise à zéro : le moteur ne doit pas dépendre de cette remise à
+# zéro (champs initialisés depuis la 6.0.1, voir test_memoire.cpp)
+add_executable(cvtests_motif
+  test_cvw.cpp
+  test_golden.cpp
+  test_generation.cpp
+  test_memoire.cpp
+  support/allocation_motif.cpp
+)
+target_link_libraries(cvtests_motif PRIVATE cvtest_support Catch2::Catch2WithMain)
+target_compile_definitions(cvtests_motif PRIVATE
+  CV_DOSSIER_CARTES="${PROJECT_SOURCE_DIR}/maps"
+  CV_DOSSIER_TUTORIEL="${PROJECT_SOURCE_DIR}/docs/tutorial"
+  CV_DOSSIER_GOLDEN="${CMAKE_CURRENT_SOURCE_DIR}/golden"
+  CV_DOSSIER_SORTIE="${CMAKE_CURRENT_BINARY_DIR}/sortie_motif"
+)
+if(MSVC)
+  target_compile_options(cvtests_motif PRIVATE /bigobj)
+endif()
+
 # La récursion de voie::CalculeDistance*() est profonde : 256 à 512 Ko de pile
 # avec Clang (Debug comme Release), davantage en Debug MSVC ou sous
 # AddressSanitizer. L'original (C++Builder) tournait avec la pile par défaut de
 # 1 Mo : l'application Qt devra en tenir compte (même réglage).
-foreach(cible cvtests cvsim)
+foreach(cible cvtests cvtests_motif cvsim)
   if(MSVC)
     target_link_options(${cible} PRIVATE /STACK:16777216)
   elseif(APPLE)
@@ -71,10 +93,15 @@ endforeach()
 
 # Une entrée CTest par groupe de tests Catch2 (étiquettes) : noms ASCII, car
 # les noms accentués des cas de test passent mal par la console Windows.
-foreach(groupe IN ITEMS compat cvw simulation generation copie)
+foreach(groupe IN ITEMS compat cvw simulation generation copie corrections)
   add_test(NAME moteur.${groupe} COMMAND cvtests "[${groupe}]")
   set_tests_properties(moteur.${groupe} PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()
+# Bogues corrigés en 6.0.1 : le moteur 6.0.0 ne rendait pas la main (blocage
+# des vehlibs), le délai fait alors échouer le test
+set_tests_properties(moteur.corrections PROPERTIES TIMEOUT 120)
+add_test(NAME moteur.memoire COMMAND cvtests_motif)
+set_tests_properties(moteur.memoire PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 # Critère de fin de la phase 1 : charger une carte, simuler 100 tours, sauvegarder
 # (carte au nom ASCII : sous Windows, argv n'est pas en UTF-8)

@@ -17,7 +17,9 @@ d'installation, installeur Windows, `.dmg` macOS, AppImage Linux (voir
 « Installation et paquets »). Phase 9 (recette et bascule) : version 6.0.0,
 après les pré-releases rc1 à rc3 ; recette Windows automatisée
 (`.github/workflows/recette-windows.yml`), liste de recette dans
-`docs/RECETTE.md`, bogues d'origine conservés dans `CHANGELOG.md`.
+`docs/RECETTE.md`, bogues d'origine conservés dans `CHANGELOG.md`. Version
+6.0.1 : bogues d'origine du moteur corrigés (`engine/README.md`) ; ceux de
+l'interface, plus bas, restent à corriger.
 Comme pour le moteur, **on porte, on ne réécrit pas** : les fiches portées
 sont des copies de `src/f_*.*` (CRLF -> LF, `__fastcall` retiré), où chaque
 autre modification est annotée `// portage`. Pour lire le portage ligne à
@@ -48,9 +50,11 @@ build/dev/app/cvw maps/Démo.cvw
 
 `cvw !` active le journal `cvw.log` (écrit à la fermeture), comme l'original.
 Comme les tests du moteur, `cvw` remet à zéro la mémoire allouée par
-`operator new` (`tests/support/allocation.cpp`) : le moteur d'origine laisse
+`operator new` (`tests/support/allocation.cpp`) : le moteur d'origine laissait
 des champs non initialisés (`centre_ville::FeuP` sans feux piétons...), et
-poser le premier feu de piétons libérait sinon un pointeur indéterminé.
+poser le premier feu de piétons libérait sinon un pointeur indéterminé. Le
+moteur les initialise depuis la 6.0.1 ; la remise à zéro reste pour les
+fiches, issues de la VCL, qui remettait à zéro tout objet dérivé de `TObject`.
 Les fichiers vont par défaut dans le dossier équivalent à `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville\`
 (`QStandardPaths::GenericDataLocation` + `Patquoi.fr/Centre-Ville` : le même
 dossier sous Windows, `~/Library/Application Support/...` sous macOS,
@@ -92,11 +96,11 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.0)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.1)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
-`ImageDeVersion`, et `LabelSousVersion` « ,0 »). Le format des fichiers
+`ImageDeVersion`, et `LabelSousVersion` « ,1 »). Le format des fichiers
 `.cvw` ne change pas (`VERSION 0x530`).
 
 ```bash
@@ -504,14 +508,12 @@ dans `CHANGELOG.md` (version 6.0.0), à corriger après la bascule.
 - **Piéton** : dans un tram, un taxi ou un vehlib, le cadre prend les
   coordonnées dans `cv->Bus` ; la situation « vers une file de vehlibs » est
   testée sur `FileTaxiTrv` ; position « ans un vehlib ».
-- **Moteur : blocage des vehlibs** (trouvé en testant les fiches sur Géant ;
-  `engine/` non modifié) : `vehlib::ReservePlaceVehlibCible` tire au hasard
-  une place libre sans limite d'essais. Sur Géant (29 vehlibs pour 32
-  places), quand plus de vehlibs reçoivent un passager qu'il ne reste de
-  places libres, la boucle ne se termine jamais et l'application se fige :
-  selon la graine (`cvsim maps/Géant.cvw --graine 123` : avant le tour 50 ;
-  123, 135 et 136 sur les graines 100 à 139 en 300 tours). Le test
-  d'interface fixe donc la graine (1) pour ses simulations.
+- **Moteur : blocage des vehlibs** (trouvé en testant les fiches sur Géant,
+  corrigé en 6.0.1) : `vehlib::ReservePlaceVehlibCible` tirait au hasard une
+  place libre sans limite d'essais ; sur Géant (29 vehlibs pour 32 places),
+  l'application se figeait selon la graine (`cvsim maps/Géant.cvw --graine
+  123` : avant le tour 50). Le test d'interface garde une graine fixe (1)
+  pour ses simulations.
 - **Taxi** : la distance à la tête de file est lue en
   `DistFileTaxi[direction][file]` (indices inversés) : valeur fausse, et
   lecture hors des tableaux quand la case a plus de directions que la carte
