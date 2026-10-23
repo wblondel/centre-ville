@@ -1404,8 +1404,8 @@ void vehlib::FaitDescendrePietons()
  {
   int i, d;
   voie *vl=&(cv->v[x][y]);
-  for(d=nord; (!vl->PietonPeutAller((direction)d))&&(d<=ouest); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis !
-  if (vl->PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même !
+  for(d=nord; (d<=ouest)&&(!vl->PietonPeutAller((direction)d)); d++); // direction où sortent les piétons et pas forcément à droite comme les taxis ! v6.0.1 : borne testée d'abord
+  if ((d<=ouest)&&vl->PietonPeutAller((direction)d)) // On s'assure que l'on trouve un trottoir quand même ! v6.0.1 : l'original appelait PietonPeutAller(5)
    {
     voie *v=&cv->V(x,y,d);
     pieton *p;
@@ -1642,8 +1642,8 @@ int bus::NumeroArretSuivant() // v3.0
  {
   int i;
   for( i=0;
-       (NumArretSvt!=cv->LigneBus[NumLigne-1].NumArret[i])&&
-       (i<cv->LigneBus[NumLigne-1].NbArrets);
+       (i<cv->LigneBus[NumLigne-1].NbArrets)&& // v6.0.1 : borne testée d'abord (NumArret[NbArrets] lu par l'original)
+       (NumArretSvt!=cv->LigneBus[NumLigne-1].NumArret[i]);
        i++);
   if (i<cv->LigneBus[NumLigne-1].NbArrets)
    return cv->LigneBus[NumLigne-1].NumArret[(i+1)%cv->LigneBus[NumLigne-1].NbArrets];
@@ -1915,8 +1915,8 @@ int tram::NumeroArretSuivant() // v3.0
  {
   int i;
   for( i=0;
-       (NumArretSvt!=cv->LigneTram[NumLigne-1].NumArret[i])&&
-       (i<cv->LigneTram[NumLigne-1].NbArrets);
+       (i<cv->LigneTram[NumLigne-1].NbArrets)&& // v6.0.1 : borne testée d'abord (NumArret[NbArrets] lu par l'original)
+       (NumArretSvt!=cv->LigneTram[NumLigne-1].NumArret[i]);
        i++);
   if (i<cv->LigneTram[NumLigne-1].NbArrets)
    return cv->LigneTram[NumLigne-1].NumArret[(i+1)%cv->LigneTram[NumLigne-1].NbArrets];
@@ -2996,7 +2996,8 @@ bool voie::AjoutePieton(int NumPietonAAjouter) //v2.0
   int i;
   if (NbPietons<NBMAXPIETONSPARCASE)
    {
-    for(i=0; NumPieton[i]&&(i<NBMAXPIETONSPARCASE); i++);
+    for(i=0; (i<NBMAXPIETONSPARCASE)&&NumPieton[i]; i++); // v6.0.1 : borne testée d'abord
+    if (i==NBMAXPIETONSPARCASE) return false; // v6.0.1 : NbPietons incohérent ; l'original écrivait hors du tableau
     NumPieton[i]=NumPietonAAjouter+1;
     NbPietons++;
     return true;
@@ -3010,7 +3011,7 @@ bool voie::RetirePieton(int NumPietonARetirer) //v2.0
   int i;
   if (NbPietons)
    {
-    for(i=0; (NumPieton[i]!=NumPietonARetirer+1)&&(i<NBMAXPIETONSPARCASE); i++);
+    for(i=0; (i<NBMAXPIETONSPARCASE)&&(NumPieton[i]!=NumPietonARetirer+1); i++); // v6.0.1 : borne testée d'abord
     if (i<NBMAXPIETONSPARCASE)
      {
       NumPieton[i]=0;
