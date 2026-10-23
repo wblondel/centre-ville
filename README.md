@@ -6,7 +6,7 @@
 
 **Centre-Ville** est un logiciel de simulation de circulation urbaine complet, interactif et pédagogique créé par **Patrice Fouquet** ([patquoi.fr](http://patquoi.fr#cvw)). Initialement développé pour Windows (Windows 95/XP jusqu'à Windows 10/11), il est distribué sous licence **GNU General Public License v2.0 (GPLv2)**.
 
-La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C++Builder (Windows seulement) vers **C++20, CMake et Qt 6**, et native sous Windows, macOS et Linux : même moteur de simulation, mêmes fenêtres, menus et raccourcis, même aide, même format de fichier `.cvw` (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md) et [`CHANGELOG.md`](CHANGELOG.md)). La version **6.0.1** corrige les bogues d'origine du moteur, dont le blocage de la simulation par les vehlibs.
+La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C++Builder (Windows seulement) vers **C++20, CMake et Qt 6**, et native sous Windows, macOS et Linux : même moteur de simulation, mêmes fenêtres, menus et raccourcis, même aide, même format de fichier `.cvw` (voir [`PLAN_PORTAGE.md`](PLAN_PORTAGE.md) et [`CHANGELOG.md`](CHANGELOG.md)). La version **6.0.1** corrige les bogues d'origine du moteur, dont le blocage de la simulation par les vehlibs et leurs passagers qui n'en descendaient jamais.
 
 ---
 

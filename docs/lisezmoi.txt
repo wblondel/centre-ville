@@ -35,6 +35,9 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 [Version 6.0.1] 
  - La simulation ne se fige plus quand aucune place de vehlib n'est libre :
    le vehlib attend qu'une place se libère.
+ - Les passagers d'un vehlib en descendent à son arrivée et redeviennent
+   des piétons : le vehlib attend à sa nouvelle place au lieu de repartir
+   aussitôt.
  - Une erreur d'écriture lors de l'enregistrement est signalée.
  - La vérification d'intégrité affiche toutes les erreurs trouvées.
  - Corrections de la commande "Copier vers...".
