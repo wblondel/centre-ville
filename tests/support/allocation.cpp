@@ -1,12 +1,14 @@
 //---------------------------------------------------------------------------
 // allocation.cpp - Tests du moteur : allocations remises à zéro
 //
-// Le moteur d'origine laisse quelques champs non initialisés (par exemple
+// Le moteur d'origine laissait quelques champs non initialisés (par exemple
 // pieton::TourAttBus avant la première attente, ou centre_ville::NbVehlibs
 // pour les fichiers antérieurs à la v5.3). Pour que l'export de l'état complet
 // et le golden master soient déterministes d'une plateforme à l'autre, les
 // exécutables de test remplacent operator new par une version qui renvoie
-// une mémoire mise à zéro. Le moteur lui-même n'est pas modifié.
+// une mémoire mise à zéro. Depuis la 6.0.1, le moteur initialise lui-même ces
+// champs : cvtests_motif refait les mêmes tests avec une mémoire remplie d'un
+// motif (allocation_motif.cpp).
 //---------------------------------------------------------------------------
 #include <cstdlib>
 #include <new>

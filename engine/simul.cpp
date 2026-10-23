@@ -4061,6 +4061,7 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
   NbVehiculesSortis=NbVehiculesDeplaces=NbVehiculesArrives=0L;
   NbPietonsGueris=NbPietonsInfectes=NbPietonsMorts=0L; // v5.4.1 : stats épidémiques des piétons
   DureeOrange=NbParkings=NbTrams=NbBus=NbVehicules=NbFeux=NbFeuxPieton=0L; // v3.0 (NbBus) v3.5 (NbTrams), v5.2 (NbFeuxPieton)
+  DureeVert=DureeRouge=0L; // v6.0.1 : indéterminées pour un nouveau réseau (avant la fiche Paramètres)
   AttenteMaxVeh=10L;
   NbVitesses=1;
   NbToursStats=100;
@@ -4077,8 +4078,9 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY)  // v4.0 
   NbMaxToursAttenteTaxi=NbMaxToursAttenteTram=NbMaxToursAttenteBus=25; // v3.6 (taxi) v5.3 (vehlib)
   VerifOk=DistancesCalculees=QuadrillageStats=false;
   NbFilesPark=NbPlacesPark=0L; // v5.0
-  NbPlacesVehlib=0L; // v5.3
+  NbVehlibs=NbPlacesVehlib=0L; // v5.3. v6.0.1 : NbVehlibs (indéterminé pour un fichier antérieur à 0x530)
   Feu=NULL;
+  FeuP=NULL; // v6.0.1 : indéterminé sans feux de piétons (libéré par IncrementeNombre au premier ajout)
   Parking=NULL;
   Vehicule=NULL;
   Vehlib=NULL; // v5.3

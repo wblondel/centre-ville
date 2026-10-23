@@ -244,6 +244,7 @@ class pieton // v2.0
 	Dir=indefinie;
 	NumVehlib=NumPlaceVehlib=NumFeuP=NumTaxi=NumTram=NumBus=NumFileTaxi=NumArretTram=NumArretBus=DemiCase=0; // v3.6 (NumTaxi, NumFileTaxi), v5.2 (NumFeuP), v5.3 (vehlib)
 	DemiCasesParcourues=TourDrnAff=TourDrnDepl=0L;
+	TourAttTaxi=TourAttTram=TourAttBus=0L; // v6.0.1 : indéterminés tant que le piéton n'a rien attendu
 	Mort=Ecrase=VeutDescendre=AttendFeuP=AttendVehlib=AttendTaxi=AttendTram=AttendBus=PlaceVehlibTrv=FileTaxiTrv=ArretTramTrv=ArretBusTrv=PsgPtTrv=false; // v4.3 (Ecrase), v5.2 (AttendFeuP), v5.3 (vehlib), v5.4.1 (Mort)
     Infection=NULL;
    };

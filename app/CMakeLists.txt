@@ -92,9 +92,12 @@ endif()
 # Les ressources (images) sont compilées dans chaque exécutable : une
 # bibliothèque statique ne les enregistrerait pas sans Q_INIT_RESOURCE.
 # Mémoire remise à zéro par operator new, comme pour les tests du moteur : le
-# moteur d'origine laisse des champs non initialisés (centre_ville::FeuP sans
-# feux piétons, NbVehlibs avant la v5.3... voir engine/README.md) ; sans cela,
-# poser le premier feu de piétons libérait un pointeur indéterminé.
+# moteur d'origine laissait des champs non initialisés (centre_ville::FeuP
+# sans feux piétons, NbVehlibs avant la v5.3... voir engine/README.md) ; sans
+# cela, poser le premier feu de piétons libérait un pointeur indéterminé. Le
+# moteur n'en dépend plus depuis la 6.0.1 (tests cvtests_motif), mais les
+# fiches viennent de la VCL, qui remettait à zéro les champs de tout objet
+# dérivé de TObject : la remise à zéro est gardée pour elles.
 add_executable(cvw WIN32 MACOSX_BUNDLE
   main.cpp
   ressources/images.qrc
