@@ -6,9 +6,16 @@ name: Tests moteur
 # être identique sur toutes les plateformes.
 #
 # Compile aussi l'application Qt (cvw) sur les trois systèmes et exécute le
-# test de son interface (pilotage de Démo.cvw, sans affichage). Les chemins
-# app/** déclenchent le workflow : une PR qui ne touche que l'application
-# passe aussi par les jobs « Tests moteur » exigés sur main.
+# test de son interface (pilotage de Démo.cvw, sans affichage).
+#
+# Les 8 jobs sont exigés sur main : ils doivent donc exister sur TOUTES les PR,
+# sinon une PR qui ne touche que la documentation reste bloquée. Le workflow se
+# lance sur chaque PR ; le job « changements » regarde si la PR touche un
+# fichier dont dépendent la compilation ou les tests. Si ce n'est pas le cas,
+# les jobs se terminent tout de suite sans rien compiler. Les jobs à matrice
+# sautent leurs étapes plutôt que le job entier : un job à matrice sauté
+# n'est pas déplié et ne produirait pas les noms de checks exigés. Si la
+# détection échoue, tout est testé.
 
 on:
   push:
@@ -22,20 +29,12 @@ on:
       - 'maps/**'
       - 'tools/**'
       - 'src/**'
+      - 'docs/**'
+      - 'res/**'
       - 'CMakeLists.txt'
       - 'CMakePresets.json'
       - '.github/workflows/tests-moteur.yml'
   pull_request:
-    paths:
-      - 'app/**'
-      - 'engine/**'
-      - 'tests/**'
-      - 'maps/**'
-      - 'tools/**'
-      - 'src/**'
-      - 'CMakeLists.txt'
-      - 'CMakePresets.json'
-      - '.github/workflows/tests-moteur.yml'
   workflow_dispatch:
 
 permissions:
@@ -46,29 +45,70 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changements:
+    name: Changements à tester
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filtre.outputs.code }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # Mêmes chemins que le déclencheur push (docs/ : test de l'aide ; res/ :
+      # icônes de l'application). Sur une PR, HEAD est le commit de fusion :
+      # HEAD^1..HEAD donne exactement les fichiers modifiés par la PR.
+      - name: Fichiers dont dépendent la compilation et les tests
+        id: filtre
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          fichiers=$(git diff --name-only HEAD^1 HEAD)
+          echo "$fichiers"
+          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.github/workflows/tests-moteur\.yml$' <<< "$fichiers"; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          fi
+
   tests:
     name: Tests moteur (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+    needs: changements
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: Aucun fichier testé n'a changé
+        if: needs.changements.outputs.code == 'false'
+        run: echo "La PR ne touche ni le code, ni les tests, ni docs/ ou res/, rien à compiler."
+
       - name: Checkout repository
+        if: needs.changements.outputs.code != 'false'
         uses: actions/checkout@v4
 
       - name: Configure (CMake preset ci, moteur seul)
+        if: needs.changements.outputs.code != 'false'
         run: cmake --preset ci -DCV_APP=OFF
 
       - name: Build
+        if: needs.changements.outputs.code != 'false'
         run: cmake --build --preset ci --parallel
 
       - name: Run tests (CTest)
+        if: needs.changements.outputs.code != 'false'
         run: ctest --preset ci
 
       - name: Upload golden master differences
-        if: failure()
+        if: failure() && needs.changements.outputs.code != 'false'
         uses: actions/upload-artifact@v4
         with:
           name: golden-ecarts-${{ matrix.os }}
@@ -81,37 +121,48 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+    needs: changements
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.os }}
 
     steps:
+      - name: Aucun fichier testé n'a changé
+        if: needs.changements.outputs.code == 'false'
+        run: echo "La PR ne touche ni le code, ni les tests, ni docs/ ou res/, rien à compiler."
+
       - name: Checkout repository
+        if: needs.changements.outputs.code != 'false'
         uses: actions/checkout@v4
 
       - name: Install Linux dependencies of Qt
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && needs.changements.outputs.code != 'false'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgl1-mesa-dev libegl1 libxkbcommon-dev libfontconfig1-dev libfreetype-dev
 
       - name: Install Qt 6.8 LTS
+        if: needs.changements.outputs.code != 'false'
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.*'
           cache: true
 
       - name: Configure (CMake preset ci, Qt obligatoire)
+        if: needs.changements.outputs.code != 'false'
         run: cmake --preset ci -DCV_APP=ON
 
       - name: Build
+        if: needs.changements.outputs.code != 'false'
         run: cmake --build --preset ci --parallel
 
       - name: Interface test (CTest)
+        if: needs.changements.outputs.code != 'false'
         run: ctest --preset ci -R interface
         env:
           QT_QPA_PLATFORM: offscreen
 
       - name: Upload screenshots
-        if: always()
+        if: always() && needs.changements.outputs.code != 'false'
         uses: actions/upload-artifact@v4
         with:
           name: captures-${{ matrix.os }}
@@ -120,6 +171,8 @@ jobs:
 
   fiches:
     name: Fiches .ui générées à jour
+    needs: changements
+    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -131,6 +184,8 @@ jobs:
 
   images:
     name: Images extraites des .dfm à jour
+    needs: changements
+    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
     runs-on: ubuntu-latest
 
     steps:
