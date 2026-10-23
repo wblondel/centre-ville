@@ -311,10 +311,9 @@ class TestInterface : public QObject
    }
   bool Demarre()
    { // Marche par la barre d'outils : vérification, calcul des distances, enregistrement.
-     // Graine fixe (srand de AppelleAuChaos) : sur Géant, le moteur d'origine boucle
-     // sans fin dans vehlib::ReservePlaceVehlibCible quand plus aucune place de
-     // vehlib n'est libre, ce qui arrive selon la graine (123 : avant le tour 50) ;
-     // la graine 1 tient plus de 1500 tours (cvsim)
+     // Graine fixe (srand de AppelleAuChaos) : simulation reproductible. Jusqu'à la
+     // 6.0.0, elle évitait aussi le blocage des vehlibs de Géant (sans place libre,
+     // vehlib::ReservePlaceVehlibCible tirait sans fin), corrigé en 6.0.1
     // Simulation pas à pas ensuite : minuteur arrêté, tours joués par JoueTour
     alea::FixeGraine(1);
     Messages.clear();

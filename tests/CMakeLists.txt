@@ -44,6 +44,7 @@ add_executable(cvtests
   test_cvw.cpp
   test_golden.cpp
   test_generation.cpp
+  test_corrections.cpp
   ${CV_ALLOCATION}
 )
 target_link_libraries(cvtests PRIVATE cvtest_support Catch2::Catch2WithMain)
@@ -71,10 +72,13 @@ endforeach()
 
 # Une entrée CTest par groupe de tests Catch2 (étiquettes) : noms ASCII, car
 # les noms accentués des cas de test passent mal par la console Windows.
-foreach(groupe IN ITEMS compat cvw simulation generation copie)
+foreach(groupe IN ITEMS compat cvw simulation generation copie corrections)
   add_test(NAME moteur.${groupe} COMMAND cvtests "[${groupe}]")
   set_tests_properties(moteur.${groupe} PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()
+# Bogues corrigés en 6.0.1 : le moteur 6.0.0 ne rendait pas la main (blocage
+# des vehlibs), le délai fait alors échouer le test
+set_tests_properties(moteur.corrections PROPERTIES TIMEOUT 120)
 
 # Critère de fin de la phase 1 : charger une carte, simuler 100 tours, sauvegarder
 # (carte au nom ASCII : sous Windows, argv n'est pas en UTF-8)

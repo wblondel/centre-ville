@@ -848,7 +848,7 @@ class vehlib // v5.3 instances créées au lancement de la simulation
   direction ProchaineDirectionAuCarrefour();
   bool PeutPasser();
   void FaitDescendrePietons();
-  void ReservePlaceVehlibCible();
+  bool ReservePlaceVehlibCible(); // v6.0.1 : false si aucune place n'est libre
   void FaitMonterPieton(int NumPietonAFaireMonter);
   int NbPietonsQuiSontMontes(); // retourne true si des piétons attendaient et sont montés
   void Verifie(AnsiString &asMsgErr);

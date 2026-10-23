@@ -1294,10 +1294,10 @@ void vehlib::CalculeProchaineDirection()
       i, j, ndp=NbDir[v->DirPoss];
 
   if ((Situation==svAttente)&&  // Si le vehlib attend,
-      (NbPietonsQuiSontMontes())) // On regarde déjà s'il y a des piétons qui veulent monter...
+      (NbPietonsQuiSontMontes())&& // On regarde déjà s'il y a des piétons qui veulent monter...
+      (NumPlaceArrivee|| // Des fois les piétons restent dans le vehlib...
+       ReservePlaceVehlibCible())) // v6.0.1 : sans place libre, le vehlib attend (nouvel essai au tour suivant)
    { // pour pouvoir partir...
-    if (!NumPlaceArrivee) // Des fois les piétons restent dans le vehlib...
-     ReservePlaceVehlibCible();
     Situation=svDepart;
     TourDepart=cv->TourCrt;
 	//DebugEcrit(Format("Vehlib(%d)::CalculeProchaineDirection(): Situation=svDepart; TourDepart=%d", ARRAYOFCONST((Numero,cv->TourCrt))));
@@ -1415,9 +1415,13 @@ void vehlib::FaitDescendrePietons()
    }
  }
 //-----------------------------------------------------------------------------
-void vehlib::ReservePlaceVehlibCible()
+bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s'il n'y a aucune place libre
  {
   int NumPlace; // 0 < NumPlace <= NbPlacesVehlib
+  // v6.0.1 : l'original tirait sans fin quand aucune place n'était libre (simulation figée)
+  for(NumPlace=0; (NumPlace<cv->NbPlacesVehlib)&&
+                  ((NumPlace+1==NumPlaceDepart)||(!cv->PlaceVehlib[NumPlace].EstLibre())); NumPlace++);
+  if (NumPlace==cv->NbPlacesVehlib) return false;
   do // On choisit une place libre
    {
     NumPlace=rand()%cv->NbPlacesVehlib;
@@ -1428,19 +1432,19 @@ void vehlib::ReservePlaceVehlibCible()
   pv->NumVehlibReserve=Numero;
   NumPlaceArrivee=NumPlace+1;
   vue->RedessineCase(xp, yp, false); // portage
+  return true;
  }
 //-----------------------------------------------------------------------------
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
   int xp=p->x, yp=p->y;
-  if (NbPersonnes<cv->NbMaxPersonnesVehlib)
+  if ((NbPersonnes<cv->NbMaxPersonnesVehlib)&&
+      (NumPlaceArrivee||ReservePlaceVehlibCible())) // v6.0.1 : le piéton ne monte que si une place d'arrivée est réservée (sinon il attend)
    {
     NbPersonnes++;
     cv->v[xp][yp].RetirePieton(NumPietonAFaireMonter);
     p->MonteDansVehlib(Numero);
-    if (!NumPlaceArrivee)
-     ReservePlaceVehlibCible();
     vue->RedessineCase(xp, yp, false); // portage
    }
  }
