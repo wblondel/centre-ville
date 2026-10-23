@@ -1523,7 +1523,7 @@ bool depot_bus::Sauve(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 void depot_bus::Verifie(AnsiString &asMsgErr) // v3.03
  {
-  AnsiString asSource=Format("Dépot bus : ", ARRAYOFCONST((x, y)));
+  AnsiString asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------

@@ -271,3 +271,25 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Vérification d'intégrité : le message du dépôt de bus donne ses coordonnées", "[corrections][verifie]")
+ { // L'original appelait Format("Dépot bus : ", ...) sans spécificateur :
+   // « Dépot bus : : abscisse incorrecte (...) », sans les coordonnées
+  VueNulle Vue;
+  vue=&Vue;
+  std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw : dépôt de bus défini
+  conversion_cvw Ref=ConvertitEn530(asCarte);
+  REQUIRE(Ref.Ok);
+  const int NbX=LitEntier(asCarte, Champ(Ref, "NbX")), y=LitEntier(asCarte, Champ(Ref, "depot.y"));
+  REQUIRE(LitEntier(asCarte, Champ(Ref, "depot.x"))>=0);
+  EcritEntier(asCarte, Champ(Ref, "depot.x"), NbX);
+  const std::string asFichier=FichierSortie("verifie_depot.cvw");
+  EcritFichier(asFichier, asCarte);
+  REQUIRE(harnais::Ouvre(asFichier));
+  AnsiString asMsgErr;
+  cv->Verifie(asMsgErr);
+  harnais::Ferme();
+  CHECK(asMsgErr.str()==Format("Dépot bus (%d,%d): abscisse incorrecte (%d)\n", ARRAYOFCONST((NbX, y, NbX))).str());
+  CHECK(Vue.Messages.empty());
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
