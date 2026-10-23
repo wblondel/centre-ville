@@ -248,6 +248,7 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
   asCarte[Champ(Ref, asFeu+"TypePsgRouge").Debut]=9;
   EcritEntier(asCarte, Champ(Ref, asFeu+"Dir"), 9);
   EcritEntier(asCarte, Champ(Ref, asFeu+"y"), NbY);
+  const char DirPoss00=asCarte[Champ(Ref, "case(0,0).DirPoss").Debut];
   asCarte[Champ(Ref, "case(0,0).DirPoss").Debut]=20;
   asCarte[Champ(Ref, "case(0,0).Priorite[0]").Debut]=9;
   const std::string asFichier=FichierSortie("verifie_champs.cvw");
@@ -266,6 +267,7 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
                                     std::string("Case (0,0): directions possibles incorrectes (20)\n"),
                                     std::string("Case (0,0) (Nord): priorité incorrecte (9)\n")})
    CHECK(asMessages.find(Attendu)!=std::string::npos);
+  cv->v[0][0].DirPoss=(dirposs)DirPoss00; // ~voie() lit NbDir[DirPoss] : hors du tableau pour 20
   harnais::Ferme();
   CHECK(Vue.Messages.empty());
   vue=nullptr;
