@@ -150,8 +150,9 @@ Conséquences pour le portage :
 ## Corrections de la 6.0.1 (annotées `// v6.0.1`)
 
 La règle « on porte, on ne corrige pas » est levée à partir de la 6.0.1.
-Chaque correction d'un bogue listé dans le `CHANGELOG.md` de la 6.0.0 a son
-commit et un test qui échoue sur le moteur 6.0.0 (`tests/test_corrections.cpp`,
+Chaque correction d'un bogue listé dans le `CHANGELOG.md` de la 6.0.0, ou
+trouvé en 6.0.1, a son commit et un test qui échoue sur le moteur 6.0.0
+(`tests/test_corrections.cpp`,
 `tests/test_memoire.cpp`, `test_compat.cpp`, et deux tests de l'interface) ;
 l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
 
@@ -170,6 +171,31 @@ l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
   roule jamais sans destination. Quand une place est libre, les tirages sont
   ceux de l'original. Graines 1 à 80, 100 à 140 et 12345 : 2000 tours sur
   Géant.
+- **Passagers des vehlibs** (trouvé en 6.0.1) : ils ne descendaient jamais.
+  `vehlib::FaitDescendrePietons` cherchait la direction de sortie en testant
+  `PietonPeutAller(d)` sur la case du vehlib, toujours fausse puisqu'il
+  l'occupe, au lieu de la case voisine dans cette direction, sur laquelle il
+  fait ensuite descendre le piéton ; et `voie::FaitDescendrePieton` ne
+  remettait pas `pieton::NumVehlib` à zéro ni ne décrémentait
+  `vehlib::NbPersonnes` (seulement pour les bus, trams et taxis). Un vehlib
+  qui avait pris un passager repartait donc dès son arrivée, puisque
+  `NbPietonsQuiSontMontes()` comptait ce passager, ce qui usait les places
+  libres ; le piéton n'était plus jamais simulé. Les deux sont corrigés comme
+  pour les taxis. À l'arrivée à la place réservée
+  (`centre_ville::PlaceVehiculeVehlib`, inchangé), chaque passager descend
+  sur la première case voisine de la place (nord, est, sud, ouest) où un
+  piéton peut aller, un trottoir en pratique, ou à côté de celle-ci si elle
+  est pleine, puis redevient un piéton simulé. Le vehlib attend ensuite à sa
+  place d'arrivée, devenue sa place de départ, qu'un piéton le prenne. Si
+  aucune case voisine ne peut accueillir de piéton, le passager reste à bord
+  et le vehlib repart aussitôt vers une autre place libre, ou attend qu'une
+  place se libère : c'est le cas que l'original prévoyait (« Des fois les
+  piétons restent dans le vehlib... », `CalculeProchaineDirection`), comme
+  le passager d'un bus qui « descendra au prochain arrêt ». Sur Géant
+  (graines 1 à 80, 100 à 140 et 12345, 2000 tours, standard et épidémie +
+  mode sanglant + résurrection) : 13 304 arrivées, 13 186 descentes, 587 fois
+  un passager resté à bord (4 %) ; `NbPersonnes` et les réservations de
+  places restent cohérents à chaque tour.
 - **Erreurs d'écriture** : `voie::Sauve` contenait un `;` au lieu de `&&`,
   `centre_ville::Sauve` écrasait `Ok` par le résultat de `DepotBus.Sauve`, et
   surtout `FileWrite` renvoie -1 (vrai dans les chaînes de `&&`) en cas
@@ -197,9 +223,13 @@ l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
   le golden master, la génération et la copie avec une mémoire remplie de
   `0xA5` : le moteur ne dépend plus de la remise à zéro.
 
-Golden master : seuls `tests/golden/copie/*.txt` changent (`NbYc=0` après
-« Copier vers… », empreinte de la copie réduite) ; la simulation
-(`standard`, `epidemie`), la génération et `verifie/` sont inchangés.
+Golden master : `tests/golden/copie/*.txt` changent (`NbYc=0` après
+« Copier vers… », empreinte de la copie réduite), ainsi que
+`standard/Geant.txt` et `epidemie/Geant.txt` à partir du tour 7, quand un
+vehlib arrive pour la première fois avec un passager : son passager
+descend et il attend, au lieu de repartir en tirant une nouvelle place
+d'arrivée. Géant est la seule carte livrée avec des vehlibs ; la simulation
+des 5 autres cartes, la génération et `verifie/` sont inchangées.
 
 ### Audit des lectures hors tableau
 
@@ -239,6 +269,8 @@ standard et en épidémie + mode sanglant + résurrection à mi-parcours, avec
 | avant l'audit | `asan-release` | 1 à 30 | 1000 | 540 | aucun |
 | 6.0.1 | `asan-release` | 1 à 40 | 2000 | 720 | aucun |
 | 6.0.1 | `asan` (Debug) | 1 à 20 | 1000 | 360 | aucun |
+| 6.0.1, passagers des vehlibs | `asan-release` | 1 à 40 | 2000 | 720 | aucun |
+| 6.0.1, passagers des vehlibs | `asan` (Debug) | 1 à 20 | 1000 | 360 | aucun |
 
 Un programme témoin du motif de `voie::AjoutePieton` est bien signalé par
 UBSan (`index 2 out of bounds for type 'int[2]'`). `ctest --preset asan`
@@ -264,16 +296,6 @@ inversés, lecture hors du tableau ; lot de l'interface).
   une simulation équilibrée (1000) » (1000 n'est pas multiple de 4×3). C'est
   le réseau d'origine qui est en cause, pas le portage : le message est figé
   dans `tests/golden/verifie/Carfours.txt`.
-- **Passagers des vehlibs** (trouvé en 6.0.1, non corrigé) : ils ne
-  descendent jamais. `vehlib::FaitDescendrePietons` cherche une direction où
-  le piéton peut aller depuis la case du vehlib (`vl->PietonPeutAller(d)`),
-  toujours fausse puisque le vehlib l'occupe, au lieu de la case voisine ; et
-  `voie::FaitDescendrePieton` ne remet pas `pieton::NumVehlib` à zéro ni ne
-  décrémente `vehlib::NbPersonnes` (il ne gère que les bus, trams et taxis).
-  Un vehlib qui a pris un passager repart donc dès son arrivée (« Des fois
-  les piétons restent dans le vehlib... », dit le code), ce qui use les
-  places libres ; le piéton n'est plus jamais simulé. Le corriger change la
-  simulation de toutes les cartes à vehlibs (golden master de Géant).
 - **Erreurs de lecture** : `FileRead` renvoie -1 en cas d'erreur, vrai dans
   les chaînes de `&&` de `Charge` : seule une fin de fichier prématurée (0)
   est vue. `Charge(-1)` réussit et donne une carte vide de 99×63 ; c'est ce

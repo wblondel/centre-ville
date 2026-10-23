@@ -20,6 +20,18 @@ la 6.0.1 s'ouvre toujours dans la 5.4.3.2, et inversement.
   place d'arrivée réservée : faute de place libre, il attend à la sienne et
   réessaie au tour suivant, et le piéton qui l'attend reste dehors. Quand une
   place est libre, la simulation est celle de l'original.
+- **Passagers des vehlibs** (trouvé en 6.0.1) : ils n'en descendaient
+  jamais. Un vehlib qui avait pris un passager repartait dès son arrivée, ce
+  qui usait les places libres, et le piéton n'était plus jamais simulé
+  (`vehlib::FaitDescendrePietons` cherchait un trottoir depuis la case du
+  vehlib, toujours occupée par lui, et `voie::FaitDescendrePieton` ne gérait
+  pas les vehlibs). À l'arrivée, les passagers descendent désormais sur un
+  trottoir voisin de la place, comme ceux d'un taxi, et redeviennent des
+  piétons ; le vehlib attend à sa place d'arrivée, devenue sa place de
+  départ, qu'un piéton le prenne. Si aucun trottoir voisin n'a de place, le
+  passager reste à bord et descendra à la place suivante, comme l'original
+  le prévoyait. La simulation de Géant, seule carte livrée avec des vehlibs,
+  change.
 - **Erreurs d'enregistrement** : une erreur d'écriture (disque plein, fichier
   en lecture seule, fichier impossible à créer) affiche « Erreur de données
   dans le fichier » et « Enregistrement NON effectué. » au lieu d'annoncer
@@ -51,11 +63,6 @@ Détail : `engine/README.md`, « Corrections de la 6.0.1 ».
 
 ### Restent à corriger
 
-- **Moteur, trouvé en 6.0.1** : les passagers d'un vehlib n'en descendent
-  jamais (`vehlib::FaitDescendrePietons` cherche un trottoir depuis la case
-  du vehlib, toujours occupée par lui, et `voie::FaitDescendrePieton` ne
-  gère pas les vehlibs). Un vehlib qui a pris un passager repart donc dès
-  qu'il arrive.
 - **Interface** : la liste « Bogues d'origine conservés » de la 6.0.0 (dans
   `CHANGELOG.md`), et `f_simul.cpp` qui
   teste `if ((hfile=FileCreate(…)))` et `if ((hfile=FileOpen(…)))` alors que
