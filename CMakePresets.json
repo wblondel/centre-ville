@@ -44,6 +44,17 @@
       }
     },
     {
+      "name": "asan-release",
+      "displayName": "Release + AddressSanitizer/UBSan (Clang/GCC)",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
       "name": "ci",
       "displayName": "Intégration continue (générateur par défaut, Release)",
       "inherits": "base",
@@ -77,6 +88,10 @@
       "configurePreset": "asan"
     },
     {
+      "name": "asan-release",
+      "configurePreset": "asan-release"
+    },
+    {
       "name": "ci",
       "configurePreset": "ci",
       "configuration": "Release"
@@ -105,6 +120,13 @@
     {
       "name": "asan",
       "configurePreset": "asan",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "asan-release",
+      "configurePreset": "asan-release",
       "output": {
         "outputOnFailure": true
       }
