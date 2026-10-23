@@ -20,6 +20,14 @@
 //---------------------------------------------------------------------------
 namespace
  {
+  const champ_cvw &Champ(const conversion_cvw &c, const std::string &Nom)
+   {
+    for(const champ_cvw &ch : c.Champs)
+     if (ch.Nom==Nom) return ch;
+    FAIL("champ introuvable : " << Nom);
+    return c.Champs.front();
+   }
+  //-------------------------------------------------------------------------
   int LitEntier(const std::string &o, const champ_cvw &ch)
    {
     unsigned u=0;
@@ -35,6 +43,20 @@ namespace
     if (p==std::string::npos) return false;
     std::string Fin=Nom.substr(p+1);
     return (Fin=="x")||(Fin=="y")||(Fin.rfind("x[", 0)==0)||(Fin.rfind("y[", 0)==0);
+   }
+  //-------------------------------------------------------------------------
+  void EcritEntier(std::string &o, const champ_cvw &ch, int v)
+   {
+    for(int i=0; i<4; i++) o[ch.Debut+(std::size_t)i]=(char)(((unsigned)v>>(8*i))&0xFF);
+   }
+  //-------------------------------------------------------------------------
+  void EcritFichier(const std::string &asChemin, const std::string &asContenu)
+   {
+    int h=FileCreate(asChemin.c_str());
+    REQUIRE(h>0);
+    REQUIRE(FileWrite(h, asContenu.data(), (unsigned)asContenu.size())==(int)asContenu.size());
+    REQUIRE(FileFlush(h));
+    FileClose(h);
    }
   //-------------------------------------------------------------------------
   // Une place que le vehlib n°NumVehlib pourrait réserver (libre, autre que sa place de départ)
@@ -203,6 +225,48 @@ TEST_CASE("Copier vers... : un élément non défini reste non défini (-1) dans
       CHECK(NbIndefinis>0); // chaque carte a des éléments non définis
      }
    }
+  CHECK(Vue.Messages.empty());
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Vérification d'intégrité : messages des contrôles de position, direction, priorité, état...", "[corrections][verifie]")
+ { // VerifiePosition, VerifieDirection, VerifiePriorite, VerifieDirPoss,
+   // VerifieEtat, VerifieDmdVert et VerifiePsgRouge recevaient asMsgErr par
+   // valeur : leurs messages étaient perdus
+  VueNulle Vue;
+  vue=&Vue;
+  std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw, format 0x530, 109 feux
+  conversion_cvw Ref=ConvertitEn530(asCarte);
+  REQUIRE(Ref.Ok);
+  REQUIRE(Ref.Version==VERSION);
+  const int NbY=LitEntier(asCarte, Champ(Ref, "NbY"));
+  int f=1; // premier feu défini (les places libres, x=-1, ne sont pas vérifiées)
+  while(LitEntier(asCarte, Champ(Ref, "feu"+std::to_string(f)+".x"))<0) f++;
+  const std::string asFeu="feu"+std::to_string(f)+".";
+  asCarte[Champ(Ref, asFeu+"Etat").Debut]=7;
+  asCarte[Champ(Ref, asFeu+"TypeDmdVert").Debut]=9;
+  asCarte[Champ(Ref, asFeu+"TypePsgRouge").Debut]=9;
+  EcritEntier(asCarte, Champ(Ref, asFeu+"Dir"), 9);
+  EcritEntier(asCarte, Champ(Ref, asFeu+"y"), NbY);
+  asCarte[Champ(Ref, "case(0,0).DirPoss").Debut]=20;
+  asCarte[Champ(Ref, "case(0,0).Priorite[0]").Debut]=9;
+  const std::string asFichier=FichierSortie("verifie_champs.cvw");
+  EcritFichier(asFichier, asCarte);
+  REQUIRE(harnais::Ouvre(asFichier));
+  AnsiString asMsgErr;
+  cv->Verifie(asMsgErr);
+  const std::string asMessages=asMsgErr.str();
+  INFO(asMessages);
+  const std::string asSource="Feu n°"+std::to_string(f);
+  for(const std::string &Attendu : {asSource+": état incorrect (7)\n",
+                                    asSource+": type de demande du vert incorrect (9)\n",
+                                    asSource+": type de passage au rouge incorrect (9)\n",
+                                    asSource+": direction incorrecte (9)\n",
+                                    asSource+": ordonnée incorrecte ("+std::to_string(NbY)+")\n",
+                                    std::string("Case (0,0): directions possibles incorrectes (20)\n"),
+                                    std::string("Case (0,0) (Nord): priorité incorrecte (9)\n")})
+   CHECK(asMessages.find(Attendu)!=std::string::npos);
+  harnais::Ferme();
   CHECK(Vue.Messages.empty());
   vue=nullptr;
  }

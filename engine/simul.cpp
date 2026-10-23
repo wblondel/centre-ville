@@ -209,15 +209,16 @@ void AppelleAuChaos()
 //-----------------------------------------------------------------------------
 // Routines privées
 //-----------------------------------------------------------------------------
-void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y);
-void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie);
-void VerifiePriorite(AnsiString asMsgErr, AnsiString asSource, priorite p);
-void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp);
-void VerifieEtat(AnsiString asMsgErr, AnsiString asSource, etat_feu e);
-void VerifieDmdVert(AnsiString asMsgErr, AnsiString asSource, dmd_vert dv);
-void VerifiePsgRouge(AnsiString asMsgErr, AnsiString asSource, psg_rouge pr);
+// v6.0.1 : asMsgErr par référence (par valeur dans l'original : les messages étaient perdus)
+void VerifiePosition(AnsiString &asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie); // v6.0.1 : prototype conforme à la définition
+void VerifieDirection(AnsiString &asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie);
+void VerifiePriorite(AnsiString &asMsgErr, AnsiString asSource, priorite p);
+void VerifieDirPoss(AnsiString &asMsgErr, AnsiString asSource, dirposs dp);
+void VerifieEtat(AnsiString &asMsgErr, AnsiString asSource, etat_feu e);
+void VerifieDmdVert(AnsiString &asMsgErr, AnsiString asSource, dmd_vert dv);
+void VerifiePsgRouge(AnsiString &asMsgErr, AnsiString asSource, psg_rouge pr);
 //-----------------------------------------------------------------------------
-void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie)
+void VerifiePosition(AnsiString &asMsgErr, AnsiString asSource, int x, int y, bool PeutEtreIndefinie)
  {
   if (((x<-1)&&(PeutEtreIndefinie))||
       ((x<0)&&(!PeutEtreIndefinie))||
@@ -229,7 +230,7 @@ void VerifiePosition(AnsiString asMsgErr, AnsiString asSource, int x, int y, boo
    asMsgErr+=asSource+Format(": ordonnée incorrecte (%d)\n", ARRAYOFCONST((y)));
  }
 //-----------------------------------------------------------------------------
-void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie)
+void VerifieDirection(AnsiString &asMsgErr, AnsiString asSource, direction d, bool PeutEtreIndefinie)
  {
   if (((d<indefinie)&&(PeutEtreIndefinie))||
       ((d<=indefinie)&&(!PeutEtreIndefinie))||
@@ -237,31 +238,31 @@ void VerifieDirection(AnsiString asMsgErr, AnsiString asSource, direction d, boo
    asMsgErr+=asSource+Format(": direction incorrecte (%d)\n", ARRAYOFCONST(((int)d))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifiePriorite(AnsiString asMsgErr, AnsiString asSource, priorite p)
+void VerifiePriorite(AnsiString &asMsgErr, AnsiString asSource, priorite p)
  {
   if ((p<a_droite)||(p>feux))
    asMsgErr+=asSource+Format(": priorité incorrecte (%d)\n", ARRAYOFCONST(((int)p))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieDirPoss(AnsiString asMsgErr, AnsiString asSource, dirposs dp)
+void VerifieDirPoss(AnsiString &asMsgErr, AnsiString asSource, dirposs dp)
  {
   if ((dp<aucune)||(dp>NESO))
    asMsgErr+=asSource+Format(": directions possibles incorrectes (%d)\n", ARRAYOFCONST(((int)dp))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieEtat(AnsiString asMsgErr, AnsiString asSource, etat_feu e)
+void VerifieEtat(AnsiString &asMsgErr, AnsiString asSource, etat_feu e)
  {
   if ((e<inactif)||(e>rouge))
    asMsgErr+=asSource+Format(": état incorrect (%d)\n", ARRAYOFCONST(((int)e))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifieDmdVert(AnsiString asMsgErr, AnsiString asSource, dmd_vert dv)
+void VerifieDmdVert(AnsiString &asMsgErr, AnsiString asSource, dmd_vert dv)
  {
   if ((dv<arrivee_vehicule)||(dv>immediate))
    asMsgErr+=asSource+Format(": type de demande du vert incorrect (%d)\n", ARRAYOFCONST(((int)dv))); // v5.4 enum as char type (cast int)
  }
 //-----------------------------------------------------------------------------
-void VerifiePsgRouge(AnsiString asMsgErr, AnsiString asSource, psg_rouge pr)
+void VerifiePsgRouge(AnsiString &asMsgErr, AnsiString asSource, psg_rouge pr)
  {
   if ((pr<prm_dmd)||(pr>immediat))
    asMsgErr+=asSource+Format(": type de passage au rouge incorrect (%d)\n", ARRAYOFCONST(((int)pr))); // v5.4 enum as char type (cast int)
@@ -6478,7 +6479,8 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
    for(j=0; j<NbY; j++)
     v[i][j].Verifie(asMsgErr);
   for(i=0; i<NbFeux; i++)
-   Feu[i].Verifie(asMsgErr, Format("Feu n°%d", ARRAYOFCONST((i+1))));
+   if (Feu[i].Defini()) // v6.0.1 : un feu supprimé laisse une place libre (NumeroFeuLibre), qui n'est pas une erreur
+    Feu[i].Verifie(asMsgErr, Format("Feu n°%d", ARRAYOFCONST((i+1))));
   for(i=0; i<NbParkings; i++)
    Parking[i].Verifie(asMsgErr);
   if (Vehicule)

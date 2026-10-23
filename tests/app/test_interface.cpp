@@ -14,6 +14,8 @@
 //   - l'enregistrement : enregistrer puis rouvrir et réenregistrer donne le
 //     même fichier, identique à la conversion de référence du format ; un
 //     fichier impossible à créer ou à écrire est signalé (v6.0.1) ;
+//   - la vérification d'intégrité après ouverture affiche les erreurs des
+//     contrôles de champs (v6.0.1) ;
 //   - Nouveau puis génération aléatoire (fiches Dimensions et Génération) à
 //     graine fixe : même réseau que le golden master de la génération ;
 //   - lot 1 des fiches secondaires (paramètres et définitions), sur une copie
@@ -381,6 +383,7 @@ class TestInterface : public QObject
   void marcheInterruptionArret();
   void enregistrementIdentique();
   void enregistrementImpossible();
+  void verificationApresOuverture();
   void nouveauEtGeneration();
   // Lot 1 des fiches secondaires (phase 6)
   void ficheAPropos();
@@ -659,6 +662,41 @@ void TestInterface::enregistrementImpossible()
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement NON effectué."));
 #endif
   frmSimulation->SaveDialog->FileName=asPrecedent;
+ }
+//---------------------------------------------------------------------------
+void TestInterface::verificationApresOuverture()
+ { // « Vérifier intégrité après ouverture » : les erreurs trouvées par les
+   // contrôles de champs (ici VerifieDmdVert) sont affichées. Jusqu'à la
+   // 6.0.0 (comme l'original), ces contrôles recevaient le message par valeur
+   // et rien n'était affiché
+  conversion_cvw Reference=ConvertitEn530(Contenu(ArgumentsTest.value(2)).toStdString());
+  QVERIFY(Reference.Ok);
+  std::string Octets=Reference.Octets;
+  auto Debut=[&Reference](const std::string &Nom) -> long long
+   {
+    for(const champ_cvw &ch : Reference.Champs) if (ch.Nom==Nom) return (long long)ch.Debut;
+    return -1;
+   };
+  int NumFeu=1; // premier feu défini (x>=0) : les places libres ne sont pas vérifiées
+  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&(Octets[(std::size_t)d+3]&0x80); NumFeu++);
+  const long long DmdVert=Debut("feu"+std::to_string(NumFeu)+".TypeDmdVert");
+  QVERIFY(DmdVert>=0);
+  Octets[(std::size_t)DmdVert]=9;
+  QString f=QFileInfo(Carte).absolutePath()+"/verification.cvw";
+  QFile Fichier(f);
+  QVERIFY(Fichier.open(QIODevice::WriteOnly|QIODevice::Truncate));
+  QCOMPARE(Fichier.write(Octets.data(), (qint64)Octets.size()), (qint64)Octets.size());
+  Fichier.close();
+  QVERIFY(!VerifierApresOuverture);
+  frmSimulation->ActionVerifierApresOuverture->Execute();
+  QVERIFY(VerifierApresOuverture);
+  Messages.clear();
+  OuvreFichier(f);
+  frmSimulation->ActionVerifierApresOuverture->Execute();
+  QVERIFY(!VerifierApresOuverture);
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("Feu n°%1: type de demande du vert incorrect (9)").arg(NumFeu)), qPrintable(Messages.first()));
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué MAIS erreur(s) d'intégrité trouvée(s)"));
  }
 //---------------------------------------------------------------------------
 void TestInterface::nouveauEtGeneration()
