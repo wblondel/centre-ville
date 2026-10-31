@@ -4089,9 +4089,12 @@ centre_ville::~centre_ville()
     delete[] v; v=NULL;
    }
   if (Feu) { delete[] Feu; Feu=NULL; }
+  if (FeuP) { delete[] FeuP; FeuP=NULL; } // v6.0.2 : oubli
   if (Parking) { delete[] Parking; Parking=NULL; }
   if (Vehicule) { delete[] Vehicule; Vehicule=NULL; }
   if (Vehlib) { delete[] Vehlib; Vehlib=NULL; } // v5.3
+  if (Bus) { delete[] Bus; Bus=NULL; } // v6.0.2 : oubli
+  if (Tram) { delete[] Tram; Tram=NULL; } // v6.0.2 : oubli
   if (Pieton) { delete[] Pieton; Pieton=NULL; }
   if (ArretBus) { delete[] ArretBus; ArretBus=NULL; } // v3.6
   if (ArretTram) { delete[] ArretTram; ArretTram=NULL; } // v3.6

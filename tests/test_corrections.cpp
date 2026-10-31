@@ -247,6 +247,43 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+long NombreAllocationsVives(); // support/allocation.cpp
+//---------------------------------------------------------------------------
+TEST_CASE("~centre_ville libère toute la mémoire du réseau", "[corrections][memoire]")
+ { // v6.0.2 : l'original ne libérait ni FeuP, ni Bus, ni Tram
+  VueNulle Vue;
+  vue=&Vue;
+  SECTION("feux de piétons d'un nouveau réseau")
+   {
+    const long Avant=NombreAllocationsVives();
+    cv=new centre_ville(true, 20, 12);
+    REQUIRE(cv->NbFeuxPieton>0);
+    delete cv;
+    cv=nullptr;
+    CHECK(NombreAllocationsVives()==Avant);
+   }
+  SECTION("réseau en simulation : véhicules, bus, trams, taxis, vehlibs et piétons")
+   {
+    const std::string asCarte=CheminCarte(Cartes[4]); // Géant
+    alea::FixeGraine(1);
+    long Avant=0;
+    for(int Essai=0; Essai<2; Essai++) // Le premier passage remplit les caches (chaînes, tampons de fichiers...)
+     {
+      Avant=NombreAllocationsVives();
+      REQUIRE(harnais::Ouvre(asCarte));
+      AnsiString asMsgErr;
+      REQUIRE(harnais::Demarre(asMsgErr));
+      REQUIRE(cv->NbBus>0);
+      REQUIRE(cv->NbTrams>0);
+      for(int i=0; i<20; i++) harnais::Tick();
+      harnais::Ferme();
+     }
+    CHECK(NombreAllocationsVives()==Avant);
+    alea::LibereGraine();
+   }
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
 TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corrections][sauvegarde]")
  { // L'original ignorait les erreurs d'écriture : FileWrite renvoie -1, vrai
    // dans les chaînes de &&, et voie::Sauve contenait un « ; » au lieu d'un
