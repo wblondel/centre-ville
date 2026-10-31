@@ -2631,6 +2631,7 @@ void TfrmSimulation::ActionInterruptionExecute(TObject *Sender)
 void TfrmSimulation::ActionArretExecute(TObject *Sender)
 {
  TypeDemande=tdArret;
+ if (Pause) TimerSimul->Enabled=true; // v6.0.2 : la demande est traitée au tic suivant, et le minuteur est arrêté en pause
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionVerifierAvantSimulationExecute(

@@ -547,11 +547,12 @@ private:
   bool SimulEstEnCours() { return SimulEnCours; };
   void MarcheArretSimul(bool EnCours)
    {
+    bool EtaitEnCours=SimulEnCours; // v6.0.2 : Arrêt en pause : le chrono est déjà arrêté
     SimulEnCours=EnCours;
     if (EnCours)
      cv->TopChrono();
     else
-     cv->StopChrono(); // v3.9.2
+     if (EtaitEnCours) cv->StopChrono(); // v3.9.2
     if (!EnCours) Application->Title=asTitreCV;
 
     if ((!Pause)&&(!EnCours))
@@ -581,7 +582,7 @@ private:
 	ActionVerifierReseau->Enabled=(!Pause)&&(!EnCours);
 	ActionMarche->Enabled=!EnCours;
 	ActionInterruption->Enabled=EnCours;
-	ActionArret->Enabled=EnCours;
+	ActionArret->Enabled=EnCours||Pause; // v6.0.2 : aussi en pause (il fallait reprendre, puis arrêter)
 	ActionEpidemie->Enabled=(!Pause)&&(!EnCours); // v5.4.2 : Action en mode interrupteur donc désactivé pendant la simulation
 	ActionEvolution->Enabled=Pause||EnCours;
     ActionFluiditeTrafic->Enabled=Pause||EnCours;

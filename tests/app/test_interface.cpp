@@ -672,8 +672,7 @@ void TestInterface::init()
   Etapes.clear();
   Messages.clear();
   ReponseQuestions=QMessageBox::No;
-  // Simulation laissée en cours (ou en pause : Arrêt y est désactivé) par un test en échec : arrêtée
-  if (frmSimulation->Pause) QTest::mouseClick(frmSimulation->ToolButtonMarche, Qt::LeftButton);
+  // Simulation laissée en cours ou en pause par un test en échec : arrêtée
   if (frmSimulation->SimulationEnCours||frmSimulation->Pause) (void)Arrete();
   alea::LibereGraine();
   Messages.clear();
@@ -3439,11 +3438,21 @@ void TestInterface::ficheFluiditeTrafic()
   QVERIFY(Modale);
   QVERIFY2(e.isEmpty(), qPrintable(e));
   QVERIFY(!frmStatsAttenteTrafic);
-  // Arrêt désactivé en pause (ActionArret->Enabled=EnCours) : reprise, puis arrêt
-  QVERIFY(!s->ActionArret->Enabled);
-  QTest::mouseClick(s->ToolButtonMarche, Qt::LeftButton);
-  QVERIFY(s->SimulationEnCours);
+  // v6.0.2 : Arrêt disponible en pause (l'original exigeait de reprendre d'abord)
+  QVERIFY(s->Pause);
+  QVERIFY(s->ActionArret->Enabled);
+  QVERIFY(s->ToolButtonArret->isEnabled());
+  QVERIFY(s->MenuItemArret->ElementQt()->isEnabled());
+  // Même bilan qu'à la pause : sa durée ne compte ni la pause, ni deux fois la simulation
+  QString BilanPause=Messages.value(0);
+  QVERIFY2(BilanPause.contains(QString::fromUtf8("Bilan au tour n°")), qPrintable(BilanPause));
+  QTest::qWait(50);
+  Messages.clear();
   QVERIFY(Arrete());
+  QCOMPARE(Messages.value(0), BilanPause);
+  QVERIFY(!s->Pause);
+  QVERIFY(!s->ActionArret->Enabled);
+  QVERIFY(s->ActionMarche->Enabled);
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheRecherche()
