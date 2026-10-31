@@ -602,6 +602,7 @@ class TestInterface : public QObject
   // Lot 3 des fiches secondaires (phase 6)
   void ficheComposition();
   void fichesEvolutionEtVehicules();
+  void evolutionEntreDeuxTours();
   void ficheFluiditeTrafic();
   void ficheRecherche();
   void rechercheElementsNonDefinis();
@@ -2985,16 +2986,16 @@ void TestInterface::fichesEvolutionEtVehicules()
    QVERIFY2(Compteur.n>=(int)(cv->TourCrt-Tour), qPrintable(QString("%1 dessins en %2 tours").arg(Compteur.n).arg(cv->TourCrt-Tour)));
   }
   QVERIFY(JoueJusquAuTour(qMin(cv->NbToursStats, 60L)));
-  // Courbes : points (x_i, y_i) des tours PrmTour..TourCrt-1 (LineTo n'allume
-  // pas le point d'arrivée : le dernier point, celui du tour à venir, n'est pas
-  // vérifié), tracés dans l'ordre rouge, jaune, vert ; quadrillage dessous
+  // Courbes : points (x_i, y_i) des tours PrmTour..TourCrt-2 (LineTo n'allume
+  // pas le point d'arrivée : le dernier point, celui du dernier tour joué, n'est
+  // pas vérifié), tracés dans l'ordre rouge, jaune, vert ; quadrillage dessous
   auto VerifieCourbes=[p](bool Epidemique) -> QString
    {
     QStringList e;
     QImage Image=p->grab().toImage();
     qreal Echelle=p->devicePixelRatioF();
     bool ParNombre=(cv->TypeStats==par_nombre);
-    int NbTours=cv->NbToursStats, DrnTour=cv->TourCrt, PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1),
+    int NbTours=cv->NbToursStats, DrnTour=cv->TourCrt-1, PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1),
         NbVehicules=cv->NbVehicules, NbPietons=cv->NbPietons,
         xMax=p->width(), yMax=p->height(), NbPoints=DrnTour-PrmTour;
     if (Q(p->Hint)!=QString::fromUtf8(Epidemique?"Guéris en vert ; Infectés en jaune et Morts en rouge":
@@ -3178,6 +3179,33 @@ void TestInterface::fichesEvolutionEtVehicules()
   QVERIFY(!s->ActionEvolution->Checked);
   QVERIFY(!g->isVisible());
   QVERIFY(!s->ActionStatsParkings->Checked);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::evolutionEntreDeuxTours()
+ { // v6.0.2 : redessinée entre deux tours, la courbe s'arrête au dernier tour joué
+   // (l'original traçait un segment vers les statistiques du tour à venir, pas
+   // encore calculées). Sur 10 tours, pour que le segment se voie, sans quadrillage
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "evolution_entre_deux_tours.cvw").isEmpty());
+  TfrmSimulation *s=frmSimulation;
+  cv->NbToursStats=10; // Directement : les actions garderaient cet état pour les autres tests
+  cv->QuadrillageStats=false;
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(5));
+  Clique(s->ToolButtonEvolution);
+  QVERIFY(frmStatistiques->isVisible());
+  QVERIFY(QTest::qWaitForWindowExposed(frmStatistiques));
+  TPaintBox *p=frmStatistiques->PaintBoxStats;
+  QImage Image=p->grab().toImage();
+  qreal Echelle=p->devicePixelRatioF();
+  int xMax=p->width(), yMax=p->height(), xPremier=xMax*(cv->TourCrt-1)/10+2;
+  QRgb Fond=CouleurQt(clBlack).rgb();
+  for(int x=xPremier; x<xMax; x++)
+   for(int y=0; y<yMax; y++)
+    QVERIFY2(Image.pixel(QPoint((int)((x+0.5)*Echelle), (int)((y+0.5)*Echelle)))==Fond,
+             qPrintable(QString("trait après le dernier tour joué, en (%1, %2)").arg(x).arg(y)));
+  frmStatistiques->close();
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheFluiditeTrafic()
