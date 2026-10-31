@@ -134,6 +134,13 @@ const AnsiString asDir[NBDIR+1]={"", "Nord", "Est", "Sud", "Ouest"},
                                 "Ouest", "Nord+Ouest", "Est+Ouest", "Nord+Est+Ouest",
                                 "Sud+Ouest", "Nord+Sud+Ouest", "Est+Sud+Ouest", "Nord+Est+Sud+Ouest"};
 //---------------------------------------------------------------------------
+// v6.0.2 : FileRead renvoie le nombre d'octets lus, ou -1 : les deux étaient vrais dans
+// les chaînes de && des Charge(). Seul un champ lu en entier compte pour lu
+static bool LitChamp(int hfile, void *Champ, unsigned NbOctets)
+ {
+  return FileRead(hfile, Champ, NbOctets)==(int)NbOctets;
+ }
+//---------------------------------------------------------------------------
 bool VerifierApresOuverture=false,
      VerifierAvantSimulation=false;
 //---------------------------------------------------------------------------
@@ -671,20 +678,20 @@ bool feu::Charge(int hfile)
  {
   int i;
   bool Ok;
-  Ok=FileRead(hfile, &Numero, sizeof(Numero))&&
-     FileRead(hfile, &x, sizeof(x))&&
-     FileRead(hfile, &y, sizeof(y))&&
-     FileRead(hfile, &Dir, sizeof(Dir))&&
-     FileRead(hfile, &Etat, sizeof(Etat))&&
-     FileRead(hfile, &NbFeuxDmd, sizeof(NbFeuxDmd))&&
-     FileRead(hfile, &NbFeuxAtt, sizeof(NbFeuxAtt))&&
+  Ok=LitChamp(hfile, &Numero, sizeof(Numero))&&
+     LitChamp(hfile, &x, sizeof(x))&&
+     LitChamp(hfile, &y, sizeof(y))&&
+     LitChamp(hfile, &Dir, sizeof(Dir))&&
+     LitChamp(hfile, &Etat, sizeof(Etat))&&
+     LitChamp(hfile, &NbFeuxDmd, sizeof(NbFeuxDmd))&&
+     LitChamp(hfile, &NbFeuxAtt, sizeof(NbFeuxAtt))&&
 	 // v5.2 : /!\ On ne charge pas les feux de piétons
-	 FileRead(hfile, &TypeDmdVert, sizeof(TypeDmdVert))&&
-	 FileRead(hfile, &TypePsgRouge, sizeof(TypePsgRouge))&&
-	 FileRead(hfile, &DureeRouge, sizeof(DureeRouge))&&
-	 FileRead(hfile, &DureeVert, sizeof(DureeVert))&&
-	 FileRead(hfile, &DemandeVert, sizeof(DemandeVert))&&
-	 FileRead(hfile, &RougeDemande, sizeof(RougeDemande));
+	 LitChamp(hfile, &TypeDmdVert, sizeof(TypeDmdVert))&&
+	 LitChamp(hfile, &TypePsgRouge, sizeof(TypePsgRouge))&&
+	 LitChamp(hfile, &DureeRouge, sizeof(DureeRouge))&&
+	 LitChamp(hfile, &DureeVert, sizeof(DureeVert))&&
+	 LitChamp(hfile, &DemandeVert, sizeof(DemandeVert))&&
+	 LitChamp(hfile, &RougeDemande, sizeof(RougeDemande));
 
   if (Ok)
    {
@@ -692,8 +699,8 @@ bool feu::Charge(int hfile)
 	if (NbFeuxAtt) Ok=!!(NumFeuxAtt=new int[NbFeuxAtt]);
 	// v5.2 : /!\ On ne charge pas les feux de piétons
    }
-  for(i=0; Ok&&(i<NbFeuxDmd); i++) Ok=FileRead(hfile, &(NumFeuxDmd[i]), sizeof(NumFeuxDmd[i]));
-  for(i=0; Ok&&(i<NbFeuxAtt); i++) Ok=FileRead(hfile, &(NumFeuxAtt[i]), sizeof(NumFeuxAtt[i]));
+  for(i=0; Ok&&(i<NbFeuxDmd); i++) Ok=LitChamp(hfile, &(NumFeuxDmd[i]), sizeof(NumFeuxDmd[i]));
+  for(i=0; Ok&&(i<NbFeuxAtt); i++) Ok=LitChamp(hfile, &(NumFeuxAtt[i]), sizeof(NumFeuxAtt[i]));
 	// v5.2 : /!\ On ne charge pas les feux de piétons
   return Ok;
  }
@@ -983,22 +990,22 @@ bool feu_pieton::Charge(int hfile)
  {
   int i;
   bool Ok;
-  Ok=FileRead(hfile, &Numero, sizeof(Numero))&&
-     FileRead(hfile, x, NBFEUXPIETONSPARNUMERO*sizeof(x[0]))&&
-     FileRead(hfile, y, NBFEUXPIETONSPARNUMERO*sizeof(y[0]))&&
-     FileRead(hfile, Dir, NBFEUXPIETONSPARNUMERO*sizeof(Dir[0]))&&
-     FileRead(hfile, iFeuDir, NBDIR*sizeof(iFeuDir[0]))&&
-     FileRead(hfile, &Etat, sizeof(Etat))&&
-     FileRead(hfile, &NbFeux, sizeof(NbFeux))&&
-     FileRead(hfile, &TypeDmdVert, sizeof(TypeDmdVert))&&
-     FileRead(hfile, &TypePsgRouge, sizeof(TypePsgRouge))&&
-     FileRead(hfile, &DureeRouge, sizeof(DureeRouge))&&
-     FileRead(hfile, &DureeVert, sizeof(DureeVert))&&
-     FileRead(hfile, &DemandeVert, sizeof(DemandeVert))&&
-     FileRead(hfile, &RougeDemande, sizeof(RougeDemande));
+  Ok=LitChamp(hfile, &Numero, sizeof(Numero))&&
+     LitChamp(hfile, x, NBFEUXPIETONSPARNUMERO*sizeof(x[0]))&&
+     LitChamp(hfile, y, NBFEUXPIETONSPARNUMERO*sizeof(y[0]))&&
+     LitChamp(hfile, Dir, NBFEUXPIETONSPARNUMERO*sizeof(Dir[0]))&&
+     LitChamp(hfile, iFeuDir, NBDIR*sizeof(iFeuDir[0]))&&
+     LitChamp(hfile, &Etat, sizeof(Etat))&&
+     LitChamp(hfile, &NbFeux, sizeof(NbFeux))&&
+     LitChamp(hfile, &TypeDmdVert, sizeof(TypeDmdVert))&&
+     LitChamp(hfile, &TypePsgRouge, sizeof(TypePsgRouge))&&
+     LitChamp(hfile, &DureeRouge, sizeof(DureeRouge))&&
+     LitChamp(hfile, &DureeVert, sizeof(DureeVert))&&
+     LitChamp(hfile, &DemandeVert, sizeof(DemandeVert))&&
+     LitChamp(hfile, &RougeDemande, sizeof(RougeDemande));
   if (Ok)
    if (NbFeux) Ok=!!(NumFeux=new int[NbFeux]);
-  for(i=0; Ok&&(i<NbFeux); i++) Ok=FileRead(hfile, &(NumFeux[i]), sizeof(NumFeux[i]));
+  for(i=0; Ok&&(i<NbFeux); i++) Ok=LitChamp(hfile, &(NumFeux[i]), sizeof(NumFeux[i]));
   if (Ok) DureeTraversee=2*(abs(x[1]-x[0])+abs(y[1]-y[0])-1)+1;
   return Ok;
  }
@@ -1046,9 +1053,9 @@ void parking::PlaceProchainVehicule()
 //-----------------------------------------------------------------------------
 bool parking::Charge(int hfile)
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y));
  }
 //-----------------------------------------------------------------------------
 bool parking::Sauve(int hfile)
@@ -1242,9 +1249,9 @@ void vehicule::Verifie(AnsiString &asMsgErr)
 //-----------------------------------------------------------------------------
 bool place_vehlib::Charge(int hfile)
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y));
  }
 //-----------------------------------------------------------------------------
 bool place_vehlib::Sauve(int hfile)
@@ -1510,8 +1517,8 @@ void depot_bus::PlaceProchainBus() // v3.0
 //-----------------------------------------------------------------------------
 bool depot_bus::Charge(int hfile) // v3.0
  {
-  return FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y));
+  return LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y));
  }
 //-----------------------------------------------------------------------------
 bool depot_bus::Sauve(int hfile) // v3.0
@@ -1717,12 +1724,12 @@ AnsiString arret_bus::asListeLignesBus() // v3.0.5
 //-----------------------------------------------------------------------------
 bool arret_bus::Charge(int hfile) // v3.0
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y))&&
-         FileRead(hfile, Ligne, NBMAXLIGNESBUSTRAM*sizeof(Ligne[0]))&&
-         FileRead(hfile, &NbLignes, sizeof(NbLignes))&&
-         FileRead(hfile, NumLigne, NBMAXLIGNESBUSTRAM*sizeof(NumLigne[0]));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y))&&
+         LitChamp(hfile, Ligne, NBMAXLIGNESBUSTRAM*sizeof(Ligne[0]))&&
+         LitChamp(hfile, &NbLignes, sizeof(NbLignes))&&
+         LitChamp(hfile, NumLigne, NBMAXLIGNESBUSTRAM*sizeof(NumLigne[0]));
  }
 //-----------------------------------------------------------------------------
 bool arret_bus::Sauve(int hfile) // v3.0
@@ -1766,9 +1773,9 @@ void ligne_bus::AjouteBus(int NumeroBus) // v3.0
 //-----------------------------------------------------------------------------
 bool ligne_bus::Charge(int hfile) // v3.0
  { // Attention : On ne stocke pas le nombre et les n° de bus (calculés avant simul)
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &NbArrets, sizeof(NbArrets))&&
-         FileRead(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &NbArrets, sizeof(NbArrets))&&
+         LitChamp(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
  }
 //-----------------------------------------------------------------------------
 bool ligne_bus::Sauve(int hfile) // v3.0
@@ -1990,12 +1997,12 @@ AnsiString arret_tram::asListeLignesTram() // v3.0.5
 //-----------------------------------------------------------------------------
 bool arret_tram::Charge(int hfile) // v3.0
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y))&&
-         FileRead(hfile, Ligne, NBMAXLIGNESBUSTRAM*sizeof(Ligne[0]))&&
-         FileRead(hfile, &NbLignes, sizeof(NbLignes))&&
-         FileRead(hfile, NumLigne, NBMAXLIGNESBUSTRAM*sizeof(NumLigne[0]));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y))&&
+         LitChamp(hfile, Ligne, NBMAXLIGNESBUSTRAM*sizeof(Ligne[0]))&&
+         LitChamp(hfile, &NbLignes, sizeof(NbLignes))&&
+         LitChamp(hfile, NumLigne, NBMAXLIGNESBUSTRAM*sizeof(NumLigne[0]));
  }
 //-----------------------------------------------------------------------------
 bool arret_tram::Sauve(int hfile) // v3.0
@@ -2039,9 +2046,9 @@ void ligne_tram::AjouteTram(int NumeroTram) // v3.0
 //-----------------------------------------------------------------------------
 bool ligne_tram::Charge(int hfile) // v3.0
  { // Attention : On ne stocke pas le nombre et les n° de tram (calculés avant simul)
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &NbArrets, sizeof(NbArrets))&&
-         FileRead(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &NbArrets, sizeof(NbArrets))&&
+         LitChamp(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE*sizeof(NumArret[0]));
  }
 //-----------------------------------------------------------------------------
 bool ligne_tram::Sauve(int hfile) // v3.0
@@ -2073,9 +2080,9 @@ void ligne_tram::Verifie(AnsiString &asMsgErr) // v3.0
 
 bool place_taxi::Charge(int hfile)
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y));
  }
 //-----------------------------------------------------------------------------
 bool place_taxi::Sauve(int hfile)
@@ -2313,9 +2320,9 @@ void taxi::Verifie(AnsiString &asMsgErr)
 
 bool place_park::Charge(int hfile)
  {
-  return FileRead(hfile, &Numero, sizeof(Numero))&&
-         FileRead(hfile, &x, sizeof(x))&&
-         FileRead(hfile, &y, sizeof(y));
+  return LitChamp(hfile, &Numero, sizeof(Numero))&&
+         LitChamp(hfile, &x, sizeof(x))&&
+         LitChamp(hfile, &y, sizeof(y));
  }
 //-----------------------------------------------------------------------------
 bool place_park::Sauve(int hfile)
@@ -3880,31 +3887,31 @@ bool voie::Charge(int hfile)
  {
   int i;
   bool Ok;
-  Ok=FileRead(hfile, &x, sizeof(x))&&
-     FileRead(hfile, &y, sizeof(y))&&
-     FileRead(hfile, &DirPoss, sizeof(DirPoss))&&
+  Ok=LitChamp(hfile, &x, sizeof(x))&&
+     LitChamp(hfile, &y, sizeof(y))&&
+     LitChamp(hfile, &DirPoss, sizeof(DirPoss))&&
      ((VersionFichier<0x350)|| // v3.5
-      (FileRead(hfile, &SensVoieTram, sizeof(SensVoieTram))))&&
+      (LitChamp(hfile, &SensVoieTram, sizeof(SensVoieTram))))&&
      ((VersionFichier<0x380)|| // v3.8
-      (FileRead(hfile, &Nature, sizeof(Nature))))&&
-     FileRead(hfile, &NumParking, sizeof(NumParking))&&
-     FileRead(hfile, &ToutDroit, sizeof(ToutDroit))&&
-     FileRead(hfile, &PassagePietons, sizeof(PassagePietons))&& // v2.0
+      (LitChamp(hfile, &Nature, sizeof(Nature))))&&
+     LitChamp(hfile, &NumParking, sizeof(NumParking))&&
+     LitChamp(hfile, &ToutDroit, sizeof(ToutDroit))&&
+     LitChamp(hfile, &PassagePietons, sizeof(PassagePietons))&& // v2.0
      ((VersionFichier<0x300)|| // v3.0
-      (FileRead(hfile, &PassageBus, sizeof(PassageBus))&&
-       FileRead(hfile, &NumArretBus, sizeof(NumArretBus))))&&
+      (LitChamp(hfile, &PassageBus, sizeof(PassageBus))&&
+       LitChamp(hfile, &NumArretBus, sizeof(NumArretBus))))&&
      ((VersionFichier<0x350)|| // v3.5
-      (FileRead(hfile, &NumArretTram, sizeof(NumArretTram))))&&
+      (LitChamp(hfile, &NumArretTram, sizeof(NumArretTram))))&&
      ((VersionFichier<0x360)|| // v3.6
-      (FileRead(hfile, &NumPlaceTaxi, sizeof(NumPlaceTaxi))))&&
+      (LitChamp(hfile, &NumPlaceTaxi, sizeof(NumPlaceTaxi))))&&
      ((VersionFichier<0x500)|| // v5.0
-      (FileRead(hfile, &NumPlacePark, sizeof(NumPlacePark))))&&
+      (LitChamp(hfile, &NumPlacePark, sizeof(NumPlacePark))))&&
      ((VersionFichier<0x530)|| // v5.3
-      (FileRead(hfile, &NumPlaceVehlib, sizeof(NumPlaceVehlib))&&
-       FileRead(hfile, &NumSpotVehlib, sizeof(NumSpotVehlib))));
+      (LitChamp(hfile, &NumPlaceVehlib, sizeof(NumPlaceVehlib))&&
+       LitChamp(hfile, &NumSpotVehlib, sizeof(NumSpotVehlib))));
   for(i=0; Ok&&(i<NBFEUXPARCASE); i++) // v5.2: NBFEUXPARCASE
-   Ok=FileRead(hfile, &(Priorite[i]), sizeof(Priorite[i]))&&
-      FileRead(hfile, &(NumFeu[i]), sizeof(NumFeu[i]));
+   Ok=LitChamp(hfile, &(Priorite[i]), sizeof(Priorite[i]))&&
+      LitChamp(hfile, &(NumFeu[i]), sizeof(NumFeu[i]));
   if (Ok)   // v5.1.1 : élimination automatique des feux fantômes !
    for(i=0; i<NBFEUXPARCASE; i++)
     if (NumFeu[i]&&
@@ -3913,7 +3920,7 @@ bool voie::Charge(int hfile)
      NumFeu[i]=0; // Feu fantôme effacé !
   if (VersionFichier>=0x520) // v5.2 : feux piétons
    for(i=0; Ok&&(i<NBFEUXPARCASE); i++)
-    Ok=FileRead(hfile, &(NumFeuP[i]), sizeof(NumFeuP[i]));
+    Ok=LitChamp(hfile, &(NumFeuP[i]), sizeof(NumFeuP[i]));
   return Ok;
  }
 //-----------------------------------------------------------------------------
@@ -6060,11 +6067,11 @@ bool centre_ville::Charge(int hfile)
 	  NvNbPlacesVehlib=0; // v5.3
   bool Ok;
   NbPietons=-1;
-  Ok=FileRead(hfile, &NbFeux, sizeof(NbFeux));
+  Ok=LitChamp(hfile, &NbFeux, sizeof(NbFeux));
   if (NbFeux>=VERSIONMIN) // v3.0
    { // Version stockée
 	VersionFichier=NbFeux;
-	Ok=FileRead(hfile, &NbFeux, sizeof(NbFeux)); // On relit le nombre de feux
+	Ok=LitChamp(hfile, &NbFeux, sizeof(NbFeux)); // On relit le nombre de feux
    }
   else // Version non stockée compatible (2.0 <= version < 3.0)
    VersionFichier=VERSIONANC;
@@ -6075,64 +6082,64 @@ bool centre_ville::Charge(int hfile)
 	NbY=NBYDEF;
    }
   else
-   Ok=FileRead(hfile, &NbX, sizeof(NbX))&&
-	  FileRead(hfile, &NbY, sizeof(NbY));
-  CreeZone();
+   Ok=Ok&&LitChamp(hfile, &NbX, sizeof(NbX))&& // v6.0.2 : Ok&& (une erreur de lecture du nombre de feux était oubliée)
+	  LitChamp(hfile, &NbY, sizeof(NbY));
+  if (Ok) CreeZone(); // v6.0.2 : si Ok, sinon NbX et NbY peuvent être indéterminés
   if (Ok) Ok= ((VersionFichier<0x520)|| // v5.2
-			   (FileRead(hfile, &NbFeuxPieton, sizeof(NbFeuxPieton))))&&
-			  FileRead(hfile, &NbParkings, sizeof(NbParkings))&&
-			  FileRead(hfile, &NbVehicules, sizeof(NbVehicules))&&
-			  FileRead(hfile, &NbPietons, sizeof(NbPietons))&&
+			   (LitChamp(hfile, &NbFeuxPieton, sizeof(NbFeuxPieton))))&&
+			  LitChamp(hfile, &NbParkings, sizeof(NbParkings))&&
+			  LitChamp(hfile, &NbVehicules, sizeof(NbVehicules))&&
+			  LitChamp(hfile, &NbPietons, sizeof(NbPietons))&&
 			  ((VersionFichier<0x300)|| // v3.0
-			   (FileRead(hfile, &NbArretsBus, sizeof(NbArretsBus))&&
-				FileRead(hfile, &NbLignesBus, sizeof(NbLignesBus))))&&
+			   (LitChamp(hfile, &NbArretsBus, sizeof(NbArretsBus))&&
+				LitChamp(hfile, &NbLignesBus, sizeof(NbLignesBus))))&&
 			  ((VersionFichier<0x350)|| // v3.5
-			   (FileRead(hfile, &NbArretsTram, sizeof(NbArretsTram))&&
-				FileRead(hfile, &NbLignesTram, sizeof(NbLignesTram))))&&
+			   (LitChamp(hfile, &NbArretsTram, sizeof(NbArretsTram))&&
+				LitChamp(hfile, &NbLignesTram, sizeof(NbLignesTram))))&&
 			  ((VersionFichier<0x360)|| // v3.6
-			   (FileRead(hfile, &NbPlacesTaxi, sizeof(NbPlacesTaxi))&&
-				FileRead(hfile, &NbTaxis, sizeof(NbTaxis))))&&
+			   (LitChamp(hfile, &NbPlacesTaxi, sizeof(NbPlacesTaxi))&&
+				LitChamp(hfile, &NbTaxis, sizeof(NbTaxis))))&&
 			  ((VersionFichier<0x500)|| // v5.0
-			   (FileRead(hfile, &NbPlacesPark, sizeof(NbPlacesPark))))&&
+			   (LitChamp(hfile, &NbPlacesPark, sizeof(NbPlacesPark))))&&
 			  ((VersionFichier<0x530)|| // v5.3
-			   (FileRead(hfile, &NbPlacesVehlib, sizeof(NbPlacesVehlib))&&
-				FileRead(hfile, &NbVehlibs, sizeof(NbVehlibs))))&&
-			  FileRead(hfile, &DureeVert, sizeof(DureeVert))&&
-			  FileRead(hfile, &DureeOrange, sizeof(DureeOrange))&&
-			  FileRead(hfile, &DureeRouge, sizeof(DureeRouge))&&
-			  FileRead(hfile, &AttenteMaxVeh, sizeof(AttenteMaxVeh))&&
-			  FileRead(hfile, &NbToursParSeconde, sizeof(NbToursParSeconde))&&
-			  FileRead(hfile, &NbToursStats, sizeof(NbToursStats))&&
-			  FileRead(hfile, &QuadrillageStats, sizeof(QuadrillageStats))&&
-			  FileRead(hfile, &TypeStats, sizeof(TypeStats))&&
-			  FileRead(hfile, &NbVitesses, sizeof(NbVitesses))&&
-			  FileRead(hfile, &NbMaxCasesDetectPsgPt, sizeof(NbMaxCasesDetectPsgPt))&&
-			  FileRead(hfile, &ProbaDirPsgPt, sizeof(ProbaDirPsgPt))&&
+			   (LitChamp(hfile, &NbPlacesVehlib, sizeof(NbPlacesVehlib))&&
+				LitChamp(hfile, &NbVehlibs, sizeof(NbVehlibs))))&&
+			  LitChamp(hfile, &DureeVert, sizeof(DureeVert))&&
+			  LitChamp(hfile, &DureeOrange, sizeof(DureeOrange))&&
+			  LitChamp(hfile, &DureeRouge, sizeof(DureeRouge))&&
+			  LitChamp(hfile, &AttenteMaxVeh, sizeof(AttenteMaxVeh))&&
+			  LitChamp(hfile, &NbToursParSeconde, sizeof(NbToursParSeconde))&&
+			  LitChamp(hfile, &NbToursStats, sizeof(NbToursStats))&&
+			  LitChamp(hfile, &QuadrillageStats, sizeof(QuadrillageStats))&&
+			  LitChamp(hfile, &TypeStats, sizeof(TypeStats))&&
+			  LitChamp(hfile, &NbVitesses, sizeof(NbVitesses))&&
+			  LitChamp(hfile, &NbMaxCasesDetectPsgPt, sizeof(NbMaxCasesDetectPsgPt))&&
+			  LitChamp(hfile, &ProbaDirPsgPt, sizeof(ProbaDirPsgPt))&&
 			  ((VersionFichier<0x300)|| // v3.0
-			   (FileRead(hfile, &NbMaxCasesDetectArretBus, sizeof(NbMaxCasesDetectArretBus))&&
-				FileRead(hfile, &ProbaDirArretBus, sizeof(ProbaDirArretBus))&&
-				FileRead(hfile, &ProbaArretBusDmd, sizeof(ProbaArretBusDmd))&&
-				FileRead(hfile, &NbMaxPersonnesBus, sizeof(NbMaxPersonnesBus))&&
-				FileRead(hfile, &NbToursStopArretBus, sizeof(NbToursStopArretBus))&&
-				FileRead(hfile, &NbMaxToursAttenteBus, sizeof(NbMaxToursAttenteBus))))&&
+			   (LitChamp(hfile, &NbMaxCasesDetectArretBus, sizeof(NbMaxCasesDetectArretBus))&&
+				LitChamp(hfile, &ProbaDirArretBus, sizeof(ProbaDirArretBus))&&
+				LitChamp(hfile, &ProbaArretBusDmd, sizeof(ProbaArretBusDmd))&&
+				LitChamp(hfile, &NbMaxPersonnesBus, sizeof(NbMaxPersonnesBus))&&
+				LitChamp(hfile, &NbToursStopArretBus, sizeof(NbToursStopArretBus))&&
+				LitChamp(hfile, &NbMaxToursAttenteBus, sizeof(NbMaxToursAttenteBus))))&&
 			  ((VersionFichier<0x350)|| // v3.5
-			   (FileRead(hfile, &NbMaxCasesDetectArretTram, sizeof(NbMaxCasesDetectArretTram))&&
-				FileRead(hfile, &ProbaDirArretTram, sizeof(ProbaDirArretTram))&&
-				FileRead(hfile, &ProbaArretTramDmd, sizeof(ProbaArretTramDmd))&&
-				FileRead(hfile, &NbMaxPersonnesTram, sizeof(NbMaxPersonnesTram))&&
-				FileRead(hfile, &NbToursStopArretTram, sizeof(NbToursStopArretTram))&&
-				FileRead(hfile, &NbMaxToursAttenteTram, sizeof(NbMaxToursAttenteTram))))&&
+			   (LitChamp(hfile, &NbMaxCasesDetectArretTram, sizeof(NbMaxCasesDetectArretTram))&&
+				LitChamp(hfile, &ProbaDirArretTram, sizeof(ProbaDirArretTram))&&
+				LitChamp(hfile, &ProbaArretTramDmd, sizeof(ProbaArretTramDmd))&&
+				LitChamp(hfile, &NbMaxPersonnesTram, sizeof(NbMaxPersonnesTram))&&
+				LitChamp(hfile, &NbToursStopArretTram, sizeof(NbToursStopArretTram))&&
+				LitChamp(hfile, &NbMaxToursAttenteTram, sizeof(NbMaxToursAttenteTram))))&&
 			  ((VersionFichier<0x360)|| // v3.6
-			   (FileRead(hfile, &NbMaxCasesDetectFileTaxi, sizeof(NbMaxCasesDetectFileTaxi))&&
-				FileRead(hfile, &ProbaDirFileTaxi, sizeof(ProbaDirFileTaxi))&&
-				FileRead(hfile, &ProbaArretTaxiDmd, sizeof(ProbaArretTaxiDmd))&&
-				FileRead(hfile, &NbMaxPersonnesTaxi, sizeof(NbMaxPersonnesTaxi))&&
-				FileRead(hfile, &NbMaxToursAttenteTaxi, sizeof(NbMaxToursAttenteTaxi))))&&
+			   (LitChamp(hfile, &NbMaxCasesDetectFileTaxi, sizeof(NbMaxCasesDetectFileTaxi))&&
+				LitChamp(hfile, &ProbaDirFileTaxi, sizeof(ProbaDirFileTaxi))&&
+				LitChamp(hfile, &ProbaArretTaxiDmd, sizeof(ProbaArretTaxiDmd))&&
+				LitChamp(hfile, &NbMaxPersonnesTaxi, sizeof(NbMaxPersonnesTaxi))&&
+				LitChamp(hfile, &NbMaxToursAttenteTaxi, sizeof(NbMaxToursAttenteTaxi))))&&
 			  ((VersionFichier<0x530)|| // v5.3
-			   (FileRead(hfile, &NbMaxPersonnesVehlib, sizeof(NbMaxPersonnesVehlib))&&
-				FileRead(hfile, &NbMaxCasesDetectFileVehlib, sizeof(NbMaxCasesDetectFileVehlib))&&
-				FileRead(hfile, &ProbaDirFileVehlib, sizeof(ProbaDirFileVehlib))&&
-				FileRead(hfile, &TauxRemplissageVehlib, sizeof(TauxRemplissageVehlib))));
+			   (LitChamp(hfile, &NbMaxPersonnesVehlib, sizeof(NbMaxPersonnesVehlib))&&
+				LitChamp(hfile, &NbMaxCasesDetectFileVehlib, sizeof(NbMaxCasesDetectFileVehlib))&&
+				LitChamp(hfile, &ProbaDirFileVehlib, sizeof(ProbaDirFileVehlib))&&
+				LitChamp(hfile, &TauxRemplissageVehlib, sizeof(TauxRemplissageVehlib))));
   if (Ok&&NbFeux&&(Ok=!!(Feu=new feu[NbFeux])))
    for(i=0; Ok&&(i<NbFeux); i++)
     {
