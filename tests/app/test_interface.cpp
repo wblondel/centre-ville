@@ -102,6 +102,7 @@
 #include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <deque>
 #include <fstream>
 #include <mutex>
@@ -577,6 +578,7 @@ class TestInterface : public QObject
   void enregistrementImpossible();
   void verificationApresOuverture();
   void ouvertureImpossible();
+  void ouvertureEnEchec();
   void marcheLectureSeuleNonModifie();
   void marcheLectureSeuleModifie();
   void interruptionErreursIntegrite();
@@ -950,6 +952,75 @@ void TestInterface::ouvertureImpossible()
   // Le réseau gardé reste utilisable
   QVERIFY2(DemarreSansBlocage("Marche après une ouverture impossible"), qPrintable(Messages.join('\n')));
   QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ouvertureEnEchec()
+ { // v6.0.2 : un fichier qui ne se charge pas (version ultérieure, erreur de lecture,
+   // fichier coupé, données incohérentes) laisse le réseau affiché tel quel, avec un
+   // message. Jusqu'à la 6.0.1, le réseau était détruit avant la lecture : cv restait
+   // incomplet (v nul) pour une version ultérieure, et l'application se fermait sinon
+  QString Reseau=OuvreDemo("ouverture_en_echec.cvw");
+  QVERIFY(!Reseau.isEmpty());
+  const QByteArray Octets=OctetsReseau();
+  const QByteArray Fichier=Contenu(Reseau);
+  const centre_ville *Avant=cv;
+  const QString Titre=Q(frmSimulation->Caption);
+  QString Dossier=QFileInfo(Carte).absolutePath();
+  auto Ecrit=[&Dossier](const QString &asNom, const QByteArray &Donnees)
+   {
+    QString f=Dossier+"/"+asNom;
+    QFile s(f);
+    if (s.open(QIODevice::WriteOnly|QIODevice::Truncate)) s.write(Donnees);
+    return f;
+   };
+  QByteArray Futur=Fichier;
+  int VersionFuture=VERSION+0x10;
+  std::memcpy(Futur.data(), &VersionFuture, sizeof(VersionFuture));
+  QByteArray Incoherent=Fichier;
+  int NbFeuxNegatif=-5;
+  std::memcpy(Incoherent.data()+sizeof(int), &NbFeuxNegatif, sizeof(NbFeuxNegatif)); // Nombre de feux, après la version
+  QString Repertoire=Dossier+"/repertoire.cvw";
+  QVERIFY(QDir().mkpath(Repertoire));
+  struct Cas { const char *Nom; QString f; const char *Texte; };
+  const char *ErreurDonnees="Erreur de lecture ou de données dans le fichier";
+  const std::vector<Cas> Essais=
+   {
+    {"version ultérieure", Ecrit("ouverture_futur.cvw", Futur), "version ultérieure"},
+    {"fichier coupé", Ecrit("ouverture_coupe.cvw", Fichier.left(Fichier.size()/2)), ErreurDonnees},
+    {"dernier octet manquant", Ecrit("ouverture_coupe1.cvw", Fichier.left(Fichier.size()-1)), ErreurDonnees},
+    {"fichier vide", Ecrit("ouverture_vide.cvw", QByteArray()), ErreurDonnees},
+    {"nombre de feux négatif", Ecrit("ouverture_incoherent.cvw", Incoherent), ErreurDonnees},
+#ifndef _WIN32
+    {"dossier (FileRead renvoie -1)", Repertoire, ErreurDonnees}, // Windows : « Impossible d'ouvrir », déjà testé
+#endif
+   };
+  for(const Cas &c : Essais)
+   {
+    Messages.clear();
+    OuvreFichier(c.f);
+    QVERIFY2(frmSimulation->isVisible(), c.Nom);
+    QVERIFY2((Messages.size()==1)&&Messages.first().contains(QString::fromUtf8(c.Texte)), qPrintable(QString("%1 : %2").arg(c.Nom, Messages.join(" / "))));
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("Le réseau affiché est conservé")), qPrintable(Messages.first()));
+    QVERIFY2(cv==Avant, c.Nom);
+    QVERIFY2(OctetsReseau()==Octets, c.Nom);
+    QCOMPARE(Q(frmSimulation->Caption), Titre);
+    QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement NON effectué."));
+    QCOMPARE(QFileInfo(Q(FILENAME(frmSimulation->SaveDialog))).fileName(), QFileInfo(Reseau).fileName());
+    // Le chargement avait écrasé les voisinages (dx, dy suivent les dimensions de la zone)
+    QCOMPARE(dx[ouest], cv->NbX-1);
+    QCOMPARE(dy[nord], cv->NbY-1);
+   }
+  // Le réseau gardé reste utilisable
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(5));
+  // Fichier abîmé pendant la simulation : Arrêt rétablit le réseau d'avant
+  QFile::remove(Reseau);
+  Ecrit(QFileInfo(Reseau).fileName(), Fichier.left(Fichier.size()/2));
+  QVERIFY(Arrete());
+  QVERIFY(OctetsReseau()==Octets);
+  QVERIFY(frmSimulation->SimulationModifiee);
+  QCOMPARE(dx[ouest], cv->NbX-1);
+  frmSimulation->SimulationModifiee=false;
  }
 //---------------------------------------------------------------------------
 void TestInterface::marcheLectureSeuleNonModifie()

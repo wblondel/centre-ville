@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryFile>
+#include <new>
 #include <time.h>
 #include <stdlib.h>
 //---------------------------------------------------------------------------
@@ -2154,26 +2155,36 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
     {
      StatusBar->Panels->Items[0]->Text="Chargement en cours...";
      FileSeek(hfile, 0, 0);
-     if (cv) { delete cv; cv=NULL; }
+     // v6.0.2 : le réseau affiché n'est remplacé qu'une fois le fichier chargé (l'original
+     // le détruisait avant : cv restait incomplet, et l'application se fermait). Charge
+     // travaille sur cv (parkings et places renumérotés)
+     centre_ville *AncienReseau=cv;
      cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0); // v non encore alloué, créé au chargement (v4.0)
-     if (!cv->Charge(hfile))
+     bool Charge;
+     try { Charge=cv->Charge(hfile); }
+     catch(const std::bad_alloc &) { Charge=false; } // Nombre d'éléments incohérent dans le fichier
+     FileClose(hfile);
+     centre_ville *ReseauEnTrop=Charge?AncienReseau:cv;
+     centre_ville *NouveauCv=Charge?cv:AncienReseau;
+     cv=ReseauEnTrop; // Les destructeurs travaillent sur cv
+     delete ReseauEnTrop;
+     cv=NouveauCv;
+     if (!Charge)
       {
+       cv->RetablitVoisinages();
+       StatusBar->Panels->Items[0]->Text="Chargement NON effectué.";
        if (VersionFichier>VERSION) // v3.5 : n'ouvre pas les fichier de simulation générés par une version ultérieure de la version actuelle (format de fichier)
         AfficheMessage("\
 Le fichier sélectionné a été généré avec une version ultérieure à la version actuelle de Centre-Ville.\n\
-Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré ce fichier.",
+Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré ce fichier.\n\
+Le réseau affiché est conservé.",
                                 asChargementNonEffectue, tmErreur, 0, 0);
        else
-        {  // v3.5 : ajout de la précision << Centre-Ville va être fermé [...] >>
-         StatusBar->Panels->Items[0]->Text="Chargement non effectué.";
-         AfficheMessage("Erreur de données dans le fichier.\nCentre-Ville va être fermé par précaution.", asChargementNonEffectue, tmErreur, 0, 0);
-         FileClose(hfile);
-         Close();
-        }
+        AfficheMessage("Erreur de lecture ou de données dans le fichier.\nLe réseau affiché est conservé.", asChargementNonEffectue, tmErreur, 0, 0);
+       OpenDialog->FileName=SaveDialog->FileName; // Le réseau affiché reste le précédent
       }
      else
       {
-       FileClose(hfile);
        RedimensionneZone();
        SimulationModifiee=false;
        SaveDialog->FileName=asNomFichier;
@@ -2359,7 +2370,7 @@ bool TfrmSimulation::SauveCopieReseau()
 //---------------------------------------------------------------------------
 bool TfrmSimulation::RestaureCopieReseau()
  { // Ni la copie ni l'état préparé utilisable (fichier temporaire effacé pendant
-   // la simulation...) : fermeture, comme pour une erreur de données à l'ouverture
+   // la simulation...) : fermeture
   int hfile=CopieReseau?FileOpen(A(QDir::toNativeSeparators(CopieReseau->fileName())), fmOpenRead):-1;
   bool Ok=(hfile!=-1);
   if (Ok)

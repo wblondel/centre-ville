@@ -4008,6 +4008,11 @@ void centre_ville::CreeZone() // v4.0 (allocation dynamique)
       if (v+i+j) v[i][j].Definit(i, j);
    }
   else v=NULL;
+  RetablitVoisinages();
+ }
+//-----------------------------------------------------------------------------
+void centre_ville::RetablitVoisinages() // v6.0.2
+ {
   dx[(int)ouest]=NbX-1; dy[(int)nord]=NbY-1;
  }
 //-----------------------------------------------------------------------------

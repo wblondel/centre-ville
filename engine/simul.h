@@ -1114,6 +1114,7 @@ class centre_ville
   place_vehlib *PlaceVehlib; // v5.3. Tableau de places de vehlib
   stats *Stats; // Tableau de statistiques
   void CreeZone(); // v4.0 (allocation dynamique si NbX*NbY>0)
+  void RetablitVoisinages(); // v6.0.2 : dx et dy (globales) suivent le dernier réseau créé : à rappeler quand on revient à un réseau existant
   centre_ville(bool NbElementsParDefaut, int NbX, int NbY); // v4.0 (NbX, NbY)
   ~centre_ville();
   int DefinitNbFeux(int n);
