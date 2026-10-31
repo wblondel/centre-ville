@@ -2334,7 +2334,15 @@ void TestInterface::fichesInfos()
   //-------------------------------------------------------------------------
   // Bus (menu Informations)
   {
-   int n=Trouve([](voie *v) { return v->NumBus; });
+   // (pas le premier bus : l'original lisait son tour de départ pour tous, et les
+   // tours sont joués jusqu'à ce que les deux diffèrent)
+   QVERIFY(JoueTours([]()
+    {
+     for(int i=1; i<cv->NbBus; i++)
+      if (cv->Bus[i].Defini()&&(cv->Bus[i].TourDepartArretSvt!=cv->Bus->TourDepartArretSvt)) return true;
+     return false;
+    }, 2000));
+   int n=Trouve([](voie *v) { return ((v->NumBus>1)&&(cv->Bus[v->NumBus-1].TourDepartArretSvt!=cv->Bus->TourDepartArretSvt))?v->NumBus:0; });
    QVERIFY(n>0);
    TfrmInfosBus *f=frmInfosBus;
    auto Ecart=[f, Case, Coordonnees](long Tour) -> QString
@@ -2355,9 +2363,9 @@ void TestInterface::fichesInfos()
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(b->NbCasesParcourues));
        Compare(e, "tours depuis l'arrêt", f->LabelToursEntreArrets->Caption, QString::number(Tour-b->TourArriveDrnArret));
        Compare(e, "parcours depuis l'arrêt", f->LabelParcoursEntreArrets->Caption, QString::number(b->NbCasesParcouruesDepuisDrnArret));
-       Compare(e, "prochain arrêt", f->LabelProchainArret->Caption, // TourDepartArretSvt du premier bus (code d'origine)
+       Compare(e, "prochain arrêt", f->LabelProchainArret->Caption, // v6.0.2 : de ce bus (l'original lisait le premier bus)
                NumeroCoordonnees(b->NumArretSvt, cv->ArretBus[b->NumArretSvt-1].x, cv->ArretBus[b->NumArretSvt-1].y)+
-               QString(" depuis le tour %1").arg(cv->Bus->TourDepartArretSvt));
+               QString(" depuis le tour %1").arg(b->TourDepartArretSvt));
        Compare(e, "vitesse", f->LabelVitesse->Caption, QString::asprintf("1/%d", cv->NbVitesses));
       }
      else
@@ -2383,7 +2391,13 @@ void TestInterface::fichesInfos()
   //-------------------------------------------------------------------------
   // Tram (menu contextuel de simulation)
   {
-   int n=Trouve([](voie *v) { return v->NumTram; });
+   QVERIFY(JoueTours([]()
+    {
+     for(int i=1; i<cv->NbTrams; i++)
+      if (cv->Tram[i].Defini()&&(cv->Tram[i].TourDepartArretSvt!=cv->Tram->TourDepartArretSvt)) return true;
+     return false;
+    }, 2000));
+   int n=Trouve([](voie *v) { return ((v->NumTram>1)&&(cv->Tram[v->NumTram-1].TourDepartArretSvt!=cv->Tram->TourDepartArretSvt))?v->NumTram:0; });
    QVERIFY(n>0);
    TfrmInfosTram *f=frmInfosTram;
    auto Ecart=[f, Case, Coordonnees](long Tour) -> QString
@@ -2399,7 +2413,10 @@ void TestInterface::fichesInfos()
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[t->Dir]));
        Compare(e, "ligne", f->LabelNumeroLigne->Caption, QString(QChar('A'+t->NumLigne-1)));
        Compare(e, "personnes", f->LabelNbPersonnes->Caption, QString::number(t->NbPersonnes));
-       Compare(e, "tours", f->LabelTours->Caption, QString::number(Tour)); // TourCrt seul (code d'origine)
+       Compare(e, "tours", f->LabelTours->Caption, QString::number(Tour)); // Tous les trams partent au tour 0 : tours depuis le départ, comme pour un bus
+       Compare(e, "prochain arrêt", f->LabelProchainArret->Caption, // v6.0.2 : de ce tram (l'original lisait le premier tram)
+               NumeroCoordonnees(t->NumArretSvt, cv->ArretTram[t->NumArretSvt-1].x, cv->ArretTram[t->NumArretSvt-1].y)+
+               QString(" depuis le tour %1").arg(t->TourDepartArretSvt));
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(t->NbCasesParcourues));
        Compare(e, "tours depuis l'arrêt", f->LabelToursEntreArrets->Caption, QString::number(Tour-t->TourArriveDrnArret));
        for(TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente})
