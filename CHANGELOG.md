@@ -4,6 +4,85 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.2] — bogues d'origine de l'interface corrigés, fichiers plus sûrs
+
+Cette version corrige les bogues de l'interface que les versions précédentes
+avaient conservés, et rend l'ouverture et l'enregistrement plus sûrs. Le format
+des fichiers `.cvw` ne change pas (0x530) : un fichier enregistré par la 6.0.2
+s'ouvre toujours dans la 5.4.3.2, et inversement. La simulation ne change pas
+(golden master identique).
+
+### Lectures hors des tableaux
+
+- **Taxi** : la distance à la tête de file était lue avec les indices inversés
+  (valeur fausse, lecture hors du tableau).
+- **Rechercher et fiche Piéton** : un piéton dans un taxi ou un vehlib (et, pour la
+  fiche, dans un tram) était situé avec les coordonnées des bus.
+- **Fiche Piéton** (trouvé en 6.0.2) : la tête de la file de taxis était lue une
+  place plus loin, hors du tableau pour la dernière place.
+- **Clic sur la carte après Arrêt** (trouvé en 6.0.2) : avec Rechercher ouverte sur
+  un piéton et la fiche Piéton ouverte, accès à un pointeur nul.
+- **Vérification du réseau** : borne testée après l'accès (`PietonPeutAller`).
+
+### Fiches d'informations
+
+- **À l'arrêt**, elles montrent aussitôt le réseau rechargé, au lieu du dernier objet
+  jusqu'au clic suivant ; de même après Ouvrir et Nouveau.
+- **Bus et tram** : « Prochain arrêt … depuis le tour » est celui du véhicule affiché,
+  et non du premier.
+- **Piéton** : « Se dirige vers une file de vehlibs » n'est plus affiché pour une file
+  de taxis ; libellé « Dans un vehlib » (« ans un vehlib »).
+
+### Rechercher
+
+- Un piéton dans un tram est trouvé (il était « non utilisé »).
+- Taxi, vehlib et place sans position : « non utilisé(e) », au lieu d'envoyer le curseur
+  en (-1, -1) ou de garder le texte précédent.
+- Un numéro plus grand que le nombre d'éléments de la carte est ramené dans les bornes à
+  l'ouverture, sans déplacer le curseur.
+
+### Distances, statistiques, paramètres
+
+- **Distances** : la ligne d'en-tête fixe revient après un tableau vide ; la fiche des
+  files de parkings a sa hauteur complète (17 pixels de plus).
+- **Statistiques véhicules** : remplies dès l'ouverture.
+- **Évolution** : redessinée entre deux tours, la courbe s'arrête au dernier tour joué.
+- **Fluidité et trafic** : dans les champs numériques, les flèches, Origine, Fin et les
+  pages restent au champ ; Échap ferme la fiche.
+- **Paramètres** : les saisies non appliquées sont gardées après une fiche fille.
+
+### Champs numériques et simulation
+
+- **Entrée** ramène la valeur dans les bornes avant de valider la fiche.
+- **Bus et tram** : le n° d'arrêt n'est plus remis à 0 pendant la frappe, mais en quittant
+  le champ ou à Entrée. Un numéro trop grand devient le dernier arrêt, comme dans les
+  autres champs.
+- **« Arrêt »** est disponible pendant la pause, et le bilan de cet arrêt a la même durée
+  que celui de la pause.
+
+### Fichiers
+
+- **Enregistrer** écrit dans un fichier temporaire voisin, puis remplace l'original d'un
+  seul geste : un disque plein ne détruit plus le fichier. Un fichier en lecture seule
+  reste refusé. Dans un dossier en lecture seule, un fichier inscriptible est encore écrit
+  directement : c'est le seul cas où une écriture interrompue peut le tronquer.
+- **Ouvrir** : le réseau affiché n'est remplacé qu'une fois le fichier chargé. Un fichier
+  d'une version ultérieure, illisible, coupé ou incohérent affiche un message et garde le
+  réseau, sans plantage ni fermeture de l'application.
+- **Moteur** : `centre_ville::Charge` voit les erreurs de lecture et les champs lus en
+  partie, et refuse un nombre d'éléments négatif ou plus grand que le fichier, ainsi qu'une
+  zone sans case ; `~centre_ville` libère `FeuP`, `Bus` et `Tram`.
+
+### Restent
+
+- **« Tours effectifs » du tram** n'a pas changé : signalé comme bogue en 6.0.0, il est
+  correct, car tous les trams partent au tour 0.
+- **Paramètres des bus et des trams** : les flèches y déplacent toujours le curseur de la
+  carte depuis les champs numériques, ce qui sert à montrer un arrêt.
+- **Lien physique** (hard link) vers un fichier enregistré : il garde l'ancien contenu.
+
+Détail : `app/README.md`, « Corrections de la 6.0.2 », et `engine/README.md`.
+
 ## [6.0.1] — bogues d'origine du moteur corrigés
 
 Première version corrective : la règle du portage (« on porte, on ne corrige
@@ -173,35 +252,7 @@ Détail : `app/README.md`, « Écarts connus avec l'original ».
 
 Moteur : corrigés en 6.0.1 (voir plus haut).
 
-Interface :
-
-- **Fiches d'informations** : à l'arrêt, rien ne les rafraîchit. Bus et
-  tram : « Prochain arrêt … depuis le tour » lit le premier bus (le premier
-  tram), « Tours effectifs » du tram affiche le tour courant. Piéton dans un
-  tram, un taxi ou un vehlib : coordonnées lues dans les bus ; « vers une
-  file de vehlibs » testé sur la file de taxis ; libellé « ans un vehlib ».
-  Taxi : distance à la tête de file lue avec les indices inversés (valeur
-  fausse, lecture hors des tableaux).
-- **Distances** : un tableau vide perd sa ligne d'en-tête fixe, même sur une
-  autre carte ensuite ; la fiche des files de parkings est plus courte de
-  17 pixels (case « Avec couloirs de bus » oubliée dans sa hauteur).
-- **Rechercher** : un piéton monté dans un taxi ou un vehlib est situé avec
-  les coordonnées des bus (lecture hors du tableau possible), dans un tram il
-  est « non utilisé » ; places non définies sans message (« Taxi » et
-  « Vehlib » ne testent pas `Defini()`) ; un numéro resté plus grand que le
-  nombre d'éléments de la carte reste affiché.
-- **Statistiques** : Statistiques véhicules vides jusqu'au tour suivant
-  l'ouverture ; le dernier segment d'Évolution, redessinée entre deux tours,
-  va vers des statistiques pas encore calculées. Fluidité et trafic : les
-  flèches et Origine déplacent le curseur même depuis les champs
-  numériques ; Échap ne ferme pas la fiche.
-- **Paramètres** : ouvrir une fiche fille (bus, tram, taxis, vehlibs) perd
-  les saisies non appliquées.
-- **Champs numériques** (`TCSpinEdit`) : Entrée valide une valeur hors des
-  bornes (seule la sortie du champ la borne) ; bus et tram : un n° d'arrêt
-  trop grand, nul ou vide est remis à 0 dès la frappe.
-- **Simulation** : « Arrêt » est grisé en pause ; il faut reprendre, puis
-  arrêter.
+Interface : corrigés en 6.0.2 (voir plus haut).
 
 ## [5.4.3.2] — version d'origine
 

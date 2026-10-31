@@ -261,7 +261,7 @@ résultat de l'original :
 tableau ; les cases voisines (`V`, `V_`, `_V_`) sont prises modulo la taille
 de la carte ; les autres conditions testent un drapeau ou une borne basse.
 Dans l'interface, `app/f_simul.cpp` a le même motif (`PietonPeutAller` avant
-`d<=ouest`, lot de l'interface). Hors de ce motif, le moteur fait confiance
+`d<=ouest`, corrigé en 6.0.2). Hors de ce motif, le moteur fait confiance
 aux valeurs lues dans le fichier : des directions possibles invalides
 (`DirPoss` > 15) font lire hors de `NbDir` (par exemple dans `~voie()`) ;
 `Verifie()` les signale, sans les corriger.
@@ -282,10 +282,29 @@ standard et en épidémie + mode sanglant + résurrection à mi-parcours, avec
 
 Un programme témoin du motif de `voie::AjoutePieton` est bien signalé par
 UBSan (`index 2 out of bounds for type 'int[2]'`). `ctest --preset asan`
-(moteur, aide, cartes) et `ctest --preset asan-release` (moteur) passent sans
-rapport. Sous ASan, `interface.demo` s'arrête sur un bogue connu de
-l'interface (fiche Taxi, `f_inftaxi.cpp:87` : indices de `DistFileTaxi`
-inversés, lecture hors du tableau ; lot de l'interface).
+et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
+`interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée).
+
+## Corrections de la 6.0.2 (annotées `// v6.0.2`)
+
+- **`centre_ville::Charge`** : tous les `Charge()` lisent par `LitChamp`, qui n'accepte
+  qu'un champ entier. `FileRead` renvoie -1 en cas d'erreur, vrai dans les chaînes de
+  `&&` : un fichier illisible donnait un réseau vide, et un champ lu en partie (fichier
+  coupé dans son dernier champ) comptait pour lu. `CreeZone` n'est plus appelée sur des
+  dimensions mal lues. `Charge(-1)` échoue. `NombreCredible` refuse un nombre d'éléments
+  négatif ou plus grand que le fichier (ou une zone sans case) avant `new[]`, qui n'échoue
+  pas forcément sur un nombre énorme. Les valeurs des champs (`DirPoss`, numéros...) restent
+  à la charge de `Verifie()`.
+- **`centre_ville::RetablitVoisinages`** : `dx` et `dy`, globales, suivent le dernier
+  réseau créé ; l'interface la rappelle quand elle revient au réseau affiché après un
+  chargement en échec.
+- **`~centre_ville`** libère `FeuP`, `Bus` et `Tram`.
+- **`taxi::Defini`**, ajoutée pour Rechercher, comme celle des autres véhicules.
+- **`compat/fichier`** : `FileCreateRemplacement`, `FileCommitRemplacement` et
+  `FileAbandonRemplacement` remplacent un fichier en un seul geste (voir leur en-tête).
+  Sans `rand` : le nom du fichier temporaire ne dépend que du processus et d'un compteur.
+
+Rien de tout cela ne change le golden master ni les octets écrits.
 
 ## Points d'attention (non corrigés)
 
@@ -304,12 +323,5 @@ inversés, lecture hors du tableau ; lot de l'interface).
   une simulation équilibrée (1000) » (1000 n'est pas multiple de 4×3). C'est
   le réseau d'origine qui est en cause, pas le portage : le message est figé
   dans `tests/golden/verifie/Carfours.txt`.
-- **Erreurs de lecture** : `FileRead` renvoie -1 en cas d'erreur, vrai dans
-  les chaînes de `&&` de `Charge` : seule une fin de fichier prématurée (0)
-  est vue. `Charge(-1)` réussit et donne une carte vide de 99×63 ; c'est ce
-  qu'obtient l'application, qui teste `if ((hfile=FileOpen(…)))` (lot de
-  l'interface).
-- **Libérations** : `~centre_ville` ne libère ni `FeuP`, ni `Bus`, ni `Tram`
-  (fuite à chaque fermeture d'un réseau). Le constructeur
-  `pieton(int, int, direction, int)`, inutilisé, n'appelle pas
+- **Constructeur inutilisé** : `pieton(int, int, direction, int)` n'appelle pas
   `Initialise()`.
