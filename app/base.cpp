@@ -119,6 +119,37 @@ String stRepLocalAppData()
    return stResult;
  }
 //---------------------------------------------------------------------------
+// v6.0.1 : au premier lancement, cartes d'exemple copiées dans le dossier des
+// fichiers de Centre-Ville, où « Ouvrir » et « Enregistrer » démarrent, comme le
+// font l'installeur Windows et l'AppImage (linux/apprun-hooks/centre-ville-cartes.sh).
+// Aucun fichier existant n'est écrasé ; .cartes-copiees marque le premier
+// lancement (une carte supprimée ensuite n'est pas recopiée). Écrit seulement si
+// tout a été copié : une copie en échec (disque plein) est retentée au lancement suivant
+//---------------------------------------------------------------------------
+void CopieCartesExemple(const QString &stSource, const QString &stDestination)
+ {
+  QDir Destination(stDestination);
+  QString stMarque=Destination.filePath(".cartes-copiees");
+  QStringList Cartes=QDir(stSource).entryList({"*.cvw"}, QDir::Files);
+  if (Cartes.isEmpty()||QFile::exists(stMarque)||(!QDir().mkpath(stDestination))) return;
+  bool Ok=true;
+  for(const QString &stCarte : Cartes)
+   {
+    QString stCopie=Destination.filePath(stCarte);
+    if (QFile::exists(stCopie)) continue;
+    if (QFile::copy(QDir(stSource).filePath(stCarte), stCopie))
+     // QFile::copy garde les droits de la source : une carte doit rester enregistrable
+     QFile::setPermissions(stCopie, QFile::permissions(stCopie)|QFileDevice::ReadOwner|QFileDevice::WriteOwner);
+    else
+     Ok=false;
+   }
+  if (Ok)
+   {
+    QFile Marque(stMarque);
+    (void)Marque.open(QIODevice::WriteOnly);
+   }
+ }
+//---------------------------------------------------------------------------
 // v5.3. S'active automatiquement au lancement de cvw.exe avec le paramètre ! et génère un fichier cvw.log où se trouve cvw.exe à la fermeture de l'application
 // Usage : DebugEcrit("message");
 bool Debug = false;

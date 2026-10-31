@@ -38,6 +38,7 @@ extern void DebugFerme();
 extern const AnsiString asDebutNomSpinEdit; // v5.4
 //---------------------------------------------------------------------------
 extern String stRepLocalAppData(); // v5.4
+extern void CopieCartesExemple(const QString &stSource, const QString &stDestination); // v6.0.1
 extern type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap);
 extern void AfficheAideContextuelle(QWidget *Form); // portage : TForm* -> QWidget* (HelpContext lu sur la fiche)
 extern void AfficheIndexAide(QWidget *Form);

@@ -166,7 +166,9 @@ if(TARGET cvwfiches)
   target_compile_definitions(test_cartes PRIVATE
     CV_SCRIPT_CARTES="${PROJECT_SOURCE_DIR}/app/linux/apprun-hooks/centre-ville-cartes.sh"
     CV_DOSSIER_CARTES="${PROJECT_SOURCE_DIR}/maps"
+    $<$<PLATFORM_ID:Darwin>:CV_PAQUET_CVW="$<TARGET_FILE:cvw>">
   )
+  add_dependencies(test_cartes cvw)
   add_test(NAME interface.cartes COMMAND test_cartes)
   set_tests_properties(interface.cartes PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"

@@ -196,6 +196,14 @@ l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
   mode sanglant + résurrection) : 13 304 arrivées, 13 186 descentes, 587 fois
   un passager resté à bord (4 %) ; `NbPersonnes` et les réservations de
   places restent cohérents à chaque tour.
+- **Distances après un réseau non connexe** (trouvé en 6.0.1) : quand Marche
+  trouve le réseau non connexe, les distances restent allouées pour que les
+  fiches les affichent. Si l'utilisateur répare alors le réseau,
+  `voie::PrepareCalculDistances` et `~voie` les libéraient d'après `DirPoss` et
+  les compteurs de `cv`, qui ont changé : `delete[]` hors du tableau, ou fuite.
+  `voie` retient les dimensions de l'allocation (hors du format `.cvw`), et
+  `centre_ville::LibereDistances`, appelée dès que l'application voit le réseau
+  modifié, évite aux fiches de relire ces tableaux avec les nouvelles dimensions.
 - **Erreurs d'écriture** : `voie::Sauve` contenait un `;` au lieu de `&&`,
   `centre_ville::Sauve` écrasait `Ok` par le résultat de `DepotBus.Sauve`, et
   surtout `FileWrite` renvoie -1 (vrai dans les chaînes de `&&`) en cas

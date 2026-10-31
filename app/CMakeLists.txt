@@ -113,6 +113,16 @@ set_target_properties(cvw PROPERTIES
   MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
 )
 
+# Sous macOS, le dossier Cartes du .dmg est en lecture seule : cartes d'exemple
+# embarquées, copiées au premier lancement dans le dossier de stRepLocalAppData
+# (main.cpp). Dans l'exécutable et non dans Contents/Resources : le volume HFS+ du
+# .dmg réécrit les noms accentués (Démo.cvw, Géant.cvw) en NFD, alors que la
+# signature les scelle en NFC (« a sealed resource is missing or invalid »).
+if(APPLE)
+  file(GLOB CV_FICHIERS_CARTES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/maps/*.cvw)
+  qt_add_resources(cvw "cartes" PREFIX "/cartes" BASE ${PROJECT_SOURCE_DIR}/maps FILES ${CV_FICHIERS_CARTES})
+endif()
+
 # Pile : le calcul récursif des distances (voie::CalculeDistance*) demande
 # jusqu'à 512 Ko avec Clang, davantage en Debug MSVC ; l'original tournait avec
 # 1 Mo. On réserve 16 Mo, comme les tests (sous Linux, la pile du fil

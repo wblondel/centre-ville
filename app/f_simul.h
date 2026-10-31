@@ -20,6 +20,7 @@
 //#include <Vcl.VirtualImageList.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
+class QTemporaryFile;
 //---------------------------------------------------------------------------
 // v5.4 : les glyphes de TSpeedButtons sont chargées manuellement (HDPI)
 //---------------------------------------------------------------------------
@@ -632,6 +633,9 @@ private:
   void ModifieSimul(bool Modifiee)
    {
     SimulModifiee=Modifiee;
+    // v6.0.1 : réseau modifié après un échec de Marche (réseau non connexe) :
+    // les distances encore affichées par les fiches ne valent plus
+    if (Modifiee&&cv&&(!SimulEnCours)&&(!Pause)) cv->LibereDistances();
     if (Modifiee)
      {
       if (Caption[Caption.Length()]!='*')
@@ -662,6 +666,12 @@ private:
   void InitialiseDeplacementFeu(); // v3.5
   void RafraichitFonctionDeplacementFeu(); // v3.5
   void DeplaceFeu(); // v3.8.3
+  // v6.0.1 : copie du réseau prise par Marche avant de le préparer (Prepare*)
+  QTemporaryFile *CopieReseau;
+  bool SauveCopieReseau();
+  bool RestaureCopieReseau();
+  void InterromptDemarrage();
+  bool EnregistreAvantMarche();
 public:
     type_demande TypeDemande;
 	Propriete<bool> SimulationEnCours; // portage : __property {read=SimulEstEnCours, write=MarcheArretSimul}
