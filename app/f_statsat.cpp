@@ -22,6 +22,11 @@ TfrmStatsAttenteTrafic::TfrmStatsAttenteTrafic(TComponent* Owner)
  for(int i=0; i<9; i++)
   if (i!=4) // v5.4 : plus de zoom !
    frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, ((TBitBtn*)(FindComponent((UnicodeString)("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
+ // v6.0.2 : dans ces deux champs, les touches de déplacement servent au champ. Les
+ // Paramètres des bus et des trams gardent les raccourcis : leurs contrôles sont
+ // presque tous des champs, et ils y déplacent le curseur pour montrer un arrêt
+ CSpinEditParkingDepart->GardeTouchesDeplacement=true;
+ CSpinEditParkingArrivee->GardeTouchesDeplacement=true;
 }
 //---------------------------------------------------------------------------
 void TfrmStatsAttenteTrafic::PaintBoxPaint(
@@ -193,6 +198,8 @@ void TfrmStatsAttenteTrafic::FormKeyDown(TObject *Sender,
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112)
    AfficheAideContextuelle(this);
+ if (Key==27) // v6.0.2 : la fiche n'a pas de bouton Cancel, et Échap ne la fermait pas
+   Close();
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

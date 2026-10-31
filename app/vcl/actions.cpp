@@ -2,6 +2,7 @@
 // vcl/actions.cpp - Portage de Centre-Ville : actions, menus, raccourcis
 //---------------------------------------------------------------------------
 #include "actions.h"
+#include "controles.h"
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
@@ -472,6 +473,15 @@ namespace
         FicheRaccourcis *f=FicheDe(w);
         return f&&f->Apercu&&f->Apercu(k, true);
        }
+      if (TCSpinEdit *Champ=dynamic_cast<TCSpinEdit *>(w))
+       if (Champ->GardeTouchesDeplacement&&!(k->modifiers()&~Qt::KeypadModifier))
+        switch(k->key())
+         { // v6.0.2
+          case Qt::Key_Left: case Qt::Key_Right: case Qt::Key_Up: case Qt::Key_Down:
+          case Qt::Key_Home: case Qt::Key_End: case Qt::Key_PageUp: case Qt::Key_PageDown:
+           return false;
+          default: break;
+         }
       TShortCut sc=RaccourciVcl(k);
       if (!sc)
        {

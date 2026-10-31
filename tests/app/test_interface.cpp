@@ -3365,12 +3365,23 @@ void TestInterface::ficheFluiditeTrafic()
     Curseur("Origine (haut gauche)", x, y);
     Touche(f->CheckBoxCoins, Qt::Key_Z);
     Curseur("Z", x, y);
-    // N° d'étape tapé hors de 0..NbParkings (frappe non bornée, comme CSPIN.pas) :
-    // « Le n° d'étape est incorrect ! » ; touches de la fiche depuis le champ :
-    // case sans statistique pour ce trajet (noire, sans détail) ; en quittant le
-    // champ, numéro ramené dans les bornes et statistiques recalculées
+    // v6.0.2 : depuis un champ numérique, les touches de déplacement restent au champ
+    // (l'original déplaçait le curseur de la carte)
     Clique(f->CheckBoxParkingDepart);
     if (!f->CSpinEditParkingDepart->hasFocus()) Ecarts<<QString::fromUtf8("parking de départ sans le focus");
+    int NumAvant=f->CSpinEditParkingDepart->Value;
+    Touche(f->CSpinEditParkingDepart, Qt::Key_Right);
+    Curseur("flèche droite depuis le champ", x, y);
+    Touche(f->CSpinEditParkingDepart, Qt::Key_Home);
+    Curseur("Origine depuis le champ", x, y);
+    Touche(f->CSpinEditParkingDepart, (NumAvant<cv->NbParkings)?Qt::Key_Up:Qt::Key_Down);
+    Curseur("flèche haut ou bas depuis le champ", x, y);
+    if (f->CSpinEditParkingDepart->Value==NumAvant) Ecarts<<QString::fromUtf8("flèche sans effet sur le champ");
+    f->CSpinEditParkingDepart->Value=NumAvant;
+    // N° d'étape tapé hors de 0..NbParkings (frappe non bornée, comme CSPIN.pas) :
+    // « Le n° d'étape est incorrect ! » ; curseur déplacé pendant ce temps : case
+    // sans statistique pour ce trajet (noire, sans détail) ; en quittant le champ,
+    // numéro ramené dans les bornes et statistiques recalculées
     int NbMessages=Messages.size();
     f->CSpinEditParkingDepart->selectAll();
     QTest::keyClicks(f->CSpinEditParkingDepart, QString::number(10*cv->NbParkings));
@@ -3381,8 +3392,8 @@ void TestInterface::ficheFluiditeTrafic()
     f->activateWindow(); // de nouveau active après la boîte de message, le champ ayant le focus
     if (!QTest::qWaitFor([f]() { return QApplication::activeWindow()==f; }, 3000)||!f->CSpinEditParkingDepart->hasFocus())
      Ecarts<<QString::fromUtf8("parking de départ sans le focus après le message");
-    Touche(f->CSpinEditParkingDepart, Qt::Key_Right);
-    Curseur("flèche droite (n° hors bornes)", x+1, y);
+    g->Col=x+1;
+    Curseur("curseur déplacé (n° hors bornes)", x+1, y);
     if (f->CouleurCase(x+1, y)!=0) Ecarts<<QString::fromUtf8("case colorée pour un n° hors bornes");
     g->Repaint(); // détail de la case courante, au dessin de la case
     Compare(Ecarts, "barre d'état (n° hors bornes)", s->StatusBar->Panels->Items[0]->Text, QString());
@@ -3392,7 +3403,7 @@ void TestInterface::ficheFluiditeTrafic()
     Etape("départ hors bornes ramené au dernier", Verifie(0, cv->NbParkings, 0));
     Clique(f->CheckBoxParkingDepart);
     e=Ecarts.join('\n');
-    f->close(); // case de la fenêtre
+    Touche(f->CheckBoxCoins, Qt::Key_Escape); // v6.0.2 : Échap ferme la fiche
    });
   ReponseQuestions=QMessageBox::Yes;
   Messages.clear();
@@ -3419,7 +3430,8 @@ void TestInterface::ficheFluiditeTrafic()
    {
     Modale=(QApplication::activeModalWidget()==frmStatsAttenteTrafic);
     e=Verifie(0, 0, 0);
-    frmStatsAttenteTrafic->close();
+    Clique(frmStatsAttenteTrafic->CheckBoxParkingDepart);
+    Touche(frmStatsAttenteTrafic->CSpinEditParkingDepart, Qt::Key_Escape); // v6.0.2 : aussi depuis un champ numérique
    });
   Focalise();
   QTest::keyClick(g, Qt::Key_F, Qt::ControlModifier|Qt::ShiftModifier);

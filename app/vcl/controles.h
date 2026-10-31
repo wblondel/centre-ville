@@ -181,6 +181,7 @@ class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
   public:
   Propriete<int> Value, MinValue, MaxValue, Increment;
   TNotifyEvent OnChange;
+  bool GardeTouchesDeplacement=false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les raccourcis de la fiche
   explicit TCSpinEdit(QWidget *Parent=nullptr);
   void PrepareVcl() override;
   void stepBy(int steps) override; // UpClick / DownClick (flèches, touches haut et bas)
