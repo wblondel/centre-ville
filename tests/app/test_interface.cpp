@@ -1754,8 +1754,8 @@ void TestInterface::fichesParametres()
               frmParamSimul->BitBtnDefTaxis->Enabled&&frmParamSimul->BitBtnDefVehlibs->Enabled&&
               !frmParamSimul->ButtonAppliquer->Enabled&&(frmParamSimul->CSpinEditDureeVert->Value==DureeVert)&&
               !frmParamSimul->BitBtnDefLignesBus->icon().isNull();
-    // Saisie perdue au retour des fiches filles : la fiche réaffichée repasse
-    // par FormShow, qui recharge les valeurs du moteur (comme dans la VCL)
+    // v6.0.2 : saisie non appliquée gardée au retour des fiches filles (l'original
+    // la perdait : la fiche réaffichée rechargeait les valeurs du moteur)
     frmParamSimul->CSpinEditDureeVert->Value=DureeVert+1;
     QVERIFY(frmParamSimul->ButtonAppliquer->Enabled);
     Clique(frmParamSimul->BitBtnDefLignesBus);
@@ -1771,7 +1771,8 @@ void TestInterface::fichesParametres()
    });
   QuandModale([]() { return frmParamSimul; }, [&]()
    {
-    Revenue=frmParamSimul->isVisible()&&(frmParamSimul->CSpinEditDureeVert->Value==DureeVert)&&!frmParamBus;
+    Revenue=frmParamSimul->isVisible()&&(frmParamSimul->CSpinEditDureeVert->Value==DureeVert+1)&&
+            frmParamSimul->ButtonAppliquer->Enabled&&(cv->DureeVert==DureeVert)&&!frmParamBus;
     Clique(frmParamSimul->BitBtnDefLignesTram);
    });
   QuandModale([]() { return frmParamTram; }, [&]()

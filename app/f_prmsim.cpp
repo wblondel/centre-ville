@@ -29,6 +29,7 @@ void Parametres()
 //---------------------------------------------------------------------------
 TfrmParamSimul::TfrmParamSimul(TComponent* Owner) : TForm(Owner)
  { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
+  RetourFicheFille=false; // v6.0.2
   NbFeuxChange=false;
   NbParkingsChange=false;
   NbVehiculesChange=false;
@@ -121,6 +122,11 @@ void TfrmParamSimul::ButtonAppliquerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::FormShow(TObject *Sender)
 {
+ if (RetourFicheFille) // v6.0.2 : la fiche se réaffiche après une fiche fille, qui ne change aucun de ses champs : ne pas recharger les valeurs du moteur, ce qui perdrait les saisies non appliquées
+  {
+   RetourFicheFille=false;
+   return;
+  }
  Initialisation=true;
  if (!Caption.Pos("["))// v5.0
   {
@@ -229,6 +235,7 @@ void TfrmParamSimul::BitBtnDefLignesBusClick(TObject *Sender)
    Finalement f([&]()
    {
     frmSimulation->DrawGridSimul->Repaint();
+    RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamBus->Release();
     frmParamBus=NULL;
@@ -250,6 +257,7 @@ void TfrmParamSimul::BitBtnDefLignesTramClick(TObject *Sender)
    Finalement f([&]()
    {
     frmSimulation->DrawGridSimul->Repaint();
+    RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamTram->Release();
     frmParamTram=NULL;
@@ -266,6 +274,7 @@ void TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
    Finalement f([&]()
    {
     frmSimulation->DrawGridSimul->Repaint();
+    RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamTaxi->Release();
     frmParamTaxi=NULL;
@@ -292,6 +301,7 @@ void TfrmParamSimul::BitBtnDefVehlibsClick(TObject *Sender)
    Finalement f([&]()
    {
     frmSimulation->DrawGridSimul->Repaint();
+    RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamVehlib->Release();
     frmParamVehlib=NULL;

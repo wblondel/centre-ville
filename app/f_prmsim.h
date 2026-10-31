@@ -85,6 +85,7 @@ private:	// Déclarations de l'utilisateur
          NbArretsTramChange, // v3.5
          NbPlacesTaxiChange, // v3.6
          NbPlacesParkChange, // v5.0
+		 RetourFicheFille, // v6.0.2 : prochain FormShow au retour d'une fiche fille
 		 Initialisation;
 	TBITMAP *Bitmap; // v5.4
 	bool AppliqueChoix();
