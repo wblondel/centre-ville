@@ -155,6 +155,7 @@ void TfrmInfosPieton::RafraichitInfos()
 	  frmRecherche->RadioButtonPieton->Checked)
    NumPieton=frmRecherche->CSpinEditPieton->Value;
   if ((NumPieton<0)||(NumPieton>cv->NbPietons)) NumPieton=0; // portage : numéro tapé hors de 1..NbPietons dans Rechercher (lecture hors de Pieton dans l'original) : pas de piéton suivi
+  if (!cv->Pieton) NumPieton=0; // v6.0.2 : réseau rechargé à l'arrêt, sans piétons (accès à un pointeur nul dans l'original, au clic suivant sur la carte)
   if (!NumPieton) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
    {
 	if (v->NumPieton[0])

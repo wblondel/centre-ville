@@ -44,8 +44,7 @@
 //     d'après le nombre de lignes et se ferment à l'arrêt ; les six fiches
 //     d'informations (non modales, au premier plan) suivent tour après tour
 //     l'objet de la case courante, l'utilisateur cliquant sur lui quand il se
-//     déplace ; à l'arrêt, elles gardent leur contenu jusqu'au clic suivant
-//     sur la carte (comme l'original), qui les vide ;
+//     déplace ; à l'arrêt, elles montrent aussitôt le réseau rechargé (v6.0.2) ;
 //   - lot 3 (statistiques et recherche), sur des copies de Géant : composition
 //     du réseau (modale) calculée sur la carte ; « Évolution » redessinée par le
 //     moteur à chaque tour, courbes et quadrillage aux positions que donnent
@@ -2577,27 +2576,54 @@ void TestInterface::fichesInfos()
    QVERIFY(!f->isVisible());
   }
   //-------------------------------------------------------------------------
-  // Arrêt : la fiche ouverte garde son contenu (aucun rafraîchissement dans
-  // l'original), puis le clic suivant sur la carte rechargée la vide
+  // Arrêt : v6.0.2 : les fiches ouvertes montrent le réseau rechargé, sans attendre
+  // de clic sur la carte (l'original gardait le dernier objet). Avec Rechercher
+  // sur un piéton : le réseau rechargé n'a plus de piétons (cv->Pieton nul), que
+  // l'original lisait au clic suivant sur la carte
   int n=Trouve([](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; });
   QVERIFY(n>0);
   int x=frmSimulation->DrawGridSimul->Col, y=frmSimulation->DrawGridSimul->Row;
   QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_V, Qt::ControlModifier);
   QVERIFY(frmInfosVehicule->isVisible());
   QVERIFY(frmInfosVehicule->RadioButtonVehiculeNumero->Checked);
+  frmSimulation->ActionRechercher->Execute();
+  QVERIFY(frmRecherche->isVisible());
+  frmRecherche->CSpinEditPieton->Value=1;
+  frmRecherche->RadioButtonPieton->Checked=true;
+  for(TAction *a : {frmSimulation->ActionDetailBus, frmSimulation->ActionDetailTram, frmSimulation->ActionDetailTaxi,
+                    frmSimulation->ActionDetailVehlib, frmSimulation->ActionDetailPieton})
+   a->Execute();
+  QVERIFY(frmInfosPieton->RadioButtonPietonNumero->Checked);
+  Focalise();
+  CliqueCase(x, y); // Rechercher a déplacé le curseur : de nouveau sur le véhicule
+  QVERIFY(frmInfosVehicule->RadioButtonVehiculeNumero->Checked);
+  QVERIFY(frmInfosPieton->RadioButtonPietonNumero->Checked);
   QVERIFY(Arrete());
   QVERIFY(frmInfosVehicule->isVisible());
   QVERIFY(frmSimulation->ActionDetailVehicule->Checked);
-  QVERIFY(frmInfosVehicule->RadioButtonVehiculeNumero->Checked);
   QVERIFY(!cv->v[x][y].NumVehicule);
-  Focalise();
-  CliqueCase(x, y);
   QVERIFY(frmInfosVehicule->RadioButtonAucunVehicule->Checked);
   QVERIFY(frmInfosVehicule->LabelDirection->isHidden());
   QCOMPARE(Q(frmInfosVehicule->GroupBoxVehicule->Caption), QString(27, ' '));
+  QVERIFY(frmInfosPieton->RadioButtonAucunPieton->Checked);
+  QVERIFY(frmInfosBus->RadioButtonAucunBus->Checked);
+  QVERIFY(frmInfosTram->RadioButtonAucunTram->Checked);
+  QVERIFY(frmInfosTaxi->RadioButtonAucunTaxi->Checked);
+  QVERIFY(frmInfosVehlib->RadioButtonAucunVehlib->Checked);
+  Focalise();
+  CliqueCase(x, y); // Clic sur la carte : toujours rien à montrer
+  QVERIFY(frmInfosVehicule->RadioButtonAucunVehicule->Checked);
+  QVERIFY(frmInfosPieton->RadioButtonAucunPieton->Checked);
   CaptureFiche(frmInfosVehicule, "fiche_infos_vehicule_arret.png");
   Clique(frmInfosVehicule->ButtonOk);
   QVERIFY(!frmInfosVehicule->isVisible());
+  Clique(frmRecherche->ButtonAnnuler);
+  Clique(frmInfosBus->ButtonOk);
+  Clique(frmInfosTram->ButtonOk);
+  Clique(frmInfosTaxi->ButtonOk);
+  Clique(frmInfosVehlib->ButtonOk);
+  Clique(frmInfosPieton->ButtonOk);
+  QVERIFY(!frmInfosPieton->isVisible());
  }
 //---------------------------------------------------------------------------
 void TestInterface::fichePietonDansUnVehicule()

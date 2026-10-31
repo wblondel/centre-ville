@@ -1621,17 +1621,25 @@ void TfrmSimulation::FormShow(TObject *Sender)
  ActionAfficherInfection->Checked=!!(Affichage&aff_infct); // v5.4.1
 }
 //---------------------------------------------------------------------------
+// v6.0.2 : aussi quand le réseau change sans clic sur la carte (Arrêt, Ouvrir, Nouveau) :
+// les fiches restées ouvertes montraient sinon le dernier objet de l'ancien réseau.
+// Ouvrir peut venir de la ligne de commande, avant la création des autres fiches
+void TfrmSimulation::RafraichitFichesInfos()
+ {
+  if (frmInfosPieton&&frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
+  if (frmInfosVehicule&&frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
+  if (frmInfosBus&&frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
+  if (frmInfosTram&&frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
+  if (frmInfosTaxi&&frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
+  if (frmInfosVehlib&&frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+ }
+//---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 {
  bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
  if ((frmDefVoie->Visible)&&PasDeSelectionFeux) frmDefVoie->RafraichitInfos();
  if ((frmDefVoiePietons->Visible)&&PasDeSelectionFeux) frmDefVoiePietons->RafraichitInfos(); //v5.2
- if (frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
- if (frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
- if (frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
- if (frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
- if (frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
- if (frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+ RafraichitFichesInfos(); // v6.0.2
  if ((frmAffDistParkings->Visible)&&PasDeSelectionFeux)
   {
    frmAffDistParkings->EffaceInfos();
@@ -2121,6 +2129,7 @@ void TfrmSimulation::ActionNouveauExecute(TObject *Sender)
    OpenDialog->FileName="";
    Caption=asTitreCV;
    InitialiseDeplacementFeu(); // v3.5
+   RafraichitFichesInfos(); // v6.0.2
    DrawGridSimul->Repaint();
   }
 }
@@ -2171,6 +2180,7 @@ Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré c
        OpenDialog->FileName=asNomFichier;
        Caption="Centre-Ville - "+asNomFichier;
        InitialiseDeplacementFeu(); // v3.5
+       RafraichitFichesInfos(); // v6.0.2
        asMsgErr=""; // v6.0.1 : erreurs d'une vérification précédente (barre d'état ci-dessous)
        if (VerifierApresOuverture)
         {
@@ -2368,6 +2378,7 @@ bool TfrmSimulation::RestaureCopieReseau()
    }
   delete CopieReseau;
   CopieReseau=NULL;
+  RafraichitFichesInfos(); // v6.0.2
   DrawGridSimul->Repaint();
   return true;
  }
