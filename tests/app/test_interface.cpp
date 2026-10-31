@@ -853,9 +853,17 @@ void TestInterface::enregistrementImpossible()
   QVERIFY2(Q(frmSimulation->StatusBar->Panels->Items[0]->Text).startsWith(QString::fromUtf8("Enregistrement non effectué"), Qt::CaseInsensitive),
            qPrintable(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)));
 #ifndef _WIN32
-  // Taille de fichier limitée à 1000 octets, comme un disque plein : l'écriture échoue en cours de route
+  // Taille de fichier limitée à 1000 octets, comme un disque plein : l'écriture échoue en
+  // cours de route. v6.0.2 : le fichier existant reste entier (l'original l'avait déjà vidé)
   QString f=Dossier+"/enregistrement_limite.cvw";
   QFile::remove(f);
+  {
+   QFile Existant(f);
+   QVERIFY(Existant.open(QIODevice::WriteOnly));
+   Existant.write("contenu existant");
+  }
+  QStringList FichiersAvant=QDir(Dossier).entryList(QDir::Files|QDir::Hidden);
+  bool ModifieeAvant=frmSimulation->SimulationModifiee;
   struct rlimit Ancienne, Limite;
   QVERIFY(getrlimit(RLIMIT_FSIZE, &Ancienne)==0);
   Limite=Ancienne;
@@ -868,9 +876,62 @@ void TestInterface::enregistrementImpossible()
   std::signal(SIGXFSZ, AncienSignal);
   QCOMPARE(Messages.size(), 1);
   QVERIFY2(Messages.first().contains(QString::fromUtf8("Erreur de données dans le fichier")), qPrintable(Messages.first()));
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("Aucun fichier existant n'a été modifié")), qPrintable(Messages.first()));
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement NON effectué."));
-  QVERIFY(frmSimulation->SimulationModifiee); // le fichier est tronqué : le réseau n'est plus que dans la mémoire
+  QCOMPARE(Contenu(f), QByteArray("contenu existant"));
+  QCOMPARE(QDir(Dossier).entryList(QDir::Files|QDir::Hidden), FichiersAvant); // pas de fichier temporaire laissé
+  QCOMPARE((bool)frmSimulation->SimulationModifiee, ModifieeAvant); // Le fichier n'a pas changé : l'état du réseau non plus
+  // Fichier en lecture seule : refusé, alors que le dossier permettrait de le remplacer
+  QString Protege=Dossier+"/enregistrement_protege.cvw";
+  QFile::remove(Protege);
+  {
+   QFile Existant(Protege);
+   QVERIFY(Existant.open(QIODevice::WriteOnly));
+   Existant.write("contenu protégé");
+  }
+  {
+   LectureSeule Droits(Protege);
+   if (Droits.Effective())
+    {
+     Messages.clear();
+     Enregistre(Protege);
+     QCOMPARE(Messages.size(), 1);
+     QVERIFY2(Messages.first().contains("Impossible de créer le fichier"), qPrintable(Messages.first()));
+     QCOMPARE(Contenu(Protege), QByteArray("contenu protégé"));
+    }
+  }
+  // Dossier en lecture seule : fichier existant et inscriptible écrit directement, faute
+  // de pouvoir créer un fichier temporaire à côté ; fichier nouveau impossible à créer
+  QString DossierProtege=Dossier+"/dossier_protege";
+  QVERIFY(QDir().mkpath(DossierProtege));
+  QString DansDossier=DossierProtege+"/existant.cvw";
+  {
+   QFile Existant(DansDossier);
+   QVERIFY(Existant.open(QIODevice::WriteOnly|QIODevice::Truncate));
+   Existant.write("ancien");
+  }
+  {
+   // (avec le droit d'entrer dans le dossier, que LectureSeule retirerait)
+   struct DroitsDossier
+    {
+     QString Dossier;
+     ~DroitsDossier() { QFile::setPermissions(Dossier, QFile::permissions(Dossier)|QFile::WriteOwner|QFile::WriteUser); }
+    } Droits{DossierProtege};
+   QFile::setPermissions(DossierProtege, QFile::ReadOwner|QFile::ReadUser|QFile::ExeOwner|QFile::ExeUser);
+   if (!QFile(DossierProtege+"/essai").open(QIODevice::WriteOnly)) // Faux pour root
+    {
+     Messages.clear();
+     Enregistre(DansDossier);
+     QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+     QVERIFY(Contenu(DansDossier)==OctetsReseau());
+     Enregistre(DossierProtege+"/nouveau.cvw");
+     QCOMPARE(Messages.size(), 1);
+     QVERIFY2(Messages.first().contains("Impossible de créer le fichier"), qPrintable(Messages.first()));
+     QVERIFY(!QFile::exists(DossierProtege+"/nouveau.cvw"));
+    }
+  }
   frmSimulation->SimulationModifiee=false;
+  frmSimulation->SaveDialog->FileName=asPrecedent;
 #endif
   QCOMPARE(Q(frmSimulation->SaveDialog->FileName), Q(asPrecedent)); // en échec, le nom courant ne change pas
  }
@@ -1330,7 +1391,7 @@ void TestInterface::interruptionEnregistrementEnEchec()
   VerifieNonDemarre(Reseau);
   if (QTest::currentTestFailed()) return;
   QVERIFY(Contenu(f)==Origine);
-  // Disque plein pendant l'enregistrement, le fichier est tronqué : message, pas de démarrage
+  // Disque plein pendant l'enregistrement : message, pas de démarrage ; v6.0.2 : le fichier reste entier
   for(int Essai=0; Essai<2; Essai++)
    {
     LimiteFichiers Limite(QString::fromUtf8("Préparation des feux de piétons..."));
@@ -1341,9 +1402,9 @@ void TestInterface::interruptionEnregistrementEnEchec()
    }
   VerifieNonDemarre(Reseau);
   if (QTest::currentTestFailed()) return;
-  QVERIFY(frmSimulation->SimulationModifiee); // Le réseau n'est plus que dans la mémoire...
-  QVERIFY(Contenu(f)!=Origine);
-  // ... et l'espace revenu, Marche l'enregistre puis démarre
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QVERIFY(Contenu(f)==Origine);
+  // L'espace revenu, Marche enregistre puis démarre
   QVERIFY2(DemarreSansBlocage("Marche, écriture de nouveau possible"), qPrintable(Messages.join('\n')));
   QVERIFY(!frmSimulation->SimulationModifiee);
   QVERIFY(JoueJusquAuTour(5));

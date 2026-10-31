@@ -2242,20 +2242,26 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
      SaveDialog->Execute())
   {
    StatusBar->Panels->Items[0]->Text="Enregistrement en cours...";
-   if ((hfile=FileCreate(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto)))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
+   // v6.0.2 : le fichier n'est remplacé qu'une fois écrit (l'original le vidait d'abord : un
+   // disque plein le détruisait), sauf si le dossier interdit le fichier temporaire (Direct)
+   bool Direct=false;
+   if ((hfile=FileCreateRemplacement(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto), &Direct))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
     {
-     if (!cv->Sauve(hfile))
+     bool Ok=cv->Sauve(hfile);
+     if (Ok)
+      Ok=FileCommitRemplacement(hfile);
+     else
+      FileAbandonRemplacement(hfile);
+     if (!Ok)
       {
-       AfficheMessage("Erreur de données dans le fichier", asSauvegardeNonEffectuee, tmErreur, 0, 0);
-       FileClose(hfile);
+       AfficheMessage(Direct?"Erreur de données dans le fichier":"Erreur de données dans le fichier.\nAucun fichier existant n'a été modifié.", asSauvegardeNonEffectuee, tmErreur, 0, 0);
        StatusBar->Panels->Items[0]->Text="Enregistrement NON effectué.";
        if (EnregistrerAvant) EnregistrerAvant=false;
        SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
-       SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
+       if (Direct) SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
       }
      else
       {
-       FileClose(hfile);
        SaveDialog->FileName=asNomFichier;
        OpenDialog->FileName=asNomFichier;
        Caption="Centre-Ville - "+asNomFichier;

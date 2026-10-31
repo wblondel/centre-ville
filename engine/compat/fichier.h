@@ -36,5 +36,15 @@ int FileWrite(int Handle, const void *Tampon, unsigned NbOctets);
 int FileSeek(int Handle, int Decalage, int Origine); // Origine : 0 début, 1 courant, 2 fin
 bool FileFlush(int Handle); // false si une écriture a échoué depuis l'ouverture (v6.0.1)
 void FileClose(int Handle);
+// v6.0.2 : remplacement d'un fichier en un seul geste, pour qu'une écriture interrompue (disque
+// plein) ne le détruise pas. FileCreateRemplacement écrit dans un fichier temporaire voisin, qui
+// prend les droits du fichier existant ; FileCommitRemplacement le met à la place de celui-ci
+// (faux en cas d'erreur), FileAbandonRemplacement l'efface. Dans les deux cas, la poignée est
+// fermée. Comme FileCreate, -1 si le fichier ne peut être ni créé ni réécrit (lecture seule,
+// dossier). Si le dossier interdit le fichier temporaire mais que le fichier existant reste
+// inscriptible, celui-ci est réécrit directement, et donc vidé : *Direct est alors vrai
+int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct=nullptr);
+bool FileCommitRemplacement(int Handle);
+void FileAbandonRemplacement(int Handle);
 //---------------------------------------------------------------------------
 #endif

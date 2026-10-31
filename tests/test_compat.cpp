@@ -2,8 +2,14 @@
 // test_compat.cpp - Tests de la couche engine/compat
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <stdexcept>
 #include <string>
+#ifndef _WIN32
+ #include <unistd.h>
+#endif
 #include "sortie.h"
 #include "compat/chaine.h"
 #include "compat/fichier.h"
@@ -233,5 +239,122 @@ TEST_CASE("FileWrite/FileFlush : erreurs d'écriture (v6.0.1)", "[compat][fichie
   // Poignée invalide
   CHECK_FALSE(FileFlush(-1));
   CHECK_FALSE(FileFlush(9999));
+ }
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+namespace
+ {
+  std::string LitTout(const AnsiString &asNom)
+   {
+    std::ifstream f(std::filesystem::path(std::u8string((const char8_t*)asNom.str().data(), asNom.str().size())), std::ios::binary);
+    return std::string(std::istreambuf_iterator<char>(f), {});
+   }
+  void EcritTout(const AnsiString &asNom, const std::string &asOctets)
+   {
+    int h=FileCreate(asNom);
+    REQUIRE(h>0);
+    FileWrite(h, asOctets.data(), (unsigned)asOctets.size());
+    FileClose(h);
+   }
+  std::filesystem::path CheminDe(const AnsiString &asNom)
+   {
+    return std::filesystem::path(std::u8string((const char8_t*)asNom.str().data(), asNom.str().size()));
+   }
+  // Fichiers du dossier de sortie : aucun fichier temporaire ne doit rester
+  std::size_t NbFichiers(const std::filesystem::path &Dossier)
+   {
+    std::size_t n=0;
+    for(const auto &e : std::filesystem::directory_iterator(Dossier)) { (void)e; n++; }
+    return n;
+   }
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("FileCreateRemplacement : le fichier n'est remplacé qu'une fois écrit (v6.0.2)", "[compat][fichier]")
+ {
+  namespace fs=std::filesystem;
+  const AnsiString asNom=FichierSortie("compat_remplacement_é.bin");
+  const fs::path Dossier=CheminDe(asNom).parent_path();
+  fs::remove(CheminDe(asNom));
+  const std::size_t NbAvant=NbFichiers(Dossier);
+  bool Direct=true;
+  // Fichier nouveau
+  int h=FileCreateRemplacement(asNom, &Direct);
+  REQUIRE(h>0);
+  CHECK_FALSE(Direct);
+  CHECK(FileWrite(h, "un", 2)==2);
+  CHECK(FileCommitRemplacement(h));
+  CHECK(LitTout(asNom)=="un");
+  CHECK(NbFichiers(Dossier)==NbAvant+1);
+  // Fichier existant : intact tant que rien n'est validé
+  h=FileCreateRemplacement(asNom, &Direct);
+  REQUIRE(h>0);
+  CHECK(FileWrite(h, "deux", 4)==4);
+  CHECK(FileFlush(h));
+  CHECK(LitTout(asNom)=="un");
+  // Abandon : intact, rien de laissé
+  FileAbandonRemplacement(h);
+  CHECK(LitTout(asNom)=="un");
+  CHECK(NbFichiers(Dossier)==NbAvant+1);
+  // Validation : remplacé
+  h=FileCreateRemplacement(asNom, &Direct);
+  REQUIRE(h>0);
+  CHECK(FileWrite(h, "trois", 5)==5);
+  CHECK(FileCommitRemplacement(h));
+  CHECK(LitTout(asNom)=="trois");
+  CHECK(NbFichiers(Dossier)==NbAvant+1);
+  // Poignée invalide, dossier inexistant, dossier à la place du fichier
+  CHECK_FALSE(FileCommitRemplacement(-1));
+  FileAbandonRemplacement(-1);
+  const std::string asDansSortie=asNom.str().substr(0, asNom.str().find_last_of("/\\")+1);
+  fs::remove_all(CheminDe(AnsiString((asDansSortie+"compat_inexistant").c_str())));
+  CHECK(FileCreateRemplacement(AnsiString((asDansSortie+"compat_inexistant/fichier.bin").c_str()), &Direct)==-1);
+  const AnsiString asDossier=FichierSortie("compat_remplacement_dossier");
+  fs::create_directories(CheminDe(asDossier));
+  CHECK(FileCreateRemplacement(asDossier, &Direct)==-1);
+  CHECK(fs::is_directory(CheminDe(asDossier)));
+#ifndef _WIN32
+  // Droits du fichier existant gardés ; lien symbolique gardé, sa cible remplacée
+  fs::permissions(CheminDe(asNom), fs::perms::owner_read|fs::perms::owner_write|fs::perms::group_read);
+  h=FileCreateRemplacement(asNom, &Direct);
+  REQUIRE(h>0);
+  CHECK(FileCommitRemplacement(h));
+  CHECK(fs::status(CheminDe(asNom)).permissions()==(fs::perms::owner_read|fs::perms::owner_write|fs::perms::group_read));
+  const AnsiString asLien=FichierSortie("compat_remplacement_lien.bin");
+  fs::remove(CheminDe(asLien));
+  fs::create_symlink(CheminDe(asNom), CheminDe(asLien));
+  h=FileCreateRemplacement(asLien, &Direct);
+  REQUIRE(h>0);
+  CHECK(FileWrite(h, "lien", 4)==4);
+  CHECK(FileCommitRemplacement(h));
+  CHECK(fs::is_symlink(CheminDe(asLien)));
+  CHECK(LitTout(asNom)=="lien");
+  fs::remove(CheminDe(asLien));
+  // Fichier en lecture seule : refusé (rename le remplacerait sans rien dire)
+  fs::permissions(CheminDe(asNom), fs::perms::owner_read);
+  if (access(CheminDe(asNom).c_str(), W_OK)!=0) // Faux pour root
+   {
+    CHECK(FileCreateRemplacement(asNom, &Direct)==-1);
+    CHECK(LitTout(asNom)=="lien");
+   }
+  fs::permissions(CheminDe(asNom), fs::perms::owner_read|fs::perms::owner_write);
+  // Dossier en lecture seule : fichier existant écrit directement ; nouveau, impossible
+  const AnsiString asProtege=FichierSortie("compat_remplacement_protege/fichier.bin");
+  const fs::path Protege=CheminDe(asProtege).parent_path();
+  fs::create_directories(Protege);
+  EcritTout(asProtege, "ancien");
+  fs::permissions(Protege, fs::perms::owner_read|fs::perms::owner_exec);
+  if (access(Protege.c_str(), W_OK)!=0)
+   {
+    h=FileCreateRemplacement(asProtege, &Direct);
+    REQUIRE(h>0);
+    CHECK(Direct);
+    CHECK(FileWrite(h, "nouveau", 7)==7);
+    CHECK(FileCommitRemplacement(h));
+    CHECK(LitTout(asProtege)=="nouveau");
+    CHECK(FileCreateRemplacement(FichierSortie("compat_remplacement_protege/autre.bin"), &Direct)==-1);
+   }
+  fs::permissions(Protege, fs::perms::owner_all);
+#endif
+  fs::remove(CheminDe(asNom));
  }
 //---------------------------------------------------------------------------
