@@ -239,8 +239,11 @@ TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QAbstractSpinBox>(Parent)
                  { // SetValue : Text:=IntToStr(CheckValue(v)) ; comme WM_SETTEXT, curseur au début
                   QString t=QString::number(CheckValue(v));
                   if (t==lineEdit()->text()) return;
+                  bool Avant=AffectationEnCours; // OnChange peut affecter Value à son tour
+                  AffectationEnCours=true;
                   lineEdit()->setText(t);
                   lineEdit()->setCursorPosition(0);
+                  AffectationEnCours=Avant;
                  });
   // Simples champs, mémorisés dans les propriétés « vcl... » du .ui
   MinValue.Definit([this]() { return property("vclMinValue").toInt(); },
@@ -317,6 +320,7 @@ void TCSpinEdit::Valide()
  {
   int v=Value;
   if (CheckValue(v)!=v) Value=v; // SetValue(Value)
+  if (OnExit) OnExit(this);
  }
 //---------------------------------------------------------------------------
 // TButton, TBitBtn

@@ -22,6 +22,9 @@ TfrmParamBus::TfrmParamBus(TComponent* Owner)
  for(int i=0; i<9; i++)
   if (i!=4) // v5.4 : plus de zoom !
    frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, ((TBitBtn*)(FindComponent((UnicodeString)("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
+ for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) // v6.0.2 : champs des n° d'arrêts
+  for(int j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
+   Connecte(((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->OnExit, this, &TfrmParamBus::CSpinEditExit);
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::RafraichitNbBus()
@@ -105,11 +108,12 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
             ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
            break;
    default:// N°d'arrêt de bus
+           // v6.0.2 : pendant la frappe, le texte n'est pas réécrit (l'original le remettait à 0 ou au suivant à chaque chiffre) : voir CSpinEditExit
            if ((n<=0)||(n>cv->NbArretsBus)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de ArretBus dans l'original)
-            CSpinEdit->Value=0;
+            { if (!CSpinEdit->Frappe()) CSpinEdit->Value=0; }
            else
             if (!cv->ArretBus[n-1].Defini())
-             CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsBus;
+             { if (!CSpinEdit->Frappe()) CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsBus; }
             else
              if (!InitialisationEnCours)
               {
@@ -127,6 +131,17 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
            break;
   }
  if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+}
+//---------------------------------------------------------------------------
+void TfrmParamBus::CSpinEditExit(TObject *Sender)
+{ // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
+ TCSpinEdit *CSpinEdit=(TCSpinEdit*)Sender;
+ int n=CSpinEdit->Value;
+ if ((n<=0)||(n>cv->NbArretsBus))
+  CSpinEdit->Value=0;
+ else
+  if (!cv->ArretBus[n-1].Defini())
+   CSpinEdit->Value=1+n%cv->NbArretsBus;
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::ButtonAideClick(TObject *Sender)

@@ -198,6 +198,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelT;
     void FormShow(TObject *Sender);
     void CSpinEditChange(TObject *Sender);
+    void CSpinEditExit(TObject *Sender); // v6.0.2
     void ButtonAideClick(TObject *Sender);
     void MenuItemClick(TObject *Sender);
     void BitBtnDirClick(TObject *Sender);

@@ -595,6 +595,7 @@ class TestInterface : public QObject
   void fichesPrioritesEtFeuxPietons();
   void fichesParametres();
   void champEntreeBorne();
+  void numeroArretPendantLaFrappe();
   void ficheCarrefours();
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
@@ -1911,6 +1912,71 @@ void TestInterface::champEntreeBorne()
   QVERIFY2(Ecart.isEmpty(), qPrintable(Ecart));
   QVERIFY(Max>0);
   QCOMPARE((int)cv->NbMaxPersonnesTaxi, Max);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::numeroArretPendantLaFrappe()
+ { // v6.0.2 : Paramètres des lignes de bus et de tram (Géant, plus de dix arrêts de
+   // chaque). Pendant la frappe, le texte n'est plus réécrit : l'original remettait à 0,
+   // ou au suivant, dès le premier chiffre invalide (« 12 » impossible à taper si
+   // l'arrêt 1 manquait, « 0 » après avoir effacé). En quittant le champ : numéro dans
+   // les bornes, vide ou nul remis à 0, arrêt non défini remplacé par le suivant
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "numero_arret.cvw").isEmpty());
+  QStringList Ecarts;
+  auto Verifie=[&Ecarts](const char *Nom, TCSpinEdit *Nb, TCSpinEdit *Champ, int NbArrets, int &xNonDefini)
+   {
+    auto Attendu=[&](const char *Quoi, const QString &Texte)
+     {
+      if (Champ->text()!=Texte)
+       Ecarts<<QString::fromUtf8("%1, %2 : « %3 » au lieu de « %4 »").arg(Nom, Quoi, Champ->text(), Texte);
+     };
+    Nb->Value=2;
+    QVERIFY(Champ->isVisible());
+    Champ->window()->activateWindow();
+    Champ->setFocus(Qt::OtherFocusReason);
+    // Effacer le texte : le champ reste vide
+    Champ->selectAll();
+    QTest::keyClick(Champ, Qt::Key_Delete);
+    Attendu("texte effacé", QString());
+    // Trop grand : gardé pendant la frappe, borné en quittant le champ
+    QString Grand=QString::number(10*NbArrets);
+    QTest::keyClicks(Champ, Grand);
+    Attendu("trop grand, pendant la frappe", Grand);
+    QTest::keyClick(Champ, Qt::Key_Tab);
+    Attendu("trop grand, en quittant le champ", QString::number(NbArrets));
+    // Vide : 0 en quittant le champ
+    Champ->setFocus(Qt::OtherFocusReason);
+    Champ->selectAll();
+    QTest::keyClick(Champ, Qt::Key_Delete);
+    QTest::keyClick(Champ, Qt::Key_Tab);
+    Attendu("vide, en quittant le champ", "0");
+    // Arrêt n°1 non défini : gardé pendant la frappe, remplacé par le suivant en
+    // quittant le champ (état forcé : les arrêts d'un réseau valide sont définis)
+    Champ->setFocus(Qt::OtherFocusReason);
+    Champ->selectAll();
+    int xAvant=xNonDefini;
+    xNonDefini=-1;
+    QTest::keyClicks(Champ, "1");
+    Attendu("non défini, pendant la frappe", "1");
+    QTest::keyClick(Champ, Qt::Key_Tab);
+    Attendu("non défini, en quittant le champ", "2");
+    xNonDefini=xAvant;
+   };
+  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefLignesBus); });
+  QuandModale([]() { return frmParamBus; }, [&]()
+   {
+    Verifie("bus", frmParamBus->CSpinEdit1, frmParamBus->CSpinEdit11, cv->NbArretsBus, cv->ArretBus[0].x);
+    Clique(frmParamBus->ButtonAnnuler);
+   });
+  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefLignesTram); });
+  QuandModale([]() { return frmParamTram; }, [&]()
+   {
+    Verifie("tram", frmParamTram->CSpinEdit1, frmParamTram->CSpinEdit11, cv->NbArretsTram, cv->ArretTram[0].x);
+    Clique(frmParamTram->ButtonAnnuler);
+   });
+  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  Clique(frmSimulation->ToolButtonParametres);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheCarrefours()
