@@ -135,6 +135,10 @@ if(TARGET cvwfiches)
     ENVIRONMENT "CV_CARTE=${PROJECT_SOURCE_DIR}/maps/Démo.cvw;CV_DOSSIER_CAPTURES=${CMAKE_CURRENT_BINARY_DIR}/sortie/captures;QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"
     TIMEOUT 300
   )
+  # Sous AddressSanitizer, le test est plusieurs fois plus lent
+  if(CMAKE_CXX_FLAGS MATCHES "sanitize")
+    set_tests_properties(interface.demo PROPERTIES TIMEOUT 1800)
+  endif()
 
   # Borne d'un indice testée après son usage, dans les fiches (v6.0.2) : tools/audit_bornes.py,
   # sans les six tableaux de distances, signalés à tort (i%NbX, jamais hors bornes)

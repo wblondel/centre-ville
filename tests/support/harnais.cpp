@@ -254,7 +254,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
        break;
       }
      // Vérification du nombre de cases potentielles avec 1 piéton par case minimal. v3.8
-     for(d=nord; (!v->PietonPeutAller((direction)d))&&(d<=ouest); d++);
+     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller((direction)d)); d++); // v6.0.2 : borne testée avant, comme f_simul.cpp
      NbCasesPietonPeutAller+=(d<=ouest);
     }
   if (Ok&&(NbCasesPietonPeutAller<cv->NbPietons)) // v4.2
