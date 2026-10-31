@@ -605,6 +605,7 @@ class TestInterface : public QObject
   void fichesEvolutionEtVehicules();
   void ficheFluiditeTrafic();
   void ficheRecherche();
+  void rechercheElementsNonDefinis();
   // Couche VCL
   void controleCSpinEdit();
   // Services système (phase 7)
@@ -2654,8 +2655,13 @@ void TestInterface::fichePietonDansUnVehicule()
         {
          o.Vue=true;
          QPoint c=o.Place(o.Numero(p));
-         Montre(i+1, c.x(), c.y());
          QStringList e;
+         // Rechercher : le curseur va au véhicule, et le texte le dit
+         r->CSpinEditPieton->Value=i+1;
+         r->CSpinEditPietonChange(r->CSpinEditPieton);
+         Compare(e, "Rechercher", r->StatusBar->SimpleText, QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(i+1).arg(o.Nom).arg(o.Numero(p)).arg(c.x()).arg(c.y()));
+         if ((s->DrawGridSimul->Col!=c.x())||(s->DrawGridSimul->Row!=c.y())) e<<QString("curseur en (%1, %2)").arg((int)s->DrawGridSimul->Col).arg((int)s->DrawGridSimul->Row);
+         Montre(i+1, c.x(), c.y());
          Compare(e, "cadre", f->GroupBoxPieton->Caption, Cadre(i+1, c.x(), c.y()));
          Compare(e, "position", f->LabelPosition->Caption, QString::fromUtf8(o.Position));
          Compare(e, "véhicule", f->LabelBusTramTaxiVehlib->Caption, NumeroCoordonnees(o.Numero(p), c.x(), c.y()));
@@ -3448,7 +3454,7 @@ void TestInterface::ficheRecherche()
     {"place de taxi", r->RadioButtonPlaceTaxi, r->CSpinEditPlaceTaxi, cv->NbPlacesTaxi, [Trouve](int k, int &x, int &y)
       {
        place_taxi *p=cv->PlaceTaxi+k-1;
-       if (!p->Definie()) return QString(); // texte inchangé (code d'origine)
+       if (!p->Definie()) return QString::fromUtf8("Place de taxi n°%1 non utilisée").arg(k); // v6.0.2 : l'original gardait le texte précédent
        x=p->x; y=p->y;
        return Trouve("Place de taxi n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -3461,7 +3467,7 @@ void TestInterface::ficheRecherche()
     {"place de parking", r->RadioButtonPlacePark, r->CSpinEditPlacePark, cv->NbPlacesPark, [Trouve](int k, int &x, int &y)
       {
        place_park *p=cv->PlacePark+k-1;
-       if (!p->Definie()) return QString();
+       if (!p->Definie()) return QString::fromUtf8("Place de parking n°%1 non utilisée").arg(k);
        x=p->x; y=p->y;
        return Trouve("Place de parking n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -3474,7 +3480,7 @@ void TestInterface::ficheRecherche()
     {"place de vehlib", r->RadioButtonPlaceVehlib, r->CSpinEditPlaceVehlib, cv->NbPlacesVehlib, [Trouve](int k, int &x, int &y)
       {
        place_vehlib *p=cv->PlaceVehlib+k-1;
-       if (!p->Definie()) return QString();
+       if (!p->Definie()) return QString::fromUtf8("Place de vehlib n°%1 non utilisée").arg(k);
        x=p->x; y=p->y;
        return Trouve("Place de vehlib n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -3575,7 +3581,7 @@ void TestInterface::ficheRecherche()
     {"piéton", [](voie *v) { return v->NumPieton[0]; },
      Touches(Qt::Key_L, Qt::ControlModifier), r->RadioButtonPieton, r->CSpinEditPieton,
      [](int n, int &x, int &y, QString &t)
-      { // Dans un taxi ou un vehlib, le texte (et, pour un vehlib, la position) vient de cv->Bus (code d'origine)
+      { // v6.0.2 : dans un véhicule, sa position et son numéro (l'original lisait cv->Bus pour un taxi et un vehlib, et ne cherchait pas dans les trams)
        pieton *p=cv->Pieton+n-1;
        if (p->Defini())
         {
@@ -3583,23 +3589,14 @@ void TestInterface::ficheRecherche()
          t=QString::fromUtf8("Piéton n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
          return (cv->v[x][y].NumPieton[0]==n)||(cv->v[x][y].NumPieton[1]==n);
         }
-       if (!p->NumBus&&!p->NumTaxi&&!p->NumVehlib) { t=QString::fromUtf8("Piéton n°%1 non utilisé").arg(n); return false; }
-       auto Dans=[&t, n](const char *Quoi, int Num, int xb, int yb)
-        { t=QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(n).arg(Quoi).arg(Num).arg(xb).arg(yb); };
-       if (p->NumBus) { x=cv->Bus[p->NumBus-1].x; y=cv->Bus[p->NumBus-1].y; Dans("bus", p->NumBus, x, y); }
-       if (p->NumTaxi)
-        {
-         x=cv->Taxi[p->NumTaxi-1].x; y=cv->Taxi[p->NumTaxi-1].y;
-         if (p->NumTaxi<=cv->NbBus) Dans("taxi", p->NumTaxi, cv->Bus[p->NumTaxi-1].x, cv->Bus[p->NumTaxi-1].y);
-         else t.clear(); // lecture hors de cv->Bus dans l'original : texte non vérifié
-        }
-       if (p->NumVehlib)
-        {
-         if (p->NumVehlib>cv->NbBus) { t.clear(); return false; }
-         x=cv->Bus[p->NumVehlib-1].x; y=cv->Bus[p->NumVehlib-1].y;
-         Dans("vehlib", p->NumVehlib, x, y);
-        }
-       return false; // fiche d'informations non vérifiée (cadre en coordonnées de cv->Bus, lot 2)
+       if (!p->NumBus&&!p->NumTram&&!p->NumTaxi&&!p->NumVehlib) { t=QString::fromUtf8("Piéton n°%1 non utilisé").arg(n); return false; }
+       auto Dans=[&t, &x, &y, n](const char *Quoi, int Num, int xb, int yb)
+        { x=xb; y=yb; t=QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(n).arg(Quoi).arg(Num).arg(xb).arg(yb); };
+       if (p->NumBus) Dans("bus", p->NumBus, cv->Bus[p->NumBus-1].x, cv->Bus[p->NumBus-1].y);
+       if (p->NumTram) Dans("tram", p->NumTram, cv->Tram[p->NumTram-1].x, cv->Tram[p->NumTram-1].y);
+       if (p->NumTaxi) Dans("taxi", p->NumTaxi, cv->Taxi[p->NumTaxi-1].x, cv->Taxi[p->NumTaxi-1].y);
+       if (p->NumVehlib) Dans("vehlib", p->NumVehlib, cv->Vehlib[p->NumVehlib-1].x, cv->Vehlib[p->NumVehlib-1].y);
+       return true;
       },
      frmInfosPieton, Touches(Qt::Key_P, Qt::ControlModifier),
      [Groupe](int n, int x, int y) { return Groupe(frmInfosPieton->GroupBoxPieton, n, x, y); }, 8, nullptr},
@@ -3707,10 +3704,10 @@ void TestInterface::ficheRecherche()
   QVERIFY(Arrete());
   //-------------------------------------------------------------------------
   // Hors simulation (curseur immobile) : numéro resté au-dessus du nombre
-  // d'éléments (carte précédente plus grande) ; FormShow règle MaxValue
-  // d'après la carte sans le ramener dans les bornes ni déclencher OnChange,
-  // la case courante ne bouge pas. Frappe hors bornes acceptée (« n°
-  // incorrect » à chaque chiffre), ramenée dans les bornes en quittant le champ
+  // d'éléments (carte précédente plus grande) ; v6.0.2 : FormShow le ramène dans
+  // les bornes, sans OnChange : la case courante ne bouge pas. Frappe hors bornes
+  // acceptée (« n° incorrect » à chaque chiffre), ramenée dans les bornes en
+  // quittant le champ
   int NbParkings=cv->NbParkings;
   r->CSpinEditParking->MaxValue=NbParkings+10;
   r->CSpinEditParking->Value=NbParkings+5;
@@ -3722,7 +3719,7 @@ void TestInterface::ficheRecherche()
   s->ActionRechercher->Execute();
   QVERIFY(r->isVisible());
   QCOMPARE((int)r->CSpinEditParking->MaxValue, NbParkings);
-  QCOMPARE((int)r->CSpinEditParking->Value, NbParkings+5);
+  QCOMPARE((int)r->CSpinEditParking->Value, NbParkings);
   QCOMPARE(NbChangeParking, 0);
   QCOMPARE(g->Col, xc);
   QCOMPARE(g->Row, yc);
@@ -3732,9 +3729,11 @@ void TestInterface::ficheRecherche()
   QVERIFY(QTest::qWaitFor([r]() { return QApplication::activeWindow()==r; }, 3000));
   Clique(r->RadioButtonParking);
   QVERIFY(r->CSpinEditParking->hasFocus());
-  QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Aucune parking défini ou n° incorrect"));
-  QCOMPARE(g->Col, xc);
-  QCOMPARE(g->Row, yc);
+  parking *Dernier=cv->Parking+NbParkings-1;
+  QVERIFY(Dernier->Defini());
+  QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Parking n°%1 trouvé en (%2, %3)").arg(NbParkings).arg(Dernier->x).arg(Dernier->y));
+  QCOMPARE(g->Col, Dernier->x);
+  QCOMPARE(g->Row, Dernier->y);
   QString Frappe=QString::number(100*NbParkings);
   r->CSpinEditParking->selectAll();
   NbChangeParking=0;
@@ -3746,14 +3745,53 @@ void TestInterface::ficheRecherche()
   QVERIFY(!r->CSpinEditParking->hasFocus());
   QCOMPARE((int)r->CSpinEditParking->Value, NbParkings);
   QCOMPARE(NbChangeParking, (int)Frappe.size()+1);
-  parking *Dernier=cv->Parking+NbParkings-1;
-  QVERIFY(Dernier->Defini());
   QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8("Parking n°%1 trouvé en (%2, %3)").arg(NbParkings).arg(Dernier->x).arg(Dernier->y));
   QCOMPARE(g->Col, Dernier->x);
   QCOMPARE(g->Row, Dernier->y);
   r->CSpinEditParking->OnChange=ChangeParking;
   Clique(r->ButtonAnnuler);
   QVERIFY(!r->isVisible());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::rechercheElementsNonDefinis()
+ { // v6.0.2 : taxi, vehlib ou place sans position : un message, et le curseur ne
+   // bouge pas (l'original allait en (-1, -1) pour un taxi ou un vehlib, et gardait
+   // le texte précédent pour une place). Ces états ne se produisent pas sur les
+   // cartes livrées : ils sont forcés le temps de la vérification
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "recherche_non_definis.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  TfrmSimulation *s=frmSimulation;
+  TfrmRecherche *r=frmRecherche;
+  s->ActionRechercher->Execute();
+  QVERIFY(r->isVisible());
+  int xc=s->DrawGridSimul->Col, yc=s->DrawGridSimul->Row;
+  auto Verifie=[r, s, xc, yc](TCSpinEdit *Champ, int &x, int &y, std::function<void()> Change, const QString &Texte)
+   {
+    int xa=x, ya=y;
+    x=-1; y=-1;
+    Champ->Value=1;
+    r->StatusBar->SimpleText="";
+    Change();
+    QString Ecart;
+    if (Q(r->StatusBar->SimpleText)!=Texte) Ecart=Q(r->StatusBar->SimpleText);
+    if ((s->DrawGridSimul->Col!=xc)||(s->DrawGridSimul->Row!=yc)) Ecart+=" : curseur déplacé";
+    x=xa; y=ya;
+    return Ecart;
+   };
+  QString e;
+  e=Verifie(r->CSpinEditTaxi, cv->Taxi[0].x, cv->Taxi[0].y, [r]() { r->CSpinEditTaxiChange(r->CSpinEditTaxi); }, QString::fromUtf8("Taxi n°1 non utilisé"));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  e=Verifie(r->CSpinEditVehlib, cv->Vehlib[0].x, cv->Vehlib[0].y, [r]() { r->CSpinEditVehlibChange(r->CSpinEditVehlib); }, QString::fromUtf8("Vehlib n°1 non utilisé"));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  e=Verifie(r->CSpinEditPlaceTaxi, cv->PlaceTaxi[0].x, cv->PlaceTaxi[0].y, [r]() { r->CSpinEditPlaceTaxiChange(r->CSpinEditPlaceTaxi); }, QString::fromUtf8("Place de taxi n°1 non utilisée"));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  e=Verifie(r->CSpinEditPlacePark, cv->PlacePark[0].x, cv->PlacePark[0].y, [r]() { r->CSpinEditPlaceParkChange(r->CSpinEditPlacePark); }, QString::fromUtf8("Place de parking n°1 non utilisée"));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  e=Verifie(r->CSpinEditPlaceVehlib, cv->PlaceVehlib[0].x, cv->PlaceVehlib[0].y, [r]() { r->CSpinEditPlaceVehlibChange(r->CSpinEditPlaceVehlib); }, QString::fromUtf8("Place de vehlib n°1 non utilisée"));
+  QVERIFY2(e.isEmpty(), qPrintable(e));
+  Clique(r->ButtonAnnuler);
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::controleCSpinEdit()

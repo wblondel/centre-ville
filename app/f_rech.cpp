@@ -113,6 +113,21 @@ void TfrmRecherche::RadioButtonClick(TObject *Sender)
  RafraichitAffichage();
 }
 //---------------------------------------------------------------------------
+// v6.0.2 : un numéro resté plus grand que le nombre d'éléments (carte précédente)
+// est ramené dans les bornes. Sans OnChange : le curseur ne doit pas quitter la case
+// courante à l'ouverture de la fiche
+static void FixeNumeroMax(TCSpinEdit *CSpinEdit, int NumMax)
+ {
+  CSpinEdit->MAXVALUE=NumMax;
+  if (CSpinEdit->Value>NumMax)
+   {
+    TNotifyEvent Change=CSpinEdit->OnChange;
+    CSpinEdit->OnChange=nullptr;
+    CSpinEdit->Value=NumMax;
+    CSpinEdit->OnChange=Change;
+   }
+ }
+//---------------------------------------------------------------------------
 void TfrmRecherche::FormShow(TObject *Sender)
 {
  int i,
@@ -120,21 +135,21 @@ void TfrmRecherche::FormShow(TObject *Sender)
      y=frmSimulation->DrawGridSimul->Row;
  voie *v=&(cv->v[x][y]);
  frmSimulation->ActionRechercher->Checked=true;
- CSpinEditParking->MAXVALUE=cv->NbParkings;
- CSpinEditFeu->MAXVALUE=cv->NbFeux;
- CSpinEditVehicule->MAXVALUE=cv->NbVehicules;
- CSpinEditPieton->MAXVALUE=cv->NbPietons;
- CSpinEditBus->MAXVALUE=cv->NbBus; // v3.0
- CSpinEditArretBus->MAXVALUE=cv->NbArretsBus; // v3.0
- CSpinEditTram->MAXVALUE=cv->NbTrams; // v3.5
- CSpinEditArretTram->MAXVALUE=cv->NbArretsTram; // v3.5
- CSpinEditTaxi->MAXVALUE=cv->NbTaxis; // v3.6
- CSpinEditPlaceTaxi->MAXVALUE=cv->NbPlacesTaxi; // v3.6
- CSpinEditFileTaxi->MAXVALUE=cv->NbFilesTaxi; // v3.6
- CSpinEditPlacePark->MAXVALUE=cv->NbPlacesPark; // v5.0
- CSpinEditFilePark->MAXVALUE=cv->NbFilesPark; // v5.0
- CSpinEditVehlib->MAXVALUE=cv->NbVehlibs; // v5.3
- CSpinEditPlaceVehlib->MAXVALUE=cv->NbPlacesVehlib; // v5.3
+ FixeNumeroMax(CSpinEditParking, cv->NbParkings);
+ FixeNumeroMax(CSpinEditFeu, cv->NbFeux);
+ FixeNumeroMax(CSpinEditVehicule, cv->NbVehicules);
+ FixeNumeroMax(CSpinEditPieton, cv->NbPietons);
+ FixeNumeroMax(CSpinEditBus, cv->NbBus); // v3.0
+ FixeNumeroMax(CSpinEditArretBus, cv->NbArretsBus); // v3.0
+ FixeNumeroMax(CSpinEditTram, cv->NbTrams); // v3.5
+ FixeNumeroMax(CSpinEditArretTram, cv->NbArretsTram); // v3.5
+ FixeNumeroMax(CSpinEditTaxi, cv->NbTaxis); // v3.6
+ FixeNumeroMax(CSpinEditPlaceTaxi, cv->NbPlacesTaxi); // v3.6
+ FixeNumeroMax(CSpinEditFileTaxi, cv->NbFilesTaxi); // v3.6
+ FixeNumeroMax(CSpinEditPlacePark, cv->NbPlacesPark); // v5.0
+ FixeNumeroMax(CSpinEditFilePark, cv->NbFilesPark); // v5.0
+ FixeNumeroMax(CSpinEditVehlib, cv->NbVehlibs); // v5.3
+ FixeNumeroMax(CSpinEditPlaceVehlib, cv->NbPlacesVehlib); // v5.3
  CSpinEditX->Value=x;
  CSpinEditY->Value=y;
  if (v->NumParking) CSpinEditParking->Value=v->NumParking;
@@ -266,7 +281,7 @@ void TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
    StatusBar->SimpleText=Format("Piéton n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPieton->Value, p->x, p->y)));
   }
  else
-  if (p->NumBus||p->NumTaxi||p->NumVehlib) // v5.4.1 : oubli tram, taxi et vehlib
+  if (p->NumBus||p->NumTram||p->NumTaxi||p->NumVehlib) // v5.4.1 : oubli tram, taxi et vehlib. v6.0.2 : tram
    {
 	if (p->NumBus)
 	 {
@@ -278,6 +293,16 @@ void TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
 												   cv->Bus[p->NumBus-1].x,
 												   cv->Bus[p->NumBus-1].y)));
 	 }
+	if (p->NumTram) // v6.0.2
+	 {
+	  frmSimulation->DrawGridSimul->Col=cv->Tram[p->NumTram-1].x;
+	  frmSimulation->DrawGridSimul->Row=cv->Tram[p->NumTram-1].y;
+	  StatusBar->SimpleText=Format( "Piéton n°%d trouvé dans le tram n°%d (%d, %d)",
+									ARRAYOFCONST(( (int)CSpinEditPieton->Value,
+												   (int)p->NumTram,
+												   cv->Tram[p->NumTram-1].x,
+												   cv->Tram[p->NumTram-1].y)));
+	 }
 	if (p->NumTaxi)
 	 {
 	  frmSimulation->DrawGridSimul->Col=cv->Taxi[p->NumTaxi-1].x;
@@ -285,18 +310,18 @@ void TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
 	  StatusBar->SimpleText=Format( "Piéton n°%d trouvé dans le taxi n°%d (%d, %d)",
 									ARRAYOFCONST(( (int)CSpinEditPieton->Value,
 												   (int)p->NumTaxi,
-												   cv->Bus[p->NumTaxi-1].x,
-												   cv->Bus[p->NumTaxi-1].y)));
+												   cv->Taxi[p->NumTaxi-1].x, // v6.0.2 : l'original lisait cv->Bus (hors du tableau si NumTaxi>NbBus)
+												   cv->Taxi[p->NumTaxi-1].y)));
 	 }
 	if (p->NumVehlib)
-	 {
-	  frmSimulation->DrawGridSimul->Col=cv->Bus[p->NumVehlib-1].x;
-	  frmSimulation->DrawGridSimul->Row=cv->Bus[p->NumVehlib-1].y;
+	 { // v6.0.2 : l'original lisait cv->Bus, pour le curseur comme pour le texte
+	  frmSimulation->DrawGridSimul->Col=cv->Vehlib[p->NumVehlib-1].x;
+	  frmSimulation->DrawGridSimul->Row=cv->Vehlib[p->NumVehlib-1].y;
 	  StatusBar->SimpleText=Format( "Piéton n°%d trouvé dans le vehlib n°%d (%d, %d)",
 									ARRAYOFCONST(( (int)CSpinEditPieton->Value,
 												   (int)p->NumVehlib,
-												   cv->Bus[p->NumVehlib-1].x,
-												   cv->Bus[p->NumVehlib-1].y)));
+												   cv->Vehlib[p->NumVehlib-1].x,
+												   cv->Vehlib[p->NumVehlib-1].y)));
 	 }
    }
   else
@@ -416,9 +441,14 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject *Sender)
    return;
   }
  taxi *t=cv->Taxi+CSpinEditTaxi->Value-1;
- frmSimulation->DrawGridSimul->Col=t->x;
- frmSimulation->DrawGridSimul->Row=t->y;
- StatusBar->SimpleText=Format("Taxi n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTaxi->Value, t->x, t->y)));
+ if (t->Defini()) // v6.0.2
+  {
+   frmSimulation->DrawGridSimul->Col=t->x;
+   frmSimulation->DrawGridSimul->Row=t->y;
+   StatusBar->SimpleText=Format("Taxi n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditTaxi->Value, t->x, t->y)));
+  }
+ else
+  StatusBar->SimpleText=Format("Taxi n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditTaxi->Value)));
 }
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
@@ -438,6 +468,8 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
    frmSimulation->DrawGridSimul->Row=pt->y;
    StatusBar->SimpleText=Format("Place de taxi n°%d trouvée en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPlaceTaxi->Value, pt->x, pt->y)));
   }
+ else // v6.0.2 : l'original gardait le texte précédent
+  StatusBar->SimpleText=Format("Place de taxi n°%d non utilisée", ARRAYOFCONST(((int)CSpinEditPlaceTaxi->Value)));
 }
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditFileTaxiChange(TObject *Sender)
@@ -477,6 +509,8 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject *Sender)
    frmSimulation->DrawGridSimul->Row=pp->y;
    StatusBar->SimpleText=Format("Place de parking n°%d trouvée en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPlacePark->Value, pp->x, pp->y)));
   }
+ else // v6.0.2 : l'original gardait le texte précédent
+  StatusBar->SimpleText=Format("Place de parking n°%d non utilisée", ARRAYOFCONST(((int)CSpinEditPlacePark->Value)));
 }
 //---------------------------------------------------------------------------
 
@@ -510,9 +544,14 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject *Sender)
    return;
   }
  vehlib *vl=cv->Vehlib+CSpinEditVehlib->Value-1;
- frmSimulation->DrawGridSimul->Col=vl->x;
- frmSimulation->DrawGridSimul->Row=vl->y;
- StatusBar->SimpleText=Format("Vehlib n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditVehlib->Value, vl->x, vl->y)));
+ if (vl->Defini()) // v6.0.2
+  {
+   frmSimulation->DrawGridSimul->Col=vl->x;
+   frmSimulation->DrawGridSimul->Row=vl->y;
+   StatusBar->SimpleText=Format("Vehlib n°%d trouvé en (%d, %d)", ARRAYOFCONST(((int)CSpinEditVehlib->Value, vl->x, vl->y)));
+  }
+ else
+  StatusBar->SimpleText=Format("Vehlib n°%d non utilisé", ARRAYOFCONST(((int)CSpinEditVehlib->Value)));
 }
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject *Sender)
@@ -532,6 +571,8 @@ void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject *Sender)
    frmSimulation->DrawGridSimul->Row=pv->y;
    StatusBar->SimpleText=Format("Place de vehlib n°%d trouvée en (%d, %d)", ARRAYOFCONST(((int)CSpinEditPlaceVehlib->Value, pv->x, pv->y)));
   }
+ else // v6.0.2 : l'original gardait le texte précédent
+  StatusBar->SimpleText=Format("Place de vehlib n°%d non utilisée", ARRAYOFCONST(((int)CSpinEditPlaceVehlib->Value)));
 }
 //---------------------------------------------------------------------------
 void TfrmRecherche::FormKeyDown(TObject *Sender, WORD &Key,

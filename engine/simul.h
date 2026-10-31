@@ -738,6 +738,7 @@ class taxi // v3.6 instances créées au lancement de la simulation
   ~taxi() {};
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int f) { NumFile=f; }; // 0 <= f < NbFilesTaxi
+  bool Defini() { return (x>-1)&&(y>-1); }; // v6.0.2 (Rechercher)
   void Place(int x0, int y0) { x=x0; y=y0; };
   void Place(int p); // 0 <= p < NbPlacesTaxi
   void CalculeProchaineDirection();
