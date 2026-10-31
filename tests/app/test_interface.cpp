@@ -2164,9 +2164,13 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
     int Grille=Hauteur-22-(f.Couloirs?17:0)-4; // zone cliente, case à cocher, bord de la grille
     QCOMPARE(f.Grille->viewport()->height(), Grille);
     if (t.Nb>0)
-     QCOMPARE(f.Grille->verticalScrollBar()->maximum()>0, 21*Lignes>Grille+1); // dernier trait coupé toléré
+     { // v6.0.2 : ligne d'en-tête fixe, même après un tableau vide sur une autre carte
+      QCOMPARE(f.Grille->verticalScrollBar()->maximum()>0, 21*Lignes>Grille+1); // dernier trait coupé toléré
+      QCOMPARE((int)f.Grille->FixedRows, 1);
+      QCOMPARE((int)f.Grille->Row, 1);
+     }
     else
-     { // RowCount=1 : TCustomGrid::SetRowCount ramène FixedRows à 0, et pour la suite
+     { // RowCount=1 : TCustomGrid::SetRowCount ramène FixedRows à 0, le temps de ce tableau
       QCOMPARE(f.Grille->verticalScrollBar()->maximum(), 0);
       QCOMPARE((int)f.Grille->FixedRows, 0);
      }
@@ -2226,11 +2230,13 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
 //---------------------------------------------------------------------------
 void TestInterface::fichesDistances()
  { // Géant (arrêts, files et places de chaque sorte, plus de 10 lignes pour les
-   // arrêts et les places) puis Démo (4 parkings, aucun arrêt, file ni place :
-   // tableaux vides, ce qui laisse ensuite ces grilles sans ligne fixe)
+   // arrêts et les places), Démo (4 parkings, aucun arrêt, file ni place : tableaux
+   // vides), puis de nouveau Géant : ces grilles retrouvent leur ligne fixe (v6.0.2)
   VerifieFichesDistances(QString::fromUtf8("Géant.cvw"), true);
   if (QTest::currentTestFailed()) return;
   VerifieFichesDistances(QString::fromUtf8("Démo.cvw"), false);
+  if (QTest::currentTestFailed()) return;
+  VerifieFichesDistances(QString::fromUtf8("Géant.cvw"), false);
  }
 //---------------------------------------------------------------------------
 void TestInterface::SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours)
