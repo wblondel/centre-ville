@@ -46,7 +46,7 @@ const AnsiString asLabel="Label",
 				 asFrmPourcentage="#.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais "#.000%"
 				 asFrmPourcents="0.0%", // v5.4.1 : porucentage à 0,1 près
 				 asFrmDemiCase="0.0", // v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
-				 asPosition[NBPOSITIONS]={"Entrée de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "ans un vehlib"}, // v5.3 (vehlib)
+				 asPosition[NBPOSITIONS]={"Entrée de la case", "Sortie de la case", "Dans un bus", "Dans un tram", "Dans un taxi", "Dans un vehlib"}, // v5.3 (vehlib). v6.0.2 : « ans un vehlib »
 				 asSituation[NBSITUATIONS]={ "Se promène",
 											 "Se dirige vers un passage piéton",
 											 "Se dirige vers un arrêt de bus",
@@ -80,7 +80,7 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
   int i;
   GroupBoxPieton->Caption=asDebutTitreCadrePieton;
   if (ARendreVisible)
-   { // v5.4.1 : manquait tram, taxi et vehlib...
+   { // v5.4.1 : manquait tram, taxi et vehlib... v6.0.2 : coordonnées lues dans leur tableau (l'original lisait les bus)
 	if (p->NumBus)
 	  GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 							   Format( asFrmNumeroCoordonnees,
@@ -92,22 +92,22 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
 		GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 								 Format( asFrmNumeroCoordonnees,
 										 ARRAYOFCONST(( NumPieton,
-														cv->Bus[p->NumTram-1].x,
-														cv->Bus[p->NumTram-1].y)));
+														cv->Tram[p->NumTram-1].x,
+														cv->Tram[p->NumTram-1].y)));
 	  else
 		if (p->NumTaxi)
 		  GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 								   Format( asFrmNumeroCoordonnees,
 										   ARRAYOFCONST(( NumPieton,
-														  cv->Bus[p->NumTaxi-1].x,
-														  cv->Bus[p->NumTaxi-1].y)));
+														  cv->Taxi[p->NumTaxi-1].x,
+														  cv->Taxi[p->NumTaxi-1].y)));
 		else
 		  if (p->NumVehlib)
 			GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 									 Format( asFrmNumeroCoordonnees,
 											 ARRAYOFCONST(( NumPieton,
-															cv->Bus[p->NumVehlib-1].x,
-															cv->Bus[p->NumVehlib-1].y)));
+															cv->Vehlib[p->NumVehlib-1].x,
+															cv->Vehlib[p->NumVehlib-1].y)));
 		  else // à pied
 			GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 									 Format( asFrmNumeroCoordonnees,
@@ -191,7 +191,7 @@ void TfrmInfosPieton::RafraichitInfos()
      Situation=ARRETTRAMTRV;
     if (p->FileTaxiTrv)
      Situation=FILETAXITRV;
-    if (p->FileTaxiTrv) // v5.3
+    if (p->PlaceVehlibTrv) // v5.3. v6.0.2 : l'original testait FileTaxiTrv
      Situation=PLACEVEHLIBTRV;
 
     if (p->AttendBus)
@@ -281,9 +281,9 @@ void TfrmInfosPieton::RafraichitInfos()
 	 else
 	  if (p->NumFileTaxi)
 	   LabelArretBusTramFileTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
-									  ARRAYOFCONST(( p->NumFileTaxi,
-													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()].x,
-													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()].y)));
+									  ARRAYOFCONST(( p->NumFileTaxi, // v6.0.2 : PlaceTeteFile() commence à 1 (l'original lisait la place suivante, hors du tableau pour la dernière)
+													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()-1].x,
+													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()-1].y)));
 	  else
 	   LabelArretBusTramFileTaxiVehlib->Caption="Aucun";
 

@@ -599,6 +599,7 @@ class TestInterface : public QObject
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
   void fichesInfos();
+  void fichePietonDansUnVehicule();
   // Lot 3 des fiches secondaires (phase 6)
   void ficheComposition();
   void fichesEvolutionEtVehicules();
@@ -2596,6 +2597,105 @@ void TestInterface::fichesInfos()
   CaptureFiche(frmInfosVehicule, "fiche_infos_vehicule_arret.png");
   Clique(frmInfosVehicule->ButtonOk);
   QVERIFY(!frmInfosVehicule->isVisible());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::fichePietonDansUnVehicule()
+ { // v6.0.2 : Géant, joué jusqu'à trouver un piéton dans chaque sorte de véhicule et
+   // dans chaque situation « se dirige vers... » que l'original confondait. Le
+   // numéro vient de Rechercher, et le curseur est placé sur l'objet
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "pieton_vehicule.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  TfrmSimulation *s=frmSimulation;
+  TfrmInfosPieton *f=frmInfosPieton;
+  TfrmRecherche *r=frmRecherche;
+  s->ActionDetailPieton->Execute();
+  s->ActionRechercher->Execute();
+  QVERIFY(f->isVisible()&&r->isVisible());
+  r->RadioButtonPieton->Checked=true;
+  auto Montre=[f, r, this](int n, int x, int y)
+   {
+    r->CSpinEditPieton->Value=n;
+    PlaceCurseur(x, y);
+    f->RafraichitInfos();
+   };
+  auto Libre=[](pieton *p)
+   { // Rien d'autre ne décide de la situation affichée
+    return !p->AttendBus&&!p->AttendTram&&!p->AttendTaxi&&!p->AttendVehlib&&!p->VeutDescendre&&!p->Ecrase&&!p->Mort;
+   };
+  struct Sorte
+   {
+    const char *Nom, *Position, *Situation;
+    std::function<int(pieton *)> Numero;
+    std::function<QPoint(int)> Place;
+    bool Vue;
+   };
+  std::vector<Sorte> Sortes=
+   {
+    {"bus", "Dans un bus", "Attend dans le bus", [](pieton *p) { return p->NumBus; }, [](int k) { return QPoint(cv->Bus[k-1].x, cv->Bus[k-1].y); }, false},
+    {"tram", "Dans un tram", "Attend dans le tram", [](pieton *p) { return p->NumTram; }, [](int k) { return QPoint(cv->Tram[k-1].x, cv->Tram[k-1].y); }, false},
+    {"taxi", "Dans un taxi", "Attend dans le taxi", [](pieton *p) { return p->NumTaxi; }, [](int k) { return QPoint(cv->Taxi[k-1].x, cv->Taxi[k-1].y); }, false},
+    {"vehlib", "Dans un vehlib", "Attend dans le vehlib", [](pieton *p) { return p->NumVehlib; }, [](int k) { return QPoint(cv->Vehlib[k-1].x, cv->Vehlib[k-1].y); }, false},
+   };
+  bool VersTaxi=false, VersVehlib=false, FileTaxi=false;
+  auto Fini=[&]()
+   {
+    for(const Sorte &o : Sortes) if (!o.Vue) return false;
+    return VersTaxi&&VersVehlib&&FileTaxi;
+   };
+  for(int Tour=0; (Tour<6000)&&!Fini()&&!QTest::currentTestFailed(); Tour++)
+   {
+    JoueTour();
+    for(int i=0; i<cv->NbPietons; i++)
+     {
+      pieton *p=&cv->Pieton[i];
+      for(Sorte &o : Sortes)
+       if (!o.Vue&&o.Numero(p))
+        {
+         o.Vue=true;
+         QPoint c=o.Place(o.Numero(p));
+         Montre(i+1, c.x(), c.y());
+         QStringList e;
+         Compare(e, "cadre", f->GroupBoxPieton->Caption, Cadre(i+1, c.x(), c.y()));
+         Compare(e, "position", f->LabelPosition->Caption, QString::fromUtf8(o.Position));
+         Compare(e, "véhicule", f->LabelBusTramTaxiVehlib->Caption, NumeroCoordonnees(o.Numero(p), c.x(), c.y()));
+         if (Libre(p)) Compare(e, "situation", f->LabelSituation->Caption, QString::fromUtf8(o.Situation));
+         QVERIFY2(e.isEmpty(), qPrintable(QString("%1 : %2").arg(o.Nom, e.join('\n'))));
+        }
+      if (!p->Defini()||p->NumBus||p->NumTram||p->NumTaxi||p->NumVehlib||!Libre(p)) continue;
+      if (p->PlaceVehlibTrv&&!VersVehlib)
+       {
+        VersVehlib=true;
+        Montre(i+1, p->x, p->y);
+        QCOMPARE(Q(f->LabelSituation->Caption), QString::fromUtf8("Se dirige vers une file de vehlibs"));
+       }
+      if (p->FileTaxiTrv&&!p->PlaceVehlibTrv&&!VersTaxi)
+       {
+        VersTaxi=true;
+        Montre(i+1, p->x, p->y);
+        QCOMPARE(Q(f->LabelSituation->Caption), QString::fromUtf8("Se dirige vers une file de taxis"));
+       }
+      if (p->NumFileTaxi&&!p->NumArretBus&&!p->NumArretTram&&!FileTaxi)
+       { // Tête de la file, dont le numéro de place commence à 1 (l'original lisait la place suivante)
+        FileTaxi=true;
+        Montre(i+1, p->x, p->y);
+        int Tete=cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile();
+        QVERIFY(Tete>0);
+        QCOMPARE(Q(f->LabelArretBusTramFileTaxiVehlib->Caption),
+                 NumeroCoordonnees(p->NumFileTaxi, cv->PlaceTaxi[Tete-1].x, cv->PlaceTaxi[Tete-1].y));
+       }
+     }
+    if (QTest::currentTestFailed()) return;
+   }
+  QStringList Manque;
+  for(const Sorte &o : Sortes) if (!o.Vue) Manque<<o.Nom;
+  if (!VersTaxi) Manque<<"vers un taxi";
+  if (!VersVehlib) Manque<<"vers un vehlib";
+  if (!FileTaxi) Manque<<"file de taxis";
+  QVERIFY2(Manque.isEmpty(), qPrintable(Manque.join(", ")));
+  Clique(r->ButtonAnnuler);
+  Clique(f->ButtonOk);
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 // Lot 3 des fiches secondaires : statistiques et recherche
