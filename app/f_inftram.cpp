@@ -111,9 +111,9 @@ void TfrmInfosTram::RafraichitInfos()
                                         ARRAYOFCONST(( NumArretSvt,
                                                        cv->ArretTram[NumArretSvt-1].x,
                                                        cv->ArretTram[NumArretSvt-1].y,
-                                                       (int)cv->Tram->TourDepartArretSvt)));
+                                                       (int)Tram->TourDepartArretSvt))); // v6.0.2 : de ce tram (l'original lisait le premier)
     LabelNbPersonnes->Caption=IntToStr(Tram->NbPersonnes);
-    LabelTours->Caption=IntToStr(cv->TourCrt);
+    LabelTours->Caption=IntToStr(cv->TourCrt); // v6.0.2 : correct, tous les trams partent au tour 0 (PrepareTrams) : c'est TourCrt-TourDepart des bus
     LabelParcours->Caption=IntToStr(Tram->NbCasesParcourues);
     LabelToursEntreArrets->Caption=IntToStr(NbTours=cv->TourCrt-Tram->TourArriveDrnArret);
     LabelParcoursEntreArrets->Caption=IntToStr(DejaParcouru=Tram->NbCasesParcouruesDepuisDrnArret);

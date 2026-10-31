@@ -84,7 +84,7 @@ void TfrmInfosTaxi::RafraichitInfos()
     LabelToursDepuisRetour->Caption=IntToStr(cv->TourCrt-Taxi->TourRetourDrnCourse);
     LabelParcoursDepuisDepart->Caption=IntToStr(Taxi->NbCasesParcouruesDrnCourse);
     for(i=0; i<NbDir[v->DirPoss]; i++)
-     if (v->DistFileTaxi[i][Taxi->NumFile]<MinDistFile) MinDistFile=v->DistFileTaxi[i][Taxi->NumFile];
+     if (v->DistFileTaxi[Taxi->NumFile][i]<MinDistFile) MinDistFile=v->DistFileTaxi[Taxi->NumFile][i]; // v6.0.2 : indices dans l'ordre [file][direction] (lecture hors du tableau)
     LabelDistanceTeteFileDepart->Caption=IntToStr(MinDistFile);
     LabelVitesse->Caption=Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
    }

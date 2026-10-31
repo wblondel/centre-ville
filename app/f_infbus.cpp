@@ -112,7 +112,7 @@ void TfrmInfosBus::RafraichitInfos()
                                         ARRAYOFCONST(( NumArretSvt,
                                                        cv->ArretBus[NumArretSvt-1].x,
                                                        cv->ArretBus[NumArretSvt-1].y,
-                                                       (int)cv->Bus->TourDepartArretSvt)));
+                                                       (int)Bus->TourDepartArretSvt))); // v6.0.2 : de ce bus (l'original lisait le premier)
     LabelTourSortie->Caption=IntToStr(Bus->TourDepart);
     LabelNbPersonnes->Caption=IntToStr(Bus->NbPersonnes);
     LabelTours->Caption=IntToStr(cv->TourCrt-Bus->TourDepart);

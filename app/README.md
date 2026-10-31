@@ -18,11 +18,11 @@ d'installation, installeur Windows, `.dmg` macOS, AppImage Linux (voir
 après les pré-releases rc1 à rc3 ; recette Windows automatisée
 (`.github/workflows/recette-windows.yml`), liste de recette dans
 `docs/RECETTE.md`, bogues d'origine conservés dans `CHANGELOG.md`. Version
-6.0.1 : bogues d'origine du moteur corrigés (`engine/README.md`) ; ceux de
-l'interface, plus bas, restent à corriger.
+6.0.1 : bogues d'origine du moteur corrigés (`engine/README.md`). Version 6.0.2 :
+ceux de l'interface corrigés, plus bas.
 Comme pour le moteur, **on porte, on ne réécrit pas** : les fiches portées
 sont des copies de `src/f_*.*` (CRLF -> LF, `__fastcall` retiré), où chaque
-autre modification est annotée `// portage`. Pour lire le portage ligne à
+autre modification est annotée `// portage`, ou `// v6.0.x` pour une correction. Pour lire le portage ligne à
 ligne :
 
 ```bash
@@ -96,11 +96,11 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.1)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.2)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
-`ImageDeVersion`, et `LabelSousVersion` « ,1 »). Le format des fichiers
+`ImageDeVersion`, et `LabelSousVersion` « ,2 »). Le format des fichiers
 `.cvw` ne change pas (`VERSION 0x530`).
 
 ```bash
@@ -204,7 +204,8 @@ une release seulement sur un tag. Ni signature ni notarisation.
 - Ajouts du lot 3 : `PopupMenu` de la fiche elle-même (`f_statsat`) : clic
   droit hors des contrôles qui ont leur propre menu, et raccourcis de ses
   éléments, `TWinControl::IsMenuKey` remontant jusqu'à la fiche (les flèches
-  déplacent alors le curseur de la carte, même dans un champ numérique).
+  déplacent alors le curseur de la carte, même dans un champ numérique, sauf
+  `TCSpinEdit::GardeTouchesDeplacement`, v6.0.2).
   `Color` de la fiche quand le `.dfm` la fixe (fond noir d'« Évolution » ;
   cela a aussi corrigé le fond sarcelle des priorités et le fond noir
   d'« À propos », restés à la couleur du thème aux lots 1 et 2) ; les couleurs
@@ -235,7 +236,9 @@ une release seulement sur un tag. Ni signature ni notarisation.
   sont jamais grisées aux bornes (captures du lot 1 : seule différence, avec
   la sélection du champ actif après `Value=`). `dfm2ui.py` écrit les valeurs
   du `.dfm` en propriétés `vclMinValue`, `vclMaxValue`, `vclValue`
-  (appliquée après les bornes, comme au chargement) et `vclIncrement`. Les
+  (appliquée après les bornes, comme au chargement) et `vclIncrement`. Depuis la
+  6.0.2 : `Valide()` borne la valeur en quittant le champ et à Entrée, puis appelle
+  `OnExit` ; `Frappe()`, dans `OnChange`, dit si le texte vient de la frappe. Les
   contrôles fenêtrés (boutons, cases à
   cocher, boutons radio, curseurs) prennent le focus au clic comme sous
   Windows, y compris sous macOS, où Qt ne le leur donne qu'à la tabulation :
@@ -271,8 +274,7 @@ les modifications non enregistrées, et oublie `asNomFichAuto`. La copie sert au
 le golden master ne change pas. `ToolButtonArret` et `MenuItemArret` suivent
 `ActionArret` : le code d'origine les activait au début de Marche.
 
-Sur un fichier en lecture seule (`QFile` ouvert en `ReadWrite`, qui ne le vide pas,
-contrairement à `FileCreate`) : réseau non modifié, Marche n'enregistre pas et
+Sur un fichier en lecture seule (`QFile` ouvert en `ReadWrite`, qui ne le vide pas) : réseau non modifié, Marche n'enregistre pas et
 réinitialise le générateur comme `ActionEnregistrer` (`AppelleAuChaos`) ; réseau
 modifié, question, puis boîte « Enregistrer sous » ouverte dans `InitialDir`.
 
@@ -284,7 +286,10 @@ raccourcis selon le mode, Marche / Interruption / Arrêt par la barre d'outils
 et les menus, barre d'état, bilan (séparateur décimal `,`), puis enregistrer →
 rouvrir (comme depuis le Finder) → réenregistrer : fichier identique, et égal à
 la conversion de référence du format (`tests/support/format_reference`) ;
-fichier impossible à ouvrir ; Marche sur un fichier en lecture seule, non modifié
+fichier impossible à ouvrir ; fichier qui ne se charge pas (version ultérieure, coupé,
+vide, incohérent, illisible : `ouvertureEnEchec`), réseau affiché gardé ; disque plein,
+fichier en lecture seule et dossier en lecture seule à l'enregistrement
+(`enregistrementImpossible`) ; Marche sur un fichier en lecture seule, non modifié
 (mêmes tirages qu'un fichier inscriptible, réseau d'origine après Arrêt) puis
 modifié ; plusieurs clics sur Marche après chaque sorte d'interruption, sous une
 limite de temps (`LimiteDeTemps`, un fil qui arrête le test si un clic ne rend
@@ -322,8 +327,10 @@ toutes se ferment à l'arrêt. Les six fiches d'informations (non modales, au
 premier plan), ouvertes sur un véhicule, un bus, un tram, un taxi, un vehlib
 ou un piéton, montrent à chaque tour les valeurs du moteur pour la case
 courante, l'utilisateur cliquant sur l'objet quand il change de case ; « Vu »
-et Échap les ferment. À l'arrêt, la fiche ouverte garde son contenu (comme
-l'original : rien ne la rafraîchit) ; le clic suivant sur la carte la vide.
+et Échap les ferment. À l'arrêt, les fiches ouvertes montrent aussitôt le réseau
+rechargé, même avec Rechercher ouverte sur un piéton. `fichePietonDansUnVehicule` :
+Géant joué jusqu'à trouver un piéton dans chaque sorte de véhicule, et dans chaque
+situation « se dirige vers... ».
 Lot 3, en simulation à graine fixe sur des copies de Géant : Composition
 (modale, barre d'outils puis Ctrl+Maj+R, « Vu » puis Échap) affiche la
 composition calculée sur la carte (cases, routes, priorités, directions,
@@ -340,10 +347,11 @@ fiche modale, couleur de chaque case de la carte (`CouleurCase` et pixel
 dessiné) égale au calcul sur l'attente et le trafic du moteur, totaux et
 moyennes, trajets (parkings de départ et d'arrivée), détail de la case dans
 la barre d'état, boutons de déplacement (avec et sans les coins) et touches
-du menu contextuel de la fiche (flèches, Origine ; Z sans effet) ; n° d'étape
-tapé hors bornes : « Le n° d'étape est incorrect ! », cases noires et détail
-vide quand une flèche déplace le curseur depuis le champ, puis numéro ramené
-dans les bornes en quittant le champ (Tab). Rechercher
+du menu contextuel de la fiche (flèches, Origine ; Z sans effet), qui restent
+au champ dans un champ numérique ; n° d'étape tapé hors bornes : « Le n° d'étape
+est incorrect ! », cases noires et détail vide, puis numéro ramené dans les bornes
+en quittant le champ (Tab) ; Échap ferme la fiche ; en pause, Arrêt disponible, au
+bilan identique à celui de la pause. Rechercher
 (barre d'outils, sur un parking) reprend les numéros de la case ; chaque sorte
 d'élément fixe (parking, feu, arrêts, places et files) est retrouvée par son
 bouton et son numéro (case courante, barre d'état de la fiche), ainsi que
@@ -353,10 +361,13 @@ menu contextuel de la carte) : à chaque tour, la case courante est sur
 l'objet, la barre d'état de la fiche le dit, et la fiche d'informations
 ouverte montre l'objet suivi, sans clic de l'utilisateur ; Échap ferme
 Rechercher, « Suivre » la rouvre. Hors simulation, un numéro de parking
-resté au-dessus du nombre de parkings n'est ni borné ni signalé par
-`OnChange` quand `FormShow` règle `MaxValue` (la case courante ne bouge
-pas) ; tapé hors bornes, il donne « n° incorrect » à chaque chiffre, puis
-Tab le ramène au dernier parking, retrouvé.
+resté au-dessus du nombre de parkings est borné par `FormShow`, sans `OnChange` (la
+case courante ne bouge pas) ; tapé hors bornes, il donne « n° incorrect » à chaque
+chiffre, puis Tab le ramène au dernier parking, retrouvé.
+`rechercheElementsNonDefinis` : taxi, vehlib et places sans position.
+`champEntreeBorne` et `numeroArretPendantLaFrappe` : Entrée dans un champ, frappe d'un
+n° d'arrêt de bus et de tram.
+`interface.audit_bornes` : `tools/audit_bornes.py` sur les fiches.
 Couche VCL (`controleCSpinEdit`, sur un `TCSpinEdit` seul) : `MinValue=` et
 `MaxValue=` sans effet ni `OnChange` ; `Value=` borné, `OnChange` seulement si
 le texte change ; frappe hors bornes acceptée (lettres refusées), ramenée
@@ -408,11 +419,8 @@ Comportement :
   affichés par `FormatFloat`, au lieu de l'exception de la RTL de
   C++Builder (division par zéro et opération invalide démasquées).
 - **Paramètres et fiches filles** : comme dans l'original, ouvrir une fiche
-  fille (bus, tram, taxis, vehlibs) cache Paramètres puis la réaffiche, ce
-  qui repasse par `FormShow` et recharge les valeurs du moteur (les saisies
-  non appliquées sont perdues, comportement d'origine conservé). Seul écart :
-  sous macOS, la console affiche alors « modalSession has been exited
-  prematurely », sans effet.
+  fille (bus, tram, taxis, vehlibs) cache Paramètres puis la réaffiche ; sous macOS,
+  la console affiche alors « modalSession has been exited prematurely », sans effet.
 - **Numéros tapés hors bornes** (le `TCSpinEdit` ne les borne qu'en quittant
   le champ, comme l'original) : l'original lisait alors hors d'un tableau ;
   le port s'en garde (`// portage`). Fluidité et trafic, n° d'étape hors de
@@ -421,8 +429,6 @@ Comportement :
   par exemple quand une flèche déplace le curseur depuis le champ ; le port
   plantait sans cette garde). Fiche Piéton pendant que Rechercher suit un
   numéro hors de `1..NbPietons` : aucun piéton suivi (piétons de la case).
-  Paramètres des lignes de bus et de tram : un n° d'arrêt négatif est remis à
-  0, comme un numéro trop grand.
 - **Molette, Page précédente et Page suivante** dans un `TCSpinEdit` :
   `Value±Increment` (dix fois pour les pages), comme dans les champs
   numériques de Qt ; la VCL n'y réagissait pas.
@@ -523,80 +529,63 @@ Visuel :
   point d'arrivée, mais les pixels des segments obliques peuvent différer
   d'un pixel de ceux de Windows.
 
-## Comportements d'origine conservés (lot 2)
+## Corrections de la 6.0.2 (annotées `// v6.0.2`)
 
-Règle d'or : ces bogues de l'original sont portés tels quels ; ils sont repris
-dans `CHANGELOG.md` (version 6.0.0), à corriger après la bascule.
+La liste des bogues de l'original, conservés jusqu'à la 6.0.1, avec le choix fait quand
+le comportement voulu n'était pas évident.
 
-- **Fiches d'informations à l'arrêt** : rien ne les rafraîchit ; elles
-  montrent le dernier objet jusqu'au prochain clic sur la carte rechargée.
-- **Tableau de distances vide** (carte sans arrêt, file ou place de la
-  sorte) : `RowCount=1` ramène `FixedRows` à 0 (`TCustomGrid::SetRowCount`),
-  et la grille garde ensuite sa ligne d'en-tête défilante, même sur une autre
-  carte.
-- **Files de parkings** (`f_afdistfp`) : la hauteur (26 et 283) ne compte pas
-  la case « Avec couloirs de bus » (`f_afdistp` utilise 43 et 300) : la
-  grille est plus courte de 17 pixels et défile.
-- **Bus et tram** : « Prochain arrêt ... depuis le tour » lit
-  `TourDepartArretSvt` du premier bus (du premier tram) ; « Tours effectifs »
-  du tram affiche `TourCrt`.
-- **Piéton** : dans un tram, un taxi ou un vehlib, le cadre prend les
-  coordonnées dans `cv->Bus` ; la situation « vers une file de vehlibs » est
-  testée sur `FileTaxiTrv` ; position « ans un vehlib ».
-- **Moteur : blocage des vehlibs** (trouvé en testant les fiches sur Géant,
-  corrigé en 6.0.1) : `vehlib::ReservePlaceVehlibCible` tirait au hasard une
-  place libre sans limite d'essais ; sur Géant (29 vehlibs pour 32 places),
-  l'application se figeait selon la graine (`cvsim maps/Géant.cvw --graine
-  123` : avant le tour 50). Le test d'interface garde une graine fixe (1)
-  pour ses simulations.
-- **Taxi** : la distance à la tête de file est lue en
-  `DistFileTaxi[direction][file]` (indices inversés) : valeur fausse, et
-  lecture hors des tableaux quand la case a plus de directions que la carte
-  n'a de files de taxis.
+| Fiche | Original | 6.0.2 |
+|---|---|---|
+| Informations | À l'arrêt, le dernier objet reste affiché jusqu'au clic suivant. | `RafraichitFichesInfos` : à l'arrêt, après Ouvrir, Nouveau et le rétablissement du réseau. Avec Rechercher ouverte sur un piéton, ce clic lisait `cv->Pieton`, nul (trouvé en 6.0.2). |
+| Bus, tram | « Prochain arrêt ... depuis le tour » du premier véhicule. | Du véhicule affiché. |
+| Tram | « Tours effectifs » affiche `TourCrt`. | Inchangé : tous les trams partent au tour 0 (`PrepareTrams`), c'est donc `TourCrt-TourDepart` des bus. Ce n'était pas un bogue. |
+| Piéton | Tram, taxi, vehlib : cadre en coordonnées de `cv->Bus`. « Vers une file de vehlibs » testé sur `FileTaxiTrv`. « ans un vehlib ». Tête de file lue en `PlaceTaxi[PlaceTeteFile()]` (trouvé en 6.0.2). | Chaque tableau, `PlaceVehlibTrv`, « Dans un vehlib », `PlaceTeteFile()-1`. |
+| Taxi | `DistFileTaxi[direction][file]` : valeur fausse, lecture hors des tableaux. | `[file][direction]`. |
+| Distances | `RowCount=1` ramène `FixedRows` à 0, pour toutes les cartes suivantes. Files de parkings : hauteur sans la case à cocher (26 et 283). | `FixedRows=1` à chaque `FormShow`, borné à `RowCount-1` : le tableau vide lui-même n'a qu'une ligne, défilante. 43 et 300, comme `f_afdistp`. |
+| Rechercher | Piéton : taxi et vehlib en coordonnées de `cv->Bus`, tram « non utilisé ». Taxi et vehlib sans `Defini()`, places sans message. Numéro resté au-dessus du nombre d'éléments. | Chaque tableau, tram trouvé ; « non utilisé(e) » ; numéro borné par `FormShow`, sans `OnChange`, car ouvrir la fiche ne doit pas déplacer le curseur. |
+| Statistiques véhicules | Vides jusqu'au tour suivant. | `FormShow` appelle `RafraichitInfos`. |
+| Évolution | Redessinée entre deux tours, dernier segment vers les statistiques du tour à venir. | Dernier tour dessiné = `TourCrt-1`, sauf pendant un tour, avant le premier et après le dernier. |
+| Fluidité et trafic | Flèches, Origine, Fin et pages déplacent le curseur même depuis les champs ; Échap ne ferme pas. | `GardeTouchesDeplacement` sur ses deux champs ; Échap dans `FormKeyDown` (le `.ui` est généré depuis le `.dfm` : pas de bouton Cancel ajouté). Les Paramètres des bus et des trams gardent ces raccourcis, qui y servent à montrer un arrêt. |
+| Paramètres | Saisies non appliquées perdues à l'ouverture d'une fiche fille. | `RetourFicheFille` : `FormShow` ne recharge rien au retour. |
+| `TCSpinEdit` | Entrée valide la valeur tapée telle quelle. | `ToucheDialogue` appelle `Valide()` avant le bouton par défaut. |
+| Bus, tram | N° d'arrêt trop grand, nul ou vide remis à 0 dès la frappe, arrêt non défini remplacé par le suivant. | Pendant la frappe, rien (`Frappe()`). En quittant le champ ou à Entrée (`CSpinEditExit`) : borné, puis nul ou vide remis à 0, non défini remplacé par le suivant. Trop grand devient donc le dernier arrêt. |
+| Simulation | « Arrêt » grisé en pause. | Actif ; relance le minuteur, qui traite la demande. Le chrono ne s'arrête qu'une fois : le bilan de l'arrêt a la durée de celui de la pause. |
+| Vérification du réseau | `PietonPeutAller(d)` avant `d<=ouest`. | Borne d'abord. |
 
-## Comportements d'origine conservés (lot 3)
+**Enregistrer** (`ActionEnregistrerExecute`) écrit par `FileCreateRemplacement`
+(`engine/compat/fichier.h`) : fichier temporaire voisin, mis sur disque, puis `rename`.
 
-- **Rechercher un piéton** monté dans un taxi : la case courante va au taxi,
-  mais le texte donne les coordonnées de `cv->Bus[NumTaxi-1]` (lecture hors
-  du tableau des bus si `NumTaxi > NbBus`) ; dans un vehlib, case courante
-  et texte viennent de `cv->Bus[NumVehlib-1]` ; dans un tram, il est « non
-  utilisé » (le commentaire v5.4.1 du code cite le tram, mais ne le traite
-  pas). Comme la fiche Piéton lit `CSpinEditPieton`, elle montre le piéton
-  suivi même quand la case en contient un autre.
-- **Places de taxi, de parking et de vehlib** non définies : la barre d'état
-  de Rechercher garde le texte précédent ; « Taxi » et « Vehlib » ne testent
-  pas `Defini()`.
-- **Statistiques véhicules** : la grille n'est remplie qu'au tour qui suit
-  l'ouverture (`FormShow` n'écrit que les en-têtes) ; un trajet n'ayant
-  qu'un véhicule arrivé, ou des véhicules au même parcours, affiche 0.
-- **Évolution** : redessinée entre deux tours (fenêtre redimensionnée ou
-  découverte), son dernier segment va vers `Stats[TourCrt%NbToursStats]`,
-  les statistiques du tour à venir, pas encore calculées (celles d'il y a
-  `NbToursStats` tours). Par nombre de véhicules, le quadrillage marque tous
-  les 10 véhicules : sur Géant (plus de 2 000 véhicules), ses points forment
-  des traits verticaux continus.
-- **Fluidité et trafic** : les flèches, Origine, Fin, Page précédente et Page
-  suivante (raccourcis du menu contextuel de la fiche) déplacent le curseur de
-  la carte depuis n'importe quel contrôle, champs numériques compris ; Échap
-  ne ferme pas la fiche (aucun bouton Cancel). Un n° d'étape tapé hors de
-  `0..NbParkings` affiche « Le n° d'étape est incorrect ! » (à chaque chiffre
-  qui le laisse hors bornes) ; il n'est ramené dans `1..NbParkings` qu'en
-  quittant le champ (d'ici là, `0` donne les statistiques de tous les
-  parkings).
+| Cas | Comportement |
+|---|---|
+| Échec d'écriture (disque plein) | Original intact, temporaire effacé, message, `SimulationModifiee` inchangé. |
+| Fichier existant en lecture seule | Refusé, comme `FileCreate` (`rename` l'aurait remplacé). |
+| Dossier en lecture seule, fichier inscriptible | Écriture directe, faute de temporaire. Seul cas où le fichier peut être tronqué : `SimulationModifiee` passe à vrai. |
+| Dossier en lecture seule, fichier nouveau | « Impossible de créer le fichier ». |
+| Dossier plein, sans droit manquant | Refusé, pas d'écriture directe, qui détruirait le fichier. |
+| Droits, propriétaire | Ceux du fichier existant (sous Windows, ceux du dossier). |
+| Lien symbolique | Gardé, sa cible est remplacée. |
+| Lien physique | Il garde l'ancien contenu : limite du procédé. |
 
-## Comportements d'origine conservés (`TCSpinEdit`)
+**Ouvrir** (`ActionOuvrirExecute`) charge dans un nouveau `centre_ville` et ne détruit
+l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv`, qui
+pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
+`RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
+fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
-- **Entrée** (bouton par défaut) valide la valeur tapée telle quelle : la
-  VCL n'envoie pas `CM_EXIT`, le champ n'est donc pas borné (le clic sur OK,
-  lui, fait sortir du champ). La vérification d'intégrité de Marche signale
-  une partie des valeurs incorrectes (négatives, notamment).
-- **Texte vide, « - » ou « + »** : `Value` vaut `MinValue`, et le texte reste
+## Comportements d'origine conservés
+
+- **Fiche Piéton pendant que Rechercher suit un piéton** : elle lit `CSpinEditPieton`,
+  et montre le piéton suivi même quand la case en contient un autre.
+- **Statistiques véhicules** : un trajet n'ayant qu'un véhicule arrivé, ou des
+  véhicules au même parcours, affiche 0.
+- **Évolution** : par nombre de véhicules, le quadrillage marque tous les 10 véhicules :
+  sur Géant (plus de 2 000 véhicules), ses points forment des traits verticaux continus.
+- **Fluidité et trafic** : un n° d'étape tapé hors de `0..NbParkings` affiche « Le n°
+  d'étape est incorrect ! » (à chaque chiffre qui le laisse hors bornes) ; il n'est ramené
+  dans `1..NbParkings` qu'en quittant le champ ou à Entrée (d'ici là, `0` donne les
+  statistiques de tous les parkings).
+- **`TCSpinEdit`, texte vide, « - » ou « + »** : `Value` vaut `MinValue`, et le texte reste
   tel quel en quittant le champ (`CheckValue(MinValue)` ne change rien).
-- **`MinValue` = `MaxValue`** : aucune borne, ni à l'affectation ni en
-  quittant le champ (Dimensions de la zone ; parkings de Fluidité et trafic
-  sur une carte à un seul parking).
-- **Rechercher** : `FormShow` règle les `MaxValue` d'après la carte sans
-  toucher aux numéros : un numéro resté au-dessus (carte précédente plus
-  grande) reste affiché, jusqu'à la flèche ou la sortie du champ.
-- **Bus et tram** : un n° d'arrêt trop grand, nul ou vide est remis à 0 dès la
-  frappe (`OnChange`), un arrêt non défini remplacé par le suivant.
+- **`TCSpinEdit`, `MinValue` = `MaxValue`** : aucune borne, ni à l'affectation ni en
+  quittant le champ (Dimensions de la zone ; parkings de Fluidité et trafic sur une carte à
+  un seul parking).

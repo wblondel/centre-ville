@@ -13,7 +13,7 @@ Catch2 3.8.1 est utilisé s'il est installé, sinon téléchargé par `FetchCont
 | `moteur.simulation` | `[simulation]` | Golden master : 500 tours × 6 cartes × 2 configurations, à graine fixe. |
 | `moteur.generation` | `[generation]` | Génération aléatoire de réseau à graine fixe (3 configurations). |
 | `moteur.copie` | `[copie]` | « Copier vers… » (`PrepareCopie`, `CopieValide`, `Sauve`). |
-| `moteur.corrections` | `[corrections]` | Bogues d'origine corrigés en 6.0.1 (`test_corrections.cpp`) : blocage des vehlibs (Géant, graine 123), descente des passagers des vehlibs (Géant, graine 12345, cohérence de `NbPersonnes` et des réservations à chaque tour), erreurs d'écriture, « Copier vers… », messages de `Verifie()`. Délai de 120 s : le moteur 6.0.0 ne rendait pas la main. |
+| `moteur.corrections` | `[corrections]` | Bogues d'origine corrigés en 6.0.1 et 6.0.2 (`test_corrections.cpp`) : erreurs de lecture de `Charge`, mémoire rendue par `~centre_ville` (`NombreAllocationsVives`, `support/allocation.cpp`), blocage des vehlibs (Géant, graine 123), descente des passagers des vehlibs (Géant, graine 12345, cohérence de `NbPersonnes` et des réservations à chaque tour), erreurs d'écriture, « Copier vers… », messages de `Verifie()`. Délai de 120 s : le moteur 6.0.0 ne rendait pas la main. |
 | `moteur.memoire` | tous sauf `[compat]` et `[corrections]` | `cvtests_motif` : round-trip, vérification, golden master, génération et copie avec une mémoire remplie de `0xA5` au lieu d'être remise à zéro, et champs que l'original laissait indéterminés (`test_memoire.cpp`). |
 | `cvsim.spaghettis_100_tours` | — | Critère de fin de la phase 1 : charger une carte, simuler 100 tours, sauvegarder. |
 

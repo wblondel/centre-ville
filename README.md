@@ -97,7 +97,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt /
 * **macOS** : `cd build/release && cpack` produit `Centre-Ville-<version>-macOS.dmg`.
 * **Linux** : AppImage avec [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) et son greffon Qt, comme dans `build-installer.yml` (le crochet `app/linux/apprun-hooks/centre-ville-cartes.sh` copie les cartes au premier lancement) ; ou installation dans un préfixe dédié (`--prefix /opt/centre-ville`), avec entrée de bureau, type MIME des fichiers `.cvw` et cartes dans `share/centre-ville/cartes`.
 
-Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,0 »).
+Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,2 »).
 
 ### 3. Intégration continue
 * `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification.
@@ -133,7 +133,7 @@ Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-in
 | 8. Build, CI et distribution | Fait : installeurs Windows, macOS et Linux compilés par la CI. |
 | 9. Recette et bascule | Fait : version 6.0.0 après trois pré-releases. Recette automatisée sous Windows (installation, mise à jour d'une 5.4.3.2, interopérabilité avec l'original, fiches en affichage natif : workflow « Recette Windows »), sous macOS et sous Linux ; restent à faire à la main, sur de vrais postes, les points de [`docs/RECETTE.md`](docs/RECETTE.md) que ces machines ne couvrent pas (SmartScreen, Gatekeeper, Windows 10/11 grand public et ARM64). |
 
-Les écarts avec l'original, les bogues d'origine corrigés (moteur, 6.0.1) et ceux qui restent (interface) sont listés dans [`CHANGELOG.md`](CHANGELOG.md), [`engine/README.md`](engine/README.md) et [`app/README.md`](app/README.md).
+Les écarts avec l'original et les bogues d'origine corrigés (moteur en 6.0.1, interface en 6.0.2) sont listés dans [`CHANGELOG.md`](CHANGELOG.md), [`engine/README.md`](engine/README.md) et [`app/README.md`](app/README.md).
 
 ---
 
@@ -147,7 +147,7 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Installeurs Windows, macOS et Linux compilés depuis les sources.
 * [x] Recette de la version 6.0.0 sur les trois systèmes, puis bascule (phase 9).
 * [x] Après la bascule : corriger les bogues d'origine du moteur, dont le blocage des vehlibs sur Géant (version 6.0.1).
-* [ ] Corriger les bogues d'origine de l'interface ([`CHANGELOG.md`](CHANGELOG.md)).
+* [x] Corriger les bogues d'origine de l'interface (version 6.0.2, [`CHANGELOG.md`](CHANGELOG.md)).
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.

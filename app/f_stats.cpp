@@ -19,7 +19,11 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
  bool ParNbVehicules=(cv->TypeStats==par_nombre);
  int i, j, x, y,
 	 NbTours=cv->NbToursStats,
-	 DrnTour=cv->TourCrt,
+	 // v6.0.2 : dernier tour dont les statistiques sont calculées. Le moteur dessine pendant
+	 // le tour, puis passe au suivant : entre deux tours (fenêtre découverte, pause), TourCrt
+	 // est le tour à venir, et Stats[TourCrt%NbTours] celles d'il y a NbTours tours. Sauf
+	 // avant le premier tour et après le dernier, où TourCrt n'avance plus
+	 DrnTour=(cv->TourEnCours||(!cv->TourCrt)||(cv->NbVehiculesArrives==cv->NbVehicules))?cv->TourCrt:cv->TourCrt-1,
 	 PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1),
 	 NbVehicules=cv->NbVehicules,
 	 NbPietons=cv->NbPietons, // v5.4.1

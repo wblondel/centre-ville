@@ -51,6 +51,7 @@ void TfrmAffDistArretsBus::FormShow(TObject *Sender)
 {
  frmSimulation->ActionDistancesArretsBus->Checked=true;
  StringGridDistances->RowCount=1+cv->NbArretsBus;
+ StringGridDistances->FixedRows=1; // v6.0.2 : RowCount=1 (tableau vide) l'avait ramené à 0, pour toutes les cartes suivantes (borné à RowCount-1)
  Height=(cv->NbArretsBus>10)?283:(26+21*StringGridDistances->RowCount);
  RafraichitInfos();
 }

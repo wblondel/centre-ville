@@ -32,6 +32,24 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.2] 
+ - Enregistrer ne détruit plus le fichier si le disque est plein : il n'est
+   remplacé qu'une fois le nouveau contenu écrit.
+ - Un fichier impossible à charger (version ultérieure, fichier abîmé) laisse
+   le réseau affiché, avec un message.
+ - "Arrêt" est disponible pendant la pause.
+ - Les fiches d'informations se mettent à jour à l'arrêt de la simulation, et
+   donnent le véhicule et la situation exacts d'un piéton, le bon prochain
+   arrêt d'un bus ou d'un tram, et la bonne distance d'un taxi à sa file.
+ - Rechercher trouve les piétons dans un tram, un taxi ou un vehlib.
+ - Fluidité et trafic : Échap ferme la fiche ; les flèches restent dans les
+   champs numériques.
+ - Statistiques véhicules : remplies dès l'ouverture.
+ - Paramètres : les saisies sont gardées après une fiche fille.
+ - Champs numériques : Entrée ramène la valeur dans les bornes ; le numéro
+   d'un arrêt de bus ou de tram n'est plus remis à 0 pendant la frappe.
+ - Tableaux de distances : ligne d'en-tête gardée après un tableau vide.
+
 [Version 6.0.1] 
  - La simulation ne se fige plus quand aucune place de vehlib n'est libre :
    le vehlib attend qu'une place se libère.

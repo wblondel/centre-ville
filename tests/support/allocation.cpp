@@ -9,36 +9,53 @@
 // une mémoire mise à zéro. Depuis la 6.0.1, le moteur initialise lui-même ces
 // champs : cvtests_motif refait les mêmes tests avec une mémoire remplie d'un
 // motif (allocation_motif.cpp).
+// Compte aussi les blocs vivants, pour vérifier que le moteur libère ce qu'il
+// alloue (NombreAllocationsVives, test_corrections.cpp).
 //---------------------------------------------------------------------------
+#include <atomic>
 #include <cstdlib>
 #include <new>
 //---------------------------------------------------------------------------
+static std::atomic<long> AllocationsVives{0};
+long NombreAllocationsVives() { return AllocationsVives; }
+static void *Alloue(std::size_t n) noexcept
+ {
+  void *p=std::calloc(n?n:1, 1);
+  if (p) AllocationsVives++;
+  return p;
+ }
+static void Libere(void *p) noexcept
+ {
+  if (p) AllocationsVives--;
+  std::free(p);
+ }
+//---------------------------------------------------------------------------
 void *operator new(std::size_t n)
  {
-  if (void *p=std::calloc(n?n:1, 1)) return p;
+  if (void *p=Alloue(n)) return p;
   throw std::bad_alloc();
  }
 //---------------------------------------------------------------------------
 void *operator new[](std::size_t n)
  {
-  if (void *p=std::calloc(n?n:1, 1)) return p;
+  if (void *p=Alloue(n)) return p;
   throw std::bad_alloc();
  }
 //---------------------------------------------------------------------------
 void *operator new(std::size_t n, const std::nothrow_t &) noexcept
  {
-  return std::calloc(n?n:1, 1);
+  return Alloue(n);
  }
 //---------------------------------------------------------------------------
 void *operator new[](std::size_t n, const std::nothrow_t &) noexcept
  {
-  return std::calloc(n?n:1, 1);
+  return Alloue(n);
  }
 //---------------------------------------------------------------------------
-void operator delete(void *p) noexcept { std::free(p); }
-void operator delete[](void *p) noexcept { std::free(p); }
-void operator delete(void *p, std::size_t) noexcept { std::free(p); }
-void operator delete[](void *p, std::size_t) noexcept { std::free(p); }
-void operator delete(void *p, const std::nothrow_t &) noexcept { std::free(p); }
-void operator delete[](void *p, const std::nothrow_t &) noexcept { std::free(p); }
+void operator delete(void *p) noexcept { Libere(p); }
+void operator delete[](void *p) noexcept { Libere(p); }
+void operator delete(void *p, std::size_t) noexcept { Libere(p); }
+void operator delete[](void *p, std::size_t) noexcept { Libere(p); }
+void operator delete(void *p, const std::nothrow_t &) noexcept { Libere(p); }
+void operator delete[](void *p, const std::nothrow_t &) noexcept { Libere(p); }
 //---------------------------------------------------------------------------

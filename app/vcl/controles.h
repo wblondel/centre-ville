@@ -177,12 +177,17 @@ class TLabel : public ControleVcl<QLabel>
 class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
  {
   bool ControleActif=false; // contrôle actif de sa fiche (entre CM_ENTER et CM_EXIT)
+  bool AffectationEnCours=false; // v6.0.2 : le texte change par Value=..., pas par la frappe
   int CheckValue(int v);
   public:
   Propriete<int> Value, MinValue, MaxValue, Increment;
   TNotifyEvent OnChange;
+  TNotifyEvent OnExit; // v6.0.2 : en quittant le champ, et à Entrée, une fois la valeur dans les bornes
+  bool Frappe() const { return !AffectationEnCours; } // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
+  bool GardeTouchesDeplacement=false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les raccourcis de la fiche
   explicit TCSpinEdit(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  void Valide(); // v6.0.2 : valeur ramenée dans les bornes (CMExit, et Entrée dans un champ, qui valide la fiche sans en sortir)
   void stepBy(int steps) override; // UpClick / DownClick (flèches, touches haut et bas)
   QValidator::State validate(QString &input, int &pos) const override; // IsValidChar
   protected:

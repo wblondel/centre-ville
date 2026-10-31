@@ -1499,7 +1499,7 @@ bool TfrmSimulation::VerifieReseau()
        break;
       }
      // Vérification du nombre de cases potentielles avec 1 piéton par case minimal. v3.8
-     for(d=nord; (!v->PietonPeutAller((direction)d))&&(d<=ouest); d++);
+     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller((direction)d)); d++); // v6.0.2 : borne testée avant PietonPeutAller, qui lit InvDir[d] et dx[d] (feu de piétons rouge dans toutes les directions)
      NbCasesPietonPeutAller+=(d<=ouest);
     }
   if (Ok&&(NbCasesPietonPeutAller<cv->NbPietons)) // v4.2
@@ -1621,17 +1621,25 @@ void TfrmSimulation::FormShow(TObject *Sender)
  ActionAfficherInfection->Checked=!!(Affichage&aff_infct); // v5.4.1
 }
 //---------------------------------------------------------------------------
+// v6.0.2 : aussi quand le réseau change sans clic sur la carte (Arrêt, Ouvrir, Nouveau) :
+// les fiches restées ouvertes montraient sinon le dernier objet de l'ancien réseau.
+// Ouvrir peut venir de la ligne de commande, avant la création des autres fiches
+void TfrmSimulation::RafraichitFichesInfos()
+ {
+  if (frmInfosPieton&&frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
+  if (frmInfosVehicule&&frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
+  if (frmInfosBus&&frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
+  if (frmInfosTram&&frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
+  if (frmInfosTaxi&&frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
+  if (frmInfosVehlib&&frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+ }
+//---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 {
  bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
  if ((frmDefVoie->Visible)&&PasDeSelectionFeux) frmDefVoie->RafraichitInfos();
  if ((frmDefVoiePietons->Visible)&&PasDeSelectionFeux) frmDefVoiePietons->RafraichitInfos(); //v5.2
- if (frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
- if (frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
- if (frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
- if (frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
- if (frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
- if (frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+ RafraichitFichesInfos(); // v6.0.2
  if ((frmAffDistParkings->Visible)&&PasDeSelectionFeux)
   {
    frmAffDistParkings->EffaceInfos();
@@ -2121,6 +2129,7 @@ void TfrmSimulation::ActionNouveauExecute(TObject *Sender)
    OpenDialog->FileName="";
    Caption=asTitreCV;
    InitialiseDeplacementFeu(); // v3.5
+   RafraichitFichesInfos(); // v6.0.2
    DrawGridSimul->Repaint();
   }
 }
@@ -2145,32 +2154,41 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
     {
      StatusBar->Panels->Items[0]->Text="Chargement en cours...";
      FileSeek(hfile, 0, 0);
-     if (cv) { delete cv; cv=NULL; }
+     // v6.0.2 : le réseau affiché n'est remplacé qu'une fois le fichier chargé (l'original
+     // le détruisait avant : cv restait incomplet, et l'application se fermait). Charge
+     // travaille sur cv (parkings et places renumérotés)
+     centre_ville *AncienReseau=cv;
      cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0); // v non encore alloué, créé au chargement (v4.0)
-     if (!cv->Charge(hfile))
+     bool Charge=cv->Charge(hfile);
+     FileClose(hfile);
+     centre_ville *ReseauEnTrop=Charge?AncienReseau:cv;
+     centre_ville *NouveauCv=Charge?cv:AncienReseau;
+     cv=ReseauEnTrop; // Les destructeurs travaillent sur cv
+     delete ReseauEnTrop;
+     cv=NouveauCv;
+     if (!Charge)
       {
+       cv->RetablitVoisinages();
+       StatusBar->Panels->Items[0]->Text="Chargement NON effectué.";
        if (VersionFichier>VERSION) // v3.5 : n'ouvre pas les fichier de simulation générés par une version ultérieure de la version actuelle (format de fichier)
         AfficheMessage("\
 Le fichier sélectionné a été généré avec une version ultérieure à la version actuelle de Centre-Ville.\n\
-Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré ce fichier.",
+Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré ce fichier.\n\
+Le réseau affiché est conservé.",
                                 asChargementNonEffectue, tmErreur, 0, 0);
        else
-        {  // v3.5 : ajout de la précision << Centre-Ville va être fermé [...] >>
-         StatusBar->Panels->Items[0]->Text="Chargement non effectué.";
-         AfficheMessage("Erreur de données dans le fichier.\nCentre-Ville va être fermé par précaution.", asChargementNonEffectue, tmErreur, 0, 0);
-         FileClose(hfile);
-         Close();
-        }
+        AfficheMessage("Erreur de lecture ou de données dans le fichier.\nLe réseau affiché est conservé.", asChargementNonEffectue, tmErreur, 0, 0);
+       OpenDialog->FileName=SaveDialog->FileName; // Le réseau affiché reste le précédent
       }
      else
       {
-       FileClose(hfile);
        RedimensionneZone();
        SimulationModifiee=false;
        SaveDialog->FileName=asNomFichier;
        OpenDialog->FileName=asNomFichier;
        Caption="Centre-Ville - "+asNomFichier;
        InitialiseDeplacementFeu(); // v3.5
+       RafraichitFichesInfos(); // v6.0.2
        asMsgErr=""; // v6.0.1 : erreurs d'une vérification précédente (barre d'état ci-dessous)
        if (VerifierApresOuverture)
         {
@@ -2221,20 +2239,26 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
      SaveDialog->Execute())
   {
    StatusBar->Panels->Items[0]->Text="Enregistrement en cours...";
-   if ((hfile=FileCreate(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto)))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
+   // v6.0.2 : le fichier n'est remplacé qu'une fois écrit (l'original le vidait d'abord : un
+   // disque plein le détruisait), sauf si le dossier interdit le fichier temporaire (Direct)
+   bool Direct=false;
+   if ((hfile=FileCreateRemplacement(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto), &Direct))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
     {
-     if (!cv->Sauve(hfile))
+     bool Ok=cv->Sauve(hfile);
+     if (Ok)
+      Ok=FileCommitRemplacement(hfile);
+     else
+      FileAbandonRemplacement(hfile);
+     if (!Ok)
       {
-       AfficheMessage("Erreur de données dans le fichier", asSauvegardeNonEffectuee, tmErreur, 0, 0);
-       FileClose(hfile);
+       AfficheMessage(Direct?"Erreur de données dans le fichier":"Erreur de données dans le fichier.\nAucun fichier existant n'a été modifié.", asSauvegardeNonEffectuee, tmErreur, 0, 0);
        StatusBar->Panels->Items[0]->Text="Enregistrement NON effectué.";
        if (EnregistrerAvant) EnregistrerAvant=false;
        SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
-       SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
+       if (Direct) SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
       }
      else
       {
-       FileClose(hfile);
        SaveDialog->FileName=asNomFichier;
        OpenDialog->FileName=asNomFichier;
        Caption="Centre-Ville - "+asNomFichier;
@@ -2349,7 +2373,7 @@ bool TfrmSimulation::SauveCopieReseau()
 //---------------------------------------------------------------------------
 bool TfrmSimulation::RestaureCopieReseau()
  { // Ni la copie ni l'état préparé utilisable (fichier temporaire effacé pendant
-   // la simulation...) : fermeture, comme pour une erreur de données à l'ouverture
+   // la simulation...) : fermeture
   int hfile=CopieReseau?FileOpen(A(QDir::toNativeSeparators(CopieReseau->fileName())), fmOpenRead):-1;
   bool Ok=(hfile!=-1);
   if (Ok)
@@ -2368,6 +2392,7 @@ bool TfrmSimulation::RestaureCopieReseau()
    }
   delete CopieReseau;
   CopieReseau=NULL;
+  RafraichitFichesInfos(); // v6.0.2
   DrawGridSimul->Repaint();
   return true;
  }
@@ -2620,6 +2645,7 @@ void TfrmSimulation::ActionInterruptionExecute(TObject *Sender)
 void TfrmSimulation::ActionArretExecute(TObject *Sender)
 {
  TypeDemande=tdArret;
+ if (Pause) TimerSimul->Enabled=true; // v6.0.2 : la demande est traitée au tic suivant, et le minuteur est arrêté en pause
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionVerifierAvantSimulationExecute(
