@@ -7,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -290,6 +291,54 @@ TEST_CASE("Ouverture : une erreur de lecture fait échouer Charge", "[correction
     INFO("Coupé de " << Coupe << " octets");
     CHECK_FALSE(Charge(h));
     FileClose(h);
+   }
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", "[corrections][chargement]")
+ { // v6.0.2 : un nombre négatif ou plus grand que le fichier allait jusqu'à new[]
+  VueNulle Vue;
+  vue=&Vue;
+  const std::string asSource=FichierSortie("nombres_source.cvw");
+  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[0])));
+  REQUIRE(harnais::SauveSansChaos(asSource)); // Format 0x530 : version, puis les nombres dans cet ordre
+  harnais::Ferme();
+  const std::string asOctets=harnais::LitFichier(asSource);
+  const std::string asCopie=FichierSortie("nombres_impossibles.cvw");
+  auto Charge=[&asCopie](const std::string &asDonnees)
+   {
+    {
+     std::ofstream f(asCopie, std::ios::binary|std::ios::trunc);
+     f.write(asDonnees.data(), (std::streamsize)asDonnees.size());
+    }
+    int h=FileOpen(asCopie.c_str(), fmOpenRead);
+    REQUIRE(h>0);
+    cv=new centre_ville(false, 0, 0); // AUCUN_ELEMENT_PAR_DEFAUT
+    bool Ok=cv->Charge(h);
+    delete cv;
+    cv=nullptr;
+    FileClose(h);
+    return Ok;
+   };
+  CHECK(Charge(asOctets));
+  struct { const char *Nom; std::size_t Position; } Champs[]=
+   {{"NbFeux", 4}, {"NbX", 8}, {"NbY", 12}, {"NbFeuxPieton", 16}, {"NbParkings", 20}, {"NbArretsBus", 32},
+    {"NbArretsTram", 40}, {"NbPlacesTaxi", 48}, {"NbPlacesPark", 56}, {"NbPlacesVehlib", 60}};
+  for(const auto &c : Champs)
+   for(int Valeur : {-5, 0x7FFFFFF0})
+    {
+     INFO(c.Nom << " = " << Valeur);
+     std::string asDonnees=asOctets;
+     std::memcpy(asDonnees.data()+c.Position, &Valeur, sizeof(Valeur));
+     CHECK_FALSE(Charge(asDonnees));
+    }
+  // Zone sans case : v resterait nul
+  for(std::size_t Position : {(std::size_t)8, (std::size_t)12})
+   {
+    std::string asDonnees=asOctets;
+    int Zero=0;
+    std::memcpy(asDonnees.data()+Position, &Zero, sizeof(Zero));
+    CHECK_FALSE(Charge(asDonnees));
    }
   vue=nullptr;
  }

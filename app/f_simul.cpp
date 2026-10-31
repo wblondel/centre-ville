@@ -6,7 +6,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryFile>
-#include <new>
 #include <time.h>
 #include <stdlib.h>
 //---------------------------------------------------------------------------
@@ -2160,9 +2159,7 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
      // travaille sur cv (parkings et places renumérotés)
      centre_ville *AncienReseau=cv;
      cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0); // v non encore alloué, créé au chargement (v4.0)
-     bool Charge;
-     try { Charge=cv->Charge(hfile); }
-     catch(const std::bad_alloc &) { Charge=false; } // Nombre d'éléments incohérent dans le fichier
+     bool Charge=cv->Charge(hfile);
      FileClose(hfile);
      centre_ville *ReseauEnTrop=Charge?AncienReseau:cv;
      centre_ville *NouveauCv=Charge?cv:AncienReseau;

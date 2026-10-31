@@ -141,6 +141,14 @@ static bool LitChamp(int hfile, void *Champ, unsigned NbOctets)
   return FileRead(hfile, Champ, NbOctets)==(int)NbOctets;
  }
 //---------------------------------------------------------------------------
+// v6.0.2 : un nombre d'éléments lu dans le fichier ne peut être ni négatif, ni plus grand
+// que le fichier (un élément y occupe au moins un octet) : il irait sinon jusqu'à new[]
+static long long TailleFichierCharge=0;
+static bool NombreCredible(long long n)
+ {
+  return (n>=0)&&(n<=TailleFichierCharge);
+ }
+//---------------------------------------------------------------------------
 bool VerifierApresOuverture=false,
      VerifierAvantSimulation=false;
 //---------------------------------------------------------------------------
@@ -693,6 +701,7 @@ bool feu::Charge(int hfile)
 	 LitChamp(hfile, &DemandeVert, sizeof(DemandeVert))&&
 	 LitChamp(hfile, &RougeDemande, sizeof(RougeDemande));
 
+  Ok=Ok&&NombreCredible(NbFeuxDmd)&&NombreCredible(NbFeuxAtt); // v6.0.2
   if (Ok)
    {
 	if (NbFeuxDmd) Ok=!!(NumFeuxDmd=new int[NbFeuxDmd]);
@@ -1003,6 +1012,7 @@ bool feu_pieton::Charge(int hfile)
      LitChamp(hfile, &DureeVert, sizeof(DureeVert))&&
      LitChamp(hfile, &DemandeVert, sizeof(DemandeVert))&&
      LitChamp(hfile, &RougeDemande, sizeof(RougeDemande));
+  Ok=Ok&&NombreCredible(NbFeux); // v6.0.2
   if (Ok)
    if (NbFeux) Ok=!!(NumFeux=new int[NbFeux]);
   for(i=0; Ok&&(i<NbFeux); i++) Ok=LitChamp(hfile, &(NumFeux[i]), sizeof(NumFeux[i]));
@@ -6071,6 +6081,9 @@ bool centre_ville::Charge(int hfile)
       NvNbPlacesPark=0, // v5.1
 	  NvNbPlacesVehlib=0; // v5.3
   bool Ok;
+  int Position=FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
+  TailleFichierCharge=FileSeek(hfile, 0, 2);
+  FileSeek(hfile, Position, 0);
   NbPietons=-1;
   Ok=LitChamp(hfile, &NbFeux, sizeof(NbFeux));
   if (NbFeux>=VERSIONMIN) // v3.0
@@ -6088,7 +6101,8 @@ bool centre_ville::Charge(int hfile)
    }
   else
    Ok=Ok&&LitChamp(hfile, &NbX, sizeof(NbX))&& // v6.0.2 : Ok&& (une erreur de lecture du nombre de feux était oubliée)
-	  LitChamp(hfile, &NbY, sizeof(NbY));
+	  LitChamp(hfile, &NbY, sizeof(NbY))&&
+	  (NbX>0)&&(NbY>0)&&NombreCredible((long long)NbX*NbY); // v6.0.2
   if (Ok) CreeZone(); // v6.0.2 : si Ok, sinon NbX et NbY peuvent être indéterminés
   if (Ok) Ok= ((VersionFichier<0x520)|| // v5.2
 			   (LitChamp(hfile, &NbFeuxPieton, sizeof(NbFeuxPieton))))&&
@@ -6145,6 +6159,9 @@ bool centre_ville::Charge(int hfile)
 				LitChamp(hfile, &NbMaxCasesDetectFileVehlib, sizeof(NbMaxCasesDetectFileVehlib))&&
 				LitChamp(hfile, &ProbaDirFileVehlib, sizeof(ProbaDirFileVehlib))&&
 				LitChamp(hfile, &TauxRemplissageVehlib, sizeof(TauxRemplissageVehlib))));
+  Ok=Ok&&NombreCredible(NbFeux)&&NombreCredible(NbFeuxPieton)&&NombreCredible(NbParkings)&& // v6.0.2
+     NombreCredible(NbArretsBus)&&NombreCredible(NbArretsTram)&&
+     NombreCredible(NbPlacesTaxi)&&NombreCredible(NbPlacesPark)&&NombreCredible(NbPlacesVehlib);
   if (Ok&&NbFeux&&(Ok=!!(Feu=new feu[NbFeux])))
    for(i=0; Ok&&(i<NbFeux); i++)
     {

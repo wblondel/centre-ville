@@ -16,7 +16,10 @@
 //     fichier impossible à créer ou à écrire est signalé (v6.0.1) ;
 //   - la vérification d'intégrité après ouverture affiche les erreurs des
 //     contrôles de champs (v6.0.1) ;
-//   - fichier impossible à ouvrir : message, réseau affiché gardé (v6.0.1) ;
+//   - fichier impossible à ouvrir : message, réseau affiché gardé (v6.0.1) ; de
+//     même pour un fichier qui ne se charge pas (v6.0.2) ;
+//   - enregistrement : fichier existant intact sur un disque plein, fichier ou
+//     dossier en lecture seule (v6.0.2) ;
 //   - Marche sur un fichier en lecture seule (v6.0.1) : non modifié, simulation
 //     sans enregistrement, avec les mêmes tirages, et Arrêt recharge le réseau
 //     d'origine ; modifié, question puis « Enregistrer sous », sinon pas de
@@ -1040,6 +1043,9 @@ void TestInterface::ouvertureEnEchec()
   QByteArray Incoherent=Fichier;
   int NbFeuxNegatif=-5;
   std::memcpy(Incoherent.data()+sizeof(int), &NbFeuxNegatif, sizeof(NbFeuxNegatif)); // Nombre de feux, après la version
+  QByteArray Enorme=Fichier;
+  int NbFeuxEnorme=0x7FFFFFF0;
+  std::memcpy(Enorme.data()+sizeof(int), &NbFeuxEnorme, sizeof(NbFeuxEnorme));
   QString Repertoire=Dossier+"/repertoire.cvw";
   QVERIFY(QDir().mkpath(Repertoire));
   struct Cas { const char *Nom; QString f; const char *Texte; };
@@ -1051,6 +1057,7 @@ void TestInterface::ouvertureEnEchec()
     {"dernier octet manquant", Ecrit("ouverture_coupe1.cvw", Fichier.left(Fichier.size()-1)), ErreurDonnees},
     {"fichier vide", Ecrit("ouverture_vide.cvw", QByteArray()), ErreurDonnees},
     {"nombre de feux négatif", Ecrit("ouverture_incoherent.cvw", Incoherent), ErreurDonnees},
+    {"nombre de feux énorme", Ecrit("ouverture_enorme.cvw", Enorme), ErreurDonnees},
 #ifndef _WIN32
     {"dossier (FileRead renvoie -1)", Repertoire, ErreurDonnees}, // Windows : « Impossible d'ouvrir », déjà testé
 #endif
