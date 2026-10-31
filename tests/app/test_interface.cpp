@@ -2154,9 +2154,9 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
     // FormShow : hauteur de la fiche (cadre compris) d'après le nombre de lignes,
     // grille de RowCount lignes de 20 pixels et un trait, sans défilement jusqu'à 10
     TableDistances t=f.Table(&cv->v[x][y], false);
-    // (seule f_afdistp compte le panneau de sa case à cocher : 43 et 300 ; f_afdistfp
-    // garde 26 et 283, sa grille est donc plus courte de 17 pixels)
-    int Panneau=(f.Fiche==frmAffDistParkings)?17:0, Lignes=1+t.Nb;
+    // (v6.0.2 : f_afdistfp compte aussi le panneau de sa case à cocher, comme
+    // f_afdistp : 43 et 300 ; sa grille était plus courte de 17 pixels)
+    int Panneau=f.Couloirs?17:0, Lignes=1+t.Nb;
     int Hauteur=(t.Nb>10)?283+Panneau:26+Panneau+21*Lignes;
     QCOMPARE((int)f.Fiche->Height, Hauteur);
     QCOMPARE(f.Fiche->height(), Hauteur-22);

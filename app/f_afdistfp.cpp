@@ -51,7 +51,7 @@ void TfrmAffDistFilesPark::FormShow(TObject *Sender)
 {
  frmSimulation->ActionDistancesFilesPark->Checked=true;
  StringGridDistances->RowCount=1+cv->NbFilesPark;
- Height=(cv->NbFilesPark>10)?283:(26+21*StringGridDistances->RowCount);
+ Height=(cv->NbFilesPark>10)?300:(43+21*StringGridDistances->RowCount); // v6.0.2 : avec la case « Avec couloirs de bus », comme f_afdistp (grille plus courte de 17 pixels)
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
