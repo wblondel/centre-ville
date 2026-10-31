@@ -594,6 +594,7 @@ class TestInterface : public QObject
   void fichesPrioritesEtFeux();
   void fichesPrioritesEtFeuxPietons();
   void fichesParametres();
+  void champEntreeBorne();
   void ficheCarrefours();
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
@@ -1885,6 +1886,31 @@ void TestInterface::fichesParametres()
   QVERIFY(Etapes.empty());
   QVERIFY(Relu);
   QVERIFY(ReluBus);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::champEntreeBorne()
+ { // v6.0.2 : Entrée valide le numéro ramené dans les bornes (l'original gardait la
+   // valeur tapée : seule la sortie du champ la borne)
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "champ_entree.cvw").isEmpty());
+  int Max=0;
+  QString Ecart;
+  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefTaxis); });
+  QuandModale([]() { return frmParamTaxi; }, [&]()
+   {
+    TCSpinEdit *Champ=frmParamTaxi->CSpinEditNbMaxPersonnesTaxi;
+    Max=Champ->MaxValue;
+    Champ->setFocus(Qt::OtherFocusReason);
+    Champ->selectAll();
+    QTest::keyClicks(Champ, QString::number(100*Max));
+    if (Champ->Value!=100*Max) Ecart=QString::fromUtf8("frappe bornée");
+    QTest::keyClick(Champ, Qt::Key_Return);
+   });
+  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  Clique(frmSimulation->ToolButtonParametres);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY2(Ecart.isEmpty(), qPrintable(Ecart));
+  QVERIFY(Max>0);
+  QCOMPARE((int)cv->NbMaxPersonnesTaxi, Max);
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheCarrefours()

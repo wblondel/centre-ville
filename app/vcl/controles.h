@@ -184,6 +184,7 @@ class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
   bool GardeTouchesDeplacement=false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les raccourcis de la fiche
   explicit TCSpinEdit(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  void Valide(); // v6.0.2 : valeur ramenée dans les bornes (CMExit, et Entrée dans un champ, qui valide la fiche sans en sortir)
   void stepBy(int steps) override; // UpClick / DownClick (flèches, touches haut et bas)
   QValidator::State validate(QString &input, int &pos) const override; // IsValidChar
   protected:

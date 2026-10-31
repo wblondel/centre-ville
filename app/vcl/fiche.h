@@ -307,6 +307,9 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     if (e->modifiers()&~(Qt::KeypadModifier)) return false;
     bool Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter), Echap=(e->key()==Qt::Key_Escape);
     if (!Entree&&!Echap) return false;
+    if (Entree) // v6.0.2 : la VCL n'envoie pas CM_EXIT : le bouton aurait lu la valeur tapée, hors des bornes
+     if (TCSpinEdit *c=dynamic_cast<TCSpinEdit *>(QApplication::focusWidget()))
+      if (c->window()==this) c->Valide();
     if (Entree)
      if (TButton *b=dynamic_cast<TButton *>(QApplication::focusWidget()))
       if (b->window()==this) { b->Click(); return true; }

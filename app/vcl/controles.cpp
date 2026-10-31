@@ -310,6 +310,11 @@ void TCSpinEdit::focusOutEvent(QFocusEvent *e)
   if ((e->reason()==Qt::ActiveWindowFocusReason)||(e->reason()==Qt::PopupFocusReason)||
       (e->reason()==Qt::MenuBarFocusReason)) return;
   ControleActif=false;
+  Valide();
+ }
+//---------------------------------------------------------------------------
+void TCSpinEdit::Valide()
+ {
   int v=Value;
   if (CheckValue(v)!=v) Value=v; // SetValue(Value)
  }
