@@ -207,6 +207,9 @@ jobs:
           sleep 15
           if ! kill -0 $pid 2>/dev/null; then cat lancement.log; echo "::error::Centre-Ville.app ne démarre pas"; exit 1; fi
           kill $pid
+          # Premier lancement : les cartes d'exemple sont copiées dans le dossier de Centre-Ville
+          test -f "$HOME/Library/Application Support/Patquoi.fr/Centre-Ville/Démo.cvw"
+          codesign --verify --deep --strict "$app"
           hdiutil detach "$volume"
 
       - name: Upload disk image

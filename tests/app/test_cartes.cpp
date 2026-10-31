@@ -13,10 +13,16 @@
 //   - sous Linux, ce dossier est celui de stRepLocalAppData, où « Ouvrir »
 //     et « Enregistrer » démarrent (OpenDialog->InitialDir : interface.demo).
 // Pas de sh sous Windows : test sauté.
+//
+// Sous macOS, cvw fait de même au lancement (CopieCartesExemple de base.cpp,
+// main.cpp), depuis ses ressources Qt, car le dossier Cartes du .dmg est en
+// lecture seule : la fonction, puis le paquet compilé lancé pour de vrai
+// avec un dossier personnel temporaire (CFFIXED_USER_HOME).
 //---------------------------------------------------------------------------
 #include <QDir>
 #include <QFile>
 #include <QProcess>
+#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
 #include "base.h"
@@ -52,6 +58,8 @@ class TestCartes : public QObject
   void premierLancement();
   void lancementSuivant();
   void dossierDeStRepLocalAppData();
+  void copieAuPremierLancement();
+  void paquetMacOS();
  };
 //---------------------------------------------------------------------------
 void TestCartes::initTestCase()
@@ -101,6 +109,77 @@ void TestCartes::dossierDeStRepLocalAppData()
 #endif
   qputenv("XDG_DATA_HOME", stDonnees.toLocal8Bit());
   QCOMPARE(Q(stRepLocalAppData()), QDir::toNativeSeparators(stDossier+"/"));
+ }
+//---------------------------------------------------------------------------
+void TestCartes::copieAuPremierLancement()
+ { // Source en lecture seule, comme les ressources Qt de l'exécutable
+  QTemporaryDir Dossier;
+  QVERIFY(Dossier.isValid());
+  QString stSource=Dossier.path()+"/cartes", stCible=Dossier.path()+"/Patquoi.fr/Centre-Ville";
+  QVERIFY(QDir().mkpath(stSource));
+  for(const QString &c : Cartes)
+   {
+    QVERIFY(QFile::copy(QString(CV_DOSSIER_CARTES)+"/"+c, stSource+"/"+c));
+    QVERIFY(QFile::setPermissions(stSource+"/"+c, QFile::ReadOwner|QFile::ReadUser|QFile::ReadGroup|QFile::ReadOther));
+   }
+  // Sans source (compilation hors paquet) : rien n'est créé
+  CopieCartesExemple(Dossier.path()+"/absent", stCible);
+  QVERIFY(!QDir(stCible).exists());
+  // Premier lancement : une carte de l'utilisateur gardée, les autres copiées et enregistrables
+  QVERIFY(QDir().mkpath(stCible));
+  QFile f(stCible+"/"+Cartes.first());
+  QVERIFY(f.open(QIODevice::WriteOnly));
+  f.write("carte modifiée");
+  f.close();
+  CopieCartesExemple(stSource, stCible);
+  QCOMPARE(Contenu(f.fileName()), QByteArray("carte modifiée"));
+  QCOMPARE(QDir(stCible).entryList({"*.cvw"}, QDir::Files), Cartes);
+  for(const QString &c : Cartes)
+   if (c!=Cartes.first())
+    {
+     QVERIFY2(Contenu(stCible+"/"+c)==Contenu(stSource+"/"+c), qPrintable(c));
+     QVERIFY2(QFile::permissions(stCible+"/"+c)&QFile::WriteOwner, qPrintable(c));
+    }
+  // Lancement suivant : une carte supprimée reste supprimée
+  QVERIFY(QFile::remove(stCible+"/"+Cartes.last()));
+  CopieCartesExemple(stSource, stCible);
+  QVERIFY(!QFile::exists(stCible+"/"+Cartes.last()));
+  for(const QString &c : Cartes) QFile::setPermissions(stSource+"/"+c, QFile::ReadOwner|QFile::WriteOwner);
+ }
+//---------------------------------------------------------------------------
+void TestCartes::paquetMacOS()
+ {
+#ifndef Q_OS_MACOS
+  QSKIP("Paquet Centre-Ville.app : macOS seulement");
+#else
+  QTemporaryDir Accueil;
+  QVERIFY(Accueil.isValid());
+  QString stCible=Accueil.path()+"/Library/Application Support/Patquoi.fr/Centre-Ville";
+  auto Lance=[&]()
+   { // Qu'il tourne : la copie précède la création des fiches
+    QProcess p;
+    QProcessEnvironment e=QProcessEnvironment::systemEnvironment();
+    e.insert("CFFIXED_USER_HOME", Accueil.path());
+    e.insert("QT_QPA_PLATFORM", "offscreen");
+    p.setProcessEnvironment(e);
+    p.start(CV_PAQUET_CVW, QStringList());
+    QVERIFY2(p.waitForStarted(10000), qPrintable(p.errorString()));
+    QVERIFY(QTest::qWaitFor([&]() { return QFile::exists(stCible+"/.cartes-copiees"); }, 30000));
+    QTest::qWait(500);
+    QCOMPARE(p.state(), QProcess::Running);
+    p.kill();
+    p.waitForFinished(10000);
+   };
+  Lance();
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(QDir(stCible).entryList({"*.cvw"}, QDir::Files), Cartes);
+  for(const QString &c : Cartes)
+   QVERIFY2(Contenu(stCible+"/"+c)==Contenu(QString(CV_DOSSIER_CARTES)+"/"+c), qPrintable(c));
+  QVERIFY(QFile::remove(stCible+"/"+Cartes.last()));
+  Lance();
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(!QFile::exists(stCible+"/"+Cartes.last()));
+#endif
  }
 //---------------------------------------------------------------------------
 QTEST_MAIN(TestCartes)

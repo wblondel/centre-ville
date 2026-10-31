@@ -9,15 +9,24 @@
 // les tests « frmDefFeux&& » du code d'origine.
 //---------------------------------------------------------------------------
 #include <QApplication>
+#include <QDir>
 #include <QMessageBox>
 #include <exception>
 #include "application.h"
+#include "base.h"
 #include "f_simul.h"
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
  QApplication App(argc, argv);
  InitialiseApplication(App);
+#ifdef Q_OS_MACOS
+ // v6.0.1 : cartes embarquées dans l'exécutable (app/CMakeLists.txt).
+ // stRepLocalAppData se rabat sur le dossier de l'exécutable s'il ne peut créer
+ // le sien : on n'écrit pas dans le paquet (signature)
+ if (Q(stRepLocalAppData())!=QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/"))
+  CopieCartesExemple(":/cartes", Q(stRepLocalAppData()));
+#endif
  OuvertureFichiers Ouverture;
  App.installEventFilter(&Ouverture);
  int Resultat=0;
