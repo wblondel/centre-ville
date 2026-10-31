@@ -904,7 +904,9 @@ class voie
       **DistArretTram,// v3.5. Distance à un arrêt de tram (même principe que DistParking mais uniquement quand SensVoieTram>aucune_voie)
 	  **DistFileTaxi, // v3.6. Distance juqu'à la queue de la file de taxis.
       ***DistFilePark, // v5.0. Distance juqu'à la queue de la file parkings.
-      **DistPlaceVehlib;// v5.3. Distance jusqu'à une place de vehlib (pas de notion de priorité d'où le ** au lieu de ***).
+      **DistPlaceVehlib,// v5.3. Distance jusqu'à une place de vehlib (pas de notion de priorité d'où le ** au lieu de ***).
+      // v6.0.1 : dimensions des nids de pointeurs à leur allocation (pour les libérer si le réseau a changé depuis)
+      NbDirDist, NbParkingsDist, NbArretsBusDist, NbArretsTramDist, NbFilesTaxiDist, NbFilesParkDist, NbPlacesVehlibDist, NbParkingsAttente;
   voie();
   ~voie();
   void Initialise();
@@ -912,7 +914,9 @@ class voie
   void Definit(int x0, int y0) { x=x0; y=y0; Initialise(); };
   voie *v(direction d); // v3.0
   bool PrepareCalculDistances(); // v3.0 : inclut également celui des arrêts de bus/tram
+  void LibereDistances(); // v6.0.1
   bool PrepareCalculAttenteTrafic(); // v2.2.7
+  void LibereAttenteTrafic(); // v6.0.1
   void CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib(); // v3.6 (changement de nom : +OuTaxi) v5.3 (changement de nom : +OuVehlib)
   void DeplaceVehiculeOuBusOuTramOuTaxi(); // v3.6 (changement de nom : +OuTaxi)
   bool PietonPeutAller(direction DirPieton); // v2.0
@@ -1205,6 +1209,7 @@ class centre_ville
   void CalculeTrajetLignesTram(); // v3.5
   bool VerifieCalculDistances(type_distance &TypeDistance); // v3.5 : inclut également celui des arrêts de bus & tram
   bool PrepareCalculDistances(); // v3.5 : inclut également celui des arrêts de bus & tram
+  void LibereDistances(); // v6.0.1 : distances obsolètes (réseau modifié après un échec de Marche)
   bool PrepareCalculAttenteTrafic(); // v2.2.7
   void PlaceVehicule(int x, int y, int NumVehicule); // v2.2.7
   bool PrepareVehicules();

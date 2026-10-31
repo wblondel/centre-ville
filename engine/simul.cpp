@@ -2362,23 +2362,25 @@ voie::voie()
   DistFileTaxi=NULL; // v3.6
   DistFilePark=NULL; // v5.0
   DistPlaceVehlib=NULL; // v5.3
+  NbDirDist=NbParkingsDist=NbArretsBusDist=NbArretsTramDist=NbFilesTaxiDist=NbFilesParkDist=NbPlacesVehlibDist=NbParkingsAttente=0; // v6.0.1
  }
 //-----------------------------------------------------------------------------
 voie::~voie()
  {
-  int i, j,
-      nd=NbDir[DirPoss],
-      ne=cv->NbParkings,
-      nab=cv->NbArretsBus, // v3.0
-      nat=cv->NbArretsTram, // v3.5
-      nft=cv->NbFilesTaxi, // v3.6
-      nfp=cv->NbFilesPark, // v5.0
-      npv=cv->NbPlacesVehlib; // v5.3
+  LibereDistances(); // v6.0.1 : avec les dimensions de l'allocation
+  LibereAttenteTrafic(); // v6.0.1 : idem
+ }
+//-----------------------------------------------------------------------------
+void voie::LibereDistances() // v6.0.1
+ { // Dimensions de l'allocation : le réseau a pu changer depuis (réseau non
+   // connexe, l'utilisateur le répare puis relance) ; l'original les relisait
+   // ici dans DirPoss et les compteurs de cv, et libérait n'importe quoi
+  int i, j;
   if (DistParking)
    {
-    for(i=0; i<ne; i++)
+    for(i=0; i<NbParkingsDist; i++)
      {
-      for(j=0; j<nd; j++)
+      for(j=0; j<NbDirDist; j++)
        delete[] DistParking[i][j];
       delete[] DistParking[i];
      }
@@ -2387,30 +2389,30 @@ voie::~voie()
   DistParking=NULL;
   if (DistArretBus)  // v3.0
    {
-    for(i=0; i<nab; i++)
+    for(i=0; i<NbArretsBusDist; i++)
      delete[] DistArretBus[i];
     delete[] DistArretBus;
    }
   DistArretBus=NULL;
   if (DistArretTram)  // v3.5
    {
-    for(i=0; i<nat; i++)
+    for(i=0; i<NbArretsTramDist; i++)
      delete[] DistArretTram[i];
     delete[] DistArretTram;
    }
   DistArretTram=NULL;
   if (DistFileTaxi)  // v3.6
    {
-    for(i=0; i<nft; i++)
+    for(i=0; i<NbFilesTaxiDist; i++)
      delete[] DistFileTaxi[i];
     delete[] DistFileTaxi;
    }
   DistFileTaxi=NULL;
   if (DistFilePark) // v5.0
    {
-    for(i=0; i<nfp; i++)
+    for(i=0; i<NbFilesParkDist; i++)
      {
-      for(j=0; j<nd; j++)
+      for(j=0; j<NbDirDist; j++)
        delete[] DistFilePark[i][j];
       delete[] DistFilePark[i];
      }
@@ -2419,21 +2421,26 @@ voie::~voie()
   DistFilePark=NULL;
   if (DistPlaceVehlib) // v5.3
    {
-    for(i=0; i<npv; i++)
+    for(i=0; i<NbPlacesVehlibDist; i++)
      delete[] DistPlaceVehlib[i];
     delete[] DistPlaceVehlib;
    }
   DistPlaceVehlib=NULL;
+ }
+//-----------------------------------------------------------------------------
+void voie::LibereAttenteTrafic() // v6.0.1
+ {
+  int i;
   if (Attente)
    {
-    for(i=0; i<=ne; i++)
+    for(i=0; i<=NbParkingsAttente; i++)
      delete[] Attente[i];
     delete[] Attente;
    }
   Attente=NULL;
   if (Trafic)
    {
-    for(i=0; i<=ne; i++)
+    for(i=0; i<=NbParkingsAttente; i++)
      delete[] Trafic[i];
     delete[] Trafic;
    }
@@ -2507,56 +2514,9 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
       nft=cv->NbFilesTaxi, // v3.6
       nfp=cv->NbFilesPark, // v5.0
       npv=cv->NbPlacesVehlib; // v5.3
-  if (DistParking)
-   {
-    for(i=0; i<ne; i++)
-     {
-      for(j=0; j<nd; j++)
-       delete[] DistParking[i][j];
-      delete[] DistParking[i];
-     }
-    delete[] DistParking;
-    DistParking=NULL;
-   }
-  if (DistArretBus) // v3.0
-   {
-    for(i=0; i<nab; i++)
-     delete[] DistArretBus[i];
-    delete[] DistArretBus;
-    DistArretBus=NULL;
-   }
-  if (DistArretTram) // v3.5
-   {
-    for(i=0; i<nat; i++)
-     delete[] DistArretTram[i];
-    delete[] DistArretTram;
-    DistArretTram=NULL;
-   }
-  if (DistFileTaxi) // v3.6
-   {
-    for(i=0; i<nft; i++)
-     delete[] DistFileTaxi[i];
-    delete[] DistFileTaxi;
-    DistFileTaxi=NULL;
-   }
-  if (DistFilePark) // v5.0
-   {
-    for(i=0; i<nfp; i++)
-     {
-      for(j=0; j<nd; j++)
-       delete[] DistFilePark[i][j];
-      delete[] DistFilePark[i];
-     }
-    delete[] DistFilePark;
-    DistFilePark=NULL;
-   }
-  if (DistPlaceVehlib) // v5.3
-   {
-    for(i=0; i<npv; i++)
-     delete[] DistPlaceVehlib[i];
-    delete[] DistPlaceVehlib;
-    DistPlaceVehlib=NULL;
-   }
+  LibereDistances(); // v6.0.1
+  NbDirDist=nd; NbParkingsDist=ne; NbArretsBusDist=nab; NbArretsTramDist=nat; // v6.0.1
+  NbFilesTaxiDist=nft; NbFilesParkDist=nfp; NbPlacesVehlibDist=npv; // v6.0.1
   if (nd>0)
    {
     if (ne>0)
@@ -2632,20 +2592,8 @@ bool voie::PrepareCalculAttenteTrafic()
  {
   bool Ok=true;
   int i, j, ne=cv->NbParkings;
-  if (Attente)
-   {
-    for(i=0; i<=ne; i++)
-     delete[] Attente[i];
-    delete[] Attente;
-    Attente=NULL;
-   }
-  if (Trafic)
-   {
-    for(i=0; i<=ne; i++)
-     delete[] Trafic[i];
-    delete[] Trafic;
-    Trafic=NULL;
-   }
+  LibereAttenteTrafic(); // v6.0.1
+  NbParkingsAttente=ne; // v6.0.1
   if (ne>0)
    {
 	if ((Ok=(!!(Attente=new int*[ne+1]))))
@@ -5393,6 +5341,13 @@ bool centre_ville::PrepareCalculDistances() // v3.0 : inclut également celui de
    for(j=0; Ok&&(j<NbY); j++)
     Ok=v[i][j].PrepareCalculDistances();
   return Ok;
+ }
+//-----------------------------------------------------------------------------
+void centre_ville::LibereDistances() // v6.0.1
+ {
+  for(int i=0; i<NbX; i++)
+   for(int j=0; j<NbY; j++)
+    v[i][j].LibereDistances();
  }
 //-----------------------------------------------------------------------------
 bool centre_ville::PrepareCalculAttenteTrafic()
