@@ -61,15 +61,53 @@ la 6.0.1 s'ouvre toujours dans la 5.4.3.2, et inversement.
 
 Détail : `engine/README.md`, « Corrections de la 6.0.1 ».
 
+### Démarrage depuis un fichier non inscriptible (trouvé en recette de la 6.0.1-rc1)
+
+Marche enregistre le réseau avant de démarrer, mais après l'avoir préparé
+(l'enregistrement écrit ce que préparent les `Prepare*`). Sur un fichier en
+lecture seule, comme les cartes du dossier `Cartes` du `.dmg`, Marche affichait
+donc « Erreur de données dans le fichier » et ne démarrait pas ; le réseau restait
+préparé, et le clic suivant tournait sans fin dans `centre_ville::PrepareBus`.
+
+- **Fichier en lecture seule, réseau non modifié** : la simulation démarre, sans
+  enregistrer ni message, avec les mêmes tirages qu'avec un fichier inscriptible.
+  Arrêt recharge le réseau d'origine.
+- **Fichier en lecture seule, réseau modifié** : Marche le dit et propose
+  d'enregistrer sous un autre nom. Sinon la simulation ne démarre pas et les
+  modifications sont gardées.
+- **Démarrage interrompu** (erreurs d'intégrité, trams impossibles à placer,
+  enregistrement annulé ou en échec, mémoire insuffisante) : le réseau est remis
+  dans son état d'avant le clic, modifications non enregistrées comprises, et
+  Arrêt reste grisé. Marche prend avant de préparer une copie du réseau dans le
+  dossier temporaire ; si elle est impossible, Marche le dit et ne démarre pas.
+- **Réseau non connexe** : les tableaux de distances restent affichés pour
+  trouver la case fautive, mais le réparer puis relancer Marche libérait ces
+  distances d'après le nouveau nombre de directions, hors des tableaux (erreur
+  mémoire de l'original). Modifier le réseau les libère désormais et vide les
+  tableaux affichés.
+- **Fichier inaccessible à l'arrêt** (volume éjecté, fichier supprimé) : le
+  réseau d'avant la simulation est rétabli, à enregistrer ailleurs.
+- **Réseau sans nom** : Arrêt recharge le fichier choisi au démarrage, sans
+  demander lequel ouvrir (annuler cette boîte laissait le réseau préparé).
+- **Trams impossibles à placer** : un seul message, sans le « Mémoire
+  insuffisante ! » qui le suivait.
+- **Fichier impossible à créer ou à ouvrir** (`FileCreate`, `FileOpen` : l'échec
+  vaut -1) : « Impossible de créer le fichier » au lieu d'« Erreur de données » ;
+  « Impossible d'ouvrir le fichier » au lieu d'une carte vide, le réseau affiché
+  étant gardé. Après un échec, Enregistrer vise toujours le fichier courant.
+- **Enregistrement interrompu** (disque plein) : le réseau reste signalé comme
+  modifié, car le fichier est tronqué.
+- **macOS** : au premier lancement, les 6 cartes d'exemple, embarquées dans le
+  paquet, sont copiées dans `~/Library/Application Support/Patquoi.fr/Centre-Ville`,
+  sans écraser un fichier existant ni recopier une carte supprimée ensuite, comme
+  l'AppImage et l'installeur Windows. Le dossier `Cartes` du `.dmg` reste.
+
 ### Restent à corriger
 
 - **Interface** : la liste « Bogues d'origine conservés » de la 6.0.0 (dans
-  `CHANGELOG.md`), et `f_simul.cpp` qui
-  teste `if ((hfile=FileCreate(…)))` et `if ((hfile=FileOpen(…)))` alors que
-  l'échec vaut -1 : un fichier impossible à créer est signalé comme une
-  erreur de données ; un fichier impossible à ouvrir donne une carte vide
-  (`centre_ville::Charge` ne voit pas les erreurs de lecture, -1, seulement
-  une fin de fichier prématurée).
+  `CHANGELOG.md`).
+- **Moteur** : `centre_ville::Charge` ne voit pas les erreurs de lecture (-1)
+  d'un fichier ouvert, seulement une fin de fichier prématurée.
 
 ## [6.0.0] — portage Qt 6
 

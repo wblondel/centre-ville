@@ -16,6 +16,19 @@
 //     fichier impossible à créer ou à écrire est signalé (v6.0.1) ;
 //   - la vérification d'intégrité après ouverture affiche les erreurs des
 //     contrôles de champs (v6.0.1) ;
+//   - fichier impossible à ouvrir : message, réseau affiché gardé (v6.0.1) ;
+//   - Marche sur un fichier en lecture seule (v6.0.1) : non modifié, simulation
+//     sans enregistrement, avec les mêmes tirages, et Arrêt recharge le réseau
+//     d'origine ; modifié, question puis « Enregistrer sous », sinon pas de
+//     démarrage ;
+//   - démarrage interrompu (v6.0.1) : erreurs d'intégrité, trams impossibles à
+//     placer, réseau non connexe, enregistrement annulé ou en échec, copie du
+//     réseau impossible. Plusieurs clics sur Marche, sous une limite de temps
+//     (jusqu'à la 6.0.0, le 2e clic tournait sans fin dans PrepareBus), puis un
+//     démarrage sur le réseau rétabli ;
+//   - Arrêt quand le fichier n'est plus accessible : réseau rétabli (v6.0.1) ;
+//   - recette : carte d'un vrai volume en lecture seule, s'il est désigné par
+//     CV_CARTE_LECTURE_SEULE (sinon sauté) ;
 //   - Nouveau puis génération aléatoire (fiches Dimensions et Génération) à
 //     graine fixe : même réseau que le golden master de la génération ;
 //   - lot 1 des fiches secondaires (paramètres et définitions), sur une copie
@@ -69,6 +82,7 @@
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileOpenEvent>
 #include <QFocusEvent>
 #include <QFontDatabase>
@@ -85,9 +99,15 @@
 #include <QTest>
 #include <QTimer>
 #include <QUrl>
+#include <chrono>
+#include <condition_variable>
+#include <cstdio>
+#include <cstdlib>
 #include <deque>
 #include <fstream>
+#include <mutex>
 #include <sstream>
+#include <thread>
 #ifndef _WIN32
  #include <csignal>
  #include <sys/resource.h>
@@ -127,6 +147,7 @@
 #include "f_statsc.h"
 #include "f_statsv.h"
 #include "format_reference.h"
+#include "compat/fichier.h"
 #include "compat/alea.h" // après les en-têtes système
 //---------------------------------------------------------------------------
 extern TfrmGeneration *frmGeneration; // défini dans f_genres.cpp (non déclaré par f_genres.h d'origine)
@@ -184,6 +205,122 @@ namespace
     for(int i=0; i<cv->NbFeuxPieton; i++) n+=cv->FeuP[i].Defini();
     return n;
    }
+  //-------------------------------------------------------------------------
+  // Limite de temps d'un clic sur Marche : le fil principal, s'il tourne sans
+  // fin, ne rendrait jamais la main à QTest ; seul un autre fil peut l'arrêter
+  class LimiteDeTemps
+   {
+    std::mutex Verrou;
+    std::condition_variable Fin;
+    bool Termine=false;
+    std::thread Fil;
+    public:
+    LimiteDeTemps(const char *Quoi, int Secondes) : Fil([this, Quoi, Secondes]()
+     {
+      std::unique_lock<std::mutex> v(Verrou);
+      if (!Fin.wait_for(v, std::chrono::seconds(Secondes), [this]() { return Termine; }))
+       {
+        std::fprintf(stderr, "FAIL! : blocage de plus de %d s : %s\n", Secondes, Quoi);
+        std::fflush(stderr);
+        std::_Exit(3);
+       }
+     }) {}
+    ~LimiteDeTemps()
+     {
+      { std::lock_guard<std::mutex> v(Verrou); Termine=true; }
+      Fin.notify_all();
+      Fil.join();
+     }
+   };
+  //-------------------------------------------------------------------------
+  // Fichier en lecture seule le temps d'un test, droits rétablis même s'il
+  // échoue (QVERIFY sort de la fonction) : le dossier temporaire reste effaçable
+  class LectureSeule
+   {
+    QString Fichier;
+    QFile::Permissions Droits;
+    public:
+    explicit LectureSeule(const QString &f) : Fichier(f), Droits(QFile::permissions(f))
+     { QFile::setPermissions(f, QFile::ReadOwner|QFile::ReadUser|QFile::ReadGroup|QFile::ReadOther); }
+    ~LectureSeule() { QFile::setPermissions(Fichier, Droits); }
+    bool Effective() const { return !QFile(Fichier).open(QIODevice::ReadWrite); } // Faux pour root
+   };
+  //-------------------------------------------------------------------------
+  // Réseau tel qu'il serait enregistré, pour le comparer à un autre
+  QByteArray OctetsReseau()
+   {
+    QTemporaryDir Dossier;
+    QString f=Dossier.path()+"/reseau.cvw";
+    int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
+    if (hfile==-1) return QByteArray();
+    bool Ok=cv->Sauve(hfile);
+    FileClose(hfile);
+    return Ok?Contenu(f):QByteArray();
+   }
+  //-------------------------------------------------------------------------
+  // Position de tout ce qui se déplace : deux simulations aux mêmes tirages ont la même
+  QString EmpreinteSimulation()
+   {
+    QString e=QString("%1 %2 %3:").arg(cv->TourCrt).arg(cv->NbVehiculesSortis).arg(cv->NbVehiculesArrives);
+    for(int i=0; i<cv->NbVehicules; i++) e+=QString(" %1,%2").arg(cv->Vehicule[i].x).arg(cv->Vehicule[i].y);
+    for(int i=0; i<cv->NbPietons; i++) e+=QString(" %1,%2").arg(cv->Pieton[i].x).arg(cv->Pieton[i].y);
+    for(int i=0; i<cv->NbBus; i++) e+=QString(" %1,%2").arg(cv->Bus[i].x).arg(cv->Bus[i].y);
+    for(int i=0; i<cv->NbTrams; i++) e+=QString(" %1,%2").arg(cv->Tram[i].x).arg(cv->Tram[i].y);
+    for(int i=0; i<cv->NbTaxis; i++) e+=QString(" %1,%2").arg(cv->Taxi[i].x).arg(cv->Taxi[i].y);
+    for(int i=0; i<cv->NbVehlibs; i++) e+=QString(" %1,%2").arg(cv->Vehlib[i].x).arg(cv->Vehlib[i].y);
+    return e;
+   }
+  //-------------------------------------------------------------------------
+  QWidget *BoiteFichier()
+   {
+    return qobject_cast<QFileDialog *>(QApplication::activeModalWidget());
+   }
+  void ChoisitFichier(const QString &asFichier)
+   {
+    QFileDialog *d=qobject_cast<QFileDialog *>(QApplication::activeModalWidget());
+    // (selectFile n'écrit pas dans le champ du nom quand celui-ci a le focus)
+    d->findChild<QLineEdit *>("fileNameEdit")->setText(asFichier);
+    QMetaObject::invokeMethod(d, "accept"); // créneau protégé
+   }
+  void AnnuleBoiteFichier()
+   {
+    qobject_cast<QFileDialog *>(QApplication::activeModalWidget())->reject();
+   }
+#ifndef _WIN32
+  //-------------------------------------------------------------------------
+  // Taille des fichiers limitée à 1000 octets, comme un disque plein. Quand la
+  // barre d'état se redessine avec asEtape (donc au milieu de Marche), si elle est donnée
+  class LimiteFichiers : public QObject
+   {
+    struct rlimit Ancienne;
+    void (*AncienSignal)(int);
+    QString Etape;
+    void Pose()
+     {
+      struct rlimit Limite=Ancienne;
+      Limite.rlim_cur=1000;
+      setrlimit(RLIMIT_FSIZE, &Limite);
+     }
+    public:
+    explicit LimiteFichiers(const QString &asEtape=QString()) : Etape(asEtape)
+     {
+      getrlimit(RLIMIT_FSIZE, &Ancienne);
+      AncienSignal=std::signal(SIGXFSZ, SIG_IGN);
+      if (Etape.isEmpty()) Pose();
+      else frmSimulation->StatusBar->installEventFilter(this);
+     }
+    ~LimiteFichiers() override
+     {
+      setrlimit(RLIMIT_FSIZE, &Ancienne);
+      std::signal(SIGXFSZ, AncienSignal);
+     }
+    bool eventFilter(QObject *o, QEvent *e) override
+     {
+      if ((e->type()==QEvent::Paint)&&(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)==Etape)) Pose();
+      return QObject::eventFilter(o, e);
+     }
+   };
+#endif
  }
 //---------------------------------------------------------------------------
 class TestInterface : public QObject
@@ -328,6 +465,62 @@ class TestInterface : public QObject
     frmSimulation->TimerSimul->Enabled=false;
     return frmSimulation->SimulationEnCours&&cv->DistancesCalculees;
    }
+  // Marche sous une limite de temps (Demarre, comme l'utilisateur)
+  bool DemarreSansBlocage(const char *Quoi)
+   {
+    LimiteDeTemps Limite(Quoi, 120);
+    return Demarre();
+   }
+  // Marche n'a rien démarré : les boutons et le menu d'Arrêt sont grisés, Marche
+  // est disponible et le réseau est celui d'avant le clic (Octets) ; aucun bus
+  // ni tram (les Prepare* les comptent sur leur ligne, à l'origine du blocage)
+  void VerifieNonDemarre(const QByteArray &Octets)
+   {
+    QVERIFY(!frmSimulation->SimulationEnCours);
+    QVERIFY(!frmSimulation->Pause);
+    QVERIFY(frmSimulation->ActionMarche->Enabled);
+    QVERIFY(!frmSimulation->ActionArret->Enabled);
+    QVERIFY(!frmSimulation->ToolButtonArret->isEnabled());
+    QVERIFY(!frmSimulation->MenuItemArret->ElementQt()->isEnabled());
+    QVERIFY(frmSimulation->DrawGridSimul->PopupMenu==frmSimulation->PopupMenuEditionCase);
+    QVERIFY(!cv->DistancesCalculees);
+    QCOMPARE((long)cv->TourCrt, 0L);
+    for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
+     {
+      QCOMPARE(cv->LigneBus[i].NbBus, 0);
+      QCOMPARE(cv->LigneTram[i].NbTrams, 0);
+     }
+    QVERIFY(!cv->Vehicule);
+    QVERIFY(OctetsReseau()==Octets);
+   }
+  // Réseau de deux boucles à sens unique, chacune avec son parking, sans lien
+  // entre elles : Marche le trouve correct, puis non connexe (distances indéfinies)
+  QString CreeReseauNonConnexe(const QString &asNom)
+   {
+    QString f=QFileInfo(Carte).absolutePath()+"/"+asNom;
+    centre_ville *Precedent=cv;
+    cv=new centre_ville(true, 20, 12); // éléments par défaut, à ajuster
+    cv->DefinitNbParkings(2);
+    cv->DefinitNbVehicules(8);
+    cv->DefinitNbPietons(0);
+    for(int x0 : {2, 10})
+     {
+      const int x1=x0+4, y0=2, y1=6;
+      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
+      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
+      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
+      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+      cv->AjouteParking(x0+2, y0);
+     }
+    int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
+    bool Ok=(hfile!=-1)&&cv->Sauve(hfile);
+    if (hfile!=-1) FileClose(hfile);
+    delete cv;
+    cv=Precedent;
+    if (!Ok) return QString();
+    OuvreFichier(f);
+    return f;
+   }
   bool Arrete()
    { // Arrêt par la barre d'outils : bilan, puis rechargement du réseau
     QTest::mouseClick(frmSimulation->ToolButtonArret, Qt::LeftButton);
@@ -384,6 +577,16 @@ class TestInterface : public QObject
   void enregistrementIdentique();
   void enregistrementImpossible();
   void verificationApresOuverture();
+  void ouvertureImpossible();
+  void marcheLectureSeuleNonModifie();
+  void marcheLectureSeuleModifie();
+  void interruptionErreursIntegrite();
+  void interruptionTramsImpossibles();
+  void interruptionReseauNonConnexe();
+  void interruptionEnregistrementAnnule();
+  void interruptionEnregistrementEnEchec();
+  void arretFichierInaccessible();
+  void carteDUnVolumeEnLectureSeule();
   void nouveauEtGeneration();
   // Lot 1 des fiches secondaires (phase 6)
   void ficheAPropos();
@@ -641,6 +844,7 @@ void TestInterface::enregistrementImpossible()
   Messages.clear();
   Enregistre(Dossier+"/inexistant/enregistrement.cvw");
   QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains("Impossible de créer le fichier"), qPrintable(Messages.first())); // jusqu'à la 6.0.1-rc1 : « Erreur de données »
   QVERIFY2(Q(frmSimulation->StatusBar->Panels->Items[0]->Text).startsWith(QString::fromUtf8("Enregistrement non effectué"), Qt::CaseInsensitive),
            qPrintable(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)));
 #ifndef _WIN32
@@ -660,8 +864,10 @@ void TestInterface::enregistrementImpossible()
   QCOMPARE(Messages.size(), 1);
   QVERIFY2(Messages.first().contains(QString::fromUtf8("Erreur de données dans le fichier")), qPrintable(Messages.first()));
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement NON effectué."));
+  QVERIFY(frmSimulation->SimulationModifiee); // le fichier est tronqué : le réseau n'est plus que dans la mémoire
+  frmSimulation->SimulationModifiee=false;
 #endif
-  frmSimulation->SaveDialog->FileName=asPrecedent;
+  QCOMPARE(Q(frmSimulation->SaveDialog->FileName), Q(asPrecedent)); // en échec, le nom courant ne change pas
  }
 //---------------------------------------------------------------------------
 void TestInterface::verificationApresOuverture()
@@ -699,8 +905,435 @@ void TestInterface::verificationApresOuverture()
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué MAIS erreur(s) d'intégrité trouvée(s)"));
  }
 //---------------------------------------------------------------------------
+void TestInterface::ouvertureImpossible()
+ { // Jusqu'à la 6.0.1-rc1 (comme l'original), FileOpen en échec (-1) passait pour
+   // une réussite : carte vide de 0 case ou 99×63, titre au nom du fichier
+  QString f=OuvreCarte("Démo.cvw", "ouverture.cvw");
+  QVERIFY(!f.isEmpty());
+  centre_ville *Reseau=cv;
+  AnsiString asTitre=frmSimulation->Caption, asOuvrir=frmSimulation->OpenDialog->FileName, asEnregistrer=frmSimulation->SaveDialog->FileName;
+  auto VerifieReseauGarde=[&]()
+   {
+    QVERIFY(cv==Reseau);
+    QCOMPARE(Messages.size(), 1);
+    QVERIFY2(Messages.first().contains("Impossible d'ouvrir le fichier"), qPrintable(Messages.first()));
+    QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement NON effectué."));
+    QCOMPARE(Q(frmSimulation->Caption), Q(asTitre));
+    QCOMPARE(Q(frmSimulation->OpenDialog->FileName), Q(asOuvrir));
+    QCOMPARE(Q(frmSimulation->SaveDialog->FileName), Q(asEnregistrer));
+    QVERIFY(!frmSimulation->SimulationModifiee);
+   };
+  Messages.clear();
+  OuvreFichier(QFileInfo(f).absolutePath()+"/inexistant.cvw");
+  VerifieReseauGarde();
+  if (QTest::currentTestFailed()) return;
+#ifndef _WIN32
+  // Fichier sans droit de lecture
+  QString Protege=QFileInfo(f).absolutePath()+"/protege.cvw";
+  QFile::remove(Protege);
+  QVERIFY(QFile::copy(f, Protege));
+   {
+    LectureSeule Droits(Protege);
+    QVERIFY(QFile::setPermissions(Protege, QFile::Permissions()));
+    if (!QFile(Protege).open(QIODevice::ReadOnly))
+     {
+      Messages.clear();
+      OuvreFichier(Protege);
+      VerifieReseauGarde();
+      if (QTest::currentTestFailed()) return;
+     }
+   }
+#endif
+  // Le réseau gardé reste utilisable
+  QVERIFY2(DemarreSansBlocage("Marche après une ouverture impossible"), qPrintable(Messages.join('\n')));
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::marcheLectureSeuleNonModifie()
+ { // Carte d'exemple ouverte depuis le .dmg : jusqu'à la 6.0.1-rc1, « Erreur de
+   // données dans le fichier » (FileCreate en échec), simulation non démarrée, et le
+   // clic suivant tournait sans fin. Le fichier est à jour : la simulation démarre
+   // Référence : même carte dans un fichier inscriptible, mêmes tirages
+  QVERIFY(!OuvreCarte("Géant.cvw", "inscriptible.cvw").isEmpty());
+  QVERIFY2(DemarreSansBlocage("Marche, fichier inscriptible"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(50));
+  QString Reference=EmpreinteSimulation();
+  QVERIFY(Arrete());
+
+  QString f=OuvreCarte("Géant.cvw", "lecture_seule.cvw");
+  QVERIFY(!f.isEmpty());
+  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  LectureSeule Droits(f);
+  if (!Droits.Effective()) QSKIP("Droits de fichier sans effet (root)");
+  for(int Essai=0; Essai<2; Essai++)
+   {
+    QVERIFY2(DemarreSansBlocage("Marche, fichier en lecture seule"), qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+    QVERIFY(!frmSimulation->SimulationModifiee);
+    QVERIFY(frmSimulation->ToolButtonArret->isEnabled());
+    QVERIFY(frmSimulation->MenuItemArret->ElementQt()->isEnabled());
+    QVERIFY(JoueJusquAuTour(50));
+    QCOMPARE(EmpreinteSimulation(), Reference);
+    QVERIFY(Contenu(f)==Origine);
+    // Arrêt : bilan, puis le réseau d'origine rechargé, sans autre message
+    QVERIFY(Arrete());
+    QVERIFY(QTest::qWaitFor([this]() { return !Messages.isEmpty(); }, 5000));
+    QCOMPARE(Messages.size(), 1);
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("Bilan au tour n°")), qPrintable(Messages.first()));
+    QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+    QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(f));
+    QVERIFY(!frmSimulation->SimulationModifiee);
+    QVERIFY(!cv->DistancesCalculees);
+    QVERIFY(OctetsReseau()==Reseau);
+    QVERIFY(Contenu(f)==Origine);
+   }
+ }
+//---------------------------------------------------------------------------
+void TestInterface::marcheLectureSeuleModifie()
+ { // Le fichier n'a pas les modifications : question, « Enregistrer sous », sinon pas de démarrage
+  QString f=OuvreCarte("Géant.cvw", "lecture_seule_modifie.cvw");
+  QVERIFY(!f.isEmpty());
+  QString Dossier=QFileInfo(f).absolutePath(), Copie=Dossier+"/lecture_seule_copie.cvw", Refuse=Dossier+"/lecture_seule_refuse.cvw";
+  QFile::remove(Copie);
+  QFile::remove(Refuse);
+  QVERIFY(QFile::copy(f, Refuse));
+  QByteArray Origine=Contenu(f);
+  LectureSeule Droits(f), DroitsRefuse(Refuse);
+  if (!Droits.Effective()) QSKIP("Droits de fichier sans effet (root)");
+  cv->AttenteMaxVeh=77; // modification de l'utilisateur
+  frmSimulation->SimulationModifiee=true;
+  QByteArray Reseau=OctetsReseau();
+  AnsiString asNom=frmSimulation->SaveDialog->FileName;
+  auto VerifieNonDemarreModifie=[&]()
+   {
+    VerifieNonDemarre(Reseau);
+    if (QTest::currentTestFailed()) return;
+    QCOMPARE(cv->AttenteMaxVeh, 77L);
+    QVERIFY(frmSimulation->SimulationModifiee);
+    QVERIFY(Contenu(f)==Origine);
+    QCOMPARE(Q(frmSimulation->SaveDialog->FileName), Q(asNom));
+   };
+  // Réponse « Non », plusieurs fois
+  for(int Essai=0; Essai<3; Essai++)
+   {
+    QVERIFY(!DemarreSansBlocage("Marche, fichier en lecture seule modifié, réponse Non"));
+    QCOMPARE(Messages.size(), 1);
+    QVERIFY2(Messages.first().contains("lecture seule"), qPrintable(Messages.first()));
+    VerifieNonDemarreModifie();
+    if (QTest::currentTestFailed()) return;
+   }
+  // « Oui », boîte annulée
+  ReponseQuestions=QMessageBox::Yes;
+  QuandModale(BoiteFichier, AnnuleBoiteFichier);
+  QVERIFY(!DemarreSansBlocage("Marche, fichier en lecture seule modifié, boîte annulée"));
+  QVERIFY(Etapes.empty());
+  VerifieNonDemarreModifie();
+  if (QTest::currentTestFailed()) return;
+  // « Oui », nom d'un autre fichier en lecture seule : refusé, comme tout échec
+  QuandModale(BoiteFichier, []() { ChoisitFichier(QFileInfo(frmSimulation->OpenDialog->FileName.c_str()).absolutePath()+"/lecture_seule_refuse.cvw"); });
+  QVERIFY(!DemarreSansBlocage("Marche, fichier en lecture seule modifié, autre fichier refusé"));
+  QVERIFY(Etapes.empty());
+  QVERIFY2(Messages.last().contains("Impossible de créer le fichier"), qPrintable(Messages.join('\n')));
+  VerifieNonDemarreModifie();
+  if (QTest::currentTestFailed()) return;
+  // « Oui », autre nom : le réseau y est enregistré, la simulation démarre, et Arrêt recharge ce fichier
+  QuandModale(BoiteFichier, [Copie]() { ChoisitFichier(Copie); });
+  QVERIFY2(DemarreSansBlocage("Marche, fichier en lecture seule modifié, enregistré sous"), qPrintable(Messages.join('\n')));
+  QVERIFY(Etapes.empty());
+  QVERIFY(QFile::exists(Copie));
+  QCOMPARE(Q(frmSimulation->SaveDialog->FileName), QDir::toNativeSeparators(Copie));
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QVERIFY(JoueJusquAuTour(20));
+  ReponseQuestions=QMessageBox::No;
+  QVERIFY(Arrete());
+  QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(Copie));
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+  QCOMPARE(cv->AttenteMaxVeh, 77L);
+  QVERIFY(Contenu(f)==Origine);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::interruptionErreursIntegrite()
+ { // « Vérifier intégrité avant simulation » : la vérification porte sur le réseau
+   // préparé (véhicules, bus...), elle ne peut pas venir avant les Prepare*
+  QString f=QFileInfo(Carte).absolutePath()+"/integrite.cvw";
+  conversion_cvw Reference=ConvertitEn530(Contenu(QFileInfo(ArgumentsTest.value(2)).absolutePath()+"/Géant.cvw").toStdString());
+  QVERIFY(Reference.Ok);
+  auto Debut=[&Reference](const std::string &Nom) -> long long
+   {
+    for(const champ_cvw &ch : Reference.Champs) if (ch.Nom==Nom) return (long long)ch.Debut;
+    return -1;
+   };
+  int NumFeu=1;
+  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&(Reference.Octets[(std::size_t)d+3]&0x80); NumFeu++);
+  const long long DmdVert=Debut("feu"+std::to_string(NumFeu)+".TypeDmdVert");
+  QVERIFY(DmdVert>=0);
+  std::string Octets=Reference.Octets;
+  const char Bon=Octets[(std::size_t)DmdVert];
+  Octets[(std::size_t)DmdVert]=9;
+  QFile::remove(f);
+  QFile Fichier(f);
+  QVERIFY(Fichier.open(QIODevice::WriteOnly));
+  QCOMPARE(Fichier.write(Octets.data(), (qint64)Octets.size()), (qint64)Octets.size());
+  Fichier.close();
+  OuvreFichier(f);
+  QVERIFY(!VerifierAvantSimulation);
+  frmSimulation->ActionVerifierAvantSimulation->Execute();
+  QVERIFY(VerifierAvantSimulation);
+  Finalement Decoche([]() { if (VerifierAvantSimulation) frmSimulation->ActionVerifierAvantSimulation->Execute(); });
+  QByteArray Reseau=OctetsReseau();
+  QByteArray Disque=Contenu(f);
+  for(int Essai=0; Essai<3; Essai++)
+   {
+    QVERIFY(!DemarreSansBlocage("Marche après des erreurs d'intégrité"));
+    QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("type de demande du vert incorrect (9)")), qPrintable(Messages.first()));
+    VerifieNonDemarre(Reseau);
+    if (QTest::currentTestFailed()) return;
+    QVERIFY(!frmSimulation->SimulationModifiee);
+    QVERIFY(Contenu(f)==Disque); // rien d'enregistré
+   }
+  // Ouvrir ne doit pas prendre ces erreurs pour celles du fichier ouvert
+  frmSimulation->ActionVerifierAvantSimulation->Execute();
+  QVERIFY(!OuvreCarte("Démo.cvw", "integrite_demo.cvw").isEmpty());
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+  // Le réseau corrigé démarre, sur le réseau rétabli
+  OuvreFichier(f);
+  cv->Feu[NumFeu-1].TypeDmdVert=(dmd_vert)Bon;
+  frmSimulation->SimulationModifiee=true;
+  QVERIFY2(DemarreSansBlocage("Marche, réseau corrigé"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+  QVERIFY(Contenu(f)==QByteArray(Reference.Octets.data(), (qsizetype)Reference.Octets.size()));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::interruptionTramsImpossibles()
+ { // Plus de trams à placer que d'arrêts sur leur ligne : tous les Prepare* jusqu'à
+   // PrepareTrams ont tourné, et un seul message (pas de « mémoire insuffisante »)
+  QString f=OuvreCarte("Géant.cvw", "trams.cvw");
+  QVERIFY(!f.isEmpty());
+  int Ligne=0;
+  while((Ligne<NBMAXLIGNESBUSTRAM)&&(cv->LigneTram[Ligne].NbArrets<2)) Ligne++;
+  QVERIFY(Ligne<NBMAXLIGNESBUSTRAM);
+  const int Arret1=cv->LigneTram[Ligne].NumArret[0], Arret2=cv->LigneTram[Ligne].NumArret[1];
+  // Trois lignes d'un tram chacune sur les deux mêmes arrêts
+  struct ligne { int NbArrets; std::vector<int> NumArret; };
+  std::vector<ligne> Lignes;
+  for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
+   Lignes.push_back({cv->LigneTram[i].NbArrets, std::vector<int>(cv->LigneTram[i].NumArret, cv->LigneTram[i].NumArret+NBMAXARRETSBUSTRAMPARLIGNE)});
+  auto Retablit=[&Lignes]()
+   {
+    for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
+     {
+      cv->LigneTram[i].NbArrets=Lignes[i].NbArrets;
+      for(int a=0; a<NBMAXARRETSBUSTRAMPARLIGNE; a++) cv->LigneTram[i].NumArret[a]=Lignes[i].NumArret[a];
+     }
+   };
+  for(int i : {0, 1, 2})
+   {
+    cv->LigneTram[i].NbArrets=2;
+    cv->LigneTram[i].NumArret[0]=Arret1;
+    cv->LigneTram[i].NumArret[1]=Arret2;
+   }
+  for(int i=3; i<NBMAXLIGNESBUSTRAM; i++) cv->LigneTram[i].NbArrets=0;
+  Enregistre(f);
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement effectué."));
+  QByteArray Reseau=OctetsReseau();
+  for(int Essai=0; Essai<3; Essai++)
+   {
+    QVERIFY(!DemarreSansBlocage("Marche après des trams impossibles à placer"));
+    QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.first().contains("placer tous les trams"), qPrintable(Messages.first()));
+    VerifieNonDemarre(Reseau);
+    if (QTest::currentTestFailed()) return;
+   }
+  // L'utilisateur rétablit ses lignes : la simulation démarre, avec les bus et les trams de chaque ligne
+  Retablit();
+  frmSimulation->SimulationModifiee=true;
+  QVERIFY2(DemarreSansBlocage("Marche, trams corrigés"), qPrintable(Messages.join('\n')));
+  for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
+   {
+    QCOMPARE(cv->LigneBus[i].NbBus, cv->LigneBus[i].NbArrets?1+(cv->LigneBus[i].NbArrets-1)/3:0);
+    QCOMPARE(cv->LigneTram[i].NbTrams, cv->LigneTram[i].NbArrets?1+(cv->LigneTram[i].NbArrets-1)/3:0);
+   }
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::interruptionReseauNonConnexe()
+ { // Seule interruption qui garde son état : les fiches affichent les distances
+   // calculées, pour trouver la case fautive. Puis l'utilisateur répare le réseau,
+   // ce qui change le nombre de directions : les distances, allouées d'après l'ancien,
+   // étaient libérées d'après le nouveau (hors du tableau, jusqu'à la 6.0.1-rc1)
+  QString f=CreeReseauNonConnexe("non_connexe.cvw");
+  QVERIFY(!f.isEmpty());
+  QByteArray Reseau=OctetsReseau();
+  for(int Essai=0; Essai<3; Essai++)
+   {
+    QVERIFY(!DemarreSansBlocage("Marche, réseau non connexe"));
+    QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("n'est pas connexe")), qPrintable(Messages.first()));
+    QVERIFY(!frmSimulation->SimulationEnCours);
+    QVERIFY(!frmSimulation->ActionArret->Enabled);
+    QVERIFY(!frmSimulation->ToolButtonArret->isEnabled());
+    QVERIFY(!frmSimulation->MenuItemArret->ElementQt()->isEnabled());
+    QVERIFY(frmAffDistParkings->isVisible());
+    QVERIFY(cv->v[4][2].DistParking);
+    QVERIFY(OctetsReseau()==Reseau);
+    QVERIFY(Contenu(f)==Reseau);
+   }
+  // Réparation : deux routes à sens unique relient les boucles, deux cases gagnent une direction
+  PlaceCurseur(6, 3);
+  frmSimulation->ActionDirectionDroite->Execute();
+  QCOMPARE((int)cv->v[6][3].DirPoss, (int)(S|E));
+  QVERIFY(frmSimulation->SimulationModifiee);
+  QVERIFY(!cv->v[4][2].DistParking); // distances obsolètes libérées...
+  frmSimulation->DrawGridSimulClick(frmSimulation->DrawGridSimul); // ... et la fiche encore ouverte le voit
+  for(int x=7; x<=9; x++) cv->v[x][3].DirPoss=E;
+  PlaceCurseur(10, 5);
+  frmSimulation->ActionDirectionGauche->Execute();
+  QCOMPARE((int)cv->v[10][5].DirPoss, (int)(N|O));
+  for(int x=7; x<=9; x++) cv->v[x][5].DirPoss=O;
+  QVERIFY2(DemarreSansBlocage("Marche, réseau réparé"), qPrintable(Messages.join('\n')));
+  QVERIFY(frmSimulation->ToolButtonArret->isEnabled());
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+  QCOMPARE((int)cv->v[6][3].DirPoss, (int)(S|E));
+  if (frmAffDistParkings->isVisible()) frmAffDistParkings->Hide();
+ }
+//---------------------------------------------------------------------------
+void TestInterface::interruptionEnregistrementAnnule()
+ { // Réseau sans nom : Marche demande où l'enregistrer (après les Prepare*, l'enregistrement les écrit)
+  // (Géant sans nom de fichier, comme après Nouveau : un réseau généré n'a pas de parkings définis)
+  QVERIFY(!OuvreCarte("Géant.cvw", "sans_nom_source.cvw").isEmpty());
+  frmSimulation->SaveDialog->FileName="";
+  frmSimulation->OpenDialog->FileName="";
+  frmSimulation->Caption="Centre-Ville";
+  QString f=QFileInfo(Carte).absolutePath()+"/sans_nom.cvw";
+  QFile::remove(f);
+  QByteArray Reseau=OctetsReseau();
+  for(int Essai=0; Essai<3; Essai++)
+   {
+    QuandModale(BoiteFichier, AnnuleBoiteFichier);
+    QVERIFY(!DemarreSansBlocage("Marche, enregistrement annulé"));
+    QVERIFY(Etapes.empty());
+    VerifieNonDemarre(Reseau);
+    if (QTest::currentTestFailed()) return;
+    QVERIFY(frmSimulation->SaveDialog->FileName.IsEmpty());
+    QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+   }
+  // Ouvrir après une interruption : pas d'ouverture du fichier de Marche sans demander
+  QuandModale(BoiteFichier, AnnuleBoiteFichier);
+  frmSimulation->ActionOuvrir->Execute();
+  QVERIFY(Etapes.empty());
+  // Nom choisi : la simulation démarre et Arrêt recharge ce fichier, sans demander lequel
+  QuandModale(BoiteFichier, [f]() { ChoisitFichier(f); });
+  QVERIFY2(DemarreSansBlocage("Marche, enregistrement accepté"), qPrintable(Messages.join('\n')));
+  QVERIFY(Etapes.empty());
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+  QVERIFY(!QApplication::activeModalWidget());
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+  QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(f));
+  QVERIFY2(!Messages.join('\n').contains("sans réponse"), qPrintable(Messages.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::interruptionEnregistrementEnEchec()
+ {
+#ifdef _WIN32
+  QSKIP("Limite de taille des fichiers : pas d'équivalent sous Windows");
+#else
+  QString f=OuvreCarte("Géant.cvw", "disque_plein.cvw");
+  QVERIFY(!f.isEmpty());
+  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  // Copie du réseau impossible (dossier temporaire plein) : aucun démarrage, rien de préparé
+  for(int Essai=0; Essai<2; Essai++)
+   {
+    LimiteFichiers Limite;
+    QVERIFY(!DemarreSansBlocage("Marche, copie du réseau impossible"));
+    QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.first().contains("dossier temporaire"), qPrintable(Messages.first()));
+   }
+  VerifieNonDemarre(Reseau);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(Contenu(f)==Origine);
+  // Disque plein pendant l'enregistrement, le fichier est tronqué : message, pas de démarrage
+  for(int Essai=0; Essai<2; Essai++)
+   {
+    LimiteFichiers Limite(QString::fromUtf8("Préparation des feux de piétons..."));
+    QVERIFY(!DemarreSansBlocage("Marche, écriture en échec"));
+    QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("Erreur de données dans le fichier")), qPrintable(Messages.first()));
+    frmSimulation->StatusBar->removeEventFilter(&Limite);
+   }
+  VerifieNonDemarre(Reseau);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(frmSimulation->SimulationModifiee); // Le réseau n'est plus que dans la mémoire...
+  QVERIFY(Contenu(f)!=Origine);
+  // ... et l'espace revenu, Marche l'enregistre puis démarre
+  QVERIFY2(DemarreSansBlocage("Marche, écriture de nouveau possible"), qPrintable(Messages.join('\n')));
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+  QVERIFY(OctetsReseau()==Reseau);
+#endif
+ }
+//---------------------------------------------------------------------------
+void TestInterface::arretFichierInaccessible()
+ { // Volume du .dmg éjecté pendant la simulation : Arrêt ne peut plus recharger le
+   // fichier ; le réseau préparé bloquerait le clic suivant, il est rétabli
+  QString f=OuvreCarte("Géant.cvw", "ejecte.cvw");
+  QVERIFY(!f.isEmpty());
+  QByteArray Reseau=OctetsReseau();
+  QVERIFY2(DemarreSansBlocage("Marche, fichier bientôt inaccessible"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(10));
+  QVERIFY(QFile::remove(f));
+  QVERIFY(Arrete());
+  QVERIFY(QTest::qWaitFor([this]() { return Messages.size()>=2; }, 5000));
+  QVERIFY2(Messages.last().contains("Impossible d'ouvrir le fichier"), qPrintable(Messages.join('\n')));
+  VerifieNonDemarre(Reseau);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(frmSimulation->SimulationModifiee);
+  QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(f)+"*");
+  // Dossier toujours là : Marche réécrit le fichier
+  QVERIFY2(DemarreSansBlocage("Marche, après l'arrêt sans fichier"), qPrintable(Messages.join('\n')));
+  QVERIFY(QFile::exists(f));
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carteDUnVolumeEnLectureSeule()
+ { // Recette (docs/RECETTE.md) : carte du dossier Cartes du .dmg monté, désignée par
+   // CV_CARTE_LECTURE_SEULE, sur un vrai système de fichiers en lecture seule et
+   // de préférence dans l'affichage natif. En temps réel, comme marcheInterruptionArret
+  QString f=qEnvironmentVariable("CV_CARTE_LECTURE_SEULE");
+  if (f.isEmpty()) QSKIP("CV_CARTE_LECTURE_SEULE non définie");
+  QVERIFY2(!QFile(f).open(QIODevice::ReadWrite), "La carte n'est pas en lecture seule");
+  OuvreFichier(f);
+  QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  for(int Essai=0; Essai<2; Essai++)
+   {
+    Messages.clear();
+    {
+     LimiteDeTemps Limite("Marche, carte d'un volume en lecture seule", 120);
+     QTest::mouseClick(frmSimulation->ToolButtonMarche, Qt::LeftButton);
+    }
+    QVERIFY2(frmSimulation->SimulationEnCours, qPrintable(Messages.join('\n')));
+    QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+    QVERIFY(AttendTour(100, 120000));
+    Capture(Essai?"volume_lecture_seule_2.png":"volume_lecture_seule_1.png");
+    QVERIFY(Arrete());
+    QVERIFY(QTest::qWaitFor([this]() { return !Messages.isEmpty(); }, 5000));
+    QVERIFY2(Messages.first().contains(QString::fromUtf8("Bilan au tour n°")), qPrintable(Messages.first()));
+    QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
+    QVERIFY(OctetsReseau()==Reseau);
+    QVERIFY(Contenu(f)==Origine);
+   }
+ }
+//---------------------------------------------------------------------------
 void TestInterface::nouveauEtGeneration()
  { // f_simul : ActionNouveauExecute -> f_dimzone -> f_genres (ButtonOkClick), graine 12345
+  QVERIFY(!OuvreDemo("avant_generation.cvw").isEmpty()); // Dimensions proposées : celles du réseau ouvert
   alea::FixeGraine(12345);
   Messages.clear();
   QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);

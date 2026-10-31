@@ -1,4 +1,4 @@
-# Recette d'une version de Centre-Ville (6.0.0)
+# Recette d'une version de Centre-Ville
 
 À faire sur les paquets d'une pré-release (`6.0.0-rc1`) avant la version
 finale, sur de vrais systèmes. Les tests automatiques (`ctest`, CI) couvrent
@@ -58,7 +58,17 @@ Paquet : `Centre-Ville-<version>-macOS.dmg`.
 - [ ] Le message n'annonce pas une application « endommagée » (signature ad hoc valide).
 - [ ] « À propos » : « 6,0 » « ,0 » ; menu Centre-Ville › À propos de Centre-Ville.
 - [ ] Double-clic sur un `.cvw` (dossier `Cartes`) : Centre-Ville l'ouvre ; icône des `.cvw` dans le Finder.
-- [ ] Fichier › Ouvrir démarre dans `~/Library/Application Support/Patquoi.fr/Centre-Ville` (vide au départ : copier les cartes du `.dmg` s'il le faut).
+- [ ] Premier lancement : les 6 cartes sont copiées dans `~/Library/Application Support/Patquoi.fr/Centre-Ville` ; une carte déjà présente n'est pas écrasée ; une carte supprimée n'est pas recopiée au lancement suivant.
+- [ ] Fichier › Ouvrir démarre dans ce dossier et montre les cartes.
+- [ ] Carte ouverte en lecture seule, depuis le volume monté (`hdiutil attach -readonly`, ou double-clic sur le `.dmg`) : ouvrir `Cartes/Géant.cvw` du volume, Marche : la simulation démarre sans message et sans rien enregistrer ; la laisser tourner, Arrêt : bilan, puis « Chargement effectué. », réseau d'origine ; recommencer Marche et Arrêt.
+- [ ] Même carte, modifiée (Paramètres, par exemple), Marche : Centre-Ville dit que le fichier est en lecture seule et propose un autre nom. « Non » : pas de démarrage, modification gardée, Arrêt grisé ; nouveau clic sur Marche : même question, sans blocage. « Oui », puis un nom dans le dossier proposé : la simulation démarre, et Arrêt recharge ce fichier.
+- [ ] `codesign --verify --deep --strict` sur le paquet, après ces lancements : signature toujours valide.
+
+Le parcours « non modifié » s'automatise dans l'affichage natif, sur la carte du volume monté, depuis une compilation avec les tests :
+
+```bash
+CV_CARTE="$PWD/maps/Démo.cvw" CV_CARTE_LECTURE_SEULE="/Volumes/Centre-Ville <version>/Cartes/Géant.cvw" QT_QPA_PLATFORM=cocoa build/release/tests/test_interface carteDUnVolumeEnLectureSeule
+```
 - [ ] F1 (fenêtre principale, Paramètres, Rechercher) : rubrique exacte dans le navigateur par défaut, avec Safari et avec Chrome.
 - [ ] Raccourcis : ⌘ à la place de Ctrl ; Control+Q (Carrefours) et Control+H (Rechercher).
 - [ ] Thème clair et thème sombre ; écran Retina et écran non Retina.

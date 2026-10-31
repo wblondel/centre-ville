@@ -111,7 +111,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # préfixe abso
 | Système | Contenu installé | Paquet |
 |---|---|---|
 | Windows | `bin/cvw.exe` (icônes `Icon_0` et `Icon_1`, version : `cvw.rc.in`), DLL de Qt et de MSVC, `bin/qt.conf`, `plugins/`, `translations/` (windeployqt, par `qt_generate_deploy_app_script`), `bin/html`, `bin/tutocv` | `inno-setup/inscvw95.iss` (même `AppId`, association `.cvw`, cartes dans `{localappdata}\Patquoi.fr\Centre-Ville`) : `iscc /DStaging=<dossier installé> inno-setup\inscvw95.iss` |
-| macOS | `Centre-Ville.app` (macdeployqt), aide et `qtbase_fr.qm` dans `Contents/Resources`, icônes `.icns` (`icones_macos.cmake`), type `.cvw` exporté (`Info.plist.in`), signature ad hoc | `cpack` dans le dossier de compilation : `Centre-Ville-<version>-macOS.dmg` (avec `Applications`, `Cartes/` et `licence.txt`) |
+| macOS | `Centre-Ville.app` (macdeployqt), aide et `qtbase_fr.qm` dans `Contents/Resources`, cartes d'exemple dans l'exécutable (ressources Qt `:/cartes`, car le volume HFS+ du `.dmg` réécrit les noms accentués en NFD et romprait le sceau de `Contents/Resources` ; copiées au premier lancement dans le dossier de `stRepLocalAppData` par `CopieCartesExemple`, appelée par `main.cpp`), icônes `.icns` (`icones_macos.cmake`), type `.cvw` exporté (`Info.plist.in`), signature ad hoc | `cpack` dans le dossier de compilation : `Centre-Ville-<version>-macOS.dmg` (avec `Applications`, `Cartes/` et `licence.txt`) |
 | Linux | `bin/cvw`, `bin/html`, `bin/tutocv`, `share/applications/fr.patquoi.CentreVille.desktop`, type MIME `application/x-centre-ville` (`*.cvw`), icônes (`linux/`, `ressources/icones`), cartes d'exemple (`share/centre-ville/cartes`) | AppImage : linuxdeploy et linuxdeploy-plugin-qt sur `DESTDIR=AppDir cmake --install`, plus le crochet `linux/apprun-hooks/centre-ville-cartes.sh` (`.github/workflows/build-installer.yml`) : au premier lancement, les cartes sont copiées, sans écraser un fichier existant, dans `~/.local/share/Patquoi.fr/Centre-Ville`, le dossier de `stRepLocalAppData` où Ouvrir et Enregistrer démarrent (comme l'installeur Windows dans `%LOCALAPPDATA%`) |
 
 Les icônes viennent de `res/ico` (`tools/extrait_icones.py` en extrait les
@@ -248,6 +248,34 @@ une release seulement sur un tag. Ni signature ni notarisation.
   sur `QPainter` ; `listeimages.*` : `TVirtualImageList` (indices `IDB_*`
   inchangés), images agrandies sans lissage en HiDPI.
 
+## Marche, l'enregistrement et les interruptions (v6.0.1)
+
+`ActionMarcheExecute` prépare le réseau (`Prepare*`, qui ne sont pas réversibles :
+`PrepareBus`, relancé, tourne sans fin), puis l'enregistre, car le fichier
+contient ce qu'ils calculent (`NbTaxis`, `NbVehlibs`) ; enfin Arrêt recharge ce
+fichier. Déplacer l'enregistrement avant les `Prepare*` changerait les octets
+écrits. `Verifie()`, qui contrôle aussi les véhicules et les bus préparés, ne
+peut pas non plus venir avant. Chaque `return` après le début de la préparation :
+
+| Retour | Traitement |
+|---|---|
+| Réseau invalide, parkings insuffisants, copie impossible | Avant toute préparation : rien à défaire. |
+| Mémoire (`Prepare*`, statistiques), trams impossibles à placer, erreurs de `Verifie()` | `InterromptDemarrage`. |
+| Enregistrement refusé, annulé ou en échec (`EnregistreAvantMarche`) | `InterromptDemarrage`. |
+| Réseau non connexe | État gardé : rien d'irréversible n'a tourné, et les fiches affichent les distances ; `ModifieSimul(true)` les libère. |
+
+`SauveCopieReseau` écrit le réseau au format `.cvw` dans un `QTemporaryFile` avant
+la préparation ; `InterromptDemarrage` le recharge (`RestaureCopieReseau`), avec
+les modifications non enregistrées, et oublie `asNomFichAuto`. La copie sert aussi
+à Arrêt si le fichier ne peut plus être rouvert. Aucun tirage (`rand`) n'est ajouté :
+le golden master ne change pas. `ToolButtonArret` et `MenuItemArret` suivent
+`ActionArret` : le code d'origine les activait au début de Marche.
+
+Sur un fichier en lecture seule (`QFile` ouvert en `ReadWrite`, qui ne le vide pas,
+contrairement à `FileCreate`) : réseau non modifié, Marche n'enregistre pas et
+réinitialise le générateur comme `ActionEnregistrer` (`AppelleAuChaos`) ; réseau
+modifié, question, puis boîte « Enregistrer sous » ouverte dans `InitialDir`.
+
 ## Tests
 
 `tests/app/test_interface.cpp` (CTest `interface.demo`, plateforme
@@ -256,7 +284,12 @@ raccourcis selon le mode, Marche / Interruption / Arrêt par la barre d'outils
 et les menus, barre d'état, bilan (séparateur décimal `,`), puis enregistrer →
 rouvrir (comme depuis le Finder) → réenregistrer : fichier identique, et égal à
 la conversion de référence du format (`tests/support/format_reference`) ;
-enfin Nouveau → Dimensions → Génération à graine fixe : même réseau que le
+fichier impossible à ouvrir ; Marche sur un fichier en lecture seule, non modifié
+(mêmes tirages qu'un fichier inscriptible, réseau d'origine après Arrêt) puis
+modifié ; plusieurs clics sur Marche après chaque sorte d'interruption, sous une
+limite de temps (`LimiteDeTemps`, un fil qui arrête le test si un clic ne rend
+pas la main), puis un démarrage sur le réseau rétabli ; Arrêt quand le fichier
+n'est plus accessible ; enfin Nouveau → Dimensions → Génération à graine fixe : même réseau que le
 golden master `tests/golden/generation/defaut_12345.txt`.
 Lot 1 des fiches secondaires, chacune sur une copie neuve de Démo et ouverte
 par son menu, son bouton ou son action : un paramètre modifié et validé,
@@ -347,6 +380,8 @@ cartes de l'AppImage, lancé comme par son `AppRun` (`sh`, `set -e`) sur une
 AppDir et un `XDG_DATA_HOME` temporaires, copie les cartes de `maps/` sans
 écraser une carte modifiée, une seule fois ; sous Linux, le dossier est celui
 de `stRepLocalAppData` (Ouvrir et Enregistrer y démarrent : `interface.demo`).
+Même contrat pour `CopieCartesExemple` ; sous macOS, le paquet compilé est
+lancé pour de bon avec un dossier personnel temporaire (`CFFIXED_USER_HOME`).
 Affichage natif de Windows (`policesEtStyleWindows`, sauté en « offscreen ») :
 police Microsoft Sans Serif obtenue par les fiches, style « windowsvista » ;
 le workflow « Recette Windows » lance le test dans cet affichage et joint les
