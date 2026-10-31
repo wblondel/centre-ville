@@ -2448,6 +2448,10 @@ void TestInterface::fichesInfos()
        Compare(e, "personnes", f->LabelNbPersonnes->Caption, QString::number(t->NbPersonnes));
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(t->NbCasesParcourues));
        Compare(e, "tours depuis le départ", f->LabelToursDepuisDepart->Caption, QString::number(Tour-t->TourDepartDrnCourse));
+       // v6.0.2 : DistFileTaxi[file][direction] (l'original inversait les indices)
+       int Min=0x7FFFFFFF;
+       for(int d=0; d<NbDir[v->DirPoss]; d++) Min=qMin(Min, v->DistFileTaxi[t->NumFile][d]);
+       Compare(e, "distance à la tête de file", f->LabelDistanceTeteFileDepart->Caption, QString::number(Min));
       }
      else
       if (!f->RadioButtonAucunTaxi->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun taxi » non affiché");
