@@ -2,6 +2,10 @@
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 //#pragma hdrstop // portage
 //---------------------------------------------------------------------------
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryFile>
 #include <time.h>
 #include <stdlib.h>
 //---------------------------------------------------------------------------
@@ -1035,6 +1039,7 @@ void TfrmSimulation::FormCreate(TObject *Sender)
  SimulModifiee=false;
  EnregistrerAvant=false;
  RedimensionnementEnCours=false; // v3.5.1
+ CopieReseau=NULL; // v6.0.1
  InitialiseDeplacementFeu();
  frmAPropos=new TfrmAPropos(this);
  cv=new centre_ville(NB_ELEMENTS_PAR_DEFAUT,NBXDEF,NBYDEF);
@@ -1044,6 +1049,7 @@ void TfrmSimulation::FormCreate(TObject *Sender)
 void TfrmSimulation::FormDestroy(TObject *Sender)
 {
  if (cv) { delete cv; cv=NULL; }
+ delete CopieReseau; // v6.0.1
  if (frmAPropos) delete frmAPropos;
  DebugFerme(); 
 }
@@ -1682,6 +1688,17 @@ void TfrmSimulation::TimerSimulTimer(TObject *Sender)
                 AfficheBilan();
                 StatusBar->Panels->Items[0]->Text="Arrêt de la simulation et réinitialisation du réseau en cours...";
                 ActionOuvrir->Execute();
+                if (cv->DistancesCalculees) // v6.0.1 : fichier impossible à rouvrir (volume éjecté...) : le réseau est encore celui de la simulation
+                 {
+                  if (RestaureCopieReseau())
+                   {
+                    Caption="Centre-Ville - "+FILENAME(SaveDialog);
+                    SimulationModifiee=true; // à enregistrer : le fichier n'est plus accessible
+                    StatusBar->Panels->Items[0]->Text="Réseau d'avant la simulation rétabli : fichier inaccessible.";
+                   }
+                 }
+                else
+                 { delete CopieReseau; CopieReseau=NULL; } // v6.0.1
                 DrawGridSimul->Options << goRangeSelect;
                 DrawGridSimul->PopupMenu=PopupMenuEditionCase;
                 return;
@@ -2124,7 +2141,7 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
 	 asNomFichier=FILENAME(OpenDialog);
    else
 	 asNomFichier=asNomFichAuto;
-   if ((hfile=FileOpen(asNomFichier, fmOpenRead)))
+   if ((hfile=FileOpen(asNomFichier, fmOpenRead))!=-1) // v6.0.1 : l'échec vaut -1 (l'original chargeait alors une carte vide)
     {
      StatusBar->Panels->Items[0]->Text="Chargement en cours...";
      FileSeek(hfile, 0, 0);
@@ -2154,6 +2171,7 @@ Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré c
        OpenDialog->FileName=asNomFichier;
        Caption="Centre-Ville - "+asNomFichier;
        InitialiseDeplacementFeu(); // v3.5
+       asMsgErr=""; // v6.0.1 : erreurs d'une vérification précédente (barre d'état ci-dessous)
        if (VerifierApresOuverture)
         {
          StatusBar->Panels->Items[0]->Text="Contrôle d'intégrité du réseau en cours...";
@@ -2187,6 +2205,7 @@ Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré c
     {
      AfficheMessage("Impossible d'ouvrir le fichier", asChargementNonEffectue, tmErreur, 0, 0);
      StatusBar->Panels->Items[0]->Text="Chargement NON effectué.";
+     OpenDialog->FileName=SaveDialog->FileName; // v6.0.1 : le réseau affiché reste le précédent
     }
    asNomFichAuto=asVide;
   }
@@ -2202,7 +2221,7 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
      SaveDialog->Execute())
   {
    StatusBar->Panels->Items[0]->Text="Enregistrement en cours...";
-   if ((hfile=FileCreate(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto))))
+   if ((hfile=FileCreate(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto)))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
     {
      if (!cv->Sauve(hfile))
       {
@@ -2210,6 +2229,8 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
        FileClose(hfile);
        StatusBar->Panels->Items[0]->Text="Enregistrement NON effectué.";
        if (EnregistrerAvant) EnregistrerAvant=false;
+       SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
+       SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
       }
      else
       {
@@ -2226,6 +2247,7 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
      AfficheMessage("Impossible de créer le fichier", asSauvegardeNonEffectuee, tmErreur, 0, 0);
      StatusBar->Panels->Items[0]->Text="Enregistrement non effectué.";
      if (EnregistrerAvant) EnregistrerAvant=false;
+     SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
     }
   }
  else
@@ -2303,6 +2325,99 @@ void TfrmSimulation::ActionVerifierReseauExecute(
  VerifieReseau();
 }
 //---------------------------------------------------------------------------
+// v6.0.1 : copie du réseau dans un fichier temporaire, par le format .cvw : au
+// rétablissement, le réseau est dans l'état où une réouverture le mettrait
+bool TfrmSimulation::SauveCopieReseau()
+ {
+  delete CopieReseau;
+  CopieReseau=new QTemporaryFile(QDir::tempPath()+"/centre-ville-XXXXXX.cvw");
+  bool Ok=CopieReseau->open();
+  if (Ok)
+   {
+    CopieReseau->close(); // Le fichier et son nom restent, jusqu'à la destruction de CopieReseau
+    int hfile=FileCreate(A(QDir::toNativeSeparators(CopieReseau->fileName())));
+    Ok=(hfile!=-1);
+    if (Ok)
+     {
+      Ok=cv->Sauve(hfile);
+      FileClose(hfile);
+     }
+   }
+  if (!Ok) { delete CopieReseau; CopieReseau=NULL; }
+  return Ok;
+ }
+//---------------------------------------------------------------------------
+bool TfrmSimulation::RestaureCopieReseau()
+ { // Ni la copie ni l'état préparé utilisable (fichier temporaire effacé pendant
+   // la simulation...) : fermeture, comme pour une erreur de données à l'ouverture
+  int hfile=CopieReseau?FileOpen(A(QDir::toNativeSeparators(CopieReseau->fileName())), fmOpenRead):-1;
+  bool Ok=(hfile!=-1);
+  if (Ok)
+   {
+    delete cv;
+    cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0);
+    Ok=cv->Charge(hfile);
+    FileClose(hfile);
+    if (!Ok) SimulationModifiee=false; // Réseau incomplet : à ne pas proposer à l'enregistrement
+   }
+  if (!Ok)
+   {
+    AfficheMessage("Impossible de rétablir le réseau.\nCentre-Ville va être fermé par précaution.", asErrInattendue, tmErreur, 0, 0);
+    Close();
+    return false;
+   }
+  delete CopieReseau;
+  CopieReseau=NULL;
+  DrawGridSimul->Repaint();
+  return true;
+ }
+//---------------------------------------------------------------------------
+// v6.0.1 : retour de Marche après le début de la préparation : le clic suivant
+// repart d'un réseau et d'un état identiques à ceux d'avant ce clic-ci
+void TfrmSimulation::InterromptDemarrage()
+ {
+  asNomFichAuto=asVide; // Sinon, Enregistrer et Ouvrir reprendraient ce nom sans demander
+  asMsgErr="";
+  if (RestaureCopieReseau())
+   StatusBar->Panels->Items[0]->Text="Simulation non démarrée : réseau remis dans son état initial.";
+ }
+//---------------------------------------------------------------------------
+// v6.0.1 : enregistrement automatique de Marche. Faux : ne pas démarrer.
+// Vrai : asNomFichAuto est le fichier qu'Arrêt rechargera.
+bool TfrmSimulation::EnregistreAvantMarche()
+ {
+  String asNomFichier=FILENAME(SaveDialog);
+  // ReadWrite ne vide pas le fichier, contrairement à FileCreate : si l'ouverture
+  // échoue (fichier en lecture seule, volume du .dmg...), il reste intact
+  if ((!asNomFichier.IsEmpty())&&(!QFile(Q(asNomFichier)).open(QIODevice::ReadWrite)))
+   {
+    if (!SimulationModifiee) // Le fichier est à jour : Arrêt le rechargera tel quel
+     {
+      asNomFichAuto=asNomFichier;
+      AppelleAuChaos(); // Comme ActionEnregistrer : mêmes tirages que si le fichier était inscriptible
+      return true;
+     }
+    if (AfficheMessage("Le fichier "+asNomFichier+" est en lecture seule : les modifications du réseau ne peuvent pas y être enregistrées.\n"
+                       "La simulation enregistre le réseau avant de démarrer. Voulez-vous l'enregistrer sous un autre nom ?\n"
+                       "Sinon, la simulation ne démarre pas.",
+                       "Enregistrement impossible", tmQuestionNecessaire, 0, 1)!=trOui) // Défaut = Oui, Echap = Non
+     return false;
+    SaveDialog->FileName=A(QFileInfo(Q(asNomFichier)).fileName()); // Sans son dossier : la boîte démarre dans InitialDir, inscriptible
+    if (!SaveDialog->Execute())
+     {
+      SaveDialog->FileName=asNomFichier;
+      return false;
+     }
+   }
+  asNomFichAuto=FILENAME(SaveDialog);
+  EnregistrerAvant=true; // On teste si on annule l'enregistrement (j'emprunte EnregistrerAvant)
+  ActionEnregistrer->Execute();
+  bool Ok=EnregistrerAvant; // Enregistrement Annulé si faux
+  EnregistrerAvant=false;
+  if (Ok) asNomFichAuto=FILENAME(SaveDialog); // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original redemandait à l'arrêt quoi ouvrir)
+  return Ok;
+ }
+//---------------------------------------------------------------------------
 void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
 {
  type_distance TypeDistance=type_indefini; // v3.5
@@ -2311,8 +2426,9 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
  if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();  // v5.2
  if (frmDefVoie->Visible) frmDefVoie->Hide();
  if (frmDefVoiePietons->Visible) frmDefVoiePietons->Hide(); // v5.2
- ToolButtonArret->Enabled=true;
- MenuItemArret->Enabled=true;
+ // v6.0.1 : ToolButtonArret et MenuItemArret suivent ActionArret, activée par
+ // SimulationEnCours=true à la fin (l'original les activait ici, et ils le
+ // restaient quand le démarrage s'interrompait)
  if (!Pause) // v3.5 (Remplace !cv->TourCrt)
   {
    StatusBar->Panels->Items[0]->Text="Vérification de la validité du réseau...";
@@ -2330,6 +2446,18 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
      return;
     }
 
+   // v6.0.1 : les Prepare* ne sont pas réversibles (PrepareBus relancé sur un
+   // réseau déjà préparé tourne sans fin) et l'enregistrement, qui peut échouer,
+   // vient après eux car il écrit ce qu'ils calculent (NbTaxis, NbVehlibs). Tout
+   // échec à partir d'ici passe donc par InterromptDemarrage, qui rétablit cette
+   // copie (avec les modifications non enregistrées). Seul le réseau non connexe
+   // garde son état : voir ci-dessous
+   if (!SauveCopieReseau())
+    {
+     AfficheMessage("Impossible de créer un fichier dans le dossier temporaire : la simulation n'a pas démarré.", asErrInattendue, tmErreur, 0, 0);
+     return;
+    }
+
    StatusBar->Panels->Items[0]->Text="Préparation du calcul des distances...";
    StatusBar->Repaint();
    cv->DefinitFilesTaxi(); // v3.6. On prépare les files de taxi pour les distances aux files de taxi
@@ -2337,6 +2465,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareCalculDistances()) // On alloue la place pour calculer les distances
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des statistiques de fluidité et de trafic...";
@@ -2344,6 +2473,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareCalculAttenteTrafic()) // v2.2.7 : On alloue la place pour calculer les statistiques d'attente et de trafic
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Calcul des distances...";
@@ -2370,6 +2500,8 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
 	   case files_vehlib:frmAffDistPlacesVehlib->Show(); break; // v5.3
        default: break; // v5.4 : évite l'avertissement
       }
+     // v6.0.1 : réseau gardé en l'état (rien n'est irréversible jusqu'ici) : les
+     // fiches ci-dessus affichent ses distances, tant qu'il n'est pas modifié (ModifieSimul)
      return;
     }
    StatusBar->Panels->Items[0]->Text="Calcul du trajet des lignes de bus et de trams...";
@@ -2389,6 +2521,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareVehicules()) // On alloue la place et on prépare les véhicules
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des bus..."; // v3.0
@@ -2396,13 +2529,16 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareBus()) // v3.0. On alloue la place et on prépare les bus. v3.0
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des trams..."; // v3.5
    StatusBar->Repaint();
    if (!cv->PrepareTrams()) // On alloue la place et on prépare les trams que l'on place sur les arrêts. v3.5
     { // Si erreur alors problème de manque de mémoire
-     AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     if (!cv->NbTrams) // v6.0.1 : sinon, PrepareTrams a déjà dit qu'elle ne peut pas les placer : ce n'est pas la mémoire
+      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des taxis..."; // v3.6
@@ -2410,6 +2546,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareTaxis()) // On alloue la place et on prépare les taxis (1 taxi sur chaque place). v3.6
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des vehlibs..."; // v5.3
@@ -2417,6 +2554,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PrepareVehlibs()) // On alloue la place et on prépare les vehlibs (1 vehlib sur chaque place). v5.3
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
    StatusBar->Panels->Items[0]->Text="Préparation des piétons...";
@@ -2424,6 +2562,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    if (!cv->PreparePietons()) // v2.0. On alloue la place et on prépare les piétons
     { // Si erreur alors problème de manque de mémoire
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
 
@@ -2442,19 +2581,21 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
      if (asMsgErr.Length()>0)
       {
        AfficheMessage(asMsgErr, "Erreurs d'intégrité trouvées dans le réseau", tmErreur, 0, 0);
+       InterromptDemarrage(); // v6.0.1
        return;
       }
     }
-   asNomFichAuto=FILENAME(SaveDialog);
-   EnregistrerAvant=true; // On teste si on annule l'enregistrement (j'emprunte EnregistrerAvant)
-   ActionEnregistrer->Execute();
-   if (!EnregistrerAvant) return; // Enregistrement Annulé
-   EnregistrerAvant=false;
+   if (!EnregistreAvantMarche()) // v6.0.1 : refusé, annulé ou en échec
+    {
+     InterromptDemarrage();
+     return;
+    }
    if ((cv->Stats=new stats[cv->NbToursStats]))
     cv->Stats[0].Definit();
    else
     {
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+     InterromptDemarrage(); // v6.0.1
      return;
     }
   }
