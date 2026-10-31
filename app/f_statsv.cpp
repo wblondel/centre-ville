@@ -39,7 +39,7 @@ void TfrmStatsVehicules::FormShow(TObject *Sender)
                                                ARRAYOFCONST((cv->Parking[i].x,
                                                              cv->Parking[i].y)));
   }
-
+ RafraichitInfos(); // v6.0.2 : l'original laissait la grille vide jusqu'au tour suivant
 }
 //---------------------------------------------------------------------------
 void TfrmStatsVehicules::FormHide(TObject *Sender)

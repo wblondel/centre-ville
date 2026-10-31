@@ -3147,6 +3147,8 @@ void TestInterface::fichesEvolutionEtVehicules()
   QVERIFY(Onglets);
   QCOMPARE(Onglets->count(), 2);
   QCOMPARE((int)g->TabControl->TabIndex, 0);
+  e=Ecart(cv->TourCrt); // v6.0.2 : rempli dès l'ouverture (l'original attendait le tour suivant)
+  QVERIFY2(e.isEmpty(), qPrintable(e));
   for(int i=0; i<3; i++)
    {
     JoueTour();
