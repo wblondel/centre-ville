@@ -136,6 +136,17 @@ if(TARGET cvwfiches)
     TIMEOUT 300
   )
 
+  # Borne d'un indice testée après son usage, dans les fiches (v6.0.2) : tools/audit_bornes.py,
+  # sans les six tableaux de distances, signalés à tort (i%NbX, jamais hors bornes)
+  find_package(Python3 COMPONENTS Interpreter QUIET)
+  if(Python3_Interpreter_FOUND)
+    file(GLOB CV_FICHES_AUDIT CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/app/f_*.cpp)
+    list(FILTER CV_FICHES_AUDIT EXCLUDE REGEX "f_afdist")
+    add_test(NAME interface.audit_bornes
+      COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/audit_bornes.py --if ${CV_FICHES_AUDIT})
+    set_tests_properties(interface.audit_bornes PROPERTIES FAIL_REGULAR_EXPRESSION "borne « ")
+  endif()
+
   # Aide HTML (phase 7) : HelpContext -> page et ancre, aide copiée à côté de cvw
   # (dans Contents/Resources du paquet sous macOS)
   if(APPLE)
