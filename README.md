@@ -103,6 +103,7 @@ Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` 
 * `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (macOS et Linux).
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
 * `.github/workflows/recette-windows.yml` : après chaque release (ou à la main), installe le paquet Windows d'une release sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
+* `.github/dependabot.yml` : mises à jour mensuelles et groupées des actions et des outils de lint.
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
 
 ### 4. Lint
@@ -112,6 +113,7 @@ Les versions sont dans `tools/lint/requirements.txt`, et la CI lance les mêmes 
 python3 -m venv .venv-lint && .venv-lint/bin/pip install -r tools/lint/requirements.txt
 .venv-lint/bin/ruff check tools
 PATH=".venv-lint/bin:$PATH" actionlint
+.venv-lint/bin/zizmor .github/workflows
 cmake --preset dev && cmake --build --preset dev
 .venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
 ```
@@ -122,7 +124,8 @@ cmake --preset dev && cmake --build --preset dev
 1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).
 2. Pousser un tag : `v<version>` publie une release, `v<version>-rc1` (ou tout autre suffixe) une **pré-release**, facultative. Un tag qui ne correspond pas à `project(VERSION)`, ou une version sans section dans `CHANGELOG.md`, arrête le workflow avant toute compilation.
 3. Le workflow vérifie les paquets, démarre une simulation depuis une carte du `.dmg` monté en lecture seule (sinon, pas de release), puis lance la recette Windows sur la release publiée. Une recette en échec laisse la release publiée : le run « Installeurs » est alors en échec, et il faut publier une version corrective.
-4. Ce qu'une machine ne couvre pas reste à faire à la main si besoin : [`docs/RECETTE.md`](docs/RECETTE.md).
+4. Chaque release joint `SHA256SUMS` et une attestation de provenance : `gh attestation verify <paquet> --repo wblondel/centre-ville`.
+5. Ce qu'une machine ne couvre pas reste à faire à la main si besoin : [`docs/RECETTE.md`](docs/RECETTE.md).
 
 ### 6. Code d'origine (`src/`)
 `src/` contient le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4). Il est en **lecture seule** : on ne le modifie pas, mais il sert encore de source au portage :

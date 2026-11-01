@@ -11,22 +11,23 @@
 | `recette-windows.yml` | appelé après la release, ou à la main | 10 min-machine | 7 min |
 | `deploy-docs.yml` | `docs/` sur `main` | moins de 1 min | moins de 1 min |
 
-Déjà en place : permissions en lecture par défaut, `contents: write` limité au job de release, CodeQL (actions, C++, Python), détection de secrets avec blocage au push, alertes Dependabot, Catch2 vérifié par SHA256, 10 jobs requis sur `main`.
+Déjà en place : permissions en lecture par défaut, écriture limitée au job de release, CodeQL (actions, C++, Python), détection de secrets avec blocage au push, alertes Dependabot, Catch2 vérifié par SHA256, 10 jobs requis sur `main`.
 
-## 1. Sécurité de la chaîne de release (priorité haute)
+## 1. Sécurité de la chaîne de release (fait)
 
-Ces outils touchent des paquets publiés ou tournent avec un jeton.
+- [x] **`linuxdeploy`** : versions figées et SHA256 vérifiés, au lieu de `continuous` sans contrôle. Leur contenu part dans l'AppImage.
+- [x] **Actions épinglées par SHA**, avec `.github/dependabot.yml` pour les mises à jour (`github-actions` et `pip`, groupées, mensuelles).
+- [x] **`softprops/action-gh-release` retiré** : c'était la seule action tierce avec `contents: write`, et `gh release create` fait le même travail.
+- [x] **Installeur 5.4.3.2** : SHA256 vérifié avant de l'exécuter.
+- [x] **Injection de `inputs.tag`** : passé par `env:`.
+- [x] **`persist-credentials: false`** sur tous les checkouts.
+- [x] **Inno Setup** : version figée (6.7.1).
+- [x] **`deploy-docs.yml`** : `pages: write` et `id-token: write` au niveau du job.
+- [x] **Règles du dépôt** : force-push et suppression bloqués sur `main`, contournement administrateur limité aux PR ; tags `v*` impossibles à déplacer ou à supprimer.
+- [x] **`zizmor` bloquant** dans le job de lint.
+- [x] **`SHA256SUMS` et attestation de provenance** à chaque release. Vérification : `gh attestation verify <paquet> --repo wblondel/centre-ville`.
 
-- [ ] **`linuxdeploy` téléchargé depuis `continuous`, sans contrôle** (`build-installer.yml`), et son contenu part dans l'AppImage. Figer une version (`1-alpha-20251107-1`, plugin Qt `1-alpha-20250213-1`) et vérifier le SHA256. C'est le risque le plus concret.
-- [ ] **Actions épinglées par étiquette** (37 constats `zizmor`), dont `softprops/action-gh-release` avec `contents: write`. Épingler par SHA, ajouter `.github/dependabot.yml` (`github-actions`, `pip`), puis activer `sha_pinning_required`.
-- [ ] **Installeur 5.4.3.2 téléchargé en HTTP et exécuté** (`recette-windows.yml`). Vérifier le SHA256 (`5b2e3908…a3e6f0`) avant de le lancer.
-- [ ] **Injection de `inputs.tag`** dans un script PowerShell (`recette-windows.yml`). Passer par `env:`.
-- [ ] **`persist-credentials: false`** sur les checkouts (16 constats `artipacked`).
-- [ ] **Inno Setup sans version** (`choco install innosetup`). Figer la version.
-- [ ] **`deploy-docs.yml`** : `pages: write` et `id-token: write` au niveau du job.
-- [ ] **Règles du dépôt** : bloquer force-push et suppression de `main` (la règle actuelle n'exige que les checks) ; protéger les tags `v*`, qui déclenchent une release.
-- [ ] **`zizmor` bloquant** dans le job de lint, une fois les points ci-dessus faits.
-- [ ] **Empreintes et provenance** : joindre `SHA256SUMS` à chaque release, et `actions/attest-build-provenance`. Les paquets n'étant pas signés, c'est la seule preuve de leur origine.
+Non retenu : l'option `sha_pinning_required` du dépôt. `jurplel/install-qt-action` appelle en interne des actions épinglées par étiquette, ce qui risquerait de bloquer toute la CI. `zizmor` vérifie les workflows du dépôt à chaque PR.
 
 ## 2. Fiabilité des releases (priorité haute)
 
@@ -62,5 +63,5 @@ Sans intérêt pour un dépôt à un seul mainteneur et un jeu à un seul joueur
 
 - **C++** : `clang-tidy`, règles de bogues et de performance (`.clang-tidy`). Le code porté garde le style de l'original pour rester comparable à `src/` : pas de `clang-format`, et les 251 constats existants sont dans `tools/lint/clang-tidy-reference.txt`. Seuls les nouveaux font échouer la CI.
 - **Python** : `ruff` (`ruff.toml`), sans constat restant.
-- **Workflows** : `actionlint` et `shellcheck` pour leurs scripts, sans constat restant.
+- **Workflows** : `actionlint`, `shellcheck` pour leurs scripts et `zizmor` pour leur sécurité, sans constat restant.
 - **Versions** : figées dans `tools/lint/requirements.txt`.

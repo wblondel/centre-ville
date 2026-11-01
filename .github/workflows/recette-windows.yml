@@ -73,13 +73,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
+          persist-credentials: false
           ref: ${{ inputs.tag || github.ref }}
 
       - name: Download the installer of the release
+        env:
+          TAG: ${{ inputs.tag }}
         run: |
-          $tag = '${{ inputs.tag }}'
+          $tag = $env:TAG
           if (-not $tag) { $tag = gh release list -R $env:GITHUB_REPOSITORY --limit 1 --json tagName --jq '.[0].tagName' }
           "Release essayée : $tag"
           gh release download $tag -R $env:GITHUB_REPOSITORY -p '*Windows-x64-Setup.exe' -D paquet
@@ -125,6 +128,9 @@ jobs:
         run: |
           . "$env:RUNNER_TEMP\outils.ps1"
           Invoke-WebRequest -Uri http://patquoi.free.fr/INSCVW95.EXE -OutFile origine.exe
+          # Téléchargé en HTTP puis exécuté : l'empreinte garantit que c'est bien l'original
+          $empreinte = (Get-FileHash origine.exe -Algorithm SHA256).Hash
+          if ($empreinte -ne '5B2E3908FF97B67B043857984D124D9881CA0C35CD16D1E11FB25EBBA3A3E6F0') { throw "empreinte inattendue de l'installeur d'origine : $empreinte" }
           "Installeur d'origine : $((Get-Item origine.exe).Length) octets"
           Installe "$PWD\origine.exe" installation-origine.log
           $v = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
@@ -269,7 +275,7 @@ jobs:
 
       - name: Upload screenshots and logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: recette-windows-${{ matrix.scenario }}
           path: |
@@ -286,12 +292,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
+          persist-credentials: false
           ref: ${{ inputs.tag || github.ref }}
 
       - name: Install Qt 6.8 LTS
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
           version: '6.8.*'
           cache: true
@@ -316,7 +323,7 @@ jobs:
 
       - name: Upload native screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: fiches-windows-natives
           path: captures-natives
