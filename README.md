@@ -30,7 +30,7 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 .
 ├── .github/
 │   └── workflows/
-│       ├── tests-moteur.yml      # CI : tests du moteur et de l'application sur les 3 systèmes
+│       ├── ci.yml                # CI : tests, ASan et UBSan, lint et couverture
 │       ├── build-installer.yml   # Installeurs (Windows, macOS, Linux) et release sur tag v*
 │       └── deploy-docs.yml       # CI Pages : déploiement automatique de la documentation
 ├── app/                          # Application Qt 6 (cvw) : les 33 fiches portées, couche VCL (app/vcl)
@@ -100,7 +100,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt /
 Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,2 »).
 
 ### 3. Intégration continue
-* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (Linux sur les PR, macOS aussi sur `main` et chaque semaine).
+* `.github/workflows/ci.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (Linux sur les PR, macOS aussi sur `main` et chaque semaine).
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
 * `.github/workflows/recette-windows.yml` : avant chaque release (ou à la main), installe le paquet Windows sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/dependabot.yml` : mises à jour mensuelles et groupées des actions et des outils de lint.
@@ -118,7 +118,7 @@ cmake --preset dev && cmake --build --preset dev
 .venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
 ```
 
-`clang-tidy` ne fait échouer que les constats absents de `tools/lint/clang-tidy-reference.txt`, qui liste ceux du code porté et fait foi sous Linux. Fausse alerte : `// NOLINT(regle)` sur la ligne, avec le motif. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md).
+`clang-tidy` ne fait échouer que les constats absents de `tools/lint/clang-tidy-reference.txt`, qui liste ceux du code porté sous Linux, ainsi que 5 vus seulement sous macOS, pour que le lint passe aussi en local. Fausse alerte : `// NOLINT(regle)` sur la ligne, avec le motif. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md), et la manière de signaler une faille dans [`SECURITY.md`](SECURITY.md).
 
 ### 5. Publier une version
 1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).
@@ -133,7 +133,7 @@ cmake --preset dev && cmake --build --preset dev
 * `tools/dfm2ui.py` produit les fiches Qt (`app/ui/*.ui`) depuis ses `.dfm` ;
 * `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
 * le test de l'aide (`tests/app/test_aide.cpp`) lit la table des rubriques de `src/base.cpp` ;
-* deux contrôles de la CI (`tests-moteur.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
+* deux contrôles de la CI (`ci.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
 
 Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` montre le portage ligne à ligne.
 

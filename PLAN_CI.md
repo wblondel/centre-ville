@@ -6,7 +6,7 @@
 
 | Workflow | Déclencheur | Coût d'un run | Attente |
 |---|---|---|---|
-| `tests-moteur.yml` | PR et `main` | 90 min-machine | 27 min (ASan macOS) |
+| `ci.yml` | PR, `main` et chaque semaine | 90 min-machine | 27 min (ASan macOS) |
 | `build-installer.yml` | tag `v*` | 34 min-machine | environ 25 min |
 | `recette-windows.yml` | appelé avant la release, ou à la main | 10 min-machine | 7 min |
 | `deploy-docs.yml` | `docs/` sur `main` | moins de 1 min | moins de 1 min |
@@ -51,12 +51,13 @@ Non retenu : l'option `sha_pinning_required` du dépôt. `jurplel/install-qt-act
 
 Pas de `ccache` pour l'instant : la compilation prend 2 min sous Linux, et ce sont les tests qui coûtent.
 
-## 4. Manière de faire (priorité basse)
+## 4. Manière de faire (fait)
 
-- [ ] **Renommer `tests-moteur.yml`** en `ci.yml` : il teste aussi l'application, ASan et le lint.
-- [ ] **Réglages du dépôt** : `delete_branch_on_merge` activé, squash et rebase désactivés puisque seules les fusions par merge commit sont utilisées.
-- [ ] **`SECURITY.md`** : comment signaler une faille.
-- [ ] **Couverture en artefact**, sans seuil bloquant : `llvm-cov` existe déjà en local, et un pourcentage imposé pousserait à tester les boutons d'aide.
+- [x] **`tests-moteur.yml` renommé `ci.yml`** : il teste aussi l'application, ASan et le lint.
+- [x] **Lint requis** : les 8 checks exigés comprennent les deux jobs de lint, pour que la fusion automatique ne puisse plus passer outre.
+- [x] **Réglages du dépôt** : branches supprimées après fusion, merge commit seul autorisé.
+- [x] **`SECURITY.md`** et signalement privé des failles activé.
+- [x] **Couverture chaque semaine**, en artefact et sans seuil : un pourcentage imposé pousserait à tester les boutons d'aide.
 
 ## Écarté volontairement
 

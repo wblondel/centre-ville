@@ -4,7 +4,8 @@
 Le code porté garde le style de l'original : les constats déjà présents sont notés dans
 tools/lint/clang-tidy-reference.txt, et seuls les nouveaux font échouer le script. Un constat est
 identifié par son fichier, sa règle et son message, sans numéro de ligne : déplacer du code n'en
-crée pas. La référence fait foi sous Linux, avec la version de tools/lint/requirements.txt.
+crée pas. La référence vaut pour la version de tools/lint/requirements.txt : les constats de
+Linux, ceux de la CI, et quelques-uns vus seulement sous macOS, pour que le script passe aussi en local.
 
     python3 tools/lint_cpp.py --dossier build/dev            # compare à la référence
     python3 tools/lint_cpp.py --dossier build/dev --reference-a-jour  # la réécrit
