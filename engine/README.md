@@ -284,7 +284,7 @@ Un programme témoin du motif de `voie::AjoutePieton` est bien signalé par
 UBSan (`index 2 out of bounds for type 'int[2]'`). `ctest --preset asan`
 et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
 `interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée). La CI
-lance `ctest --preset asan` sous macOS et Linux, une erreur d'UBSan arrêtant le test.
+lance `ctest --preset asan` sous Linux, et sous macOS sur `main`, une erreur d'UBSan arrêtant le test.
 
 ## Corrections de la 6.0.3 (annotées `// v6.0.3`)
 

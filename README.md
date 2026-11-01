@@ -100,7 +100,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt /
 Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,2 »).
 
 ### 3. Intégration continue
-* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (macOS et Linux).
+* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (Linux sur les PR, macOS aussi sur `main` et chaque semaine).
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
 * `.github/workflows/recette-windows.yml` : avant chaque release (ou à la main), installe le paquet Windows sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/dependabot.yml` : mises à jour mensuelles et groupées des actions et des outils de lint.

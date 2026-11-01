@@ -272,9 +272,12 @@ namespace
 TEST_CASE("FileCreateRemplacement : le fichier n'est remplacé qu'une fois écrit (v6.0.2)", "[compat][fichier]")
  {
   namespace fs=std::filesystem;
-  const AnsiString asNom=FichierSortie("compat_remplacement_é.bin");
+  // Dossier à lui seul : d'autres tests écrivent dans sortie/ en parallèle, et on y compte les fichiers
+  const AnsiString asDossierTest=FichierSortie("compat_remplacement_seul");
+  fs::remove_all(CheminDe(asDossierTest));
+  fs::create_directories(CheminDe(asDossierTest));
+  const AnsiString asNom=FichierSortie("compat_remplacement_seul/compat_remplacement_é.bin");
   const fs::path Dossier=CheminDe(asNom).parent_path();
-  fs::remove(CheminDe(asNom));
   const std::size_t NbAvant=NbFichiers(Dossier);
   bool Direct=true;
   // Fichier nouveau

@@ -100,6 +100,10 @@ endforeach()
 # Bogues corrigés en 6.0.1 : le moteur 6.0.0 ne rendait pas la main (blocage
 # des vehlibs), le délai fait alors échouer le test
 set_tests_properties(moteur.corrections PROPERTIES TIMEOUT 120)
+# Sous sanitizer, et avec d'autres tests en parallèle, le test est plusieurs fois plus lent
+if(CMAKE_CXX_FLAGS MATCHES "sanitize")
+  set_tests_properties(moteur.corrections PROPERTIES TIMEOUT 600)
+endif()
 add_test(NAME moteur.memoire COMMAND cvtests_motif)
 set_tests_properties(moteur.memoire PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 

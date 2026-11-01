@@ -1,0 +1,6 @@
+# Configuration de zizmor (job « Lint Python et workflows »)
+rules:
+  # Propose la syntaxe récente « $/ » à la place de « ./ » pour les actions et workflows du
+  # dépôt : même garantie, tous deux suivent le commit en cours.
+  self-repository:
+    disable: true

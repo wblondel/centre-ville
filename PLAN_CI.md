@@ -39,17 +39,17 @@ Non retenu : l'option `sha_pinning_required` du dépôt. `jurplel/install-qt-act
 - [x] **Run hebdomadaire** de la suite complète, le lundi.
 - [ ] **Remplacer `ubuntu-22.04`** pour l'AppImage, gardée pour sa glibc 2.35 : son support standard finit en avril 2027.
 
-## 3. Optimisation (priorité moyenne)
+## 3. Optimisation (fait)
 
-- [ ] **Fusionner « Tests moteur » et « Application Qt »** en un job par système : tout compiler une fois, tout tester. « Application Qt » compile déjà les tests du moteur sans les lancer. Il faudra mettre à jour les checks requis.
-- [ ] **`ctest --parallel`** : la suite `dev` passe de 187 s à 100 s avec `-j8` sur un Mac, sans échec. `interface.demo` seul prend 99 s et fixe la limite ; à mesurer sur les machines de CI, qui ont moins de cœurs. Le découper irait plus loin.
-- [ ] **ASan requis sur Linux seulement**, macOS sur `main` et dans le run hebdomadaire : 27 min-machine de moins par PR. En contrepartie, un bogue propre à macOS serait vu après la fusion.
-- [ ] **Action composite** pour les dépendances et Qt : le même bloc est répété 7 fois.
-- [ ] **`retention-days`** sur les captures et les constats : 90 jours par défaut, 14 suffisent.
-- [ ] **`concurrency`** : ne pas annuler les runs de `main`, seulement ceux des PR.
-- [ ] **Nettoyage** : retirer `port/**`, et la liste de chemins en double entre `paths:` et le job « changements » ; `HOMEBREW_NO_AUTO_UPDATE` sur macOS.
+- [x] **« Tests moteur » et « Application Qt » fusionnés** en un job « Tests » par système : tout compiler une fois, tout tester.
+- [x] **`ctest --parallel 4`** : la suite `dev` passe de 187 s à 100 s avec `-j8` sur un Mac, sans échec. `interface.demo` seul prend 99 s et fixe la limite.
+- [x] **ASan requis sous Linux seulement**, macOS sur `main` et dans le run hebdomadaire. Un bogue propre à macOS sera vu après la fusion.
+- [x] **Action composite `prepare-qt`** : les dépendances et la version de Qt ne sont écrites qu'à un endroit.
+- [x] **`retention-days: 14`** sur les artefacts, au lieu de 90 jours.
+- [x] **`concurrency`** : seuls les runs de PR s'annulent, ceux de `main` vont au bout.
+- [x] **Nettoyage** : `port/**` retiré, une seule liste de chemins (job « changements »), aussi appliquée à `main`, `HOMEBREW_NO_AUTO_UPDATE`.
 
-Je ne ferais pas `ccache` pour l'instant : la compilation prend 2 min sous Linux, et ce sont les tests qui coûtent.
+Pas de `ccache` pour l'instant : la compilation prend 2 min sous Linux, et ce sont les tests qui coûtent.
 
 ## 4. Manière de faire (priorité basse)
 

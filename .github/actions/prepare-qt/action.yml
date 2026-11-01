@@ -1,0 +1,40 @@
+name: Préparer Qt
+description: Dépendances Linux de Qt, Ninja si demandé, et Qt. La version de Qt n'est écrite qu'ici.
+
+inputs:
+  ninja:
+    description: Installer Ninja (presets asan, lint)
+    required: false
+    default: 'false'
+  paquets-linux:
+    description: Paquets apt en plus, sous Linux
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Install Linux dependencies of Qt
+      if: runner.os == 'Linux'
+      shell: bash
+      env:
+        NINJA: ${{ inputs.ninja }}
+        PAQUETS: ${{ inputs.paquets-linux }}
+      run: |
+        if [ "$NINJA" = true ]; then PAQUETS="$PAQUETS ninja-build"; fi
+        sudo apt-get update
+        # shellcheck disable=SC2086 # une liste de paquets
+        sudo apt-get install -y libgl1-mesa-dev libegl1 libxkbcommon-dev libfontconfig1-dev libfreetype-dev $PAQUETS
+
+    - name: Install Ninja
+      if: runner.os == 'macOS' && inputs.ninja == 'true'
+      shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: '1'
+      run: brew install ninja
+
+    - name: Install Qt 6.8 LTS
+      uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
+      with:
+        version: '6.8.3'
+        cache: true
