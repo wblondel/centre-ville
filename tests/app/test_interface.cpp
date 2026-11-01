@@ -67,6 +67,8 @@
 //     Enregistrer sous, réouverture, simulation jusqu'au bout ; chaque édition marque
 //     la carte modifiée ; Quitter avec des modifications ; Copier vers ; effacement
 //     d'une sélection ;
+//   - feux (v6.0.5) : fiche Feux, listes par double-clic, suppression d'un feu
+//     référencé par un feu ou un feu de piétons, effacement d'une sélection ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
 //     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 //     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
@@ -559,6 +561,7 @@ class TestInterface : public QObject
    }
   void VerifieFichesDistances(const QString &asCarte, bool Captures);
   void SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours);
+  bool DimensionsPilotees=false; // La fiche Dimensions répond par une étape, pas par défaut
   void NouvelleZone(int NbX, int NbY)
    { // Nouveau : zone vide, sans génération ni paramètres, sans enregistrer la précédente
     ReponseQuestions=QMessageBox::No;
@@ -570,7 +573,9 @@ class TestInterface : public QObject
       frmDimensionsZone->CheckBoxGenererReseau->Checked=false;
       Clique(frmDimensionsZone->ButtonCreer);
      });
+    DimensionsPilotees=true;
     QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+    DimensionsPilotees=false;
     QVERIFY(Etapes.empty());
     QCOMPARE(cv->NbX, NbX);
     QCOMPARE(cv->NbY, NbY);
@@ -586,6 +591,69 @@ class TestInterface : public QObject
     QVERIFY(frmSimulation->ActionSegmentRoute->Enabled);
     frmSimulation->ActionSegmentRoute->Execute();
     CliqueCase(x2, y2); // Fin de la sélection, comme avant la commande suivante
+   }
+  void DoubleCliqueCase(int x, int y)
+   { // Double-clic de l'utilisateur sur la case : choix d'un feu pendant une sélection
+    GrilleSimulation *g=frmSimulation->DrawGridSimul;
+    g->LeftCol=qMax(0, x-4);
+    g->TopRow=qMax(0, y-4);
+    TRect r=g->CellRect(x, y);
+    const QPoint Centre((r.Left+r.Right)/2, (r.Top+r.Bottom)/2);
+    QTest::mouseClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), Centre);
+    QTest::mouseDClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), Centre);
+    g->Repaint();
+   }
+  void PoseFeu(int x, int y, TRadioGroup *Groupe)
+   { // Fiche Priorités : feu dans une direction
+    CliqueCase(x, y);
+    Clique(frmSimulation->ToolButtonPriorites);
+    QVERIFY(frmDefVoie->isVisible());
+    QVERIFY(Groupe->Enabled);
+    CliqueChoix(Groupe, feux);
+    Clique(frmDefVoie->ButtonOk);
+    QVERIFY(!frmDefVoie->isVisible());
+   }
+  void ReseauAvecFeux()
+   { // Zone vide, deux routes, trois feux : (4,8) et (10,8) vers l'est, (8,4) vers le sud
+    NouvelleZone(20, 20);
+    if (QTest::currentTestFailed()) return;
+    TraceSegment(2, 8, 14, 8);
+    TraceSegment(8, 2, 8, 6);
+    if (QTest::currentTestFailed()) return;
+    PoseFeu(4, 8, frmDefVoie->RadioGroupPrioriteEst);
+    PoseFeu(10, 8, frmDefVoie->RadioGroupPrioriteEst);
+    PoseFeu(8, 4, frmDefVoie->RadioGroupPrioriteSud);
+    Messages.clear();
+   }
+  void OuvreFicheFeu(int x, int y, direction d)
+   { // Fiche Priorités de la case, puis bouton du feu : les deux fiches restent ouvertes
+    TBitBtn *Boutons[NBDIR]={frmDefVoie->BitBtnDefFeuN, frmDefVoie->BitBtnDefFeuE,
+                             frmDefVoie->BitBtnDefFeuS, frmDefVoie->BitBtnDefFeuO};
+    CliqueCase(x, y);
+    Clique(frmSimulation->ToolButtonPriorites);
+    QVERIFY(frmDefVoie->isVisible());
+    QVERIFY(Boutons[d-1]->Enabled);
+    Clique(Boutons[d-1]);
+    QVERIFY(frmDefFeux->isVisible());
+   }
+  int PoseFeuPietonsLie(int xFeu, int yFeu)
+   { // Passage piétons en (6,8), trottoirs (6,7) et (6,9), feu de piétons du nord vers le
+     // sud, lié au feu de la case (xFeu, yFeu). Renvoie son numéro
+    TfrmSimulation *s=frmSimulation;
+    ExecuteSurCase(6, 8, s->ActionPassagePietons);
+    ExecuteSurCase(6, 7, s->ActionNatureTrottoir);
+    ExecuteSurCase(6, 9, s->ActionNatureTrottoir);
+    CliqueCase(6, 7);
+    s->MenuItemPrioritesPietons->ElementQt()->trigger();
+    if (!frmDefVoiePietons->isVisible()) { QTest::qFail("fiche Priorités piétons fermée", __FILE__, __LINE__); return 0; }
+    Clique(frmDefVoiePietons->SpeedButtonS);
+    if (!frmDefFeuxPietons->isVisible()) { QTest::qFail("fiche Feux de piétons fermée", __FILE__, __LINE__); return 0; }
+    Clique(frmDefFeuxPietons->SpeedButtonSelFeux);
+    DoubleCliqueCase(xFeu, yFeu);
+    Clique(frmDefFeuxPietons->ButtonOk);
+    Clique(frmDefVoiePietons->ButtonOk);
+    Messages.clear();
+    return cv->v[6][7].NumFeuP[sud-1];
    }
   void ExecuteSurCase(int x, int y, TAction *Action)
    { // Commande d'une case : clic, puis l'action, qui doit être disponible
@@ -646,12 +714,18 @@ class TestInterface : public QObject
   void fichePietonDansUnVehicule();
   void fichePietonSuiviAilleurs();
   void dimensionsZoneBornees();
+  void nouvelleZoneGenereePlusPetite();
   void parametresSansParking();
   void parcoursEdition();
   void editionMarqueLaCarteModifiee();
   void quitterAvecModifications();
   void copierVersUnFichier();
   void effacerRoutesDeLaSelection();
+  void ficheFeuxEtListes();
+  void selectionCaseADeuxFeux();
+  void suppressionFeuReference();
+  void suppressionFeuReferenceParUnFeuPietons();
+  void effacerSelectionAvecFeuReference();
   // Lot 3 des fiches secondaires (phase 6)
   void ficheComposition();
   void fichesEvolutionEtVehicules();
@@ -685,6 +759,7 @@ void TestInterface::initTestCase()
      }
     if (frmDimensionsZone&&(Modale==frmDimensionsZone))
      { // Nouveau : dimensions proposées, génération aléatoire, sans les paramètres
+      if (DimensionsPilotees) return; // Une étape vient d'y répondre : la fiche va se fermer
       frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
       frmDimensionsZone->CheckBoxGenererReseau->Checked=true;
       QTest::mouseClick(frmDimensionsZone->ButtonCreer, Qt::LeftButton);
@@ -3097,7 +3172,9 @@ void TestInterface::dimensionsZoneBornees()
     Ouverte=frmDimensionsZone->isVisible();
     Clique(frmDimensionsZone->ButtonAnnuler);
    });
+  DimensionsPilotees=true;
   QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  DimensionsPilotees=false;
   QVERIFY(Etapes.empty());
   QVERIFY(Refuse);
   QVERIFY(Ouverte);
@@ -3112,7 +3189,9 @@ void TestInterface::dimensionsZoneBornees()
     frmDimensionsZone->CheckBoxGenererReseau->Checked=false;
     Clique(frmDimensionsZone->ButtonCreer);
    });
+  DimensionsPilotees=true;
   QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  DimensionsPilotees=false;
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
   QCOMPARE(cv->NbX, NBXMAX);
   QCOMPARE(cv->NbY, NBYMAX);
@@ -3447,6 +3526,297 @@ void TestInterface::effacerRoutesDeLaSelection()
   QVERIFY(!cv->Parking[0].Defini());
   QCOMPARE((int)cv->v[5][8].NumParking, 2);
   QVERIFY(cv->Parking[1].Defini());
+ }
+//---------------------------------------------------------------------------
+// Feux : fiche, listes de dépendance et suppression d'un feu référencé
+//---------------------------------------------------------------------------
+void TestInterface::ficheFeuxEtListes()
+ { // Chaque contrôle active Appliquer ; Annuler n'écrit rien ; Appliquer garde la fiche ;
+   // listes par double-clic sur la carte, gardées à l'enregistrement
+  TfrmSimulation *s=frmSimulation;
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1], b=cv->v[10][8].NumFeu[est-1], c=cv->v[8][4].NumFeu[sud-1];
+  QVERIFY((a>0)&&(b>0)&&(c>0));
+  const QString f=QFileInfo(Carte).absolutePath()+"/feux.cvw";
+  QFile::remove(f);
+  Enregistre(f);
+  feu *Feu=&cv->Feu[a-1];
+  const int Vert=Feu->DureeVert;
+  // Annuler : rien n'est écrit ; chaque contrôle active Appliquer
+  OuvreFicheFeu(4, 8, est);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(!frmDefFeux->ButtonAppliquer->Enabled);
+  frmDefFeux->CSpinEditDureeVert->Value=Vert+3;
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonAnnuler);
+  QVERIFY(!frmDefFeux->isVisible());
+  QCOMPARE((int)Feu->DureeVert, Vert);
+  QVERIFY(!s->SimulationModifiee);
+  Clique(frmDefVoie->BitBtnDefFeuE);
+  QVERIFY(!frmDefFeux->ButtonAppliquer->Enabled);
+  frmDefFeux->CSpinEditDureeRouge->Value=Feu->DureeRouge+2;
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonAnnuler);
+  // Appliquer : écrit, carte modifiée, fiche ouverte, bouton désactivé
+  Clique(frmDefVoie->BitBtnDefFeuE);
+  CliqueChoix(frmDefFeux->RadioGroupTypeDmdVert, 1);
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonAppliquer);
+  QVERIFY(frmDefFeux->isVisible());
+  QVERIFY(!frmDefFeux->ButtonAppliquer->Enabled);
+  QCOMPARE((int)Feu->TypeDmdVert, 1);
+  QVERIFY(s->SimulationModifiee);
+  CliqueChoix(frmDefFeux->RadioGroupTypePsgRouge, 1);
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonAppliquer);
+  QCOMPARE((int)Feu->TypePsgRouge, 1);
+  // Liste « demande » : b ajouté par double-clic, retiré, puis ajouté
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  QVERIFY(s->SelectionFeuxDmd);
+  QVERIFY(!s->SelectionFeuxAtt);
+  QVERIFY(!s->ActionPriorites->Enabled);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  QCOMPARE(frmDefFeux->NumFeuxDmd[0], b);
+  QCOMPARE(Q(frmDefFeux->LabelNbFeuxDmd->Caption), QString("1"));
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 0);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  QCOMPARE(Feu->NbFeuxDmd, 0); // Rien n'est écrit avant Appliquer ou OK
+  // Liste « attente » : les deux boutons s'excluent
+  Clique(frmDefFeux->SpeedButtonSelFeuxAtt);
+  QVERIFY(s->SelectionFeuxAtt);
+  QVERIFY(!s->SelectionFeuxDmd);
+  DoubleCliqueCase(8, 4);
+  QCOMPARE(frmDefFeux->NbFeuxAtt, 1);
+  QCOMPARE(frmDefFeux->NumFeuxAtt[0], c);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  // OK : écrit ; le curseur revient sur le feu défini, la sélection s'arrête
+  Clique(frmDefFeux->ButtonOk);
+  QVERIFY(!frmDefFeux->isVisible());
+  QVERIFY(!s->SelectionFeuxAtt);
+  QVERIFY(!s->SelectionFeuxDmd);
+  QCOMPARE(s->DrawGridSimul->Col, 4);
+  QCOMPARE(s->DrawGridSimul->Row, 8);
+  QCOMPARE(Feu->NbFeuxDmd, 1);
+  QCOMPARE(Feu->NumFeuxDmd[0], b);
+  QCOMPARE(Feu->NbFeuxAtt, 1);
+  QCOMPARE(Feu->NumFeuxAtt[0], c);
+  // Liste modifiée puis Annuler : la liste écrite reste
+  Clique(frmDefVoie->BitBtnDefFeuE);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 0);
+  Clique(frmDefFeux->ButtonAnnuler);
+  QCOMPARE(Feu->NbFeuxDmd, 1);
+  QVERIFY(!s->SelectionFeuxDmd);
+  Clique(frmDefVoie->ButtonAnnuler);
+  // Enregistrés : retrouvés à la réouverture
+  Enregistre(f);
+  OuvreFichier(f);
+  QCOMPARE(cv->Feu[a-1].NbFeuxDmd, 1);
+  QCOMPARE(cv->Feu[a-1].NumFeuxDmd[0], b);
+  QCOMPARE(cv->Feu[a-1].NbFeuxAtt, 1);
+  QCOMPARE(cv->Feu[a-1].NumFeuxAtt[0], c);
+  QCOMPARE((int)cv->Feu[a-1].TypeDmdVert, 1);
+  QCOMPARE((int)cv->Feu[a-1].TypePsgRouge, 1);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::selectionCaseADeuxFeux()
+ { // Double-clics sur une case à deux feux : aucun, premier, second, les deux, aucun. Un
+   // autre feu de la liste reste. L'original écrivait hors de la liste en retirant son
+   // dernier élément (visible sous ASan)
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(12, 8, 12, 12); // (12,8) : vers l'est et vers le sud
+  if (QTest::currentTestFailed()) return;
+  CliqueCase(12, 8);
+  Clique(frmSimulation->ToolButtonPriorites);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, feux);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
+  Clique(frmDefVoie->ButtonOk);
+  const int f1=cv->v[12][8].NumFeu[est-1], f2=cv->v[12][8].NumFeu[sud-1],
+            Autre=cv->v[10][8].NumFeu[est-1];
+  QVERIFY((f1>0)&&(f2>0)&&(f1!=f2));
+  auto Liste=[](int *NumFeux, int NbFeux)
+   {
+    QList<int> l;
+    for(int i=0; i<NbFeux; i++) l<<NumFeux[i];
+    return l;
+   };
+  OuvreFicheFeu(4, 8, est);
+  if (QTest::currentTestFailed()) return;
+  // Liste « demande »
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(Liste(frmDefFeux->NumFeuxDmd, frmDefFeux->NbFeuxDmd), QList<int>({Autre}));
+  const QList<QList<int>> Cycle={{Autre, f1}, {Autre, f2}, {Autre, f2, f1}, {Autre}, {Autre, f1}};
+  for(const QList<int> &Attendu : Cycle)
+   {
+    DoubleCliqueCase(12, 8);
+    QCOMPARE(Liste(frmDefFeux->NumFeuxDmd, frmDefFeux->NbFeuxDmd), Attendu);
+   }
+  // Liste « attente »
+  Clique(frmDefFeux->SpeedButtonSelFeuxAtt);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(Liste(frmDefFeux->NumFeuxAtt, frmDefFeux->NbFeuxAtt), QList<int>({Autre}));
+  for(const QList<int> &Attendu : Cycle)
+   {
+    DoubleCliqueCase(12, 8);
+    QCOMPARE(Liste(frmDefFeux->NumFeuxAtt, frmDefFeux->NbFeuxAtt), Attendu);
+   }
+  Clique(frmDefFeux->ButtonAnnuler);
+  Clique(frmDefVoie->ButtonAnnuler);
+  // Liste d'un feu de piétons
+  TfrmSimulation *s=frmSimulation;
+  ExecuteSurCase(6, 8, s->ActionPassagePietons);
+  ExecuteSurCase(6, 7, s->ActionNatureTrottoir);
+  ExecuteSurCase(6, 9, s->ActionNatureTrottoir);
+  CliqueCase(6, 7);
+  s->MenuItemPrioritesPietons->ElementQt()->trigger();
+  QVERIFY(frmDefVoiePietons->isVisible());
+  Clique(frmDefVoiePietons->SpeedButtonS);
+  QVERIFY(frmDefFeuxPietons->isVisible());
+  Clique(frmDefFeuxPietons->SpeedButtonSelFeux);
+  DoubleCliqueCase(10, 8);
+  QCOMPARE(Liste(frmDefFeuxPietons->NumFeux, frmDefFeuxPietons->NbFeux), QList<int>({Autre}));
+  for(const QList<int> &Attendu : Cycle)
+   {
+    DoubleCliqueCase(12, 8);
+    QCOMPARE(Liste(frmDefFeuxPietons->NumFeux, frmDefFeuxPietons->NbFeux), Attendu);
+   }
+  Clique(frmDefFeuxPietons->ButtonAnnuler);
+  Clique(frmDefVoiePietons->ButtonAnnuler);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::suppressionFeuReference()
+ { // Fiche Priorités : le message nomme le feu qui référence ; Non garde tout ; Oui retire
+   // le feu et toutes ses références (feux et feux de piétons)
+  TfrmSimulation *s=frmSimulation;
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1], c=cv->v[8][4].NumFeu[sud-1];
+  QCOMPARE(c, cv->NbFeux); // Le feu qui référence est le dernier du tableau
+  // c demande a
+  OuvreFicheFeu(8, 4, sud);
+  if (QTest::currentTestFailed()) return;
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  DoubleCliqueCase(4, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  Clique(frmDefFeux->ButtonOk);
+  Clique(frmDefVoie->ButtonOk);
+  QCOMPARE(cv->Feu[c-1].NumFeuxDmd[0], a);
+  // Non : le message nomme c, le feu reste
+  CliqueCase(4, 8);
+  Clique(s->ToolButtonPriorites);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, a_droite);
+  ReponseQuestions=QMessageBox::No;
+  Messages.clear();
+  Clique(frmDefVoie->ButtonAppliquer);
+  QCOMPARE(Messages.size(), 1);
+  const QString Attendu=QString::fromUtf8("référencé par le feu n°%1 (8,4)").arg(c);
+  QVERIFY2(Messages.first().contains(Attendu), qPrintable(Messages.first()));
+  QCOMPARE((int)cv->v[4][8].NumFeu[est-1], a);
+  QCOMPARE((int)cv->v[4][8].Priorite[est-1], (int)feux);
+  QCOMPARE((int)frmDefVoie->RadioGroupPrioriteEst->ItemIndex, (int)feux);
+  QCOMPARE(cv->Feu[c-1].NbFeuxDmd, 1);
+  // Oui : feu et référence retirés
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, a_droite);
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  Clique(frmDefVoie->ButtonOk);
+  QCOMPARE(Messages.size(), 1);
+  QCOMPARE((int)cv->v[4][8].NumFeu[est-1], 0);
+  QCOMPARE((int)cv->v[4][8].Priorite[est-1], (int)a_droite);
+  QVERIFY(!cv->Feu[a-1].Defini());
+  QCOMPARE(cv->Feu[c-1].NbFeuxDmd, 0);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::suppressionFeuReferenceParUnFeuPietons()
+ { // Un feu de piétons référence le feu : message et retrait de la référence
+  TfrmSimulation *s=frmSimulation;
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1];
+  const int n=PoseFeuPietonsLie(4, 8);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(cv->FeuP[n-1].NbFeux, 1);
+  QCOMPARE(cv->FeuP[n-1].NumFeux[0], a);
+  CliqueCase(4, 8);
+  Clique(s->ToolButtonPriorites);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, a_droite);
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  Clique(frmDefVoie->ButtonOk);
+  QCOMPARE(Messages.size(), 1);
+  const QString Attendu=QString::fromUtf8("référencé par le feu piéton n°%1 (6,7)").arg(n);
+  QVERIFY2(Messages.first().contains(Attendu), qPrintable(Messages.first()));
+  QVERIFY(!cv->Feu[a-1].Defini());
+  QCOMPARE(cv->FeuP[n-1].NbFeux, 0);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::effacerSelectionAvecFeuReference()
+ { // Effacer les routes d'une sélection : question pour chaque feu référencé, puis plus
+   // aucune référence au feu effacé, depuis les feux comme depuis les feux de piétons
+  TfrmSimulation *s=frmSimulation;
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1], b=cv->v[10][8].NumFeu[est-1];
+  OuvreFicheFeu(10, 8, est);
+  if (QTest::currentTestFailed()) return;
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  DoubleCliqueCase(4, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  Clique(frmDefFeux->ButtonOk);
+  Clique(frmDefVoie->ButtonOk);
+  const int n=PoseFeuPietonsLie(4, 8);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(cv->Feu[b-1].NumFeuxDmd[0], a);
+  QCOMPARE(cv->FeuP[n-1].NumFeux[0], a);
+  ReponseQuestions=QMessageBox::No;
+  Messages.clear();
+  const QByteArray Reseau=OctetsReseau();
+  Selectionne(3, 8, 5, 8);
+  s->ActionEffacerRoutes->Execute();
+  QVERIFY(OctetsReseau()==Reseau);
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  Selectionne(3, 8, 5, 8);
+  s->ActionEffacerRoutes->Execute();
+  QVERIFY2(Messages.join('\n').contains(QString::fromUtf8("dépend du feu n°%1").arg(a)), qPrintable(Messages.join('\n')));
+  QCOMPARE((int)cv->v[4][8].NumFeu[est-1], 0);
+  QVERIFY(!cv->Feu[a-1].Defini());
+  QCOMPARE(cv->Feu[b-1].NbFeuxDmd, 0);
+  QCOMPARE(cv->FeuP[n-1].NbFeux, 0);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::nouvelleZoneGenereePlusPetite()
+ { // v6.0.5 : zone plus petite, générée : l'original redessinait la grille aux anciennes
+   // dimensions pendant la génération, hors du réseau (visible sous ASan)
+  QVERIFY(!OuvreDemo("avant_petite_zone.cvw").isEmpty());
+  QVERIFY((cv->NbX>NBXMIN+2)&&(cv->NbY>NBYMIN+2));
+  QuandModale([]() { return frmDimensionsZone; }, [this]()
+   {
+    frmDimensionsZone->CSpinEditNbX->Value=NBXMIN+2;
+    frmDimensionsZone->CSpinEditNbY->Value=NBYMIN+2;
+    frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
+    frmDimensionsZone->CheckBoxGenererReseau->Checked=true;
+    Clique(frmDimensionsZone->ButtonCreer);
+   });
+  ReponseQuestions=QMessageBox::No;
+  DimensionsPilotees=true;
+  QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  DimensionsPilotees=false;
+  QVERIFY(Etapes.empty());
+  QVERIFY(!frmGeneration);
+  QCOMPARE(cv->NbX, NBXMIN+2);
+  QCOMPARE(cv->NbY, NBYMIN+2);
+  QCOMPARE(frmSimulation->DrawGridSimul->ColCount, NBXMIN+2);
+  QCOMPARE(frmSimulation->DrawGridSimul->RowCount, NBYMIN+2);
  }
 //---------------------------------------------------------------------------
 void TestInterface::parametresSansParking()
