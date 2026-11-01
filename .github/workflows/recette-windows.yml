@@ -297,6 +297,7 @@ jobs:
             interop
             desinstallation.log
           if-no-files-found: ignore
+          retention-days: 14
 
   fiches:
     name: Fiches (affichage natif de Windows)
@@ -310,11 +311,8 @@ jobs:
           persist-credentials: false
           ref: ${{ inputs.tag || github.ref }}
 
-      - name: Install Qt 6.8 LTS
-        uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
-        with:
-          version: '6.8.3'
-          cache: true
+      - name: Prepare Qt
+        uses: ./.github/actions/prepare-qt
 
       - name: Configure and build the interface test
         run: |
@@ -341,3 +339,4 @@ jobs:
           name: fiches-windows-natives
           path: captures-natives
           if-no-files-found: warn
+          retention-days: 14

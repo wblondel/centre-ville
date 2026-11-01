@@ -1,11 +1,16 @@
 # Mises à jour groupées et mensuelles : chaque PR coûte un run complet de la CI. Les failles
-# connues passent à part, par les mises à jour de sécurité de Dependabot.
+# connues passent à part, par les mises à jour de sécurité de Dependabot. Une version doit
+# avoir 7 jours : le temps qu'une version compromise soit repérée.
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
+      - /.github/actions/*
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ["*"]
@@ -13,6 +18,8 @@ updates:
     directory: /tools/lint
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     groups:
       lint:
         patterns: ["*"]
