@@ -30,8 +30,9 @@ name: Recette Windows
 # Non couvert : SmartScreen (installation silencieuse), Windows 10/11 grand
 # public, ARM64.
 #
-# Lancement : à la main (tag à essayer ; par défaut la plus récente release
-# ou pré-release), ou au push de ce fichier hors de main (mise au point).
+# Lancement : par build-installer.yml après chaque release ou pré-release ; à
+# la main (tag à essayer ; par défaut la plus récente release ou pré-release) ;
+# ou au push de ce fichier hors de main (mise au point).
 
 on:
   workflow_dispatch:
@@ -40,6 +41,12 @@ on:
         description: 'Tag de la release à essayer (vide : la plus récente, pré-releases comprises)'
         required: false
         default: ''
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag de la release à essayer'
+        required: true
+        type: string
   push:
     branches-ignore:
       - main

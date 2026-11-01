@@ -16,6 +16,10 @@ name: Installeurs
 # CHANGELOG.md ; un tag qui ne correspond pas à la version arrête tout. Lancé
 # à la main, le workflow ne produit que ses artefacts. Ni signature ni
 # notarisation : avertissements de SmartScreen et de Gatekeeper.
+# Avant la release : une carte du .dmg, ouverte sur son volume en lecture seule,
+# doit démarrer (job macos-lecture-seule) ; un échec empêche la release. Après
+# la release : recette Windows sur son installeur (recette-windows.yml), dont
+# l'échec laisse la release publiée et ce run en échec.
 
 on:
   push:
@@ -219,6 +223,46 @@ jobs:
           path: build/ci/Centre-Ville-*-macOS.dmg
           if-no-files-found: error
 
+  # Test d'interface sur une carte du volume monté : compilé à part, le paquet
+  # n'embarque pas les tests. Le parcours « non modifié » de docs/RECETTE.md
+  macos-lecture-seule:
+    name: Carte du .dmg en lecture seule
+    needs: [version, macos]
+    runs-on: macos-latest
+    env:
+      PAQUET: ${{ needs.version.outputs.paquet }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      - name: Download disk image
+        uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: paquet
+
+      - name: Configure (CMake preset ci, Qt obligatoire)
+        run: cmake --preset ci -DCV_APP=ON
+
+      - name: Build
+        run: cmake --build --preset ci --parallel --target test_interface
+
+      - name: Start the simulation from a map of the mounted image
+        run: |
+          volume=$(hdiutil attach -nobrowse -readonly "paquet/Centre-Ville-$PAQUET-macOS.dmg" | tail -1 | cut -f3-)
+          code=0
+          CV_CARTE="$PWD/maps/Démo.cvw" CV_CARTE_LECTURE_SEULE="$volume/Cartes/Géant.cvw" QT_QPA_PLATFORM=offscreen \
+            build/ci/tests/test_interface carteDUnVolumeEnLectureSeule || code=$?
+          hdiutil detach "$volume"
+          exit $code
+
   linux:
     name: AppImage Linux
     needs: version
@@ -308,7 +352,7 @@ jobs:
   release:
     name: Release GitHub
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [version, sources, windows, macos, linux]
+    needs: [version, sources, windows, macos, macos-lecture-seule, linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -339,3 +383,12 @@ jobs:
           body_path: notes.md
           draft: false
           prerelease: ${{ needs.version.outputs.prerelease == 'true' }}
+
+  # Une release créée avec GITHUB_TOKEN ne déclenche aucun workflow : appel direct
+  recette-windows:
+    name: Recette Windows
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: release
+    uses: ./.github/workflows/recette-windows.yml
+    with:
+      tag: ${{ github.ref_name }}
