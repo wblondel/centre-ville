@@ -63,6 +63,10 @@
 //   - couche VCL : TCSpinEdit comme CSPIN.pas (MinValue/MaxValue sans effet ni
 //     OnChange, Value= borné, frappe non bornée jusqu'à la sortie du champ,
 //     flèches, EditorEnabled) ;
+//   - édition d'une carte (v6.0.4) : nouvelle zone, routes, parkings, feu déplacé,
+//     Enregistrer sous, réouverture, simulation jusqu'au bout ; chaque édition marque
+//     la carte modifiée ; Quitter avec des modifications ; Copier vers ; effacement
+//     d'une sélection ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
 //     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 //     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
@@ -555,6 +559,40 @@ class TestInterface : public QObject
    }
   void VerifieFichesDistances(const QString &asCarte, bool Captures);
   void SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours);
+  void NouvelleZone(int NbX, int NbY)
+   { // Nouveau : zone vide, sans génération ni paramètres, sans enregistrer la précédente
+    ReponseQuestions=QMessageBox::No;
+    QuandModale([]() { return frmDimensionsZone; }, [this, NbX, NbY]()
+     {
+      frmDimensionsZone->CSpinEditNbX->Value=NbX;
+      frmDimensionsZone->CSpinEditNbY->Value=NbY;
+      frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
+      frmDimensionsZone->CheckBoxGenererReseau->Checked=false;
+      Clique(frmDimensionsZone->ButtonCreer);
+     });
+    QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+    QVERIFY(Etapes.empty());
+    QCOMPARE(cv->NbX, NbX);
+    QCOMPARE(cv->NbY, NbY);
+    Messages.clear();
+    Focalise();
+   }
+  void TraceSegment(int x1, int y1, int x2, int y2)
+   { // Clic sur le début, Maj+clic sur la fin, puis la commande
+    Selectionne(x1, y1, x2, y2);
+    if (QTest::currentTestFailed()) return;
+    QCOMPARE(frmSimulation->DrawGridSimul->Col, x1);
+    QCOMPARE(frmSimulation->DrawGridSimul->Row, y1);
+    QVERIFY(frmSimulation->ActionSegmentRoute->Enabled);
+    frmSimulation->ActionSegmentRoute->Execute();
+    CliqueCase(x2, y2); // Fin de la sélection, comme avant la commande suivante
+   }
+  void ExecuteSurCase(int x, int y, TAction *Action)
+   { // Commande d'une case : clic, puis l'action, qui doit être disponible
+    CliqueCase(x, y);
+    QVERIFY2(Action->Enabled, qPrintable(QString("(%1, %2)").arg(x).arg(y)));
+    Action->Execute();
+   }
   void Focalise()
    {
     frmSimulation->activateWindow();
@@ -609,6 +647,11 @@ class TestInterface : public QObject
   void fichePietonSuiviAilleurs();
   void dimensionsZoneBornees();
   void parametresSansParking();
+  void parcoursEdition();
+  void editionMarqueLaCarteModifiee();
+  void quitterAvecModifications();
+  void copierVersUnFichier();
+  void effacerRoutesDeLaSelection();
   // Lot 3 des fiches secondaires (phase 6)
   void ficheComposition();
   void fichesEvolutionEtVehicules();
@@ -3073,6 +3116,337 @@ void TestInterface::dimensionsZoneBornees()
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
   QCOMPARE(cv->NbX, NBXMAX);
   QCOMPARE(cv->NbY, NBYMAX);
+ }
+//---------------------------------------------------------------------------
+// Parcours d'édition d'une carte, par l'interface
+//---------------------------------------------------------------------------
+void TestInterface::parcoursEdition()
+ { // Nouvelle zone vide, boucle de routes, parkings, feu déplacé, Enregistrer sous,
+   // réouverture à l'identique, simulation
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(!s->SimulationModifiee);
+  // Quatre segments : sens du premier clic vers le second, sans la dernière case
+  TraceSegment(2, 2, 12, 2);
+  TraceSegment(12, 2, 12, 12);
+  TraceSegment(12, 12, 2, 12);
+  TraceSegment(2, 12, 2, 2);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(s->SimulationModifiee);
+  for(int i=2; i<12; i++)
+   {
+    QCOMPARE((int)cv->v[i][2].DirPoss, (int)E);
+    QCOMPARE((int)cv->v[12][i].DirPoss, (int)S);
+    QCOMPARE((int)cv->v[14-i][12].DirPoss, (int)O);
+    QCOMPARE((int)cv->v[2][14-i].DirPoss, (int)N);
+   }
+  // Parkings : créés dans les places existantes, puis en plus ; numéro d'un supprimé réutilisé
+  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  ExecuteSurCase(6, 2, s->ActionParking);
+  QCOMPARE((int)cv->v[6][2].NumParking, 1);
+  QCOMPARE(Statut(), QString::fromUtf8("Le parking créé a le numéro 1."));
+  ExecuteSurCase(6, 12, s->ActionParking);
+  QCOMPARE((int)cv->v[6][12].NumParking, 2);
+  QCOMPARE((int)cv->NbParkings, 2);
+  ExecuteSurCase(12, 6, s->ActionParking);
+  QCOMPARE((int)cv->v[12][6].NumParking, 3);
+  QCOMPARE((int)cv->NbParkings, 3);
+  ExecuteSurCase(12, 6, s->ActionParking);
+  QCOMPARE((int)cv->v[12][6].NumParking, 0);
+  QVERIFY(!cv->Parking[2].Defini());
+  QCOMPARE(Statut(), QString::fromUtf8("Le parking numéro 3 a été supprimé."));
+  ExecuteSurCase(10, 12, s->ActionParking);
+  QCOMPARE((int)cv->v[10][12].NumParking, 3);
+  ExecuteSurCase(10, 12, s->ActionParking);
+  // Case effacée puis retracée
+  ExecuteSurCase(12, 6, s->ActionEffacerRoute);
+  QCOMPARE((int)cv->v[12][6].DirPoss, (int)aucune);
+  TraceSegment(12, 6, 12, 7);
+  QCOMPARE((int)cv->v[12][6].DirPoss, (int)S);
+  // Feu : créé par la fiche Priorités, puis déplacé
+  CliqueCase(8, 2);
+  Clique(s->ToolButtonPriorites);
+  QVERIFY(frmDefVoie->isVisible());
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, feux);
+  Clique(frmDefVoie->ButtonOk);
+  QCOMPARE((int)cv->v[8][2].Priorite[est-1], (int)feux);
+  const int NumFeu=cv->v[8][2].NumFeu[est-1];
+  QVERIFY(NumFeu>0);
+  ExecuteSurCase(8, 2, s->ActionDeplacerFeuSource);
+  ExecuteSurCase(9, 2, s->ActionDeplacerFeuDestination);
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  QCOMPARE((int)cv->v[8][2].NumFeu[est-1], 0);
+  QCOMPARE((int)cv->v[8][2].Priorite[est-1], (int)a_droite);
+  QCOMPARE((int)cv->v[9][2].NumFeu[est-1], NumFeu);
+  QCOMPARE((int)cv->v[9][2].Priorite[est-1], (int)feux);
+  QCOMPARE((int)cv->Feu[NumFeu-1].x, 9);
+  // Vers une case d'une autre direction : refusé, le feu reste
+  ExecuteSurCase(9, 2, s->ActionDeplacerFeuSource);
+  ExecuteSurCase(12, 4, s->ActionDeplacerFeuDestination);
+  QVERIFY2(Messages.join('\n').contains(QString::fromUtf8("n'a pas la même direction")), qPrintable(Messages.join('\n')));
+  Messages.clear();
+  QCOMPARE((int)cv->v[9][2].NumFeu[est-1], NumFeu);
+  QCOMPARE((int)cv->Feu[NumFeu-1].x, 9);
+  // Trottoirs : de la place pour les 30 piétons par défaut
+  for(int x=3; x<12; x++)
+   for(int y=3; y<7; y++) ExecuteSurCase(x, y, s->ActionNatureTrottoir);
+  if (QTest::currentTestFailed()) return;
+  // Vérification : le parking supprimé laisse une place vide, signalée
+  Messages.clear();
+  s->ActionVerifierReseau->Execute();
+  QVERIFY2(Statut().contains(QString::fromUtf8("Parking n°3 non défini")), qPrintable(Statut()));
+  // Enregistrer sous : nom, titre, plus de modification
+  const QString f=QFileInfo(Carte).absolutePath()+"/edition.cvw";
+  QFile::remove(f);
+  QuandModale([this]() { return BoiteFichier(); }, [this, f]() { ChoisitFichier(f); });
+  s->ActionEnregistrerSous->Execute();
+  QVERIFY(Etapes.empty());
+  QVERIFY(QFile::exists(f));
+  QVERIFY(!s->SimulationModifiee);
+  QVERIFY(Q(s->Caption).contains("edition.cvw"));
+  const QByteArray Reseau=OctetsReseau();
+  QVERIFY(!Reseau.isEmpty());
+  QVERIFY(Contenu(f)==Reseau);
+  // Réouverture après une autre zone : même réseau, éléments retrouvés
+  NouvelleZone(10, 10);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(cv->NbX, 10);
+  OuvreFichier(f);
+  QCOMPARE(cv->NbX, 20);
+  QCOMPARE(cv->NbY, 20);
+  QVERIFY(!s->SimulationModifiee);
+  QCOMPARE((int)cv->NbParkings, 2); // « Pour renuméroter : sauvez puis rouvrez le réseau »
+  QCOMPARE((int)cv->v[6][2].NumParking, 1);
+  QCOMPARE((int)cv->v[6][12].NumParking, 2);
+  QCOMPARE((int)cv->v[9][2].NumFeu[est-1], NumFeu);
+  QCOMPARE((int)cv->v[3][2].DirPoss, (int)E);
+  QCOMPARE((int)cv->v[12][6].DirPoss, (int)S);
+  // Ensuite, enregistrer puis rouvrir ne change plus rien
+  const QByteArray Reouvert=OctetsReseau();
+  QVERIFY(Reouvert!=Reseau);
+  Enregistre(f);
+  OuvreFichier(f);
+  QVERIFY(OctetsReseau()==Reouvert);
+  // Simulation jusqu'au bout : tous les véhicules arrivent, puis le réseau est rechargé
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Statut()));
+  QVERIFY(JoueTours([s]() { return !s->SimulationEnCours; }, 1000));
+  QVERIFY2(Messages.join('\n').contains(QString::fromUtf8("Nombre de véhicules : 120")), qPrintable(Messages.join('\n')));
+  QCOMPARE(Statut(), QString::fromUtf8("Chargement effectué."));
+  QVERIFY(OctetsReseau()==Reouvert);
+  QVERIFY(Contenu(f)==Reouvert);
+  QVERIFY(!s->SimulationModifiee);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::editionMarqueLaCarteModifiee()
+ { // Toute modification de la carte doit proposer d'enregistrer avant de la quitter
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 2, 12, 2);
+  TraceSegment(2, 4, 12, 4);
+  TraceSegment(2, 6, 12, 6);
+  if (QTest::currentTestFailed()) return;
+  const QString f=QFileInfo(Carte).absolutePath()+"/edition_modifiee.cvw";
+  QStringList Ecarts;
+  struct Edition { const char *Nom; int x, y; TAction *Action; };
+  const std::vector<Edition> Editions=
+   {
+    {"parking", 3, 2, s->ActionParking},
+    {"parking retiré", 3, 2, s->ActionParking},
+    {"place de parking", 4, 2, s->ActionPlacePark},
+    {"place de parking retirée", 4, 2, s->ActionPlacePark},
+    {"dépôt de bus", 5, 2, s->ActionDepotBus},
+    {"dépôt de bus retiré", 5, 2, s->ActionDepotBus},
+    {"place de taxi", 6, 2, s->ActionPlaceTaxi},
+    {"place de taxi retirée", 6, 2, s->ActionPlaceTaxi},
+    {"arrêt de bus", 7, 2, s->ActionArretBusTram},
+    {"arrêt de bus retiré", 7, 2, s->ActionArretBusTram},
+    {"passage réservé aux bus", 8, 2, s->ActionPassageBus},
+    {"passage réservé aux bus retiré", 8, 2, s->ActionPassageBus},
+    {"passage piétons", 3, 4, s->ActionPassagePietons},
+    {"passage piétons retiré", 3, 4, s->ActionPassagePietons},
+    {"tout droit", 4, 4, s->ActionToutDroit},
+    {"tout droit retiré", 4, 4, s->ActionToutDroit},
+    {"route effacée", 5, 4, s->ActionEffacerRoute},
+    {"trottoir", 2, 15, s->ActionNatureTrottoir},
+    {"arbre", 2, 15, s->ActionDecorsArbre},
+    {"arbre retiré", 2, 15, s->ActionDecorsArbre},
+    {"pelouse", 2, 15, s->ActionDecorsPelouse},
+    {"pelouse retirée", 2, 15, s->ActionDecorsPelouse},
+    {"immeuble", 3, 15, s->ActionNatureImmeuble},
+    {"immeuble retiré", 3, 15, s->ActionNatureImmeuble},
+   };
+  Enregistre(f);
+  for(const Edition &e : Editions)
+   {
+    QVERIFY2(!s->SimulationModifiee, e.Nom);
+    CliqueCase(e.x, e.y);
+    if (!e.Action->Enabled) { Ecarts<<QString::fromUtf8("%1 : action indisponible").arg(e.Nom); continue; }
+    QByteArray Avant=OctetsReseau();
+    e.Action->Execute();
+    if (OctetsReseau()==Avant) Ecarts<<QString::fromUtf8("%1 : carte inchangée").arg(e.Nom);
+    if (!s->SimulationModifiee) Ecarts<<QString::fromUtf8("%1 : carte non marquée modifiée").arg(e.Nom);
+    Enregistre(f);
+   }
+  // Voie de tram : segment, puis une case effacée
+  Selectionne(2, 10, 12, 10);
+  QVERIFY(s->ActionSegmentTram->Enabled);
+  s->ActionSegmentTram->Execute();
+  QVERIFY(s->SimulationModifiee);
+  QVERIFY(cv->v[5][10].SensVoieTram>aucune_voie);
+  Enregistre(f);
+  ExecuteSurCase(5, 10, s->ActionEffacerVoieTram);
+  QCOMPARE((int)cv->v[5][10].SensVoieTram, (int)aucune_voie);
+  QVERIFY(s->SimulationModifiee);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::quitterAvecModifications()
+ { // Quitter une carte modifiée : Annuler et Oui sans nom restent ; Non quitte sans
+   // écrire ; Oui écrit le fichier. Le fichier n'est relu qu'à la fin
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  const QString f=QFileInfo(Carte).absolutePath()+"/quitter.cvw";
+  QFile::remove(f);
+  Enregistre(f);
+  const QByteArray Vide=Contenu(f);
+  QVERIFY(!Vide.isEmpty());
+  // Sans modification, aucune question
+  Messages.clear();
+  bool Peut=false;
+  s->FormCloseQuery(s, Peut);
+  QVERIFY(Peut);
+  QVERIFY(Messages.isEmpty());
+  TraceSegment(2, 2, 12, 2);
+  if (QTest::currentTestFailed()) return;
+  // Annuler (Échap) : on reste, sans écrire
+  ReponseQuestions=QMessageBox::Cancel;
+  Messages.clear();
+  s->ActionQuitter->Execute();
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY2(Messages.first().contains(QString::fromUtf8("avant de quitter")), qPrintable(Messages.first()));
+  QVERIFY(s->isVisible());
+  QVERIFY(s->SimulationModifiee);
+  QVERIFY(Contenu(f)==Vide);
+  // Non : quitter est permis, sans écrire
+  ReponseQuestions=QMessageBox::No;
+  Peut=false;
+  s->FormCloseQuery(s, Peut);
+  QVERIFY(Peut);
+  QVERIFY(Contenu(f)==Vide);
+  // Oui : le fichier est écrit, et quitter est permis
+  ReponseQuestions=QMessageBox::Yes;
+  Peut=false;
+  s->FormCloseQuery(s, Peut);
+  QVERIFY(Peut);
+  QVERIFY(Contenu(f)!=Vide);
+  QVERIFY(!s->SimulationModifiee);
+  // Oui sans nom de fichier, boîte annulée : on reste, carte toujours modifiée
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 2, 12, 2);
+  if (QTest::currentTestFailed()) return;
+  ReponseQuestions=QMessageBox::Yes;
+  QuandModale([this]() { return BoiteFichier(); }, [this]() { AnnuleBoiteFichier(); });
+  Peut=true;
+  s->FormCloseQuery(s, Peut);
+  QVERIFY(Etapes.empty());
+  QVERIFY(!Peut);
+  QVERIFY(s->SimulationModifiee);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::copierVersUnFichier()
+ { // Copier vers : la sélection seule dans un autre fichier ; le réseau affiché, son
+   // nom et ses modifications non enregistrées ne changent pas
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  const QString Original=QFileInfo(Carte).absolutePath()+"/copier_original.cvw",
+                Copie=QFileInfo(Carte).absolutePath()+"/copier_copie.cvw";
+  QFile::remove(Original);
+  QFile::remove(Copie);
+  Enregistre(Original);
+  const QByteArray Vide=Contenu(Original);
+  TraceSegment(3, 3, 9, 3);
+  TraceSegment(9, 3, 9, 9);
+  ExecuteSurCase(5, 3, s->ActionParking);
+  if (QTest::currentTestFailed()) return;
+  // Moins de 8x8 : refusé
+  Messages.clear();
+  Selectionne(2, 2, 6, 6);
+  s->ActionCopierVers->Execute();
+  QVERIFY2(Messages.join('\n').contains("8x8"), qPrintable(Messages.join('\n')));
+  // Parking hors de la sélection : refusé, sans boîte de fichier
+  Messages.clear();
+  Selectionne(8, 2, 17, 11);
+  s->ActionCopierVers->Execute();
+  QVERIFY2(Messages.join('\n').contains("DOIVENT"), qPrintable(Messages.join('\n')));
+  QVERIFY(!QFile::exists(Copie));
+  // Sélection de 10x10 : le fichier ne contient qu'elle
+  const QByteArray Reseau=OctetsReseau();
+  const AnsiString asTitre=s->Caption;
+  Messages.clear();
+  Selectionne(2, 2, 11, 11);
+  QVERIFY(s->ActionCopierVers->Enabled);
+  QuandModale([this]() { return BoiteFichier(); }, [this, Copie]() { ChoisitFichier(Copie); });
+  s->ActionCopierVers->Execute();
+  QVERIFY(Etapes.empty());
+  QVERIFY2(QFile::exists(Copie), qPrintable(Messages.join('\n')));
+  // Le réseau affiché reste le même, avec ses modifications à enregistrer sous son nom
+  QCOMPARE(cv->NbX, 20);
+  QVERIFY(OctetsReseau()==Reseau);
+  QCOMPARE(Q(s->Caption), Q(asTitre));
+  QVERIFY(s->SimulationModifiee);
+  QCOMPARE(QFileInfo(Q(FILENAME(s->SaveDialog))).fileName(), QFileInfo(Original).fileName());
+  QVERIFY(Contenu(Original)==Vide);
+  // Enregistrer écrit donc l'original, pas la copie
+  const QByteArray OctetsCopie=Contenu(Copie);
+  s->ActionEnregistrer->Execute();
+  QVERIFY(Contenu(Copie)==OctetsCopie);
+  QVERIFY(Contenu(Original)==Reseau);
+  // La copie s'ouvre : éléments décalés de l'origine de la sélection
+  ReponseQuestions=QMessageBox::No;
+  OuvreFichier(Copie);
+  QCOMPARE(cv->NbX, 10);
+  QCOMPARE(cv->NbY, 10);
+  QCOMPARE((int)cv->v[3][1].NumParking, 1);
+  QCOMPARE((int)cv->v[1][1].DirPoss, (int)E);
+  QCOMPARE((int)cv->v[7][1].DirPoss, (int)S);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::effacerRoutesDeLaSelection()
+ { // Effacer les routes de la sélection : la question, puis tout ce qui s'y trouve
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 2, 12, 2);
+  TraceSegment(2, 8, 12, 8);
+  ExecuteSurCase(5, 2, s->ActionParking);
+  ExecuteSurCase(5, 8, s->ActionParking);
+  if (QTest::currentTestFailed()) return;
+  // Non : rien ne change
+  ReponseQuestions=QMessageBox::No;
+  const QByteArray Reseau=OctetsReseau();
+  Selectionne(1, 1, 13, 3);
+  QVERIFY(s->ActionEffacerRoutes->Enabled);
+  s->ActionEffacerRoutes->Execute();
+  QVERIFY(OctetsReseau()==Reseau);
+  // Oui : routes et parking de la sélection effacés, le reste gardé
+  ReponseQuestions=QMessageBox::Yes;
+  Selectionne(1, 1, 13, 3);
+  s->ActionEffacerRoutes->Execute();
+  for(int i=2; i<12; i++)
+   {
+    QCOMPARE((int)cv->v[i][2].DirPoss, (int)aucune);
+    QCOMPARE((int)cv->v[i][8].DirPoss, (int)E);
+   }
+  QCOMPARE((int)cv->v[5][2].NumParking, 0);
+  QVERIFY(!cv->Parking[0].Defini());
+  QCOMPARE((int)cv->v[5][8].NumParking, 2);
+  QVERIFY(cv->Parking[1].Defini());
  }
 //---------------------------------------------------------------------------
 void TestInterface::parametresSansParking()

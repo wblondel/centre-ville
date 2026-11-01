@@ -2942,6 +2942,7 @@ void TfrmSimulation::ActionDepotBusExecute(TObject *Sender)
    cv->DepotBus.Definit(x,y);
    RedessineCase(xPrc, yPrc, true);
   }
+ SimulationModifiee=true; // v6.0.4 : quitter sans enregistrer perdait le dépôt, sans question
  RedessineCase(x, y, true);
 }
 //---------------------------------------------------------------------------
@@ -3108,6 +3109,7 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
      yd=DrawGridSimul->Row,
      xf=(xd==Gauche?Droite:Gauche),
      yf=(yd==Haut?Bas:Haut);
+ x0=x1=xd; y0=y1=yd; // v6.0.4 : x1 et y1 lus sans valeur pour un segment d'une seule voie
 
  if ((dx>1)&&(dy>1))
   {
@@ -3557,10 +3559,19 @@ Vous pouvez, avant d'ouvrir le fichier généré, activer l'option \"Fichier | V
 Ce message récapitulatif sera mis à jour en fonction des contrôles ajoutés dans les versions successives. Il n'y a pas d'aide en ligne pour cette commande.",
                 "Commande \"Copier vers...\"", tmAvertissement, 0, 0); // v4.2
 */
+ // v6.0.4 : la copie est un fichier à part. L'original lui donnait le nom et le titre
+ // du réseau affiché, marqué non modifié : Enregistrer écrasait la copie par tout le
+ // réseau, et ses modifications se perdaient sans question
+ const AnsiString asNomEnregistrer=SaveDialog->FileName, asNomOuvrir=OpenDialog->FileName, asTitre=Caption;
+ const bool Modifiee=SimulationModifiee;
  { // portage : try/__finally -> garde RAII (Finalement)
   Finalement f([&]()
   {
    cv->PrepareCopie(FIN, 0, 0, 0, 0);
+   SaveDialog->FileName=asNomEnregistrer;
+   OpenDialog->FileName=asNomOuvrir;
+   Caption=asTitre;
+   SimulationModifiee=Modifiee;
   });
    cv->PrepareCopie( DEBUT,
                      DrawGridSimul->Selection.Left,
