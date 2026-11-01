@@ -1,7 +1,7 @@
 # Recette d'une version de Centre-Ville
 
-À faire sur les paquets d'une pré-release (`6.0.0-rc1`) avant la version
-finale, sur de vrais systèmes. Les tests automatiques (`ctest`, CI) couvrent
+À faire au besoin sur les paquets d'une version, sur de vrais systèmes : une
+pré-release n'est pas obligatoire. Les tests automatiques (`ctest`, CI) couvrent
 le moteur, les fiches et l'aide en mode « offscreen », mais pas
 l'installation, le système de fichiers, ni les navigateurs. Noter chaque
 écart (système, version, étapes, capture) dans une issue GitHub.
@@ -11,7 +11,7 @@ l'installation, le système de fichiers, ni les navigateurs. Noter chaque
 Paquet : `Centre-Ville-<version>-Windows-x64-Setup.exe`.
 
 Sans machine Windows : le workflow « Recette Windows »
-(`.github/workflows/recette-windows.yml`, lancé à la main sur un tag) refait
+(`.github/workflows/recette-windows.yml`, lancé après chaque release, ou à la main sur un tag) refait
 sur une machine Windows de GitHub l'installation, l'ouverture d'un `.cvw` par
 son association, F1, « À propos » et la désinstallation, sur une machine
 neuve et en mise à jour d'une 5.4.3.2 installée par l'installeur d'origine
@@ -64,7 +64,7 @@ Paquet : `Centre-Ville-<version>-macOS.dmg`.
 - [ ] Même carte, modifiée (Paramètres, par exemple), Marche : Centre-Ville dit que le fichier est en lecture seule et propose un autre nom. « Non » : pas de démarrage, modification gardée, Arrêt grisé ; nouveau clic sur Marche : même question, sans blocage. « Oui », puis un nom dans le dossier proposé : la simulation démarre, et Arrêt recharge ce fichier.
 - [ ] `codesign --verify --deep --strict` sur le paquet, après ces lancements : signature toujours valide.
 
-Le parcours « non modifié » s'automatise dans l'affichage natif, sur la carte du volume monté, depuis une compilation avec les tests :
+Le parcours « non modifié » est lancé par le workflow « Installeurs », en « offscreen », avant chaque release (job « Carte du .dmg en lecture seule »). Pour le refaire dans l'affichage natif, sur la carte du volume monté, depuis une compilation avec les tests :
 
 ```bash
 CV_CARTE="$PWD/maps/Démo.cvw" CV_CARTE_LECTURE_SEULE="/Volumes/Centre-Ville <version>/Cartes/Géant.cvw" QT_QPA_PLATFORM=cocoa build/release/tests/test_interface carteDUnVolumeEnLectureSeule
