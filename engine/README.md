@@ -285,6 +285,13 @@ UBSan (`index 2 out of bounds for type 'int[2]'`). `ctest --preset asan`
 et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
 `interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée).
 
+## Corrections de la 6.0.3 (annotées `// v6.0.3`)
+
+- **`centre_ville::Verifie`** : `NbMaxVehicules` divisait par
+  `NbParkings*(NbParkings-1)` avant le test du nombre de parkings. Arrêt sur x86,
+  valeur quelconque sur ARM (relevé par UBSan). Le message « Le nombre de parkings est
+  incorrect » est désormais donné.
+
 ## Corrections de la 6.0.2 (annotées `// v6.0.2`)
 
 - **`centre_ville::Charge`** : tous les `Charge()` lisent par `LitChamp`, qui n'accepte
@@ -317,8 +324,11 @@ Rien de tout cela ne change le golden master ni les octets écrits.
 - **Pile** : le calcul des distances (`voie::CalculeDistance*`) est récursif. Il
   demande entre 256 et 512 Ko de pile avec Clang, davantage en Debug MSVC ou
   sous ASan. L'original tournait avec la pile par défaut de 1 Mo. Les
-  exécutables de test réservent 16 Mo (Windows) ou 64 Mo (macOS) ;
-  l'application devra prévoir une marge équivalente.
+  exécutables de test réservent 16 Mo (Windows) ou 64 Mo (macOS), l'application
+  16 Mo (Windows et macOS). La récursion descend au plus d'un niveau par case, à
+  environ 160 octets le niveau : 6,4 Mo pour une zone de 200x200 (`NBXMAX`,
+  `NBYMAX`, v6.0.3), moins que les 8 Mo du fil principal sous Linux. Une carte
+  plus grande, qui ne peut venir que d'un fichier, n'a pas cette garantie.
 - **Carfours.cvw** : `Verifie()` signale « Le nombre de véhicules ne permet pas
   une simulation équilibrée (1000) » (1000 n'est pas multiple de 4×3). C'est
   le réseau d'origine qui est en cause, pas le portage : le message est figé

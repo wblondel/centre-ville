@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.2)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.3)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -372,8 +372,8 @@ Couche VCL (`controleCSpinEdit`, sur un `TCSpinEdit` seul) : `MinValue=` et
 `MaxValue=` sans effet ni `OnChange` ; `Value=` borné, `OnChange` seulement si
 le texte change ; frappe hors bornes acceptée (lettres refusées), ramenée
 dans les bornes au clic sur un bouton mais pas à la perte d'activation de la
-fenêtre ; texte vide (`Value` = `MinValue`) laissé vide ; flèches ; aucune
-borne si `MinValue=MaxValue` ; `EditorEnabled=False` ; valeur du `.dfm`
+fenêtre ; texte vide (`Value` = `MinValue`) remplacé en quittant le champ (v6.0.3) ; flèches ; aucune
+borne si `MinValue=MaxValue=0` (v6.0.3) ; `EditorEnabled=False` ; valeur du `.dfm`
 bornée au chargement.
 Aide (phase 7) : F1 sur la fiche principale, sur Rechercher (non modale) et
 sur Paramètres (modale), bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
@@ -572,10 +572,18 @@ pointe sur le nouveau le temps de la lecture). En cas d'échec, message et rése
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
+## Corrections de la 6.0.3 (annotées `// v6.0.3`)
+
+| Fiche | Original | 6.0.3 |
+|---|---|---|
+| Piéton | Rechercher suit un piéton à pied : comparé au véhicule de la case, son `NumBus` nul égale celui d'une case sans bus, et le piéton de la case n'est jamais montré. | Le véhicule n'est comparé que si le piéton en a un. Sur une case sans piéton, le piéton suivi reste affiché, comme l'original. |
+| Dimensions de la zone | Aucune limite haute. | `NBXMAX` et `NBYMAX` (200), message « Zone trop grande ». Vaut pour Nouveau seulement : Ouvrir accepte une carte plus grande. |
+| Paramètres | Moins de deux parkings sans place : division par zéro dans `CalculeChoixPossiblesNbVehicules`. | Nombre de véhicules et ses bornes laissés tels quels. |
+| `TCSpinEdit` | `MinValue`=`MaxValue` : aucune borne, comme `CSPIN.pas`. | Aucune borne seulement si les deux valent 0 : Dimensions de la zone reste libre, et un champ à un seul numéro possible est borné. |
+| `TCSpinEdit` | Texte vide, « - » ou « + » gardé en quittant le champ. | `Valide()` écrit la valeur, et `OnChange` suit. |
+
 ## Comportements d'origine conservés
 
-- **Fiche Piéton pendant que Rechercher suit un piéton** : elle lit `CSpinEditPieton`,
-  et montre le piéton suivi même quand la case en contient un autre.
 - **Statistiques véhicules** : un trajet n'ayant qu'un véhicule arrivé, ou des
   véhicules au même parcours, affiche 0.
 - **Évolution** : par nombre de véhicules, le quadrillage marque tous les 10 véhicules :
@@ -584,8 +592,3 @@ fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
   d'étape est incorrect ! » (à chaque chiffre qui le laisse hors bornes) ; il n'est ramené
   dans `1..NbParkings` qu'en quittant le champ ou à Entrée (d'ici là, `0` donne les
   statistiques de tous les parkings).
-- **`TCSpinEdit`, texte vide, « - » ou « + »** : `Value` vaut `MinValue`, et le texte reste
-  tel quel en quittant le champ (`CheckValue(MinValue)` ne change rien).
-- **`TCSpinEdit`, `MinValue` = `MaxValue`** : aucune borne, ni à l'affectation ni en
-  quittant le champ (Dimensions de la zone ; parkings de Fluidité et trafic sur une carte à
-  un seul parking).

@@ -13,6 +13,8 @@
 #define NBYDEF                    63 // v4.0 (NBY->NBYDEF)
 #define NBXMIN                    8  // v4.0
 #define NBYMIN                    8  // v4.0
+#define NBXMAX                    200 // v6.0.3 : nouvelle zone seulement (mémoire, et pile du calcul récursif des distances)
+#define NBYMAX                    200 // v6.0.3
 //---------------------------------------------------------------------------
 #define NBDIR                      4
 #define NBFEUXDEFAUT               2 // v5.1 : anciennement 30

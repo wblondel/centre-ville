@@ -6415,7 +6415,8 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
  { // v5.0 : Calcul préalable pour le NbVehicules
   int NbMinVehicules= NbParkings*(NbParkings-1)
                      +2*NbPlacesPark, // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
-      NbMaxVehicules= (NBMAXVEHICULES/(NbParkings*(NbParkings-1)))*NbParkings*(NbParkings-1)
+      NbMaxVehicules= NbParkings<2?0: // v6.0.3 : division par zéro dans l'original (signalé plus bas)
+                      (NBMAXVEHICULES/(NbParkings*(NbParkings-1)))*NbParkings*(NbParkings-1)
                      +2*NbPlacesPark; // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
   int i, j;
   asMsgErr="";

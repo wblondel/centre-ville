@@ -266,9 +266,9 @@ void TCSpinEdit::PrepareVcl()
  }
 //---------------------------------------------------------------------------
 int TCSpinEdit::CheckValue(int v)
- { // Bornes appliquées seulement si MaxValue<>MinValue
+ { // v6.0.3 : bornes appliquées sauf si MinValue=MaxValue=0 (CSPIN.pas : seulement si MaxValue<>MinValue, donc aucune borne pour un seul numéro possible)
   int Min=MinValue, Max=MaxValue;
-  if (Max!=Min)
+  if ((Max!=Min)||(Max!=0))
    {
     if (v<Min) return Min;
     if (v>Max) return Max;
@@ -319,7 +319,9 @@ void TCSpinEdit::focusOutEvent(QFocusEvent *e)
 void TCSpinEdit::Valide()
  {
   int v=Value;
-  if (CheckValue(v)!=v) Value=v; // SetValue(Value)
+  bool Nombre=false;
+  lineEdit()->text().toInt(&Nombre);
+  if (!Nombre||(CheckValue(v)!=v)) Value=v; // SetValue(Value). v6.0.3 : texte vide, « - » ou « + » remplacé par la valeur qu'il vaut
   if (OnExit) OnExit(this);
  }
 //---------------------------------------------------------------------------

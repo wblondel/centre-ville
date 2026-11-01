@@ -32,6 +32,15 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.3] 
+ - Plus de plantage quand une carte a moins de deux parkings.
+ - Une nouvelle zone est limitée à 200x200 cases (une carte plus grande
+   s'ouvre toujours).
+ - La fiche Piéton montre le piéton de la case, même quand Rechercher en suit
+   un autre.
+ - Un champ numérique vide reprend sa valeur minimale en quittant le champ, et
+   un champ à un seul numéro possible est borné.
+
 [Version 6.0.2] 
  - Enregistrer ne détruit plus le fichier si le disque est plein : il n'est
    remplacé qu'une fois le nouveau contenu écrit.

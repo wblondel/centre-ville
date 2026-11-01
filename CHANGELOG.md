@@ -4,6 +4,37 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.3] — plantages évités, fiche Piéton et champs numériques corrigés
+
+Cette version corrige deux causes de plantage trouvées en relisant le code, et trois
+comportements de l'interface que la 6.0.2 avait gardés. Le format des fichiers `.cvw` ne
+change pas (0x530), ni la simulation (golden master identique).
+
+### Plantages
+
+- **Moins de deux parkings** (trouvé en 6.0.3) : la vérification du réseau et l'ouverture
+  des Paramètres divisaient par zéro, ce qui arrête l'application sur un processeur x86
+  (Windows, Linux, Mac Intel). La vérification signale maintenant le nombre de parkings, et
+  les Paramètres s'ouvrent.
+- **Dimensions de la zone** (trouvé en 6.0.3) : aucune limite haute. Une zone de
+  99999x99999 demandait 2,5 To de mémoire. Une nouvelle zone est limitée à 200x200, ce qui
+  laisse assez de pile au calcul récursif des distances. Une carte plus grande s'ouvre
+  toujours.
+
+### Fiche Piéton
+
+- Quand Rechercher suit un piéton, la fiche montre celui de la case du curseur, et non plus
+  le piéton suivi. Sur une case sans piéton, elle garde le piéton suivi.
+
+### Champs numériques
+
+- **Un seul numéro possible** (par exemple Fluidité et trafic sur une carte à un seul
+  parking) : un numéro tapé est ramené à ce numéro. Seuls les champs sans limites (minimum
+  et maximum à 0) ne sont pas bornés.
+- **Texte vide, « - » ou « + »** : remplacé par la valeur minimale en quittant le champ.
+
+Détail : `app/README.md`, « Corrections de la 6.0.3 », et `engine/README.md`.
+
 ## [6.0.2] — bogues d'origine de l'interface corrigés, fichiers plus sûrs
 
 Cette version corrige les bogues de l'interface que les versions précédentes
