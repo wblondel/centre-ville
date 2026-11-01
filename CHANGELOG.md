@@ -4,6 +4,29 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.4] — modifications qui pouvaient se perdre, édition de carte testée
+
+Cette version corrige deux pertes de modifications, trouvées par de nouveaux tests du
+parcours d'édition d'une carte. Ces bogues venaient de l'original. Le format des fichiers
+`.cvw` ne change pas (0x530), ni la simulation (golden master identique).
+
+### Bogues corrigés
+
+- **Copier vers…** : après la copie, le réseau entier prenait le nom de la copie et n'était
+  plus marqué modifié. « Enregistrer » écrasait alors la copie par tout le réseau, et quitter
+  perdait les modifications sans poser de question. Le réseau garde maintenant son nom, son
+  titre et ses modifications.
+- **Dépôt de bus** : le poser ou le retirer ne marquait pas la carte comme modifiée. Quitter
+  ou ouvrir une autre carte le perdait sans poser de question.
+- **Tracer une route** : deux coordonnées étaient lues sans valeur pour un segment d'une
+  seule voie. Sans effet visible, trouvé en relisant le code.
+
+### Tests
+
+Nouveaux parcours par l'interface : création d'un réseau jusqu'à la fin de sa simulation,
+parkings, feu déplacé, Enregistrer sous et réouverture, chaque édition marquant la carte
+modifiée, Quitter avec des modifications, Copier vers, effacement d'une sélection.
+
 ## [6.0.3] — plantages évités, fiche Piéton et champs numériques corrigés
 
 Cette version corrige deux causes de plantage trouvées en relisant le code, et trois

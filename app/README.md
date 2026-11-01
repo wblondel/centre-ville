@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.3)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.4)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -571,6 +571,14 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.4 (annotées `// v6.0.4`)
+
+| Commande | Original | 6.0.4 |
+|---|---|---|
+| Copier vers… | `ActionEnregistrer` donne au réseau affiché le nom de la copie et le marque non modifié. | Nom d'enregistrement et d'ouverture, titre et état modifié rétablis après la copie, réussie ou non. |
+| Dépôt de bus | `SimulationModifiee` non mis à vrai. | Mis à vrai, pour poser et pour retirer. |
+| Tracer une route | `x1`, `y1` lus sans valeur par `RedessineCase` pour un segment d'une seule voie. | Initialisés. |
 
 ## Corrections de la 6.0.3 (annotées `// v6.0.3`)
 
