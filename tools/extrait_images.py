@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Extraction des images embarquées dans les fiches VCL (.dfm) de Centre-Ville.
 
 Phase 3 de PLAN_PORTAGE.md (outillage) :
@@ -115,7 +114,7 @@ class LecteurDfm:
         if not self._voit(genre, valeur):
             attendu = valeur or genre
             obtenu = self.jetons[self.i] if self.i < len(self.jetons) else "fin"
-            raise ErreurDfm("%s : %r attendu, %r obtenu" % (self.nom_fichier, attendu, obtenu))
+            raise ErreurDfm(f"{self.nom_fichier} : {attendu!r} attendu, {obtenu!r} obtenu")
         j = self.jetons[self.i]
         self.i += 1
         return j[1]
@@ -127,7 +126,7 @@ class LecteurDfm:
     def _objet(self):
         genre = self._prend("ident")
         if genre not in ("object", "inherited", "inline"):
-            raise ErreurDfm("%s : 'object' attendu, %r obtenu" % (self.nom_fichier, genre))
+            raise ErreurDfm(f"{self.nom_fichier} : 'object' attendu, {genre!r} obtenu")
         nom = self._prend("ident")
         classe = None
         if self._voit("symbole", ":"):
@@ -201,7 +200,7 @@ class LecteurDfm:
                 elements.append(props)
             self.i += 1
             return elements
-        raise ErreurDfm("%s : valeur inattendue %r" % (self.nom_fichier, v))
+        raise ErreurDfm(f"{self.nom_fichier} : valeur inattendue {v!r}")
 
 
 def lit_dfm(chemin):
@@ -300,7 +299,7 @@ class Extraction:
 
     def ajoute(self, chemin, octets):
         if chemin in self.fichiers and self.fichiers[chemin] != octets:
-            self.messages.append("ATTENTION : deux images différentes pour %s" % chemin)
+            self.messages.append(f"ATTENTION : deux images différentes pour {chemin}")
         self.fichiers[chemin] = octets
 
 
@@ -320,7 +319,7 @@ def extrait(src):
                 for item in obj.props.get("Images", []):
                     nom = item["Name"]
                     sources = item.get("SourceImages", [])
-                    for k, source in enumerate(sources):
+                    for _k, source in enumerate(sources):
                         png = bytes(source["Image.Data"])
                         largeur, hauteur = taille_png(png)
                         base = "images/" + "/".join(nom_fichier_sur(p) for p in nom.split("\\"))
@@ -342,7 +341,7 @@ def extrait(src):
             if "Glyph.Data" in obj.props:
                 donnees = bytes(obj.props["Glyph.Data"])
                 bmp = donnees[4:]
-                base = "images/%s/%s" % (fiche, nom_fichier_sur(obj.nom))
+                base = f"images/{fiche}/{nom_fichier_sur(obj.nom)}"
                 png, largeur, hauteur = bmp_vers_png(bmp, transparent=True)
                 ex.ajoute(base + ".bmp", bmp)
                 ex.ajoute(base + ".png", png)
@@ -356,7 +355,7 @@ def extrait(src):
                 n = donnees[0]
                 classe_image = donnees[1:1 + n].decode("ascii")
                 reste = donnees[1 + n:]
-                base = "images/%s/%s" % (fiche, nom_fichier_sur(obj.nom))
+                base = f"images/{fiche}/{nom_fichier_sur(obj.nom)}"
                 if classe_image == "TPngImage":
                     largeur, hauteur = taille_png(reste)
                     ex.ajoute(base + ".png", reste)
@@ -367,8 +366,7 @@ def extrait(src):
                     ex.ajoute(base + ".bmp", bmp)
                     ex.ajoute(base + ".png", png)
                 else:
-                    ex.messages.append("ATTENTION : %s.%s : Picture de classe %s non prise en charge"
-                                       % (fiche, obj.nom, classe_image))
+                    ex.messages.append(f"ATTENTION : {fiche}.{obj.nom} : Picture de classe {classe_image} non prise en charge")
                     continue
                 ex.composants.append({"fiche": fiche, "composant": obj.nom, "classe": obj.classe,
                                       "propriete": "Picture", "fichier": base + ".png",
@@ -494,7 +492,7 @@ def png_pixels(donnees):
             elif couleur == 4:
                 pixels.append((valeurs[0],) * 3 + (valeurs[1],))
             elif couleur == 2:
-                pixels.append(tuple(valeurs) + (255,))
+                pixels.append((*tuple(valeurs), 255))
             else:
                 pixels.append(tuple(valeurs))
         lignes.append(pixels)
@@ -506,14 +504,14 @@ def controle_res_png(ex, res, racine, rapport):
     (recherchés par nom, dans tous les sous-dossiers)."""
     affichage = os.path.relpath(res, racine)
     if not os.path.isdir(res):
-        rapport.append("Dossier %s absent : contrôle croisé non effectué." % affichage)
+        rapport.append(f"Dossier {affichage} absent : contrôle croisé non effectué.")
         return True
     references = {}
     for dossier, _, fichiers in os.walk(res):
         for f in sorted(fichiers):
             if f.lower().endswith(".png"):
                 references.setdefault(os.path.splitext(f)[0], []).append(os.path.join(dossier, f))
-    rapport.append("Contrôle croisé des collections avec %s :" % affichage)
+    rapport.append(f"Contrôle croisé des collections avec {affichage} :")
     ok = True
     noms_vus = set()
     for fiche, collections in ex.collections.items():
@@ -527,7 +525,7 @@ def controle_res_png(ex, res, racine, rapport):
                 candidats = references.get(cle, [])
                 if not candidats:
                     absents += 1
-                    details.append("    absente : %s" % elt["nom"])
+                    details.append("    absente : {}".format(elt["nom"]))
                     continue
                 with open(candidats[0], "rb") as f:
                     ref = f.read()
@@ -538,18 +536,18 @@ def controle_res_png(ex, res, racine, rapport):
                 else:
                     differents += 1
                     ok = False
-                    details.append("    DIFFÉRENTE : %s / %s" % (elt["nom"], os.path.relpath(candidats[0], racine)))
+                    details.append("    DIFFÉRENTE : {} / {}".format(elt["nom"], os.path.relpath(candidats[0], racine)))
             rapport.append("  %s.dfm, %s : %d identiques à l'octet près, %d au pixel près, %d différentes, %d absentes"
                            % (fiche, nom_collection, identiques, memes_pixels, differents, absents))
             rapport.extend(details)
     en_trop = sorted(set(references) - noms_vus)
     if en_trop:
-        rapport.append("  Présentes dans %s mais dans aucune collection : %s" % (affichage, ", ".join(en_trop)))
+        rapport.append("  Présentes dans {} mais dans aucune collection : {}".format(affichage, ", ".join(en_trop)))
     return ok
 
 
 def entete_cpp(ex):
-    l = ["//---------------------------------------------------------------------------",
+    lignes = ["//---------------------------------------------------------------------------",
          "// index_images.h - GÉNÉRÉ par tools/extrait_images.py : ne pas modifier",
          "//",
          "// Indices des TVirtualImageList de f_simul.dfm -> images des ressources Qt.",
@@ -559,28 +557,28 @@ def entete_cpp(ex):
          "#ifndef index_imagesH", "#define index_imagesH", ""]
     for fiche, listes in ex.listes.items():
         for nom_liste, liste in listes.items():
-            l.append("// %s.dfm, %s : %d images %dx%d" % (fiche, nom_liste, len(liste["images"]),
+            lignes.append("// %s.dfm, %s : %d images %dx%d" % (fiche, nom_liste, len(liste["images"]),
                                                           liste["largeur"], liste["hauteur"]))
-            l.append("const int NB_%s_%s=%d;" % (fiche.upper(), nom_liste, len(liste["images"])))
-            l.append("const char *const %s_%s[NB_%s_%s]=" % (fiche, nom_liste, fiche.upper(), nom_liste))
-            l.append(" {")
+            lignes.append("const int NB_%s_%s=%d;" % (fiche.upper(), nom_liste, len(liste["images"])))
+            lignes.append(f"const char *const {fiche}_{nom_liste}[NB_{fiche.upper()}_{nom_liste}]=")
+            lignes.append(" {")
             for i, img in enumerate(liste["images"]):
                 fichier = fichier_de_collection(ex, fiche, liste["collection"], img["collection"])
-                l.append('  ":/%s", // %d : %s' % (fichier, i, img["collection"].replace("\\", "/")))
-            l.append(" };")
-            l.append("")
-    l.append("#endif")
-    return "\n".join(l) + "\n"
+                lignes.append('  ":/%s", // %d : %s' % (fichier, i, img["collection"].replace("\\", "/")))
+            lignes.append(" };")
+            lignes.append("")
+    lignes.append("#endif")
+    return "\n".join(lignes) + "\n"
 
 
 def qrc(ex):
-    l = ['<!DOCTYPE RCC>', '<!-- GÉNÉRÉ par tools/extrait_images.py : ne pas modifier -->', '<RCC version="1.0">',
+    lignes = ['<!DOCTYPE RCC>', '<!-- GÉNÉRÉ par tools/extrait_images.py : ne pas modifier -->', '<RCC version="1.0">',
          '  <qresource prefix="/">']
     for chemin in ex.fichiers:
         if chemin.endswith(".png"):
-            l.append("    <file>%s</file>" % chemin)
-    l += ["  </qresource>", "</RCC>"]
-    return "\n".join(l) + "\n"
+            lignes.append(f"    <file>{chemin}</file>")
+    lignes += ["  </qresource>", "</RCC>"]
+    return "\n".join(lignes) + "\n"
 
 
 def index_json(ex):

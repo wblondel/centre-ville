@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Recense les conditions dont la borne d'un indice est testée après son usage.
 
 Audit de la 6.0.1 (engine/README.md, « Audit des lectures hors tableau ») :
@@ -85,8 +84,9 @@ def sans_parentheses(x):
 
 
 def audite(nom, mots):
-    s = sans_commentaires(open(nom, encoding='utf-8').read())
-    for m in re.finditer(r'\b(%s)\s*\(' % '|'.join(mots), s):
+    with open(nom, encoding='utf-8') as f:
+        s = sans_commentaires(f.read())
+    for m in re.finditer(r'\b({})\s*\('.format('|'.join(mots)), s):
         i = m.end() - 1
         entete = s[i + 1:parenthese(s, i)]
         if m.group(1) == 'for':
@@ -106,7 +106,7 @@ def audite(nom, mots):
             v = b.group(1)
             if variables is not None and v not in variables:
                 continue
-            avant = [a for a in termes[:k] if re.search(r'\b%s\b' % v, a)]
+            avant = [a for a in termes[:k] if re.search(rf'\b{v}\b', a)]
             if avant:
                 print('%s:%d  borne « %s » après : %s'
                       % (nom, s.count('\n', 0, m.start()) + 1, terme, ' && '.join(avant)))
