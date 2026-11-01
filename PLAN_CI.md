@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `tests-moteur.yml` | PR et `main` | 90 min-machine | 27 min (ASan macOS) |
 | `build-installer.yml` | tag `v*` | 34 min-machine | environ 25 min |
-| `recette-windows.yml` | appelé après la release, ou à la main | 10 min-machine | 7 min |
+| `recette-windows.yml` | appelé avant la release, ou à la main | 10 min-machine | 7 min |
 | `deploy-docs.yml` | `docs/` sur `main` | moins de 1 min | moins de 1 min |
 
 Déjà en place : permissions en lecture par défaut, écriture limitée au job de release, CodeQL (actions, C++, Python), détection de secrets avec blocage au push, alertes Dependabot, Catch2 vérifié par SHA256, 10 jobs requis sur `main`.
@@ -29,12 +29,15 @@ Déjà en place : permissions en lecture par défaut, écriture limitée au job 
 
 Non retenu : l'option `sha_pinning_required` du dépôt. `jurplel/install-qt-action` appelle en interne des actions épinglées par étiquette, ce qui risquerait de bloquer toute la CI. `zizmor` vérifie les workflows du dépôt à chaque PR.
 
-## 2. Fiabilité des releases (priorité haute)
+## 2. Fiabilité des releases (fait)
 
-- [ ] **Recette Windows avant la publication**, sur l'artefact et non sur la release. Aujourd'hui, une recette en échec laisse une release publiée.
-- [ ] **`timeout-minutes` sur tous les jobs** : seul le job ASan en a un, les autres ont le défaut de 6 h.
-- [ ] **Runners et Qt figés** : `ubuntu-24.04`, `macos-15`, `windows-2025` plutôt que `-latest`, et une version exacte de Qt plutôt que `6.8.*`. Un changement d'image ne doit pas casser une release sans modification du dépôt. Prévoir le remplacement de `ubuntu-22.04`, dont le support standard finit en avril 2027.
-- [ ] **Run hebdomadaire** de la suite complète, pour voir les dérives d'images sans attendre une PR.
+- [x] **Releases immuables** : les paquets publiés et leur tag ne peuvent plus changer. Une release ratée se corrige par une nouvelle version, et son nom de tag ne resservira pas.
+- [x] **Recette Windows avant la publication**, sur l'artefact et non sur la release : un échec empêche la release.
+- [x] **Contrôle du contenu** : exactement les 5 paquets attendus. Le job de release tourne aussi à la main, sans publier, ce qui l'éprouve hors d'un tag.
+- [x] **`timeout-minutes` sur tous les jobs**, au lieu du défaut de 6 h.
+- [x] **Images et Qt figés** : `ubuntu-24.04`, `macos-26`, `windows-2025-vs2026`, Qt 6.8.3. Checks requis nommés par système, pour qu'un changement d'image ne les touche pas.
+- [x] **Run hebdomadaire** de la suite complète, le lundi.
+- [ ] **Remplacer `ubuntu-22.04`** pour l'AppImage, gardée pour sa glibc 2.35 : son support standard finit en avril 2027.
 
 ## 3. Optimisation (priorité moyenne)
 
