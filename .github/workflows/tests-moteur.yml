@@ -8,6 +8,9 @@ name: Tests moteur
 # Compile aussi l'application Qt (cvw) sur les trois systèmes et exécute le
 # test de son interface (pilotage de Démo.cvw, sans affichage).
 #
+# Noms des jobs par système (Linux, macOS, Windows) et non par image : ce sont les checks
+# exigés, ils ne changent pas quand on passe à une nouvelle image.
+#
 # Les 10 jobs sont exigés sur main : ils doivent donc exister sur TOUTES les PR,
 # sinon une PR qui ne touche que la documentation reste bloquée. Le workflow se
 # lance sur chaque PR ; le job « changements » regarde si la PR touche un
@@ -28,6 +31,9 @@ name: Tests moteur
 # sur un constat absent de tools/lint/clang-tidy-reference.txt (tools/lint_cpp.py).
 
 on:
+  # Chaque semaine : voir les dérives des outils et des images sans attendre une PR
+  schedule:
+    - cron: '17 3 * * 1'
   push:
     branches:
       - main
@@ -59,7 +65,8 @@ concurrency:
 jobs:
   changements:
     name: Changements à tester
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
       code: ${{ steps.filtre.outputs.code }}
 
@@ -94,10 +101,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - {os: Linux, image: ubuntu-24.04}
+          - {os: macOS, image: macos-26}
+          - {os: Windows, image: windows-2025-vs2026}
     needs: changements
     if: ${{ !cancelled() }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.image }}
+    timeout-minutes: 30
 
     steps:
       - name: Aucun fichier testé n'a changé
@@ -134,10 +145,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - {os: Linux, image: ubuntu-24.04}
+          - {os: macOS, image: macos-26}
+          - {os: Windows, image: windows-2025-vs2026}
     needs: changements
     if: ${{ !cancelled() }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.image }}
+    timeout-minutes: 30
 
     steps:
       - name: Aucun fichier testé n'a changé
@@ -159,7 +174,7 @@ jobs:
         if: needs.changements.outputs.code != 'false'
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
-          version: '6.8.*'
+          version: '6.8.3'
           cache: true
 
       - name: Configure (CMake preset ci, Qt obligatoire)
@@ -188,7 +203,8 @@ jobs:
     name: Fiches .ui générées à jour
     needs: changements
     if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
 
     steps:
       - name: Checkout repository
@@ -202,7 +218,8 @@ jobs:
     name: Images extraites des .dfm à jour
     needs: changements
     if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
 
     steps:
       - name: Checkout repository
@@ -217,11 +234,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        include:
+          - {os: Linux, image: ubuntu-24.04}
+          - {os: macOS, image: macos-26}
     needs: changements
     if: ${{ !cancelled() }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    runs-on: ${{ matrix.image }}
+    timeout-minutes: 60
 
     steps:
       - name: Aucun fichier testé n'a changé
@@ -247,7 +266,7 @@ jobs:
         if: needs.changements.outputs.code != 'false'
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
-          version: '6.8.*'
+          version: '6.8.3'
           cache: true
 
       - name: Configure (CMake preset asan)
@@ -273,7 +292,7 @@ jobs:
 
   lint-outils:
     name: Lint Python et workflows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -304,7 +323,7 @@ jobs:
     name: Lint C++ (clang-tidy)
     needs: changements
     if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -321,7 +340,7 @@ jobs:
       - name: Install Qt 6.8 LTS
         uses: jurplel/install-qt-action@b344308e4483fc892e0d27b3cd1b173ebdd95f06 # v4.5.0
         with:
-          version: '6.8.*'
+          version: '6.8.3'
           cache: true
 
       # clang-tidy lit compile_commands.json et les en-têtes générés : rien d'autre à compiler

@@ -11,7 +11,7 @@ l'installation, le système de fichiers, ni les navigateurs. Noter chaque
 Paquet : `Centre-Ville-<version>-Windows-x64-Setup.exe`.
 
 Sans machine Windows : le workflow « Recette Windows »
-(`.github/workflows/recette-windows.yml`, lancé après chaque release, ou à la main sur un tag) refait
+(`.github/workflows/recette-windows.yml`, lancé avant chaque release, ou à la main sur un tag) refait
 sur une machine Windows de GitHub l'installation, l'ouverture d'un `.cvw` par
 son association, F1, « À propos » et la désinstallation, sur une machine
 neuve et en mise à jour d'une 5.4.3.2 installée par l'installeur d'origine
