@@ -284,8 +284,9 @@ jobs:
       - name: Python (ruff)
         run: '"$RUNNER_TEMP/lint/bin/ruff" check tools'
 
-      - name: Workflows (actionlint)
-        run: '"$RUNNER_TEMP/lint/bin/actionlint"'
+      # PATH : le shellcheck de requirements.txt, pas celui de la machine
+      - name: Workflows (actionlint, shellcheck)
+        run: PATH="$RUNNER_TEMP/lint/bin:$PATH" actionlint
 
   lint-cpp:
     name: Lint C++ (clang-tidy)

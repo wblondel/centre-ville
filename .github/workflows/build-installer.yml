@@ -183,7 +183,7 @@ jobs:
       - name: Package (CPack DragNDrop)
         working-directory: build/ci
         run: |
-          for essai in 1 2 3; do
+          for _ in 1 2 3; do
             if cpack; then
               [ "$PAQUET" = "$VERSION" ] || mv "Centre-Ville-$VERSION-macOS.dmg" "Centre-Ville-$PAQUET-macOS.dmg"
               exit 0
@@ -319,7 +319,7 @@ jobs:
 
       - name: Check AppImage
         run: |
-          ./Centre-Ville-$PAQUET-x86_64.AppImage --appimage-extract > /dev/null
+          "./Centre-Ville-$PAQUET-x86_64.AppImage" --appimage-extract > /dev/null
           for f in usr/bin/cvw usr/bin/qt.conf usr/bin/html/index.html usr/bin/tutocv/index.html \
                    usr/plugins/platforms/libqxcb.so usr/translations/qtbase_fr.qm \
                    usr/share/mime/packages/fr.patquoi.CentreVille.xml \
@@ -340,7 +340,7 @@ jobs:
           timeout 20 xvfb-run -a "./Centre-Ville-$PAQUET-x86_64.AppImage" > lancement.log 2>&1 || code=$?
           if [ "$code" -ne 124 ]; then cat lancement.log; echo "::error::l'AppImage ne démarre pas (code $code)"; exit 1; fi
           ls "$HOME/.local/share/Patquoi.fr/Centre-Ville"
-          test "$(ls "$HOME/.local/share/Patquoi.fr/Centre-Ville"/*.cvw | wc -l)" -eq 6
+          test "$(find "$HOME/.local/share/Patquoi.fr/Centre-Ville" -maxdepth 1 -name '*.cvw' | wc -l)" -eq 6
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4

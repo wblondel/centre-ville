@@ -62,5 +62,5 @@ Sans intérêt pour un dépôt à un seul mainteneur et un jeu à un seul joueur
 
 - **C++** : `clang-tidy`, règles de bogues et de performance (`.clang-tidy`). Le code porté garde le style de l'original pour rester comparable à `src/` : pas de `clang-format`, et les 251 constats existants sont dans `tools/lint/clang-tidy-reference.txt`. Seuls les nouveaux font échouer la CI.
 - **Python** : `ruff` (`ruff.toml`), sans constat restant.
-- **Workflows** : `actionlint`, sans constat restant.
+- **Workflows** : `actionlint` et `shellcheck` pour leurs scripts, sans constat restant.
 - **Versions** : figées dans `tools/lint/requirements.txt`.

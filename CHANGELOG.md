@@ -20,7 +20,8 @@ simulation (golden master identique).
 
 ### Outillage
 
-`clang-tidy` pour le C++, `ruff` pour le Python, `actionlint` pour les workflows, dans la CI.
+`clang-tidy` pour le C++, `ruff` pour le Python, `actionlint` et `shellcheck` pour les workflows,
+dans la CI.
 Voir `README.md`, « Lint », et `PLAN_CI.md`.
 
 ## [6.0.5] — feux et zone générée, lectures et écritures hors des tableaux corrigées

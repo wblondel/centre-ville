@@ -111,7 +111,7 @@ Les versions sont dans `tools/lint/requirements.txt`, et la CI lance les mêmes 
 ```bash
 python3 -m venv .venv-lint && .venv-lint/bin/pip install -r tools/lint/requirements.txt
 .venv-lint/bin/ruff check tools
-.venv-lint/bin/actionlint
+PATH=".venv-lint/bin:$PATH" actionlint
 cmake --preset dev && cmake --build --preset dev
 .venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
 ```
