@@ -1,0 +1,18 @@
+# Mises à jour groupées et mensuelles : chaque PR coûte un run complet de la CI. Les failles
+# connues passent à part, par les mises à jour de sécurité de Dependabot.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /tools/lint
+    schedule:
+      interval: monthly
+    groups:
+      lint:
+        patterns: ["*"]
