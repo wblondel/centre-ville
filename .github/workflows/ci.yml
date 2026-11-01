@@ -1,4 +1,4 @@
-name: Tests moteur
+name: CI
 
 # Compile le moteur et l'application sur les trois systèmes et lance toute la suite :
 # round-trip des cartes .cvw, Verifie(), golden master de la simulation (identique sur
@@ -8,8 +8,8 @@ name: Tests moteur
 # Noms des jobs par système (Linux, macOS, Windows) et non par image : ce sont les checks
 # exigés, ils ne changent pas quand on passe à une nouvelle image.
 #
-# Six jobs sont exigés sur main : Tests (trois systèmes), ASan et UBSan (Linux), Fiches
-# et Images. Ils doivent donc exister sur TOUTES les PR, sinon une PR qui ne touche que la
+# Huit jobs sont exigés sur main : Tests (trois systèmes), ASan et UBSan (Linux), Fiches,
+# Images et les deux de lint. Ils doivent donc exister sur TOUTES les PR, sinon une PR qui ne touche que la
 # documentation reste bloquée. Le job « changements » regarde si le commit touche un
 # fichier dont dépendent la compilation ou les tests. Si ce n'est pas le cas, les jobs se
 # terminent tout de suite sans rien compiler. Les jobs à matrice sautent leurs étapes
@@ -21,6 +21,9 @@ name: Tests moteur
 # sur les PR ; aussi sous macOS sur main et chaque semaine. Une erreur d'UBSan arrête le
 # test (halt_on_error), sinon elle ne ferait qu'un message. Les fuites ne sont pas
 # cherchées (detect_leaks=0) : LSan, sous Linux seulement, signalerait aussi celles de Qt.
+#
+# Job « couverture » : chaque semaine, ou à la main. Rapport à lire, sans seuil : un
+# pourcentage imposé pousserait à tester les boutons d'aide plutôt que ce qui compte.
 #
 # Jobs de lint : tools/lint/requirements.txt fixe les versions. clang-tidy n'échoue que
 # sur un constat absent de tools/lint/clang-tidy-reference.txt (tools/lint_cpp.py).
@@ -39,7 +42,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: tests-moteur-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }} # Un run de main va au bout
 
 jobs:
@@ -70,7 +73,7 @@ jobs:
           fi
           fichiers=$(git diff --name-only HEAD^1 HEAD)
           echo "$fichiers"
-          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^ruff\.toml$|^\.github/workflows/tests-moteur\.yml$|^\.github/actions/' <<< "$fichiers"; then
+          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^ruff\.toml$|^\.github/workflows/ci\.yml$|^\.github/actions/' <<< "$fichiers"; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
             echo "code=false" >> "$GITHUB_OUTPUT"
@@ -287,3 +290,50 @@ jobs:
           path: build/lint/constats-clang-tidy.txt
           if-no-files-found: ignore
           retention-days: 14
+
+  couverture:
+    name: Couverture des tests
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Prepare Qt, Ninja and Clang
+        uses: ./.github/actions/prepare-qt
+        with:
+          ninja: 'true'
+          paquets-linux: clang llvm
+
+      - name: Build with coverage
+        run: |
+          options="-fprofile-instr-generate -fcoverage-mapping"
+          cmake -S . -B build/couverture -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCV_APP=ON -DCV_TESTS=ON \
+            -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="$options" -DCMAKE_EXE_LINKER_FLAGS="$options"
+          cmake --build build/couverture --parallel
+
+      - name: Run tests (CTest)
+        run: ctest --test-dir build/couverture --parallel 4 --output-on-failure
+        env:
+          QT_QPA_PLATFORM: offscreen
+          LLVM_PROFILE_FILE: ${{ github.workspace }}/build/couverture/profils/%p-%m.profraw
+
+      - name: Report
+        run: |
+          llvm-profdata merge -sparse build/couverture/profils/*.profraw -o build/couverture/tout.profdata
+          b=build/couverture/tests
+          llvm-cov report "$b/test_interface" -object "$b/cvtests" -object "$b/cvtests_motif" -object "$b/test_aide" \
+            -object "$b/test_cartes" -instr-profile=build/couverture/tout.profdata \
+            -ignore-filename-regex='(build/|tests/|_deps|/Qt/|ui_|moc_|qrc_)' > couverture.txt
+          { echo '```'; tail -1 couverture.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: couverture
+          path: couverture.txt
+          retention-days: 30
