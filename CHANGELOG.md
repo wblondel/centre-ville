@@ -4,6 +4,25 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.6] — deux accès hors tableau corrigés, linter
+
+Cette version corrige deux accès hors tableau de l'original, trouvés par le nouveau linter et
+confirmés par AddressSanitizer. Le format des fichiers `.cvw` ne change pas (0x530), ni la
+simulation (golden master identique).
+
+### Bogues corrigés
+
+- **Case avec trois ou quatre feux** : pendant le choix d'une liste de feux, le double-clic
+  écrivait hors d'un tableau de deux éléments (plantage possible). Le double-clic parcourt
+  maintenant les deux premiers feux de la case : les suivants ne peuvent pas être choisis.
+- **Effacer une sélection contenant un arrêt de bus ou de tram** : lecture hors du tableau
+  pour le dernier arrêt.
+
+### Outillage
+
+`clang-tidy` pour le C++, `ruff` pour le Python, `actionlint` pour les workflows, dans la CI.
+Voir `README.md`, « Lint », et `PLAN_CI.md`.
+
 ## [6.0.5] — feux et zone générée, lectures et écritures hors des tableaux corrigées
 
 Cette version corrige les listes de feux, la suppression d'un feu que d'autres feux utilisent

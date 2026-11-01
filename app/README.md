@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.5)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.6)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -571,6 +571,13 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.6 (annotées `// v6.0.6`)
+
+| Commande | Original | 6.0.6 |
+|---|---|---|
+| Double-clic pendant le choix d'une liste de feux | `NumFeuVoie[2]` reçoit jusqu'à 4 feux. | Les 2 premiers seulement : le cycle de sélection n'en gère pas plus. |
+| Effacer une sélection (`SupprimeArretsUtilisesDansSelection`) | `ArretBusDejaVu[NumArret]`, numéro à partir de 1. | `NumArret-1`, comme dans la fonction de confirmation. |
 
 ## Corrections de la 6.0.5 (annotées `// v6.0.5`)
 
