@@ -69,6 +69,8 @@
 //     d'une sélection ;
 //   - feux (v6.0.5) : fiche Feux, listes par double-clic, suppression d'un feu
 //     référencé par un feu ou un feu de piétons, effacement d'une sélection ;
+//   - fiches de configuration, champ par champ (Paramètres, bus, tram, taxi, vehlib, feux,
+//     feux de piétons) : Annuler, OK, enregistrement et réouverture, réaffichage ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
 //     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 //     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
@@ -592,6 +594,100 @@ class TestInterface : public QObject
     frmSimulation->ActionSegmentRoute->Execute();
     CliqueCase(x2, y2); // Fin de la sélection, comme avant la commande suivante
    }
+  // Un champ d'une fiche de configuration : borné, lu à l'écran, saisi, et sa valeur dans le réseau
+  struct ChampFiche
+   {
+    const char *Nom;
+    std::function<int()> Min, Max, Ecran;
+    std::function<void(int)> Saisit;
+    std::function<int()> Lu;
+    int Cible=0;
+   };
+  ChampFiche ChampSpin(const char *Nom, std::function<TCSpinEdit *()> Champ, std::function<int()> Lu)
+   {
+    ChampFiche c;
+    c.Nom=Nom;
+    c.Min=[Champ]() { return (int)Champ()->MinValue; };
+    c.Max=[Champ]() { return (int)Champ()->MaxValue; };
+    c.Ecran=[Champ]() { return (int)Champ()->Value; };
+    c.Saisit=[Champ](int v) { Champ()->Value=v; };
+    c.Lu=Lu;
+    return c;
+   }
+  ChampFiche ChampRadio(const char *Nom, std::function<TRadioGroup *()> Groupe, std::function<int()> Lu)
+   {
+    ChampFiche c;
+    c.Nom=Nom;
+    c.Min=[]() { return 0; };
+    c.Max=[Groupe]()
+     {
+      int n=0;
+      while (Groupe()->findChild<QRadioButton *>(Groupe()->objectName()+"_"+QString::number(n+1))) n++;
+      return n;
+     };
+    c.Ecran=[Groupe]() { return (int)Groupe()->ItemIndex; };
+    c.Saisit=[this, Groupe](int v) { CliqueChoix(Groupe(), v); };
+    c.Lu=Lu;
+    return c;
+   }
+  // Annuler n'écrit rien ; OK écrit chaque champ ; enregistrer et rouvrir garde les valeurs, que
+  // la fiche réaffiche. Valeurs différentes entre champs si possible : un champ écrit à la place
+  // d'un autre se voit. Dans : ouvre la fiche, y exécute l'action, referme ce qui l'entoure
+  void VerifieChamps(const char *Fiche, const QString &asFichier, std::function<void(std::function<void()>)> Dans,
+                     std::function<QWidget *()> BoutonOk, std::function<QWidget *()> BoutonAnnuler, std::vector<ChampFiche> Champs)
+   {
+    QStringList Ecarts;
+    auto Saisit=[&Champs]()
+     {
+      QList<int> Prises;
+      for(ChampFiche &c : Champs)
+       {
+        const int Actuel=c.Ecran(), Min=c.Min(), Max=c.Max();
+        int Choix=Actuel;
+        for(int Ecart=1; (Ecart<=Max-Min)&&(Choix==Actuel||Prises.contains(Choix)); Ecart++)
+         {
+          if ((Actuel+Ecart<=Max)&&!Prises.contains(Actuel+Ecart)) Choix=Actuel+Ecart;
+          else if ((Actuel-Ecart>=Min)&&!Prises.contains(Actuel-Ecart)) Choix=Actuel-Ecart;
+         }
+        if (Choix==Actuel) Choix=(Actuel<Max)?Actuel+1:Actuel-1; // Trop peu de valeurs : la même qu'un autre champ
+        c.Cible=Choix;
+        Prises<<Choix;
+        c.Saisit(Choix);
+       }
+     };
+    auto Compare=[&](const char *Etape, std::function<int(const ChampFiche &)> Attendu, std::function<int(const ChampFiche &)> Obtenu)
+     {
+      for(const ChampFiche &c : Champs)
+       if (Obtenu(c)!=Attendu(c))
+        Ecarts<<QString::fromUtf8("%1, %2, %3 : %4 au lieu de %5").arg(QString::fromUtf8(Fiche), QString::fromUtf8(Etape), QString::fromUtf8(c.Nom))
+                                                                  .arg(Obtenu(c)).arg(Attendu(c));
+     };
+    std::vector<int> Avant;
+    for(const ChampFiche &c : Champs) Avant.push_back(c.Lu());
+    // Annuler
+    Dans([&]() { Saisit(); Clique(BoutonAnnuler()); });
+    if (QTest::currentTestFailed()) return;
+    for(size_t i=0; i<Champs.size(); i++)
+     if (Champs[i].Lu()!=Avant[i])
+      Ecarts<<QString::fromUtf8("%1, Annuler, %2 : écrit").arg(QString::fromUtf8(Fiche), QString::fromUtf8(Champs[i].Nom));
+    // OK
+    Messages.clear();
+    Dans([&]() { Saisit(); Clique(BoutonOk()); });
+    if (QTest::currentTestFailed()) return;
+    Compare("OK", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Lu(); });
+    // Enregistrer et rouvrir, puis la fiche réaffiche
+    Enregistre(asFichier);
+    OuvreFichier(asFichier);
+    Compare("réouverture", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Lu(); });
+    Dans([&]()
+     {
+      Compare("réaffichage", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Ecran(); });
+      Clique(BoutonAnnuler());
+     });
+    if (QTest::currentTestFailed()) return;
+    QVERIFY2(Etapes.empty(), Fiche);
+    QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+   }
   void DoubleCliqueCase(int x, int y)
    { // Double-clic de l'utilisateur sur la case : choix d'un feu pendant une sélection
     GrilleSimulation *g=frmSimulation->DrawGridSimul;
@@ -715,6 +811,9 @@ class TestInterface : public QObject
   void fichePietonSuiviAilleurs();
   void dimensionsZoneBornees();
   void nouvelleZoneGenereePlusPetite();
+  void parametresChampParChamp();
+  void feuxChampParChamp();
+  void ficheVehiculeNiveauxDePriorite();
   void parametresSansParking();
   void parcoursEdition();
   void editionMarqueLaCarteModifiee();
@@ -3817,6 +3916,165 @@ void TestInterface::nouvelleZoneGenereePlusPetite()
   QCOMPARE(cv->NbY, NBYMIN+2);
   QCOMPARE(frmSimulation->DrawGridSimul->ColCount, NBXMIN+2);
   QCOMPARE(frmSimulation->DrawGridSimul->RowCount, NBYMIN+2);
+ }
+//---------------------------------------------------------------------------
+// Fiches de configuration, champ par champ
+//---------------------------------------------------------------------------
+void TestInterface::parametresChampParChamp()
+ { // Paramètres et ses fiches filles, sur Géant, qui a des bus, des trams, des taxis et
+   // des vehlibs
+  const QString f=OuvreCarte(QString::fromUtf8("Géant.cvw"), "champs_parametres.cvw");
+  QVERIFY(!f.isEmpty());
+  Focalise();
+  QVERIFY(cv->NbArretsBus&&cv->NbArretsTram&&cv->NbPlacesTaxi&&cv->NbPlacesVehlib);
+  // Paramètres de la simulation
+  auto DansParametres=[this](std::function<void()> Action)
+   {
+    QuandModale([]() { return frmParamSimul; }, Action);
+    Clique(frmSimulation->ToolButtonParametres);
+   };
+  auto DansFille=[this](std::function<QWidget *()> Fiche, TBitBtn *TfrmParamSimul::*Bouton, std::function<void()> Action)
+   {
+    QuandModale([]() { return frmParamSimul; }, [this, Bouton]() { Clique(frmParamSimul->*Bouton); });
+    QuandModale(Fiche, Action);
+    QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->ButtonAnnuler); });
+    Clique(frmSimulation->ToolButtonParametres);
+   };
+  VerifieChamps("Paramètres", f, DansParametres, []() { return frmParamSimul->ButtonOk; }, []() { return frmParamSimul->ButtonAnnuler; },
+   {
+    ChampSpin("durée du vert", []() { return frmParamSimul->CSpinEditDureeVert; }, []() { return (int)cv->DureeVert; }),
+    ChampSpin("durée de l'orange", []() { return frmParamSimul->CSpinEditDureeOrange; }, []() { return (int)cv->DureeOrange; }),
+    ChampSpin("durée du rouge", []() { return frmParamSimul->CSpinEditDureeRouge; }, []() { return (int)cv->DureeRouge; }),
+    ChampSpin("attente avant choix", []() { return frmParamSimul->CSpinEditAttenteAvChx; }, []() { return (int)cv->AttenteMaxVeh; }),
+    ChampSpin("tours par seconde", []() { return frmParamSimul->CSpinEditNbToursParSeconde; }, []() { return (int)cv->NbToursParSeconde; }),
+    ChampSpin("cases du passage piéton", []() { return frmParamSimul->CSpinEditNbCasesMaxPsgPtn; }, []() { return (int)cv->NbMaxCasesDetectPsgPt; }),
+    ChampSpin("probabilité du passage piéton", []() { return frmParamSimul->CSpinEditProbaPsgPt; }, []() { return (int)cv->ProbaDirPsgPt; }),
+    ChampRadio("vitesses", []() { return frmParamSimul->RadioGroupVitesses; }, []() { return (int)cv->NbVitesses-1; }),
+   });
+  if (QTest::currentTestFailed()) return;
+  // Bus
+  VerifieChamps("Bus", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamBus; }, &TfrmParamSimul::BitBtnDefLignesBus, Action); },
+                []() { return frmParamBus->ButtonOk; }, []() { return frmParamBus->ButtonAnnuler; },
+   {
+    ChampSpin("personnes par bus", []() { return frmParamBus->CSpinEditNbMaxPersonnesBus; }, []() { return (int)cv->NbMaxPersonnesBus; }),
+    ChampSpin("arrêt aux stations", []() { return frmParamBus->CSpinEditNbToursStopArretBus; }, []() { return (int)cv->NbToursStopArretBus; }),
+    ChampSpin("cases vers un arrêt", []() { return frmParamBus->CSpinEditNbCasesMaxArretBus; }, []() { return (int)cv->NbMaxCasesDetectArretBus; }),
+    ChampSpin("probabilité vers un arrêt", []() { return frmParamBus->CSpinEditProbaDirArretBus; }, []() { return (int)cv->ProbaDirArretBus; }),
+    ChampSpin("attente maximale", []() { return frmParamBus->CSpinEditNbMaxToursAttenteBus; }, []() { return (int)cv->NbMaxToursAttenteBus; }),
+    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamBus->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretBusDmd; }),
+   });
+  if (QTest::currentTestFailed()) return;
+  // Tram
+  VerifieChamps("Tram", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTram; }, &TfrmParamSimul::BitBtnDefLignesTram, Action); },
+                []() { return frmParamTram->ButtonOk; }, []() { return frmParamTram->ButtonAnnuler; },
+   {
+    ChampSpin("personnes par tram", []() { return frmParamTram->CSpinEditNbMaxPersonnesTram; }, []() { return (int)cv->NbMaxPersonnesTram; }),
+    ChampSpin("arrêt aux stations", []() { return frmParamTram->CSpinEditNbToursStopArretTram; }, []() { return (int)cv->NbToursStopArretTram; }),
+    ChampSpin("cases vers un arrêt", []() { return frmParamTram->CSpinEditNbCasesMaxArretTram; }, []() { return (int)cv->NbMaxCasesDetectArretTram; }),
+    ChampSpin("probabilité vers un arrêt", []() { return frmParamTram->CSpinEditProbaDirArretTram; }, []() { return (int)cv->ProbaDirArretTram; }),
+    ChampSpin("attente maximale", []() { return frmParamTram->CSpinEditNbMaxToursAttenteTram; }, []() { return (int)cv->NbMaxToursAttenteTram; }),
+    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamTram->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretTramDmd; }),
+   });
+  if (QTest::currentTestFailed()) return;
+  // Taxi
+  VerifieChamps("Taxi", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTaxi; }, &TfrmParamSimul::BitBtnDefTaxis, Action); },
+                []() { return frmParamTaxi->ButtonOk; }, []() { return frmParamTaxi->ButtonAnnuler; },
+   {
+    ChampSpin("personnes par taxi", []() { return frmParamTaxi->CSpinEditNbMaxPersonnesTaxi; }, []() { return (int)cv->NbMaxPersonnesTaxi; }),
+    ChampSpin("cases vers une place", []() { return frmParamTaxi->CSpinEditNbCasesMaxPlaceTaxi; }, []() { return (int)cv->NbMaxCasesDetectFileTaxi; }),
+    ChampSpin("probabilité vers une place", []() { return frmParamTaxi->CSpinEditProbaDirPlaceTaxi; }, []() { return (int)cv->ProbaDirFileTaxi; }),
+    ChampSpin("attente maximale", []() { return frmParamTaxi->CSpinEditNbMaxToursAttente; }, []() { return (int)cv->NbMaxToursAttenteTaxi; }),
+    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamTaxi->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretTaxiDmd; }),
+   });
+  if (QTest::currentTestFailed()) return;
+  // Vehlib
+  VerifieChamps("Vehlib", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamVehlib; }, &TfrmParamSimul::BitBtnDefVehlibs, Action); },
+                []() { return frmParamVehlib->ButtonOk; }, []() { return frmParamVehlib->ButtonAnnuler; },
+   {
+    ChampSpin("personnes par vehlib", []() { return frmParamVehlib->CSpinEditNbMaxPersonnesVehlib; }, []() { return (int)cv->NbMaxPersonnesVehlib; }),
+    ChampSpin("cases vers une place", []() { return frmParamVehlib->CSpinEditNbCasesMaxPlaceVehlib; }, []() { return (int)cv->NbMaxCasesDetectFileVehlib; }),
+    ChampSpin("probabilité vers une place", []() { return frmParamVehlib->CSpinEditProbaDirPlaceVehlib; }, []() { return (int)cv->ProbaDirFileVehlib; }),
+    ChampSpin("taux de remplissage", []() { return frmParamVehlib->CSpinEditTauxRemplissage; }, []() { return (int)cv->TauxRemplissageVehlib; }),
+   });
+ }
+//---------------------------------------------------------------------------
+void TestInterface::feuxChampParChamp()
+ { // Fiche Feux et fiche Feux de piétons, retrouvées par leur case après la réouverture
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  PoseFeuPietonsLie(4, 8);
+  if (QTest::currentTestFailed()) return;
+  const QString f=QFileInfo(Carte).absolutePath()+"/champs_feux.cvw";
+  QFile::remove(f);
+  Enregistre(f);
+  OuvreFichier(f);
+  auto Feu=[]() { return &cv->Feu[cv->v[4][8].NumFeu[est-1]-1]; };
+  auto FeuP=[]() { return &cv->FeuP[cv->v[6][7].NumFeuP[sud-1]-1]; };
+  auto DansFeux=[this](std::function<void()> Action)
+   {
+    OuvreFicheFeu(4, 8, est);
+    if (!QTest::currentTestFailed()) Action();
+    Clique(frmDefVoie->ButtonAnnuler);
+   };
+  VerifieChamps("Feux", f, DansFeux, []() { return frmDefFeux->ButtonOk; }, []() { return frmDefFeux->ButtonAnnuler; },
+   {
+    ChampSpin("durée du vert", []() { return frmDefFeux->CSpinEditDureeVert; }, [Feu]() { return (int)Feu()->DureeVert; }),
+    ChampSpin("durée du rouge", []() { return frmDefFeux->CSpinEditDureeRouge; }, [Feu]() { return (int)Feu()->DureeRouge; }),
+    ChampRadio("état", []() { return frmDefFeux->RadioGroupEtat; }, [Feu]() { return (int)Feu()->Etat; }),
+    ChampRadio("demande du vert", []() { return frmDefFeux->RadioGroupTypeDmdVert; }, [Feu]() { return (int)Feu()->TypeDmdVert; }),
+    ChampRadio("passage au rouge", []() { return frmDefFeux->RadioGroupTypePsgRouge; }, [Feu]() { return (int)Feu()->TypePsgRouge; }),
+   });
+  if (QTest::currentTestFailed()) return;
+  auto DansFeuxPietons=[this](std::function<void()> Action)
+   { // Feu existant : bouton relâché puis enfoncé pour rouvrir sa fiche
+    CliqueCase(6, 7);
+    frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
+    QVERIFY(frmDefVoiePietons->isVisible());
+    QVERIFY(frmDefVoiePietons->SpeedButtonS->Down);
+    Clique(frmDefVoiePietons->SpeedButtonS);
+    Clique(frmDefVoiePietons->SpeedButtonS);
+    QVERIFY(frmDefFeuxPietons->isVisible());
+    Action();
+    Clique(frmDefVoiePietons->ButtonAnnuler);
+   };
+  VerifieChamps("Feux de piétons", f, DansFeuxPietons, []() { return frmDefFeuxPietons->ButtonOk; }, []() { return frmDefFeuxPietons->ButtonAnnuler; },
+   {
+    ChampSpin("durée du vert", []() { return frmDefFeuxPietons->CSpinEditDureeVert; }, [FeuP]() { return (int)FeuP()->DureeVert; }),
+    ChampSpin("durée du rouge", []() { return frmDefFeuxPietons->CSpinEditDureeRouge; }, [FeuP]() { return (int)FeuP()->DureeRouge; }),
+    ChampRadio("état", []() { return frmDefFeuxPietons->RadioGroupEtat; }, [FeuP]() { return (int)FeuP()->Etat-(FeuP()->Etat==rouge); }),
+    ChampRadio("demande du vert", []() { return frmDefFeuxPietons->RadioGroupTypeDmdVert; }, [FeuP]() { return (int)FeuP()->TypeDmdVert; }),
+    ChampRadio("passage au rouge", []() { return frmDefFeuxPietons->RadioGroupTypePsgRouge; }, [FeuP]() { return (int)FeuP()->TypePsgRouge; }),
+   });
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ficheVehiculeNiveauxDePriorite()
+ { // Géant : un véhicule d'urgence et un de police, sur la carte. Le premier véhicule trouvé
+   // par fichesInfos est normal : un libellé jamais écrit y resterait juste
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "vehicule_priorites.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  TfrmSimulation *s=frmSimulation;
+  s->ActionDetailVehicule->Execute();
+  QVERIFY(frmInfosVehicule->isVisible());
+  bool Vus[3]={false, false, false};
+  const char *Libelles[3]={"Normal", "Urgences", "Police"};
+  for(int Tour=0; (Tour<400)&&!(Vus[normal]&&Vus[urgence]&&Vus[police])&&!QTest::currentTestFailed(); Tour++)
+   {
+    JoueTour();
+    for(int i=0; i<cv->NbVehicules; i++)
+     {
+      vehicule *Veh=cv->Vehicule+i;
+      if (!Veh->Defini()||Vus[Veh->NivPriorite]) continue;
+      if ((cv->v[Veh->x][Veh->y].NumVehicule!=i+1)||cv->v[Veh->x][Veh->y].NumParking) continue;
+      PlaceCurseur(Veh->x, Veh->y);
+      frmInfosVehicule->RafraichitInfos();
+      QCOMPARE(Q(frmInfosVehicule->LabelNivPriorite->Caption), QString(Libelles[Veh->NivPriorite]));
+      Vus[Veh->NivPriorite]=true;
+     }
+   }
+  QVERIFY(Vus[normal]&&Vus[urgence]&&Vus[police]);
+  Clique(frmInfosVehicule->ButtonOk);
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::parametresSansParking()

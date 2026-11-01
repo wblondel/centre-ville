@@ -575,3 +575,69 @@ TEST_CASE("Vérification d'intégrité : moins de deux parkings, sans division p
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[corrections][feux]")
+ { // Une liste d'un seul feu ne le montre pas : il faut en retirer au début, au milieu et à la fin
+  VueNulle Vue;
+  vue=&Vue;
+  cv=new centre_ville(true, NBXMIN, NBYMIN);
+  auto Liste=[](int *Num, int Nb) { return std::vector<int>(Num, Num+Nb); };
+  feu &f=cv->Feu[0];
+  f.NbFeuxDmd=f.NbFeuxAtt=3;
+  f.NumFeuxDmd=new int[3]{4, 5, 6};
+  f.NumFeuxAtt=new int[3]{4, 5, 6};
+  f.RetireFeuDmd(5);
+  f.RetireFeuAtt(5);
+  CHECK(Liste(f.NumFeuxDmd, f.NbFeuxDmd)==std::vector<int>{4, 6});
+  CHECK(Liste(f.NumFeuxAtt, f.NbFeuxAtt)==std::vector<int>{4, 6});
+  f.RetireFeuDmd(4);
+  f.RetireFeuAtt(4);
+  CHECK(Liste(f.NumFeuxDmd, f.NbFeuxDmd)==std::vector<int>{6});
+  CHECK(Liste(f.NumFeuxAtt, f.NbFeuxAtt)==std::vector<int>{6});
+  f.RetireFeuDmd(6);
+  f.RetireFeuAtt(6);
+  CHECK(f.NbFeuxDmd==0);
+  CHECK(f.NumFeuxDmd==nullptr);
+  CHECK(f.NbFeuxAtt==0);
+  CHECK(f.NumFeuxAtt==nullptr);
+  feu_pieton &p=cv->FeuP[0];
+  for(int n : {4, 5, 6}) p.AjouteFeu(n);
+  p.RetireFeu(5);
+  CHECK(Liste(p.NumFeux, p.NbFeux)==std::vector<int>{4, 6});
+  p.RetireFeu(6);
+  CHECK(Liste(p.NumFeux, p.NbFeux)==std::vector<int>{4});
+  delete cv;
+  cv=nullptr;
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Nouveau feu : durées par défaut du réseau", "[corrections][feux]")
+ {
+  VueNulle Vue;
+  vue=&Vue;
+  cv=new centre_ville(true, NBXMIN, NBYMIN);
+  cv->DureeVert=7;
+  cv->DureeRouge=9;
+  const int n=cv->AjouteFeu(1, 1, est);
+  REQUIRE(n>0);
+  CHECK(cv->Feu[n-1].DureeVert==7);
+  CHECK(cv->Feu[n-1].DureeRouge==9);
+  delete cv;
+  cv=nullptr;
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Direction d'une case : modifiable seulement avant le premier tour", "[corrections][edition]")
+ {
+  VueNulle Vue;
+  vue=&Vue;
+  cv=new centre_ville(true, NBXMIN, NBYMIN);
+  CHECK(cv->ChangeDirectionSiPossible(1, 1, E));
+  CHECK(cv->v[1][1].DirPoss==E);
+  cv->TourCrt=1;
+  CHECK_FALSE(cv->ChangeDirectionSiPossible(1, 1, E));
+  CHECK(cv->v[1][1].DirPoss==E);
+  delete cv;
+  cv=nullptr;
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
