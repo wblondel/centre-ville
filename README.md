@@ -150,6 +150,7 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Après la bascule : corriger les bogues d'origine du moteur, dont le blocage des vehlibs sur Géant (version 6.0.1).
 * [x] Corriger les bogues d'origine de l'interface (version 6.0.2, [`CHANGELOG.md`](CHANGELOG.md)).
 * [x] Corriger les plantages trouvés ensuite et les derniers comportements gênants de l'interface (version 6.0.3).
+* [x] Tester le parcours d'édition d'une carte par l'interface, et corriger les pertes de modifications trouvées (version 6.0.4).
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.

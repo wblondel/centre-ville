@@ -32,6 +32,11 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.4] 
+ - "Copier vers..." : le réseau garde son nom et ses modifications. Enregistrer
+   n'écrase plus la copie, et quitter propose bien d'enregistrer.
+ - Poser ou retirer le dépôt de bus propose bien d'enregistrer avant de quitter.
+
 [Version 6.0.3] 
  - Plus de plantage quand une carte a moins de deux parkings.
  - Une nouvelle zone est limitée à 200x200 cases (une carte plus grande
