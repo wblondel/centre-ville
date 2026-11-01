@@ -16,6 +16,13 @@ name: Tests moteur
 # sautent leurs étapes plutôt que le job entier : un job à matrice sauté
 # n'est pas déplié et ne produirait pas les noms de checks exigés. Si la
 # détection échoue, tout est testé.
+#
+# Job « sanitizers » : toute la suite sous AddressSanitizer et UBSan, qui voient
+# les lectures et écritures hors des tableaux que les autres jobs laissent passer.
+# Il n'est pas exigé sur main (il n'existe pas sur les PR sans code). Une erreur
+# d'UBSan arrête le test (halt_on_error), sinon elle ne ferait qu'un message.
+# Les fuites ne sont pas cherchées (detect_leaks=0) : LSan, sous Linux seulement,
+# signalerait aussi celles de Qt.
 
 on:
   push:
@@ -194,3 +201,52 @@ jobs:
 
       - name: Check tools/extrait_images.py output
         run: python3 tools/extrait_images.py --verifie
+
+  sanitizers:
+    name: ASan et UBSan (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    needs: changements
+    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies of Qt, and Ninja
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1 libxkbcommon-dev libfontconfig1-dev libfreetype-dev
+
+      - name: Install Ninja
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          cache: true
+
+      - name: Configure (CMake preset asan)
+        run: cmake --preset asan -DCV_APP=ON
+
+      - name: Build
+        run: cmake --build --preset asan --parallel
+
+      # Pile : le calcul récursif des distances en demande plus sous ASan. Sous
+      # Linux, les tests suivent « ulimit -s » (Windows et macOS : à l'édition de liens)
+      - name: Run tests (CTest)
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then ulimit -s 65536; fi
+          ctest --preset asan
+        env:
+          QT_QPA_PLATFORM: offscreen
+          ASAN_OPTIONS: detect_leaks=0
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1

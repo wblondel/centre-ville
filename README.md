@@ -100,7 +100,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt /
 Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` (affiché par « À propos » : « 6,0 » et « ,2 »).
 
 ### 3. Intégration continue
-* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification.
+* `.github/workflows/tests-moteur.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (macOS et Linux).
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
 * `.github/workflows/recette-windows.yml` : après chaque release (ou à la main), installe le paquet Windows d'une release sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
@@ -151,6 +151,7 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Corriger les bogues d'origine de l'interface (version 6.0.2, [`CHANGELOG.md`](CHANGELOG.md)).
 * [x] Corriger les plantages trouvés ensuite et les derniers comportements gênants de l'interface (version 6.0.3).
 * [x] Tester le parcours d'édition d'une carte par l'interface, et corriger les pertes de modifications trouvées (version 6.0.4).
+* [x] Tester les fiches Feux par l'interface, et corriger la suppression d'un feu référencé (version 6.0.5).
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.

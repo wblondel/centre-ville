@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.4)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.5)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -571,6 +571,16 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.5 (annotées `// v6.0.5`)
+
+| Commande | Original | 6.0.5 |
+|---|---|---|
+| Nouveau, génération | `RedimensionneZone` après `GenereReseau`, qui redessine : grille aux anciennes dimensions, lecture hors de `cv->v`. | Avant. |
+| Listes de feux (double-clic pendant une sélection) | Chaque feu copié avant de savoir s'il reste : écriture hors de `NumFeu` quand le dernier de la liste est retiré. | Copié seulement s'il reste. |
+| Supprimer un feu référencé (fiche Priorités) | `NumRef` passe au feu suivant celui trouvé : message faux, lecture hors du tableau pour le dernier. `!NumRef` choisit « piéton ». | `NumRef` et `NumRefP` restent sur le feu trouvé, `RefVoie` choisit le texte et les coordonnées. |
+| Idem, référence d'un feu de piétons | Compare `NumFeuP` de la case aux numéros de feux : référence gardée. | Compare `NumFeu`. |
+| Effacer les routes ou voies de tram d'une sélection | `ExisteVoieDansDirection(TypeVoie, (direction)d)` pour `NumFeu[d]` : direction précédente, question et retrait de la référence oubliés. Feux de piétons ignorés. | `d+1` ; question et retrait aussi pour les feux de piétons. |
 
 ## Corrections de la 6.0.4 (annotées `// v6.0.4`)
 

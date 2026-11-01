@@ -32,6 +32,14 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.5] 
+ - Nouveau : plus de lecture hors du réseau en générant une zone plus petite.
+ - Retirer le dernier feu d'une liste de feux n'abîme plus la mémoire.
+ - Supprimer un feu utilisé par d'autres feux : le message nomme le bon feu.
+ - Un feu supprimé n'est plus gardé dans la liste d'un feu de piétons.
+ - Effacer les routes d'une sélection pose bien la question pour les feux
+   utilisés par d'autres, et retire ces références.
+
 [Version 6.0.4] 
  - "Copier vers..." : le réseau garde son nom et ses modifications. Enregistrer
    n'écrase plus la copie, et quitter propose bien d'enregistrer.

@@ -1174,9 +1174,13 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
    NbNonSel=0;
    for(i=0; i<NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
     {
-     NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxDmd[i];
+     // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
+     // NumFeu quand le feu retiré était le dernier de la liste
+     int NbRetires=0;
      for(j=0; j<NbFeuxVoie; j++)
-      NbNonSel+=(frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+      NbRetires+=(frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxDmd[i];
+     NbNonSel+=NbRetires;
     }
    for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
@@ -1218,9 +1222,13 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
    NbNonSel=0;
    for(i=0; i<NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
     {
-     NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxAtt[i];
+     // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
+     // NumFeu quand le feu retiré était le dernier de la liste
+     int NbRetires=0;
      for(j=0; j<NbFeuxVoie; j++)
-      NbNonSel+=(frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+      NbRetires+=(frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxAtt[i];
+     NbNonSel+=NbRetires;
     }
    for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
@@ -1262,9 +1270,13 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
    NbNonSel=0;
    for(i=0; i<NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
     {
-     NumFeu[i-NbNonSel]=frmDefFeuxPietons->NumFeux[i];
+     // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
+     // NumFeu quand le feu retiré était le dernier de la liste
+     int NbRetires=0;
      for(j=0; j<NbFeuxVoie; j++)
-      NbNonSel+=(frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+      NbRetires+=(frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
+     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeuxPietons->NumFeux[i];
+     NbNonSel+=NbRetires;
     }
    for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
@@ -1761,7 +1773,7 @@ bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie Type
   for(x=xd; (!Abandon)&&(x<=xf); x++)
    for(y=yd; (!Abandon)&&(y<=yf); y++)
     for(d=0; (!Abandon)&&(d<NBDIR); d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)d)&& // v3.5
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
          (NumFeu=cv->v[x][y].NumFeu[d]))
       for(i=0; (!Abandon)&&(i<cv->NbFeux); i++)
        {
@@ -1802,6 +1814,30 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
             default:         break;
            }
        }
+  // v6.0.5 : les feux de piétons référencent aussi les feux (oubliés par l'original)
+  for(x=xd; (!Abandon)&&(x<=xf); x++)
+   for(y=yd; (!Abandon)&&(y<=yf); y++)
+    for(d=0; (!Abandon)&&(d<NBDIR); d++)
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&&
+         (NumFeu=cv->v[x][y].NumFeu[d]))
+      for(i=0; (!Abandon)&&(i<cv->NbFeuxPieton); i++)
+       for(j=0; (!Abandon)&&(j<cv->FeuP[i].NbFeux); j++)
+        if (cv->FeuP[i].NumFeux[j]==NumFeu)
+         switch(MessageDlg( Format( "\
+Le feu de piétons n°%d dépend du feu n°%d (à supprimer).\n\n\
+Si vous continuez, le feu n°%d sera supprimé.\n\
+Êtes-vous sûr de vouloir continuer ?",
+                                    ARRAYOFCONST((i+1, NumFeu, NumFeu))),
+                            mtConfirmation,
+                            TMsgDlgButtons() << mbYes << mbNo << mbYesToAll, 0))
+          {
+           case mrYesToAll: ToutSupprimer=true;
+                            Abandon=true;
+                            break;
+           case mrNo:       ToutSupprimer=false;
+                            Abandon=true;
+           default:         break;
+          }
   return ToutSupprimer;
  }
 //---------------------------------------------------------------------------
@@ -1815,7 +1851,7 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
   for(x=xd; x<=xf; x++)
    for(y=yd; y<=yf; y++)
     for(d=0; d<NBDIR; d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)d)&& // v3.5
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
          (NumFeu=cv->v[x][y].NumFeu[d]))
       for(i=0; i<cv->NbFeux; i++)
        {
@@ -1826,6 +1862,16 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
          if (cv->Feu[i].NumFeuxAtt[j]==NumFeu)
           cv->Feu[i].RetireFeuAtt(NumFeu);
        }
+  // v6.0.5 : de même dans les feux de piétons (oubliés par l'original)
+  for(x=xd; x<=xf; x++)
+   for(y=yd; y<=yf; y++)
+    for(d=0; d<NBDIR; d++)
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&&
+         (NumFeu=cv->v[x][y].NumFeu[d]))
+      for(i=0; i<cv->NbFeuxPieton; i++)
+       for(j=0; j<cv->FeuP[i].NbFeux; j++)
+        if (cv->FeuP[i].NumFeux[j]==NumFeu)
+         cv->FeuP[i].RetireFeu(NumFeu);
  }
 //---------------------------------------------------------------------------
 bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) // v3.5
@@ -2121,8 +2167,8 @@ void TfrmSimulation::ActionNouveauExecute(TObject *Sender)
    if (!DefinitDimensionsZone(NbX, NbY, GenereReseauAleatoirement)) return; // v4.2 (GenereReseauAleatoirement)
    if (cv) { delete cv; }
    cv=new centre_ville(NB_ELEMENTS_PAR_DEFAUT, NbX, NbY);
+   RedimensionneZone(); // v6.0.5 : avant la génération, qui redessine : l'original lisait hors du réseau pour une zone plus petite
    if (GenereReseauAleatoirement) GenereReseau(); // v4.2
-   RedimensionneZone();
    SimulationModifiee=false;
    asNomFichAuto="";
    SaveDialog->FileName="";

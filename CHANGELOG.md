@@ -4,6 +4,37 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.5] — feux et zone générée, lectures et écritures hors des tableaux corrigées
+
+Cette version corrige les listes de feux, la suppression d'un feu que d'autres feux utilisent
+et la génération d'une zone plus petite, trouvées par de nouveaux tests des fiches Feux. Ces
+bogues venaient de l'original. Le format des fichiers
+`.cvw` ne change pas (0x530), ni la simulation (golden master identique).
+
+### Bogues corrigés
+
+- **Listes de feux** (demande, attente, feux de piétons) : retirer le dernier feu d'une liste
+  écrivait hors du tableau (corruption de la mémoire, plantage possible plus tard).
+- **Nouveau, zone générée plus petite** : pendant la génération, la grille était redessinée
+  aux anciennes dimensions, hors du réseau (plantage possible).
+- **Message de suppression d'un feu** : il annonçait le feu suivant celui qui référence, et
+  lisait hors du tableau quand c'était le dernier (par exemple « feu n°4 (0,0) » pour le
+  feu n°3 en (8,4)). Une référence par un feu de piétons donnait aussi des coordonnées
+  fausses.
+- **Feu supprimé, référencé par un feu de piétons** : la référence restait.
+- **Effacer les routes d'une sélection** : un feu sur une route à sens unique était effacé
+  sans question, et les feux qui le référençaient gardaient cette référence. Les feux de
+  piétons n'étaient pas traités non plus.
+
+Une carte enregistrée avant cette version peut encore contenir ces références : elles ne
+sont pas réparées à l'ouverture.
+
+### Tests
+
+Nouveaux tests par l'interface : fiche Feux (Appliquer, Annuler, listes de feux par
+double-clic, réouverture), suppression d'un feu référencé par un feu ou un feu de piétons,
+effacement d'une sélection.
+
 ## [6.0.4] — modifications qui pouvaient se perdre, édition de carte testée
 
 Cette version corrige deux pertes de modifications, trouvées par de nouveaux tests du

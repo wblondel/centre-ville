@@ -17,7 +17,7 @@ const AnsiString asFrmMsgSuppr="\
 Le feu %s (à supprimer) est référencé par le feu %sn°%d (%d,%d).\n\
 Si vous choisissez de supprimer le feu, TOUTES les références seront supprimées.\n\n\
 Voulez-vous néanmoins le supprimer ?", // v5.2 : ajout d'un paramètre permettant d'indiquer si la référence est un feu de circulation ou de piéton
-                 asVoieOuPieton[2]={" ","piéton "}, // v5.2 : Paramètre %s de la chaîne ci-dessus
+                 asVoieOuPieton[2]={"","piéton "}, // v5.2 : Paramètre %s de la chaîne ci-dessus
                  asMAJIgnoree="Modifications de priorité ignorées";
 
 //---------------------------------------------------------------------------
@@ -59,7 +59,9 @@ void TfrmDefVoie::AppliqueChoix()
         (RadioGroupPriorite[d-1]->ItemIndex!=feux))
      {
       RefTrv=0;
-      for(NumRef=0; (!RefTrv)&&(NumRef<cv->NbFeux); NumRef++)
+      // v6.0.5 : NumRef reste sur le feu trouvé (l'original passait au suivant : message
+      // sur le mauvais feu, lu hors du tableau pour le dernier)
+      for(NumRef=0; (!RefTrv)&&(NumRef<cv->NbFeux); NumRef+=!RefTrv)
        if (cv->Feu[NumRef].Defini())
         {
          for(int j=0; (!RefTrv)&&(j<cv->Feu[NumRef].NbFeuxAtt); j++)
@@ -68,7 +70,8 @@ void TfrmDefVoie::AppliqueChoix()
           RefTrv=(cv->Feu[NumRef].NumFeuxDmd[j]==v->NumFeu[d-1]);
         }
       // v5.2 : Référence dans les feux de piéton
-      for(NumRefP=0; (!RefTrv)&&(NumRefP<cv->NbFeuxPieton); NumRefP++)
+      const bool RefVoie=RefTrv; // v6.0.5
+      for(NumRefP=0; (!RefTrv)&&(NumRefP<cv->NbFeuxPieton); NumRefP+=!RefTrv)
        if (cv->FeuP[NumRefP].Defini())
         for(int j=0; (!RefTrv)&&(j<cv->FeuP[NumRefP].NbFeux); j++)
          RefTrv=(cv->FeuP[NumRefP].NumFeux[j]==v->NumFeu[d-1]);
@@ -76,10 +79,10 @@ void TfrmDefVoie::AppliqueChoix()
        { // A. On a trouvé des références au feu à supprimer
         if (AfficheMessage( Format( asFrmMsgSuppr,
                                     ARRAYOFCONST(( asDir[d],
-                                                   asVoieOuPieton[!NumRef],
-                                                   NumRef+1,
-                                                   cv->Feu[NumRef].x,
-                                                   cv->Feu[NumRef].y))),
+                                                   asVoieOuPieton[!RefVoie], // v6.0.5 : l'original testait !NumRef
+                                                   (RefVoie?NumRef:NumRefP)+1,
+                                                   RefVoie?cv->Feu[NumRef].x:cv->FeuP[NumRefP].x[0],
+                                                   RefVoie?cv->Feu[NumRef].y:cv->FeuP[NumRefP].y[0]))),
                             "Suppression de feu",
                             tmQuestionNecessaire, 1, 1)==trOui)
          {
@@ -96,8 +99,8 @@ void TfrmDefVoie::AppliqueChoix()
           // A.1.b On supprime les références au feu à supprimer dans les feux de piéton (v5.2)
           for(int i=0; i<cv->NbFeuxPieton; i++)
            for(int j=0; j<cv->FeuP[i].NbFeux; j++)
-			if (cv->FeuP[i].NumFeux[j]==v->NumFeuP[d-1])
-             cv->FeuP[i].RetireFeu(v->NumFeuP[d-1]);
+			if (cv->FeuP[i].NumFeux[j]==v->NumFeu[d-1]) // v6.0.5 : l'original comparait NumFeuP : référence gardée vers un feu supprimé
+             cv->FeuP[i].RetireFeu(v->NumFeu[d-1]);
           // A.1.c On peut maintenant supprimer le feu
           cv->SupprimeFeu(v->NumFeu[d-1]-1);
           if (frmDefFeux->Visible) frmDefFeux->Hide();
