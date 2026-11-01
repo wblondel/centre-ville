@@ -1,0 +1,19 @@
+# Python : scripts de tools/ (job « Lint Python et workflows » de la CI)
+target-version = "py310"
+line-length = 120
+
+[lint]
+select = [
+  "E", "W", "F",  # pycodestyle, pyflakes
+  "I",            # imports triés
+  "B",            # bogues probables
+  "UP",           # syntaxe à jour
+  "C4", "SIM",    # simplifications
+  "S",            # sécurité
+  "PLE", "PLW",   # pylint : erreurs et avertissements
+  "RUF",
+]
+ignore = [
+  "E501",   # lignes longues : tableaux de correspondances des convertisseurs de fiches
+  "UP031",  # format % : gardé là où la conversion automatique n'est pas sûre
+]

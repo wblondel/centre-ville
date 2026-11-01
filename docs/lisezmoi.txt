@@ -32,6 +32,11 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.6] 
+ - Plus de plantage en choisissant une liste de feux sur une case à 3 ou 4 feux.
+   Le double-clic parcourt les deux premiers feux de la case.
+ - Effacer une sélection contenant un arrêt ne lit plus hors de la mémoire.
+
 [Version 6.0.5] 
  - Nouveau : plus de lecture hors du réseau en générant une zone plus petite.
  - Retirer le dernier feu d'une liste de feux n'abîme plus la mémoire.

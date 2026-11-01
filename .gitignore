@@ -46,3 +46,4 @@ bin/
 
 # CMake (presets)
 build/
+.venv-lint/

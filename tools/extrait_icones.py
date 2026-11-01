@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Extraction des icônes de Centre-Ville pour les paquets Linux et macOS.
 
 Phase 8 de PLAN_PORTAGE.md : les icônes d'origine sont dans res/ico, au
@@ -58,7 +57,10 @@ def main():
     for source, cible in ICONES:
         image = png_256(os.path.join(args.res, source))
         chemin = os.path.join(args.sortie, cible)
-        actuel = open(chemin, "rb").read() if os.path.exists(chemin) else None
+        actuel = None
+        if os.path.exists(chemin):
+            with open(chemin, "rb") as f:
+                actuel = f.read()
         if actuel == image:
             continue
         if args.verifie:

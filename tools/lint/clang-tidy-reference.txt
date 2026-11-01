@@ -1,0 +1,251 @@
+app/application.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/application.cpp: [concurrency-mt-unsafe] function is not thread safe
+app/application.cpp: [performance-use-std-move] 'f' could be moved here
+app/base.cpp: [performance-unnecessary-value-param] the const qualified parameter 'asMessage' of type 'const AnsiString' is copied for each invocation; consider making it a reference
+app/base.cpp: [performance-unnecessary-value-param] the const qualified parameter 'asMessage' of type 'const AnsiString' is copied for each invocation; consider making it a reference
+app/base.cpp: [performance-unnecessary-value-param] the const qualified parameter 'asMessage' of type 'const AnsiString' is copied for each invocation; consider making it a reference
+app/base.cpp: [performance-unnecessary-value-param] the const qualified parameter 'asTitre' of type 'const AnsiString' is copied for each invocation; consider making it a reference
+app/base.cpp: [performance-unnecessary-value-param] the const qualified parameter 'stURL' of type 'const String' is copied for each invocation; consider making it a reference
+app/base.cpp: [performance-use-std-move] 'stExePath' could be moved here
+app/f_afdistab.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistab.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistab.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding 'Dirdp'
+app/f_afdistat.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistat.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistfp.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistfp.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistfp.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding 'Dirdp'
+app/f_afdistft.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistft.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistft.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding 'Dirdp'
+app/f_afdistp.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistp.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistp.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding 'Dirdp'
+app/f_afdistpv.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_afdistpv.cpp: [bugprone-redundant-branch-condition] redundant condition 'i'
+app/f_afdistpv.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding 'Dirdp'
+app/f_carfours.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_carfours.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_carfours.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_deff.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_deffp.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_defn.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_defv.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_defvp.cpp: [bugprone-empty-catch] empty catch statements hide issues; to handle exceptions appropriately, consider re-throwing, handling, or avoiding catch altogether
+app/f_defvp.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_dimzone.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_epidemie.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_genres.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_infbus.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_infptn.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_inftaxi.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_inftram.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_infveh.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_infvehlib.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_prmbus.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_prmbus.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_prmbus.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_prmbus.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_prmbus.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_prmsim.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_prmtaxi.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_prmtram.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_prmtram.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_prmtram.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_prmtram.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_prmtram.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_prmvehlib.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_propos.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_propos.cpp: [bugprone-narrowing-conversions] narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined
+app/f_propos.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_rech.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_simul.cpp: [bugprone-exception-escape] an exception may be thrown in function '~TfrmSimulation' which should not throw exceptions
+app/f_simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+app/f_simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+app/f_simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+app/f_simul.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_simul.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_simul.cpp: [clang-analyzer-deadcode.DeadStores] Although the value stored to 'NumPieton' is used in the enclosing expression, the value is never actually read from 'NumPieton'
+app/f_simul.cpp: [clang-analyzer-optin.core.EnumCastOutOfRange] The value '82' provided to the cast expression is not in the valid range of values for 'affichage'
+app/f_simul.cpp: [performance-unnecessary-value-param] the const qualified parameter 'asTitre' of type 'const AnsiString' is copied for each invocation; consider making it a reference
+app/f_simul.cpp: [performance-use-std-move] 'asNomFichier' could be moved here
+app/f_simul.cpp: [performance-use-std-move] 'asNomFichier' could be moved here
+app/f_simul.h: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+app/f_simul.h: [bugprone-narrowing-conversions] narrowing conversion from 'unsigned int' to signed type 'int' is implementation-defined
+app/f_stats.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_statsat.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_statsat.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_statsat.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_statsat.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/f_statsat.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_statsat.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+app/f_statsc.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_statsv.cpp: [bugprone-macro-parentheses] macro argument should be enclosed in parentheses
+app/f_statsv.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+app/grille/GrilleSimulation.h: [bugprone-derived-method-shadowing-base-method] 'GrilleSimulation::Repaint' shadows method with the same name in class 'ControleVcl<QAbstractScrollArea>'
+app/vcl/actions.cpp: [bugprone-branch-clone] repeated branch body in conditional chain
+app/vcl/controles.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+app/vcl/controles.cpp: [clang-analyzer-cplusplus.NewDeleteLeaks] Potential leak of memory pointed to by 'Filtre'
+app/vcl/controles.h: [bugprone-derived-method-shadowing-base-method] 'TStringGrid::Invalidate' shadows method with the same name in class 'ControleVcl<QAbstractScrollArea>'
+app/vcl/controles.h: [bugprone-derived-method-shadowing-base-method] 'TStringGrid::Repaint' shadows method with the same name in class 'ControleVcl<QAbstractScrollArea>'
+app/vcl/controles.h: [bugprone-unhandled-self-assignment,cert-oop54-cpp] operator=() does not handle self-assignment properly
+app/vcl/controles.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/fiche.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
+app/vcl/graphiques.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+app/vcl/graphiques.h: [cert-oop54-cpp] operator=() does not handle self-assignment properly
+app/vcl/graphiques.h: [cert-oop54-cpp] operator=() does not handle self-assignment properly
+app/vcl/proprietes.h: [cert-oop54-cpp] operator=() does not handle self-assignment properly
+app/vcl/proprietes.h: [cert-oop54-cpp] operator=() does not handle self-assignment properly
+app/vcl/vcl.cpp: [bugprone-unchecked-string-to-number-conversion,cert-err34-c] 'atoi' used to convert a string to an integer value, but function will not report conversion errors; consider using 'strtol' instead
+app/vcl/vcl.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/vcl/vcl.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/vcl/vcl.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/vcl/vcl.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/vcl/vcl.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+app/vcl/vcl.h: [bugprone-exception-escape] an exception may be thrown in function '~Finalement' which should not throw exceptions
+engine/compat/chaine.cpp: [bugprone-switch-missing-default-case] switching on non-enum value without default case may not cover all cases
+engine/compat/chaine.cpp: [bugprone-unchecked-string-to-number-conversion,cert-err34-c] 'atoi' used to convert a string to an integer value, but function will not report conversion errors; consider using 'strtol' instead
+engine/compat/chaine.cpp: [bugprone-unhandled-code-paths] potential uncovered code path; add a default label
+engine/compat/chaine.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+engine/compat/chaine.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+engine/compat/chaine.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+engine/compat/chaine.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+engine/compat/chaine.cpp: [concurrency-mt-unsafe] function is not thread safe
+engine/compat/chaine.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+engine/compat/chaine.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+engine/compat/chaine.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+engine/compat/chaine.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+engine/compat/chaine.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+engine/compat/chaine.h: [clang-analyzer-core.CallAndMessage] 1st function call argument is an uninitialized value
+engine/compat/fichier.cpp: [clang-analyzer-unix.BlockInCriticalSection] Call to blocking function 'read' inside of critical section
+engine/compat/fichier.cpp: [performance-use-std-move] 'Cible' could be moved here
+engine/compat/fichier.cpp: [performance-use-std-move] 'Resolu' could be moved here
+engine/compat/fichier.cpp: [performance-use-std-move] 'Temporaire' could be moved here
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/format_cvw.h: [bugprone-implicit-widening-of-multiplication-result] performing an implicit widening conversion to type '__size_t' (aka 'unsigned long') of a multiplication performed in type 'int'
+engine/simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+engine/simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+engine/simul.cpp: [bugprone-implicit-widening-of-multiplication-result] result of multiplication in type 'int' is used as a pointer offset after an implicit widening conversion to type 'ptrdiff_t'
+engine/simul.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+engine/simul.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+engine/simul.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Although the value stored to 'DirSvt' is used in the enclosing expression, the value is never actually read from 'DirSvt'
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Value stored to 'Trv' is never read
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Value stored to 'Trv' is never read
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Value stored to 'Trv' is never read
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Value stored to 'Trv' is never read
+engine/simul.cpp: [clang-analyzer-deadcode.DeadStores] Value stored to 'Trv' is never read
+engine/simul.cpp: [clang-analyzer-optin.core.EnumCastOutOfRange] The value provided to the cast expression is not in the valid range of values for 'sens'
+engine/simul.cpp: [clang-analyzer-optin.core.EnumCastOutOfRange] The value provided to the cast expression is not in the valid range of values for 'sens'
+engine/simul.cpp: [clang-analyzer-optin.core.EnumCastOutOfRange] The value provided to the cast expression is not in the valid range of values for 'sens'
+engine/simul.cpp: [clang-analyzer-optin.core.EnumCastOutOfRange] The value provided to the cast expression is not in the valid range of values for 'sens'
+engine/simul.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory after the end of the heap area
+engine/simul.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory after the end of the heap area
+engine/simul.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory after the end of the heap area
+engine/simul.cpp: [clang-analyzer-security.ArrayBound] Out of bound access to memory preceding the heap area
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.cpp: [performance-unnecessary-value-param] the parameter 'asSource' of type 'AnsiString' is copied for each invocation but only used as a const reference; consider making it a const reference
+engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_FEUXPIETONS', which is a reserved identifier
+engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_NATURE', which is a reserved identifier
+engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_V', which is a reserved identifier
+engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_V_', which is a reserved identifier
+tests/app/test_aide.cpp: [bugprone-narrowing-conversions] narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined
+tests/app/test_interface.cpp: [bugprone-exception-escape] an exception may be thrown in function 'main' which should not throw exceptions
+tests/app/test_interface.cpp: [bugprone-narrowing-conversions] narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined
+tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/app/test_interface.cpp: [clang-analyzer-core.StackAddressEscape] Address of stack memory associated with temporary object of type 'std::function<TCSpinEdit *()>' returned to caller
+tests/app/test_interface.cpp: [clang-analyzer-core.StackAddressEscape] Address of stack memory associated with temporary object of type 'std::function<TRadioGroup *()>' returned to caller
+tests/app/test_interface.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/app/test_interface.cpp: [performance-inefficient-vector-operation] 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop
+tests/app/test_interface.cpp: [performance-inefficient-vector-operation] 'push_back' is called inside a loop; consider pre-allocating the container capacity before the loop
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Action' of type 'std::function<void ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Fiche' of type 'std::function<QWidget *()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Lu' of type 'std::function<int ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] parameter 'Lu' of type 'std::function<int ()>' is passed by value and only copied once; consider moving it to avoid unnecessary copies
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Action' of type 'std::function<void ()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Action' of type 'std::function<void ()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Attendu' of type 'std::function<int (const ChampFiche &)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Champ' of type 'std::function<TCSpinEdit *()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Change' of type 'std::function<void ()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Dans' of type 'std::function<void (std::function<void ()>)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Ecart' of type 'std::function<QString (long)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Fin' of type 'std::function<bool ()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Groupe' of type 'std::function<TRadioGroup *()>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Numero' of type 'std::function<int (voie *)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Numero' of type 'std::function<int (voie *)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Obtenu' of type 'std::function<int (const ChampFiche &)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-unnecessary-value-param] the parameter 'Position' of type 'std::function<bool (int &, int &)>' is copied for each invocation but only used as a const reference; consider making it a const reference
+tests/app/test_interface.cpp: [performance-use-std-move] 'Lu' could be moved here
+tests/app/test_interface.cpp: [performance-use-std-move] 'Lu' could be moved here
+tests/cvsim.cpp: [bugprone-exception-escape] an exception may be thrown in function 'main' which should not throw exceptions
+tests/cvsim.cpp: [bugprone-unchecked-string-to-number-conversion,cert-err34-c] 'atoi' used to convert a string to an integer value, but function will not report conversion errors; consider using 'strtol' instead
+tests/cvsim.cpp: [bugprone-unchecked-string-to-number-conversion,cert-err34-c] 'atoi' used to convert a string to an integer value, but function will not report conversion errors; consider using 'strtol' instead
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/etat.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/etat.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/etat.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/etat.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/etat.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/format_reference.cpp: [bugprone-suspicious-string-compare] function 'memcmp' is called without explicitly comparing result
+tests/support/golden.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/golden.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/golden.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/golden.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
+tests/support/golden.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/golden.cpp: [performance-faster-string-find,performance-prefer-single-char-overloads] 'operator+=' called with a string literal consisting of a single character; consider using the more efficient overload accepting a character
+tests/support/golden.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+tests/support/golden.cpp: [performance-inefficient-string-concatenation] string concatenation results in allocation of unnecessary temporary strings; consider using 'operator+=' or 'string::append()' instead
+tests/test_corrections.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors

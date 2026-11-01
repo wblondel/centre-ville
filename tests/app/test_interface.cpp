@@ -822,6 +822,8 @@ class TestInterface : public QObject
   void effacerRoutesDeLaSelection();
   void ficheFeuxEtListes();
   void selectionCaseADeuxFeux();
+  void selectionCaseATroisFeux();
+  void effacerSelectionAvecArretsDeBus();
   void suppressionFeuReference();
   void suppressionFeuReferenceParUnFeuPietons();
   void effacerSelectionAvecFeuReference();
@@ -3629,6 +3631,29 @@ void TestInterface::effacerRoutesDeLaSelection()
 //---------------------------------------------------------------------------
 // Feux : fiche, listes de dépendance et suppression d'un feu référencé
 //---------------------------------------------------------------------------
+void TestInterface::effacerSelectionAvecArretsDeBus()
+ { // v6.0.6 : numéro d'arrêt (à partir de 1) utilisé tel quel dans un tableau (à partir de 0) :
+   // lecture et écriture hors du tableau pour le dernier arrêt (trouvé par clang-tidy, visible
+   // sous ASan)
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 2, 12, 2);
+  if (QTest::currentTestFailed()) return;
+  ExecuteSurCase(5, 2, s->ActionArretBusTram);
+  ExecuteSurCase(6, 2, s->ActionArretBusTram);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE((int)cv->NbArretsBus, 1);
+  QCOMPARE((int)cv->v[5][2].NumArretBus, 1);
+  QCOMPARE((int)cv->v[6][2].NumArretBus, 1);
+  ReponseQuestions=QMessageBox::Yes;
+  Selectionne(4, 1, 7, 3);
+  s->ActionEffacerRoutes->Execute();
+  QCOMPARE((int)cv->v[5][2].NumArretBus, 0);
+  QCOMPARE((int)cv->v[6][2].NumArretBus, 0);
+  QCOMPARE((int)cv->v[5][2].DirPoss, (int)aucune);
+ }
+//---------------------------------------------------------------------------
 void TestInterface::ficheFeuxEtListes()
  { // Chaque contrôle active Appliquer ; Annuler n'écrit rien ; Appliquer garde la fiche ;
    // listes par double-clic sur la carte, gardées à l'enregistrement
@@ -3790,6 +3815,36 @@ void TestInterface::selectionCaseADeuxFeux()
    }
   Clique(frmDefFeuxPietons->ButtonAnnuler);
   Clique(frmDefVoiePietons->ButtonAnnuler);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::selectionCaseATroisFeux()
+ { // v6.0.6 : une case peut avoir un feu par direction ; l'original écrivait les trois dans un
+   // tableau de deux (trouvé par clang-tidy, visible sous ASan). Le double-clic parcourt les
+   // deux premiers, comme sur une case à deux feux
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(12, 8, 12, 12); // (12,8) : vers l'est et vers le sud
+  TraceSegment(12, 8, 12, 4); // et vers le nord
+  if (QTest::currentTestFailed()) return;
+  CliqueCase(12, 8);
+  Clique(frmSimulation->ToolButtonPriorites);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteNord, feux);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, feux);
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
+  Clique(frmDefVoie->ButtonOk);
+  const int fn=cv->v[12][8].NumFeu[nord-1], fe=cv->v[12][8].NumFeu[est-1];
+  QVERIFY((fn>0)&&(fe>0)&&(cv->v[12][8].NumFeu[sud-1]>0));
+  OuvreFicheFeu(4, 8, est);
+  if (QTest::currentTestFailed()) return;
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  DoubleCliqueCase(12, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  QCOMPARE(frmDefFeux->NumFeuxDmd[0], fn);
+  DoubleCliqueCase(12, 8);
+  QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
+  QCOMPARE(frmDefFeux->NumFeuxDmd[0], fe);
+  Clique(frmDefFeux->ButtonAnnuler);
+  Clique(frmDefVoie->ButtonAnnuler);
  }
 //---------------------------------------------------------------------------
 void TestInterface::suppressionFeuReference()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Conversion des fiches VCL (.dfm) de Centre-Ville en fichiers Qt Designer (.ui).
 
 Phase 6 de PLAN_PORTAGE.md (outillage), utilisée dès la phase 5 pour la fiche
@@ -47,7 +46,7 @@ import xml.etree.ElementTree as ET
 from collections import OrderedDict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from extrait_images import lit_dfm, Binaire, Identifiant  # noqa: E402
+from extrait_images import Binaire, lit_dfm
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -133,7 +132,7 @@ def raccourci_qt(n):
     touche = n & 0xFF
     nom = TOUCHES.get(touche)
     if nom is None:
-        raise ValueError("touche virtuelle 0x%02X sans équivalent" % touche)
+        raise ValueError(f"touche virtuelle 0x{touche:02X} sans équivalent")
     mods = []
     if n & SC_CTRL:
         mods.append("Ctrl")
@@ -141,7 +140,7 @@ def raccourci_qt(n):
         mods.append("Alt")
     if n & SC_SHIFT:
         mods.append("Shift")
-    return "+".join(mods + [nom])
+    return "+".join([*mods, nom])
 
 
 def couleur(valeur):
@@ -162,8 +161,8 @@ def hint_court_long(hint):
 def taille_points(hauteur, ppp=96):
     """Font.Height négatif = hauteur des caractères en pixels à PixelsPerInch."""
     if hauteur < 0:
-        return max(1, int(round(-hauteur * 72.0 / ppp)))
-    return max(1, int(round(hauteur * 72.0 / ppp * 0.85)))
+        return max(1, round(-hauteur * 72.0 / ppp))
+    return max(1, round(hauteur * 72.0 / ppp * 0.85))
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +182,7 @@ def prop(parent, nom, genre, valeur, dynamique=False):
         p.set("stdset", "0")
     if genre == "rect":
         r = sous(p, "rect")
-        for k, v in zip(("x", "y", "width", "height"), valeur):
+        for k, v in zip(("x", "y", "width", "height"), valeur, strict=False):
             sous(r, k, str(v))
     elif genre == "bool":
         sous(p, "bool", "true" if valeur else "false")
@@ -279,7 +278,7 @@ class Conversion:
         try:
             images = self.index["listes"][self.fiche][liste]["images"]
         except KeyError:
-            self.note("  ! liste d'images %s inconnue" % liste)
+            self.note(f"  ! liste d'images {liste} inconnue")
             return None
         if indice >= len(images):
             self.note("  ! %s : indice %d hors liste" % (liste, indice))
@@ -367,7 +366,7 @@ class Conversion:
             if all(isinstance(x, (str, int, float)) for x in v):
                 prop(e, nom, "stringlist", [str(x) for x in v], True)
             else:
-                prop(e, nom, "stringlist", [";".join("%s=%s" % (kk, vv) for kk, vv in el.items())
+                prop(e, nom, "stringlist", [";".join(f"{kk}={vv}" for kk, vv in el.items())
                                             for el in v], True)
         else:
             prop(e, nom, "string", str(v), True)
@@ -377,7 +376,6 @@ class Conversion:
         self.classes_utilisees[classe] = (base, entete)
         e = sous(parent_xml, "widget", class_=classe, name=o.nom)
         deja = set()
-        p = o.props
         methode = getattr(self, "w_" + o.classe, None)
         if methode:
             deja = methode(e, o) or set()
@@ -400,15 +398,15 @@ class Conversion:
         elif o.classe in ("TMainMenu", "TPopupMenu", "TActionList", "TMenuItem", "TAction"):
             pass  # traités à part
         elif o.classe in NON_VISUELS_PROPRIETE:
-            valeurs = ["%s=%s" % (k, (",".join(sorted(map(str, v))) if isinstance(v, set) else v))
+            valeurs = ["{}={}".format(k, (",".join(sorted(map(str, v))) if isinstance(v, set) else v))
                        for k, v in o.props.items() if k not in ("Left", "Top")]
-            prop(self.xml_racine, "vcl_" + o.nom, "stringlist", ["Classe=" + o.classe] + valeurs, True)
+            prop(self.xml_racine, "vcl_" + o.nom, "stringlist", ["Classe=" + o.classe, *valeurs], True)
             self.composants.append((o.classe, o.nom))
             self.evenements_de(o)
         elif o.classe in IGNORES:
             self.composants.append((o.classe, o.nom))
         else:
-            self.note("  ! composant %s: %s non converti" % (o.nom, o.classe))
+            self.note(f"  ! composant {o.nom}: {o.classe} non converti")
 
     # --- contrôles ---------------------------------------------------------------
 
@@ -493,10 +491,7 @@ class Conversion:
         elements = p.get("Items.Strings", [])
         colonnes = max(1, p.get("Columns", 1))
         indice = p.get("ItemIndex", -1)
-        if "Font.Height" in p:
-            hauteur_texte = int(round(-p["Font.Height"] * 13.0 / 11.0))
-        else:
-            hauteur_texte = self.hauteur_texte
+        hauteur_texte = round(-p["Font.Height"] * 13.0 / 11.0) if "Font.Height" in p else self.hauteur_texte
         largeur, hauteur = p.get("Width", 0), p.get("Height", 0)
         if elements:
             par_colonne = (len(elements) + colonnes - 1) // colonnes
@@ -588,7 +583,7 @@ class Conversion:
         p = o.props
         panneaux = []
         for el in p.get("Panels", []):
-            panneaux.append(";".join("%s=%s" % (k, v) for k, v in el.items()))
+            panneaux.append(";".join(f"{k}={v}" for k, v in el.items()))
         prop(e, "vclPanels", "stringlist", panneaux, True)
         if self.principale:
             prop(e, "sizeGripEnabled", "bool", p.get("SizeGrip") != "False")
@@ -751,8 +746,8 @@ class Conversion:
         r = self.racine
         p = r.props
         ui = ET.Element("ui", version="4.0")
-        sous(ui, "comment", "GÉNÉRÉ par tools/dfm2ui.py depuis src/%s.dfm : ne pas modifier à la main "
-                            "avant la fin du portage de la fiche" % self.fiche)
+        sous(ui, "comment", f"GÉNÉRÉ par tools/dfm2ui.py depuis src/{self.fiche}.dfm : ne pas modifier à la main "
+                            "avant la fin du portage de la fiche")
         sous(ui, "class", r.nom)
         classe = "QMainWindow" if self.principale else "QDialog"
         racine = sous(ui, "widget", class_=classe, name=r.nom)
@@ -824,10 +819,10 @@ class Conversion:
             enfants = [e for e in o.enfants if "TabOrder" in e.props]
             enfants.sort(key=lambda e: e.props["TabOrder"])
             for e in enfants:
-                if e.classe in FOCALISABLES and e.props.get("TabStop") != "False":
-                    if not (e.classe == "TRadioButton" and e.props.get("TabStop") != "True"
-                            and e.props.get("Checked") != "True"):
-                        ordre.append(e.nom)
+                if e.classe in FOCALISABLES and e.props.get("TabStop") != "False" and not (
+                    e.classe == "TRadioButton" and e.props.get("TabStop") != "True" and e.props.get("Checked") != "True"
+                ):
+                    ordre.append(e.nom)
                 if e.classe in CONTENEURS:
                     if e.classe == "TRadioGroup":
                         n = len(e.props.get("Items.Strings", []))
@@ -843,24 +838,21 @@ class Conversion:
         nom = self.racine.nom
         garde = self.fiche + "_composantsH"
         lignes = ["//---------------------------------------------------------------------------",
-                  "// %s_composants.h - GÉNÉRÉ par tools/dfm2ui.py depuis src/%s.dfm : ne pas modifier"
-                  % (self.fiche, self.fiche),
+                  f"// {self.fiche}_composants.h - GÉNÉRÉ par tools/dfm2ui.py depuis src/{self.fiche}.dfm : ne pas modifier",
                   "//",
-                  "// COMPOSANTS_%s(X) : X(classe VCL, nom) pour chaque composant de la fiche,"
-                  % nom,
+                  f"// COMPOSANTS_{nom}(X) : X(classe VCL, nom) pour chaque composant de la fiche,",
                   "// dans l'ordre du .dfm (membres à lier aux objets créés par uic).",
-                  "// EVENEMENTS_%s(X) : X(composant, événement, gestionnaire) pour chaque"
-                  % nom,
+                  f"// EVENEMENTS_{nom}(X) : X(composant, événement, gestionnaire) pour chaque",
                   "// gestionnaire d'événement à connecter (« this » = la fiche).",
                   "//---------------------------------------------------------------------------",
                   "#ifndef " + garde, "#define " + garde, ""]
-        lignes.append("#define COMPOSANTS_%s(X) \\" % nom)
+        lignes.append(f"#define COMPOSANTS_{nom}(X) \\")
         for classe, n in self.composants:
-            lignes.append("  X(%s, %s) \\" % (classe, n))
+            lignes.append(f"  X({classe}, {n}) \\")
         lignes.append("")
-        lignes.append("#define EVENEMENTS_%s(X) \\" % nom)
+        lignes.append(f"#define EVENEMENTS_{nom}(X) \\")
         for c, ev, g in self.evenements:
-            lignes.append("  X(%s, %s, %s) \\" % (c, ev, g))
+            lignes.append(f"  X({c}, {ev}, {g}) \\")
         lignes.append("")
         lignes.append("#endif")
         return "\n".join(lignes) + "\n"

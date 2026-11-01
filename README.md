@@ -105,13 +105,26 @@ Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` 
 * `.github/workflows/recette-windows.yml` : après chaque release (ou à la main), installe le paquet Windows d'une release sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
 
-### 4. Publier une version
+### 4. Lint
+Les versions sont dans `tools/lint/requirements.txt`, et la CI lance les mêmes commandes :
+
+```bash
+python3 -m venv .venv-lint && .venv-lint/bin/pip install -r tools/lint/requirements.txt
+.venv-lint/bin/ruff check tools
+PATH=".venv-lint/bin:$PATH" actionlint
+cmake --preset dev && cmake --build --preset dev
+.venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
+```
+
+`clang-tidy` ne fait échouer que les constats absents de `tools/lint/clang-tidy-reference.txt`, qui liste ceux du code porté et fait foi sous Linux. Fausse alerte : `// NOLINT(regle)` sur la ligne, avec le motif. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md).
+
+### 5. Publier une version
 1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).
 2. Pousser un tag : `v<version>` publie une release, `v<version>-rc1` (ou tout autre suffixe) une **pré-release**, facultative. Un tag qui ne correspond pas à `project(VERSION)`, ou une version sans section dans `CHANGELOG.md`, arrête le workflow avant toute compilation.
 3. Le workflow vérifie les paquets, démarre une simulation depuis une carte du `.dmg` monté en lecture seule (sinon, pas de release), puis lance la recette Windows sur la release publiée. Une recette en échec laisse la release publiée : le run « Installeurs » est alors en échec, et il faut publier une version corrective.
 4. Ce qu'une machine ne couvre pas reste à faire à la main si besoin : [`docs/RECETTE.md`](docs/RECETTE.md).
 
-### 5. Code d'origine (`src/`)
+### 6. Code d'origine (`src/`)
 `src/` contient le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4). Il est en **lecture seule** : on ne le modifie pas, mais il sert encore de source au portage :
 * `tools/dfm2ui.py` produit les fiches Qt (`app/ui/*.ui`) depuis ses `.dfm` ;
 * `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
@@ -152,6 +165,7 @@ Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/si
 * [x] Corriger les plantages trouvés ensuite et les derniers comportements gênants de l'interface (version 6.0.3).
 * [x] Tester le parcours d'édition d'une carte par l'interface, et corriger les pertes de modifications trouvées (version 6.0.4).
 * [x] Tester les fiches Feux par l'interface, et corriger la suppression d'un feu référencé (version 6.0.5).
+* [x] Mettre en place un linter dans la CI (version 6.0.6, [`PLAN_CI.md`](PLAN_CI.md)).
 * [ ] Signature et notarisation des paquets (Windows, macOS).
 * [ ] Traduction / localisation de l'interface en anglais.
 * [ ] Portage WebAssembly pour exécuter la simulation directement dans le navigateur.
