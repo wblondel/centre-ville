@@ -8,7 +8,7 @@ name: Tests moteur
 # Compile aussi l'application Qt (cvw) sur les trois systèmes et exécute le
 # test de son interface (pilotage de Démo.cvw, sans affichage).
 #
-# Les 8 jobs sont exigés sur main : ils doivent donc exister sur TOUTES les PR,
+# Les 10 jobs sont exigés sur main : ils doivent donc exister sur TOUTES les PR,
 # sinon une PR qui ne touche que la documentation reste bloquée. Le workflow se
 # lance sur chaque PR ; le job « changements » regarde si la PR touche un
 # fichier dont dépendent la compilation ou les tests. Si ce n'est pas le cas,
@@ -19,8 +19,8 @@ name: Tests moteur
 #
 # Job « sanitizers » : toute la suite sous AddressSanitizer et UBSan, qui voient
 # les lectures et écritures hors des tableaux que les autres jobs laissent passer.
-# Il n'est pas exigé sur main (il n'existe pas sur les PR sans code). Une erreur
-# d'UBSan arrête le test (halt_on_error), sinon elle ne ferait qu'un message.
+# Une erreur d'UBSan arrête le test (halt_on_error), sinon elle ne ferait qu'un
+# message.
 # Les fuites ne sont pas cherchées (detect_leaks=0) : LSan, sous Linux seulement,
 # signalerait aussi celles de Qt.
 
@@ -209,39 +209,48 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     needs: changements
-    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
 
     steps:
+      - name: Aucun fichier testé n'a changé
+        if: needs.changements.outputs.code == 'false'
+        run: echo "La PR ne touche ni le code, ni les tests, ni docs/ ou res/, rien à compiler."
+
       - name: Checkout repository
+        if: needs.changements.outputs.code != 'false'
         uses: actions/checkout@v4
 
       - name: Install Linux dependencies of Qt, and Ninja
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && needs.changements.outputs.code != 'false'
         run: |
           sudo apt-get update
           sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1 libxkbcommon-dev libfontconfig1-dev libfreetype-dev
 
       - name: Install Ninja
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && needs.changements.outputs.code != 'false'
         run: brew install ninja
 
       - name: Install Qt 6.8 LTS
+        if: needs.changements.outputs.code != 'false'
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.8.*'
           cache: true
 
       - name: Configure (CMake preset asan)
+        if: needs.changements.outputs.code != 'false'
         run: cmake --preset asan -DCV_APP=ON
 
       - name: Build
+        if: needs.changements.outputs.code != 'false'
         run: cmake --build --preset asan --parallel
 
       # Pile : le calcul récursif des distances en demande plus sous ASan. Sous
       # Linux, les tests suivent « ulimit -s » (Windows et macOS : à l'édition de liens)
       - name: Run tests (CTest)
+        if: needs.changements.outputs.code != 'false'
         shell: bash
         run: |
           if [ "$RUNNER_OS" = Linux ]; then ulimit -s 65536; fi
