@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(CentreVille
-  VERSION 6.0.4
+  VERSION 6.0.5
   DESCRIPTION "Centre-Ville : simulateur de circulation urbaine"
   HOMEPAGE_URL "http://patquoi.fr"
   LANGUAGES CXX
