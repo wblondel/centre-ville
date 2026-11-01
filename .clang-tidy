@@ -1,0 +1,31 @@
+# Analyse statique du C++ (tools/lint_cpp.py, job « Lint C++ » de la CI).
+# Bugs et performance seulement : le code porté garde le style de l'original, pour rester
+# comparable à src/ (app/README.md). Les constats déjà présents sont dans
+# tools/lint/clang-tidy-reference.txt : seuls les nouveaux font échouer la CI.
+#
+# Règles retirées, parce qu'elles visent un style de l'original, voulu ou sans risque :
+#  - assignment-in-if-condition, assignment-in-selection-statement : if ((x=...)), partout ;
+#  - signed-bitwise : les directions (dirposs) sont des masques de bits sur des entiers ;
+#  - throwing-static-initialization, cert-err58-cpp : chaînes globales AnsiString ;
+#  - easily-swappable-parameters : (x, y) dans toutes les signatures ;
+#  - performance-enum-size : la taille des énumérés fait partie du format .cvw.
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  cert-err33-c,cert-err34-c,cert-flp*,cert-mem*,cert-oop*,
+  concurrency-*,
+  misc-definitions-in-headers,misc-misplaced-const,misc-new-delete-overloads,
+  misc-redundant-expression,misc-throw-by-value-catch-by-reference,
+  misc-unconventional-assign-operator,misc-uniqueptr-reset-release,misc-unused-using-decls,
+  performance-*,
+  portability-*,
+  -bugprone-assignment-in-if-condition,
+  -bugprone-assignment-in-selection-statement,
+  -bugprone-signed-bitwise,
+  -bugprone-throwing-static-initialization,
+  -cert-err58-cpp,
+  -bugprone-easily-swappable-parameters,
+  -performance-enum-size
+HeaderFilterRegex: '(engine|app|tests)/.*\.h$'
+ExcludeHeaderFilterRegex: '(^|/)build/'

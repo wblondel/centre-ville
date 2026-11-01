@@ -23,6 +23,9 @@ name: Tests moteur
 # message.
 # Les fuites ne sont pas cherchées (detect_leaks=0) : LSan, sous Linux seulement,
 # signalerait aussi celles de Qt.
+#
+# Jobs de lint : tools/lint/requirements.txt fixe les versions. clang-tidy n'échoue que
+# sur un constat absent de tools/lint/clang-tidy-reference.txt (tools/lint_cpp.py).
 
 on:
   push:
@@ -40,6 +43,8 @@ on:
       - 'res/**'
       - 'CMakeLists.txt'
       - 'CMakePresets.json'
+      - '.clang-tidy'
+      - 'ruff.toml'
       - '.github/workflows/tests-moteur.yml'
   pull_request:
   workflow_dispatch:
@@ -77,7 +82,7 @@ jobs:
           fi
           fichiers=$(git diff --name-only HEAD^1 HEAD)
           echo "$fichiers"
-          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.github/workflows/tests-moteur\.yml$' <<< "$fichiers"; then
+          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^ruff\.toml$|^\.github/workflows/tests-moteur\.yml$' <<< "$fichiers"; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
             echo "code=false" >> "$GITHUB_OUTPUT"
@@ -259,3 +264,74 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           ASAN_OPTIONS: detect_leaks=0
           UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+
+  lint-outils:
+    name: Lint Python et workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install tools
+        run: |
+          python3 -m venv "$RUNNER_TEMP/lint"
+          "$RUNNER_TEMP/lint/bin/pip" install --quiet -r tools/lint/requirements.txt
+
+      - name: Python (ruff)
+        run: '"$RUNNER_TEMP/lint/bin/ruff" check tools'
+
+      - name: Workflows (actionlint)
+        run: '"$RUNNER_TEMP/lint/bin/actionlint"'
+
+  lint-cpp:
+    name: Lint C++ (clang-tidy)
+    needs: changements
+    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Linux dependencies of Qt, and Ninja
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgl1-mesa-dev libegl1 libxkbcommon-dev libfontconfig1-dev libfreetype-dev
+
+      - name: Install Qt 6.8 LTS
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          cache: true
+
+      # clang-tidy lit compile_commands.json et les en-têtes générés : rien d'autre à compiler
+      - name: Configure and generate headers
+        run: |
+          cmake -S . -B build/lint -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCV_APP=ON -DCV_TESTS=ON -DCMAKE_GLOBAL_AUTOGEN_TARGET=ON
+          cmake --build build/lint --target autogen --parallel
+
+      - name: Install clang-tidy
+        run: |
+          python3 -m venv "$RUNNER_TEMP/lint"
+          "$RUNNER_TEMP/lint/bin/pip" install --quiet -r tools/lint/requirements.txt
+
+      - name: Run clang-tidy
+        run: >
+          python3 tools/lint_cpp.py --dossier build/lint --clang-tidy "$RUNNER_TEMP/lint/bin/clang-tidy"
+          --sortie build/lint/constats-clang-tidy.txt
+
+      - name: Upload findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: constats-clang-tidy
+          path: build/lint/constats-clang-tidy.txt
+          if-no-files-found: ignore
+          retention-days: 14
