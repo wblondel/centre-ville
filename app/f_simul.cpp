@@ -1145,7 +1145,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 
  // Calcul du nombre et des numéros de feux de la voie
  for(i=0; i<NBDIR; i++)
-  if (v->NumFeu[i]>0) NumFeuVoie[NbFeuxVoie++]=v->NumFeu[i];
+  if ((v->NumFeu[i]>0)&&(NbFeuxVoie<2)) NumFeuVoie[NbFeuxVoie++]=v->NumFeu[i]; // v6.0.6 : jusqu'à 4 feux sur une case, écrits par l'original dans ce tableau de 2. Le choix porte sur les 2 premiers
 
  // Attention : les listes sont exclusives à la sélection donc pas d'initialisation entre les 2
 
@@ -1946,8 +1946,8 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
      // v5.4 : conversion CBC6>BCBX (= au lieu de += dans les énumérés)
 	 if (((TypeVoie&tvRoute)&&v->DirPoss&&(NumArret=v->NumArretBus)&&(TypeVoieCrt=tvRoute))||
          ((TypeVoie&tvVoieTram)&&v->SensVoieTram&&(NumArret=v->NumArretTram)&&(TypeVoieCrt=(TypeVoieCrt?tvTout:tvVoieTram)))) // v3.5
-      if (((TypeVoieCrt&tvRoute)&&(!ArretBusDejaVu[NumArret]))||
-          ((TypeVoieCrt&tvVoieTram)&&(!ArretTramDejaVu[NumArret])))
+      if (((TypeVoieCrt&tvRoute)&&(!ArretBusDejaVu[NumArret-1]))|| // v6.0.6 : NumArret-1, l'original lisait hors du tableau pour le dernier arrêt
+          ((TypeVoieCrt&tvVoieTram)&&(!ArretTramDejaVu[NumArret-1])))
        {
         switch(TypeVoieCrt)
          {
