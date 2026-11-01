@@ -167,9 +167,10 @@ class TLabel : public ControleVcl<QLabel>
 // fait foi. Value lit StrToInt(Text), ou MinValue si le texte n'est pas un
 // nombre ; Value=... écrit IntToStr(CheckValue(v)). MinValue et MaxValue sont
 // de simples champs (les changer ne touche ni au texte ni à OnChange), que
-// CheckValue n'applique que s'ils diffèrent : à l'affectation de Value, aux
-// flèches (Value=Value±Increment) et en quittant le champ (CMExit). La frappe
-// n'est pas bornée (IsValidChar : chiffres, signes, séparateur décimal).
+// CheckValue applique sauf s'ils valent tous deux 0 (v6.0.3 : CSPIN.pas, s'ils
+// diffèrent) : à l'affectation de Value, aux flèches (Value=Value±Increment) et
+// en quittant le champ (CMExit). La frappe n'est pas bornée (IsValidChar :
+// chiffres, signes, séparateur décimal).
 // OnChange suit le texte (EN_CHANGE) : frappe, ou Value=... qui le change.
 // Base QAbstractSpinBox et non QSpinBox : sans type de valeur, Qt ne touche
 // jamais au texte (QSpinBox le borne pendant la frappe et le remplace par sa

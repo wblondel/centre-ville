@@ -168,10 +168,10 @@ void TfrmInfosPieton::RafraichitInfos()
    {
     if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvé de piéton
 		(v->NumPieton[1]!=NumPieton)&& // sur la case courante ET
-		(v->NumBus!=cv->Pieton[NumPieton-1].NumBus)&&
-		(v->NumTram!=cv->Pieton[NumPieton-1].NumTram)&&
-		(v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi)&&
-		(v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib)) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
+		(!cv->Pieton[NumPieton-1].NumBus||(v->NumBus!=cv->Pieton[NumPieton-1].NumBus))&& // v6.0.3 : un piéton à pied (0) « était » dans le véhicule d'une case qui n'en a pas (0)
+		(!cv->Pieton[NumPieton-1].NumTram||(v->NumTram!=cv->Pieton[NumPieton-1].NumTram))&&
+		(!cv->Pieton[NumPieton-1].NumTaxi||(v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi))&&
+		(!cv->Pieton[NumPieton-1].NumVehlib||(v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib))) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
 	 { // On cherche un autre piéton
 	  if (v->NumPieton[0])
 	   NumPieton=v->NumPieton[0];

@@ -93,6 +93,7 @@ void TfrmParamSimul::CSpinEditNbPietonsChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des possibilités de véhicules déporté en fonction car utilisé dans FormShow
  {
+  if ((cv->NbParkings*(cv->NbParkings-1)+2*cv->NbPlacesPark)<=0) return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
   int NbMinVehicules= cv->NbParkings*(cv->NbParkings-1)
                      +2*cv->NbPlacesPark, // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
 	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules), // v5.0.3

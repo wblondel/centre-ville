@@ -554,3 +554,24 @@ TEST_CASE("Vérification d'intégrité : le message du dépôt de bus donne ses 
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Vérification d'intégrité : moins de deux parkings, sans division par zéro (v6.0.3)", "[corrections][verification]")
+ { // L'original divisait par NbParkings*(NbParkings-1) avant de tester le nombre
+   // de parkings : arrêt de l'application sur x86, valeur quelconque sur ARM
+  VueNulle Vue;
+  vue=&Vue;
+  for(int NbParkings : {0, 1})
+   {
+    cv=new centre_ville(true, NBXMIN, NBYMIN);
+    cv->DefinitNbParkings(NbParkings);
+    AnsiString asMsgErr;
+    cv->Verifie(asMsgErr);
+    const std::string asMessages=asMsgErr.str();
+    delete cv;
+    cv=nullptr;
+    INFO(asMessages);
+    CHECK(asMessages.find("Le nombre de parkings est incorrect ("+std::to_string(NbParkings)+")\n")!=std::string::npos);
+    CHECK(asMessages.find("Le nombre de véhicules ne permet pas une simulation équilibrée")!=std::string::npos);
+   }
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------

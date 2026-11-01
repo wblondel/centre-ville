@@ -58,6 +58,12 @@ void TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
 {
  NbX=CSpinEditNbX->Value;
  NbY=CSpinEditNbY->Value;
+ if ((NbX>NBXMAX)||(NbY>NBYMAX)) // v6.0.3 : aucune limite dans l'original (mémoire épuisée, plantage)
+  AfficheMessage( Format( "Vous devez spécifier une zone d'au plus %dx%d.",
+                          ARRAYOFCONST((NBXMAX, NBYMAX))),
+                  "Zone trop grande",
+                  tmAvertissement, 0, 0);
+ else
  if ((NbX>=NBXMIN)&&(NbY>=NBYMIN))
   ModalResult=mrOk;
  else

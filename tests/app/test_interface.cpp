@@ -606,6 +606,9 @@ class TestInterface : public QObject
   void fichesDistances();
   void fichesInfos();
   void fichePietonDansUnVehicule();
+  void fichePietonSuiviAilleurs();
+  void dimensionsZoneBornees();
+  void parametresSansParking();
   // Lot 3 des fiches secondaires (phase 6)
   void ficheComposition();
   void fichesEvolutionEtVehicules();
@@ -2968,6 +2971,130 @@ void TestInterface::fichePietonDansUnVehicule()
   QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
+void TestInterface::fichePietonSuiviAilleurs()
+ { // v6.0.3 : Rechercher suit un piéton à pied, et le curseur est sur une case où se
+   // trouve un autre piéton : la fiche montre celui de la case. L'original gardait le
+   // piéton suivi (0 du piéton à pied égal au 0 d'une case sans véhicule). Sur une case
+   // sans piéton, la fiche garde le piéton suivi, comme l'original
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "pieton_suivi.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  TfrmSimulation *s=frmSimulation;
+  TfrmInfosPieton *f=frmInfosPieton;
+  TfrmRecherche *r=frmRecherche;
+  s->ActionDetailPieton->Execute();
+  s->ActionRechercher->Execute();
+  QVERIFY(f->isVisible()&&r->isVisible());
+  r->RadioButtonParking->Checked=true;
+  auto APied=[](int i)
+   {
+    pieton *p=cv->Pieton+i;
+    return p->Defini()&&!p->NumBus&&!p->NumTram&&!p->NumTaxi&&!p->NumVehlib&&
+           (cv->v[p->x][p->y].NumPieton[0]==i+1);
+   };
+  int Suivi=0, Autre=0;
+  for(int Tour=0; (Tour<2000)&&!Autre&&!QTest::currentTestFailed(); Tour++)
+   {
+    JoueTour();
+    Suivi=0;
+    for(int i=0; (i<cv->NbPietons)&&!Autre; i++)
+     if (APied(i))
+      {
+       if (!Suivi) Suivi=i+1;
+       else
+        if ((cv->Pieton[i].x!=cv->Pieton[Suivi-1].x)||(cv->Pieton[i].y!=cv->Pieton[Suivi-1].y)) Autre=i+1;
+      }
+   }
+  QVERIFY(Autre);
+  auto Fiche=[f, this](int x, int y)
+   {
+    PlaceCurseur(x, y);
+    f->RafraichitInfos();
+    return Q(f->GroupBoxPieton->Caption);
+   };
+  pieton *a=cv->Pieton+Autre-1, *b=cv->Pieton+Suivi-1;
+  const QString asAutre=Fiche(a->x, a->y); // Piéton de la case, rien n'étant suivi
+  r->RadioButtonPieton->Checked=true;
+  r->CSpinEditPieton->Value=Suivi;
+  const QString asSuivi=Fiche(b->x, b->y);
+  QVERIFY(asAutre!=asSuivi);
+  QCOMPARE(Fiche(a->x, a->y), asAutre);
+  // Case sans piéton ni véhicule
+  int xVide=-1, yVide=-1;
+  for(int x=0; (x<cv->NbX)&&(xVide<0); x++)
+   for(int y=0; (y<cv->NbY)&&(xVide<0); y++)
+    {
+     voie *v=&cv->v[x][y];
+     if (!v->NumPieton[0]&&!v->NumPieton[1]&&!v->NumBus&&!v->NumTram&&!v->NumTaxi&&!v->NumVehlib) { xVide=x; yVide=y; }
+    }
+  QVERIFY(xVide>=0);
+  QCOMPARE(Fiche(xVide, yVide), asSuivi);
+  Clique(r->ButtonAnnuler);
+  Clique(f->ButtonOk);
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::dimensionsZoneBornees()
+ { // v6.0.3 : l'original n'avait aucune limite haute (99999x99999 : 2,5 To)
+  QVERIFY(!OuvreDemo("dimensions_zone.cvw").isEmpty());
+  voie **Zone=cv->v;
+  bool Refuse=false, Ouverte=false;
+  Messages.clear();
+  QuandModale([]() { return frmDimensionsZone; }, [&]()
+   {
+    frmDimensionsZone->CSpinEditNbX->Value=NBXMAX+1;
+    frmDimensionsZone->CSpinEditNbY->Value=NBYMAX;
+    Clique(frmDimensionsZone->ButtonCreer);
+    Refuse=Messages.join('\n').contains(QString::fromUtf8("zone d'au plus %1x%2").arg(NBXMAX).arg(NBYMAX));
+    Messages.clear();
+    frmDimensionsZone->CSpinEditNbX->Value=NBXMAX;
+    frmDimensionsZone->CSpinEditNbY->Value=NBYMAX+1;
+    Clique(frmDimensionsZone->ButtonCreer);
+    Refuse=Refuse&&Messages.join('\n').contains(QString::fromUtf8("zone d'au plus %1x%2").arg(NBXMAX).arg(NBYMAX));
+    Ouverte=frmDimensionsZone->isVisible();
+    Clique(frmDimensionsZone->ButtonAnnuler);
+   });
+  QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  QVERIFY(Etapes.empty());
+  QVERIFY(Refuse);
+  QVERIFY(Ouverte);
+  QCOMPARE(cv->v, Zone); // Réseau ouvert gardé
+  // La plus grande zone possible
+  Messages.clear();
+  QuandModale([]() { return frmDimensionsZone; }, [&]()
+   {
+    frmDimensionsZone->CSpinEditNbX->Value=NBXMAX;
+    frmDimensionsZone->CSpinEditNbY->Value=NBYMAX;
+    frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
+    frmDimensionsZone->CheckBoxGenererReseau->Checked=false;
+    Clique(frmDimensionsZone->ButtonCreer);
+   });
+  QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  QCOMPARE(cv->NbX, NBXMAX);
+  QCOMPARE(cv->NbY, NBYMAX);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::parametresSansParking()
+ { // v6.0.3 : moins de deux parkings et aucune place : division par zéro à l'ouverture
+   // de la fiche dans l'original (arrêt de l'application sur x86, relevé par UBSan sur ARM)
+  QVERIFY(!OuvreDemo("sans_parking.cvw").isEmpty());
+  const int NbX=cv->NbX, NbY=cv->NbY;
+  delete cv;
+  cv=new centre_ville(true, NbX, NbY);
+  cv->DefinitNbParkings(0);
+  QCOMPARE(cv->NbPlacesPark, 0);
+  bool Vue=false;
+  QuandModale([]() { return frmParamSimul; }, [&]()
+   {
+    Vue=frmParamSimul->isVisible();
+    Clique(frmParamSimul->ButtonAnnuler);
+   });
+  Clique(frmSimulation->ToolButtonParametres);
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY(Vue);
+ }
+//---------------------------------------------------------------------------
 // Lot 3 des fiches secondaires : statistiques et recherche
 //---------------------------------------------------------------------------
 namespace
@@ -4115,9 +4242,10 @@ void TestInterface::controleCSpinEdit()
    // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
    // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
    // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
-   // le texte reste vide ; flèches : Value±Increment, borné ; sans bornes si
-   // MinValue=MaxValue ; EditorEnabled=False : flèches seulement ; texte
-   // sélectionné en entrant dans le champ (sauf au clic)
+   // le texte prend cette valeur en quittant le champ (v6.0.3) ; flèches :
+   // Value±Increment, borné ; sans bornes si MinValue=MaxValue=0 (v6.0.3) ;
+   // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
+   // le champ (sauf au clic)
   QWidget Fiche;
   TCSpinEdit *s=new TCSpinEdit(&Fiche);
   TButton *b=new TButton(&Fiche);
@@ -4171,7 +4299,7 @@ void TestInterface::controleCSpinEdit()
   QVERIFY(b->hasFocus());
   QCOMPARE(Texte->text(), QString("3"));
   QCOMPARE(NbChange, 3);
-  // Texte vide : Value=MinValue, déjà dans les bornes : le texte reste vide
+  // Texte vide : Value=MinValue pendant la frappe ; v6.0.3 : écrit en quittant le champ
   s->setFocus(Qt::MouseFocusReason);
   s->selectAll();
   QTest::keyClick(s, Qt::Key_Backspace);
@@ -4179,8 +4307,15 @@ void TestInterface::controleCSpinEdit()
   QCOMPARE((int)s->Value, 1);
   QCOMPARE(NbChange, 4);
   b->setFocus(Qt::TabFocusReason);
-  QCOMPARE(Texte->text(), QString());
-  QCOMPARE(NbChange, 4);
+  QCOMPARE(Texte->text(), QString("1"));
+  QCOMPARE(NbChange, 5);
+  // v6.0.3 : de même pour un signe seul
+  s->setFocus(Qt::MouseFocusReason);
+  s->selectAll();
+  QTest::keyClicks(s, "-");
+  QCOMPARE(Texte->text(), QString("-"));
+  b->setFocus(Qt::TabFocusReason);
+  QCOMPARE(Texte->text(), QString("1"));
   // Flèches (touches haut et bas, stepBy des boutons) : Value±Increment, borné
   s->MinValue=0;
   s->MaxValue=10;
@@ -4202,11 +4337,21 @@ void TestInterface::controleCSpinEdit()
   QCOMPARE((int)s->Value, -9);
   QTest::keyClick(s, Qt::Key_Up);
   QCOMPARE(Texte->text(), QString("0"));
-  // MinValue=MaxValue : aucune borne, ni à l'affectation ni en sortant
+  // v6.0.3 : MinValue=MaxValue : un seul numéro possible, appliqué comme les autres bornes
   s->MinValue=7;
   s->MaxValue=7;
   s->Value=-12;
+  QCOMPARE(Texte->text(), QString("7"));
+  s->selectAll();
+  QTest::keyClicks(s, "99");
+  b->setFocus(Qt::TabFocusReason);
+  QCOMPARE(Texte->text(), QString("7"));
+  // MinValue=MaxValue=0 (valeurs par défaut) : aucune borne, ni à l'affectation ni en sortant
+  s->MinValue=0;
+  s->MaxValue=0;
+  s->Value=-12;
   QCOMPARE(Texte->text(), QString("-12"));
+  s->setFocus(Qt::MouseFocusReason);
   s->selectAll();
   QTest::keyClicks(s, "99999");
   b->setFocus(Qt::TabFocusReason);
