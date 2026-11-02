@@ -59,10 +59,7 @@ void TfrmInfosTaxi::RafraichitInfos()
  {
   int i,
       NumPlaceTeteFile,
-      NbDirPoss,
-      MinDistFile=0x7FFFFFFF,
-      ResteAParcourir,
-      DistMin;
+      MinDistFile=0x7FFFFFFF;
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;

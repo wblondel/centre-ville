@@ -33,11 +33,6 @@ QColor CouleurQt(TColor Couleur)
   return QColor(Couleur&0xFF, (Couleur>>8)&0xFF, (Couleur>>16)&0xFF);
  }
 //---------------------------------------------------------------------------
-TColor CouleurVcl(const QColor &Couleur)
- {
-  return (TColor)(Couleur.red()|(Couleur.green()<<8)|(Couleur.blue()<<16));
- }
-//---------------------------------------------------------------------------
 TColor CouleurDepuisTexte(const AnsiString &asCouleur)
  {
   static const std::map<std::string, TColor> Noms=
@@ -120,16 +115,6 @@ void TCanvas::FillRect(const TRect &r)
   Peintre->fillRect(r.Qt(), CouleurQt(Brush->Color));
  }
 //---------------------------------------------------------------------------
-void TCanvas::FrameRect(const TRect &r)
- {
-  if (!Peintre) return;
-  QColor c=CouleurQt(Brush->Color);
-  Peintre->fillRect(QRect(r.Left, r.Top, r.Width(), 1), c);
-  Peintre->fillRect(QRect(r.Left, r.Bottom-1, r.Width(), 1), c);
-  Peintre->fillRect(QRect(r.Left, r.Top, 1, r.Height()), c);
-  Peintre->fillRect(QRect(r.Right-1, r.Top, 1, r.Height()), c);
- }
-//---------------------------------------------------------------------------
 void TCanvas::Rectangle(int x1, int y1, int x2, int y2)
  { // GDI : contour au crayon, intérieur à la brosse, bords droit et bas exclus
   if (!Peintre) return;
@@ -180,19 +165,6 @@ void TCanvas::TextOut(int x, int y, const AnsiString &asTexte)
   Peintre->drawText(QPoint(x, y+m.ascent()), t);
  }
 //---------------------------------------------------------------------------
-void TCanvas::TextRect(const TRect &r, int x, int y, const AnsiString &asTexte)
- {
-  if (!Peintre) return;
-  Peintre->save();
-  Peintre->setClipRect(r.Qt(), ::Qt::IntersectClip);
-  FillRect(r);
-  TBrushStyle Style=Brush->Style;
-  Brush->Style=bsClear;
-  TextOut(x, y, asTexte);
-  Brush->Style=Style;
-  Peintre->restore();
- }
-//---------------------------------------------------------------------------
 int TCanvas::TextWidth(const AnsiString &asTexte)
  {
   return QFontMetrics(Font->Qt()).horizontalAdvance(Q(asTexte));
@@ -202,11 +174,6 @@ int TCanvas::TextHeight(const AnsiString &asTexte)
  {
   (void)asTexte;
   return QFontMetrics(Font->Qt()).height();
- }
-//---------------------------------------------------------------------------
-void TCanvas::Draw(int x, int y, const QPixmap &Image)
- {
-  if (Peintre) Peintre->drawPixmap(QPoint(x, y), Image);
  }
 //---------------------------------------------------------------------------
 void TCanvas::DrawFocusRect(const TRect &r)

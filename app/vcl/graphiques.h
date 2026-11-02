@@ -38,19 +38,11 @@ const TColor clScrollBar=(TColor)0xFF000000, clBackground=(TColor)0xFF000001,
              clBtnText=(TColor)0xFF000012, clBtnHighlight=(TColor)0xFF000014,
              clInfoBk=(TColor)0xFF000018;
 QColor CouleurQt(TColor Couleur);
-TColor CouleurVcl(const QColor &Couleur);
 TColor CouleurDepuisTexte(const AnsiString &asCouleur); // "clRed", "0x00FF0080"...
 // RGB de windows.h : 0x00BBGGRR (statistiques de fluidité et de trafic)
 #ifndef RGB // macro de windows.h, si l'en-tête a déjà été inclus
 inline int RGB(int r, int g, int b) { return (r&0xFF)|((g&0xFF)<<8)|((b&0xFF)<<16); }
 #endif
-//---------------------------------------------------------------------------
-struct TPoint
- {
-  int X=0, Y=0;
-  TPoint() {}
-  TPoint(int x, int y) : X(x), Y(y) {}
- };
 //---------------------------------------------------------------------------
 struct TRect
  {
@@ -61,7 +53,6 @@ struct TRect
   int Height() const { return Bottom-Top; }
   QRect Qt() const { return QRect(Left, Top, Right-Left, Bottom-Top); }
  };
-inline TRect Rect(int l, int t, int r, int b) { return TRect(l, t, r, b); }
 //---------------------------------------------------------------------------
 enum TBrushStyle { bsSolid, bsClear };
 enum TPenStyle { psSolid, psDash, psDot, psDashDot, psDashDotDot, psClear };
@@ -137,17 +128,13 @@ class TCanvas
   QPainter *Painter() const { return Peintre; }
   bool Actif() const { return Peintre!=nullptr; }
   void FillRect(const TRect &r);
-  void FrameRect(const TRect &r);
   void Rectangle(int x1, int y1, int x2, int y2);
-  void Rectangle(const TRect &r) { Rectangle(r.Left, r.Top, r.Right, r.Bottom); }
   void Ellipse(int x1, int y1, int x2, int y2);
   void MoveTo(int x, int y);
   void LineTo(int x, int y);
   void TextOut(int x, int y, const AnsiString &asTexte);
-  void TextRect(const TRect &r, int x, int y, const AnsiString &asTexte);
   int TextWidth(const AnsiString &asTexte);
   int TextHeight(const AnsiString &asTexte);
-  void Draw(int x, int y, const QPixmap &Image);
   void DrawFocusRect(const TRect &r);
  };
 //---------------------------------------------------------------------------

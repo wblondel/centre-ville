@@ -15,7 +15,6 @@
 #ifndef vcl_listeimagesH
 #define vcl_listeimagesH
 //---------------------------------------------------------------------------
-#include <QIcon>
 #include <QPixmap>
 #include <map>
 #include <vector>
@@ -35,7 +34,6 @@ class TVirtualImageList : public QObject
   void Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enabled=true);
   void GetBitmap(int Index, TBitmap *Bitmap) const;
   QPixmap Pixmap(int Index) const;
-  QIcon Icone(int Index) const;
  };
 //---------------------------------------------------------------------------
 // Agrandissement au plus proche voisin, pour un facteur d'échelle d'écran

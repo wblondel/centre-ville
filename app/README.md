@@ -251,6 +251,10 @@ une release seulement sur un tag. Ni signature ni notarisation.
   sur `QPainter` ; `listeimages.*` : `TVirtualImageList` (indices `IDB_*`
   inchangés), images agrandies sans lissage en HiDPI.
 
+La couche ne garde que ce que les fiches utilisent : les fonctions sans
+appelant ont été retirées après la 6.0.7 (liste et méthode dans
+`engine/README.md`, « Code mort retiré »).
+
 ## Marche, l'enregistrement et les interruptions (v6.0.1)
 
 `ActionMarcheExecute` prépare le réseau (`Prepare*`, qui ne sont pas réversibles :

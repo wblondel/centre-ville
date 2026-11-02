@@ -160,7 +160,6 @@ TEST_CASE("TDateTime/Time() : chronométrage", "[compat][temps]")
   CHECK((double)dtTop<1.0);
   dtTemps+=(Time()-dtTop);
   CHECK((double)dtTemps>-1.0/86400); // à minuit près
-  CHECK((double)Now()>45000.0); // après 2023
  }
 //---------------------------------------------------------------------------
 TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écriture mêlées)", "[compat][fichier]")

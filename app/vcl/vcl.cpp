@@ -13,8 +13,6 @@
 #include <stdexcept>
 //---------------------------------------------------------------------------
 String String::UpperCase() const { return A(Q(*this).toUpper()); }
-String String::LowerCase() const { return A(Q(*this).toLower()); }
-String String::Trim() const { return A(Q(*this).trimmed()); }
 //---------------------------------------------------------------------------
 int ParamCount()
  {
@@ -47,20 +45,6 @@ String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
     else r+=f[i++];
    }
   return String(r);
- }
-//---------------------------------------------------------------------------
-String ExtractFilePath(const AnsiString &asNomFichier)
- {
-  QString s=Q(asNomFichier);
-  int i=(int)qMax(s.lastIndexOf('/'), s.lastIndexOf('\\'));
-  return A(s.left(i+1));
- }
-//---------------------------------------------------------------------------
-String ExtractFileName(const AnsiString &asNomFichier)
- {
-  QString s=Q(asNomFichier);
-  int i=(int)qMax(s.lastIndexOf('/'), s.lastIndexOf('\\'));
-  return A(s.mid(i+1));
  }
 //---------------------------------------------------------------------------
 int StrToInt(const AnsiString &asTexte)
@@ -182,10 +166,5 @@ TApplication *Application=nullptr;
 TApplication::TApplication()
  { // Avec MainFormOnTaskBar, Title n'apparaît nulle part : il est seulement mémorisé
   Title.Definit([this]() { return asTitre; }, [this](const AnsiString &as) { asTitre=as; });
- }
-//---------------------------------------------------------------------------
-void TApplication::ProcessMessages()
- {
-  QCoreApplication::processEvents();
  }
 //---------------------------------------------------------------------------

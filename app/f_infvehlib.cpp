@@ -57,10 +57,7 @@ void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
 void TfrmInfosVehlib::RafraichitInfos()
  {
   int i,
-      NbDirPoss,
-      MinDistPlace=0x7FFFFFFF,
-      ResteAParcourir,
-      DistMin;
+      MinDistPlace=0x7FFFFFFF;
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;

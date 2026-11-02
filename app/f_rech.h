@@ -78,7 +78,6 @@ public: // portage : __published	// Composants gérés par l'EDI
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
 private:	// Déclarations de l'utilisateur
-    int xPrc, yPrc;
     void RafraichitAffichage();
 public:		// Déclarations de l'utilisateur
     TfrmRecherche(TComponent* Owner);

@@ -86,7 +86,6 @@ app/grille/GrilleSimulation.h: [bugprone-derived-method-shadowing-base-method] '
 app/vcl/actions.cpp: [bugprone-branch-clone] repeated branch body in conditional chain
 app/vcl/controles.cpp: [bugprone-incorrect-roundings] casting (double + 0.5) to integer leads to incorrect rounding; consider using lround (#include <cmath>) instead
 app/vcl/controles.cpp: [clang-analyzer-cplusplus.NewDeleteLeaks] Potential leak of memory pointed to by 'Filtre'
-app/vcl/controles.h: [bugprone-derived-method-shadowing-base-method] 'TStringGrid::Invalidate' shadows method with the same name in class 'ControleVcl<QAbstractScrollArea>'
 app/vcl/controles.h: [bugprone-derived-method-shadowing-base-method] 'TStringGrid::Repaint' shadows method with the same name in class 'ControleVcl<QAbstractScrollArea>'
 app/vcl/controles.h: [bugprone-unhandled-self-assignment,cert-oop54-cpp] operator=() does not handle self-assignment properly
 app/vcl/controles.h: [portability-template-virtual-member-function] unspecified virtual member function instantiation; the virtual member function is not instantiated but it might be with a different compiler
