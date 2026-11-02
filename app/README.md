@@ -380,7 +380,7 @@ sur Paramètres (modale), bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 ouvrent la bonne page à la bonne rubrique (`QDesktopServices::openUrl`
 intercepté par `setUrlHandler("file")`).
 `tests/app/test_aide.cpp` (CTest `interface.aide`) : les 57 entrées de
-`caCorresp`, lues dans `src/base.cpp` (l'original), ouvrent la page de
+`caCorresp` de l'original, recopiées dans le test, ouvrent la page de
 redirection vers `html/index.html#ANCRE` à côté de l'exécutable, et chaque
 ancre existe dans `docs/guide/index.html` ; tous les `HelpContext` des `.ui`
 ont leur rubrique ; un `HelpContext` inconnu n'ouvre rien ; `html/` et

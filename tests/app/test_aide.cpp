@@ -4,7 +4,7 @@
 // AfficheAideContextuelle, AfficheIndexAide et AfficheTutoriel (base.cpp)
 // ouvrent leur page par QDesktopServices::openUrl, intercepté ici
 // (setUrlHandler("file")). Vérifie :
-//   - les 57 entrées de caCorresp, lues dans src/base.cpp (l'original) :
+//   - les 57 entrées de caCorresp, recopiées de l'original (CorrespOriginal) :
 //     HelpContext -> page de redirection (adresse sans ancre, que le système
 //     ne peut pas perdre) -> html/index.html#ANCRE à côté de l'exécutable ;
 //     chaque ancre existe dans docs/guide/index.html ;
@@ -14,6 +14,8 @@
 //   - l'aide copiée par la compilation à côté de cvw (dans le paquet sous
 //     macOS) est identique à docs/guide et docs/tutorial.
 //---------------------------------------------------------------------------
+#include <cstddef>
+#include <iterator>
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDir>
@@ -28,6 +30,67 @@
 //---------------------------------------------------------------------------
 namespace
  {
+  // Table caCorresp de src/base.cpp (5.4.3.2), recopiée pour que le test ne
+  // dépende plus de src/ : HelpContext -> ancre de html/index.html
+  const struct { int Numero; const char *szHREF; } CorrespOriginal[]=
+                      {{ 0, "ASCV"},
+                       {10, "BR"},
+                       {20, "EDLS"},
+                       {30, "PDLI"},
+                       {31, "LMP"},
+                       {3101, "LMF"},
+                       {3102, "LMA"},
+                       {3103, "LMSI"},
+                       {3104, "LMST"},
+                       {3105, "LMI"},
+                       {311, "PDLS"},
+                       {3111, "DDDDLZDS"},
+                       {3112, "GADUR"},
+                       {3121, "PDRDB"},
+                       {3122, "PDRDT"},
+                       {3123, "PDT"},
+                       {3124, "PDV"},
+                       {313, "CDLS"},
+                       {314, "SDLS"},
+                       {315, "SSLCDR"},
+                       {316, "PDLADSDE"},
+                       {317, "PDLE"}, // v5.4.1
+                       {32, "LBDO"},
+                       {33, "LZDS"},
+                       {3301, "LDEDLZDS"},
+                       {3302, "LMD"},
+                       {34, "LBDE"},
+                       {40, "CDR"},
+                       {41, "DDP"},
+                       {415, "DDPP"},
+                       {42, "DDF"},
+                       {425, "DDFDP"},
+                       {431, "ODC"},
+                       {4311, "OCUCS"},
+                       {4312, "OCPCS"},
+                       {432, "C"},
+                       {44, "BDN"},
+                       {45, "DDLNDUZ"},
+                       {50, "LDLS"},
+                       {611, "EGDLS"},
+                       {612, "SDFEDT"},
+                       {62, "SDVDUEAUA"},
+                       {63, "ADDJAE"},
+                       {641, "ADDJAADB"},
+                       {642, "ADDJAADT"},
+                       {643, "ADDJAFDT"},
+                       {644, "ADDJAFDP"},
+                       {645, "ADDJAPDV"},
+                       {65, "RDUEDLS"},
+                       {66, "ISUV"},
+                       {671, "ISUB"},
+                       {672, "ISUT"},
+                       {673, "ISUVDT"},
+                       {674, "ISUVL"},
+                       {68, "ISUP"},
+                       {69, "RC"},
+                       {70, "MDE"}};
+  //-------------------------------------------------------------------------
   QByteArray Contenu(const QString &asFichier)
    {
     QFile f(asFichier);
@@ -99,19 +162,13 @@ void TestAide::cleanupTestCase()
 //---------------------------------------------------------------------------
 void TestAide::tableDesContextes()
  { // Table caCorresp de l'original : chaque HelpContext ouvre html/index.html#ANCRE
-  QString stSource=QString::fromUtf8(Contenu(CV_SOURCE_BASE));
-  int Debut=stSource.indexOf("caCorresp[NBCONTEXTESAIDE]");
-  QVERIFY(Debut>0);
-  QString stTable=stSource.mid(Debut, stSource.indexOf("};", Debut)-Debut);
-  QRegularExpression Entree("\\{\\s*(\\d+)\\s*,\\s*\"([^\"]+)\"\\s*\\}");
   QSet<QString> AncresGuide=Ancres(CV_DOSSIER_DOCS "/guide/index.html");
   QVERIFY(AncresGuide.size()>57);
-  int n=0;
-  for(auto i=Entree.globalMatch(stTable); i.hasNext(); n++)
+  QCOMPARE(std::size(CorrespOriginal), (std::size_t)57); // NBCONTEXTESAIDE
+  for(const auto &e : CorrespOriginal)
    {
-    QRegularExpressionMatch m=i.next();
-    int HelpContext=m.captured(1).toInt();
-    QString stAncre=m.captured(2);
+    int HelpContext=e.Numero;
+    QString stAncre=e.szHREF;
     QVERIFY2(AncresGuide.contains(stAncre), qPrintable("Ancre absente de docs/guide/index.html : "+stAncre));
     QWidget Fiche;
     Fiche.setProperty("vclHelpContext", HelpContext);
@@ -127,7 +184,6 @@ void TestAide::tableDesContextes()
     Attendue.setFragment(stAncre);
     QCOMPARE(QUrl(Cible(Page)), Attendue);
    }
-  QCOMPARE(n, 57);
  }
 //---------------------------------------------------------------------------
 void TestAide::contextesDesFiches()

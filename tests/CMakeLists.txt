@@ -167,7 +167,6 @@ if(TARGET cvwfiches)
   set_target_properties(test_aide PROPERTIES AUTOMOC ON)
   target_link_libraries(test_aide PRIVATE cvwfiches Qt6::Test)
   target_compile_definitions(test_aide PRIVATE
-    CV_SOURCE_BASE="${PROJECT_SOURCE_DIR}/src/base.cpp"
     CV_DOSSIER_DOCS="${PROJECT_SOURCE_DIR}/docs"
     CV_DOSSIER_UI="${PROJECT_SOURCE_DIR}/app/ui"
     CV_DOSSIER_AIDE_CVW="${CV_AIDE_CVW}"
