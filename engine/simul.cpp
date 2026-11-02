@@ -5920,6 +5920,7 @@ void centre_ville::PrepareFeuxPietons() // v5.2
    if (Feu[i].NbFeuxPtn)
     {
      delete[] Feu[i].NumFeuxPtn;
+     Feu[i].NumFeuxPtn=NULL; // v6.0.7 : sinon AjouteFeuPtn libère une seconde fois ce tableau
      Feu[i].NbFeuxPtn=0;
     }
   // On charge les feux de piétons
@@ -6435,12 +6436,12 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     asMsgErr+=Format("Le nombre de véhicules ne permet pas une simulation équilibrée (%d)\n", ARRAYOFCONST((NbVehicules)));
   if (NbPietons<0)
    asMsgErr+=Format("Le nombre de piétons est incorrect (%d)\n", ARRAYOFCONST((NbPietons)));
-  if (DureeVert<0)
-   asMsgErr+=Format("La durée du feu vert par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
+  if (DureeVert<0) // v6.0.7 : DureeVert, l'original affichait DureeOrange
+   asMsgErr+=Format("La durée du feu vert par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeVert)));
   if (DureeOrange<0)
    asMsgErr+=Format("La durée du feu orange est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
-  if (DureeRouge<0)
-   asMsgErr+=Format("La durée du feu rouge par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeOrange)));
+  if (DureeRouge<0) // v6.0.7 : DureeRouge, l'original affichait DureeOrange
+   asMsgErr+=Format("La durée du feu rouge par défaut est incorrecte (%d)\n", ARRAYOFCONST((DureeRouge)));
   if (AttenteMaxVeh<0)
    asMsgErr+=AnsiString("La durée d'attente maximale d'un véhicule est incorrecte\n");
   if (NbToursParSeconde<0)

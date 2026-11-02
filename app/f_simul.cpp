@@ -1319,6 +1319,11 @@ bool TfrmSimulation::VerifieReseau()
     asMsgErr=Format( "Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                      ARRAYOFCONST((i+1, cv->NbPlacesPark)));
 
+  for(i=0; Ok&&(i<cv->NbPlacesVehlib); i++) // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
+   if (!(Ok=cv->PlaceVehlib[i].Definie()))
+    asMsgErr=Format( "Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
+                     ARRAYOFCONST((i+1)));
+
   for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++)
    for(j=0; Ok&&(j<NBMAXARRETSBUSTRAMPARLIGNE); j++)
     {
