@@ -132,7 +132,6 @@ cmake --preset dev && cmake --build --preset dev
 `src/` contient le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4). Il est en **lecture seule** : on ne le modifie pas, mais il sert encore de source au portage :
 * `tools/dfm2ui.py` produit les fiches Qt (`app/ui/*.ui`) depuis ses `.dfm` ;
 * `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
-* le test de l'aide (`tests/app/test_aide.cpp`) lit la table des rubriques de `src/base.cpp` ;
 * deux contrôles de la CI (`ci.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
 
 Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` montre le portage ligne à ligne.

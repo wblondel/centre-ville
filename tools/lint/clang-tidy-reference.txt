@@ -171,7 +171,6 @@ engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_FEU
 engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_NATURE', which is a reserved identifier
 engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_V', which is a reserved identifier
 engine/simul.h: [bugprone-reserved-identifier] declaration uses identifier '_V_', which is a reserved identifier
-tests/app/test_aide.cpp: [bugprone-narrowing-conversions] narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined
 tests/app/test_interface.cpp: [bugprone-exception-escape] an exception may be thrown in function 'main' which should not throw exceptions
 tests/app/test_interface.cpp: [bugprone-narrowing-conversions] narrowing conversion from 'qsizetype' (aka 'long long') to signed type 'int' is implementation-defined
 tests/app/test_interface.cpp: [cert-err33-c] the value returned by this function should not be disregarded; neglecting it may lead to errors
