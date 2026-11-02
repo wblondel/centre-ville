@@ -61,12 +61,6 @@ void TfrmAffDistPlacesVehlib::FormHide(TObject *Sender)
  frmSimulation->ActionDistancesPlacesVehlib->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmAffDistPlacesVehlib::CheckBoxCouloirsBusClick(
-      TObject *Sender)
-{
- RafraichitInfos();
-}
-//---------------------------------------------------------------------------
 void TfrmAffDistPlacesVehlib::FormKeyDown(TObject *Sender,
       WORD &Key, TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)

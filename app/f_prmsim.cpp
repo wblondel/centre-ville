@@ -49,7 +49,6 @@ TfrmParamSimul::TfrmParamSimul(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 bool TfrmParamSimul::AppliqueChoix()
  {
-  int i;
   frmSimulation->SimulationModifiee=true;
   if (NbVehiculesChange) cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
   if (NbPietonsChange) cv->DefinitNbPietons((CSpinEditNbPietons->Value*CSpinEditNbVehicules->Value)/100); // v2.0

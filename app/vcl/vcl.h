@@ -37,8 +37,6 @@ class String : public AnsiString
   String(const AnsiString &as) : AnsiString(as) {}
   String(const std::string &s) : AnsiString(s) {}
   String UpperCase() const;
-  String LowerCase() const;
-  String Trim() const;
  };
 typedef String UnicodeString;
 //---------------------------------------------------------------------------
@@ -80,7 +78,6 @@ class TShiftState
   public:
   TShiftState() {}
   TShiftState &operator<<(TShiftStateElement e) { Bits|=1u<<e; return *this; }
-  TShiftState &operator>>(TShiftStateElement e) { Bits&=~(1u<<e); return *this; }
   bool Contains(TShiftStateElement e) const { return (Bits>>e)&1u; }
  };
 //---------------------------------------------------------------------------
@@ -109,8 +106,6 @@ enum TModalResult { mrNone=0, mrOk=1, mrCancel=2, mrAbort=3, mrRetry=4, mrIgnore
 int ParamCount();
 String ParamStr(int Index);
 String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt);
-String ExtractFilePath(const AnsiString &asNomFichier);
-String ExtractFileName(const AnsiString &asNomFichier);
 int StrToInt(const AnsiString &asTexte); // texte invalide : exception (EConvertError)
 // Une seule section : « 0 », « # », « . » et caractères littéraux (« #.000% »,
 // « 0.0 », « ###.## »...), séparateur décimal de FormatSettings, arrondi au
@@ -136,7 +131,6 @@ class TApplication : public QObject
   public:
   TApplication();
   Propriete<AnsiString> Title;
-  void ProcessMessages();
  };
 extern TApplication *Application;
 //---------------------------------------------------------------------------

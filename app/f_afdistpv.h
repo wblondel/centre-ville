@@ -16,7 +16,6 @@ public: // portage : __published	// Composants gérés par l'EDI
   TStringGrid *StringGridDistances;
     void FormShow(TObject *Sender);
     void FormHide(TObject *Sender);
-  void CheckBoxCouloirsBusClick(TObject *Sender);
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
 

@@ -891,7 +891,6 @@ void feu_pieton::ChangeEtat()
 //-----------------------------------------------------------------------------
 void feu_pieton::DefinitProchainEtat()
  {
-  int i;
   TourDrnChgEtat=cv->TourCrt;
   if (Etat) ProchainEtat=(etat_feu)(4-Etat);
   switch(ProchainEtat)
@@ -1295,7 +1294,6 @@ void vehlib::Place(int p) // ATTENTION: 0 <= p < NbPlacesVehlib
   Situation=svAttente;
   for(int d=nord; (!Dir)&&(d<=ouest); d++)
    if (v->DirPoss&PossDir[(direction)d]) Dir=(direction)d;
-  //DebugEcrit(Format("Vehlib(%d)::Place(%d): (x,y)=(%d,%d); cv->v[x][y].NumVehlib=%d; Situation=svAttente; Dir=%d", ARRAYOFCONST((Numero,p,x,y,Numero,(int)Dir))));
  }
 //-----------------------------------------------------------------------------
 bool vehlib::EstDestination(const voie *v)
@@ -1320,7 +1318,6 @@ void vehlib::CalculeProchaineDirection()
    { // pour pouvoir partir...
     Situation=svDepart;
     TourDepart=cv->TourCrt;
-	//DebugEcrit(Format("Vehlib(%d)::CalculeProchaineDirection(): Situation=svDepart; TourDepart=%d", ARRAYOFCONST((Numero,cv->TourCrt))));
    }
   Dir=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux files.
@@ -1336,7 +1333,6 @@ void vehlib::CalculeProchaineDirection()
                      ((v->DistPlaceVehlib[NumPlaceArrivee-1][i]==v->DistPlaceVehlib[NumPlaceArrivee-1][j])&&
                       ((Dirdp[i][v->DirPoss]!=AncDir)|| // En cas d'égalité, préfère garder la direction courante
                        ((i+Numero+cv->TourCrt)%ndp>(j+Numero+cv->TourCrt)%ndp)))); // sinon tirage au hasard (Ici TourCrt+1)
-	   //DebugEcrit(Format("Vehlib(%d)::CalculeProchaineDirection(): NumPlaceArrivee>0 (%d) -> for(i,j)=(%d,%d) OrdreDir[i]=%d [V(i,j).NumPlaceVehlib=(%d,%d),V(i,j).DistPlaceVehlib=(%d,%d)]", ARRAYOFCONST((Numero,NumPlaceArrivee,i,j,OrdreDir[i],cv->V(x,y,Dirdp[i][v->DirPoss]).NumPlaceVehlib,cv->V(x,y,Dirdp[j][v->DirPoss]).NumPlaceVehlib,v->DistPlaceVehlib[NumPlaceArrivee-1][i],v->DistPlaceVehlib[NumPlaceArrivee-1][j]))));
       }
   for(i=0; (!Dir)&&(i<5); i++)
    for(j=0; (!Dir)&&(j<ndp); j++)
@@ -1359,7 +1355,6 @@ void vehlib::CalculeProchaineDirection()
           (cv->TourCrt<=1+TourDrnDepl+cv->AttenteMaxVeh*(1+OrdreDir[j]))))
       {
        Dir=Dirdp[j][v->DirPoss];
-       //if (NumPlaceArrivee) DebugEcrit(Format("Vehlib(%d)::CalculeProchaineDirection(): for(i,j)=(%d,%d) OrdreDir[j]==i -> Dir=Dirdp[j][v->DirPoss] (%d)", ARRAYOFCONST((Numero,i,j,(int)Dir))));
       }
     }
 
@@ -2368,7 +2363,6 @@ int place_park::PlaceQueueFile() // Retourne 1+NumPlace si elle existe sinon 0
 
 voie::voie()
  {
-  int i;
   x=-1; y=-1;
   Initialise();
   DistParking=NULL;
@@ -3416,24 +3410,6 @@ int voie::PlaceQueueFilePark() // v5.0. Retourne 1+NumPlace si elle existe sinon
    return NumPlaceQueue; // Sinon c'est celle qui a été trouvée
  }
 //-----------------------------------------------------------------------------
-int voie::PlaceTeteFilePark() // v5.0. Retourne 1+NumPlace si elle existe sinon 0
- {
-  int NumPlaceTete=0;
-  voie *v;
-  if (!NumPlacePark) return 0; // N'est pas une place de taxi
-  if (EstTeteFilePark()) return NumPlacePark;
-  for(int d=nord; (!NumPlaceTete)&&(d<=ouest); d++)
-   {
-    v=&(cv->V(x,y,d));
-    if ((DirPoss&PossDir[d])&&v->NumPlacePark)
-     NumPlaceTete=v->PlaceTeteFilePark();
-   }
-  if (!NumPlaceTete)
-   return NumPlacePark; // Pas d'autre place trouvée alors c'est la tête
-  else
-   return NumPlaceTete; // Sinon c'est celle qui a été trouvée
- }
-//-----------------------------------------------------------------------------
 bool voie::ExistePlusieursQueuesFilePark() // v5.0
  {
   int NbQueues=0;
@@ -3456,91 +3432,6 @@ bool voie::ExistePlusieursTetesFilePark() // v5.0
     {
      v=&(cv->V(x,y,d));
      NbTetes+=((v->DirPoss&PossDir[d])&&v->NumPlacePark);
-    }
-  return NbTetes>1;
- }
-//-----------------------------------------------------------------------------
-bool voie::EstQueueFileVehlibs() // v5.3
- {
-  bool EstQueueFile=(NumPlaceVehlib>0);
-  voie *v;
-  for(int d=nord; EstQueueFile&&(d<=ouest); d++)
-   {
-    v=&(cv->V(x,y,d));
-    EstQueueFile=((v->DirPoss&InvPossDir[d])==aucune)||(!v->NumPlaceVehlib);
-   }
-  return EstQueueFile;
- }
-//-----------------------------------------------------------------------------
-bool voie::EstTeteFileVehlibs() // v5.3
- {
-  bool EstTeteFile=(NumPlaceVehlib>0);
-  voie *v;
-  for(int d=nord; EstTeteFile&&(d<=ouest); d++)
-   {
-    v=&(cv->V(x,y,d));
-    EstTeteFile=(((DirPoss&PossDir[d])==aucune)||(!v->NumPlaceVehlib));
-   }
-  return EstTeteFile;
- }
-//-----------------------------------------------------------------------------
-int voie::PlaceQueueFileVehlib() // v5.3. Retourne 1+NumPlace si elle existe sinon 0
- {
-  int NumPlaceQueue=0;
-  voie *v;
-  if (!NumPlaceVehlib) return 0; // N'est pas une place de vehlib
-  for(int d=nord; (!NumPlaceQueue)&&(d<=ouest); d++)
-   {
-    v=&(cv->V(x,y,d));
-    if ((v->DirPoss&InvPossDir[d])&&v->NumPlaceVehlib)
-     NumPlaceQueue=v->PlaceQueueFileVehlib();
-   }
-  if (!NumPlaceQueue)
-   return NumPlaceVehlib; // Pas d'autre place trouvée alors c'est la queue
-  else
-   return NumPlaceQueue; // Sinon c'est celle qui a été trouvée
- }
-//-----------------------------------------------------------------------------
-int voie::PlaceTeteFileVehlib() // v5.3. Retourne 1+NumPlace si elle existe sinon 0
- {
-  int NumPlaceTete=0;
-  voie *v;
-  if (!NumPlaceVehlib) return 0; // N'est pas une place de vehlib
-  if (EstTeteFileVehlibs()) return NumPlaceVehlib;
-  for(int d=nord; (!NumPlaceTete)&&(d<=ouest); d++)
-   {
-    v=&(cv->V(x,y,d));
-    if ((DirPoss&PossDir[d])&&v->NumPlaceVehlib)
-     NumPlaceTete=v->PlaceTeteFileVehlib();
-   }
-  if (!NumPlaceTete)
-   return NumPlaceVehlib; // Pas d'autre place trouvée alors c'est la tête
-  else
-   return NumPlaceTete; // Sinon c'est celle qui a été trouvée
- }
-//-----------------------------------------------------------------------------
-bool voie::ExistePlusieursQueuesFileVehlibs() // v5.3
- {
-  int NbQueues=0;
-  voie *v;
-  if (NumPlaceVehlib)
-   for(int d=nord; d<=ouest; d++)
-    {
-     v=&(cv->V(x,y,d));
-     NbQueues+=((v->DirPoss&InvPossDir[d])&&v->NumPlaceVehlib);
-    }
-  return NbQueues>1;
- }
-//-----------------------------------------------------------------------------
-bool voie::ExistePlusieursTetesFileVehlibs() // v5.3
- {
-  int NbTetes=0;
-  voie *v;
-  if (NumPlaceVehlib)
-   for(int d=nord; d<=ouest; d++)
-    {
-     v=&(cv->V(x,y,d));
-     NbTetes+=((v->DirPoss&PossDir[d])&&v->NumPlaceVehlib);
     }
   return NbTetes>1;
  }
@@ -3783,12 +3674,6 @@ void voie::InitialiseInfosLignesBus()
  {
   for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
    LigneBus[i]=false; // v3.0.3
- }
-//-----------------------------------------------------------------------------
-void voie::InitialiseInfosLignesTram()
- {
-  for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   LigneTram[i]=false;
  }
 //-----------------------------------------------------------------------------
 void voie::ModifieSensVoieTram(direction DirOrig, direction DirDest) // v3.5
@@ -4240,45 +4125,6 @@ int centre_ville::DefinitNbPietons(int n)
   return NbPietons;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::DefinitNbArretsBus(int n) // v3.0
- {
-  int i;
-  if (NbArretsBus) { delete[] ArretBus; ArretBus=NULL; }
-  NbArretsBus=0;
-  if ((ArretBus=new arret_bus[n]))
-   {
-    for(i=0; i<n; i++) ArretBus[i].AffecteNumero(i+1);
-    NbArretsBus=n;
-   }
-  return NbArretsBus;
- }
-//-----------------------------------------------------------------------------
-int centre_ville::DefinitNbArretsTram(int n) // v3.5
- {
-  int i;
-  if (NbArretsTram) { delete[] ArretTram; ArretTram=NULL; }
-  NbArretsTram=0;
-  if ((ArretTram=new arret_tram[n]))
-   {
-    for(i=0; i<n; i++) ArretTram[i].AffecteNumero(i+1);
-    NbArretsTram=n;
-   }
-  return NbArretsTram;
- }
-//-----------------------------------------------------------------------------
-int centre_ville::DefinitNbPlacesTaxi(int n) // v3.0
- {
-  int i;
-  if (NbPlacesTaxi) { delete[] PlaceTaxi; PlaceTaxi=NULL; }
-  NbPlacesTaxi=0;
-  if (n&&(PlaceTaxi=new place_taxi[n]))
-   {
-    for(i=0; i<n; i++) { PlaceTaxi[i].AffecteNumero(i+1); }
-    NbPlacesTaxi=n;
-   }
-  return NbPlacesTaxi;
- }
-//-----------------------------------------------------------------------------
 int centre_ville::DefinitNbFilesTaxi(int n) // v3.0
  {
   int i;
@@ -4333,19 +4179,6 @@ int centre_ville::DefinitFilesTaxi() // v3.6
   return NbFilesTrv;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::DefinitNbPlacesPark(int n) // v5.0
- {
-  int i;
-  if (NbPlacesPark) { delete[] PlacePark; PlacePark=NULL; }
-  NbPlacesPark=0;
-  if (n&&(PlacePark=new place_park[n]))
-   {
-    for(i=0; i<n; i++) { PlacePark[i].AffecteNumero(i+1); }
-    NbPlacesPark=n;
-   }
-  return NbPlacesPark;
- }
-//-----------------------------------------------------------------------------
 int centre_ville::DefinitNbFilesPark(int n) // v5.0
  {
   int i;
@@ -4387,19 +4220,6 @@ int centre_ville::DefinitFilesPark() // v5.0
   return NbFilesTrv;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::DefinitNbPlacesVehlib(int n) // v5.3
- {
-  int i;
-  if (NbPlacesVehlib) { delete[] PlaceVehlib; PlaceVehlib=NULL; }
-  NbPlacesVehlib=0;
-  if (n&&(PlaceVehlib=new place_vehlib[n]))
-   {
-    for(i=0; i<n; i++) { PlaceVehlib[i].AffecteNumero(i+1); }
-    NbPlacesVehlib=n;
-   }
-  return NbPlacesVehlib;
- }
-//-----------------------------------------------------------------------------
 int centre_ville::NbFeuxLibres()
  {
   int i, n=0;
@@ -4426,27 +4246,6 @@ int centre_ville::NumeroParkingLibre()
   int i;
   for(i=0; (i<NbParkings)&&Parking[i].Defini(); i++);
   return (i+1)*(i<NbParkings);
- }
-//-----------------------------------------------------------------------------
-int centre_ville::NumeroVehiculeLibre()
- {
-  int i;
-  for(i=0; (i<NbVehicules)&&Vehicule[i].Defini(); i++);
-  return (i+1)*(i<NbVehicules);
- }
-//-----------------------------------------------------------------------------
-int centre_ville::NumeroVehlibLibre() // v5.3
- {
-  int i;
-  for(i=0; (i<NbVehlibs)&&Vehlib[i].Defini(); i++);
-  return (i+1)*(i<NbVehlibs);
- }
-//-----------------------------------------------------------------------------
-int centre_ville::NumeroPietonLibre()
- {
-  int i;
-  for(i=0; (i<NbPietons)&&Pieton[i].Defini(); i++);
-  return (i+1)*(i<NbPietons);
  }
 //-----------------------------------------------------------------------------
 int centre_ville::ArretBusExistant(int x, int y) // v3.0
@@ -4549,7 +4348,7 @@ int centre_ville::AjouteFeu(int x, int y, direction d)
 //-----------------------------------------------------------------------------
 int centre_ville::AjouteFeuPietons(int x, int y, direction d) // v5.2
  { // Inclut l'ajout du feu opposé de même numéro
-  int j, i=NumeroFeuPietonsLibre();
+  int i=NumeroFeuPietonsLibre();
   if (!i) // v5.1
    i=IncrementeNombre(&FeuP, NbFeuxPieton);
   if (i)
@@ -5036,38 +4835,10 @@ direction centre_ville::DirectionArretBus(int x, int y) // v3.0
   return (direction)((!Ambiguite)*Dir);
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::DirectionArretTram(int x, int y) // v3.5
- {
-  bool Ambiguite=false;
-  int d;
-  direction Dir=indefinie;
-  for(d=nord; d<=ouest; d++) // On prend la dernière possibilité en cas de litige
-   if ((!(v[x][y].DirPoss&PossDir[d]))&& // Si pas de déplacement vers d ET
-       (!_V(x,y,d).DirPoss)&& // Mur vers d ET
-       (v[x][y].DirPoss&PossDir[AGaucheDe[d]])) // Direction possible à gauche (sens de la circulation de la voie)
-    {
-     Ambiguite=!!Dir;
-     Dir=(direction)d;
-    }
-  return (direction)((!Ambiguite)*Dir);
- }
-//-----------------------------------------------------------------------------
 position_arret_bus_tram centre_ville::PositionArretBus(int x, int y, direction d) // v3.0
  {
   switch(  (_V(x,y,AGaucheDe[d]).NumArretBus==v[x][y].NumArretBus)+
          2*(_V(x,y,ADroiteDe[d]).NumArretBus==v[x][y].NumArretBus))
-   {
-    case 1: return queue;
-    case 2: return tete;
-    case 3: return milieu;
-    default: return tete;
-   }
- }
-//-----------------------------------------------------------------------------
-position_arret_bus_tram centre_ville::PositionArretTram(int x, int y, direction d) // v3.5
- {
-  switch(  (_V(x,y,AGaucheDe[d]).NumArretTram==v[x][y].NumArretTram)+
-         2*(_V(x,y,ADroiteDe[d]).NumArretTram==v[x][y].NumArretTram))
    {
     case 1: return queue;
     case 2: return tete;
@@ -5224,14 +4995,6 @@ void centre_ville::InitialiseInfosTrajetLignesBus()
     v[i][j].InitialiseInfosLignesBus();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::InitialiseInfosTrajetLignesTram()
- {
-  int i, j;
-  for(i=0; i<NbX; i++)
-   for(j=0; j<NbY; j++)
-    v[i][j].InitialiseInfosLignesTram();
- }
-//-----------------------------------------------------------------------------
 void centre_ville::CalculeTrajetLignesBus() // v3.0.3
  { // InitialiseInfosTrajetLignesBus doit avoir été lancé avant pour mettre les voie::LigneBus[i] à false
   int i, j, dp, ndp, DistArretBus, DistCrt, NumArretSvt;
@@ -5266,7 +5029,7 @@ void centre_ville::CalculeTrajetLignesBus() // v3.0.3
  }
 //-----------------------------------------------------------------------------
 void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
- { // InitialiseInfosTrajetLignesTram doit avoir été lancé avant pour mettre les voie::LigneTram[i] à false
+ { // Les voie::LigneTram[i] sont à false : les trajets ne sont calculés qu'au premier démarrage
   int i, j, dp, ndp, DistArretTram, DistCrt, NumArretSvt;
   direction DirCrt, DirPrc, // v3.8
             DirSvt;
@@ -5883,20 +5646,6 @@ void centre_ville::PlaceVehiculesSurPlacesPark() // v5.0
       vue->RedessineCase(Veh->x, Veh->y, false); // portage
       Vehicule[i].TourDepart=cv->TourCrt;
       NbVehiculesSortis++;
-     }
-   }
- }
-//-----------------------------------------------------------------------------
-void centre_ville::PlaceVehlibsSurPlaces() // v5.3
- {
-  for(int i=0; i<NbVehlibs; i++)
-   {
-    vehlib *VL=Vehlib+i;
-    if (VL->NumPlaceDepart)
-     {
-      v[VL->x][VL->y].NumVehlib=i+1;
-      PlaceVehiculeVehlib(VL->x, VL->y, i+1); // Inclut les stats d'Attente/Trafic
-      vue->RedessineCase(VL->x, VL->y, false); // portage
      }
    }
  }

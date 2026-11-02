@@ -268,7 +268,6 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
       BordTrottoir=0, BordToiture=0, CoinToiture=0, // v3.8
       NumPieton, // v2.0
       NivPriorite, // v2.2
-      SensVT, // v3.5
       Vlr; // v5.3
   TColor CoulTxt; // v3.0.5
   direction dorig, ddest,
@@ -283,7 +282,6 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
   taxi *Taxi; // v3.6
   vehlib *Vlb; // v5.3
   bool NordPoss, EstPoss, SudPoss, OuestPoss,
-       NordPossT, EstPossT, SudPossT, OuestPossT, // v3.5
        DefFeux= (frmDefFeux&&  // v3.8.1
                  frmDefFeux->Visible)||
                 (frmDefFeuxPietons&&  // v5.2
@@ -1882,7 +1880,7 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
 bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) // v3.5
  {
   bool Abandon=false, ToutSupprimer=true;
-  int i, j, d, x, y, NumArret,
+  int i, x, y, NumArret,
       xd=DrawGridSimul->Selection.Left,
       yd=DrawGridSimul->Selection.Top,
       xf=DrawGridSimul->Selection.Right,
@@ -1933,7 +1931,7 @@ Si vous continuez, il sera supprimé.\n\
 //---------------------------------------------------------------------------
 void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
  {
-  int i, j, d, x, y, NumArret,
+  int i, x, y, NumArret,
       xd=DrawGridSimul->Selection.Left,
       yd=DrawGridSimul->Selection.Top,
       xf=DrawGridSimul->Selection.Right,

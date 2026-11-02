@@ -71,13 +71,3 @@ QPixmap TVirtualImageList::Pixmap(int Index) const
   return Images[(std::size_t)Index];
  }
 //---------------------------------------------------------------------------
-QIcon TVirtualImageList::Icone(int Index) const
- { // Icônes des menus et barres d'outils : versions agrandies sans lissage
-  QIcon i;
-  if ((Index<0)||(Index>=Count())) return i;
-  const QPixmap &p=Images[(std::size_t)Index];
-  i.addPixmap(p);
-  for(qreal e : {1.25, 1.5, 2.0, 3.0}) i.addPixmap(AgranditSansLissage(p, e));
-  return i;
- }
-//---------------------------------------------------------------------------

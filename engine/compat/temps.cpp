@@ -37,19 +37,3 @@ TDateTime Time()
   return TDateTime(FractionDeJour(Local, ms));
  }
 //---------------------------------------------------------------------------
-TDateTime Now()
- {
-  int ms;
-  std::tm Local=HeureLocale(ms);
-  // Nombre de jours civils depuis le 30/12/1899 (origine de TDateTime)
-  int a=Local.tm_year+1900, m=Local.tm_mon+1, j=Local.tm_mday;
-  // Algorithme « days from civil » (H. Hinnant) : jours depuis le 01/01/1970
-  a-=(m<=2);
-  int Ere=(a>=0?a:a-399)/400;
-  unsigned AnDeLEre=(unsigned)(a-Ere*400);
-  unsigned JourDeLAn=(153u*(unsigned)(m+(m>2?-3:9))+2u)/5u+(unsigned)j-1u;
-  unsigned JourDeLEre=AnDeLEre*365u+AnDeLEre/4u-AnDeLEre/100u+JourDeLAn;
-  long long Jours1970=(long long)Ere*146097LL+(long long)JourDeLEre-719468LL;
-  return TDateTime((double)(Jours1970+25569LL)+FractionDeJour(Local, ms));
- }
-//---------------------------------------------------------------------------

@@ -262,7 +262,6 @@ class pieton // v2.0
 	if (FileTaxiTrv) FileTaxiTrv=false; // v3.6
 	if (PlaceVehlibTrv) PlaceVehlibTrv=false; // v5.3
    };
-  pieton(int x0, int y0, direction Dir0, int DemiCase0) { Definit(x0, y0, Dir0, DemiCase0); };
   ~pieton()
    {
 	if (Infection) delete Infection; // v5.4.1
@@ -440,7 +439,6 @@ class parking
    };
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  parking(int x0, int y0) { Definit(x0, y0); };
   ~parking() {};
   bool Defini() { return (x>-1)&&(y>-1); };
   void PlaceProchainVehicule();
@@ -498,7 +496,6 @@ class depot_bus // v3.0 ATTENTION : il n'y en a qu'un !
   void Initialise() { x=-1; y=-1; NumDrnBusSorti=0; };
   depot_bus() { Initialise(); };
   void Definit(int x0, int y0) { x=x0; y=y0; NumDrnBusSorti=0; };
-  depot_bus(int x0, int y0) { Definit(x0, y0); };
   ~depot_bus() {};
   bool Defini() { return (x>-1)&&(y>-1); };
   void PlaceProchainBus();
@@ -558,7 +555,6 @@ class arret_bus // v3.0
   void Copie(arret_bus *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  arret_bus(int x0, int y0) { Definit(x0, y0); };
   ~arret_bus() {};
   bool Defini() { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesBus();
@@ -639,7 +635,6 @@ class arret_tram // v3.5
   void Copie(arret_tram *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  arret_tram(int x0, int y0) { Definit(x0, y0); };
   ~arret_tram() {};
   bool Defini() { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesTram();
@@ -949,16 +944,9 @@ class voie
   bool EstQueueFilePark(); // v5.0
   bool EstTeteFilePark(); // v5.0
   int PlaceQueueFilePark(); // v5.0. Retourne 1+NumPlace si elle existe, 0 sinon.
-  int PlaceTeteFilePark(); // v5.0. Retourne 1+NumPlace si elle existe, 0 sinon.
   bool ExistePlusieursQueuesFilePark(); // v5.0
   bool ExistePlusieursTetesFilePark(); // v5.0
 
-  bool EstQueueFileVehlibs(); // v5.3
-  bool EstTeteFileVehlibs(); // v5.3
-  int PlaceQueueFileVehlib(); // v5.3. Retourne 1+NumPlaceVehlib si elle existe, 0 sinon.
-  int PlaceTeteFileVehlib(); // v5.3. Retourne 1+NumPlaceVehlib si elle existe, 0 sinon.
-  bool ExistePlusieursQueuesFileVehlibs(); // v5.3
-  bool ExistePlusieursTetesFileVehlibs(); // v5.3
   int OrientationPlaceVehlib(); // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
 
   void DefinitArretBus(int n); // v3.0
@@ -974,7 +962,6 @@ class voie
   void CalculeDistanceFilePark(int fp, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig); // v5.0
   void CalculeDistancePlaceVehlib(int pv, int Distance, direction DirOrig); // v5.3
   void InitialiseInfosLignesBus(); // v3.0
-  void InitialiseInfosLignesTram(); // v3.5
   void ModifieSensVoieTram(direction DirOrig, direction DirDest); // v3.5
   direction DirSensVoieTram(direction DirOrigine, int iDir); // v3.5
   bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination); // v3.5
@@ -1128,28 +1115,20 @@ class centre_ville
   int DefinitNbTrams(int n); // v3.5
   int DefinitNbPietons(int n); // v2.0
   int DefinitNbLignesBus(int n); // v3.0
-  int DefinitNbArretsBus(int n); // v3.0
   int DefinitNbLignesTram(int n); // v3.5
-  int DefinitNbArretsTram(int n); // v3.5
 
-  int DefinitNbPlacesTaxi(int n); // v3.6
   int DefinitNbFilesTaxi(int n); // v3.6
   int DefinitNbTaxis(int n); // v3.6
   int DefinitFilesTaxi(); // v3.6. Renvoie le nombre de files créées. Défini à partir de PlaceTaxi.
 
-  int DefinitNbPlacesPark(int n); // v5.0
   int DefinitNbFilesPark(int n); // v5.0
   int DefinitFilesPark(); // v5.0. Renvoie le nombre de files créées. Défini à partir de PlacePark.
 
-  int DefinitNbPlacesVehlib(int n); // v5.3
 
   int NbFeuxLibres();
   int NumeroFeuLibre();
   int NumeroFeuPietonsLibre(); // v5.2
   int NumeroParkingLibre();
-  int NumeroVehiculeLibre();
-  int NumeroVehlibLibre(); // v5.3
-  int NumeroPietonLibre(); //v2.0
   int ArretBusExistant(int x, int y); // v3.0
   int ArretTramExistant(int x, int y); // v3.5
   int NumeroArretBusLibre(int x, int y); //v3.0
@@ -1194,9 +1173,7 @@ class centre_ville
   void DefinitArretBus(int n, int x, int y); // v3.0
   void DefinitArretTram(int n, int x, int y); // v3.5
   direction DirectionArretBus(int x, int y); // v3.0
-  direction DirectionArretTram(int x, int y); // v3.5
   position_arret_bus_tram PositionArretBus(int x, int y, direction d); // v3.0
-  position_arret_bus_tram PositionArretTram(int x, int y, direction d); // v3.5
   bool ArretsBusVoisinsDifferents(int x, int y); // v3.0
   bool ArretsTramVoisinsDifferents(int x, int y); // v3.5
   direction DirArretBusVoisin(int x, int y); // v3.0
@@ -1208,7 +1185,6 @@ class centre_ville
   void InitialiseInfosLignesBus(); // v3.0
   void InitialiseInfosLignesTram(); // v3.5
   void InitialiseInfosTrajetLignesBus(); // v3.0
-  void InitialiseInfosTrajetLignesTram(); // v3.5
   void CalculeTrajetLignesBus(); // v3.0
   void CalculeTrajetLignesTram(); // v3.5
   bool VerifieCalculDistances(type_distance &TypeDistance); // v3.5 : inclut également celui des arrêts de bus & tram
@@ -1233,7 +1209,6 @@ class centre_ville
   void CalculeDistances();
   void RessuscitePietons(); // v4.3.1
   void PlaceVehiculesSurPlacesPark(); // v5.0
-  void PlaceVehlibsSurPlaces(); // v5.3
   bool ExisteFeuPietons(int x, int y); //v5.2
   void PrepareFeuxPietons(); // v5.2
   bool FeuPietonsPossible(int x, int y, direction d); //v5.2

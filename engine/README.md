@@ -33,7 +33,7 @@ Les tests sont décrits dans `tests/README.md`.
 | `compat/chaine.*` | Remplace `<dstring.h>` : sous-ensemble d'`AnsiString`, `Format(…, ARRAYOFCONST((…)))`, `IntToStr`. |
 | `compat/fichier.*` | `FileOpen`, `FileCreate`, `FileRead`, `FileWrite`, `FileSeek`, `FileClose` avec la sémantique de SysUtils. |
 | `compat/alea.*` | `rand()`/`srand()` de la RTL Borland, graine injectable. |
-| `compat/temps.*` | Remplace `<systdate.h>` : `TDateTime`, `Time()`, `Now()`. |
+| `compat/temps.*` | Remplace `<systdate.h>` : `TDateTime`, `Time()`. |
 
 ## Modifications du moteur (toutes annotées `// portage`)
 
@@ -329,14 +329,7 @@ Le job « Couverture des tests » de la CI (chaque lundi, ou `gh workflow run ci
 les lignes exécutées par l'ensemble des tests. En 6.0.7, `simul.cpp` est couvert à 93 % des
 lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). Tri de ce qui reste :
 
-- **Fonctions sans appelant** (code mort de l'original, gardé tel quel), environ 200 lignes :
-  `voie::PlaceTeteFilePark`, `EstQueueFileVehlibs`, `EstTeteFileVehlibs`,
-  `PlaceQueueFileVehlib`, `PlaceTeteFileVehlib`, `ExistePlusieursQueuesFileVehlibs`,
-  `ExistePlusieursTetesFileVehlibs`, `centre_ville::DefinitNbArretsBus`,
-  `DefinitNbArretsTram`, `DefinitNbPlacesTaxi`, `DefinitNbPlacesPark`,
-  `DefinitNbPlacesVehlib`, `NumeroVehiculeLibre`, `NumeroVehlibLibre`, `NumeroPietonLibre`,
-  `DirectionArretTram`, `PositionArretTram`, `PlaceVehlibsSurPlaces`, et
-  `InitialiseInfosTrajetLignesTram` avec `voie::InitialiseInfosLignesTram`, qu'elle seule appelle.
+- **Fonctions sans appelant** : retirées depuis (voir « Code mort retiré »).
 - **Branches défensives inatteignables** : `TourDeDeplacementVehlib` (condition toujours
   vraie : un vehlib roule à chaque tour), `voie::AjoutePieton` et `RetirePieton` sur une case
   incohérente, `pieton::ChercheFileTaxi` sans numéro de file, `Cherche*` sans distance de
@@ -349,12 +342,54 @@ lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). Tri de ce qui reste
   droit » sur deux cases (`CalculeDistanceParking`, `CalculeDistanceFilePark`), arrêt ou file
   de taxi inaccessible (`VerifieCalculDistances`), certains effacements de voie
   (`voie::Initialise`), « Copier vers… » laissant hors de la sélection autre chose qu'un
-  parking (`CopieValide`).
+  parking (`CopieValide`), place de taxi ajoutée quand tous les numéros sont pris
+  (`IncrementeNombre`, `place_taxi::Copie`).
 
 Les chemins testés en 6.0.7 (`tests/test_chemins.cpp`) : places de parking et de vehlib
 retirées par `Charge`, arrêts de plusieurs cases (`ExisteCaseArretBus`,
 `ExisteCaseArretTram`, `ArretTramExistant`), `SupprimeArretTram`, tableaux agrandis par
 `IncrementeNombre` (`Copie` des arrêts et des feux de piétons), réinfections (`infection::Svt`).
+
+## Code mort retiré
+
+Après la 6.0.7, le code que rien n'appelle a été retiré du moteur et de l'application. Les
+fonctions sans appelant sont celles que l'éditeur de liens élimine de `cvw`
+(`-Wl,-dead_strip -Wl,-map,cvw.map` sous macOS, section « Dead Stripped Symbols ») ; les
+fonctions inline, que le compilateur n'émet pas quand elles ne servent pas, viennent du
+rapport de couverture (fonctions jamais exécutées). Chacune a ensuite été cherchée dans tout
+le code, y compris celui propre à Windows et à Linux, puis la compilation a confirmé
+l'absence d'appel : `place_taxi::Copie`, appelée par le gabarit `IncrementeNombre`, est
+restée. Les variables et champs inutilisés viennent de `-Wunused-variable` et
+`-Wunused-private-field`.
+
+- **Moteur** : `voie::PlaceTeteFilePark`, les six fonctions de file de vehlibs de `voie`
+  (`EstQueueFileVehlibs`, `EstTeteFileVehlibs`, `PlaceQueueFileVehlib`,
+  `PlaceTeteFileVehlib`, `ExistePlusieursQueuesFileVehlibs`,
+  `ExistePlusieursTetesFileVehlibs`), `centre_ville::DefinitNbArretsBus`,
+  `DefinitNbArretsTram`, `DefinitNbPlacesTaxi`, `DefinitNbPlacesPark`,
+  `DefinitNbPlacesVehlib`, `NumeroVehiculeLibre`, `NumeroVehlibLibre`, `NumeroPietonLibre`,
+  `DirectionArretTram`, `PositionArretTram`, `PlaceVehlibsSurPlaces`,
+  `InitialiseInfosTrajetLignesTram` et `voie::InitialiseInfosLignesTram` (les
+  `voie::LigneTram` sont déjà à `false` : les trajets ne sont calculés qu'au premier
+  démarrage), les constructeurs `parking`, `depot_bus`, `arret_bus`, `arret_tram` et
+  `pieton` à coordonnées (celui de `pieton` n'appelait pas `Initialise()`), `Now()` de
+  `compat/temps`, les traces `DebugEcrit` commentées.
+- **Application** : dans `vcl/`, les méthodes `Show`, `Hide`, `Refresh`, `Invalidate` et
+  `BringToFront` des contrôles (les fiches gardent les leurs), `TStringGrid::Invalidate`,
+  `LitTaille`, `DerniereColonneGauche` et `DerniereLigneHaut`, `TMenuItem::Count`,
+  `TStatusPanels::Count`, `ExtractFilePath`, `ExtractFileName`, `String::LowerCase` et
+  `Trim`, `TApplication::ProcessMessages`, `TShiftState::operator>>`, `CouleurVcl`,
+  `TPoint`, `Rect`, `TCanvas::FrameRect`, `TextRect`, `Draw` et `Rectangle(TRect)`,
+  `TVirtualImageList::Icone` ; `TfrmAffDistPlacesVehlib::CheckBoxCouloirsBusClick`,
+  déjà orpheline dans l'original (la fiche n'a pas cette case).
+- **Gardé** : `DebugEcrit`, seul moyen d'écrire dans le journal `cvw !` ;
+  `feu_pieton::AjouteFeu(int)`, `alea::FixeGraine` et `TVirtualImageList::Pixmap`,
+  appelées par les tests.
+
+Ce qui reste non exécuté est dans des fonctions appelées : branches que le réseau rend
+impossibles, ou cas que les tests ne parcourent pas. Les six avertissements
+`-Wmisleading-indentation` de `simul.cpp` sont de fausses alertes (le `if (!Dir)` suit la
+boucle, seules les accolades sont mal alignées).
 
 ## Points d'attention (non corrigés)
 
@@ -376,5 +411,3 @@ retirées par `Charge`, arrêts de plusieurs cases (`ExisteCaseArretBus`,
   une simulation équilibrée (1000) » (1000 n'est pas multiple de 4×3). C'est
   le réseau d'origine qui est en cause, pas le portage : le message est figé
   dans `tests/golden/verifie/Carfours.txt`.
-- **Constructeur inutilisé** : `pieton(int, int, direction, int)` n'appelle pas
-  `Initialise()`.

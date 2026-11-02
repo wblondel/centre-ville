@@ -131,13 +131,8 @@ template <class B> class ControleVcl : public B, public ControleVclBase
   // TControl::Repaint : dessin immédiat, sauf pendant le dessin d'un autre
   // contrôle (RafraichitActionsEdition depuis OnDrawCell) : dessin différé
   void Repaint() { if (TCanvas::NbDessinsEnCours) B::update(); else B::repaint(); }
-  void Invalidate() { B::update(); }
-  void Refresh() { Repaint(); }
-  void Show() { B::show(); }
-  void Hide() { B::hide(); }
   void SetFocus() { B::setFocus(); }
   bool Focused() const { return B::hasFocus(); }
-  void BringToFront() { B::raise(); }
   void PrepareVcl() override; // police, couleurs, curseur
  };
 //---------------------------------------------------------------------------
@@ -355,7 +350,6 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
       TStringGrid *g; bool Colonnes; int i;
       public:
       Taille(TStringGrid *gg, bool c, int ii) : g(gg), Colonnes(c), i(ii) {}
-      operator int() const { return g->LitTaille(Colonnes, i); }
       Taille &operator=(int v) { g->EcritTaille(Colonnes, i, v); return *this; }
      };
     Tailles(TStringGrid *gg, bool c) : g(gg), Colonnes(c) {}
@@ -368,11 +362,9 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
   void setColumnCount(int n) { ColCount=n; }
   AnsiString LitCellule(int c, int r) const;
   void EcritCellule(int c, int r, const AnsiString &as);
-  int LitTaille(bool Colonne, int i) const;
   void EcritTaille(bool Colonne, int i, int Taille);
   TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
   void Repaint() { if (TCanvas::NbDessinsEnCours) viewport()->update(); else viewport()->repaint(); }
-  void Invalidate() { viewport()->update(); }
   void PrepareVcl() override;
   protected:
   void paintEvent(QPaintEvent *e) override;
@@ -399,8 +391,6 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
   int Hauteur(int r) const { return ((r>=0)&&(r<(int)Hauteurs.size()))?Hauteurs[(std::size_t)r]:HauteurDefaut; }
   int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
   int DebutLigne(int r) const;
-  int DerniereColonneGauche() const; // LeftCol maximal (dernière colonne entièrement visible)
-  int DerniereLigneHaut() const;
   void MetAJourDefilement();
   void DefinitHautGauche(int Gauche, int Haut);
   void Montre(int c, int r); // TCustomGrid::ClampInView
@@ -475,7 +465,6 @@ class TStatusPanels
  {
   public:
   std::vector<TStatusPanel *> Items;
-  int Count() const { return (int)Items.size(); }
   ~TStatusPanels();
  };
 class TStatusBar : public ControleVcl<QStatusBar>, public AvecMenuContextuel

@@ -127,7 +127,6 @@ class TMenuItem : public QObject, public ClientAction
   TMenuItem(QMenu *Menu, QObject *Parent);
   QAction *ElementQt() const { return Element; }
   QMenu *MenuQt() const { return SousMenu; }
-  int Count() const { return (int)Items.size(); }
   void Click();
   TMenuItem *Find(TShortCut Raccourci); // TMenu::FindItem(..., fkShortCut)
   void LieAction(TAction *a); // lien établi au chargement (sans recopie)

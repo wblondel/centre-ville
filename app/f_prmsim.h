@@ -87,7 +87,6 @@ private:	// Déclarations de l'utilisateur
          NbPlacesParkChange, // v5.0
 		 RetourFicheFille, // v6.0.2 : prochain FormShow au retour d'une fiche fille
 		 Initialisation;
-	TBITMAP *Bitmap; // v5.4
 	bool AppliqueChoix();
     void CalculeChoixPossiblesNbVehicules(); // v5.0
 public:		// Déclarations de l'utilisateur

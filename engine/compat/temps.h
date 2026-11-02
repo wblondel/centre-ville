@@ -24,6 +24,5 @@ class TDateTime
  };
 //---------------------------------------------------------------------------
 TDateTime Time(); // Heure locale courante, en fraction de jour
-TDateTime Now(); // Date et heure locales (jours depuis le 30/12/1899)
 //---------------------------------------------------------------------------
 #endif

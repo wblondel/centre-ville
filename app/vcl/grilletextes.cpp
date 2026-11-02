@@ -160,11 +160,6 @@ void TStringGrid::EcritCellule(int c, int r, const AnsiString &as)
   if (Rect.Width()>0) viewport()->update(Rect.Qt());
  }
 //---------------------------------------------------------------------------
-int TStringGrid::LitTaille(bool Colonne, int i) const
- {
-  return Colonne?Largeur(i):Hauteur(i);
- }
-//---------------------------------------------------------------------------
 void TStringGrid::EcritTaille(bool Colonne, int i, int Taille)
  {
   std::vector<int> &t=Colonne?Largeurs:Hauteurs;
@@ -250,20 +245,6 @@ namespace
      }
     return qMax(Fixes, Resultat);
    }
- }
-//---------------------------------------------------------------------------
-int TStringGrid::DerniereColonneGauche() const
- {
-  int Fixe=0;
-  for(int i=0; i<NbFixesC; i++) Fixe+=Largeur(i)+Trait;
-  return CaseMax(NbColonnes, NbFixesC, viewport()->width(), Trait, Fixe, [this](int i) { return Largeur(i); });
- }
-//---------------------------------------------------------------------------
-int TStringGrid::DerniereLigneHaut() const
- {
-  int Fixe=0;
-  for(int i=0; i<NbFixesL; i++) Fixe+=Hauteur(i)+Trait;
-  return CaseMax(NbLignes, NbFixesL, viewport()->height(), Trait, Fixe, [this](int i) { return Hauteur(i); });
  }
 //---------------------------------------------------------------------------
 void TStringGrid::MetAJourDefilement()
