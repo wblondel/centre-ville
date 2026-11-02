@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.6)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.7)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -571,6 +571,12 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.7 (annotées `// v6.0.7`)
+
+| Commande | Original | 6.0.7 |
+|---|---|---|
+| Marche après la suppression d'une place de vehlib (`VerifieReseau`) | Places de vehlib non contrôlées (v5.3) : `CalculeDistances` part de la case (-1,-1), plantage. | « Place de vehlib n°… non définie. Pour renuméroter : sauvez puis rouvrez le réseau. », comme pour les places de parking. La copie de `tests/support/harnais.cpp` suit. |
 
 ## Corrections de la 6.0.6 (annotées `// v6.0.6`)
 

@@ -286,6 +286,15 @@ et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
 `interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée). La CI
 lance `ctest --preset asan` sous Linux, et sous macOS sur `main`, une erreur d'UBSan arrêtant le test.
 
+## Corrections de la 6.0.7 (annotées `// v6.0.7`)
+
+- **`centre_ville::Verifie`** : les messages d'une durée par défaut du vert ou du rouge
+  négative (fichier abîmé) donnaient `DureeOrange`.
+- **`centre_ville::PrepareFeuxPietons`** : les listes `NumFeuxPtn` déjà préparées étaient
+  libérées sans remettre leur pointeur à `NULL`, que `feu::AjouteFeuPtn` libérait une
+  seconde fois. Inatteignable depuis l'interface depuis la 6.0.1 : un Marche interrompu
+  recharge le réseau, qui n'est donc jamais préparé deux fois.
+
 ## Corrections de la 6.0.3 (annotées `// v6.0.3`)
 
 - **`centre_ville::Verifie`** : `NbMaxVehicules` divisait par
@@ -313,6 +322,39 @@ lance `ctest --preset asan` sous Linux, et sous macOS sur `main`, une erreur d'U
   Sans `rand` : le nom du fichier temporaire ne dépend que du processus et d'un compteur.
 
 Rien de tout cela ne change le golden master ni les octets écrits.
+
+## Couverture des tests
+
+Le job « Couverture des tests » de la CI (chaque lundi, ou `gh workflow run ci.yml`) mesure
+les lignes exécutées par l'ensemble des tests. En 6.0.7, `simul.cpp` est couvert à 93 % des
+lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). Tri de ce qui reste :
+
+- **Fonctions sans appelant** (code mort de l'original, gardé tel quel), environ 200 lignes :
+  `voie::PlaceTeteFilePark`, `EstQueueFileVehlibs`, `EstTeteFileVehlibs`,
+  `PlaceQueueFileVehlib`, `PlaceTeteFileVehlib`, `ExistePlusieursQueuesFileVehlibs`,
+  `ExistePlusieursTetesFileVehlibs`, `centre_ville::DefinitNbArretsBus`,
+  `DefinitNbArretsTram`, `DefinitNbPlacesTaxi`, `DefinitNbPlacesPark`,
+  `DefinitNbPlacesVehlib`, `NumeroVehiculeLibre`, `NumeroVehlibLibre`, `NumeroPietonLibre`,
+  `DirectionArretTram`, `PositionArretTram`, `PlaceVehlibsSurPlaces`, et
+  `InitialiseInfosTrajetLignesTram` avec `voie::InitialiseInfosLignesTram`, qu'elle seule appelle.
+- **Branches défensives inatteignables** : `TourDeDeplacementVehlib` (condition toujours
+  vraie : un vehlib roule à chaque tour), `voie::AjoutePieton` et `RetirePieton` sur une case
+  incohérente, `pieton::ChercheFileTaxi` sans numéro de file, `Cherche*` sans distance de
+  détection, `default` des `switch`, `Prepare*` quand `DefinitNb*` n'obtient pas la mémoire.
+- **Contrôles d'intégrité** (`Verifie()`) : messages de champs abîmés que les cartes livrées
+  ne produisent pas (numéros négatifs, nombres hors bornes...).
+- **Cas atteignables, absents des cartes, non testés** : feu relié à deux feux de piétons
+  (`feu::AjouteFeuPtn`), arrêt ou place à égale distance des deux côtés d'un piéton
+  (`ChercheArretBus`, `ChercheArretTram`, `CherchePlaceTaxi`, `CherchePlaceVehlib`), « Tout
+  droit » sur deux cases (`CalculeDistanceParking`, `CalculeDistanceFilePark`), arrêt ou file
+  de taxi inaccessible (`VerifieCalculDistances`), certains effacements de voie
+  (`voie::Initialise`), « Copier vers… » laissant hors de la sélection autre chose qu'un
+  parking (`CopieValide`).
+
+Les chemins testés en 6.0.7 (`tests/test_chemins.cpp`) : places de parking et de vehlib
+retirées par `Charge`, arrêts de plusieurs cases (`ExisteCaseArretBus`,
+`ExisteCaseArretTram`, `ArretTramExistant`), `SupprimeArretTram`, tableaux agrandis par
+`IncrementeNombre` (`Copie` des arrêts et des feux de piétons), réinfections (`infection::Svt`).
 
 ## Points d'attention (non corrigés)
 

@@ -641,3 +641,70 @@ TEST_CASE("Direction d'une case : modifiable seulement avant le premier tour", "
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Vérification du réseau : une place de vehlib supprimée est signalée (v6.0.7)", "[corrections][verification]")
+ { // Comme les places de parking (v5.1), mais la v5.3 avait oublié les places de
+   // vehlib : la simulation démarrait et CalculeDistances lisait la case (-1,-1)
+  VueNulle Vue;
+  vue=&Vue;
+  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : 32 places de vehlib
+  cv->SupprimePlaceVehlib(1); // ActionPlaceVehlibExecute sur la place n°2
+  AnsiString asMsgErr;
+  CHECK_FALSE(harnais::VerifieReseau(asMsgErr));
+  CHECK(asMsgErr.str()=="Place de vehlib n°2 non définie. Pour renuméroter : sauvez puis rouvrez le réseau.");
+  CHECK_FALSE(harnais::Demarre(asMsgErr));
+  CHECK_FALSE(cv->DistancesCalculees);
+  harnais::Ferme();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Vérification d'intégrité : durées par défaut du vert et du rouge négatives (v6.0.7)", "[corrections][verifie]")
+ { // Les deux messages affichaient la durée de l'orange
+  VueNulle Vue;
+  vue=&Vue;
+  std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[0])); // 8x8.cvw
+  conversion_cvw Ref=ConvertitEn530(asCarte);
+  REQUIRE(Ref.Ok);
+  REQUIRE(Ref.Version==VERSION);
+  REQUIRE(LitEntier(asCarte, Champ(Ref, "DureeOrange"))>=0);
+  EcritEntier(asCarte, Champ(Ref, "DureeVert"), -7);
+  EcritEntier(asCarte, Champ(Ref, "DureeRouge"), -9);
+  const std::string asFichier=FichierSortie("verifie_durees.cvw");
+  EcritFichier(asFichier, asCarte);
+  REQUIRE(harnais::Ouvre(asFichier));
+  AnsiString asMsgErr;
+  cv->Verifie(asMsgErr);
+  const std::string asMessages=asMsgErr.str();
+  INFO(asMessages);
+  CHECK(asMessages.find("La durée du feu vert par défaut est incorrecte (-7)\n")!=std::string::npos);
+  CHECK(asMessages.find("La durée du feu rouge par défaut est incorrecte (-9)\n")!=std::string::npos);
+  harnais::Ferme();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------
+TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans double libération (v6.0.7)", "[corrections][feux]")
+ { // PrepareFeuxPietons libérait les listes sans remettre leur pointeur à NULL,
+   // que AjouteFeuPtn libérait à nouveau. L'interface ne prépare plus deux fois
+   // le même réseau depuis la 6.0.1 (Marche interrompu : réseau rechargé)
+  VueNulle Vue;
+  vue=&Vue;
+  alea::FixeGraine(1);
+  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : 6 feux de piétons
+  AnsiString asMsgErr;
+  REQUIRE(harnais::Demarre(asMsgErr));
+  std::vector<std::vector<int>> Listes;
+  Listes.reserve((std::size_t)cv->NbFeux);
+  for(int i=0; i<cv->NbFeux; i++)
+   Listes.push_back(std::vector<int>(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn));
+  REQUIRE(std::any_of(Listes.begin(), Listes.end(), [](const std::vector<int> &l) { return !l.empty(); }));
+  cv->PrepareFeuxPietons();
+  for(int i=0; i<cv->NbFeux; i++)
+   {
+    INFO("Feu n°" << i+1);
+    CHECK(std::vector<int>(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn)==Listes[(std::size_t)i]);
+   }
+  for(int t=0; t<20; t++) REQUIRE(harnais::Tick());
+  harnais::Ferme();
+  alea::LibereGraine();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------

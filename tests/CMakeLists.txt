@@ -45,6 +45,7 @@ add_executable(cvtests
   test_golden.cpp
   test_generation.cpp
   test_corrections.cpp
+  test_chemins.cpp
   ${CV_ALLOCATION}
 )
 target_link_libraries(cvtests PRIVATE cvtest_support Catch2::Catch2WithMain)
@@ -93,7 +94,7 @@ endforeach()
 
 # Une entrée CTest par groupe de tests Catch2 (étiquettes) : noms ASCII, car
 # les noms accentués des cas de test passent mal par la console Windows.
-foreach(groupe IN ITEMS compat cvw simulation generation copie corrections)
+foreach(groupe IN ITEMS compat cvw simulation generation copie corrections chemins)
   add_test(NAME moteur.${groupe} COMMAND cvtests "[${groupe}]")
   set_tests_properties(moteur.${groupe} PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endforeach()

@@ -824,6 +824,7 @@ class TestInterface : public QObject
   void selectionCaseADeuxFeux();
   void selectionCaseATroisFeux();
   void effacerSelectionAvecArretsDeBus();
+  void placeVehlibSupprimee();
   void suppressionFeuReference();
   void suppressionFeuReferenceParUnFeuPietons();
   void effacerSelectionAvecFeuReference();
@@ -3652,6 +3653,32 @@ void TestInterface::effacerSelectionAvecArretsDeBus()
   QCOMPARE((int)cv->v[5][2].NumArretBus, 0);
   QCOMPARE((int)cv->v[6][2].NumArretBus, 0);
   QCOMPARE((int)cv->v[5][2].DirPoss, (int)aucune);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::placeVehlibSupprimee()
+ { // v6.0.7 : VerifieReseau ne contrôlait pas les places de vehlib (v5.3) : une place
+   // supprimée, la simulation démarrait et CalculeDistances lisait la case (-1,-1)
+  TfrmSimulation *s=frmSimulation;
+  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  QString f=OuvreCarte("Géant.cvw", "place_vehlib.cvw");
+  QVERIFY(!f.isEmpty());
+  QCOMPARE((int)cv->NbPlacesVehlib, 32);
+  const int x=cv->PlaceVehlib[1].x, y=cv->PlaceVehlib[1].y;
+  ExecuteSurCase(x, y, s->ActionPlaceVehlib);
+  QCOMPARE(Statut(), QString::fromUtf8("La place de vehlib numéro 2 a été supprimée."));
+  const QByteArray Reseau=OctetsReseau();
+  QVERIFY(!DemarreSansBlocage("Marche après la suppression d'une place de vehlib"));
+  QVERIFY2(Statut().contains(QString::fromUtf8("Place de vehlib n°2 non définie")), qPrintable(Statut()));
+  VerifieNonDemarre(Reseau);
+  if (QTest::currentTestFailed()) return;
+  // « Pour renuméroter : sauvez puis rouvrez le réseau »
+  Enregistre(f);
+  OuvreFichier(f);
+  QCOMPARE((int)cv->NbPlacesVehlib, 31);
+  QCOMPARE((int)cv->v[x][y].NumPlaceVehlib, 0);
+  QVERIFY2(DemarreSansBlocage("Marche, places de vehlib renumérotées"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(5));
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheFeuxEtListes()
