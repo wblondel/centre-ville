@@ -4,6 +4,28 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.7] — place de vehlib supprimée, couverture du moteur
+
+Cette version corrige un plantage de l'original, trouvé grâce au rapport de couverture des
+tests. Le format des fichiers `.cvw` ne change pas (0x530), ni la simulation (golden master
+identique).
+
+### Bogues corrigés
+
+- **Place de vehlib supprimée** : Marche lançait la simulation, qui lisait hors du réseau
+  (plantage). Comme pour une place de parking, la vérification du réseau signale maintenant
+  la place manquante : enregistrer puis rouvrir le réseau renumérote les places.
+- **Contrôle d'intégrité** : les messages d'une durée par défaut du vert ou du rouge
+  négative donnaient la durée de l'orange.
+
+### Tests
+
+Nouveaux tests du moteur sur des chemins que les cartes livrées ne parcouraient pas : places
+de parking et de vehlib supprimées puis renumérotées à la réouverture, arrêts de bus et de
+tram retirés case par case, arrêts et feux de piétons ajoutés quand tous les numéros sont
+pris, épidémie avec réinfections. Le tri des lignes encore non
+exécutées est dans `engine/README.md`, « Couverture des tests ».
+
 ## [6.0.6] — deux accès hors tableau corrigés, linter
 
 Cette version corrige deux accès hors tableau de l'original, trouvés par le nouveau linter et
