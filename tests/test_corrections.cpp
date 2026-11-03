@@ -764,3 +764,31 @@ TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refus�
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Arrêt desservi plusieurs fois par une ligne : ligne listée une fois (v6.0.9)", "[corrections][lignes]")
+ { // AjouteLigneBus et AjouteLigneTram (appelées par Paramètres des lignes, pour chaque arrêt
+   // de chaque ligne) ajoutaient la ligne à chaque passage : « 4,4 » dans la barre d'état,
+   // et, dès le dixième passage (neuf lignes de neuf arrêts possibles), écriture hors de
+   // NumLigne, dans l'arrêt suivant ou après le tableau
+  arret_bus ArretBus;
+  arret_tram ArretTram;
+  for(int i=0; i<10; i++)
+   {
+    ArretBus.AjouteLigneBus(4);
+    ArretTram.AjouteLigneTram(5);
+   }
+  ArretBus.AjouteLigneBus(3);
+  ArretTram.AjouteLigneTram(1);
+  ArretTram.AjouteLigneTram(5);
+  CHECK(ArretBus.NbLignes==2);
+  CHECK(ArretBus.asListeLignesBus()=="4,3");
+  CHECK((ArretBus.Ligne[2]&&ArretBus.Ligne[3]&&!ArretBus.Ligne[4]));
+  CHECK(ArretTram.NbLignes==2);
+  CHECK(ArretTram.asListeLignesTram()=="E,A"); // lignes de tram désignées par une lettre
+  CHECK((ArretTram.Ligne[0]&&ArretTram.Ligne[4]&&!ArretTram.Ligne[3]));
+  // Remise à zéro (lignes réappliquées) : la ligne est de nouveau ajoutée
+  ArretBus.InitialiseInfosLignesBus();
+  ArretBus.AjouteLigneBus(4);
+  CHECK(ArretBus.NbLignes==1);
+  CHECK(ArretBus.asListeLignesBus()=="4");
+ }
+//---------------------------------------------------------------------------

@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.8)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.9)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -456,6 +456,26 @@ Tests ajoutés en 6.0.8 (`test_interface.cpp`) :
 - `reseauNonConnexeSansParking` : arrêt, file ou place qu'on ne peut pas rejoindre.
 - `epidemieSansPietonDansLaBarreDEtat` : voir les corrections de la 6.0.8.
 
+## Couverture de `f_prmbus.cpp` et `f_prmtram.cpp`
+
+Les deux fiches Paramètres des lignes de bus et de tram ont le même code, au nom des
+champs près. En 6.0.8, 62 lignes sur 243 n'étaient exécutées dans aucune des deux
+(74,5 %), dont cinq fonctions jamais appelées sur 17 : Appliquer, les flèches, la case
+« Tout », le bouton Aide et le menu des flèches. Les tests de la 6.0.9 en laissent 3
+(98,8 %) : `MenuItemClick`, que rien ne peut appeler (menu rattaché à aucun contrôle, voir
+« Comportements d'origine conservés »).
+
+Tests ajoutés en 6.0.9 (`test_interface.cpp`), pour chacune des deux fiches :
+
+- `lignesAppliqueesEtArretRepete` : arrêts non définis refusés par Appliquer et par OK ;
+  Appliquer, qui laisse la fiche ouverte ; ligne qui passe plusieurs fois par un arrêt
+  (voir les corrections de la 6.0.9), puis Marche.
+- `lignesSansArretDefini` : arrêts posés puis retirés, message de la fiche et lignes
+  vides.
+- `lignesDeplacementsEtClignotement` : chaque flèche, sans sortir de la grille ou jusqu'au
+  bord avec « Coins » ; arrêt saisi montré par le curseur et qui clignote ; F1 et Aide.
+- `lignesToutesCochees` : case « Tout » pendant la simulation, fiche réduite.
+
 ## Écarts connus avec l'original
 
 Comportement :
@@ -624,6 +644,12 @@ pointe sur le nouveau le temps de la lecture). En cas d'échec, message et rése
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
+## Corrections de la 6.0.9 (annotées `// v6.0.9`)
+
+| Commande | Original | 6.0.9 |
+|---|---|---|
+| Paramètres des lignes de bus et de tram, OK ou Appliquer, avec une ligne qui passe plusieurs fois par un arrêt (`arret_bus::AjouteLigneBus`, `arret_tram::AjouteLigneTram`, moteur) | La ligne est ajoutée à la liste des lignes de l'arrêt (`NumLigne`, 9 entrées) à chaque passage : « Arrêt bus 25 (3,4,4) » dans la barre d'état. Au dixième passage par un même arrêt, toutes lignes confondues, écriture dans l'arrêt suivant (son numéro, puis sa position), ou hors du tableau pour le dernier arrêt. | Chaque ligne n'est listée qu'une fois : neuf entrées suffisent. |
+
 ## Corrections de la 6.0.8 (annotées `// v6.0.8`)
 
 | Commande | Original | 6.0.8 |
@@ -681,6 +707,16 @@ fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
   place pointe. Une place qui pointe sur deux places dont les files tournent n'est donc pas
   signalée : sa seconde file rejoint la première. Géant, ainsi modifiée, simule 3 000 tours
   sans incident, sous ASan compris.
+- **Ligne qui passe plusieurs fois par un arrêt** : acceptée par Paramètres des lignes.
+  Un bus ou un tram repart toujours vers l'arrêt qui suit le premier passage
+  (`NumeroArretSuivant`) : avec les arrêts 25, 25, 24, le 24 n'est jamais desservi. Chaque
+  tram part d'un arrêt différent de sa ligne : une ligne de tram de quatre passages au même
+  arrêt, qui reçoit deux trams, interrompt Marche (trams impossibles à placer).
+- **Menu des flèches de Paramètres des lignes de bus et de tram** (`PopupMenu`,
+  `MenuItemClick`) : rattaché à aucun contrôle dans le `.dfm`, il ne s'ouvre jamais, et
+  ses raccourcis (flèches, Origine, Fin, pages, Z) ne le déclenchent pas, dans la VCL
+  (`TWinControl::IsMenuKey`) comme dans le port. Son entrée « Zoom » vise `BitBtn22`,
+  retiré en 5.4.
 - **Statistiques véhicules** : un trajet n'ayant qu'un véhicule arrivé, ou des
   véhicules au même parcours, affiche 0.
 - **Évolution** : par nombre de véhicules, le quadrillage marque tous les 10 véhicules :

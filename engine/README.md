@@ -286,6 +286,17 @@ et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
 `interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée). La CI
 lance `ctest --preset asan` sous Linux, et sous macOS sur `main`, une erreur d'UBSan arrêtant le test.
 
+## Corrections de la 6.0.9 (annotées `// v6.0.9`)
+
+- **`arret_bus::AjouteLigneBus`, `arret_tram::AjouteLigneTram`** : appelées par Paramètres
+  des lignes pour chaque arrêt de chaque ligne, elles ajoutaient la ligne à la liste de
+  l'arrêt (`NumLigne`, `NBMAXLIGNESBUSTRAM` entrées) à chaque passage, sans borne. Au
+  dixième passage par un même arrêt, écriture dans l'arrêt suivant du tableau (son
+  `Numero`, puis `x` et `y`), ou hors du tableau pour le dernier (ASan :
+  `heap-buffer-overflow`). La ligne n'est plus ajoutée si elle y est déjà (`Ligne[n-1]`).
+  `NumLigne` n'est lu que pour l'affichage (`asListeLignes*`), l'enregistrement et
+  `Verifie` : la simulation ne change pas.
+
 ## Corrections de la 6.0.8 (annotées `// v6.0.8`)
 
 - **`centre_ville::VerifieCalculDistances`** : les distances aux files de parking (v5.0) et
@@ -338,8 +349,8 @@ Rien de tout cela ne change le golden master ni les octets écrits.
 Le job « Couverture des tests » de la CI (chaque lundi, ou `gh workflow run ci.yml`) mesure
 les lignes exécutées par l'ensemble des tests. En 6.0.7, `simul.cpp` est couvert à 93 % des
 lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). En 6.0.8, après le retrait du
-code mort et les nouveaux tests de l'interface, il en reste 167 sur 5 386 (97 %). Tri de ce
-qui reste :
+code mort et les nouveaux tests de l'interface, il en reste 167 sur 5 386 (97 %), et 165
+sur 5 388 en 6.0.9. Tri de ce qui reste :
 
 - **Fonctions sans appelant** : retirées depuis (voir « Code mort retiré »).
 - **Branches défensives inatteignables** : `TourDeDeplacementVehlib` (condition toujours

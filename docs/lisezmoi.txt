@@ -32,6 +32,11 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.9]
+ - Une ligne de bus ou de tram qui passe plusieurs fois par le même arrêt
+   n'y est plus listée qu'une fois. À partir du dixième passage par un même
+   arrêt, la liste débordait et pouvait déplacer un autre arrêt.
+
 [Version 6.0.8]
  - Plus de plantage sous Windows et Linux en simulant un réseau sans piéton avec
    l'affichage épidémie : la barre d'état donne les statistiques des véhicules.

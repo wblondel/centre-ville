@@ -816,6 +816,40 @@ class TestInterface : public QObject
     frmSimulation->DrawGridSimul->setFocus();
     QApplication::processEvents();
    }
+  // Paramètres des lignes de bus et de tram : fiches jumelles, aux mêmes composants à part
+  // les libellés propres au bus ou au tram ; ce qui diffère de l'une à l'autre
+  struct FicheLignes
+   {
+    const char *Nom, *Pluriel, *Suffixe, *LabelNb, *Rubrique; // « bus », « bus », « Bus », « LabelNbBus », ancre de l'aide
+    std::function<TForm *()> Fiche;
+    TBitBtn *TfrmParamSimul::*Bouton;
+    std::function<int(int)> NbArrets; // de la ligne n
+    std::function<int()> NbLignes;
+    std::function<QString(int)> ListeLignes; // lignes de l'arrêt n
+    std::function<QPoint(int)> Arret; // position de l'arrêt n
+    std::function<int()> NumArretAMontrer;
+   };
+  static std::vector<FicheLignes> FichesLignes()
+   {
+    return {{"bus", "bus", "Bus", "LabelNbBus", "PDRDB", []() -> TForm * { return frmParamBus; }, &TfrmParamSimul::BitBtnDefLignesBus,
+             [](int n) { return (int)cv->LigneBus[n-1].NbArrets; }, []() { return (int)cv->NbLignesBus; },
+             [](int n) { return Q(cv->ArretBus[n-1].asListeLignesBus()); },
+             [](int n) { return QPoint(cv->ArretBus[n-1].x, cv->ArretBus[n-1].y); },
+             []() { return frmParamBus->NumArretBusAMontrer; }},
+            {"tram", "trams", "Tram", "LabelNbTrams", "PDRDT", []() -> TForm * { return frmParamTram; }, &TfrmParamSimul::BitBtnDefLignesTram,
+             [](int n) { return (int)cv->LigneTram[n-1].NbArrets; }, []() { return (int)cv->NbLignesTram; },
+             [](int n) { return Q(cv->ArretTram[n-1].asListeLignesTram()); },
+             [](int n) { return QPoint(cv->ArretTram[n-1].x, cv->ArretTram[n-1].y); },
+             []() { return frmParamTram->NumArretTramAMontrer; }}};
+   }
+  template<class T> static T *Composant(TForm *Fiche, const QString &Nom) { return (T *)Fiche->FindComponent(A(Nom)); }
+  void DansFicheLignes(const FicheLignes &l, const std::function<void(TForm *)> &Action)
+   { // Paramètres, la fiche des lignes (Action), puis Annuler dans Paramètres
+    QuandModale([]() { return frmParamSimul; }, [this, &l]() { Clique(frmParamSimul->*l.Bouton); });
+    QuandModale(l.Fiche, [&l, &Action]() { Action(l.Fiche()); }); // étapes jouées pendant Clique
+    QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->ButtonAnnuler); });
+    Clique(frmSimulation->ToolButtonParametres);
+   }
   QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
   QUrl AdresseAide(const QUrl &Url)
    { // Aide contextuelle : adresse que charge la page de redirection (base.cpp)
@@ -855,6 +889,10 @@ class TestInterface : public QObject
   void fichesParametres();
   void champEntreeBorne();
   void numeroArretPendantLaFrappe();
+  void lignesAppliqueesEtArretRepete();
+  void lignesSansArretDefini();
+  void lignesDeplacementsEtClignotement();
+  void lignesToutesCochees();
   void ficheCarrefours();
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
@@ -2401,6 +2439,211 @@ void TestInterface::numeroArretPendantLaFrappe()
   Clique(frmSimulation->ToolButtonParametres);
   QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::lignesAppliqueesEtArretRepete()
+ { // Paramètres des lignes de bus et de tram (Géant) : arrêts non définis refusés par
+   // Appliquer et par OK (la fiche reste ouverte) ; Appliquer : lignes, nombre de véhicules
+   // et carte modifiée, fiche ouverte ; Annuler garde ce qui est appliqué. v6.0.9 : une
+   // ligne qui passe plusieurs fois par un arrêt y était ajoutée à chaque passage (« 4,4 »),
+   // et écrite hors de la liste des lignes de l'arrêt dès le dixième passage
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lignes_appliquees.cvw").isEmpty());
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QStringList Ecarts;
+  // Bus : ligne 4 de neuf passages à l'arrêt 25 (ligne 3) ; trams : ligne 5 de trois passages
+  // à l'arrêt 16 (lignes A et D), un seul tram (deux ne trouveraient pas de place au départ)
+  const struct { int Ligne, NumArret, NbPassages, NbVehicules; const char *Liste; } Cas[]=
+   {{4, 25, 9, 12, "3,4"}, {5, 16, 3, 11, "A,D,E"}};
+  std::vector<FicheLignes> Fiches=FichesLignes();
+  for(int i=0; i<2; i++)
+   DansFicheLignes(Fiches[i], [&, i](TForm *f)
+    {
+     const FicheLignes &l=Fiches[i];
+     const auto &c=Cas[i];
+     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
+     auto Spin=[f](int k) { return Composant<TCSpinEdit>(f, QString("CSpinEdit%1").arg(k)); };
+     TButton *Appliquer=Composant<TButton>(f, "ButtonAppliquer");
+     const int NbLignes=l.NbLignes();
+     const QString Refus=QString::fromUtf8("Le réseau de %1 n'est pas correct :\n"
+                                           " - Le 1er arrêt de la ligne n°%2 n'est pas défini.\n"
+                                           " - Le 2ème arrêt de la ligne n°%2 n'est pas défini.\n"
+                                           "\nCorrigez avant de continuer.").arg(l.Pluriel).arg(c.Ligne);
+     Spin(c.Ligne)->Value=2;
+     Messages.clear();
+     Clique(Appliquer);
+     Clique(Composant<TButton>(f, "ButtonOk"));
+     Ecart((Messages.size()==2)&&Messages[0].endsWith(Refus)&&Messages[1].endsWith(Refus), "refus : "+Messages.join(" | "));
+     Ecart(f->isVisible()&&Appliquer->Enabled&&!l.NbArrets(c.Ligne)&&(l.NbLignes()==NbLignes), "appliqué malgré le refus");
+     Spin(c.Ligne)->Value=c.NbPassages;
+     for(int j=1; j<=c.NbPassages; j++) Spin(10*c.Ligne+j)->Value=c.NumArret;
+     Messages.clear();
+     Clique(Appliquer);
+     Ecart(Messages.isEmpty(), "Appliquer : "+Messages.join(" | "));
+     Ecart(f->isVisible()&&!Appliquer->Enabled&&frmSimulation->SimulationModifiee, "fiche fermée, Appliquer actif ou carte non modifiée");
+     Ecart((l.NbArrets(c.Ligne)==c.NbPassages)&&(l.NbLignes()==NbLignes+1),
+           QString("ligne %1 : %2 arrêts, %3 lignes").arg(c.Ligne).arg(l.NbArrets(c.Ligne)).arg(l.NbLignes()));
+     Ecart(l.ListeLignes(c.NumArret)==QString::fromUtf8(c.Liste), QString("lignes de l'arrêt %1 : %2").arg(c.NumArret).arg(l.ListeLignes(c.NumArret)));
+     const QString NbVehicules=Q(Composant<TLabel>(f, l.LabelNb)->Caption);
+     Ecart(NbVehicules==QString::number(c.NbVehicules), "nombre de véhicules : "+NbVehicules);
+     Clique(Composant<TButton>(f, "ButtonAnnuler"));
+    });
+  QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE((int)cv->LigneBus[3].NbArrets, 9);
+  QCOMPARE((int)cv->LigneTram[4].NbArrets, 3);
+  QVERIFY2(DemarreSansBlocage("Marche, lignes passant plusieurs fois par le même arrêt"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(50));
+  int NbBus=0, NbTrams=0;
+  for(int i=0; i<cv->NbBus; i++) NbBus+=(cv->Bus[i].NumLigne==4);
+  for(int i=0; i<cv->NbTrams; i++) NbTrams+=(cv->Tram[i].NumLigne==5);
+  QCOMPARE(NbBus, 3);
+  QCOMPARE(NbTrams, 1);
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::lignesSansArretDefini()
+ { // Arrêts de bus et de tram posés puis retirés : le bouton de Paramètres reste actif
+   // (numéros attribués), la fiche des lignes prévient qu'il n'y a pas d'arrêt et cache
+   // les nombres d'arrêts des lignes ; OK : aucune ligne
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 2, 12, 2);
+  ExecuteSurSelection(15, 4, 15, 12, s->ActionSegmentTram);
+  if (QTest::currentTestFailed()) return;
+  for(int i=0; i<2; i++)
+   {
+    ExecuteSurCase(5, 2, s->ActionArretBusTram);
+    ExecuteSurCase(15, 6, s->ActionArretBusTram);
+   }
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE((int)cv->NbArretsBus, 1);
+  QCOMPARE((int)cv->NbArretsTram, 1);
+  QVERIFY(!cv->ArretBus[0].Defini());
+  QVERIFY(!cv->ArretTram[0].Defini());
+  QStringList Ecarts;
+  for(const FicheLignes &l : FichesLignes())
+   {
+    Messages.clear();
+    DansFicheLignes(l, [&](TForm *f)
+     {
+      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
+      for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++)
+       Ecart(!Composant<TCSpinEdit>(f, QString("CSpinEdit%1").arg(i))->isVisible(), QString("nombre d'arrêts de la ligne %1 visible").arg(i));
+      Ecart((Q(Composant<TLabel>(f, QString("LabelNbArrets")+l.Suffixe)->Caption)=="0")&&
+            (Q(Composant<TLabel>(f, QString("LabelNbMaxArrets")+l.Suffixe)->Caption)=="1")&&
+            (Q(Composant<TLabel>(f, l.LabelNb)->Caption)=="0"), "nombres affichés");
+      Clique(Composant<TButton>(f, "ButtonOk"));
+     });
+    const QString Message=QString::fromUtf8("Vous devez poser au moins un arrêt de %1 sur le réseau pour pouvoir définir le réseau de lignes de %1.").arg(l.Nom);
+    if ((Messages.size()!=1)||!Messages[0].endsWith(Message)) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Messages.join(" | ");
+    if (l.NbLignes()) Ecarts<<QString::fromUtf8("%1 : %2 lignes").arg(l.Nom).arg(l.NbLignes());
+   }
+  QVERIFY(Etapes.empty());
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::lignesDeplacementsEtClignotement()
+ { // Paramètres des lignes (Géant) : les flèches déplacent le curseur de la grille d'une
+   // case, sans en sortir, ou jusqu'au bord avec « Coins » ; un numéro d'arrêt saisi amène
+   // le curseur sur l'arrêt, qui clignote ; F1 et le bouton Aide ouvrent la rubrique
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lignes_deplacements.cvw").isEmpty());
+  Messages.clear(); // « Voulez-vous enregistrer… » d'un réseau laissé modifié
+  QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
+  GrilleSimulation *g=frmSimulation->DrawGridSimul;
+  const int xMax=g->ColCount-1, yMax=g->RowCount-1;
+  // Bouton (BitBtn<colonne><ligne>, 2 = sans déplacement), avec « Coins », case de départ, case attendue
+  const struct { int Bouton; bool Coins; int x0, y0, x, y; } Deplacements[]=
+   {{32, false, 10, 10, 11, 10}, {23, false, 11, 10, 11, 11}, {11, false, 11, 11, 10, 10}, {13, false, 10, 10, 9, 11},
+    {31, false, 9, 11, 10, 10}, {33, false, 10, 10, 11, 11}, {21, false, 11, 11, 11, 10}, {12, false, 11, 10, 10, 10},
+    {11, false, 0, 0, 0, 0}, {13, false, 0, yMax, 0, yMax}, {33, false, xMax, yMax, xMax, yMax}, {31, false, xMax, 0, xMax, 0},
+    {33, true, 10, 10, xMax, yMax}, {21, true, xMax, yMax, xMax, 0}, {12, true, xMax, 0, 0, 0}, {23, true, 0, 0, 0, yMax},
+    {31, true, 0, yMax, xMax, 0}, {13, true, xMax, 0, 0, yMax}, {32, true, 0, yMax, xMax, yMax}, {11, true, 40, 30, 0, 0}};
+  QStringList Ecarts;
+  QString stDossier=QCoreApplication::applicationDirPath();
+  for(const FicheLignes &l : FichesLignes())
+   {
+    UrlsOuvertes.clear();
+    DansFicheLignes(l, [&](TForm *f)
+     {
+      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
+      TCheckBox *Coins=Composant<TCheckBox>(f, "CheckBoxCoins");
+      for(const auto &d : Deplacements)
+       {
+        Coins->Checked=d.Coins;
+        g->Col=d.x0;
+        g->Row=d.y0;
+        Clique(Composant<TBitBtn>(f, QString("BitBtn%1").arg(d.Bouton)));
+        Ecart((g->Col==d.x)&&(g->Row==d.y), QString("BitBtn%1%2 depuis (%3, %4) : (%5, %6)").arg(d.Bouton).arg(d.Coins?" (coins)":"")
+                                                .arg(d.x0).arg(d.y0).arg((int)g->Col).arg((int)g->Row));
+       }
+      Coins->Checked=false;
+      // Premier arrêt de la ligne 1 remplacé par le 2, puis par le 3 : le curseur suit
+      TCSpinEdit *Champ=Composant<TCSpinEdit>(f, "CSpinEdit11");
+      TTimer *Clignotement=Composant<TTimer>(f, "TimerClignotement");
+      for(int n : {2, 3})
+       {
+        Champ->Value=n;
+        Ecart((l.NumArretAMontrer()==n)&&(QPoint(g->Col, g->Row)==l.Arret(n)), QString("arrêt %1 non montré").arg(n));
+       }
+      const int Tag=Clignotement->Tag;
+      Ecart(QTest::qWaitFor([&]() { return Clignotement->Tag!=Tag; }, 2000), "pas de clignotement");
+      Ecart(QTest::qWaitFor([&]() { return Clignotement->Tag==Tag; }, 2000), "clignotement arrêté");
+      Touche(Champ, Qt::Key_F1);
+      Clique(Composant<TButton>(f, "ButtonAide"));
+      Clique(Composant<TButton>(f, "ButtonAnnuler"));
+     });
+    QUrl Rubrique=QUrl::fromLocalFile(stDossier+"/html/index.html");
+    Rubrique.setFragment(l.Rubrique);
+    if ((UrlsOuvertes.size()!=2)||(AdresseAide(UrlsOuvertes[0])!=Rubrique)||(AdresseAide(UrlsOuvertes[1])!=Rubrique))
+     Ecarts<<QString::fromUtf8("%1 : aide (%2 pages)").arg(l.Nom).arg(UrlsOuvertes.size());
+   }
+  QDesktopServices::unsetUrlHandler("file");
+  QVERIFY(Etapes.empty());
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  // Annuler : les lignes du réseau n'ont pas changé
+  QCOMPARE((int)cv->LigneBus[0].NumArret[0], 1);
+  QCOMPARE((int)cv->LigneTram[0].NumArret[0], 1);
+  QVERIFY(!frmSimulation->SimulationModifiee);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::lignesToutesCochees()
+ { // Pendant la simulation (Géant), « Tout » coche les lignes qui ont des arrêts et réduit
+   // la fiche pour montrer leurs trajets ; décochée, elle décoche tout, sans réduire
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lignes_cochees.cvw").isEmpty());
+  Messages.clear(); // « Voulez-vous enregistrer… » d'un réseau laissé modifié
+  QVERIFY2(DemarreSansBlocage("Marche, Géant"), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(3));
+  QStringList Ecarts;
+  for(const FicheLignes &l : FichesLignes())
+   DansFicheLignes(l, [&](TForm *f)
+    {
+     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
+     auto Cochees=[&]()
+      {
+       QString Liste;
+       for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++)
+        if (Composant<TCheckBox>(f, QString("CheckBox%1").arg(i))->Checked) Liste+=QString::number(i);
+       return Liste;
+      };
+     QString Attendues;
+     for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) if (l.NbArrets(i)) Attendues+=QString::number(i);
+     TCheckBox *Tout=Composant<TCheckBox>(f, "CheckBoxTout");
+     Ecart(Tout->isVisible()&&!Tout->Checked, "« Tout » caché ou coché");
+     Clique(Tout);
+     Ecart(Tout->Checked&&(Cochees()==Attendues), "cochées : "+Cochees()+" au lieu de "+Attendues);
+     Ecart(f->WindowState==wsMinimized, "fiche non réduite");
+     frmSimulation->DrawGridSimul->Repaint();
+     f->WindowState=wsNormal;
+     Clique(Tout);
+     Ecart(!Tout->Checked&&Cochees().isEmpty()&&(f->WindowState==wsNormal), "décochées : "+Cochees());
+     Clique(Composant<TButton>(f, "ButtonAnnuler"));
+    });
+  QVERIFY(Etapes.empty());
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheCarrefours()
