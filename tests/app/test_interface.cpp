@@ -532,6 +532,50 @@ class TestInterface : public QObject
     OuvreFichier(f);
     return f;
    }
+  // Boucle principale à sens unique avec deux parkings, et boucle secondaire dont une route
+  // sort vers la principale sans qu'aucune n'y entre ; deux anneaux de voies de tram
+  // séparés. Ajoute place ses objets sur la boucle secondaire (13 à 16, 2) ou sur
+  // l'anneau de gauche (3, 8) : seules leurs distances restent indéfinies
+  QString CreeReseauABoucleSansEntree(const QString &asNom, const std::function<void()> &Ajoute)
+   {
+    QString f=QFileInfo(Carte).absolutePath()+"/"+asNom;
+    centre_ville *Precedent=cv;
+    cv=new centre_ville(true, 24, 14);
+    cv->DefinitNbParkings(2);
+    cv->DefinitNbVehicules(8);
+    cv->DefinitNbPietons(0);
+    for(int x0 : {2, 12})
+     {
+      const int x1=x0+6, y0=2, y1=6;
+      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
+      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
+      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
+      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+     }
+    cv->v[12][4].DirPoss=(dirposs)(N|O); // sortie de la boucle secondaire...
+    for(int x=9; x<12; x++) cv->v[x][4].DirPoss=O; // ... vers la principale
+    cv->AjouteParking(4, 2);
+    cv->AjouteParking(4, 6);
+    for(int x0 : {2, 12})
+     { // anneau de voies de tram de (x0, 8) à (x0+4, 11)
+      const int x1=x0+4, y0=8, y1=11;
+      for(int x=x0+1; x<x1; x++) cv->v[x][y0].SensVoieTram=cv->v[x][y1].SensVoieTram=est_ouest;
+      for(int y=y0+1; y<y1; y++) cv->v[x0][y].SensVoieTram=cv->v[x1][y].SensVoieTram=nord_sud;
+      cv->v[x0][y0].SensVoieTram=sud_est;
+      cv->v[x1][y0].SensVoieTram=sud_ouest;
+      cv->v[x1][y1].SensVoieTram=nord_ouest;
+      cv->v[x0][y1].SensVoieTram=nord_est;
+     }
+    Ajoute();
+    int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
+    bool Ok=(hfile!=-1)&&cv->Sauve(hfile);
+    if (hfile!=-1) FileClose(hfile);
+    delete cv;
+    cv=Precedent;
+    if (!Ok) return QString();
+    OuvreFichier(f);
+    return f;
+   }
   bool Arrete()
    { // Arrêt par la barre d'outils : bilan, puis rechargement du réseau
     QTest::mouseClick(frmSimulation->ToolButtonArret, Qt::LeftButton);
@@ -825,6 +869,8 @@ class TestInterface : public QObject
   void selectionCaseATroisFeux();
   void effacerSelectionAvecArretsDeBus();
   void placeVehlibSupprimee();
+  void epidemieSansPietonDansLaBarreDEtat();
+  void reseauNonConnexeSansParking();
   void suppressionFeuReference();
   void suppressionFeuReferenceParUnFeuPietons();
   void effacerSelectionAvecFeuReference();
@@ -3679,6 +3725,69 @@ void TestInterface::placeVehlibSupprimee()
   QVERIFY2(DemarreSansBlocage("Marche, places de vehlib renumérotées"), qPrintable(Messages.join('\n')));
   QVERIFY(JoueJusquAuTour(5));
   QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::epidemieSansPietonDansLaBarreDEtat()
+ { // v6.0.8 : affichage épidémie sur un réseau sans piéton : la barre d'état divisait par
+   // NbPietons à chaque tour (plantage sous Windows et Linux, « 0 % » sous macOS ARM)
+  TfrmSimulation *s=frmSimulation;
+  struct Retablit
+   { // Affichage d'origine pour les tests suivants, même après un échec
+    ~Retablit() { try { if (frmSimulation->ActionAfficherInfection->Checked) frmSimulation->ActionAfficherInfection->Execute(); } catch (...) { qWarning("Affichage épidémie non rétabli"); } }
+   } r;
+  QVERIFY(!OuvreCarte("8x8.cvw", "sans_pieton.cvw").isEmpty());
+  QCOMPARE((int)cv->NbPietons, 0);
+  QVERIFY(!s->ActionAfficherInfection->Checked);
+  s->ActionAfficherInfection->Execute();
+  QVERIFY(s->ActionAfficherInfection->Checked);
+  QVERIFY(DemarreSansBlocage("Marche, affichage épidémie sans piéton"));
+  QVERIFY(JoueTours([]() { return cv->NbVehiculesSortis>cv->NbVehiculesArrives; }, 100));
+  const QString Texte=Q(s->StatusBar->Panels->Items[0]->Text);
+  QVERIFY(Arrete());
+  // Statistiques des véhicules à la place de celles des piétons
+  QVERIFY2(Texte.startsWith(QString::fromUtf8("Sur "))&&Texte.contains(QString::fromUtf8(" sortis [")), qPrintable(Texte));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::reseauNonConnexeSansParking()
+ { // Parkings accessibles de partout, mais un arrêt, une file de taxis, une place de parking
+   // ou de vehlib qu'on ne peut pas rejoindre : Marche le signale et ouvre la fiche des
+   // distances de ce type (les parkings ont la leur, interruptionReseauNonConnexe)
+  // v6.0.8 : la v5.0 nommait « file de parkings » les files de taxis, et lisait hors de
+  // asTypeDistance pour les files de parkings et les places de vehlib
+  const struct { const char *Type; std::function<void()> Ajoute; TForm *Fiche; } Cas[]=
+   {{"à un arrêt de bus", []() { cv->AjouteArretBus(13, 2); cv->AjouteArretBus(14, 2); }, frmAffDistArretsBus},
+    {"à une file de taxis", []() { cv->AjoutePlaceTaxi(13, 2); cv->AjoutePlaceTaxi(14, 2); }, frmAffDistFilesTaxi},
+    {"à une file de parkings", []() { cv->AjoutePlacePark(13, 2); cv->AjoutePlacePark(14, 2); cv->DefinitNbVehicules(12); }, frmAffDistFilesPark},
+    {"à une place de vehlib", []() { cv->AjoutePlaceVehlib(13, 2); cv->AjoutePlaceVehlib(14, 2); }, frmAffDistPlacesVehlib},
+    {"à un arrêt de tram", []() { cv->AjouteArretTram(3, 8); cv->AjouteArretTram(4, 8); }, frmAffDistArretsTram}};
+  QStringList Ecarts;
+  for(const auto &c : Cas)
+   {
+    const QString f=CreeReseauABoucleSansEntree("sans_entree.cvw", c.Ajoute);
+    QVERIFY(!f.isEmpty());
+    CliqueCase(0, 0); // une seule case sélectionnée : la barre d'état garde le message de Marche
+    const QByteArray Reseau=OctetsReseau();
+    if (DemarreSansBlocage("Marche, objet inaccessible"))
+     {
+      Ecarts<<QString::fromUtf8("%1 : la simulation a démarré").arg(QString::fromUtf8(c.Type));
+      QVERIFY(Arrete());
+      continue;
+     }
+    const QString Message=QString::fromUtf8("Le réseau n'est pas connexe : une distance %1 n'a pas pu être définie !").arg(QString::fromUtf8(c.Type)),
+                  Statut=Q(frmSimulation->StatusBar->Panels->Items[0]->Text);
+    if ((Messages.size()!=1)||!Messages.first().contains(Message))
+     Ecarts<<QString::fromUtf8("%1 : %2").arg(QString::fromUtf8(c.Type), Messages.join(" / "));
+    if (!Statut.contains(QString::fromUtf8(" a une distance %1 indéfinie.").arg(QString::fromUtf8(c.Type))))
+     Ecarts<<QString::fromUtf8("%1 : barre d'état « %2 »").arg(QString::fromUtf8(c.Type), Statut);
+    if (!c.Fiche->isVisible())
+     Ecarts<<QString::fromUtf8("%1 : fiche des distances fermée").arg(QString::fromUtf8(c.Type));
+    if (OctetsReseau()!=Reseau)
+     Ecarts<<QString::fromUtf8("%1 : réseau modifié").arg(QString::fromUtf8(c.Type));
+    for(TForm *Fiche : {(TForm *)frmAffDistParkings, (TForm *)frmAffDistArretsBus, (TForm *)frmAffDistArretsTram,
+                        (TForm *)frmAffDistFilesTaxi, (TForm *)frmAffDistFilesPark, (TForm *)frmAffDistPlacesVehlib})
+     if (Fiche->isVisible()) Fiche->Hide();
+   }
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheFeuxEtListes()

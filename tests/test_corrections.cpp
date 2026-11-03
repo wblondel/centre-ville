@@ -708,3 +708,59 @@ TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans 
   vue=nullptr;
  }
 //---------------------------------------------------------------------------
+TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refusé (v6.0.8)", "[corrections][distances]")
+ { // VerifieCalculDistances oubliait les files de parking (v5.0) et les places de vehlib
+   // (v5.3) : la simulation démarrait, et les véhicules destinés à une place qu'on ne peut
+   // pas rejoindre tournaient sans fin (simulation jamais terminée). Boucle principale
+   // avec les deux parkings ; boucle secondaire dont on peut sortir, pas entrer
+  VueNulle Vue;
+  vue=&Vue;
+  const char *Places[]={"aucune", "parking", "vehlib", "parking accessible"};
+  for(const char *Place : Places)
+   {
+    INFO(Place);
+    cv=new centre_ville(true, 24, 14);
+    cv->DefinitNbParkings(2);
+    cv->DefinitNbVehicules(8);
+    cv->DefinitNbPietons(0);
+    for(int x0 : {2, 12})
+     {
+      const int x1=x0+6, y0=2, y1=6;
+      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
+      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
+      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
+      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+     }
+    cv->v[12][4].DirPoss=(dirposs)(N|O);
+    for(int x=9; x<12; x++) cv->v[x][4].DirPoss=O;
+    cv->AjouteParking(4, 2);
+    cv->AjouteParking(4, 6);
+    const std::string asPlace=Place;
+    if (asPlace=="parking") { cv->AjoutePlacePark(13, 2); cv->AjoutePlacePark(14, 2); cv->DefinitNbVehicules(12); }
+    if (asPlace=="vehlib") { cv->AjoutePlaceVehlib(13, 2); cv->AjoutePlaceVehlib(14, 2); }
+    if (asPlace=="parking accessible") { cv->AjoutePlacePark(2, 4); cv->AjoutePlacePark(2, 3); cv->DefinitNbVehicules(12); }
+    const std::string asFichier=FichierSortie("place_inaccessible.cvw");
+    REQUIRE(harnais::SauveSansChaos(asFichier));
+    delete cv;
+    cv=nullptr;
+    alea::FixeGraine(1);
+    REQUIRE(harnais::Ouvre(asFichier));
+    AnsiString asMsgErr;
+    REQUIRE(harnais::VerifieReseau(asMsgErr));
+    const bool Demarre=harnais::Demarre(asMsgErr);
+    INFO(asMsgErr.str());
+    if (asPlace=="parking") CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 5)")==0)));
+    else if (asPlace=="vehlib") CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 6)")==0)));
+    else
+     { // Témoins : tous les véhicules arrivent
+      REQUIRE(Demarre);
+      int t=0;
+      while ((t<2000)&&harnais::Tick()) t++;
+      CHECK(cv->NbVehiculesArrives==cv->NbVehicules);
+     }
+    harnais::Ferme();
+   }
+  alea::LibereGraine();
+  vue=nullptr;
+ }
+//---------------------------------------------------------------------------

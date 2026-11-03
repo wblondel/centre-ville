@@ -123,7 +123,8 @@
 #define TRAM 2
 //---------------------------------------------------------------------------
 // Pour VerifieDistances
-#define NBTYPESDISTANCE 5 // v5.0 (ajout distances aux files de parkings
+#define NBTYPESDISTANCE 7 // v5.0 (ajout distances aux files de parkings. v6.0.8 : une entrée par type_distance, files de taxis et places de vehlib comprises
+static_assert(NBTYPESDISTANCE==files_vehlib+1, "asTypeDistance : une entrée par type_distance"); // v6.0.8
 //---------------------------------------------------------------------------
 TfrmSimulation *frmSimulation=NULL;
 //---------------------------------------------------------------------------
@@ -160,7 +161,7 @@ const AnsiString asVide,
                  asTypeVehicule[NBNIVEAUXPRIORITE]={"", "d'urgence","de police"},
                  asDebutNom[2]={"ToolBar", "MenuItem"}, // v3.5
 				 asNomElementBarreOutils[NBELEMENTSBARREOUTILS]={"Fichier", "Affichage", "EditionCase", "EditionSelection", "Simulation", "Informations", "Statistiques"}, // v3.5 : ajout. v5.4 : suppression de "Menu"
-                 asTypeDistance[NBTYPESDISTANCE]={"", "à un parking", "à un arrêt de bus", "à un arrêt de tram", "à une file de parkings"},
+                 asTypeDistance[NBTYPESDISTANCE]={"", "à un parking", "à un arrêt de bus", "à un arrêt de tram", "à une file de taxis", "à une file de parkings", "à une place de vehlib"}, // v6.0.8 : la v5.0 avait mis les files de parkings à la place des files de taxis
                  asChargementNonEffectue="Chargement non effectué",
                  asSauvegardeNonEffectuee="Sauvegarde non effectuée",
                  asErrInattendue="Erreur inattendue",
@@ -1746,7 +1747,7 @@ void TfrmSimulation::TimerSimulTimer(TObject *Sender)
  else
   {
    cv->EffectueTourSimulation();
-   if (Affichage&aff_infct) // v5.4.1 : si l'affichage épidémie est activé, on affiche les stats épidémiques des piétons
+   if ((Affichage&aff_infct)&&cv->NbPietons) // v5.4.1 : si l'affichage épidémie est activé, on affiche les stats épidémiques des piétons. v6.0.8 : sans piéton, division entière par zéro (plantage sous Windows et Linux) : statistiques des véhicules
 	{
 	 if (cv->NbVehiculesSortis&&(cv->NbVehiculesSortis-cv->NbVehiculesArrives))
 	   StatusBar->Panels->Items[0]->Text=Format("Sur %d piétons : %d guéri(s) [%d%%], %d infecté(s) [%d%%], %d mort(s) [%d%%].",
