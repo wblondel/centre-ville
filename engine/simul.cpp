@@ -1711,7 +1711,8 @@ void arret_bus::InitialiseInfosLignesBus() // v3.0
 //-----------------------------------------------------------------------------
 void arret_bus::AjouteLigneBus(int n) // v3.0
  {
-  NumLigne[NbLignes++]=n; // v3.0.5
+  if (!Ligne[n-1]) // v6.0.9 : ajoutée à chaque passage de la ligne par l'arrêt (« 4,4 ») : écriture hors de NumLigne dès le dixième
+   NumLigne[NbLignes++]=n; // v3.0.5
   Ligne[n-1]=true;
  }
 //-----------------------------------------------------------------------------
@@ -1984,7 +1985,8 @@ void arret_tram::InitialiseInfosLignesTram() // v3.5
 //-----------------------------------------------------------------------------
 void arret_tram::AjouteLigneTram(int n) // v3.0
  {
-  NumLigne[NbLignes++]=n; // v3.0.5
+  if (!Ligne[n-1]) // v6.0.9 : comme pour les arrêts de bus
+   NumLigne[NbLignes++]=n; // v3.0.5
   Ligne[n-1]=true;
  }
 //-----------------------------------------------------------------------------
