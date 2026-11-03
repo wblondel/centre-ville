@@ -4,6 +4,41 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.8] — couverture de la fiche principale, deux bogues corrigés
+
+Cette version corrige deux bogues trouvés en testant les chemins de la fiche principale que
+les tests ne parcouraient pas, et retire le code que rien n'appelait. Le format des fichiers
+`.cvw` ne change pas (0x530), ni la simulation des cartes livrées (golden master identique).
+
+### Bogues corrigés
+
+- **Affichage épidémie sans piéton** : sur un réseau sans piéton, la barre d'état divisait
+  par le nombre de piétons à chaque tour, ce qui plantait l'application sous Windows et
+  Linux. Elle donne maintenant les statistiques des véhicules.
+- **Place de parking ou de vehlib inaccessible** : la vérification des distances oubliait
+  ces places (depuis les versions 5.0 et 5.3). La simulation démarrait, et les véhicules
+  destinés à une place qu'on ne peut pas rejoindre tournaient sans fin : elle ne se
+  terminait jamais. Marche signale maintenant le réseau non connexe et affiche le tableau
+  des distances, comme pour les arrêts et les files de taxis.
+- **Réseau non connexe pour une file de taxis** : le message parlait d'une file de
+  parkings.
+
+### Tests
+
+Nouveaux tests de l'interface : chaque message de la vérification du réseau, comparé à sa
+copie dans le harnais des tests du moteur ; coins, périphériques et segments de deux voies ;
+voies et arrêts de tram ; directions et double-clic ; commandes d'affichage et nombre de
+tours des statistiques ; dessins pendant la simulation (piétons écrasés et morts, trajet des
+lignes, « Suivre… ») ; confirmations de l'effacement d'une sélection ; arrêts, files et
+places inaccessibles. Le tri des lignes encore non exécutées est dans `app/README.md`,
+« Couverture de `f_simul.cpp` ».
+
+### Maintenance
+
+- Code sans appelant retiré du moteur et de l'application : méthode et liste dans
+  `engine/README.md`, « Code mort retiré ».
+- Le test de l'aide ne lit plus `src/`.
+
 ## [6.0.7] — place de vehlib supprimée, couverture du moteur
 
 Cette version corrige un plantage de l'original, trouvé grâce au rapport de couverture des

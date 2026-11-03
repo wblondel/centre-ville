@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.7)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.8)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -408,6 +408,54 @@ principale (Démo au tour 0 et au tour 200 ; Géant en statistiques de fluidité
 `carte_fluidite_trafic.png`, et de trafic, `carte_trafic.png`) et des fiches
 (`fiche_*.png`).
 
+## Couverture de `f_simul.cpp`
+
+En 6.0.7, le rapport de couverture (job « Couverture des tests » de la CI) comptait
+656 lignes non exécutées sur 3 121 dans `f_simul.cpp` (79 %), dont 34 fonctions
+jamais appelées. Les tests de la 6.0.8 en ramènent le nombre à 142 (95 %). Une seule
+fonction reste non appelée : l'écriture, vide, de la propriété en lecture seule
+`EpidemieActivee`. Tri de ce qui reste :
+
+- **Mémoire insuffisante** : messages `asMemInsuff` de Marche (`Prepare*`) et du
+  double-clic.
+- **Inatteignables depuis la 5.1** : « Impossible de créer un parking (un arrêt, une
+  place…) : il y en a déjà… » et « vous devez d'abord en définir le nombre ».
+  `AjouteParking`, `AjouteArret*` et `AjoutePlace*` agrandissent leur tableau au lieu
+  d'échouer.
+- **Écartées par un contrôle précédent** :
+  - « Il manque des parkings ! » : `VerifieReseau` refuse déjà un parking non défini.
+  - « Il n'y a aucun feu sur cette case ! » : Déplacer le feu n'est disponible que sur une
+    case qui a un feu.
+  - Passage piéton rendu invalide par un changement de direction :
+    `ChangeDirectionSiPossible` refuse de modifier une case qui en porte un. Seul un
+    passage déjà invalide dans le fichier y mène.
+- **Raccourcis** : Alt+F1 et Alt+Maj+F1 dans `FormKeyDown`. Les actions À propos et
+  Sommaire de l'aide les traitent avant, comme dans la VCL.
+- **Hors de portée des tests** : la boîte d'ouverture native (les tests ouvrent par
+  `QFileOpenEvent`), un réseau impossible à rétablir après un Marche interrompu (copie
+  temporaire illisible), le journal `cvw !` (paramètre de la ligne de commande), et les
+  `default` des `switch`.
+
+Tests ajoutés en 6.0.8 (`test_interface.cpp`) :
+
+- `verificationDuReseauMessageParMessage` : un défaut posé dans Géant pour chacun des 22
+  messages de `VerifieReseau`. Le message doit être celui de `harnais::VerifieReseau` (sa
+  copie pour les tests du moteur), et la case en cause doit clignoter.
+- `commandesDeTraceDeLaSelection` : coins, périphériques, segments de deux voies, et
+  sélections refusées.
+- `voiesEtArretsDeTram` : segments de voie de tram, voies tracées selon la case
+  précédente du curseur, arrêts de tram, effacement de la sélection.
+- `directionsEtDoubleClic` : directions avec les fiches Priorités ouvertes, arrêt de bus
+  de deux cases, double-clic.
+- `deplacementDeFeuRefuse`, `commandesDAffichage` (éléments affichés, barres d'outils,
+  nombre de tours des statistiques et menu remis à l'ouverture).
+- `dessinsPendantLaSimulation` : Géant en mode sanglant avec l'épidémie (piétons écrasés et
+  morts, résurrection, statistiques des piétons), trajet des lignes, « Suivre… ».
+- `effacementDeLaSelectionConfirme` : feux dépendants et arrêts de tram, avec Non, Oui
+  et Oui pour tout.
+- `reseauNonConnexeSansParking` : arrêt, file ou place qu'on ne peut pas rejoindre.
+- `epidemieSansPietonDansLaBarreDEtat` : voir les corrections de la 6.0.8.
+
 ## Écarts connus avec l'original
 
 Comportement :
@@ -576,6 +624,14 @@ pointe sur le nouveau le temps de la lecture). En cas d'échec, message et rése
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
+## Corrections de la 6.0.8 (annotées `// v6.0.8`)
+
+| Commande | Original | 6.0.8 |
+|---|---|---|
+| Simulation avec Affichage > Épidémie sur un réseau sans piéton (`TimerSimulTimer`) | La barre d'état divise par `NbPietons` à chaque tour : exception `EDivByZero`. Le port plantait sous Windows et Linux, et affichait « 0 % » sous macOS ARM. | Statistiques des véhicules, comme sans l'affichage épidémie. La fiche Évolution ne dessinait déjà rien sans piéton. |
+| Marche avec une place de parking ou de vehlib qu'on ne peut pas rejoindre (`VerifieCalculDistances`, moteur) | Non contrôlées (v5.0, v5.3) : la simulation démarre, et les véhicules destinés à une place inaccessible tournent sans fin, si bien qu'elle ne se termine jamais. Les fiches des distances aux files de parking et aux places de vehlib, prévues par Marche, ne s'ouvraient jamais. | « Le réseau n'est pas connexe… », puis la fiche des distances de ce type, comme pour les files de taxis. |
+| Marche, distance indéfinie (`asTypeDistance`) | La table des libellés s'arrête à la v5.0, qui a mis « à une file de parkings » à la place des files de taxis : une file de taxis inaccessible était annoncée comme une file de parkings. | Un libellé par type de distance : file de taxis, file de parkings, place de vehlib. Sans cela, la correction précédente aurait lu hors de la table. |
+
 ## Corrections de la 6.0.7 (annotées `// v6.0.7`)
 
 | Commande | Original | 6.0.7 |
@@ -619,6 +675,12 @@ fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
 ## Comportements d'origine conservés
 
+- **Vérification du réseau, files de taxis et de parking** : « La place … pointe sur plus
+  d'une file » (`voie::ExistePlusieursTetesFile*`) compte les places voisines qui
+  continuent dans la direction qui les sépare de la place, et non celles vers lesquelles la
+  place pointe. Une place qui pointe sur deux places dont les files tournent n'est donc pas
+  signalée : sa seconde file rejoint la première. Géant, ainsi modifiée, simule 3 000 tours
+  sans incident, sous ASan compris.
 - **Statistiques véhicules** : un trajet n'ayant qu'un véhicule arrivé, ou des
   véhicules au même parcours, affiche 0.
 - **Évolution** : par nombre de véhicules, le quadrillage marque tous les 10 véhicules :

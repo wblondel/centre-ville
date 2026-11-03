@@ -286,6 +286,16 @@ et `ctest --preset asan-release` (moteur) passent sans rapport depuis la 6.0.2,
 `interface.demo` compris (fiche Taxi, `f_inftaxi.cpp:87`, qui l'arrêtait, corrigée). La CI
 lance `ctest --preset asan` sous Linux, et sous macOS sur `main`, une erreur d'UBSan arrêtant le test.
 
+## Corrections de la 6.0.8 (annotées `// v6.0.8`)
+
+- **`centre_ville::VerifieCalculDistances`** : les distances aux files de parking (v5.0) et
+  aux places de vehlib (v5.3) n'étaient pas contrôlées. Sur un réseau où une place ne peut
+  pas être rejointe de partout, la simulation démarrait, et les véhicules destinés à cette
+  place tournaient sans fin : la simulation ne se terminait jamais. Le contrôle suit celui
+  des parkings (sans tenir compte des passages de bus sur ou vers un passage de bus) et
+  celui des files de taxis. Les six cartes livrées et les trois cartes du tutoriel
+  démarrent comme avant (golden master identique).
+
 ## Corrections de la 6.0.7 (annotées `// v6.0.7`)
 
 - **`centre_ville::Verifie`** : les messages d'une durée par défaut du vert ou du rouge
@@ -327,7 +337,9 @@ Rien de tout cela ne change le golden master ni les octets écrits.
 
 Le job « Couverture des tests » de la CI (chaque lundi, ou `gh workflow run ci.yml`) mesure
 les lignes exécutées par l'ensemble des tests. En 6.0.7, `simul.cpp` est couvert à 93 % des
-lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). Tri de ce qui reste :
+lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). En 6.0.8, après le retrait du
+code mort et les nouveaux tests de l'interface, il en reste 167 sur 5 386 (97 %). Tri de ce
+qui reste :
 
 - **Fonctions sans appelant** : retirées depuis (voir « Code mort retiré »).
 - **Branches défensives inatteignables** : `TourDeDeplacementVehlib` (condition toujours
@@ -339,8 +351,7 @@ lignes (385 non exécutées sur 5 577, contre 564 en 6.0.6). Tri de ce qui reste
 - **Cas atteignables, absents des cartes, non testés** : feu relié à deux feux de piétons
   (`feu::AjouteFeuPtn`), arrêt ou place à égale distance des deux côtés d'un piéton
   (`ChercheArretBus`, `ChercheArretTram`, `CherchePlaceTaxi`, `CherchePlaceVehlib`), « Tout
-  droit » sur deux cases (`CalculeDistanceParking`, `CalculeDistanceFilePark`), arrêt ou file
-  de taxi inaccessible (`VerifieCalculDistances`), certains effacements de voie
+  droit » sur deux cases (`CalculeDistanceParking`, `CalculeDistanceFilePark`), certains effacements de voie
   (`voie::Initialise`), « Copier vers… » laissant hors de la sélection autre chose qu'un
   parking (`CopieValide`), place de taxi ajoutée quand tous les numéros sont pris
   (`IncrementeNombre`, `place_taxi::Copie`).

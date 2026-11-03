@@ -5106,6 +5106,24 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
           xErr=i; yErr=j;
           TypeDistance=files_taxi;
          } // v3.6
+       // v6.0.8 : files de parking (v5.0) et places de vehlib (v5.3) oubliées : la simulation
+       // démarrait, et les véhicules destinés à une place inaccessible tournaient sans fin
+       for(k=0; Ok&&(k<NbFilesPark); k++)
+        if (!(Ok=(v[i][j].DistFilePark[k][d][AVECPSGBUS]<DIST_INDEFINIE)&&
+                 (v[i][j].PassageBus|| // Sur un passage de bus ou pointant sur un, comme pour les parkings
+                  _V(i,j,Dirdp[d][v[i][j].DirPoss]).PassageBus||
+                  (v[i][j].DistFilePark[k][d][SANSPSGBUS]<DIST_INDEFINIE))))
+         {
+          xErr=i; yErr=j;
+          TypeDistance=files_park;
+         }
+       for(k=0; Ok&&(k<NbPlacesVehlib); k++)
+        if (PlaceVehlib[k].Definie()&&
+            (!(Ok=(v[i][j].DistPlaceVehlib[k][d]<DIST_INDEFINIE))))
+         {
+          xErr=i; yErr=j;
+          TypeDistance=files_vehlib;
+         }
       }
      // v3.5
      ndp=v[i][j].NbDirPossSensVoieTram(indefinie);
