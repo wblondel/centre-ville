@@ -32,6 +32,15 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.8]
+ - Plus de plantage sous Windows et Linux en simulant un réseau sans piéton avec
+   l'affichage épidémie : la barre d'état donne les statistiques des véhicules.
+ - Une place de parking ou de vehlib qu'on ne peut pas rejoindre empêchait la
+   simulation de se terminer. Marche la signale maintenant (réseau non connexe)
+   et affiche le tableau des distances, comme pour les arrêts et les taxis.
+ - Une file de taxis qu'on ne peut pas rejoindre n'est plus annoncée comme une
+   file de parkings.
+
 [Version 6.0.7]
  - Plus de plantage en lançant la simulation après avoir supprimé une place de
    vehlib : la vérification du réseau la signale, comme une place de parking.
