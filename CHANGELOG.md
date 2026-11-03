@@ -4,6 +4,28 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.9] — fiches des lignes de bus et de tram, un bogue corrigé
+
+Cette version corrige un bogue trouvé en testant les chemins des fiches Paramètres des
+lignes de bus et de tram que les tests ne parcouraient pas. Le format des fichiers `.cvw`
+ne change pas (0x530), ni la simulation des cartes livrées (golden master identique).
+
+### Bogue corrigé
+
+- **Ligne qui passe plusieurs fois par le même arrêt** : la ligne était ajoutée à la
+  liste des lignes de l'arrêt à chaque passage (« Arrêt bus 25 (3,4,4) » dans la barre
+  d'état). Au dixième passage par un même arrêt, toutes lignes confondues, la liste
+  débordait sur l'arrêt suivant, qui pouvait changer de place, ou hors de la mémoire
+  réservée aux arrêts pour le dernier. Chaque ligne n'est maintenant listée qu'une fois.
+
+### Tests
+
+Nouveaux tests de l'interface pour les deux fiches : Appliquer, arrêts non définis
+refusés, réseau dont tous les arrêts ont été retirés, flèches de déplacement du curseur
+(avec « Coins »), clignotement de l'arrêt choisi, aide, case « Tout » pendant la
+simulation. Le tri des lignes encore non exécutées est dans `app/README.md`, « Couverture
+de `f_prmbus.cpp` et `f_prmtram.cpp` ».
+
 ## [6.0.8] — couverture de la fiche principale, deux bogues corrigés
 
 Cette version corrige deux bogues trouvés en testant les chemins de la fiche principale que
