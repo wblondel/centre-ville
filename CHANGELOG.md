@@ -4,6 +4,30 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.11] — fiches Priorités après une commande sur la sélection
+
+Cette version corrige un bogue de l'original repéré en testant la fiche Carrefours. Le format
+des fichiers `.cvw` ne change pas (0x530), ni la simulation des cartes livrées (golden master
+identique).
+
+### Bogue corrigé
+
+- **Fiche Priorités restée ouverte pendant une commande sur la sélection** : après
+  Carrefours, Effacer les routes ou les voies de tram, un segment, un coin ou un
+  périphérique, la fiche Priorités (ou Priorités piétons) montrait encore la case d'avant.
+  OK y réécrivait alors les anciennes priorités et les anciens feux. Un feu pouvait ainsi
+  être reposé sur une case effacée, ou ajouté à l'entrée d'un carrefour sur une direction
+  qu'elle n'a plus. La fiche est maintenant réaffichée après la commande, comme après
+  l'édition d'une case : elle montre la case modifiée, ou laisse la place à l'autre fiche
+  Priorités si la case a gagné ou perdu ses voies. La fiche Feu, si elle était ouverte, se
+  ferme sans rien écrire, comme après un clic sur la carte.
+
+### Tests
+
+Nouveau test de l'interface : chacune de ces commandes sur une case dont une fiche Priorités
+est ouverte, puis OK, qui ne doit pas modifier la case. Les deux tests de la 6.0.10 où la
+fiche Feu est ouverte pendant un carrefour vérifient maintenant qu'elle se ferme.
+
 ## [6.0.10] — fiche Carrefours, trois bogues corrigés
 
 Cette version corrige trois bogues trouvés en testant les chemins de la fiche Carrefours que
