@@ -75,6 +75,10 @@
 //     de feux ;
 //   - fiches Priorités (v6.0.11) : réaffichées après une commande sur la sélection qui
 //     modifie leur case, OK ne la change pas ;
+//   - Rechercher et carte (v6.0.12) : ouvrir Rechercher ne déplace pas le curseur (arrêts,
+//     bus et trams de plusieurs cases, files des places) ; message de chaque élément (non
+//     utilisé, n° hors bornes) ; carte au clavier, à la molette, aux barres de défilement ;
+//     sélection glissée au-delà de la vue (une case par tic, comme la VCL) ; menu contextuel ;
 //   - fiches de configuration, champ par champ (Paramètres, bus, tram, taxi, vehlib, feux,
 //     feux de piétons) : Annuler, OK, enregistrement et réouverture, réaffichage ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
@@ -94,6 +98,7 @@
 #include <QAbstractButton>
 #include <QApplication>
 #include <QCheckBox>
+#include <QContextMenuEvent>
 #include <QDesktopServices>
 #include <QDir>
 #include <QElapsedTimer>
@@ -105,6 +110,7 @@
 #include <QFontInfo>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPointer>
 #include <QPushButton>
 #include <QRadioButton>
@@ -116,6 +122,7 @@
 #include <QTest>
 #include <QTimer>
 #include <QUrl>
+#include <QWheelEvent>
 #include <chrono>
 #include <condition_variable>
 #include <cstdio>
@@ -1090,6 +1097,12 @@ class TestInterface : public QObject
   void ficheFluiditeTrafic();
   void ficheRecherche();
   void rechercheElementsNonDefinis();
+  void rechercheSansDeplacerLeCurseur();
+  void rechercheMessagesDeChaqueElement();
+  // Carte (grille/GrilleSimulation)
+  void grilleAuClavierALaMoletteEtAuxBarres();
+  void selectionAuDelaDeLaVue();
+  void menuContextuelDeLaGrille();
   // Couche VCL
   void controleCSpinEdit();
   // Services système (phase 7)
@@ -6959,6 +6972,450 @@ void TestInterface::rechercheElementsNonDefinis()
   QVERIFY2(e.isEmpty(), qPrintable(e));
   Clique(r->ButtonAnnuler);
   QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::rechercheSansDeplacerLeCurseur()
+ { // v6.0.12 : Géant en simulation. À l'ouverture, Rechercher reprend les numéros de la
+   // case sans déplacer le curseur, même ceux d'un élément posé ailleurs : autre case d'un
+   // arrêt, case arrière d'un bus ou d'un tram, queue de la file d'une place (le OnChange du
+   // numéro y menait le curseur). Si le bouton de l'élément est coché, la fiche le cherche,
+   // comme l'original ; sur la case de l'élément, le numéro garde son OnChange
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "recherche_ouverture.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(15));
+  TfrmSimulation *s=frmSimulation;
+  TfrmRecherche *r=frmRecherche;
+  GrilleSimulation *g=s->DrawGridSimul;
+  struct Element
+   {
+    const char *Nom;
+    int Ordre; // rang du numéro dans FormShow, à partir du bus
+    TRadioButton *Radio;
+    TCSpinEdit *Numero;
+    int Nb;
+    const char *Trouve; // texte de son OnChange
+    std::function<int(voie *, QPoint &)> DeLaCase; // numéro repris de la case, position de l'élément qu'il désigne
+   };
+  auto Position=[](auto *e, QPoint &p) { p=QPoint(e->x, e->y); };
+  std::vector<Element> Elements=
+   {
+    {"bus", 0, r->RadioButtonBus, r->CSpinEditBus, cv->NbBus, "Bus n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
+      { if (v->NumBus) Position(cv->Bus+v->NumBus-1, p); return v->NumBus; }},
+    {"arrêt de bus", 1, r->RadioButtonArretBus, r->CSpinEditArretBus, cv->NbArretsBus, "Arrêt de bus n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
+      { if (v->NumArretBus) Position(cv->ArretBus+v->NumArretBus-1, p); return v->NumArretBus; }},
+    {"tram", 2, r->RadioButtonTram, r->CSpinEditTram, cv->NbTrams, "Tram n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
+      { if (v->NumTram) Position(cv->Tram+v->NumTram-1, p); return v->NumTram; }},
+    {"arrêt de tram", 3, r->RadioButtonArretTram, r->CSpinEditArretTram, cv->NbArretsTram, "Arrêt de tram n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
+      { if (v->NumArretTram) Position(cv->ArretTram+v->NumArretTram-1, p); return v->NumArretTram; }},
+    {"file de taxis", 5, r->RadioButtonFileTaxi, r->CSpinEditFileTaxi, cv->NbFilesTaxi, "file de taxis n°%1 trouvée en (%2, %3)", [Position](voie *v, QPoint &p)
+      {
+       if (!v->NumPlaceTaxi) return 0;
+       int f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile;
+       Position(cv->PlaceTaxi+cv->FileTaxi[f].NumPlaceQueue, p);
+       return f+1;
+      }},
+    {"file de parkings", 6, r->RadioButtonFilePark, r->CSpinEditFilePark, cv->NbFilesPark, "file de parkings n°%1 trouvée en (%2, %3)", [Position](voie *v, QPoint &p)
+      {
+       if (!v->NumPlacePark) return 0;
+       int f=cv->PlacePark[v->NumPlacePark-1].NumFile;
+       Position(cv->PlacePark+cv->FilePark[f].NumPlaceQueue, p);
+       return f+1;
+      }},
+   };
+  // Numéros que FormShow pose après celui de rang Ordre (leur OnChange déciderait du texte
+  // de la barre d'état, ou ramènerait le curseur sur la case)
+  auto Suivants=[](voie *v, int Ordre)
+   {
+    int n[]={v->NumBus, v->NumArretBus, v->NumTram, v->NumArretTram, v->NumTaxi, v->NumPlaceTaxi, v->NumPlacePark, v->NumVehlib, v->NumPlaceVehlib};
+    int k=0;
+    for(int i=Ordre+1; i<9; i++) k+=(n[i]!=0);
+    return k;
+   };
+  // Fiche fermée, bouton coché et numéro autre que celui de la case
+  auto Prepare=[this, r, s](TRadioButton *Radio, TCSpinEdit *Numero, int Autre)
+   {
+    if (!r->isVisible()) s->ActionRechercher->Execute();
+    Clique(Radio);
+    Numero->Value=Autre;
+    Clique(r->ButtonAnnuler);
+    QVERIFY(!r->isVisible());
+   };
+  auto Ouvre=[this, s, r](QPoint Case)
+   {
+    Focalise();
+    CliqueCase(Case.x(), Case.y());
+    s->ActionRechercher->Execute();
+    QVERIFY(r->isVisible());
+   };
+  int NbSurSaCase=0;
+  for(const Element &el : Elements)
+   {
+    QVERIFY2(el.Nb>1, el.Nom);
+    QPoint Case(-1, -1), Ailleurs;
+    int n=0;
+    for(int y=0; (y<cv->NbY)&&!n; y++)
+     for(int x=0; (x<cv->NbX)&&!n; x++)
+      {
+       QPoint p(-1, -1);
+       int k=el.DeLaCase(&cv->v[x][y], p);
+       if (k&&(p.x()>=0)&&(p!=QPoint(x, y))&&!Suivants(&cv->v[x][y], el.Ordre)) { n=k; Case=QPoint(x, y); Ailleurs=p; }
+      }
+    QVERIFY2(n>0, el.Nom);
+    QString Contexte=QString::fromUtf8("%1 n°%2 en (%3, %4), case (%5, %6)").arg(QString::fromUtf8(el.Nom)).arg(n).arg(Ailleurs.x()).arg(Ailleurs.y()).arg(Case.x()).arg(Case.y());
+    // Bouton Coordonnées coché : le curseur reste sur la case
+    Prepare(r->RadioButtonCoordonnees, el.Numero, n%el.Nb+1);
+    Ouvre(Case);
+    QVERIFY2((g->Col==Case.x())&&(g->Row==Case.y()), qPrintable(Contexte+QString(" : curseur en (%1, %2)").arg((int)g->Col).arg((int)g->Row)));
+    QVERIFY2((int)el.Numero->Value==n, qPrintable(Contexte));
+    QCOMPARE((int)r->CSpinEditX->Value, Case.x());
+    QCOMPARE((int)r->CSpinEditY->Value, Case.y());
+    // Bouton de l'élément coché : la fiche le cherche
+    Prepare(el.Radio, el.Numero, n%el.Nb+1);
+    Ouvre(Case);
+    QVERIFY2((g->Col==Ailleurs.x())&&(g->Row==Ailleurs.y()), qPrintable(Contexte+QString(" (bouton coché) : curseur en (%1, %2)").arg((int)g->Col).arg((int)g->Row)));
+    QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8(el.Trouve).arg(n).arg(Ailleurs.x()).arg(Ailleurs.y()));
+    // Sur la case de l'élément, bouton Coordonnées : OnChange (texte), curseur sur la case
+    if (!Suivants(&cv->v[Ailleurs.x()][Ailleurs.y()], el.Ordre))
+     {
+      QPoint p(-1, -1);
+      if (el.DeLaCase(&cv->v[Ailleurs.x()][Ailleurs.y()], p)!=n) continue;
+      Prepare(r->RadioButtonCoordonnees, el.Numero, n%el.Nb+1);
+      Ouvre(Ailleurs);
+      QVERIFY2((g->Col==Ailleurs.x())&&(g->Row==Ailleurs.y()), qPrintable(Contexte+" (case de l'élément)"));
+      QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8(el.Trouve).arg(n).arg(Ailleurs.x()).arg(Ailleurs.y()));
+      NbSurSaCase++;
+     }
+   }
+  QVERIFY(NbSurSaCase>0);
+  Clique(r->ButtonAnnuler);
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::rechercheMessagesDeChaqueElement()
+ { // v6.0.12 (couverture de f_rech.cpp) : Géant en simulation, Rechercher ouverte. Pour
+   // chaque sorte d'élément, numéro au-delà du nombre d'éléments (MaxValue relevé le temps de
+   // la vérification) : « n° incorrect », le curseur ne bouge pas ; élément n°1 sans position
+   // (forcée, comme rechercheElementsNonDefinis) : « non utilisé », ou « au dépôt » pour un bus
+  QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "recherche_messages.cvw").isEmpty());
+  Focalise();
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  QVERIFY(JoueJusquAuTour(15));
+  TfrmSimulation *s=frmSimulation;
+  TfrmRecherche *r=frmRecherche;
+  GrilleSimulation *g=s->DrawGridSimul;
+  s->ActionRechercher->Execute();
+  QVERIFY(r->isVisible());
+  struct Element
+   {
+    TCSpinEdit *Numero;
+    int Nb;
+    const char *Incorrect;
+    int *x, *y; // position de l'élément n°1, forcée à (-1, -1) (nul : pas de vérification)
+    const char *NonUtilise;
+   };
+  pieton *p1=cv->Pieton;
+  std::vector<Element> Elements=
+   {
+    {r->CSpinEditParking, cv->NbParkings, "Aucune parking défini ou n° incorrect", &cv->Parking[0].x, &cv->Parking[0].y, "Parking n°1 non utilisé"},
+    {r->CSpinEditFeu, cv->NbFeux, "Aucun feu défini ou n° incorrect", &cv->Feu[0].x, &cv->Feu[0].y, "Feu n°1 non utilisé"},
+    {r->CSpinEditVehicule, cv->NbVehicules, "Aucun véhicule défini ou n° incorrect", &cv->Vehicule[0].x, &cv->Vehicule[0].y, "Véhicule n°1 non utilisé"},
+    {r->CSpinEditPieton, cv->NbPietons, "Aucun piéton défini ou n° incorrect", &p1->x, &p1->y, "Piéton n°1 non utilisé"},
+    {r->CSpinEditBus, cv->NbBus, "Aucun bus défini ou n° incorrect", &cv->Bus[0].x, &cv->Bus[0].y, "Bus n°1 au dépôt"},
+    {r->CSpinEditArretBus, cv->NbArretsBus, "Aucun arrêt de bus défini ou n° incorrect", &cv->ArretBus[0].x, &cv->ArretBus[0].y, "Arrêt de bus n°1 non utilisé"},
+    {r->CSpinEditTram, cv->NbTrams, "Aucun tram défini ou n° incorrect", &cv->Tram[0].x, &cv->Tram[0].y, "Tram n°1 non utilisé"},
+    {r->CSpinEditArretTram, cv->NbArretsTram, "Aucun arrêt de tram défini ou n° incorrect", &cv->ArretTram[0].x, &cv->ArretTram[0].y, "Arrêt de tram n°1 non utilisé"},
+    {r->CSpinEditTaxi, cv->NbTaxis, "Aucun taxi défini ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditPlaceTaxi, cv->NbPlacesTaxi, "Aucune place de taxi définie ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditFileTaxi, cv->NbFilesTaxi, "Aucune file de taxis définie ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditPlacePark, cv->NbPlacesPark, "Aucune place de parking définie ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditFilePark, cv->NbFilesPark, "Aucune file de parkings définie ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditVehlib, cv->NbVehlibs, "Aucun vehlib défini ou n° incorrect", nullptr, nullptr, nullptr},
+    {r->CSpinEditPlaceVehlib, cv->NbPlacesVehlib, "Aucune place de vehlib définie ou n° incorrect", nullptr, nullptr, nullptr},
+   };
+  int xc=g->Col, yc=g->Row;
+  for(const Element &el : Elements)
+   {
+    QVERIFY(el.Nb>0);
+    // Numéro au-delà du nombre d'éléments
+    int Max=el.Numero->MaxValue;
+    el.Numero->MaxValue=el.Nb+1;
+    el.Numero->Value=el.Nb+1;
+    el.Numero->MaxValue=Max;
+    QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8(el.Incorrect));
+    QCOMPARE(g->Col, xc);
+    QCOMPARE(g->Row, yc);
+    if (!el.x) continue;
+    // Élément n°1 sans position (un piéton, ni dans un véhicule) : rien ne se dessine entre
+    // la position forcée et son rétablissement
+    int xa=*el.x, ya=*el.y;
+    int Dans[]={p1->NumBus, p1->NumTram, p1->NumTaxi, p1->NumVehlib};
+    if (el.Numero==r->CSpinEditPieton) p1->NumBus=p1->NumTram=p1->NumTaxi=p1->NumVehlib=0;
+    *el.x=*el.y=-1;
+    el.Numero->Value=1;
+    QString Texte=Q(r->StatusBar->SimpleText);
+    bool Deplace=(g->Col!=xc)||(g->Row!=yc);
+    *el.x=xa; *el.y=ya;
+    if (el.Numero==r->CSpinEditPieton) { p1->NumBus=Dans[0]; p1->NumTram=Dans[1]; p1->NumTaxi=Dans[2]; p1->NumVehlib=Dans[3]; }
+    QCOMPARE(Texte, QString::fromUtf8(el.NonUtilise));
+    QVERIFY(!Deplace);
+   }
+  Clique(r->ButtonAnnuler);
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+// Carte (grille/GrilleSimulation, comportement du TDrawGrid). v6.0.12 : la carte de Démo
+// dans une fenêtre plus petite qu'elle, qui fait apparaître les barres de défilement
+//---------------------------------------------------------------------------
+namespace
+ {
+  struct FenetreReduite
+   { // Fenêtre principale en (50, 50), 500 x 400 ; rétablie à la fin du test
+    QRect Avant;
+    TNotifyEvent ClicAvant;
+    int NbClics=0;
+    FenetreReduite()
+     {
+      Avant=frmSimulation->geometry();
+      frmSimulation->setGeometry(50, 50, 500, 400);
+      QApplication::processEvents();
+      ClicAvant=frmSimulation->DrawGridSimul->OnClick;
+      frmSimulation->DrawGridSimul->OnClick=[this](TObject *Sender) { NbClics++; ClicAvant(Sender); };
+     }
+    ~FenetreReduite()
+     {
+      frmSimulation->DrawGridSimul->OnClick=ClicAvant;
+      frmSimulation->setGeometry(Avant);
+      QApplication::processEvents();
+     }
+   };
+  QString EtatGrille(GrilleSimulation *g)
+   {
+    return QString::fromUtf8("case (%1, %2), sélection (%3, %4)-(%5, %6), vue (%7, %8)")
+            .arg((int)g->Col).arg((int)g->Row).arg(g->Selection.Left).arg(g->Selection.Top)
+            .arg(g->Selection.Right).arg(g->Selection.Bottom).arg((int)g->LeftCol).arg((int)g->TopRow);
+   }
+  QString EtatAttendu(int Col, int Row, int Gauche, int Haut, int Ancre=-1, int AncreY=-1)
+   { // Sélection de la case courante à l'ancre (par défaut, la case courante seule)
+    if (Ancre<0) { Ancre=Col; AncreY=Row; }
+    return QString::fromUtf8("case (%1, %2), sélection (%3, %4)-(%5, %6), vue (%7, %8)")
+            .arg(Col).arg(Row).arg(qMin(Col, Ancre)).arg(qMin(Row, AncreY))
+            .arg(qMax(Col, Ancre)).arg(qMax(Row, AncreY)).arg(Gauche).arg(Haut);
+   }
+ }
+//---------------------------------------------------------------------------
+void TestInterface::grilleAuClavierALaMoletteEtAuxBarres()
+ { // Flèches (Maj : la case courante bouge, l'ancre reste), Origine, Fin, pages, avec Ctrl,
+   // comme TCustomGrid::KeyDown : OnClick à chaque déplacement, rien au bord. Ctrl+flèches
+   // (sur macOS, Cmd ou Contrôle) : en édition, les raccourcis des directions passent avant,
+   // comme dans la VCL ; en simulation, actions grisées, la carte. Molette : une ligne par cran
+   // de 120, même en plusieurs fois. Barres de défilement : la vue seule ; agrandir la
+   // fenêtre les retire
+  QVERIFY(!OuvreDemo("grille_clavier.cvw").isEmpty());
+  TfrmSimulation *s=frmSimulation;
+  GrilleSimulation *g=s->DrawGridSimul;
+  FenetreReduite f;
+  Focalise();
+  int Cv=g->viewport()->width()/16, Lv=g->viewport()->height()/16;
+  int MaxG=g->horizontalScrollBar()->maximum(), MaxH=g->verticalScrollBar()->maximum();
+  QCOMPARE(MaxG, cv->NbX-Cv);
+  QCOMPARE(MaxH, cv->NbY-Lv);
+  g->Col=0;
+  g->Row=0;
+  QCOMPARE(EtatGrille(g), EtatAttendu(0, 0, 0, 0));
+  struct Touche { Qt::Key Code; Qt::KeyboardModifiers Mod; QString Attendu; int Clics; };
+  std::vector<Touche> Touches=
+   {
+    {Qt::Key_Right, Qt::NoModifier, EtatAttendu(1, 0, 0, 0), 1},
+    {Qt::Key_Down, Qt::NoModifier, EtatAttendu(1, 1, 0, 0), 1},
+    {Qt::Key_Down, Qt::ShiftModifier, EtatAttendu(1, 2, 0, 0, 1, 1), 1},
+    {Qt::Key_Right, Qt::ShiftModifier, EtatAttendu(2, 2, 0, 0, 1, 1), 1},
+    {Qt::Key_End, Qt::NoModifier, EtatAttendu(cv->NbX-1, 2, MaxG, 0), 1},
+    {Qt::Key_Home, Qt::NoModifier, EtatAttendu(0, 2, 0, 0), 1},
+    {Qt::Key_PageDown, Qt::NoModifier, EtatAttendu(0, 2+Lv, 0, Lv), 1},
+    {Qt::Key_PageUp, Qt::NoModifier, EtatAttendu(0, 2, 0, 0), 1},
+    {Qt::Key_End, Qt::ControlModifier, EtatAttendu(cv->NbX-1, cv->NbY-1, MaxG, MaxH), 1},
+    {Qt::Key_Home, Qt::ControlModifier, EtatAttendu(0, 0, 0, 0), 1},
+    {Qt::Key_PageDown, Qt::ControlModifier, EtatAttendu(0, Lv-1, 0, 0), 1},
+    {Qt::Key_PageUp, Qt::ControlModifier, EtatAttendu(0, 0, 0, 0), 1},
+    {Qt::Key_Left, Qt::NoModifier, EtatAttendu(0, 0, 0, 0), 0},
+    {Qt::Key_Up, Qt::NoModifier, EtatAttendu(0, 0, 0, 0), 0},
+    {Qt::Key_PageUp, Qt::NoModifier, EtatAttendu(0, 0, 0, 0), 0},
+    {Qt::Key_Home, Qt::ControlModifier, EtatAttendu(0, 0, 0, 0), 0},
+   };
+  auto Frappe=[g, &f](const std::vector<Touche> &Liste)
+   {
+    for(const Touche &t : Liste)
+     {
+      f.NbClics=0;
+      QTest::keyClick(g, t.Code, t.Mod);
+      QString Contexte=QKeySequence(t.Code|t.Mod).toString();
+      QVERIFY2(EtatGrille(g)==t.Attendu, qPrintable(Contexte+" : "+EtatGrille(g)+" au lieu de "+t.Attendu));
+      QVERIFY2(f.NbClics==t.Clics, qPrintable(Contexte+QString(" : %1 clic(s)").arg(f.NbClics)));
+     }
+   };
+  Frappe(Touches);
+  // Molette (crans de 120)
+  auto Molette=[g](int Delta)
+   {
+    QPoint c=g->viewport()->rect().center();
+    QWheelEvent e(c, g->viewport()->mapToGlobal(c), QPoint(), QPoint(0, Delta), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+    QApplication::sendEvent(g->viewport(), &e);
+   };
+  g->Col=5;
+  g->Row=5;
+  struct Cran { int Delta; int Row; int Clics; };
+  for(const Cran &c : std::vector<Cran>{{-120, 6, 1}, {-60, 6, 0}, {-60, 7, 1}, {360, 4, 3}, {-240, 6, 2}})
+   {
+    f.NbClics=0;
+    Molette(c.Delta);
+    QVERIFY2(EtatGrille(g)==EtatAttendu(5, c.Row, 0, 0), qPrintable(QString("molette %1 : ").arg(c.Delta)+EtatGrille(g)));
+    QCOMPARE(f.NbClics, c.Clics);
+   }
+  g->Row=0;
+  f.NbClics=0;
+  Molette(120);
+  QCOMPARE(EtatGrille(g), EtatAttendu(5, 0, 0, 0));
+  QCOMPARE(f.NbClics, 0);
+  // Barres de défilement : la vue bouge, pas la case courante ; bornées
+  g->horizontalScrollBar()->setValue(10);
+  g->verticalScrollBar()->setValue(7);
+  QCOMPARE(EtatGrille(g), EtatAttendu(5, 0, 10, 7));
+  g->LeftCol=1000;
+  g->TopRow=-5;
+  QCOMPARE(EtatGrille(g), EtatAttendu(5, 0, MaxG, 0));
+  QCOMPARE(g->horizontalScrollBar()->value(), MaxG);
+  QCOMPARE(f.NbClics, 0);
+  // Fenêtre agrandie, vue au bout : barres retirées, vue ramenée en (0, 0)
+  QTest::keyClick(g, Qt::Key_End, Qt::ControlModifier);
+  QCOMPARE(EtatGrille(g), EtatAttendu(cv->NbX-1, cv->NbY-1, MaxG, MaxH));
+  s->resize(16*cv->NbX+200, 16*cv->NbY+300);
+  QApplication::processEvents();
+  QCOMPARE(g->horizontalScrollBar()->maximum(), 0);
+  QCOMPARE(g->verticalScrollBar()->maximum(), 0);
+  QCOMPARE(EtatGrille(g), EtatAttendu(cv->NbX-1, cv->NbY-1, 0, 0));
+  s->setGeometry(50, 50, 500, 400);
+  QApplication::processEvents();
+  // Ctrl+flèches en simulation : la carte défile d'une page (gauche, droite) ou d'une ligne
+  QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
+  Focalise();
+  g->Col=5;
+  g->Row=5;
+  g->LeftCol=0;
+  g->TopRow=0;
+  QCOMPARE(EtatGrille(g), EtatAttendu(5, 5, 0, 0));
+  std::vector<Qt::KeyboardModifiers> Ctrl={Qt::ControlModifier};
+#if defined(Q_OS_MACOS)
+  Ctrl.push_back(Qt::MetaModifier); // touche Control
+#endif
+  for(Qt::KeyboardModifiers m : Ctrl)
+   Frappe({{Qt::Key_Right, m, EtatAttendu(5+Cv, 5, Cv, 0), 1},
+           {Qt::Key_Down, m, EtatAttendu(5+Cv, 5, Cv, 1), 0},
+           {Qt::Key_Up, m, EtatAttendu(5+Cv, 5, Cv, 0), 0},
+           {Qt::Key_Left, m, EtatAttendu(5, 5, 0, 0), 1}});
+  QVERIFY(Arrete());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::selectionAuDelaDeLaVue()
+ { // v6.0.12 : sélection glissée hors des cases entièrement visibles, comme TCustomGrid
+   // (MouseMove, WMTimer, TimedScroll) : la souris place l'ancre jusqu'à la case qui suit la
+   // dernière visible, pas plus loin ni à gauche des cases ; au-delà, la minuterie de 60 ms
+   // avance l'ancre d'une case par tic et la vue la suit (la vue avançait d'une case, puis
+   // l'ancre allait sous la souris : plusieurs cases par tic). OnClick au relâchement, et la
+   // minuterie s'arrête
+  QVERIFY(!OuvreDemo("grille_selection.cvw").isEmpty());
+  GrilleSimulation *g=frmSimulation->DrawGridSimul;
+  FenetreReduite f;
+  Focalise();
+  g->LeftCol=0;
+  g->TopRow=0;
+  QWidget *vp=g->viewport();
+  int Cv=vp->width()/16, Lv=vp->height()/16;
+  QVERIFY((Cv<cv->NbX-5)&&(Lv<cv->NbY-5));
+  auto Deplace=[vp](QPoint p)
+   {
+    QMouseEvent e(QEvent::MouseMove, QPointF(p), vp->mapToGlobal(QPointF(p)), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(vp, &e);
+   };
+  int y=2*16+8;
+  f.NbClics=0;
+  QTest::mousePress(vp, Qt::LeftButton, Qt::NoModifier, QPoint(2*16+8, y));
+  QCOMPARE(EtatGrille(g), EtatAttendu(2, 2, 0, 0));
+  // Dernière case entièrement visible, puis bien au-delà : l'ancre n'y va pas
+  Deplace(QPoint((Cv-1)*16+8, y));
+  QCOMPARE(EtatGrille(g), EtatAttendu(2, 2, 0, 0, Cv-1, 2));
+  Deplace(QPoint(vp->width()+100, y));
+  QCOMPARE(EtatGrille(g), EtatAttendu(2, 2, 0, 0, Cv-1, 2));
+  Deplace(QPoint(Cv*16+8, vp->height()+100));
+  QCOMPARE(EtatGrille(g), EtatAttendu(2, 2, 0, 0, Cv-1, 2));
+  // La case qui suit la dernière visible : l'ancre, et la vue d'une case
+  Deplace(QPoint(Cv*16+2, y));
+  QCOMPARE(EtatGrille(g), EtatAttendu(2, 2, 1, 0, Cv, 2));
+  // Minuterie : une case par tic, la vue suit l'ancre
+  QElapsedTimer Duree;
+  Duree.start();
+  QVERIFY(QTest::qWaitFor([g, Cv]() { return g->Selection.Right>=Cv+3; }, 3000));
+  qint64 ms=Duree.elapsed();
+  int Avance=g->Selection.Right-Cv;
+  QVERIFY2(Avance<=ms/50+1, qPrintable(QString("%1 cases en %2 ms").arg(Avance).arg(ms)));
+  QCOMPARE((int)g->LeftCol, g->Selection.Right-Cv+1);
+  QCOMPARE(g->Selection.Top, 2);
+  QCOMPARE(g->Selection.Bottom, 2);
+  // À gauche des cases : rien au mouvement, la minuterie ramène l'ancre vers la gauche
+  int Ancre=g->Selection.Right, Gauche=g->LeftCol;
+  Deplace(QPoint(-20, y));
+  QCOMPARE(g->Selection.Right, Ancre);
+  QCOMPARE((int)g->LeftCol, Gauche);
+  QVERIFY(QTest::qWaitFor([g, Ancre]() { return g->Selection.Right<Ancre; }, 3000));
+  // Relâchement : OnClick, puis plus rien
+  Deplace(QPoint(Cv*16, y));
+  QTest::mouseRelease(vp, Qt::LeftButton, Qt::NoModifier, QPoint(Cv*16, y));
+  QCOMPARE(f.NbClics, 1);
+  QString Fin=EtatGrille(g);
+  QTest::qWait(200);
+  QCOMPARE(EtatGrille(g), Fin);
+  QCOMPARE((int)g->Col, 2);
+  QCOMPARE((int)g->Row, 2);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::menuContextuelDeLaGrille()
+ { // Clic droit : menu sous la souris, la case courante ne change pas. Touche Menu (ou
+   // Maj+F10) : sous la case courante ; v6.0.12 : en haut à gauche des cases si elle n'est
+   // pas entièrement visible, comme la VCL (le menu s'ouvrait hors de la grille)
+  QVERIFY(!OuvreDemo("grille_menu.cvw").isEmpty());
+  GrilleSimulation *g=frmSimulation->DrawGridSimul;
+  FenetreReduite f;
+  Focalise();
+  QWidget *vp=g->viewport();
+  QVERIFY(g->PopupMenu);
+  auto Menu=[vp](QContextMenuEvent::Reason Raison, QPoint p) -> QPoint
+   { // Coin supérieur gauche du menu ouvert (exec), fermé dès qu'il s'affiche
+    auto Position=std::make_shared<QPoint>(-1000, -1000);
+    QTimer::singleShot(50, [Position]()
+     {
+      if (QWidget *m=QApplication::activePopupWidget()) { *Position=m->geometry().topLeft(); m->close(); }
+     });
+    QContextMenuEvent e(Raison, p, vp->mapToGlobal(p));
+    QApplication::sendEvent(vp, &e);
+    return *Position;
+   };
+  g->LeftCol=0;
+  g->TopRow=0;
+  g->Col=3;
+  g->Row=2;
+  f.NbClics=0;
+  QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(3*16, 3*16)));
+  QCOMPARE(Menu(QContextMenuEvent::Mouse, QPoint(100, 40)), vp->mapToGlobal(QPoint(100, 40)));
+  QTest::mouseClick(vp, Qt::RightButton, Qt::NoModifier, QPoint(10*16+8, 5*16+8));
+  QCOMPARE(EtatGrille(g), EtatAttendu(3, 2, 0, 0));
+  QCOMPARE(f.NbClics, 0);
+  // Case courante hors de la vue
+  g->LeftCol=10;
+  QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(0, 0)));
+  g->LeftCol=0;
+  g->TopRow=5;
+  QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(0, 0)));
+  QCOMPARE(EtatGrille(g), EtatAttendu(3, 2, 0, 5));
  }
 //---------------------------------------------------------------------------
 void TestInterface::controleCSpinEdit()
