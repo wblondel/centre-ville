@@ -1650,6 +1650,16 @@ void TfrmSimulation::RafraichitFichesInfos()
   if (frmInfosVehlib&&frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
  }
 //---------------------------------------------------------------------------
+// v6.0.11 : les fiches Priorités (non modales) sont réaffichées après une commande sur la
+// sélection, comme après l'édition de la case courante (ActionEffacerRouteExecute...). Sinon
+// OK y réécrivait les priorités et les feux d'avant sur une case que la commande avait
+// effacée ou redessinée, jusqu'à poser un feu sur une case sans route
+void TfrmSimulation::RafraichitFichesPriorites()
+ {
+  if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
+  if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos();
+ }
+//---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 {
  bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
@@ -3184,6 +3194,7 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
     }
    RedessineCase(x0, yf, true);
    RedessineCase(x1, yd, true);
+   RafraichitFichesPriorites(); // v6.0.11
    return;
   }
 
@@ -3197,6 +3208,7 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
     }
    RedessineCase(xf, y0, true);
    RedessineCase(xd, y1, true);
+   RafraichitFichesPriorites(); // v6.0.11
    return;
   }
 }
@@ -3236,6 +3248,7 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
      if (dx==1)
       cv->v[yd<yf?Droite:Gauche][i==yd?yf:i].ModifieSensVoieTram(nord, sud);
     }
+   RafraichitFichesPriorites(); // v6.0.11
    return;
   }
 
@@ -3247,6 +3260,7 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
      if (dy==1)
       cv->v[i==xd?xf:i][xd<xf?Haut:Bas].ModifieSensVoieTram(est, ouest);
     }
+   RafraichitFichesPriorites(); // v6.0.11
    return;
   }
 }
@@ -3270,6 +3284,7 @@ void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject *Sender)
  for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
   cv->ChangeDirectionSiPossible(i, Haut, xd<xf?E:O);
  RedessineCase(xf, Haut, true);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCoinInferieurGaucheExecute(
@@ -3292,6 +3307,7 @@ void TfrmSimulation::ActionCoinInferieurGaucheExecute(
  for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
   cv->ChangeDirectionSiPossible(i, Bas, xd<xf?E:O);
  RedessineCase(xf, Bas, true);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
@@ -3314,6 +3330,7 @@ void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
  for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
   cv->ChangeDirectionSiPossible(i, Haut, xd<xf?E:O);
  RedessineCase(xf, Haut, true);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCoinInferieurDroitExecute(
@@ -3336,6 +3353,7 @@ void TfrmSimulation::ActionCoinInferieurDroitExecute(
  for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
   cv->ChangeDirectionSiPossible(i, Bas, xd<xf?E:O);
  RedessineCase(xf, Bas, true);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPeripheriqueExterieurExecute(
@@ -3358,6 +3376,7 @@ void TfrmSimulation::ActionPeripheriqueExterieurExecute(
  for(i=Bas; i>Haut; i--) cv->ChangeDirectionSiPossible(Droite, i, N);
  for(i=Droite; i>Gauche; i--) cv->ChangeDirectionSiPossible(i, Haut, O);
  for(i=Haut; i<Bas; i++) cv->ChangeDirectionSiPossible(Gauche, i, S);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPeripheriqueInterieurExecute(
@@ -3379,24 +3398,26 @@ void TfrmSimulation::ActionPeripheriqueInterieurExecute(
  for(i=Haut; i<Bas; i++) cv->ChangeDirectionSiPossible(Droite, i, S);
  for(i=Droite; i>Gauche; i--) cv->ChangeDirectionSiPossible(i, Bas, O);
  for(i=Bas; i>Haut; i--) cv->ChangeDirectionSiPossible(Gauche, i, N);
+ RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCarrefoursExecute(TObject *Sender)
 {
- Carrefours( DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1,
-             DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1);
+ if (Carrefours( DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1,
+                 DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1)!=mrCancel) // v6.0.11
+  RafraichitFichesPriorites();
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerRoutesExecute(
       TObject *Sender)
 {
- SupprimeToutDansSelection(tvRoute);
+ if (SupprimeToutDansSelection(tvRoute)) RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerVoiesTramExecute(
       TObject *Sender)
 {
- SupprimeToutDansSelection(tvVoieTram);
+ if (SupprimeToutDansSelection(tvVoieTram)) RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDefinirNatureExecute(TObject *Sender)

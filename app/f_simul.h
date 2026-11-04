@@ -413,6 +413,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
   void DrawGridSimulDblClick(TObject *Sender);
   void FormShow(TObject *Sender);
   void RafraichitFichesInfos(); // v6.0.2
+  void RafraichitFichesPriorites(); // v6.0.11
   void DrawGridSimulClick(TObject *Sender);
   void TimerSimulTimer(TObject *Sender);
   void FormCloseQuery(TObject *Sender, bool &CanClose);
