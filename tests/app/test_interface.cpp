@@ -7170,14 +7170,14 @@ void TestInterface::rechercheMessagesDeChaqueElement()
 namespace
  {
   struct FenetreReduite
-   { // Fenêtre principale en (50, 50), 500 x 400 ; rétablie à la fin du test
+   { // Fenêtre principale en (20, 50), 500 x 400 ; rétablie à la fin du test
     QRect Avant;
     TNotifyEvent ClicAvant;
     int NbClics=0;
     FenetreReduite()
      {
       Avant=frmSimulation->geometry();
-      frmSimulation->setGeometry(50, 50, 500, 400);
+      frmSimulation->setGeometry(20, 50, 500, 400);
       QApplication::processEvents();
       ClicAvant=frmSimulation->DrawGridSimul->OnClick;
       frmSimulation->DrawGridSimul->OnClick=[this](TObject *Sender) { NbClics++; ClicAvant(Sender); };
@@ -7294,7 +7294,7 @@ void TestInterface::grilleAuClavierALaMoletteEtAuxBarres()
   QCOMPARE(g->horizontalScrollBar()->maximum(), 0);
   QCOMPARE(g->verticalScrollBar()->maximum(), 0);
   QCOMPARE(EtatGrille(g), EtatAttendu(cv->NbX-1, cv->NbY-1, 0, 0));
-  s->setGeometry(50, 50, 500, 400);
+  s->setGeometry(20, 50, 500, 400);
   QApplication::processEvents();
   // Ctrl+flèches en simulation : la carte défile d'une page (gauche, droite) ou d'une ligne
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
@@ -7381,7 +7381,9 @@ void TestInterface::selectionAuDelaDeLaVue()
 void TestInterface::menuContextuelDeLaGrille()
  { // Clic droit : menu sous la souris, la case courante ne change pas. Touche Menu (ou
    // Maj+F10) : sous la case courante ; v6.0.12 : en haut à gauche des cases si elle n'est
-   // pas entièrement visible, comme la VCL (le menu s'ouvrait hors de la grille)
+   // pas entièrement visible, comme la VCL (le menu s'ouvrait hors de la grille). Menus
+   // ouverts près du bord gauche de la grille : Qt déplace un menu qui ne tient pas sur
+   // l'écran (800 pixels de large en « offscreen »), plus large sous Windows
   QVERIFY(!OuvreDemo("grille_menu.cvw").isEmpty());
   GrilleSimulation *g=frmSimulation->DrawGridSimul;
   FenetreReduite f;
@@ -7401,13 +7403,13 @@ void TestInterface::menuContextuelDeLaGrille()
    };
   g->LeftCol=0;
   g->TopRow=0;
-  g->Col=3;
+  g->Col=1;
   g->Row=2;
   f.NbClics=0;
-  QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(3*16, 3*16)));
-  QCOMPARE(Menu(QContextMenuEvent::Mouse, QPoint(100, 40)), vp->mapToGlobal(QPoint(100, 40)));
+  QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(16, 3*16)));
+  QCOMPARE(Menu(QContextMenuEvent::Mouse, QPoint(8, 40)), vp->mapToGlobal(QPoint(8, 40)));
   QTest::mouseClick(vp, Qt::RightButton, Qt::NoModifier, QPoint(10*16+8, 5*16+8));
-  QCOMPARE(EtatGrille(g), EtatAttendu(3, 2, 0, 0));
+  QCOMPARE(EtatGrille(g), EtatAttendu(1, 2, 0, 0));
   QCOMPARE(f.NbClics, 0);
   // Case courante hors de la vue
   g->LeftCol=10;
@@ -7415,7 +7417,7 @@ void TestInterface::menuContextuelDeLaGrille()
   g->LeftCol=0;
   g->TopRow=5;
   QCOMPARE(Menu(QContextMenuEvent::Keyboard, QPoint(0, 0)), vp->mapToGlobal(QPoint(0, 0)));
-  QCOMPARE(EtatGrille(g), EtatAttendu(3, 2, 0, 5));
+  QCOMPARE(EtatGrille(g), EtatAttendu(1, 2, 0, 5));
  }
 //---------------------------------------------------------------------------
 void TestInterface::controleCSpinEdit()
