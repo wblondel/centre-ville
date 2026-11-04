@@ -4,6 +4,48 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.10] — fiche Carrefours, trois bogues corrigés
+
+Cette version corrige trois bogues trouvés en testant les chemins de la fiche Carrefours que
+les tests ne parcouraient pas. Le format des fichiers `.cvw` ne change pas (0x530), ni la
+simulation des cartes livrées (golden master identique).
+
+### Bogues corrigés
+
+- **Sélection d'une autre taille** : la fiche activait aussi les boutons d'une taille qui
+  donnait le même nombre « 10 × colonnes + lignes ». Une sélection de 2 colonnes sur 14
+  lignes proposait ainsi les carrefours de 3 sur 4 (de même pour 3 × 13, 3 × 14, 5 × 16 et
+  7 × 18). Le carrefour était alors lu hors de sa table, d'où des directions quelconques.
+  Ses priorités étaient posées dans la colonne à droite de la sélection, et hors de la
+  mémoire du réseau quand celle-ci touchait le bord droit de la carte. Seuls les boutons
+  de la taille exacte de la sélection sont maintenant actifs.
+- **Fiche Feu ouverte pendant l'ajout de feux** : cette fiche, qui n'est pas modale,
+  gardait l'adresse de son feu. Quand un carrefour à feux, ou la fiche Priorités,
+  agrandissait la table des feux, OK et Appliquer écrivaient dans l'ancienne table, déjà
+  libérée. Le feu n'était donc pas modifié, et la mémoire pouvait être corrompue.
+- **Fiche Feu ouverte sur un feu effacé par un carrefour** : le carrefour reprend le
+  numéro du feu effacé pour l'un de ses feux. OK ou Appliquer y écrivait alors les valeurs
+  de la fiche, et ce feu du carrefour n'attendait plus que les autres passent au rouge. La
+  fiche se ferme maintenant sans rien écrire.
+
+### Tests
+
+Nouveaux tests de l'interface :
+
+- chaque bouton de la fiche (taille, orientation, avec ou sans feux). Le dessin est
+  vérifié par sa structure : aucune impasse, chaque entrée mène à chaque sortie, priorités
+  et feux aux seules entrées, états et listes des feux ;
+- sélections d'une autre taille, et l'aide ;
+- table des feux agrandie de ce qui manque ;
+- fiche Feu ouverte pendant l'ajout ou l'effacement de feux.
+
+Le test existant de la fiche cliquait sur son bouton Annuler. Ce bouton est invisible
+(0 × 0 pixel), le clic restait sans effet et la fiche ne se fermait qu'au bout des
+10 secondes de garde du test. Le test ferme maintenant la fiche par Échap.
+
+Le tri des lignes encore non exécutées est dans `app/README.md`, « Couverture de
+`f_carfours.cpp` ».
+
 ## [6.0.9] — fiches des lignes de bus et de tram, un bogue corrigé
 
 Cette version corrige un bogue trouvé en testant les chemins des fiches Paramètres des
