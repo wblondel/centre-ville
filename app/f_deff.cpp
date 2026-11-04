@@ -81,6 +81,11 @@ bool TfrmDefFeux::RafraichitInfos()
 bool TfrmDefFeux::AppliqueChoix()
  {
   int i;
+  // v6.0.10 : la fiche n'est pas modale. Depuis RafraichitInfos, Carrefours ou la fiche
+  // Priorités ont pu agrandir la table des feux, donc la déplacer ; Carrefours a pu effacer ce
+  // feu et reprendre son numéro ailleurs : rien n'est alors écrit (et la fiche se ferme)
+  if (cv->v[x][y].NumFeu[Direction-1]!=Numero) return false;
+  f=&(cv->Feu[Numero-1]);
   frmSimulation->SimulationModifiee=true;
   f->Etat=(etat_feu)RadioGroupEtat->ItemIndex;
   f->TypeDmdVert=(dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
@@ -165,12 +170,14 @@ void TfrmDefFeux::ButtonAppliquerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupEtatClick(TObject *Sender)
 {
+ f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
  if (RadioGroupEtat->ItemIndex!=f->Etat)
   ButtonAppliquer->Enabled=true;
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject *Sender)
 {
+ f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert)
  ButtonAppliquer->Enabled=true;
 }
@@ -204,6 +211,7 @@ void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupTypePsgRougeClick(TObject *Sender)
 {
+ f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge)
   ButtonAppliquer->Enabled=true;
 }

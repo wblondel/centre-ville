@@ -91,7 +91,8 @@ void TfrmCarrefours::Active(int Colonnes, int Lignes)
  {
   int i;
   TComponent *Component;
-  AnsiString asType;
+  AnsiString asType,
+             asTaille=IntToStr(Colonnes)+IntToStr(Lignes); // v6.0.10 : au lieu de IntToStr(10*Colonnes+Lignes), « 34 » aussi pour 2 x 14 (voir app/README.md)
   for(i=0; i<ComponentCount; i++) // v5.4 : plus facile de tester les inclusions que les exclusions ;^)
    if ((NomDe(Components[i]).SubString(1, 8)=="GroupBox")|| // portage : TComponent::Name -> NomDe
 	   (NomDe(Components[i]).SubString(1, 11)=="SpeedButton"))
@@ -99,9 +100,9 @@ void TfrmCarrefours::Active(int Colonnes, int Lignes)
 	 Component=(TComponent*)Components[i];
 	 asType=AnsiString(NomClasseDe(Component)); // portage : TObject::ClassName() -> NomClasseDe
 	 ((QWidget*)Component)->setEnabled(((asType=="TGroupBox")&& // portage : TControl::Enabled -> QWidget::setEnabled
-									  (NomDe(Component).SubString(9, 2)==IntToStr(10*Colonnes+Lignes)))||
+									  (NomDe(Component).SubString(9, 2)==asTaille))|| // v6.0.10
 									 ((asType=="TSpeedButton")&&
-                                      (NomDe(Component).SubString(12, 2)==IntToStr(10*Colonnes+Lignes))));
+                                      (NomDe(Component).SubString(12, 2)==asTaille))); // v6.0.10
     }
  }
 //---------------------------------------------------------------------------

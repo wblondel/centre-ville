@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.9)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.10)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -476,6 +476,38 @@ Tests ajoutés en 6.0.9 (`test_interface.cpp`), pour chacune des deux fiches :
   bord avec « Coins » ; arrêt saisi montré par le curseur et qui clignote ; F1 et Aide.
 - `lignesToutesCochees` : case « Tout » pendant la simulation, fiche réduite.
 
+## Couverture de `f_carfours.cpp`
+
+En 6.0.9, 94 lignes sur 195 n'étaient exécutées par aucun test (51,8 %). Il s'agissait des
+carrefours de 3 × 4, de 4 × 3, de 6 × 6 et de 8 × 8, de l'agrandissement de la table des
+feux, de l'effacement refusé, de l'aide et de F1. Les tests de la 6.0.10 n'en laissent
+aucune (100 %). Deux branches ne sont jamais prises : le cas implicite `default` du `switch`
+de `SpeedButtonClick` (les `Tag` des boutons ne donnent que 34, 43, 44, 66 et 88), et le
+`if (OnCreate)` de `ChargeFiche`, la fiche n'ayant pas de gestionnaire `OnCreate`.
+
+Tests ajoutés en 6.0.10 (`test_interface.cpp`) :
+
+- `carrefoursDeChaqueBouton` : les 18 boutons, chacun sur une zone neuve et une sélection
+  de sa taille, la fiche étant ouverte par la barre d'outils, le menu contextuel ou
+  l'action (Ctrl+Q). Seuls le groupe et les boutons de cette taille sont actifs. Le dessin
+  est vérifié par sa structure, sans recopier les tables : aucune direction ne mène à une
+  case vide, chaque entrée mène à chaque sortie, les entrées sont dans les sens attendus
+  (côté de la branche des carrefours en T, comme sur les images) et sont seules à avoir
+  une priorité. Avec feux, il y a un feu par entrée, qui attend et demande le rouge des
+  entrées perpendiculaires, et dont l'état de départ est celui de l'image du bouton. La
+  table des feux n'est agrandie que de ce qui manque, et rien n'est modifié autour de la
+  zone.
+- `carrefoursSelectionDUneAutreTaille` : voir les corrections de la 6.0.10 ; F1, Aide, F2
+  (sans effet) et Échap.
+- `carrefoursTableDesFeuxAgrandie` : effacement refusé, feux libres pris d'abord, carrefour
+  remplacé par un autre sans feux, enregistrement et réouverture.
+- `carrefoursPendantLaDefinitionDUnFeu`, `carrefoursSurLeFeuDeLaFicheFeu` et
+  `ficheFeuPendantUnAjoutDeFeu` (ce dernier sans Carrefours) : voir les corrections de la
+  6.0.10.
+- `ficheCarrefours` cliquait sur le bouton Annuler, qui est invisible (0 × 0 pixel) : le
+  clic restait sans effet, et la fiche n'était fermée qu'au bout des 10 s de garde du
+  test. Il la ferme maintenant par Échap.
+
 ## Écarts connus avec l'original
 
 Comportement :
@@ -644,6 +676,14 @@ pointe sur le nouveau le temps de la lecture). En cas d'échec, message et rése
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
+## Corrections de la 6.0.10 (annotées `// v6.0.10`)
+
+| Commande | Original | 6.0.10 |
+|---|---|---|
+| Carrefours, sélection de 2 × 14, 3 × 13, 3 × 14, 5 × 16 ou 7 × 18 cases (`TfrmCarrefours::Active`) | Sont actifs les boutons dont le nom contient `IntToStr(10*Colonnes+Lignes)`, soit « 34 » aussi pour 2 × 14. Le carrefour est alors lu hors de sa table (ASan : `global-buffer-overflow` sur `DirPossC3x4`, d'où des directions quelconques). Ses priorités sont posées dans la colonne à droite de la sélection, et hors de `cv->v` si la sélection touche le bord droit de la carte. | `IntToStr(Colonnes)+IntToStr(Lignes)` : seuls les boutons de la taille exacte de la sélection sont actifs. |
+| Fiche Feu ouverte (non modale) pendant un carrefour à feux, ou pendant l'ajout d'un feu par la fiche Priorités (`TfrmDefFeux`) | `f`, l'adresse du feu prise par `RafraichitInfos`, reste celle de l'ancienne table une fois celle-ci agrandie par `IncrementeNombre`. Les boutons d'état et de type la lisent, OK et Appliquer y écrivent, alors qu'elle est libérée (ASan : `heap-use-after-free`, `f_deff.cpp:168`). Le feu n'est pas modifié. | `f` est reprise dans `cv->Feu` à chaque usage. |
+| Idem, feu effacé par le carrefour | Le numéro du feu, devenu libre, est repris par un feu du carrefour. OK ou Appliquer y écrit l'état, les durées et les listes de la fiche, celles de l'ancien feu : ce feu du carrefour n'attend plus le rouge des autres feux du carrefour. | `AppliqueChoix` n'écrit rien si la case n'a plus ce feu, et la fiche se ferme. |
+
 ## Corrections de la 6.0.9 (annotées `// v6.0.9`)
 
 | Commande | Original | 6.0.9 |
@@ -701,6 +741,17 @@ fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
 ## Comportements d'origine conservés
 
+- **Carrefours** :
+  - Le bouton Annuler est invisible (0 × 0 pixel, `Cancel`) : la fiche se ferme par
+    Échap ou par sa case de fermeture.
+  - La confirmation de l'effacement dit « effacer les  et supprimer tout ce qui en
+    dépend » : `asTypeVoie[tvTout]` est vide.
+  - Avant cette question, `SpeedButtonClick` agrandit la table des feux jusqu'à trois ou
+    quatre feux libres, même si la réponse est Non. Cela laisse des feux libres en trop,
+    sans effet, et la carte n'est pas marquée modifiée. Cet agrandissement fait double
+    emploi avec celui d'`AjouteFeu` (v5.1). Celui-ci a aussi rendu inutiles les messages
+    `asNbFeuxLibresInsuffisant` et `asImpossibleCreerCarrefour`, qui ne sont jamais
+    affichés.
 - **Vérification du réseau, files de taxis et de parking** : « La place … pointe sur plus
   d'une file » (`voie::ExistePlusieursTetesFile*`) compte les places voisines qui
   continuent dans la direction qui les sépare de la place, et non celles vers lesquelles la

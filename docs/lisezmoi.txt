@@ -32,6 +32,16 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.10]
+ - La fiche Carrefours n'active plus que les boutons de la taille exacte de la
+   sélection. Une sélection de 2 colonnes sur 14 lignes, par exemple, proposait
+   les carrefours de 3 sur 4, dessinés en partie hors de la sélection, ce qui
+   pouvait faire planter le programme.
+ - La fiche Feu, laissée ouverte pendant la création d'un carrefour à feux ou
+   l'ajout d'un feu par la fiche Priorités, modifie bien son feu, sans risque
+   de plantage. Si le carrefour a effacé ce feu, elle se ferme sans rien
+   modifier.
+
 [Version 6.0.9]
  - Une ligne de bus ou de tram qui passe plusieurs fois par le même arrêt
    n'y est plus listée qu'une fois. À partir du dixième passage par un même

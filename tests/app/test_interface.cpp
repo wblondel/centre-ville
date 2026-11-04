@@ -69,6 +69,10 @@
 //     d'une sélection ;
 //   - feux (v6.0.5) : fiche Feux, listes par double-clic, suppression d'un feu
 //     référencé par un feu ou un feu de piétons, effacement d'une sélection ;
+//   - Carrefours (v6.0.10) : chaque bouton, dessin vérifié par sa structure (entrées,
+//     sorties, priorités, feux) ; sélections d'une autre taille ; table des feux
+//     agrandie de ce qui manque ; fiche Feu ouverte pendant l'ajout ou l'effacement
+//     de feux ;
 //   - fiches de configuration, champ par champ (Paramètres, bus, tram, taxi, vehlib, feux,
 //     feux de piétons) : Annuler, OK, enregistrement et réouverture, réaffichage ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
@@ -104,6 +108,7 @@
 #include <QRadioButton>
 #include <QRegularExpression>
 #include <QScrollBar>
+#include <QSet>
 #include <QTabBar>
 #include <QTemporaryDir>
 #include <QTest>
@@ -116,6 +121,7 @@
 #include <cstring>
 #include <deque>
 #include <fstream>
+#include <map>
 #include <mutex>
 #include <sstream>
 #include <thread>
@@ -216,6 +222,146 @@ namespace
     int n=0;
     for(int i=0; i<cv->NbFeuxPieton; i++) n+=cv->FeuP[i].Defini();
     return n;
+   }
+  int NbFeuxDefinis()
+   {
+    int n=0;
+    for(int i=0; i<cv->NbFeux; i++) n+=cv->Feu[i].Defini();
+    return n;
+   }
+  //-------------------------------------------------------------------------
+  // Bouton de la fiche Carrefours et ce qu'il doit dessiner dans une sélection de
+  // Colonnes x Lignes cases : sens de circulation des entrées (cédez-le-passage, ou feux)
+  // et, avec des feux, les sens qui ont le vert au départ
+  struct BoutonCarrefour
+   {
+    const char *Nom;
+    int Colonnes, Lignes;
+    bool Feux;
+    dirposs Entrees, Vertes;
+   };
+  const BoutonCarrefour BoutonsCarrefours[]=
+   {{"SpeedButton34a1", 3, 4, false, NSO, aucune}, // route nord-sud, branche à l'est
+    {"SpeedButton34a2", 3, 4, true, NSO, NS},
+    {"SpeedButton34a3", 3, 4, true, NSO, O},
+    {"SpeedButton34b1", 3, 4, false, NES, aucune}, // route nord-sud, branche à l'ouest
+    {"SpeedButton34b2", 3, 4, true, NES, NS},
+    {"SpeedButton34b3", 3, 4, true, NES, E},
+    {"SpeedButton43a1", 4, 3, false, ESO, aucune}, // route est-ouest, branche au nord
+    {"SpeedButton43a2", 4, 3, true, ESO, EO},
+    {"SpeedButton43a3", 4, 3, true, ESO, S},
+    {"SpeedButton43b1", 4, 3, false, NEO, aucune}, // route est-ouest, branche au sud
+    {"SpeedButton43b2", 4, 3, true, NEO, EO},
+    {"SpeedButton43b3", 4, 3, true, NEO, N},
+    {"SpeedButton44a", 4, 4, false, NESO, aucune},
+    {"SpeedButton44b", 4, 4, true, NESO, EO},
+    {"SpeedButton44c", 4, 4, true, NESO, NS},
+    {"SpeedButton66a", 6, 6, false, NESO, aucune}, // giratoires
+    {"SpeedButton66b", 6, 6, false, NESO, aucune},
+    {"SpeedButton88", 8, 8, false, NESO, aucune}};
+  const char *const GroupesCarrefours[]={"GroupBox34", "GroupBox43", "GroupBox44", "GroupBox66", "GroupBox88"};
+  //-------------------------------------------------------------------------
+  // Carrefour du bouton b dessiné en (xd, yd) : écarts avec ce qui est attendu. Les
+  // directions sont vérifiées par leur structure, sans recopier les tables de la fiche :
+  // aucune ne mène à une case vide de la zone, chaque entrée mène à chaque sortie, les
+  // entrées sont dans les sens attendus et ont seules une priorité. Chaque feu (un par
+  // entrée) attend et demande le rouge des feux des entrées perpendiculaires à la sienne
+  QStringList EcartsCarrefour(const BoutonCarrefour &b, int xd, int yd, int NbFeuxAvant)
+   {
+    QStringList Ecarts;
+    const int dxc[NBDIR+1]={0, 0, 1, 0, -1}, dyc[NBDIR+1]={0, -1, 0, 1, 0};
+    const QString Nom=QString::fromUtf8(b.Nom)+" : ";
+    auto Dedans=[&](int x, int y) { return (x>=xd)&&(x<xd+b.Colonnes)&&(y>=yd)&&(y<yd+b.Lignes); };
+    auto Case=[](int x, int y) -> voie & { return cv->v[x][y]; };
+    struct Entree { int x, y, d; };
+    std::vector<Entree> Entrees;
+    QSet<QString> Sorties;
+    for(int x=xd; x<xd+b.Colonnes; x++)
+     for(int y=yd; y<yd+b.Lignes; y++)
+      {
+       const int p=Case(x, y).DirPoss;
+       bool Rejointe=false;
+       for(int d=nord; d<=ouest; d++)
+        {
+         const int xs=x+dxc[d], ys=y+dyc[d], xp=x-dxc[d], yp=y-dyc[d];
+         if (p&PossDir[d])
+          {
+           if (!Dedans(xs, ys)) Sorties<<QString("%1,%2,%3").arg(x).arg(y).arg(d);
+           else if (!Case(xs, ys).DirPoss) Ecarts<<Nom+QString("impasse en (%1, %2) vers %3").arg(x).arg(y).arg(d);
+          }
+         Rejointe=Rejointe||(Dedans(xp, yp)&&(Case(xp, yp).DirPoss&PossDir[d]));
+        }
+       if (p&&!Rejointe)
+        { // Entrée : une seule direction, depuis le bord de la zone
+         int d=nord;
+         while ((d<ouest)&&(p!=PossDir[d])) d++;
+         if ((p!=PossDir[d])||Dedans(x-dxc[d], y-dyc[d]))
+          Ecarts<<Nom+QString("entrée (%1, %2) de directions %3").arg(x).arg(y).arg(p);
+         else
+          Entrees.push_back({x, y, d});
+        }
+      }
+    int Sens=aucune;
+    for(const Entree &e : Entrees) Sens|=PossDir[e.d];
+    if ((Sens!=b.Entrees)||((int)Entrees.size()!=NbDir[b.Entrees])||(Sorties.size()!=(int)Entrees.size()))
+     Ecarts<<Nom+QString("%1 entrées de sens %2 au lieu de %3, %4 sorties").arg(Entrees.size()).arg(Sens).arg((int)b.Entrees).arg(Sorties.size());
+    for(const Entree &e : Entrees)
+     { // Sorties atteintes depuis l'entrée
+      QSet<QString> Atteintes;
+      QSet<int> Vues{e.x*1000+e.y};
+      std::deque<QPoint> File{QPoint(e.x, e.y)};
+      while (!File.empty())
+       {
+        const QPoint c=File.front();
+        File.pop_front();
+        for(int d=nord; d<=ouest; d++)
+         if (Case(c.x(), c.y()).DirPoss&PossDir[d])
+          {
+           const int xs=c.x()+dxc[d], ys=c.y()+dyc[d];
+           if (!Dedans(xs, ys)) Atteintes<<QString("%1,%2,%3").arg(c.x()).arg(c.y()).arg(d);
+           else if (!Vues.contains(xs*1000+ys)) { Vues<<xs*1000+ys; File.push_back(QPoint(xs, ys)); }
+          }
+       }
+      if (Atteintes!=Sorties)
+       Ecarts<<Nom+QString("depuis l'entrée (%1, %2), %3 sorties sur %4").arg(e.x).arg(e.y).arg(Atteintes.size()).arg(Sorties.size());
+     }
+    // Priorités : seulement aux entrées ; un feu par entrée s'il y en a
+    std::map<int, int> NumFeu; // sens d'une entrée -> numéro de son feu
+    for(int x=xd; x<xd+b.Colonnes; x++)
+     for(int y=yd; y<yd+b.Lignes; y++)
+      for(int d=nord; d<=ouest; d++)
+       {
+        bool EstEntree=false;
+        for(const Entree &e : Entrees) EstEntree=EstEntree||((e.x==x)&&(e.y==y)&&(e.d==d));
+        const int Attendue=EstEntree?(b.Feux?feux:cedez_le_passage):a_droite, n=Case(x, y).NumFeu[d-1];
+        if (Case(x, y).Priorite[d-1]!=Attendue)
+         Ecarts<<Nom+QString("priorité %1 en (%2, %3) vers %4").arg((int)Case(x, y).Priorite[d-1]).arg(x).arg(y).arg(d);
+        if (EstEntree&&b.Feux)
+         {
+          if ((n<1)||(n>cv->NbFeux)||(cv->Feu[n-1].x!=x)||(cv->Feu[n-1].y!=y)||(cv->Feu[n-1].Dir!=d))
+           Ecarts<<Nom+QString("feu %1 de l'entrée (%2, %3)").arg(n).arg(x).arg(y);
+          else
+           NumFeu[d]=n;
+         }
+        else if (n)
+         Ecarts<<Nom+QString("feu %1 en (%2, %3) vers %4").arg(n).arg(x).arg(y).arg(d);
+       }
+    if (NbFeuxDefinis()!=NbFeuxAvant+(b.Feux?(int)Entrees.size():0))
+     Ecarts<<Nom+QString("%1 feux au lieu de %2").arg(NbFeuxDefinis()).arg(NbFeuxAvant+(b.Feux?(int)Entrees.size():0));
+    if (!b.Feux||(NumFeu.size()!=Entrees.size())) return Ecarts;
+    for(const auto &[d, n] : NumFeu)
+     {
+      const feu &f=cv->Feu[n-1];
+      const etat_feu Etat=(b.Vertes&PossDir[d])?vert:rouge;
+      if (f.Etat!=Etat) Ecarts<<Nom+QString("feu %1 (sens %2) : état %3 au lieu de %4").arg(n).arg(d).arg((int)f.Etat).arg((int)Etat);
+      QSet<int> Conflits, Dmd, Att;
+      for(const auto &[d2, n2] : NumFeu) if ((d2-d)%2) Conflits<<n2;
+      for(int i=0; i<f.NbFeuxDmd; i++) Dmd<<f.NumFeuxDmd[i];
+      for(int i=0; i<f.NbFeuxAtt; i++) Att<<f.NumFeuxAtt[i];
+      if ((Dmd!=Conflits)||(Att!=Conflits)||(f.NbFeuxDmd!=Conflits.size())||(f.NbFeuxAtt!=Conflits.size()))
+       Ecarts<<Nom+QString("feu %1 (sens %2) : listes de %3 et %4 feux").arg(n).arg(d).arg(f.NbFeuxDmd).arg(f.NbFeuxAtt);
+     }
+    return Ecarts;
    }
   //-------------------------------------------------------------------------
   // Limite de temps d'un clic sur Marche : le fil principal, s'il tourne sans
@@ -894,6 +1040,12 @@ class TestInterface : public QObject
   void lignesDeplacementsEtClignotement();
   void lignesToutesCochees();
   void ficheCarrefours();
+  void carrefoursDeChaqueBouton();
+  void carrefoursSelectionDUneAutreTaille();
+  void carrefoursTableDesFeuxAgrandie();
+  void carrefoursPendantLaDefinitionDUnFeu();
+  void carrefoursSurLeFeuDeLaFicheFeu();
+  void ficheFeuPendantUnAjoutDeFeu();
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
   void fichesInfos();
@@ -2707,11 +2859,14 @@ void TestInterface::ficheCarrefours()
   VerifieCarrefour();
   if (QTest::currentTestFailed()) return;
   QVERIFY(frmSimulation->SimulationModifiee);
-  // Annuler sur une autre zone : rien ne change
+  // Échap (bouton Annuler invisible, de 0 x 0 pixel) sur une autre zone : rien ne change
   Selectionne(xa, ya, xa+3, ya+3);
-  QuandModale([]() { return frmCarrefours; }, [&]() { Clique(frmCarrefours->ButtonAnnuler); });
+  Messages.clear();
+  QuandModale([]() { return frmCarrefours; }, [&]() { Touche(frmCarrefours->SpeedButton44a, Qt::Key_Escape); });
   frmSimulation->MenuItemCarrefours->ElementQt()->trigger();
   QVERIFY(Etapes.empty());
+  QVERIFY(!frmCarrefours->isVisible());
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
   for(int i=0; i<4; i++)
    for(int j=0; j<4; j++)
     QVERIFY(CaseLibre(xa+i, ya+j));
@@ -2722,6 +2877,336 @@ void TestInterface::ficheCarrefours()
   OuvreFichier(Fichier);
   QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(Fichier));
   VerifieCarrefour();
+ }
+//---------------------------------------------------------------------------
+namespace
+ {
+  // Groupes et boutons actifs de la fiche Carrefours
+  QStringList CarrefoursActifs()
+   {
+    QStringList Actifs;
+    for(const char *g : GroupesCarrefours)
+     if (((QWidget *)frmCarrefours->FindComponent(g))->isEnabled()) Actifs<<g;
+    for(const BoutonCarrefour &b : BoutonsCarrefours)
+     if (((QWidget *)frmCarrefours->FindComponent(b.Nom))->isEnabled()) Actifs<<b.Nom;
+    return Actifs;
+   }
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carrefoursDeChaqueBouton()
+ { // Chaque bouton, sur une zone neuve et une sélection de sa taille, la fiche ouverte par
+   // la barre d'outils, le menu contextuel ou l'action (Ctrl+Q) : seuls le groupe et les boutons de
+   // cette taille sont actifs ; directions, entrées, priorités et feux dessinés ; rien
+   // autour. La zone neuve n'a que deux feux, libres : la table est agrandie de ce qui
+   // manque pour un carrefour à feux, et seulement pour lui
+  QStringList Ecarts;
+  int i=0;
+  for(const BoutonCarrefour &b : BoutonsCarrefours)
+   {
+    NouvelleZone(12, 12);
+    if (QTest::currentTestFailed()) return;
+    QCOMPARE(cv->NbFeux, NBFEUXDEFAUT);
+    QCOMPARE(cv->NbFeuxLibres(), NBFEUXDEFAUT);
+    const int xd=2, yd=2, xf=xd+b.Colonnes-1, yf=yd+b.Lignes-1;
+    Selectionne(xd, yd, xf, yf);
+    if (QTest::currentTestFailed()) return;
+    QVERIFY(frmSimulation->ActionCarrefours->Enabled);
+    QStringList Actifs, Attendus;
+    for(const char *g : GroupesCarrefours)
+     if (QString(g).endsWith(QString("%1%2").arg(b.Colonnes).arg(b.Lignes))) Attendus<<g;
+    for(const BoutonCarrefour &a : BoutonsCarrefours)
+     if ((a.Colonnes==b.Colonnes)&&(a.Lignes==b.Lignes)) Attendus<<a.Nom;
+    bool Glyphe=false;
+    ReponseQuestions=QMessageBox::Yes; // « Êtes-vous bien sûr(e) de vouloir effacer... »
+    Messages.clear();
+    QuandModale([]() { return frmCarrefours; }, [&]()
+     {
+      Actifs=CarrefoursActifs();
+      TSpeedButton *s=(TSpeedButton *)frmCarrefours->FindComponent(b.Nom);
+      Glyphe=!s->icon().isNull();
+      Clique(s);
+     });
+    switch(i++%3)
+     {
+      case 0: Clique(frmSimulation->ToolButtonCarrefours); break;
+      case 1: frmSimulation->MenuItemCarrefours->ElementQt()->trigger(); break;
+      default: frmSimulation->ActionCarrefours->Execute(); break; // Ctrl+Q
+     }
+    ReponseQuestions=QMessageBox::No;
+    QVERIFY2(Etapes.empty(), b.Nom);
+    QVERIFY2(!frmCarrefours->isVisible(), b.Nom);
+    const QString Nom=QString::fromUtf8(b.Nom)+" : ";
+    if (Actifs!=Attendus) Ecarts<<Nom+"actifs "+Actifs.join(", ");
+    if (!Glyphe) Ecarts<<Nom+"sans image";
+    if ((Messages.size()!=1)||!Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")))
+     Ecarts<<Nom+Messages.join(" | ");
+    Ecarts<<EcartsCarrefour(b, xd, yd, 0);
+    // Table des feux : les deux feux libres, puis ce qui manque
+    const int NbEntrees=NbDir[b.Entrees];
+    if (b.Feux&&((cv->NbFeux!=NbEntrees)||cv->NbFeuxLibres()))
+     Ecarts<<Nom+QString("table de %1 feux, %2 libres").arg(cv->NbFeux).arg(cv->NbFeuxLibres());
+    if (!b.Feux&&(cv->NbFeux!=NBFEUXDEFAUT))
+     Ecarts<<Nom+QString("table de %1 feux").arg(cv->NbFeux);
+    // Rien autour de la zone
+    for(int x=0; x<cv->NbX; x++)
+     for(int y=0; y<cv->NbY; y++)
+      if (((x<xd)||(x>xf)||(y<yd)||(y>yf))&&!CaseLibre(x, y)) Ecarts<<Nom+QString("case (%1, %2) modifiée").arg(x).arg(y);
+    if (!frmSimulation->SimulationModifiee) Ecarts<<Nom+"carte non modifiée";
+   }
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carrefoursSelectionDUneAutreTaille()
+ { // Sélections d'aucune taille de la fiche : aucun bouton actif. Dont celles où 10 x
+   // colonnes + lignes donne une taille de la fiche (2 x 14 : « 34 »), dont l'original
+   // activait les boutons (corrigé en 6.0.10). F1 et Aide ouvrent la rubrique, F2 rien ; Échap
+   // (bouton Annuler invisible, de 0 x 0 pixel) ne dessine rien
+  NouvelleZone(30, 30);
+  if (QTest::currentTestFailed()) return;
+  QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
+  UrlsOuvertes.clear();
+  const struct { int Colonnes, Lignes; } Tailles[]=
+   {{2, 14}, {3, 13}, {3, 14}, {5, 16}, {7, 18}, {2, 2}, {4, 5}, {8, 6}, {3, 3}};
+  QStringList Ecarts;
+  bool Aide=true;
+  for(const auto &t : Tailles)
+   {
+    Selectionne(1, 1, t.Colonnes, t.Lignes);
+    if (QTest::currentTestFailed()) break;
+    QStringList Actifs;
+    QuandModale([]() { return frmCarrefours; }, [&]()
+     {
+      Actifs=CarrefoursActifs();
+      if (Aide)
+       {
+        Touche(frmCarrefours->ButtonAide, Qt::Key_F2); // sans effet
+        Touche(frmCarrefours->ButtonAide, Qt::Key_F1);
+        Clique(frmCarrefours->ButtonAide);
+        Aide=false;
+       }
+      Touche(frmCarrefours->ButtonAide, Qt::Key_Escape); // ButtonAnnuler : 0 x 0 pixel, Cancel
+     });
+    Clique(frmSimulation->ToolButtonCarrefours);
+    if (!Etapes.empty()) { Ecarts<<QString("%1 x %2 : fiche non ouverte").arg(t.Colonnes).arg(t.Lignes); Etapes.clear(); }
+    if (!Actifs.isEmpty()) Ecarts<<QString("%1 x %2 : %3").arg(t.Colonnes).arg(t.Lignes).arg(Actifs.join(", "));
+   }
+  QDesktopServices::unsetUrlHandler("file");
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+  for(int x=0; x<cv->NbX; x++)
+   for(int y=0; y<cv->NbY; y++)
+    QVERIFY(CaseLibre(x, y));
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QUrl Rubrique=QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html");
+  Rubrique.setFragment("C"); // HelpContext 432
+  QCOMPARE(UrlsOuvertes.size(), 2);
+  QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique);
+  QCOMPARE(AdresseAide(UrlsOuvertes[1]), Rubrique);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carrefoursTableDesFeuxAgrandie()
+ { // La table des feux n'est agrandie que de ce qui manque aux feux libres, que le
+   // carrefour prend d'abord. Effacement refusé (« Non ») : rien n'est dessiné, la carte
+   // n'est pas modifiée, mais la table reste agrandie (original, sans effet)
+  NouvelleZone(30, 20);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(cv->NbFeux, NBFEUXDEFAUT);
+  QCOMPARE(cv->NbFeuxLibres(), NBFEUXDEFAUT);
+  auto Carrefour=[&](const char *Nom, int xd, int yd, QMessageBox::StandardButton Reponse, int NbFeuxRemplaces=0)
+   {
+    const BoutonCarrefour *b=nullptr;
+    for(const BoutonCarrefour &a : BoutonsCarrefours) if (!qstrcmp(a.Nom, Nom)) b=&a;
+    Selectionne(xd, yd, xd+b->Colonnes-1, yd+b->Lignes-1);
+    if (QTest::currentTestFailed()) return QStringList("sélection");
+    const int NbFeuxAvant=NbFeuxDefinis();
+    ReponseQuestions=Reponse;
+    Messages.clear();
+    QuandModale([]() { return frmCarrefours; }, [Nom, this]() { Clique((TSpeedButton *)frmCarrefours->FindComponent(Nom)); });
+    Clique(frmSimulation->ToolButtonCarrefours);
+    ReponseQuestions=QMessageBox::No;
+    if (!Etapes.empty()) { Etapes.clear(); return QStringList(QString::fromUtf8(Nom)+" : fiche non ouverte"); }
+    return (Reponse==QMessageBox::Yes)?EcartsCarrefour(*b, xd, yd, NbFeuxAvant-NbFeuxRemplaces):QStringList();
+   };
+  auto Feux=[](int xd, int yd, int l, int h)
+   {
+    QSet<int> n;
+    for(int x=xd; x<xd+l; x++)
+     for(int y=yd; y<yd+h; y++)
+      for(int d=0; d<NBDIR; d++)
+       if (cv->v[x][y].NumFeu[d]) n<<cv->v[x][y].NumFeu[d];
+    return n;
+   };
+  // Effacement refusé : 3 x 4 à feux, la table est agrandie d'un feu avant la question
+  QStringList Ecarts=Carrefour("SpeedButton34a2", 2, 2, QMessageBox::No);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(Messages.size(), 1);
+  QVERIFY(Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")));
+  for(int x=0; x<cv->NbX; x++)
+   for(int y=0; y<cv->NbY; y++)
+    QVERIFY(CaseLibre(x, y));
+  QVERIFY(!frmSimulation->SimulationModifiee);
+  QCOMPARE(cv->NbFeux, 3);
+  QCOMPARE(cv->NbFeuxLibres(), 3);
+  // 4 x 4 à feux : les trois feux libres et un de plus
+  Ecarts=Carrefour("SpeedButton44b", 2, 2, QMessageBox::Yes);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(cv->NbFeux, 4);
+  QCOMPARE(cv->NbFeuxLibres(), 0);
+  // 3 x 4 à feux : trois de plus
+  Ecarts=Carrefour("SpeedButton34b3", 8, 2, QMessageBox::Yes);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(cv->NbFeux, 7);
+  QCOMPARE(cv->NbFeuxLibres(), 0);
+  // Le 4 x 4 remplacé par un sans feux : ses quatre feux sont libérés (avec les feux qui en
+  // dépendent, confirmés), la table ne change pas
+  const QSet<int> Liberes=Feux(2, 2, 4, 4);
+  QCOMPARE(Liberes.size(), 4);
+  Ecarts=Carrefour("SpeedButton44a", 2, 2, QMessageBox::Yes, 4);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(cv->NbFeux, 7);
+  QCOMPARE(cv->NbFeuxLibres(), 4);
+  // 4 x 3 à feux : trois des quatre feux libres, sans agrandir
+  Ecarts=Carrefour("SpeedButton43a3", 14, 2, QMessageBox::Yes);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(cv->NbFeux, 7);
+  QCOMPARE(cv->NbFeuxLibres(), 1);
+  QVERIFY(Liberes.contains(Feux(14, 2, 4, 3)));
+  // 4 x 4 à feux : le dernier feu libre et trois de plus
+  Ecarts=Carrefour("SpeedButton44c", 20, 2, QMessageBox::Yes);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QCOMPARE(cv->NbFeux, 10);
+  QCOMPARE(cv->NbFeuxLibres(), 0);
+  QVERIFY(Feux(20, 2, 4, 4).contains(Liberes-Feux(14, 2, 4, 3)));
+  // Enregistrement et réouverture : carrefours et feux conservés
+  const QString f=QFileInfo(Carte).absolutePath()+"/carrefours_feux.cvw";
+  QFile::remove(f);
+  Enregistre(f);
+  QVERIFY(!OuvreDemo("carrefours_autre.cvw").isEmpty());
+  OuvreFichier(f);
+  QCOMPARE(cv->NbFeux, 10);
+  const struct { int Bouton, xd, yd; } Dessines[]={{12, 2, 2}, {5, 8, 2}, {8, 14, 2}, {14, 20, 2}}; // 44a, 34b3, 43a3, 44c
+  for(const auto &c : Dessines)
+   {
+    const BoutonCarrefour &b=BoutonsCarrefours[c.Bouton];
+    Ecarts<<EcartsCarrefour(b, c.xd, c.yd, 10-(b.Feux?NbDir[b.Entrees]:0));
+   }
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
+ { // Fiche Feu ouverte, sélection de ses feux en cours : un carrefour à feux sur une
+   // sélection agrandit la table des feux, puis OK sur la fiche Feu écrit dans son feu.
+   // L'original gardait l'adresse du feu dans l'ancienne table, libérée (corrigé en
+   // 6.0.10 ; ASan : heap-use-after-free)
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1];
+  QVERIFY(a>0);
+  QCOMPARE(cv->NbFeuxLibres(), 0);
+  QCOMPARE((int)cv->Feu[a-1].Etat, (int)inactif);
+  OuvreFicheFeu(4, 8, est);
+  if (QTest::currentTestFailed()) return;
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  QVERIFY(frmSimulation->SelectionFeuxDmd);
+  Selectionne(11, 11, 14, 14);
+  if (QTest::currentTestFailed()) return;
+  QVERIFY(frmDefFeux->isVisible());
+  QVERIFY(frmSimulation->ActionCarrefours->Enabled);
+  const int NbFeuxAvant=NbFeuxDefinis();
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton44b); });
+  Clique(frmSimulation->ToolButtonCarrefours);
+  ReponseQuestions=QMessageBox::No;
+  QVERIFY(Etapes.empty());
+  QVERIFY(cv->NbFeux>NbFeuxAvant); // table agrandie, donc déplacée
+  QStringList Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 11, 11, NbFeuxAvant);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  // La fiche Feu, restée ouverte, modifie son feu
+  QVERIFY(frmDefFeux->isVisible());
+  CliqueChoix(frmDefFeux->RadioGroupEtat, rouge);
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  CliqueChoix(frmDefFeux->RadioGroupTypePsgRouge, immediat);
+  CliqueChoix(frmDefFeux->RadioGroupTypeDmdVert, immediate);
+  Clique(frmDefFeux->ButtonOk);
+  QVERIFY(!frmDefFeux->isVisible());
+  QCOMPARE((int)cv->Feu[a-1].Etat, (int)rouge);
+  QCOMPARE((int)cv->Feu[a-1].TypePsgRouge, (int)immediat);
+  QCOMPARE((int)cv->Feu[a-1].TypeDmdVert, (int)immediate);
+  QCOMPARE(cv->Feu[a-1].NbFeuxDmd, 0);
+  Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 11, 11, NbFeuxAvant);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  Clique(frmDefVoie->ButtonAnnuler);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::carrefoursSurLeFeuDeLaFicheFeu()
+ { // Fiche Feu ouverte sur un feu de la sélection, sélection de ses feux en cours : le
+   // carrefour efface ce feu et reprend son numéro pour un des siens. Appliquer sur la fiche
+   // Feu ne modifie pas le carrefour et la ferme ; l'original y écrivait les valeurs et
+   // les listes (vides) de la fiche : feu du carrefour qui n'attend plus le rouge des
+   // autres (corrigé en 6.0.10)
+  ReseauAvecFeux();
+  if (QTest::currentTestFailed()) return;
+  const int a=cv->v[4][8].NumFeu[est-1];
+  QVERIFY(a>0);
+  OuvreFicheFeu(4, 8, est);
+  if (QTest::currentTestFailed()) return;
+  Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
+  Selectionne(3, 7, 6, 10);
+  if (QTest::currentTestFailed()) return;
+  const int NbFeuxAvant=NbFeuxDefinis();
+  ReponseQuestions=QMessageBox::Yes;
+  Messages.clear();
+  QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton44b); });
+  Clique(frmSimulation->ToolButtonCarrefours);
+  ReponseQuestions=QMessageBox::No;
+  QVERIFY(Etapes.empty());
+  QCOMPARE(cv->v[4][8].NumFeu[est-1], 0);
+  QCOMPARE(cv->v[4][7].NumFeu[sud-1], a); // numéro repris
+  QStringList Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 3, 7, NbFeuxAvant-1);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  QVERIFY(frmDefFeux->isVisible());
+  CliqueChoix(frmDefFeux->RadioGroupEtat, vert);
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonAppliquer);
+  QVERIFY(!frmDefFeux->isVisible());
+  Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 3, 7, NbFeuxAvant-1);
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  Clique(frmDefVoie->ButtonAnnuler);
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ficheFeuPendantUnAjoutDeFeu()
+ { // Même défaut sans Carrefours : fiche Feu ouverte sur une case à deux directions, la
+   // fiche Priorités y ajoute un feu (Appliquer) sans feu libre, ce qui agrandit la table
+   // des feux ; la fiche Feu, restée ouverte, modifie ensuite le sien (corrigé en 6.0.10)
+  NouvelleZone(20, 20);
+  if (QTest::currentTestFailed()) return;
+  TraceSegment(2, 8, 14, 8);
+  TraceSegment(8, 2, 8, 14);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE((int)cv->v[8][8].DirPoss, (int)SE);
+  PoseFeu(4, 8, frmDefVoie->RadioGroupPrioriteEst);
+  PoseFeu(8, 8, frmDefVoie->RadioGroupPrioriteEst);
+  if (QTest::currentTestFailed()) return;
+  QCOMPARE(cv->NbFeuxLibres(), 0);
+  const int a=cv->v[8][8].NumFeu[est-1], NbFeux=cv->NbFeux;
+  QVERIFY(a>0);
+  Messages.clear();
+  OuvreFicheFeu(8, 8, est);
+  if (QTest::currentTestFailed()) return;
+  CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
+  Clique(frmDefVoie->ButtonAppliquer);
+  QCOMPARE(cv->NbFeux, NbFeux+1); // table agrandie, donc déplacée
+  QVERIFY(cv->v[8][8].NumFeu[sud-1]>0);
+  QVERIFY(frmDefFeux->isVisible());
+  CliqueChoix(frmDefFeux->RadioGroupEtat, orange);
+  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
+  Clique(frmDefFeux->ButtonOk);
+  QVERIFY(!frmDefFeux->isVisible());
+  QCOMPARE((int)cv->Feu[a-1].Etat, (int)orange);
+  QCOMPARE((int)cv->Feu[cv->v[8][8].NumFeu[sud-1]-1].Etat, (int)inactif);
+  Clique(frmDefVoie->ButtonAnnuler);
+  QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
  }
 //---------------------------------------------------------------------------
 // Lot 2 des fiches secondaires : distances et informations
