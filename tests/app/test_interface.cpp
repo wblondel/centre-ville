@@ -73,6 +73,8 @@
 //     sorties, priorités, feux) ; sélections d'une autre taille ; table des feux
 //     agrandie de ce qui manque ; fiche Feu ouverte pendant l'ajout ou l'effacement
 //     de feux ;
+//   - fiches Priorités (v6.0.11) : réaffichées après une commande sur la sélection qui
+//     modifie leur case, OK ne la change pas ;
 //   - fiches de configuration, champ par champ (Paramètres, bus, tram, taxi, vehlib, feux,
 //     feux de piétons) : Annuler, OK, enregistrement et réouverture, réaffichage ;
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
@@ -1046,6 +1048,7 @@ class TestInterface : public QObject
   void carrefoursPendantLaDefinitionDUnFeu();
   void carrefoursSurLeFeuDeLaFicheFeu();
   void ficheFeuPendantUnAjoutDeFeu();
+  void prioritesApresUneCommandeSurLaSelection();
   // Lot 2 des fiches secondaires (phase 6)
   void fichesDistances();
   void fichesInfos();
@@ -2891,6 +2894,46 @@ namespace
      if (((QWidget *)frmCarrefours->FindComponent(b.Nom))->isEnabled()) Actifs<<b.Nom;
     return Actifs;
    }
+  //-------------------------------------------------------------------------
+  // Fiches Priorités après une commande : celle qui est ouverte est celle de la case courante
+  // (Priorités si la case a une voie, Priorités piétons sinon) et montre son état
+  QStringList EcartsFichesPriorites(const QString &Quoi)
+   {
+    QStringList Ecarts;
+    const int x=frmSimulation->DrawGridSimul->Col, y=frmSimulation->DrawGridSimul->Row;
+    const voie &v=cv->v[x][y];
+    const bool Voies=v.DirPoss||v.SensVoieTram;
+    const QString Case=QString("%1, %2").arg(x, 2, 10, QChar('0')).arg(y, 2, 10, QChar('0'));
+    if (frmDefVoie->isVisible()!=Voies)
+     Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités %1 en (%2)").arg(Voies?"fermée":"ouverte", Case);
+    if (frmDefVoiePietons->isVisible()==Voies)
+     Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités piétons %1 en (%2)").arg(Voies?"ouverte":"fermée", Case);
+    if (frmDefVoie->isVisible())
+     {
+      TRadioGroup *Groupes[NBDIR]={frmDefVoie->RadioGroupPrioriteNord, frmDefVoie->RadioGroupPrioriteEst,
+                                   frmDefVoie->RadioGroupPrioriteSud, frmDefVoie->RadioGroupPrioriteOuest};
+      if (Q(frmDefVoie->LabelCoordonnees->Caption)!=Case)
+       Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités en (%1) au lieu de (%2)").arg(Q(frmDefVoie->LabelCoordonnees->Caption), Case);
+      for(int d=nord; d<=ouest; d++)
+       {
+        if ((int)Groupes[d-1]->ItemIndex!=(int)v.Priorite[d-1])
+         Ecarts<<Quoi+QString::fromUtf8(" : priorité %1 affichée au lieu de %2 (direction %3)").arg((int)Groupes[d-1]->ItemIndex).arg((int)v.Priorite[d-1]).arg(d);
+        if (!v.SensVoieTram&&!v.NumParking&&((bool)Groupes[d-1]->Enabled!=!!(v.DirPoss&PossDir[d])))
+         Ecarts<<Quoi+QString::fromUtf8(" : direction %1 %2 dans la fiche").arg(d).arg(Groupes[d-1]->Enabled?"active":"inactive");
+       }
+     }
+    if (frmDefVoiePietons->isVisible()&&(Q(frmDefVoiePietons->LabelCoordonnees->Caption)!=Case))
+     Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités piétons en (%1) au lieu de (%2)").arg(Q(frmDefVoiePietons->LabelCoordonnees->Caption), Case);
+    return Ecarts;
+   }
+  // Ce qui, sur une case, dépend de la fiche Priorités
+  QString EtatPriorites(int x, int y)
+   {
+    const voie &v=cv->v[x][y];
+    QString e=QString("%1 %2 :").arg((int)v.DirPoss).arg((int)v.SensVoieTram);
+    for(int d=0; d<NBDIR; d++) e+=QString(" %1/%2").arg((int)v.Priorite[d]).arg(v.NumFeu[d]);
+    return e+QString(" (%1 feux)").arg(NbFeuxDefinis());
+   }
  }
 //---------------------------------------------------------------------------
 void TestInterface::carrefoursDeChaqueBouton()
@@ -3094,10 +3137,12 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
  }
 //---------------------------------------------------------------------------
 void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
- { // Fiche Feu ouverte, sélection de ses feux en cours : un carrefour à feux sur une
-   // sélection agrandit la table des feux, puis OK sur la fiche Feu écrit dans son feu.
-   // L'original gardait l'adresse du feu dans l'ancienne table, libérée (corrigé en
-   // 6.0.10 ; ASan : heap-use-after-free)
+ { // Fiche Feu ouverte, sélection de ses feux en cours : un carrefour à feux sur une autre
+   // sélection agrandit la table des feux, donc la déplace. Les fiches Priorités sont
+   // réaffichées après la commande, comme après un clic sur la carte (6.0.11) : la fiche
+   // Feu se ferme sans rien écrire et le curseur revient sur son feu. Rouverte, elle modifie
+   // bien son feu. En 6.0.10, elle restait ouverte ; l'original y gardait l'adresse du feu
+   // dans l'ancienne table, libérée (voir aussi ficheFeuPendantUnAjoutDeFeu)
   ReseauAvecFeux();
   if (QTest::currentTestFailed()) return;
   const int a=cv->v[4][8].NumFeu[est-1];
@@ -3106,6 +3151,7 @@ void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
   QCOMPARE((int)cv->Feu[a-1].Etat, (int)inactif);
   OuvreFicheFeu(4, 8, est);
   if (QTest::currentTestFailed()) return;
+  CliqueChoix(frmDefFeux->RadioGroupEtat, rouge); // choix laissé en suspens
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   QVERIFY(frmSimulation->SelectionFeuxDmd);
   Selectionne(11, 11, 14, 14);
@@ -3122,7 +3168,15 @@ void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
   QVERIFY(cv->NbFeux>NbFeuxAvant); // table agrandie, donc déplacée
   QStringList Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 11, 11, NbFeuxAvant);
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
-  // La fiche Feu, restée ouverte, modifie son feu
+  // Fiche Feu fermée sans rien écrire, fiche Priorités sur la case du feu
+  QVERIFY(!frmDefFeux->isVisible());
+  QVERIFY(!frmSimulation->SelectionFeuxDmd);
+  QVERIFY(frmDefVoie->isVisible());
+  QCOMPARE(frmSimulation->DrawGridSimul->Col, 4);
+  QCOMPARE(frmSimulation->DrawGridSimul->Row, 8);
+  QCOMPARE((int)cv->Feu[a-1].Etat, (int)inactif);
+  // Rouverte, la fiche Feu modifie son feu, dans la table agrandie
+  Clique(frmDefVoie->BitBtnDefFeuE);
   QVERIFY(frmDefFeux->isVisible());
   CliqueChoix(frmDefFeux->RadioGroupEtat, rouge);
   QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
@@ -3141,10 +3195,11 @@ void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
 //---------------------------------------------------------------------------
 void TestInterface::carrefoursSurLeFeuDeLaFicheFeu()
  { // Fiche Feu ouverte sur un feu de la sélection, sélection de ses feux en cours : le
-   // carrefour efface ce feu et reprend son numéro pour un des siens. Appliquer sur la fiche
-   // Feu ne modifie pas le carrefour et la ferme ; l'original y écrivait les valeurs et
-   // les listes (vides) de la fiche : feu du carrefour qui n'attend plus le rouge des
-   // autres (corrigé en 6.0.10)
+   // carrefour efface ce feu et reprend son numéro pour un des siens. La fiche Feu se ferme,
+   // et la fiche Priorités montre la case telle que le carrefour l'a dessinée : OK ne la
+   // modifie pas (6.0.11). En 6.0.10, la fiche Feu restait ouverte, et AppliqueChoix n'y
+   // écrivait rien. L'original y écrivait les valeurs et les listes de la fiche : le feu du
+   // carrefour n'attendait plus le rouge des autres
   ReseauAvecFeux();
   if (QTest::currentTestFailed()) return;
   const int a=cv->v[4][8].NumFeu[est-1];
@@ -3165,14 +3220,13 @@ void TestInterface::carrefoursSurLeFeuDeLaFicheFeu()
   QCOMPARE(cv->v[4][7].NumFeu[sud-1], a); // numéro repris
   QStringList Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 3, 7, NbFeuxAvant-1);
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
-  QVERIFY(frmDefFeux->isVisible());
-  CliqueChoix(frmDefFeux->RadioGroupEtat, vert);
-  QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
-  Clique(frmDefFeux->ButtonAppliquer);
   QVERIFY(!frmDefFeux->isVisible());
+  QVERIFY(frmDefVoie->isVisible());
+  Ecarts=EcartsFichesPriorites("carrefour sur le feu");
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  Clique(frmDefVoie->ButtonOk);
   Ecarts=EcartsCarrefour(BoutonsCarrefours[13], 3, 7, NbFeuxAvant-1);
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
-  Clique(frmDefVoie->ButtonAnnuler);
  }
 //---------------------------------------------------------------------------
 void TestInterface::ficheFeuPendantUnAjoutDeFeu()
@@ -3207,6 +3261,63 @@ void TestInterface::ficheFeuPendantUnAjoutDeFeu()
   QCOMPARE((int)cv->Feu[cv->v[8][8].NumFeu[sud-1]-1].Etat, (int)inactif);
   Clique(frmDefVoie->ButtonAnnuler);
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
+ }
+//---------------------------------------------------------------------------
+void TestInterface::prioritesApresUneCommandeSurLaSelection()
+ { // Fiche Priorités (ou Priorités piétons) ouverte sur l'ancre d'une sélection, puis une
+   // commande sur la sélection qui modifie cette case : la fiche montre ensuite la case
+   // modifiée, Priorités piétons si elle n'a plus de voie (et inversement), et OK ne la
+   // change pas. L'original laissait la fiche telle quelle : OK y réécrivait les priorités et
+   // les feux d'avant, jusqu'à reposer un feu sur une case effacée ou remplacer les priorités
+   // d'un carrefour (corrigé en 6.0.11)
+  TfrmSimulation *s=frmSimulation;
+  NouvelleZone(30, 24);
+  if (QTest::currentTestFailed()) return;
+  for(int y : {2, 6, 10, 14}) TraceSegment(2, y, 12, y); // routes vers l'est
+  TraceSegment(14, 2, 22, 2);
+  if (QTest::currentTestFailed()) return;
+  PoseFeu(4, 2, frmDefVoie->RadioGroupPrioriteEst);
+  PoseFeu(4, 6, frmDefVoie->RadioGroupPrioriteEst);
+  if (QTest::currentTestFailed()) return;
+  Selectionne(2, 18, 12, 18); // voie de tram
+  s->ActionSegmentTram->Execute();
+  CliqueCase(12, 18);
+  QVERIFY(cv->v[4][18].SensVoieTram);
+  Messages.clear();
+  QStringList Ecarts;
+  auto Verifie=[&](const QString &Quoi, int x, int y, int x2, int y2, const std::function<void()> &Commande)
+   {
+    CliqueCase(x, y);
+    Clique(s->ToolButtonPriorites);
+    if (!frmDefVoie->isVisible()&&!frmDefVoiePietons->isVisible()) { Ecarts<<Quoi+QString::fromUtf8(" : fiche non ouverte"); return; }
+    Selectionne(x, y, x2, y2);
+    const QString Avant=EtatPriorites(x, y);
+    ReponseQuestions=QMessageBox::Yes; // effacements confirmés
+    Commande();
+    ReponseQuestions=QMessageBox::No;
+    if (EtatPriorites(x, y)==Avant) Ecarts<<Quoi+QString::fromUtf8(" : case non modifiée par la commande");
+    Ecarts<<EcartsFichesPriorites(Quoi);
+    const QString Apres=EtatPriorites(x, y);
+    if (frmDefVoie->isVisible()) Clique(frmDefVoie->ButtonOk);
+    if (frmDefVoiePietons->isVisible()) Clique(frmDefVoiePietons->ButtonOk);
+    if (EtatPriorites(x, y)!=Apres) Ecarts<<Quoi+QString::fromUtf8(" : OK a changé la case : ")+Apres+" -> "+EtatPriorites(x, y);
+   };
+  Verifie(QString::fromUtf8("Effacer les routes"), 4, 2, 6, 3, [s]() { s->ActionEffacerRoutes->Execute(); });
+  Verifie(QString::fromUtf8("Carrefours"), 4, 6, 6, 9, [this, s]()
+   {
+    QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton34a2); });
+    s->ActionCarrefours->Execute();
+   });
+  Verifie(QString::fromUtf8("Segment de route"), 4, 10, 6, 10, [s]() { s->ActionSegmentRoute->Execute(); });
+  Verifie(QString::fromUtf8("Coin supérieur gauche"), 4, 14, 7, 17, [s]() { s->ActionCoinSuperieurGauche->Execute(); });
+  Verifie(QString::fromUtf8("Périphérique extérieur"), 16, 2, 20, 6, [s]() { s->ActionPeripheriqueExterieur->Execute(); });
+  Verifie(QString::fromUtf8("Segment de voie de tram"), 4, 18, 6, 18, [s]() { s->ActionSegmentTram->Execute(); });
+  Verifie(QString::fromUtf8("Effacer les voies de tram"), 8, 18, 10, 19, [s]() { s->ActionEffacerVoiesTram->Execute(); });
+  Verifie(QString::fromUtf8("Segment de route sur une case vide"), 4, 22, 8, 22, [s]() { s->ActionSegmentRoute->Execute(); });
+  QVERIFY(Etapes.empty());
+  QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
+  for(const QString &m : Messages)
+   QVERIFY2(m.contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")), qPrintable(m));
  }
 //---------------------------------------------------------------------------
 // Lot 2 des fiches secondaires : distances et informations

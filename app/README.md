@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.10)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.11)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -503,7 +503,8 @@ Tests ajoutés en 6.0.10 (`test_interface.cpp`) :
   remplacé par un autre sans feux, enregistrement et réouverture.
 - `carrefoursPendantLaDefinitionDUnFeu`, `carrefoursSurLeFeuDeLaFicheFeu` et
   `ficheFeuPendantUnAjoutDeFeu` (ce dernier sans Carrefours) : voir les corrections de la
-  6.0.10.
+  6.0.10. Depuis la 6.0.11, les deux premiers vérifient que la fiche Feu se ferme après le
+  carrefour (voir les corrections de la 6.0.11).
 - `ficheCarrefours` cliquait sur le bouton Annuler, qui est invisible (0 × 0 pixel) : le
   clic restait sans effet, et la fiche n'était fermée qu'au bout des 10 s de garde du
   test. Il la ferme maintenant par Échap.
@@ -675,6 +676,22 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.11 (annotées `// v6.0.11`)
+
+| Commande | Original | 6.0.11 |
+|---|---|---|
+| Carrefours, Effacer les routes, Effacer les voies de tram, segments de route et de voie de tram, coins, périphériques, avec la fiche Priorités ou Priorités piétons ouverte (`TfrmSimulation::RafraichitFichesPriorites`) | La fiche, non modale, garde la case d'avant la commande. OK y réécrit les priorités et les feux affichés : feu reposé sur une case effacée, feu ajouté sur une direction que la case n'a plus (entrée d'un carrefour), priorités du carrefour remplacées. Une direction retirée par un segment reste aussi proposée. | La fiche est réaffichée après la commande, comme après l'édition de la case courante (`ActionEffacerRouteExecute`…) : elle montre la case modifiée, ou laisse la place à l'autre fiche Priorités si la case a gagné ou perdu ses voies. La fiche Feu ouverte se ferme sans rien écrire, comme après un clic sur la carte. |
+
+Test ajouté en 6.0.11 (`test_interface.cpp`) : `prioritesApresUneCommandeSurLaSelection`,
+chacune de ces commandes sur l'ancre de la sélection, dont la fiche Priorités est ouverte (ou
+Priorités piétons, sur une case vide où le segment trace une route). Ensuite, la fiche
+ouverte est celle de la case et montre son état, et OK ne modifie pas la case. Depuis cette
+correction, la fiche Feu ne peut plus rester ouverte sur un feu que Carrefours efface : la
+garde de la 6.0.10 dans `TfrmDefFeux::AppliqueChoix` n'est plus atteignable, et les tests
+`carrefoursPendantLaDefinitionDUnFeu` et `carrefoursSurLeFeuDeLaFicheFeu` vérifient que la
+fiche Feu se ferme. L'adresse reprise à chaque usage reste nécessaire
+(`ficheFeuPendantUnAjoutDeFeu`).
 
 ## Corrections de la 6.0.10 (annotées `// v6.0.10`)
 
