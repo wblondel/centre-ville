@@ -113,19 +113,34 @@ void TfrmRecherche::RadioButtonClick(TObject *Sender)
  RafraichitAffichage();
 }
 //---------------------------------------------------------------------------
+static void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 : tirée de FixeNumeroMax
+ {
+  TNotifyEvent Change=CSpinEdit->OnChange;
+  CSpinEdit->OnChange=nullptr;
+  CSpinEdit->Value=Valeur;
+  CSpinEdit->OnChange=Change;
+ }
+//---------------------------------------------------------------------------
 // v6.0.2 : un numéro resté plus grand que le nombre d'éléments (carte précédente)
 // est ramené dans les bornes. Sans OnChange : le curseur ne doit pas quitter la case
 // courante à l'ouverture de la fiche
 static void FixeNumeroMax(TCSpinEdit *CSpinEdit, int NumMax)
  {
   CSpinEdit->MAXVALUE=NumMax;
-  if (CSpinEdit->Value>NumMax)
-   {
-    TNotifyEvent Change=CSpinEdit->OnChange;
-    CSpinEdit->OnChange=nullptr;
-    CSpinEdit->Value=NumMax;
-    CSpinEdit->OnChange=Change;
-   }
+  if (CSpinEdit->Value>NumMax) FixeValeurSansChange(CSpinEdit, NumMax);
+ }
+//---------------------------------------------------------------------------
+// v6.0.12 : numéro d'un élément de la case courante, repris à l'ouverture de la fiche. Son
+// OnChange place le curseur sur l'élément. Pour la même raison que FixeNumeroMax, il est posé
+// sans OnChange si l'élément est sur une autre case (autre case d'un arrêt, case arrière d'un
+// bus ou d'un tram, queue de la file d'une place), sauf si son bouton est coché : la fiche
+// cherche alors cet élément, comme après un clic sur le bouton
+static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int Numero, bool Ailleurs)
+ {
+  if (Ailleurs&&!RadioButton->Checked)
+   FixeValeurSansChange(CSpinEdit, Numero);
+  else
+   CSpinEdit->Value=Numero;
  }
 //---------------------------------------------------------------------------
 void TfrmRecherche::FormShow(TObject *Sender)
@@ -167,20 +182,25 @@ void TfrmRecherche::FormShow(TObject *Sender)
 	 CSpinEditPieton->Value=v->NumPieton[1];
 	}
   }
- if (v->NumBus) CSpinEditBus->Value=v->NumBus; // v3.0
- if (v->NumArretBus) CSpinEditArretBus->Value=v->NumArretBus; // v3.0
- if (v->NumTram) CSpinEditTram->Value=v->NumTram; // v3.5
- if (v->NumArretTram) CSpinEditArretTram->Value=v->NumArretTram; // v3.5
+ auto Ailleurs=[x, y](int xe, int ye) { return (xe!=x)||(ye!=y); }; // v6.0.12 : voir FixeNumeroCase
+ if (v->NumBus) FixeNumeroCase(CSpinEditBus, RadioButtonBus, v->NumBus, Ailleurs(cv->Bus[v->NumBus-1].x, cv->Bus[v->NumBus-1].y)); // v3.0. v6.0.12 : FixeNumeroCase
+ if (v->NumArretBus) FixeNumeroCase(CSpinEditArretBus, RadioButtonArretBus, v->NumArretBus, Ailleurs(cv->ArretBus[v->NumArretBus-1].x, cv->ArretBus[v->NumArretBus-1].y)); // v3.0. v6.0.12
+ if (v->NumTram) FixeNumeroCase(CSpinEditTram, RadioButtonTram, v->NumTram, Ailleurs(cv->Tram[v->NumTram-1].x, cv->Tram[v->NumTram-1].y)); // v3.5. v6.0.12
+ if (v->NumArretTram) FixeNumeroCase(CSpinEditArretTram, RadioButtonArretTram, v->NumArretTram, Ailleurs(cv->ArretTram[v->NumArretTram-1].x, cv->ArretTram[v->NumArretTram-1].y)); // v3.5. v6.0.12
  if (v->NumTaxi) CSpinEditTaxi->Value=v->NumTaxi; // v3.6
  if (v->NumPlaceTaxi)
   {
+   int f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile; // v6.0.12 : queue de la file, si la simulation a défini les files (sinon OnChange ne déplace pas le curseur)
+   place_taxi *q=(cv->FileTaxi&&(f>=0)&&(f<cv->NbFilesTaxi))?cv->PlaceTaxi+cv->FileTaxi[f].NumPlaceQueue:nullptr;
    CSpinEditPlaceTaxi->Value=v->NumPlaceTaxi; // v3.6
-   CSpinEditFileTaxi->Value=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile+1; // v3.6
+   FixeNumeroCase(CSpinEditFileTaxi, RadioButtonFileTaxi, f+1, q&&Ailleurs(q->x, q->y)); // v3.6. v6.0.12
   }
  if (v->NumPlacePark) // v5.0
   {
+   int f=cv->PlacePark[v->NumPlacePark-1].NumFile; // v6.0.12 : comme pour les taxis
+   place_park *q=(cv->FilePark&&(f>=0)&&(f<cv->NbFilesPark))?cv->PlacePark+cv->FilePark[f].NumPlaceQueue:nullptr;
    CSpinEditPlacePark->Value=v->NumPlacePark;
-   CSpinEditFilePark->Value=cv->PlacePark[v->NumPlacePark-1].NumFile+1;
+   FixeNumeroCase(CSpinEditFilePark, RadioButtonFilePark, f+1, q&&Ailleurs(q->x, q->y)); // v6.0.12
   }
  if (v->NumVehlib) CSpinEditVehlib->Value=v->NumVehlib; // v5.3
  if (v->NumPlaceVehlib) // v5.3
