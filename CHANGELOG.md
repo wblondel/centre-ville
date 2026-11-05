@@ -4,6 +4,27 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.13] — aide de chaque fiche vérifiée
+
+Cette version ne change pas le comportement du programme. Les tests ne vérifiaient
+l'aide que de la fiche principale, de Rechercher, de Paramètres, des lignes de bus et de
+tram et de Carrefours. Ils vérifient maintenant F1 et le bouton Aide de chacune des 32
+fiches qui ont une aide, et n'y ont trouvé aucun bogue. Le format des fichiers `.cvw` ne
+change pas (0x530), ni la simulation des cartes livrées (golden master identique).
+
+### Tests
+
+Dans le test de chaque fiche, F1 frappée dans un de ses champs, puis un clic sur son bouton
+Aide s'il y en a un, doivent chacun ouvrir l'aide à la rubrique de la fiche. Les fiches
+nouvellement vérifiées sont Dimensions, Génération, Épidémie, Nature, Priorités, Feu,
+Priorités piétons, Feu de piétons, taxis, vehlibs, les six fiches de distances, les six
+fiches d'informations, Composition, Évolution, Statistiques véhicules, et Fluidité et
+trafic. Pour Paramètres, le bouton Aide est vérifié en plus de F1.
+
+Dans la version d'origine, la fiche Épidémie n'a pas de gestionnaire de F1, contrairement
+aux autres : F1 n'y ouvre rien, et seul son bouton Aide ouvre l'aide. Ce comportement est
+conservé, et le test le vérifie.
+
 ## [6.0.12] — fiche Rechercher et carte, trois bogues corrigés
 
 Cette version corrige trois bogues trouvés en testant les chemins de la carte

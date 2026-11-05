@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.12)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.13)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -382,7 +382,8 @@ bornée au chargement.
 Aide (phase 7) : F1 sur la fiche principale, sur Rechercher (non modale) et
 sur Paramètres (modale), bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 ouvrent la bonne page à la bonne rubrique (`QDesktopServices::openUrl`
-intercepté par `setUrlHandler("file")`).
+intercepté par `setUrlHandler("file")`) ; depuis la 6.0.13, F1 et le bouton Aide de
+chacune des autres fiches (voir « Aide des fiches »).
 `tests/app/test_aide.cpp` (CTest `interface.aide`) : les 57 entrées de
 `caCorresp` de l'original, recopiées dans le test, ouvrent la page de
 redirection vers `html/index.html#ANCRE` à côté de l'exécutable, et chaque
@@ -540,6 +541,33 @@ Tests ajoutés en 6.0.12 (`test_interface.cpp`) :
   au-delà du nombre d'éléments (`MaxValue` relevé le temps de la vérification). Puis, pour
   les éléments qui ont ce message, l'élément n° 1 sans position (forcée, comme dans
   `rechercheElementsNonDefinis`).
+
+## Aide des fiches
+
+En 6.0.12, l'aide n'était vérifiée que sur la fiche principale, Rechercher, Paramètres (F1
+seulement), les lignes de bus et de tram et Carrefours. Dans les 26 autres fiches qui ont
+une aide, ni F1 (`FormKeyDown`) ni le bouton Aide (`ButtonAideClick`) n'étaient testés.
+
+Depuis la 6.0.13, `VerifieAide` (`test_interface.cpp`) frappe F1 dans un contrôle de la
+fiche, puis clique sur son bouton Aide s'il y en a un. Chacun doit ouvrir `html/index.html`
+à la rubrique du `HelpContext` de la fiche. La rubrique attendue est écrite dans le test ;
+la table `caCorresp` est vérifiée à part par `test_aide.cpp`. Le contrôle doit pouvoir
+prendre le focus : comme dans la VCL, `KeyPreview` ne voit que les touches du contrôle
+actif, ou de la fiche si aucun de ses contrôles ne l'est. `VerifieAide` est appelé dans le
+test de chaque fiche, après sa capture :
+
+- `nouveauEtGeneration` et `dimensionsZoneBornees` : Génération et Dimensions ;
+- `ficheEpidemie`, `ficheNature`, `fichesPrioritesEtFeux` et
+  `fichesPrioritesEtFeuxPietons` ;
+- `fichesParametres` : Paramètres (bouton Aide en plus de F1), taxis et vehlibs ;
+- `fichesDistances` (six fiches, sans bouton Aide) et `fichesInfos` (six fiches) ;
+- `ficheComposition`, `fichesEvolutionEtVehicules` et `ficheFluiditeTrafic` (sans bouton
+  Aide). Évolution n'a que sa zone de dessin, qui ne prend pas le focus : F1 y est frappée
+  sur la fiche elle-même.
+
+Tous ces gestionnaires sont maintenant exécutés, et aucun bogue n'a été trouvé. Seule
+exception, conservée : la fiche Épidémie n'a pas de gestionnaire de F1 (voir « Comportements
+d'origine conservés »).
 
 ## Écarts connus avec l'original
 
@@ -829,6 +857,9 @@ fiche Feu se ferme. L'adresse reprise à chaque usage reste nécessaire
     emploi avec celui d'`AjouteFeu` (v5.1). Celui-ci a aussi rendu inutiles les messages
     `asNbFeuxLibresInsuffisant` et `asImpossibleCreerCarrefour`, qui ne sont jamais
     affichés.
+- **Épidémie, F1** : la fiche, ajoutée en 5.4.1, n'a ni `KeyPreview` ni `OnKeyDown` dans son
+  `.dfm`, contrairement aux autres fiches qui ont une aide. F1 n'y ouvre donc pas l'aide ;
+  son bouton Aide ouvre la rubrique « Paramètres de l'épidémie » (`HelpContext` 317).
 - **Vérification du réseau, files de taxis et de parking** : « La place … pointe sur plus
   d'une file » (`voie::ExistePlusieursTetesFile*`) compte les places voisines qui
   continuent dans la direction qui les sépare de la place, et non celles vers lesquelles la
