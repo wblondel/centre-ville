@@ -84,7 +84,8 @@
 //   - aide (phase 7) : F1 sur la fiche principale, une fiche non modale et une
 //     fiche modale, bouton Aide, Alt+Maj+F1, menus Sommaire et Tutoriel
 //     (QDesktopServices::openUrl intercepté ; la table des rubriques et les
-//     ancres sont vérifiées par test_aide.cpp).
+//     ancres sont vérifiées par test_aide.cpp) ; F1 et bouton Aide de chacune des
+//     autres fiches (v6.0.13, VerifieAide), dans le test de la fiche.
 // Les fiches modales sont pilotées par des étapes (QuandModale) : l'action
 // prévue est exécutée quand la fiche attendue devient la fiche modale active.
 // Simulations pas à pas (Demarre) : le minuteur de la simulation est arrêté et
@@ -1010,6 +1011,25 @@ class TestInterface : public QObject
    { // Aide contextuelle : adresse que charge la page de redirection (base.cpp)
     QRegularExpressionMatch m=QRegularExpression("url='([^']*)'").match(QString::fromUtf8(Contenu(Url.toLocalFile())));
     return m.hasMatch()?QUrl(m.captured(1)):Url;
+   }
+  void VerifieAide(QWidget *Champ, QWidget *BoutonAide, const char *Ancre, bool F1=true)
+   { // v6.0.13 : F1 frappée dans Champ (qui prend le focus), puis un clic sur le
+     // bouton Aide s'il y en a un, ouvrent chacun html/index.html#Ancre.
+     // F1=false : la fiche n'a pas de gestionnaire de F1, qui n'ouvre rien
+    QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
+    UrlsOuvertes.clear();
+    Touche(Champ, Qt::Key_F1);
+    qsizetype NbF1=UrlsOuvertes.size();
+    if (BoutonAide) Clique(BoutonAide);
+    QDesktopServices::unsetUrlHandler("file");
+    QString Fiche=Champ->window()->objectName();
+    QVERIFY2(NbF1==(F1?1:0), qPrintable(QString("%1 : %2 page(s) ouverte(s) par F1").arg(Fiche).arg(NbF1)));
+    QVERIFY2(UrlsOuvertes.size()==NbF1+(BoutonAide?1:0),
+             qPrintable(QString("%1 : %2 page(s) ouverte(s) par le bouton Aide").arg(Fiche).arg(UrlsOuvertes.size()-NbF1)));
+    QUrl Rubrique=QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html");
+    Rubrique.setFragment(Ancre);
+    for(const QUrl &u : UrlsOuvertes)
+     QVERIFY2(AdresseAide(u)==Rubrique, qPrintable(QString("%1 : %2 au lieu de #%3").arg(Fiche, AdresseAide(u).toString(), Ancre)));
    }
   public slots:
   void UrlOuverte(const QUrl &Url) { UrlsOuvertes<<Url; }
@@ -1969,8 +1989,14 @@ void TestInterface::nouveauEtGeneration()
   QVERIFY(!OuvreDemo("avant_generation.cvw").isEmpty()); // Dimensions proposées : celles du réseau ouvert
   alea::FixeGraine(12345);
   Messages.clear();
+  QuandModale([]() { return frmGeneration; }, [this]()
+   { // Dimensions : réponse par défaut (génération, sans les paramètres)
+    VerifieAide(frmGeneration->TrackBarTailleMinSegments, frmGeneration->ButtonAide, "GADUR"); // HelpContext 3112
+    Clique(frmGeneration->ButtonOk);
+   });
   QTest::mouseClick(frmSimulation->ToolButtonNouveau, Qt::LeftButton);
   alea::LibereGraine();
+  QVERIFY(Etapes.empty());
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
   QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville"));
   QCOMPARE(cv->NbX, NBXDEF);
@@ -2057,6 +2083,7 @@ void TestInterface::ficheEpidemie()
     frmEpidemie->CSpinEditChargeViraleFatale->Value=Charge+3;
     Clique(frmEpidemie->CheckBoxReinfections);
     CaptureFiche(frmEpidemie, "fiche_epidemie.png");
+    VerifieAide(frmEpidemie->CSpinEditInfectiosite, frmEpidemie->ButtonAide, "PDLE", false); // HelpContext 317, sans F1 (ni KeyPreview ni OnKeyDown)
     Clique(frmEpidemie->ButtonOk);
    });
   frmSimulation->Epidemie1->ElementQt()->trigger();
@@ -2115,6 +2142,7 @@ void TestInterface::ficheNature()
   QVERIFY(frmDefNature->ButtonAppliquer->Enabled);
   QVERIFY(frmDefNature->CheckBoxPelouse->Enabled);
   CaptureFiche(frmDefNature, "fiche_nature.png");
+  VerifieAide(frmDefNature->CheckBoxPelouse, frmDefNature->ButtonAide, "DDLNDUZ"); // HelpContext 45
   Clique(frmDefNature->ButtonAppliquer);
   for(int i=0; i<4; i++)
    for(int j=0; j<2; j++)
@@ -2174,6 +2202,7 @@ void TestInterface::fichesPrioritesEtFeux()
   CliqueChoix(Groupe, stop);
   QVERIFY(frmDefVoie->ButtonAppliquer->Enabled);
   CaptureFiche(frmDefVoie, "fiche_priorites.png");
+  VerifieAide(frmDefVoie->ButtonAppliquer, frmDefVoie->ButtonAide, "DDP"); // HelpContext 41
   Clique(frmDefVoie->ButtonOk);
   QVERIFY(!frmDefVoie->isVisible());
   QVERIFY(!frmSimulation->ActionPriorites->Checked);
@@ -2212,6 +2241,7 @@ void TestInterface::fichesPrioritesEtFeux()
   CliqueChoix(frmDefFeux->RadioGroupEtat, rouge);
   QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
   CaptureFiche(frmDefFeux, "fiche_feux.png");
+  VerifieAide(frmDefFeux->CSpinEditDureeVert, frmDefFeux->ButtonAide, "DDF"); // HelpContext 42
   Clique(frmDefFeux->ButtonOk);
   QVERIFY(!frmDefFeux->isVisible());
   QCOMPARE(cv->Feu[n-1].DureeVert, 7);
@@ -2281,6 +2311,7 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
   QVERIFY(!frmDefVoiePietons->ImageNN->Visible);
   QVERIFY(!frmDefVoiePietons->SpeedButtonS->icon().isNull());
   CaptureFiche(frmDefVoiePietons, "fiche_priorites_pietons.png");
+  VerifieAide(frmDefVoiePietons->ButtonOk, frmDefVoiePietons->ButtonAide, "DDPP"); // HelpContext 415
   int NbFeuxP=NbFeuxPietonsDefinis();
   // Clic sur le feu sud : feu créé (et son opposé), fiche Feux de piétons ; puis Annuler partout
   Clique(frmDefVoiePietons->SpeedButtonS);
@@ -2312,6 +2343,7 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
   frmDefFeuxPietons->CSpinEditDureeVert->Value=6;
   QVERIFY(frmDefFeuxPietons->ButtonAppliquer->Enabled);
   CaptureFiche(frmDefFeuxPietons, "fiche_feux_pietons.png");
+  VerifieAide(frmDefFeuxPietons->CSpinEditDureeVert, frmDefFeuxPietons->ButtonAide, "DDFDP"); // HelpContext 425
   Messages.clear();
   Clique(frmDefFeuxPietons->ButtonOk); // assistant (aucun feu de circulation lié) : « Non »
   QVERIFY(!frmDefFeuxPietons->isVisible());
@@ -2422,6 +2454,7 @@ void TestInterface::fichesParametres()
     CacheeTaxi=!frmParamSimul->isVisible();
     frmParamTaxi->CSpinEditNbMaxPersonnesTaxi->Value=NbMaxTaxi+1;
     CaptureFiche(frmParamTaxi, "fiche_parametres_taxis.png");
+    VerifieAide(frmParamTaxi->CSpinEditNbMaxPersonnesTaxi, frmParamTaxi->ButtonAide, "PDT"); // HelpContext 3123
     Clique(frmParamTaxi->ButtonOk);
    });
   QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefVehlibs); });
@@ -2430,6 +2463,7 @@ void TestInterface::fichesParametres()
     CacheeVehlib=!frmParamSimul->isVisible();
     frmParamVehlib->CSpinEditTauxRemplissage->Value=TauxVehlib-20;
     CaptureFiche(frmParamVehlib, "fiche_parametres_vehlibs.png");
+    VerifieAide(frmParamVehlib->CSpinEditTauxRemplissage, frmParamVehlib->ButtonAide, "PDV"); // HelpContext 3124
     Clique(frmParamVehlib->ButtonOk);
    });
   QuandModale([]() { return frmParamSimul; }, [&]()
@@ -2440,6 +2474,7 @@ void TestInterface::fichesParametres()
     frmParamSimul->CSpinEditProbaPsgPt->Value=ProbaPsgPt-10;
     CliqueChoix(frmParamSimul->RadioGroupVitesses, 2);
     CaptureFiche(frmParamSimul, "fiche_parametres.png");
+    VerifieAide(frmParamSimul->CSpinEditDureeOrange, frmParamSimul->ButtonAide, "PDLS"); // HelpContext 311
     Clique(frmParamSimul->ButtonOk);
    });
   Clique(frmSimulation->ToolButtonParametres);
@@ -3357,6 +3392,7 @@ namespace
   struct FicheDistances
    {
     const char *Nom; // capture fiche_distances_<Nom>.png
+    const char *Rubrique; // ancre de l'aide (F1)
     TForm *Fiche;
     TStringGrid *Grille;
     TAction *Action;
@@ -3396,7 +3432,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
   TfrmSimulation *s=frmSimulation;
   std::vector<FicheDistances> Fiches=
    {
-    {"parkings", frmAffDistParkings, frmAffDistParkings->StringGridDistances, s->ActionDistancesParkings,
+    {"parkings", "ADDJAE", frmAffDistParkings, frmAffDistParkings->StringGridDistances, s->ActionDistancesParkings,
      frmAffDistParkings->CheckBoxCouloirsBus,
      [](voie *v, bool c)
       {
@@ -3406,7 +3442,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        return t;
       },
      [s]() { s->MenuItemInfosDistancesEtapes->ElementQt()->trigger(); }},
-    {"arrets_bus", frmAffDistArretsBus, frmAffDistArretsBus->StringGridDistances, s->ActionDistancesArretsBus, nullptr,
+    {"arrets_bus", "ADDJAADB", frmAffDistArretsBus, frmAffDistArretsBus->StringGridDistances, s->ActionDistancesArretsBus, nullptr,
      [](voie *v, bool)
       {
        TableDistances t=TableRoute(v);
@@ -3415,7 +3451,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        return t;
       },
      [s]() { s->MenuItemDistancesArretsBus->ElementQt()->trigger(); }}, // menu contextuel de simulation
-    {"arrets_tram", frmAffDistArretsTram, frmAffDistArretsTram->StringGridDistances, s->ActionDistancesArretsTram, nullptr,
+    {"arrets_tram", "ADDJAADT", frmAffDistArretsTram, frmAffDistArretsTram->StringGridDistances, s->ActionDistancesArretsTram, nullptr,
      [](voie *v, bool)
       {
        TableDistances t;
@@ -3426,7 +3462,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        return t;
       },
      []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); }},
-    {"files_taxi", frmAffDistFilesTaxi, frmAffDistFilesTaxi->StringGridDistances, s->ActionDistancesFilesTaxi, nullptr,
+    {"files_taxi", "ADDJAFDT", frmAffDistFilesTaxi, frmAffDistFilesTaxi->StringGridDistances, s->ActionDistancesFilesTaxi, nullptr,
      [](voie *v, bool)
       {
        TableDistances t=TableRoute(v);
@@ -3435,7 +3471,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        return t;
       },
      [s]() { s->MenuItemInfosDistancesFilesTaxi->ElementQt()->trigger(); }},
-    {"files_parkings", frmAffDistFilesPark, frmAffDistFilesPark->StringGridDistances, s->ActionDistancesFilesPark,
+    {"files_parkings", "ADDJAFDP", frmAffDistFilesPark, frmAffDistFilesPark->StringGridDistances, s->ActionDistancesFilesPark,
      frmAffDistFilesPark->CheckBoxCouloirsBus,
      [](voie *v, bool c)
       {
@@ -3445,7 +3481,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        return t;
       },
      []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); }},
-    {"places_vehlib", frmAffDistPlacesVehlib, frmAffDistPlacesVehlib->StringGridDistances, s->ActionDistancesPlacesVehlib, nullptr,
+    {"places_vehlib", "ADDJAPDV", frmAffDistPlacesVehlib, frmAffDistPlacesVehlib->StringGridDistances, s->ActionDistancesPlacesVehlib, nullptr,
      [](voie *v, bool)
       {
        TableDistances t=TableRoute(v);
@@ -3544,6 +3580,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
       QCOMPARE((int)f.Grille->FixedRows, 0);
      }
     if (Captures) CaptureFiche(f.Fiche, QString("fiche_distances_%1.png").arg(f.Nom));
+    if (Captures) VerifieAide(f.Grille, nullptr, f.Rubrique); // HelpContext 63, 641 à 645 ; sans bouton Aide
     if (t.Nb>10)
      { // Clavier (TCustomGrid::KeyDown) : la case courante descend d'une page, la
        // grille défile pour la garder visible ; Ctrl+Début revient en haut
@@ -3696,6 +3733,7 @@ void TestInterface::fichesInfos()
    QVERIFY2(e.isEmpty(), qPrintable(e));
    QVERIFY(Q(f->GroupBoxVehicule->Caption).contains(QString::number(n)+" ("));
    CaptureFiche(f, "fiche_infos_vehicule.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUV"); // HelpContext 66
    SuitObjet("véhicule", Ecart, [n](int &x, int &y)
     {
      vehicule *Veh=cv->Vehicule+n-1;
@@ -3754,6 +3792,7 @@ void TestInterface::fichesInfos()
    QString e=Ecart(cv->TourCrt);
    QVERIFY2(e.isEmpty(), qPrintable(e));
    CaptureFiche(f, "fiche_infos_bus.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUB"); // HelpContext 671
    SuitObjet("bus", Ecart, [n](int &x, int &y)
     {
      x=cv->Bus[n-1].x; y=cv->Bus[n-1].y;
@@ -3808,6 +3847,7 @@ void TestInterface::fichesInfos()
    QString e=Ecart(cv->TourCrt);
    QVERIFY2(e.isEmpty(), qPrintable(e));
    CaptureFiche(f, "fiche_infos_tram.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUT"); // HelpContext 672
    SuitObjet("tram", Ecart, [n](int &x, int &y)
     {
      x=cv->Tram[n-1].x; y=cv->Tram[n-1].y;
@@ -3856,6 +3896,7 @@ void TestInterface::fichesInfos()
    QString e=Ecart(cv->TourCrt);
    QVERIFY2(e.isEmpty(), qPrintable(e));
    CaptureFiche(f, "fiche_infos_taxi.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUVDT"); // HelpContext 673
    SuitObjet("taxi", Ecart, [n](int &x, int &y)
     {
      x=cv->Taxi[n-1].x; y=cv->Taxi[n-1].y;
@@ -3898,6 +3939,7 @@ void TestInterface::fichesInfos()
    QString e=Ecart(cv->TourCrt);
    QVERIFY2(e.isEmpty(), qPrintable(e));
    CaptureFiche(f, "fiche_infos_vehlib.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUVL"); // HelpContext 674
    SuitObjet("vehlib", Ecart, [n](int &x, int &y)
     {
      x=cv->Vehlib[n-1].x; y=cv->Vehlib[n-1].y;
@@ -3940,6 +3982,7 @@ void TestInterface::fichesInfos()
    QString e=Ecart(cv->TourCrt);
    QVERIFY2(e.isEmpty(), qPrintable(e));
    CaptureFiche(f, "fiche_infos_pieton.png");
+   VerifieAide(f->ButtonOk, f->ButtonAide, "ISUP"); // HelpContext 68
    SuitObjet("piéton", Ecart, [n](int &x, int &y)
     {
      pieton *p=&cv->Pieton[n-1];
@@ -4176,6 +4219,7 @@ void TestInterface::dimensionsZoneBornees()
   Messages.clear();
   QuandModale([]() { return frmDimensionsZone; }, [&]()
    {
+    VerifieAide(frmDimensionsZone->CSpinEditNbX, frmDimensionsZone->ButtonAide, "DDDDLZDS"); // HelpContext 3111
     frmDimensionsZone->CSpinEditNbX->Value=NBXMAX+1;
     frmDimensionsZone->CSpinEditNbY->Value=NBYMAX;
     Clique(frmDimensionsZone->ButtonCreer);
@@ -6018,6 +6062,7 @@ void TestInterface::ficheComposition()
    {
     Verifie();
     CaptureFiche(frmStatsComposition, "fiche_composition.png");
+    VerifieAide(frmStatsComposition->ButtonOk, frmStatsComposition->ButtonAide, "SSLCDR"); // HelpContext 315
     Clique(frmStatsComposition->ButtonOk);
    });
   Clique(frmSimulation->ToolButtonComposition);
@@ -6151,6 +6196,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   QString e=VerifieCourbes(false);
   QVERIFY2(e.isEmpty(), qPrintable(e));
   CaptureFiche(f, "fiche_evolution.png");
+  VerifieAide(f, nullptr, "EGDLS"); // HelpContext 611 ; sans contrôle qui prenne le focus ni bouton Aide
   // Par pourcentage (menu Affichage), sans quadrillage
   s->MenuItemParPourcentage->ElementQt()->trigger();
   QCOMPARE((int)cv->TypeStats, (int)par_pourcentage);
@@ -6253,6 +6299,7 @@ void TestInterface::fichesEvolutionEtVehicules()
     QVERIFY2(e.isEmpty(), qPrintable(e));
    }
   CaptureFiche(g, "fiche_stats_vehicules.png");
+  VerifieAide(g->StringGridStatsVehicules, g->ButtonAide, "SDVDUEAUA"); // HelpContext 62
   // Second onglet (clic) : recalcul immédiat sur les tours
   QTest::mouseClick(Onglets, Qt::LeftButton, Qt::KeyboardModifiers(), Onglets->tabRect(1).center());
   QCOMPARE((int)g->TabControl->TabIndex, 1);
@@ -6411,6 +6458,7 @@ void TestInterface::ficheFluiditeTrafic()
     g->Row=Depart.y();
     Etape("attente", Verifie(0, 0, 0));
     CaptureFiche(f, "fiche_fluidite_trafic.png");
+    VerifieAide(f->CheckBoxParkingDepart, nullptr, "SDFEDT"); // HelpContext 612 ; sans bouton Aide
     Capture("carte_fluidite_trafic.png");
     // Trafic
     CliqueChoix(f->RadioGroupType, 1);
