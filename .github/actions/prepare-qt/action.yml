@@ -10,6 +10,10 @@ inputs:
     description: Paquets apt en plus, sous Linux
     required: false
     default: ''
+  setup-python:
+    description: "Python de setup-python pour aqtinstall ; 'false' : celui du système (conteneur)"
+    required: false
+    default: 'true'
 
 runs:
   using: composite
@@ -38,3 +42,4 @@ runs:
       with:
         version: '6.8.3'
         cache: true
+        setup-python: ${{ inputs.setup-python }}

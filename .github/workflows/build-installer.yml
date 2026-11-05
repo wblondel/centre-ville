@@ -267,20 +267,43 @@ jobs:
   linux:
     name: AppImage Linux
     needs: version
-    # Ubuntu 22.04 : glibc 2.35, l'AppImage tourne aussi sur les systèmes plus anciens que 24.04
-    runs-on: ubuntu-22.04
+    # Ubuntu 22.04 : glibc 2.35, l'AppImage tourne aussi sur les systèmes plus anciens que 24.04.
+    # Conteneur sur un runner 24.04, l'image ubuntu-22.04 de GitHub étant appelée à disparaître
+    runs-on: ubuntu-24.04
+    container:
+      image: ubuntu:22.04@sha256:076e7bf82319619f28dd0aa9c02ab34b055ad37100395b4f49a2ffba04fb5e11
     timeout-minutes: 30
     env:
       PAQUET: ${{ needs.version.outputs.paquet }}
+      LANG: C.UTF-8
+      DEBIAN_FRONTEND: noninteractive
 
     steps:
+      # Ce que l'image ubuntu-22.04 de GitHub fournissait : sudo (prepare-qt, install-qt-action),
+      # git (checkout), Python 3 (aqtinstall), wget, xauth (xvfb-run) et CMake 3.31.6 (3.25 au
+      # moins ; celui d'Ubuntu 22.04 est en 3.22), version figée et empreinte vérifiée
+      - name: Install tools of the runner image
+        working-directory: /tmp
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends ca-certificates git make python3 python3-pip sudo wget xauth
+          wget -q https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-linux-x86_64.tar.gz
+          sha256sum --check --strict <<'EMPREINTE'
+          5a1133ff103c71eb5120e2cc3de922733e7d8a26a98ae716397e8676adb367bf  cmake-3.31.6-linux-x86_64.tar.gz
+          EMPREINTE
+          tar -xzf cmake-3.31.6-linux-x86_64.tar.gz -C /opt
+          echo /opt/cmake-3.31.6-linux-x86_64/bin >> "$GITHUB_PATH"
+
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Python d'Ubuntu 22.04 : celui de setup-python, pris dans le cache d'outils du runner
+      # 24.04, demanderait une glibc plus récente que celle du conteneur
       - name: Prepare Qt
         uses: ./.github/actions/prepare-qt
         with:
+          setup-python: 'false'
           paquets-linux: >-
             g++-12 xvfb libopengl0 libxkbcommon-x11-0 libdbus-1-3 libxcb-cursor0 libxcb-icccm4
             libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0
