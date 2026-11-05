@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.13)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.14)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -121,8 +121,9 @@ installation hors AppImage, choisir un préfixe dédié (`/opt/centre-ville`).
 `.github/workflows/build-installer.yml` compile sur les trois systèmes, sur
 un tag `v*` ou à la main, et produit l'installeur Windows, le `.dmg`
 (universel arm64 et x86_64, macOS 12 ou plus récent), l'AppImage x86_64
-(construite sous Ubuntu 22.04) et les archives des sources ; il les joint à
-une release seulement sur un tag. Ni signature ni notarisation.
+(construite dans un conteneur Ubuntu 22.04, pour sa glibc 2.35, depuis la 6.0.14) et
+les archives des sources ; il les joint à une release seulement sur un tag. Ni
+signature ni notarisation.
 
 ## Organisation
 

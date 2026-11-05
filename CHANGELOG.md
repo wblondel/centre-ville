@@ -4,6 +4,29 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.14] — AppImage construite dans un conteneur Ubuntu 22.04
+
+Cette version ne change pas le programme. L'AppImage Linux était construite sur l'image
+`ubuntu-22.04` de GitHub, gardée pour sa glibc 2.35, mais cette image est appelée à
+disparaître : le support standard d'Ubuntu 22.04 finit en avril 2027. L'AppImage est
+maintenant construite dans un conteneur Ubuntu 22.04, sur l'image `ubuntu-24.04`. Elle
+reste compatible avec les mêmes systèmes : glibc 2.35 ou plus récente (Ubuntu 22.04,
+Debian 12…). Le format des fichiers `.cvw` ne change pas (0x530), ni la simulation des
+cartes livrées (golden master identique).
+
+### Paquets
+
+Avant ce changement, l'AppImage construite dans le conteneur à partir des sources de la
+6.0.13 a été comparée à celle de la release 6.0.13. Elle a les mêmes 419 fichiers, avec la
+même version la plus récente de glibc demandée (2.34). Seuls trois fichiers diffèrent :
+
+- `cvw`, de 13 octets, la longueur du dossier de compilation ;
+- `libglib-2.0` et `libgthread-2.0`, qui viennent de la mise à jour 2.72.4-0ubuntu2.11
+  d'Ubuntu 22.04, publiée le 4 novembre 2026, au lieu de la 2.72.4-0ubuntu2.10 de l'image
+  de GitHub.
+
+Les paquets Windows et macOS ne changent pas de construction.
+
 ## [6.0.13] — aide de chaque fiche vérifiée
 
 Cette version ne change pas le comportement du programme. Les tests ne vérifiaient
