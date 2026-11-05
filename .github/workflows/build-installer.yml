@@ -280,13 +280,14 @@ jobs:
 
     steps:
       # Ce que l'image ubuntu-22.04 de GitHub fournissait : sudo (prepare-qt, install-qt-action),
-      # git (checkout), Python 3 (aqtinstall), wget, xauth (xvfb-run) et CMake 3.31.6 (3.25 au
-      # moins ; celui d'Ubuntu 22.04 est en 3.22), version figée et empreinte vérifiée
+      # git (checkout), Python 3 (aqtinstall), wget, file (appimagetool), xauth (xvfb-run) et
+      # CMake 3.31.6 (3.25 au moins ; celui d'Ubuntu 22.04 est en 3.22), version figée et
+      # empreinte vérifiée
       - name: Install tools of the runner image
         working-directory: /tmp
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends ca-certificates git make python3 python3-pip sudo wget xauth
+          apt-get install -y --no-install-recommends ca-certificates file git make python3 python3-pip sudo wget xauth
           wget -q https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6-linux-x86_64.tar.gz
           sha256sum --check --strict <<'EMPREINTE'
           5a1133ff103c71eb5120e2cc3de922733e7d8a26a98ae716397e8676adb367bf  cmake-3.31.6-linux-x86_64.tar.gz
