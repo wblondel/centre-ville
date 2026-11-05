@@ -48,17 +48,18 @@ GrilleSimulation::GrilleSimulation(QWidget *Parent) : ControleVcl<QAbstractScrol
   TopRow.Definit([this]() { return HautGauche.Y; }, [this](const int &r) { DefinitHautGauche(HautGauche.X, r); });
   DefilementAuto.setInterval(60);
   QObject::connect(&DefilementAuto, &QTimer::timeout, this, [this]()
-   { // Sélection à la souris hors de la zone visible : défilement (minuterie de 60 ms de la VCL)
+   { // Sélection à la souris hors des cases entièrement visibles : l'ancre avance d'une case
+     // par tic de la minuterie de 60 ms, et la vue la suit (TCustomGrid::WMTimer et
+     // TimedScroll). v6.0.12 : la vue avançait d'une case, puis l'ancre allait sous la souris
+     // (plusieurs cases par tic, selon la distance)
     if (!SelectionEnCours) return;
     QPoint p=DernierePosition;
-    int g=HautGauche.X, h=HautGauche.Y;
-    if (p.x()<0) g--; else if (p.x()>=viewport()->width()) g++;
-    if (p.y()<0) h--; else if (p.y()>=viewport()->height()) h++;
-    if ((g!=HautGauche.X)||(h!=HautGauche.Y))
-     {
-      DefinitHautGauche(g, h);
-      MoveAnchor(CaseEn(p, true));
-     }
+    TGridCoord a=Ancre;
+    if (p.x()<0) { if (a.X>0) a.X--; }
+    else if ((p.x()>LimiteVisible(true))&&(a.X<NbColonnes-1)) a.X++;
+    if (p.y()<0) { if (a.Y>0) a.Y--; }
+    else if ((p.y()>LimiteVisible(false))&&(a.Y<NbLignes-1)) a.Y++;
+    if ((a.X!=Ancre.X)||(a.Y!=Ancre.Y)) MoveAnchor(a);
    });
   MetAJourSelection();
  }
@@ -92,6 +93,16 @@ int GrilleSimulation::LignesVisibles() const
   return qMax(1, viewport()->height()/DefaultRowHeight);
  }
 //---------------------------------------------------------------------------
+int GrilleSimulation::DerniereVisible(bool Colonne) const
+ { // v6.0.12 : TGridAxisDrawInfo::LastFullVisibleCell
+  return Colonne?qMin(NbColonnes-1, HautGauche.X+ColonnesVisibles()-1):qMin(NbLignes-1, HautGauche.Y+LignesVisibles()-1);
+ }
+//---------------------------------------------------------------------------
+int GrilleSimulation::LimiteVisible(bool Colonne) const
+ { // v6.0.12 : TGridAxisDrawInfo::FullVisBoundary, bord de la dernière case entièrement visible
+  return Colonne?(DerniereVisible(true)-HautGauche.X+1)*DefaultColWidth:(DerniereVisible(false)-HautGauche.Y+1)*DefaultRowHeight;
+ }
+//---------------------------------------------------------------------------
 TRect GrilleSimulation::CellRect(int ACol, int ARow) const
  { // TCustomGrid::CellRect : rectangle dans le contrôle (bords droit et bas exclus)
   int x=(ACol-HautGauche.X)*DefaultColWidth, y=(ARow-HautGauche.Y)*DefaultRowHeight;
@@ -104,18 +115,13 @@ QRect GrilleSimulation::RectGrille(const TGridRect &r) const
   return QRect(a.Left, a.Top, b.Right-a.Left, b.Bottom-a.Top);
  }
 //---------------------------------------------------------------------------
-TGridCoord GrilleSimulation::CaseEn(const QPoint &p, bool Bornee) const
- {
+TGridCoord GrilleSimulation::CaseEn(const QPoint &p) const
+ { // Case sous le point, (-1, -1) hors de la grille. v6.0.12 : sans la variante bornée de
+   // l'ancienne minuterie de défilement
   TGridCoord c;
   c.X=HautGauche.X+(p.x()>=0?p.x()/DefaultColWidth:-1);
   c.Y=HautGauche.Y+(p.y()>=0?p.y()/DefaultRowHeight:-1);
-  if (Bornee)
-   {
-    c.X=qBound(0, c.X, NbColonnes-1);
-    c.Y=qBound(0, c.Y, NbLignes-1);
-   }
-  else
-   if ((c.X<0)||(c.X>=NbColonnes)||(c.Y<0)||(c.Y>=NbLignes)) c.X=c.Y=-1;
+  if ((c.X<0)||(c.X>=NbColonnes)||(c.Y<0)||(c.Y>=NbLignes)) c.X=c.Y=-1;
   return c;
  }
 //---------------------------------------------------------------------------
@@ -296,7 +302,7 @@ void GrilleSimulation::mousePressEvent(QMouseEvent *e)
  { // TCustomGrid::MouseDown
   setFocus(Qt::MouseFocusReason);
   if (e->button()!=Qt::LeftButton) return; // clic droit : pas de changement de case
-  TGridCoord c=CaseEn(e->position().toPoint(), false);
+  TGridCoord c=CaseEn(e->position().toPoint());
   if (c.X<0) return;
   SelectionEnCours=true;
   DernierePosition=e->position().toPoint();
@@ -309,10 +315,16 @@ void GrilleSimulation::mousePressEvent(QMouseEvent *e)
 //---------------------------------------------------------------------------
 void GrilleSimulation::mouseMoveEvent(QMouseEvent *e)
  { // Glisser : l'ancre suit la souris, la case courante reste celle du clic
+   // (TCustomGrid::MouseMove, gsSelecting). v6.0.12 : comme la VCL, pas au-delà de la case qui
+   // suit la dernière case entièrement visible, ni à gauche ou au-dessus des cases : au-delà,
+   // la minuterie fait avancer l'ancre (l'ancre allait sous la souris, à plusieurs cases de la
+   // vue, et un mouvement à gauche ou au-dessus faisait défiler d'une case)
   if (!SelectionEnCours) return;
   DernierePosition=e->position().toPoint();
-  TGridCoord c=CaseEn(DernierePosition, false);
-  if (c.X>=0) MoveAnchor(c);
+  TGridCoord c=CaseEn(DernierePosition);
+  if ((DernierePosition.x()>=0)&&(DernierePosition.y()>=0)&&(c.X>=0)&&
+      (c.X<=DerniereVisible(true)+1)&&(c.Y<=DerniereVisible(false)+1)) // v6.0.12
+   MoveAnchor(c);
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::mouseReleaseEvent(QMouseEvent *e)
@@ -354,9 +366,12 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
    {
     QPoint g=e->globalPos();
     if (e->reason()!=QContextMenuEvent::Mouse)
-     { // Touche Menu / Maj+F10 : sous la case courante
+     { // Touche Menu / Maj+F10 : sous la case courante. v6.0.12 : si elle n'est pas
+       // entièrement visible, en haut à gauche des cases, comme la VCL (le menu s'ouvrait
+       // hors de la grille)
       TRect r=CellRect(Courante.X, Courante.Y);
-      g=viewport()->mapToGlobal(QPoint(r.Left, r.Bottom));
+      bool Visible=viewport()->rect().contains(r.Qt());
+      g=viewport()->mapToGlobal(Visible?QPoint(r.Left, r.Bottom):QPoint(0, 0));
      }
     PopupMenu->Popup(g.x(), g.y());
    }

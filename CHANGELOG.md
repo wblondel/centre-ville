@@ -4,6 +4,43 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.12] — fiche Rechercher et carte, trois bogues corrigés
+
+Cette version corrige trois bogues trouvés en testant les chemins de la carte
+(`grille/GrilleSimulation.cpp`) et de la fiche Rechercher que les tests ne parcouraient pas :
+le premier vient de l'original, les deux autres du port. Le format des fichiers `.cvw` ne
+change pas (0x530), ni la simulation des cartes livrées (golden master identique).
+
+### Bogues corrigés
+
+- **Rechercher déplaçait le curseur à son ouverture** : sur une case qui porte le numéro d'un
+  élément posé ailleurs (arrière d'un bus ou d'un tram, autre case d'un arrêt de bus ou de
+  tram, place de taxi ou de parking dont la file commence ailleurs), la fiche plaçait le
+  curseur sur l'avant du véhicule, la case de l'arrêt ou la queue de la file. Les
+  coordonnées affichées restaient pourtant celles de la case. Le curseur reste maintenant sur
+  la case, sauf si le bouton de cet élément est coché : la fiche cherche alors l'élément,
+  comme avant.
+- **Sélection glissée au-delà de la carte visible** : la carte défilait de plusieurs cases
+  toutes les 60 ms, d'autant plus que la souris était loin, et la sélection sautait jusqu'à
+  la case sous la souris. Un mouvement à gauche ou au-dessus de la carte la faisait aussi
+  défiler. Comme dans la version d'origine, la sélection ne s'étend plus que d'une case
+  au-delà des cases visibles, puis d'une case toutes les 60 ms.
+- **Menu contextuel ouvert au clavier** (touche Menu ou Maj+F10, sous Windows et Linux) : il
+  s'ouvrait hors de la carte quand la case courante n'était pas visible. Il s'ouvre alors en
+  haut à gauche de la carte, comme dans la version d'origine.
+
+### Tests
+
+Nouveaux tests de l'interface :
+
+- l'ouverture de Rechercher sur chacune de ces cases, avec le bouton Coordonnées puis celui
+  de l'élément coché, et sur la case de l'élément ;
+- le message de chaque sorte d'élément de Rechercher : numéro au-delà du nombre d'éléments,
+  élément non utilisé ;
+- la carte au clavier (flèches, Maj, Ctrl, Origine, Fin, pages), à la molette et aux barres
+  de défilement, dans une fenêtre plus petite que la carte ;
+- la sélection glissée au-delà de la vue, et le menu contextuel à la souris et au clavier.
+
 ## [6.0.11] — fiches Priorités après une commande sur la sélection
 
 Cette version corrige un bogue de l'original repéré en testant la fiche Carrefours. Le format

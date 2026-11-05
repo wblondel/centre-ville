@@ -7,7 +7,8 @@
 //   - case courante (Col, Row) et ancre : la sélection (Selection) est le
 //     rectangle qui les joint (goRangeSelect) ; le clic place les deux, le
 //     glisser et Maj+clic déplacent l'ancre, Maj+flèches déplacent la case
-//     courante ;
+//     courante ; en glissant hors des cases entièrement visibles, l'ancre avance
+//     d'une case par tic d'une minuterie de 60 ms (v6.0.12) ;
 //   - OnClick au relâchement du bouton et à chaque déplacement au clavier ou à
 //     la molette (FocusCell), OnDblClick sans déplacement, clic droit sans
 //     changement de case puis menu contextuel PopupMenu ;
@@ -54,7 +55,7 @@ class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMen
   void MetAJourSelection();
   QRect RectGrille(const TGridRect &r) const; // en pixels du viewport
   void InvalideSelection(const TGridRect &Ancienne);
-  TGridCoord CaseEn(const QPoint &p, bool Bornee) const;
+  TGridCoord CaseEn(const QPoint &p) const;
   void MoveCurrent(int ACol, int ARow, bool MoveAnchor);
   void MoveAnchor(TGridCoord NouvelleAncre);
   void FocusCell(int ACol, int ARow, bool MoveAnchor);
@@ -62,6 +63,8 @@ class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMen
   void DefinitHautGauche(int Gauche, int Haut);
   int ColonnesVisibles() const; // cases entièrement visibles
   int LignesVisibles() const;
+  int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
+  int LimiteVisible(bool Colonne) const; // v6.0.12 : son bord droit ou bas, en pixels du viewport
   public:
   // Propriétés de TDrawGrid utilisées par la fiche
   Propriete<int> ColCount, RowCount, Col, Row, LeftCol, TopRow;

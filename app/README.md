@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.11)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.12)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -509,6 +509,38 @@ Tests ajoutés en 6.0.10 (`test_interface.cpp`) :
   clic restait sans effet, et la fiche n'était fermée qu'au bout des 10 s de garde du
   test. Il la ferme maintenant par Échap.
 
+## Couverture de `grille/GrilleSimulation.cpp` et `f_rech.cpp`
+
+En 6.0.11, 82 lignes sur 371 de `GrilleSimulation.cpp` n'étaient exécutées par aucun test
+(77,9 %). Toutes les cartes tiennent dans la fenêtre des tests, qui s'ajuste à la carte : la
+vue ne défilait jamais. Ni le clavier, ni la molette, ni le menu contextuel, ni la
+minuterie de la sélection glissée n'étaient testés. Dans `f_rech.cpp`, 75 lignes sur 518
+n'étaient pas exécutées (85,5 %) : les messages « n° incorrect » et « non utilisé » de la
+plupart des éléments, et l'ouverture sur une place de taxi. Les tests de la 6.0.12 laissent
+une ligne non exécutée dans chacun des deux fichiers :
+
+- `GrilleSimulation::MetAJourDefilement` : le retour de la vue dans les nouvelles bornes.
+  Il est défensif : `setRange` ramène déjà la valeur des barres de défilement, et
+  `scrollContentsBy` la vue.
+- `TfrmRecherche::RafraichitAffichage` : le `default` du `switch`. Un bouton est toujours
+  coché.
+
+Tests ajoutés en 6.0.12 (`test_interface.cpp`) :
+
+- `grilleAuClavierALaMoletteEtAuxBarres` : Démo dans une fenêtre de 500 × 400. On vérifie
+  chaque touche de `TCustomGrid::KeyDown` (case courante, sélection, vue, nombre de
+  `OnClick`, rien au bord), la molette par crans de 120 (même en deux fois), les barres de
+  défilement, et le retrait des barres quand la fenêtre est agrandie. Ctrl+flèches est vérifié
+  en simulation (voir « Comportements d'origine conservés »).
+- `selectionAuDelaDeLaVue` et `menuContextuelDeLaGrille` : voir les corrections de la
+  6.0.12. Le premier vérifie aussi que la minuterie s'arrête au relâchement, après un seul
+  `OnClick`. Le second vérifie qu'un clic droit ne change pas de case.
+- `rechercheSansDeplacerLeCurseur` : voir les corrections de la 6.0.12.
+- `rechercheMessagesDeChaqueElement` : pour chacune des quinze sortes d'éléments, un numéro
+  au-delà du nombre d'éléments (`MaxValue` relevé le temps de la vérification). Puis, pour
+  les éléments qui ont ce message, l'élément n° 1 sans position (forcée, comme dans
+  `rechercheElementsNonDefinis`).
+
 ## Écarts connus avec l'original
 
 Comportement :
@@ -677,6 +709,29 @@ pointe sur le nouveau le temps de la lecture). En cas d'échec, message et rése
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
 
+## Corrections de la 6.0.12 (annotées `// v6.0.12`)
+
+| Commande | Original ou 6.0.11 | 6.0.12 |
+|---|---|---|
+| Rechercher, ouverture (`TfrmRecherche::FormShow`) | Original : les numéros de la case sont posés avec leur `OnChange`, qui place le curseur sur l'élément. Sur l'arrière d'un bus ou d'un tram, sur une autre case d'un arrêt de bus ou de tram, ou sur une place dont la file commence ailleurs, le curseur quitte la case pour l'avant du véhicule, la case de l'arrêt ou la queue de la file. Les champs X et Y gardent pourtant la case. | `FixeNumeroCase` : un tel numéro est posé sans `OnChange`, comme celui que `FixeNumeroMax` ramène dans les bornes (6.0.2), car ouvrir la fiche ne doit pas déplacer le curseur. Si le bouton de l'élément est coché, la fiche le cherche, comme après un clic sur le bouton. Sur la case de l'élément, rien ne change (texte de la barre d'état). |
+| Sélection glissée hors des cases entièrement visibles (`GrilleSimulation`) | Port : la souris place l'ancre sous elle, à plusieurs cases de la vue s'il le faut, et un mouvement à gauche ou au-dessus des cases fait défiler d'une case. La minuterie de 60 ms fait défiler la vue d'une case, puis remet l'ancre sous la souris. La sélection avance donc de plusieurs cases par tic, selon la distance de la souris. | Comme `TCustomGrid` (`MouseMove`, `WMTimer`, `TimedScroll`) : la souris ne place l'ancre que jusqu'à la case qui suit la dernière entièrement visible, et jamais à gauche ni au-dessus des cases. Au-delà, la minuterie avance l'ancre d'une case par tic, et la vue la suit. |
+| Menu contextuel au clavier, touche Menu ou Maj+F10 (`GrilleSimulation::contextMenuEvent`) | Port : le menu s'ouvre sous la case courante, même quand elle n'est pas visible, donc hors de la grille, voire de l'écran. | Si la case n'est pas entièrement visible, le menu s'ouvre en haut à gauche des cases, comme dans la VCL (`WMContextMenu`). |
+
+Tests ajoutés en 6.0.12 (`test_interface.cpp`) :
+
+- `rechercheSansDeplacerLeCurseur` : Géant au tour 15, une case de chaque sorte (bus, arrêt
+  de bus, tram, arrêt de tram, file de taxis, file de parkings) où l'élément est ailleurs.
+  Avant d'ouvrir la fiche, le champ reçoit un autre numéro, pour que son `OnChange` ait lieu.
+  Le curseur doit rester sur la case avec le bouton Coordonnées, aller sur l'élément avec le
+  bouton de l'élément, et rester sur la case de l'élément quand on l'ouvre là. Sans la
+  correction, les six cases échouent.
+- `selectionAuDelaDeLaVue` : l'ancre ne dépasse pas la case qui suit la dernière visible,
+  même quand la souris est bien au-delà, et rien ne bouge à gauche des cases. Ensuite, la
+  minuterie n'avance pas de plus d'une case par tic (borne tirée de la durée mesurée), et la
+  vue suit l'ancre.
+- `menuContextuelDeLaGrille` : position du menu, à la souris et au clavier, la case courante
+  étant visible, puis cachée à gauche, puis en haut.
+
 ## Corrections de la 6.0.11 (annotées `// v6.0.11`)
 
 | Commande | Original | 6.0.11 |
@@ -758,6 +813,11 @@ fiche Feu se ferme. L'adresse reprise à chaque usage reste nécessaire
 
 ## Comportements d'origine conservés
 
+- **Carte, Ctrl+flèches** (Cmd ou Contrôle sur macOS) : en édition, ce sont les raccourcis
+  des actions Direction vers le haut, la droite, le bas et la gauche. Comme dans la VCL, ils
+  passent avant `TCustomGrid::KeyDown`. La carte ne défile par Ctrl+flèches (d'une page vers
+  la gauche ou la droite, d'une ligne vers le haut ou le bas) que lorsque ces actions sont
+  grisées, en simulation par exemple.
 - **Carrefours** :
   - Le bouton Annuler est invisible (0 × 0 pixel, `Cancel`) : la fiche se ferme par
     Échap ou par sa case de fermeture.
