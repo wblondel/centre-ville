@@ -55,13 +55,16 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
 // dessinées par Qt, même sous Windows où il les trouve (il prend alors une
 // police de secours plus large : libellés coupés). Leurs équivalents
 // TrueType passent devant : Microsoft Sans Serif (aux mêmes mesures, fournie
-// par Windows), Verdana ou Tahoma ; absents, les substitutions de
+// par Windows et par macOS) ; absente, les substitutions de
 // InitialiseApplication (application.cpp) s'appliquent.
+// v6.0.16 : Microsoft Sans Serif aussi pour Small Fonts, au lieu de Verdana,
+// plus large de 13 % en moyenne (jusqu'à 35 %) : les notes en petits
+// caractères des fiches étaient coupées
 //---------------------------------------------------------------------------
 QStringList FamillesQt(const QString &Famille)
  {
-  if (Famille==QLatin1String("MS Sans Serif")) return {"Microsoft Sans Serif", Famille};
-  if (Famille==QLatin1String("Small Fonts")) return {"Verdana", "Tahoma", Famille};
+  if ((Famille==QLatin1String("MS Sans Serif"))||(Famille==QLatin1String("Small Fonts")))
+   return {"Microsoft Sans Serif", Famille};
   return {Famille};
  }
 //---------------------------------------------------------------------------
