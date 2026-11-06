@@ -101,12 +101,12 @@ namespace
   QSet<QString> Ancres(const QString &asPage)
    {
     QSet<QString> Resultat;
-    QRegularExpression Motif("<a\\s[^>]*\\bname\\s*=\\s*\"([^\"]+)\"|\\bid\\s*=\\s*\"([^\"]+)\"",
+    QRegularExpression const Motif("<a\\s[^>]*\\bname\\s*=\\s*\"([^\"]+)\"|\\bid\\s*=\\s*\"([^\"]+)\"",
                              QRegularExpression::CaseInsensitiveOption);
-    QString stPage=QString::fromUtf8(Contenu(asPage));
+    QString const stPage=QString::fromUtf8(Contenu(asPage));
     for(auto i=Motif.globalMatch(stPage); i.hasNext(); )
      {
-      QRegularExpressionMatch m=i.next();
+      QRegularExpressionMatch const m=i.next();
       Resultat<<(m.captured(1).isEmpty()?m.captured(2):m.captured(1));
      }
     return Resultat;
@@ -116,7 +116,7 @@ namespace
   QStringList Fichiers(const QString &asDossier)
    {
     QStringList Resultat;
-    QDir d(asDossier);
+    QDir const d(asDossier);
     for(QDirIterator i(asDossier, QDir::Files|QDir::Hidden, QDirIterator::Subdirectories); i.hasNext(); ) {
      Resultat<<d.relativeFilePath(i.next());
 }
@@ -132,9 +132,9 @@ class TestAide : public QObject
   QString stRepExe;     // dossier de l'exécutable des tests (stRepAide)
   QString Cible(const QUrl &Page)
    { // Adresse chargée par la page de redirection (balise meta et lien)
-    QString stPage=QString::fromUtf8(Contenu(Page.toLocalFile()));
-    QRegularExpressionMatch Meta=QRegularExpression("<meta http-equiv=\"refresh\" content=\"0; url='([^']*)'\">").match(stPage);
-    QRegularExpressionMatch Lien=QRegularExpression("<a href=\"([^\"]*)\">").match(stPage);
+    QString const stPage=QString::fromUtf8(Contenu(Page.toLocalFile()));
+    QRegularExpressionMatch const Meta=QRegularExpression("<meta http-equiv=\"refresh\" content=\"0; url='([^']*)'\">").match(stPage);
+    QRegularExpressionMatch const Lien=QRegularExpression("<a href=\"([^\"]*)\">").match(stPage);
     if (!Meta.hasMatch()||!Lien.hasMatch()||(Meta.captured(1)!=Lien.captured(1))) { return {};
 }
     return Meta.captured(1).replace("&amp;", "&");
@@ -164,13 +164,13 @@ void TestAide::cleanupTestCase()
 //---------------------------------------------------------------------------
 void TestAide::tableDesContextes()
  { // Table caCorresp de l'original : chaque HelpContext ouvre html/index.html#ANCRE
-  QSet<QString> AncresGuide=Ancres(CV_DOSSIER_DOCS "/guide/index.html");
+  QSet<QString> const AncresGuide=Ancres(CV_DOSSIER_DOCS "/guide/index.html");
   QVERIFY(AncresGuide.size()>57);
   QCOMPARE(std::size(CorrespOriginal), (std::size_t)57); // NBCONTEXTESAIDE
   for(const auto &e : CorrespOriginal)
    {
-    int HelpContext=e.Numero;
-    QString stAncre=e.szHREF;
+    int const HelpContext=e.Numero;
+    QString const stAncre=e.szHREF;
     QVERIFY2(AncresGuide.contains(stAncre), qPrintable("Ancre absente de docs/guide/index.html : "+stAncre));
     QWidget Fiche;
     Fiche.setProperty("vclHelpContext", HelpContext);
@@ -179,7 +179,7 @@ void TestAide::tableDesContextes()
     QCOMPARE(Ouvertes.size(), 1);
     // Page de redirection : fichier local sans ancre, que le système ouvre
     // tel quel ; elle charge l'adresse de l'aide avec son ancre
-    QUrl Page=Ouvertes[0];
+    QUrl const Page=Ouvertes[0];
     QVERIFY2(Page.isLocalFile()&&!Page.hasFragment(), qPrintable(Page.toString()));
     QVERIFY(QFile::exists(Page.toLocalFile()));
     QUrl Attendue=QUrl::fromLocalFile(stRepExe+"/html/index.html");
@@ -190,21 +190,21 @@ void TestAide::tableDesContextes()
 //---------------------------------------------------------------------------
 void TestAide::contextesDesFiches()
  { // HelpContext des fiches et des composants (.dfm -> .ui) : tous dans la table
-  QSet<QString> AncresGuide=Ancres(CV_DOSSIER_DOCS "/guide/index.html");
-  QRegularExpression Propriete("<property name=\"vclHelpContext\"[^>]*>\\s*<number>(\\d+)</number>");
+  QSet<QString> const AncresGuide=Ancres(CV_DOSSIER_DOCS "/guide/index.html");
+  QRegularExpression const Propriete("<property name=\"vclHelpContext\"[^>]*>\\s*<number>(\\d+)</number>");
   int n=0;
   for(const QString &stUi : QDir(CV_DOSSIER_UI).entryList({"*.ui"}))
    {
-    QString stContenu=QString::fromUtf8(Contenu(CV_DOSSIER_UI "/"+stUi));
+    QString const stContenu=QString::fromUtf8(Contenu(CV_DOSSIER_UI "/"+stUi));
     for(auto i=Propriete.globalMatch(stContenu); i.hasNext(); n++)
      {
-      int HelpContext=i.next().captured(1).toInt();
+      int const HelpContext=i.next().captured(1).toInt();
       QWidget Fiche;
       Fiche.setProperty("vclHelpContext", HelpContext);
       Ouvertes.clear();
       AfficheAideContextuelle(&Fiche);
       QVERIFY2(Ouvertes.size()==1, qPrintable(stUi+" : HelpContext "+QString::number(HelpContext)+" sans page"));
-      QUrl Url(Cible(Ouvertes[0]));
+      QUrl const Url(Cible(Ouvertes[0]));
       QVERIFY2(AncresGuide.contains(Url.fragment()), qPrintable(Url.toString()));
      }
    }
@@ -237,10 +237,10 @@ void TestAide::aideCopieeACoteDeCvw()
   const struct { const char *Copie, *Source; } Dossiers[]={{.Copie="html", .Source="guide"}, {.Copie="tutocv", .Source="tutorial"}};
   for(const auto &d : Dossiers)
    {
-    QString stCopie=QString(CV_DOSSIER_AIDE_CVW)+"/"+d.Copie;
-    QString stSource=QString(CV_DOSSIER_DOCS)+"/"+d.Source;
+    QString const stCopie=QString(CV_DOSSIER_AIDE_CVW)+"/"+d.Copie;
+    QString const stSource=QString(CV_DOSSIER_DOCS)+"/"+d.Source;
     QVERIFY2(QDir(stCopie).exists(), qPrintable("Dossier absent : "+stCopie));
-    QStringList Copies=Fichiers(stCopie);
+    QStringList const Copies=Fichiers(stCopie);
     QCOMPARE(Copies, Fichiers(stSource));
     QVERIFY(Copies.contains("index.html"));
     for(const QString &f : Copies) {

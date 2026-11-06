@@ -57,6 +57,12 @@ void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(
  {
   Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
  }
+// Gestionnaire qui ne modifie pas la fiche (méthode const)
+template <class R, class... P, class C, class O>
+void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...) const)
+ {
+  Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+ }
 //---------------------------------------------------------------------------
 // try/__finally de C++Builder -> garde RAII : le code est exécuté en sortie de bloc
 //---------------------------------------------------------------------------

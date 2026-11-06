@@ -17,23 +17,23 @@ TfrmParamVehlib::TfrmParamVehlib(TComponent* Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::ButtonOkClick(TObject *Sender)
+void TfrmParamVehlib::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  ModalResult=mrOk;
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::ButtonAppliquerClick(TObject *Sender)
+void TfrmParamVehlib::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::ButtonAideClick(TObject *Sender)
+void TfrmParamVehlib::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this);
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::FormShow(TObject *Sender)
+void TfrmParamVehlib::FormShow(TObject * /*Sender*/)
 {
  InitialisationEnCours=true;
  CSpinEditNbMaxPersonnesVehlib->Value=cv->NbMaxPersonnesVehlib;
@@ -43,7 +43,7 @@ void TfrmParamVehlib::FormShow(TObject *Sender)
  InitialisationEnCours=false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::AppliqueChoix()
+void TfrmParamVehlib::AppliqueChoix() const
  {
   cv->NbMaxPersonnesVehlib=CSpinEditNbMaxPersonnesVehlib->Value;
   cv->NbMaxCasesDetectFileVehlib=CSpinEditNbCasesMaxPlaceVehlib->Value;
@@ -54,14 +54,14 @@ void TfrmParamVehlib::AppliqueChoix()
  }
 //---------------------------------------------------------------------------
 void TfrmParamVehlib::CSpinEditParametresChange(
-      TObject *Sender)
+      TObject * /*Sender*/) const
 {
  if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmParamVehlib::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

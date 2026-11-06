@@ -350,7 +350,7 @@ bool infection::Reinfecte(int Tour, int NumPieton, int Rang) // comme le constru
    }
 };
 //-----------------------------------------------------------------------------
-bool infection::DoitSuccomber(int Tour)
+bool infection::DoitSuccomber(int Tour) const
  {
   if (TourFatal != 0) {
 	return (Tour >= TourFatal + cv->EpidemieInfectiosite);
@@ -362,9 +362,9 @@ bool infection::DoitSuccomber(int Tour)
 }
  }
 //-----------------------------------------------------------------------------
-void pieton::Verifie(AnsiString &asMsgErr)
+void pieton::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -459,7 +459,7 @@ void pieton::EstContaminePar(int NumPieton, int Rang) // v5.4.1. NumPieton>0 (pi
 }
  }
 //-----------------------------------------------------------------------------
-int pieton::DonneRang()
+int pieton::DonneRang() const
  {
   if (Infection) {
 	return Infection->DonneRang(cv->TourCrt);
@@ -468,7 +468,7 @@ int pieton::DonneRang()
 
  }
 //-----------------------------------------------------------------------------
-int pieton::DonneChargeVirale()
+int pieton::DonneChargeVirale() const
  {
   if (Infection) {
 	return Infection->DonneChargeVirale(cv->TourCrt);
@@ -477,7 +477,7 @@ int pieton::DonneChargeVirale()
 
  }
 //-----------------------------------------------------------------------------
-bool pieton::DoitSuccomber()
+bool pieton::DoitSuccomber() const
  {
   if (Infection) {
 	return Infection->DoitSuccomber(cv->TourCrt);
@@ -562,7 +562,7 @@ void feu::RetireFeuAtt(int NumFeu) // NumFeu(>0) doit être dans NumFeuxAtt[]
 //-----------------------------------------------------------------------------
 void feu::ChangeEtat()
  {
-  bool ChgEtat=(Etat!=ProchainEtat);
+  bool const ChgEtat=(Etat!=ProchainEtat);
   Etat=ProchainEtat;
   if (ChgEtat) { vue->RedessineCase(x, y, false); // portage
 }
@@ -914,9 +914,9 @@ void feu_pieton::DefinitFeuOppose()
   int k = 0;
   for(k=1; cv->V_(x[0],y[0],k,Dir[0]).PassagePietons; k++) {;
 }
-  int xx=(x[0]+(k*dx[Dir[0]]))%cv->NbX;
-  int yy=(y[0]+(k*dy[Dir[0]]))%cv->NbY;
-  direction dd=InvDir[Dir[0]];
+  int const xx=(x[0]+(k*dx[Dir[0]]))%cv->NbX;
+  int const yy=(y[0]+(k*dy[Dir[0]]))%cv->NbY;
+  direction const dd=InvDir[Dir[0]];
   x[1]=xx;
   y[1]=yy;
   Dir[1]=dd;
@@ -957,7 +957,7 @@ void feu_pieton::RetireFeu(int NumFeu) // //v5.2
 //-----------------------------------------------------------------------------
 void feu_pieton::ChangeEtat()
  {
-  bool ChgEtat=(Etat!=ProchainEtat);
+  bool const ChgEtat=(Etat!=ProchainEtat);
   Etat=ProchainEtat;
   if (ChgEtat) {
    for(int i=0; i<NBFEUXPIETONSPARNUMERO; i++) {
@@ -1139,7 +1139,7 @@ bool feu_pieton::Sauve(int hfile)
   return Ok != 0;
  }
 //-----------------------------------------------------------------------------
-void parking::PlaceProchainVehicule()
+void parking::PlaceProchainVehicule() const
  {
   int i = 0;
   int NumVehicule=0;
@@ -1176,9 +1176,9 @@ bool parking::Sauve(int hfile)
          (FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)) != 0);  // v4.0.1
  }
 //-----------------------------------------------------------------------------
-void parking::Verifie(AnsiString &asMsgErr)
+void parking::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Parking n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Parking n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1196,7 +1196,7 @@ void vehicule::Definit(int x0, int y0, direction Dir0,
   NivPriorite=NivPriorite0;
  }
 //-----------------------------------------------------------------------------
-bool vehicule::EstDestination(const voie *v) // v5.0 : inclut les parkings extérieurs
+bool vehicule::EstDestination(const voie *v) const // v5.0 : inclut les parkings extérieurs
  {
   if (NumParkingArrivee != 0) {
    return (NumParkingArrivee==v->NumParking);
@@ -1211,12 +1211,12 @@ void vehicule::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction AncDir=Dir; // v2.2.4
-  bool Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
+  direction const AncDir=Dir; // v2.2.4
+  bool const Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   Dir=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings.
@@ -1292,14 +1292,14 @@ void vehicule::CalculeProchaineDirection()
 }
  }
 //-----------------------------------------------------------------------------
-direction vehicule::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFINIE
+direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
-  bool Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
+  bool const Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
@@ -1348,7 +1348,7 @@ direction vehicule::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE
   return DirAuCarrefour;
  }
 //-----------------------------------------------------------------------------
-bool vehicule::PeutPasser()
+bool vehicule::PeutPasser() const
  {
   voie *v=&cv->v[x][y];
   int NumFeuVeh = 0;
@@ -1360,9 +1360,9 @@ bool vehicule::PeutPasser()
             (cv->Feu[NumFeuVeh-1].Etat<orange))));
  }
 //-----------------------------------------------------------------------------
-void vehicule::Verifie(AnsiString &asMsgErr)
+void vehicule::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Véhicule n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Véhicule n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1410,16 +1410,16 @@ bool place_vehlib::Sauve(int hfile)
          (FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)) != 0);  // v4.0.1
  }
 //-----------------------------------------------------------------------------
-void place_vehlib::Verifie(AnsiString &asMsgErr)
+void place_vehlib::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Place Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Place Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
-bool place_vehlib::EstLibre()
+bool place_vehlib::EstLibre() const
  {
   return (NumVehlibReserve == 0)&&
          (cv->v[x][y].NumVehlib == 0);
@@ -1438,7 +1438,7 @@ void vehlib::Place(int p) // ATTENTION: 0 <= p < NbPlacesVehlib
 }
  }
 //-----------------------------------------------------------------------------
-bool vehlib::EstDestination(const voie *v)
+bool vehlib::EstDestination(const voie *v) const
  {
   if (NumPlaceArrivee != 0) {
    return (NumPlaceArrivee==v->NumPlaceVehlib);
@@ -1451,11 +1451,11 @@ void vehlib::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction AncDir=Dir; // v2.2.4
+  direction const AncDir=Dir; // v2.2.4
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
 
   if ((Situation==svAttente)&&  // Si le vehlib attend,
       (NbPietonsQuiSontMontes() != 0)&& // On regarde déjà s'il y a des piétons qui veulent monter...
@@ -1525,13 +1525,13 @@ void vehlib::CalculeProchaineDirection()
 }
  }
 //-----------------------------------------------------------------------------
-direction vehlib::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFINIE
+direction vehlib::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
@@ -1563,7 +1563,7 @@ direction vehlib::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE D
   return DirAuCarrefour;
  }
 //-----------------------------------------------------------------------------
-bool vehlib::PeutPasser()
+bool vehlib::PeutPasser() const
  {
   voie *v=&cv->v[x][y];
   int NumFeuVeh = 0;
@@ -1574,7 +1574,7 @@ bool vehlib::PeutPasser()
            (cv->Feu[NumFeuVeh-1].Etat<orange)));
  }
 //-----------------------------------------------------------------------------
-void vehlib::FaitDescendrePietons()
+void vehlib::FaitDescendrePietons() const
  {
   int i = 0;
   int d = 0;
@@ -1610,8 +1610,8 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
    }
   while((NumPlace+1==NumPlaceDepart)||(!cv->PlaceVehlib[NumPlace].EstLibre()));
   place_vehlib *pv=cv->PlaceVehlib+NumPlace;
-  int xp=pv->x;
-  int yp=pv->y;
+  int const xp=pv->x;
+  int const yp=pv->y;
   pv->NumVehlibReserve=Numero;
   NumPlaceArrivee=NumPlace+1;
   vue->RedessineCase(xp, yp, false); // portage
@@ -1621,8 +1621,8 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int xp=p->x;
-  int yp=p->y;
+  int const xp=p->x;
+  int const yp=p->y;
   if ((NbPersonnes<cv->NbMaxPersonnesVehlib)&&
       ((NumPlaceArrivee != 0)||ReservePlaceVehlibCible())) // v6.0.1 : le piéton ne monte que si une place d'arrivée est réservée (sinon il attend)
    {
@@ -1653,9 +1653,9 @@ int vehlib::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui atten
   return NbPersonnes;
  }
 //-----------------------------------------------------------------------------
-void vehlib::Verifie(AnsiString &asMsgErr)
+void vehlib::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1709,17 +1709,17 @@ bool depot_bus::Sauve(int hfile) // v3.0
          (FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)) != 0); // v4.0.1
  }
 //-----------------------------------------------------------------------------
-void depot_bus::Verifie(AnsiString &asMsgErr) // v3.03
+void depot_bus::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
+  AnsiString const asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
 void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int xp=p->x;
-  int yp=p->y;
+  int const xp=p->x;
+  int const yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesBus)
    {
     NbPersonnes++;
@@ -1732,7 +1732,7 @@ void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
 void bus::FaitMonterEtDescendre() // v3.0
  {
   int i = 0;
-  direction d=ADroiteDe[Dir];
+  direction const d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -1754,11 +1754,11 @@ void bus::CalculeProchaineDirection() // v3.0
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction AncDir=Dir;
+  direction const AncDir=Dir;
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   Dir=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux arrêts de bus
   // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
@@ -1805,13 +1805,13 @@ void bus::CalculeProchaineDirection() // v3.0
 }
  }
 //-----------------------------------------------------------------------------
-direction bus::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
+direction bus::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
@@ -1840,7 +1840,7 @@ direction bus::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFI
   return DirAuCarrefour;
  }
 //-----------------------------------------------------------------------------
-bool bus::PeutPasser() // v3.0
+bool bus::PeutPasser() const // v3.0
  {
   voie *v=&cv->v[x][y];
   int NumFeuBus = 0;
@@ -1851,7 +1851,7 @@ bool bus::PeutPasser() // v3.0
           (cv->Feu[NumFeuBus-1].Etat<orange));
  }
 //-----------------------------------------------------------------------------
-int bus::NumeroArretSuivant() // v3.0
+int bus::NumeroArretSuivant() const // v3.0
  {
   int i = 0;
   for( i=0;
@@ -1866,9 +1866,9 @@ int bus::NumeroArretSuivant() // v3.0
 
  }
 //-----------------------------------------------------------------------------
-void bus::Verifie(AnsiString &asMsgErr) // v3.03
+void bus::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString asSource=Format("Bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1961,7 +1961,7 @@ bool arret_bus::Sauve(int hfile) // v3.0
 void arret_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString asSource=Format("Arrêt de bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Arrêt de bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2009,7 +2009,7 @@ bool ligne_bus::Sauve(int hfile) // v3.0
 void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString asSource=Format("Ligne de bus n°%d", ARRAYOFCONST((Numero)));
+  AnsiString const asSource=Format("Ligne de bus n°%d", ARRAYOFCONST((Numero)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2028,8 +2028,8 @@ void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
 void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int xp=p->x;
-  int yp=p->y;
+  int const xp=p->x;
+  int const yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesTram)
    {
     NbPersonnes++;
@@ -2042,7 +2042,7 @@ void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
 void tram::FaitMonterEtDescendre() // v3.5
  {
   int i = 0;
-  direction d=ADroiteDe[Dir];
+  direction const d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -2064,14 +2064,14 @@ void tram::CalculeProchaineDirection() // v3.5
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction AncDir=DirDrnDepl;
+  direction const AncDir=DirDrnDepl;
   int OrdreDir[NBDIR]={0,0,0,0};
   int d = 0;
   int i = 0;
   int j = 0;
-  int nd=v->NbDirPossSensVoieTram(indefinie);
+  int const nd=v->NbDirPossSensVoieTram(indefinie);
   int // Nombre total de directions (pour DistArretTram)
-      ndp=v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre de directions possibles
+      const ndp=v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre de directions possibles
   Dir=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux arrêts de tram
   // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
@@ -2121,14 +2121,14 @@ void tram::CalculeProchaineDirection() // v3.5
 }
  }
 //-----------------------------------------------------------------------------
-direction tram::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
+direction tram::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
   int OrdreDir[NBDIR]={0,0,0,0};
   int d = 0;
   int i = 0;
   int j = 0;
-  int ndp=v->NbDirPossSensVoieTram(InvDir[Dir]); // Nombre de directions possibles
+  int const ndp=v->NbDirPossSensVoieTram(InvDir[Dir]); // Nombre de directions possibles
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
@@ -2158,7 +2158,7 @@ direction tram::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEF
   return DirAuCarrefour;
  }
 //-----------------------------------------------------------------------------
-bool tram::PeutPasser() // v3.0
+bool tram::PeutPasser() const // v3.0
  {
   voie *v=&cv->v[x][y];
   int NumFeuTram = 0;
@@ -2169,7 +2169,7 @@ bool tram::PeutPasser() // v3.0
           (cv->Feu[NumFeuTram-1].Etat<orange));
  }
 //-----------------------------------------------------------------------------
-int tram::NumeroArretSuivant() // v3.0
+int tram::NumeroArretSuivant() const // v3.0
  {
   int i = 0;
   for( i=0;
@@ -2184,9 +2184,9 @@ int tram::NumeroArretSuivant() // v3.0
 
  }
 //-----------------------------------------------------------------------------
-void tram::Verifie(AnsiString &asMsgErr) // v3.03
+void tram::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString asSource=Format("Tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2279,7 +2279,7 @@ bool arret_tram::Sauve(int hfile) // v3.0
 void arret_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString asSource=Format("Arrêt de tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Arrêt de tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2327,7 +2327,7 @@ bool ligne_tram::Sauve(int hfile) // v3.0
 void ligne_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString asSource=Format("Ligne de tram n°%d", ARRAYOFCONST((Numero)));
+  AnsiString const asSource=Format("Ligne de tram n°%d", ARRAYOFCONST((Numero)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2366,7 +2366,7 @@ bool place_taxi::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void place_taxi::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString asSource=Format("Place Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Place Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2378,27 +2378,27 @@ void place_taxi::Verifie(AnsiString &asMsgErr)
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
-bool place_taxi::EstQueueFile()
+bool place_taxi::EstQueueFile() const
  {
   return cv->v[x][y].EstQueueFileTaxis();
  }
 //-----------------------------------------------------------------------------
-bool place_taxi::EstTeteFile()
+bool place_taxi::EstTeteFile() const
  {
   return cv->v[x][y].EstTeteFileTaxis();
  }
 //-----------------------------------------------------------------------------
-int place_taxi::PlaceQueueFile() // Retourne 1+NumPlace si elle existe sinon 0
+int place_taxi::PlaceQueueFile() const // Retourne 1+NumPlace si elle existe sinon 0
  {
   return cv->v[x][y].PlaceQueueFileTaxi();
  }
 //-----------------------------------------------------------------------------
-int place_taxi::PlaceTeteFile() // Retourne 1+NumPlace si elle existe sinon 0
+int place_taxi::PlaceTeteFile() const // Retourne 1+NumPlace si elle existe sinon 0
  {
   return cv->v[x][y].PlaceTeteFileTaxi();
  }
 //-----------------------------------------------------------------------------
-direction place_taxi::DirPlaceSvtMemeFile()
+direction place_taxi::DirPlaceSvtMemeFile() const
  {
   int NumPlaceSvt = 0;
   direction DirSvt=indefinie;
@@ -2440,11 +2440,11 @@ void taxi::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction AncDir=Dir; // v2.2.4
+  direction const AncDir=Dir; // v2.2.4
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
 
   if ((Situation==stAttente)&&  // Si le taxi attend,
       (NbPietonsQuiSontMontes() != 0)) // On regarde déjà s'il y a des piétons qui veulent monter...
@@ -2504,13 +2504,13 @@ void taxi::CalculeProchaineDirection()
 }
  }
 //-----------------------------------------------------------------------------
-direction taxi::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEFINIE
+direction taxi::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int ndp=NbDir[v->DirPoss];
+  int const ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
@@ -2547,7 +2547,7 @@ direction taxi::ProchaineDirectionAuCarrefour() // ATTENTION : DIR DOIT ETRE DEF
   return DirAuCarrefour;
  }
 //-----------------------------------------------------------------------------
-bool taxi::PeutPasser()
+bool taxi::PeutPasser() const
  {
   voie *v=&cv->v[x][y];
   int NumFeuTaxi = 0;
@@ -2558,10 +2558,10 @@ bool taxi::PeutPasser()
           (cv->Feu[NumFeuTaxi-1].Etat<orange));
  }
 //-----------------------------------------------------------------------------
-void taxi::FaitDescendrePietons()
+void taxi::FaitDescendrePietons() const
  {
   int i = 0;
-  direction d=ADroiteDe[Dir];
+  direction const d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -2578,8 +2578,8 @@ void taxi::FaitDescendrePietons()
 void taxi::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int xp=p->x;
-  int yp=p->y;
+  int const xp=p->x;
+  int const yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesTaxi)
    {
     NbPersonnes++;
@@ -2608,9 +2608,9 @@ int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attenda
   return NbPersonnes;
  }
 //-----------------------------------------------------------------------------
-void taxi::Verifie(AnsiString &asMsgErr)
+void taxi::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2639,9 +2639,9 @@ bool place_park::Sauve(int hfile)
          (FileWrite(hfile, cv->CopieEnCours?&yc:&y, sizeof(y)) != 0);
  }
 //-----------------------------------------------------------------------------
-void place_park::Verifie(AnsiString &asMsgErr)
+void place_park::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString asSource=Format("Place prkg n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  AnsiString const asSource=Format("Place prkg n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2653,12 +2653,12 @@ void place_park::Verifie(AnsiString &asMsgErr)
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
-bool place_park::EstQueueFile()
+bool place_park::EstQueueFile() const
  {
   return cv->v[x][y].EstQueueFilePark();
  }
 //-----------------------------------------------------------------------------
-int place_park::PlaceQueueFile() // Retourne 1+NumPlace si elle existe sinon 0
+int place_park::PlaceQueueFile() const // Retourne 1+NumPlace si elle existe sinon 0
  {
   return cv->v[x][y].PlaceQueueFilePark();
  }
@@ -2831,7 +2831,7 @@ void voie::Initialise(type_voie TypeVoie) // v3.5
   NbPietons=0;
  }
 //-----------------------------------------------------------------------------
-voie *voie::v(direction d)
+voie *voie::v(direction d) const
  { // v3.0
   return &cv->V(x,y,d);
  }
@@ -2842,16 +2842,16 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
   int i = 0;
   int j = 0;
   int nd=NbDir[DirPoss];
-  int ne=cv->NbParkings;
-  int nab=cv->NbArretsBus;
+  int const ne=cv->NbParkings;
+  int const nab=cv->NbArretsBus;
   int // v3.0
-      nat=cv->NbArretsTram;
+      const nat=cv->NbArretsTram;
   int // v3.5
-      nft=cv->NbFilesTaxi;
+      const nft=cv->NbFilesTaxi;
   int // v3.6
-      nfp=cv->NbFilesPark;
+      const nfp=cv->NbFilesPark;
   int // v5.0
-      npv=cv->NbPlacesVehlib; // v5.3
+      const npv=cv->NbPlacesVehlib; // v5.3
   LibereDistances(); // v6.0.1
   NbDirDist=nd; NbParkingsDist=ne; NbArretsBusDist=nab; NbArretsTramDist=nat; // v6.0.1
   NbFilesTaxiDist=nft; NbFilesParkDist=nfp; NbPlacesVehlibDist=npv; // v6.0.1
@@ -2951,7 +2951,7 @@ bool voie::PrepareCalculAttenteTrafic()
   bool Ok=true;
   int i = 0;
   int j = 0;
-  int ne=cv->NbParkings;
+  int const ne=cv->NbParkings;
   LibereAttenteTrafic(); // v6.0.1
   NbParkingsAttente=ne; // v6.0.1
   if (ne>0)
@@ -3558,8 +3558,8 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 	// 1. Infection par contact
 	if (NbPietonsDehors==2)
 	 {
-	  int np1=NumPietonDehors[0];
-	  int np2=NumPietonDehors[1];
+	  int const np1=NumPietonDehors[0];
+	  int const np2=NumPietonDehors[1];
 	  pieton *p1=&cv->Pieton[np1-1];
 	  pieton *p2=&cv->Pieton[np2-1];
 	  if (p1->EstContagieux()&&
@@ -3592,7 +3592,7 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 //-----------------------------------------------------------------------------
 void voie::RetireArretBus() // v3.0
  {
-  int Numero=NumArretBus;
+  int const Numero=NumArretBus;
   int d = 0;
   NumArretBus=0;
   if (vue) { vue->RedessineCase(x,y,true); // portage
@@ -3606,7 +3606,7 @@ void voie::RetireArretBus() // v3.0
 //-----------------------------------------------------------------------------
 void voie::RetireArretTram() // v3.5
  {
-  int Numero=NumArretTram;
+  int const Numero=NumArretTram;
   int d = 0;
   NumArretTram=0;
   if (vue) { vue->RedessineCase(x,y,true); // portage
@@ -3639,49 +3639,49 @@ void voie::RetirePlaceVehlib() // v5.3
 }
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteArretBus() // v3.0
+bool voie::EstTeteArretBus() const // v3.0
  {
   return (NumArretBus != 0)&&
          (cv->ArretBus[NumArretBus-1].x==x)&&
          (cv->ArretBus[NumArretBus-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteArretTram() // v3.5
+bool voie::EstTeteArretTram() const // v3.5
  {
   return (NumArretTram != 0)&&
          (cv->ArretTram[NumArretTram-1].x==x)&&
          (cv->ArretTram[NumArretTram-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteArretBus(int NumeroArretBus) // v3.0
+bool voie::EstTeteArretBus(int NumeroArretBus) const // v3.0
  {
   return (NumArretBus==NumeroArretBus)&&
          (cv->ArretBus[NumeroArretBus-1].x==x)&&
          (cv->ArretBus[NumeroArretBus-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteArretTram(int NumeroArretTram) // v3.5
+bool voie::EstTeteArretTram(int NumeroArretTram) const // v3.5
  {
   return (NumArretTram==NumeroArretTram)&&
          (cv->ArretTram[NumeroArretTram-1].x==x)&&
          (cv->ArretTram[NumeroArretTram-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteBus() // v3.0
+bool voie::EstTeteBus() const // v3.0
  {
   return (NumBus != 0)&&
          (cv->Bus[NumBus-1].x==x)&&
          (cv->Bus[NumBus-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteTram() // v3.5
+bool voie::EstTeteTram() const // v3.5
  {
   return (NumTram != 0)&&
          (cv->Tram[NumTram-1].x==x)&&
          (cv->Tram[NumTram-1].y==y);
  }
 //-----------------------------------------------------------------------------
-bool voie::EstQueueFileTaxis() // v3.6
+bool voie::EstQueueFileTaxis() const // v3.6
  {
   bool EstQueueFile=(NumPlaceTaxi>0);
   voie *v = nullptr;
@@ -3693,7 +3693,7 @@ bool voie::EstQueueFileTaxis() // v3.6
   return EstQueueFile;
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteFileTaxis() // v3.6
+bool voie::EstTeteFileTaxis() const // v3.6
  {
   bool EstTeteFile=(NumPlaceTaxi>0);
   voie *v = nullptr;
@@ -3705,7 +3705,7 @@ bool voie::EstTeteFileTaxis() // v3.6
   return EstTeteFile;
  }
 //-----------------------------------------------------------------------------
-int voie::PlaceQueueFileTaxi() // v3.6. Retourne 1+NumPlace si elle existe sinon 0
+int voie::PlaceQueueFileTaxi() const // v3.6. Retourne 1+NumPlace si elle existe sinon 0
  {
   int NumPlaceQueue=0;
   voie *v = nullptr;
@@ -3747,7 +3747,7 @@ int voie::PlaceTeteFileTaxi() // v3.6. Retourne 1+NumPlace si elle existe sinon 
 
  }
 //-----------------------------------------------------------------------------
-bool voie::ExistePlusieursQueuesFileTaxis() // v3.6
+bool voie::ExistePlusieursQueuesFileTaxis() const // v3.6
  {
   int NbQueues=0;
   voie *v = nullptr;
@@ -3761,7 +3761,7 @@ bool voie::ExistePlusieursQueuesFileTaxis() // v3.6
   return NbQueues>1;
  }
 //-----------------------------------------------------------------------------
-bool voie::ExistePlusieursTetesFileTaxis() // v3.6
+bool voie::ExistePlusieursTetesFileTaxis() const // v3.6
  {
   int NbTetes=0;
   voie *v = nullptr;
@@ -3776,7 +3776,7 @@ bool voie::ExistePlusieursTetesFileTaxis() // v3.6
  }
 
 //-----------------------------------------------------------------------------
-bool voie::EstQueueFilePark() // v5.0
+bool voie::EstQueueFilePark() const // v5.0
  {
   bool EstQueueFile=(NumPlacePark>0);
   voie *v = nullptr;
@@ -3788,7 +3788,7 @@ bool voie::EstQueueFilePark() // v5.0
   return EstQueueFile;
  }
 //-----------------------------------------------------------------------------
-bool voie::EstTeteFilePark() // v5.0
+bool voie::EstTeteFilePark() const // v5.0
  {
   bool EstTeteFile=(NumPlacePark>0);
   voie *v = nullptr;
@@ -3800,7 +3800,7 @@ bool voie::EstTeteFilePark() // v5.0
   return EstTeteFile;
  }
 //-----------------------------------------------------------------------------
-int voie::PlaceQueueFilePark() // v5.0. Retourne 1+NumPlace si elle existe sinon 0
+int voie::PlaceQueueFilePark() const // v5.0. Retourne 1+NumPlace si elle existe sinon 0
  {
   int NumPlaceQueue=0;
   voie *v = nullptr;
@@ -3820,7 +3820,7 @@ int voie::PlaceQueueFilePark() // v5.0. Retourne 1+NumPlace si elle existe sinon
 
  }
 //-----------------------------------------------------------------------------
-bool voie::ExistePlusieursQueuesFilePark() // v5.0
+bool voie::ExistePlusieursQueuesFilePark() const // v5.0
  {
   int NbQueues=0;
   voie *v = nullptr;
@@ -3834,7 +3834,7 @@ bool voie::ExistePlusieursQueuesFilePark() // v5.0
   return NbQueues>1;
  }
 //-----------------------------------------------------------------------------
-bool voie::ExistePlusieursTetesFilePark() // v5.0
+bool voie::ExistePlusieursTetesFilePark() const // v5.0
  {
   int NbTetes=0;
   voie *v = nullptr;
@@ -3848,7 +3848,7 @@ bool voie::ExistePlusieursTetesFilePark() // v5.0
   return NbTetes>1;
  }
 //-----------------------------------------------------------------------------
-int voie::OrientationPlaceVehlib() // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
+int voie::OrientationPlaceVehlib() const // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
  {
   int Orientation=0;
   if (NumPlaceVehlib != 0) {
@@ -3861,17 +3861,17 @@ int voie::OrientationPlaceVehlib() // v5.3 : Permet d'orienter l'image de la pla
    return Orientation;
  }
 //-----------------------------------------------------------------------------
-void voie::DefinitArretBus(int n) // v3.0
+void voie::DefinitArretBus(int n) const // v3.0
  {
   cv->DefinitArretBus(n, x, y);
  }
 //-----------------------------------------------------------------------------
-void voie::DefinitArretTram(int n) // v3.5
+void voie::DefinitArretTram(int n) const // v3.5
  {
   cv->DefinitArretTram(n, x, y);
  }
 //-----------------------------------------------------------------------------
-void voie::RedessineCasesArretBus(direction d0) // v3.0
+void voie::RedessineCasesArretBus(direction d0) const // v3.0
  {
   if (vue) { vue->RedessineCase(x,y,false); // portage
 }
@@ -3890,7 +3890,7 @@ void voie::RedessineCasesArretBus(direction d0) // v3.0
 }
  }
 //-----------------------------------------------------------------------------
-void voie::RedessineCasesArretTram(direction d0) // v3.5
+void voie::RedessineCasesArretTram(direction d0) const // v3.5
  {
   if (vue) { vue->RedessineCase(x,y,false); // portage
 }
@@ -3909,7 +3909,7 @@ void voie::RedessineCasesArretTram(direction d0) // v3.5
 }
  }
 //-----------------------------------------------------------------------------
-bool voie::EstDepotBus() // v3.0
+bool voie::EstDepotBus() const // v3.0
  {
   return (x==cv->DepotBus.x)&&(y==cv->DepotBus.y);
  }
@@ -4144,7 +4144,7 @@ direction voie::DirSensVoieTram(direction DirOrigine, int iDir) // v3.5
   return DirTrv;
  }
 //-----------------------------------------------------------------------------
-bool voie::EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) // v3.5
+bool voie::EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) const // v3.5
  {
   int i = 0;
   for(i=32;
@@ -4219,7 +4219,7 @@ void voie::DefinitNature(nature NvNature, bool Ecraser) // v3.8
 void voie::TuePietons() // v4.3
  {
   int NbPietonsEcrases=0;
-  for(int i : NumPieton) {
+  for(int const i : NumPieton) {
    if (i != 0)
     {
      NbPietonsEcrases++;
@@ -4230,13 +4230,13 @@ void voie::TuePietons() // v4.3
 }
  }
 //-----------------------------------------------------------------------------
-bool voie::FeuPietonsPossible() //v5.2
+bool voie::FeuPietonsPossible() const //v5.2
  {
   return (Nature==trottoirs)&& // Trottoirs sans décors  : les piétons peuvent passer
          (DirPoss == 0)&&(SensVoieTram == 0); // ET Pas de voies de circulation
  }
 //-----------------------------------------------------------------------------
-void voie::RedessineCase(bool EffaceFond) // v3.0
+void voie::RedessineCase(bool EffaceFond) const // v3.0
  {
   vue->RedessineCase(x, y, EffaceFond); // portage
  }
@@ -4324,7 +4324,7 @@ void voie::Verifie(AnsiString &asMsgErr)
   int i = 0;
   int xx = 0;
   int yy = 0;
-  AnsiString asSource=Format("Case (%d,%d)", ARRAYOFCONST((x, y)));
+  AnsiString const asSource=Format("Case (%d,%d)", ARRAYOFCONST((x, y)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirPoss(asMsgErr, asSource, DirPoss);
   for(i=0; i<NBDIR; i++)
@@ -4392,7 +4392,7 @@ void centre_ville::CreeZone() // v4.0 (allocation dynamique)
   RetablitVoisinages();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::RetablitVoisinages() // v6.0.2
+void centre_ville::RetablitVoisinages() const // v6.0.2
  {
   dx[static_cast<int>(ouest)]=NbX-1; dy[static_cast<int>(nord)]=NbY-1;
  }
@@ -4731,7 +4731,7 @@ int centre_ville::DefinitFilesPark() // v5.0
   return NbFilesTrv;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NbFeuxLibres()
+int centre_ville::NbFeuxLibres() const
  {
   int i = 0;
   int n=0;
@@ -4740,7 +4740,7 @@ int centre_ville::NbFeuxLibres()
   return n;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroFeuLibre()
+int centre_ville::NumeroFeuLibre() const
  {
   int i = 0;
   for(i=0; (i<NbFeux)&&Feu[i].Defini(); i++) {;
@@ -4748,7 +4748,7 @@ int centre_ville::NumeroFeuLibre()
   return (i+1)*static_cast<int>(i<NbFeux);
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroFeuPietonsLibre() // v5.2
+int centre_ville::NumeroFeuPietonsLibre() const // v5.2
  {
   int i = 0;
   for(i=0; (i<NbFeuxPieton)&&FeuP[i].Defini(); i++) {;
@@ -4756,7 +4756,7 @@ int centre_ville::NumeroFeuPietonsLibre() // v5.2
   return (i+1)*static_cast<int>(i<NbFeuxPieton);
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroParkingLibre()
+int centre_ville::NumeroParkingLibre() const
  {
   int i = 0;
   for(i=0; (i<NbParkings)&&Parking[i].Defini(); i++) {;
@@ -4764,7 +4764,7 @@ int centre_ville::NumeroParkingLibre()
   return (i+1)*static_cast<int>(i<NbParkings);
  }
 //-----------------------------------------------------------------------------
-int centre_ville::ArretBusExistant(int x, int y) // v3.0
+int centre_ville::ArretBusExistant(int x, int y) const // v3.0
  {
   int d = 0;
   int i=0;
@@ -4789,7 +4789,7 @@ int centre_ville::ArretBusExistant(int x, int y) // v3.0
   return i;
  }
 //-----------------------------------------------------------------------------
-int centre_ville::ArretTramExistant(int x, int y) // v3.5
+int centre_ville::ArretTramExistant(int x, int y) const // v3.5
  { // Pour les trams on ne change pas la tête de l'arrêt car il peut y avoir un double sens sur la voie
   int d = 0;
   int i=0;
@@ -4832,7 +4832,7 @@ int centre_ville::NumeroArretTramLibre(int x, int y) // v3.5
    
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroPlaceTaxiLibre() // v3.6
+int centre_ville::NumeroPlaceTaxiLibre() const // v3.6
  {
   int i = 0;
   for(i=0; (i<NbPlacesTaxi)&&PlaceTaxi[i].Definie(); i++) {;
@@ -4840,7 +4840,7 @@ int centre_ville::NumeroPlaceTaxiLibre() // v3.6
   return (i+1)*static_cast<int>(i<NbPlacesTaxi);
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroPlaceParkLibre() // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre avec NumeroPlaceVehlibLibre()
+int centre_ville::NumeroPlaceParkLibre() const // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre avec NumeroPlaceVehlibLibre()
  {
   int i = 0;
   for(i=0; (i<NbPlacesPark)&&PlacePark[i].Definie(); i++) {;
@@ -4848,7 +4848,7 @@ int centre_ville::NumeroPlaceParkLibre() // v5.0. v5.3 renommée de NumeroPlaceL
   return (i+1)*static_cast<int>(i<NbPlacesPark);
  }
 //-----------------------------------------------------------------------------
-int centre_ville::NumeroPlaceVehlibLibre() // v5.3
+int centre_ville::NumeroPlaceVehlibLibre() const // v5.3
  {
   int i = 0;
   for(i=0; (i<NbPlacesVehlib)&&PlaceVehlib[i].Definie(); i++) {;
@@ -4891,7 +4891,7 @@ int centre_ville::AjouteFeuPietons(int x, int y, direction d) // v5.2
   return i;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeFeu(int n)
+void centre_ville::SupprimeFeu(int n) const
  {
   if ((n>-1)&&(n<NbFeux))
    {
@@ -4900,7 +4900,7 @@ void centre_ville::SupprimeFeu(int n)
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeFeuPietons(int n) // v5.2
+void centre_ville::SupprimeFeuPietons(int n) const // v5.2
  {
   if ((n>-1)&&(n<NbFeuxPieton))
    {
@@ -4923,14 +4923,14 @@ void centre_ville::SupprimeFeuxVoie(int x, int y, type_voie TypeVoie) // v3.5 (T
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeParkingVoie(int x, int y) // v3.6
+void centre_ville::SupprimeParkingVoie(int x, int y) const // v3.6
  {
   voie *Voie=&v[x][y];
   if (Voie->NumParking != 0) { cv->SupprimeParking(Voie->NumParking-1);
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretBusVoie(int x, int y) // v3.6
+void centre_ville::SupprimeArretBusVoie(int x, int y) const // v3.6
  {
   voie *Voie=&v[x][y];
   if (Voie->NumArretBus != 0) { Voie->RetireArretBus();
@@ -4944,28 +4944,28 @@ void centre_ville::SupprimeDepotBusVoie(int x, int y) // v3.6
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretTramVoie(int x, int y) // v3.6
+void centre_ville::SupprimeArretTramVoie(int x, int y) const // v3.6
  {
   voie *Voie=&v[x][y];
   if (Voie->NumArretTram != 0) { Voie->RetireArretTram();
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlaceTaxiVoie(int x, int y) // v3.6
+void centre_ville::SupprimePlaceTaxiVoie(int x, int y) const // v3.6
  {
   voie *Voie=&v[x][y];
   if (Voie->NumPlaceTaxi != 0) { Voie->RetirePlaceTaxi();
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlaceParkVoie(int x, int y) // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
+void centre_ville::SupprimePlaceParkVoie(int x, int y) const // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
  {
   voie *Voie=&v[x][y];
   if (Voie->NumPlacePark != 0) { Voie->RetirePlacePark();
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlaceVehlibVoie(int x, int y) // v5.3
+void centre_ville::SupprimePlaceVehlibVoie(int x, int y) const // v5.3
  {
   voie *Voie=&v[x][y];
   if (Voie->NumPlaceVehlib != 0) { Voie->RetirePlaceVehlib();
@@ -4987,7 +4987,7 @@ int centre_ville::AjouteParking(int x, int y)
   return i;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeParking(int n)
+void centre_ville::SupprimeParking(int n) const
  {
   if ((n>-1)&&(n<NbParkings))
    {
@@ -5076,11 +5076,11 @@ int centre_ville::AjoutePlaceVehlib(int x, int y) // v5.3
   return i;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::ExisteCaseArretBus(int x, int y) // v3.0
+bool centre_ville::ExisteCaseArretBus(int x, int y) const // v3.0
  {
   bool Existe=false;
   int d = 0;
-  int i=v[x][y].NumArretBus;
+  int const i=v[x][y].NumArretBus;
   voie *Voie = nullptr;
   for(d=nord; d<=ouest; d++)
    {
@@ -5096,11 +5096,11 @@ bool centre_ville::ExisteCaseArretBus(int x, int y) // v3.0
   return Existe;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::ExisteCaseArretTram(int x, int y) // v3.5
+bool centre_ville::ExisteCaseArretTram(int x, int y) const // v3.5
  {
   bool Existe=false;
   int d = 0;
-  int i=v[x][y].NumArretTram;
+  int const i=v[x][y].NumArretTram;
   voie *Voie = nullptr;
   for(d=nord; d<=ouest; d++)
    {
@@ -5118,7 +5118,7 @@ bool centre_ville::ExisteCaseArretTram(int x, int y) // v3.5
 //-----------------------------------------------------------------------------
 void centre_ville::SupprimeArretBus(int x, int y) // v3.0. Supprime sur une case seulement
  {
-  int i=v[x][y].NumArretBus;
+  int const i=v[x][y].NumArretBus;
   if ((i>0)&&(i<=NbArretsBus))
    {
     if (!ExisteCaseArretBus(x, y)) {
@@ -5130,7 +5130,7 @@ void centre_ville::SupprimeArretBus(int x, int y) // v3.0. Supprime sur une case
 //-----------------------------------------------------------------------------
 void centre_ville::SupprimeArretTram(int x, int y) // v3.5. Supprime sur une case seulement
  {
-  int i=v[x][y].NumArretTram;
+  int const i=v[x][y].NumArretTram;
   if ((i>0)&&(i<=NbArretsTram))
    {
     if (!ExisteCaseArretTram(x, y)) {
@@ -5140,37 +5140,37 @@ void centre_ville::SupprimeArretTram(int x, int y) // v3.5. Supprime sur une cas
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretBus(int n) // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
+void centre_ville::SupprimeArretBus(int n) const // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
  {
   v[ArretBus[n].x][ArretBus[n].y].RetireArretBus(); // Retire le n° d'arrêt de bus récursivement sur toutes les cases
   ArretBus[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimeArretTram(int n) // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
+void centre_ville::SupprimeArretTram(int n) const // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
  {
   v[ArretTram[n].x][ArretTram[n].y].RetireArretTram(); // Retire le n° d'arrêt de tram récursivement sur toutes les cases
   ArretTram[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlaceTaxi(int n) // v3.6
+void centre_ville::SupprimePlaceTaxi(int n) const // v3.6
  {
   v[PlaceTaxi[n].x][PlaceTaxi[n].y].RetirePlaceTaxi();
   PlaceTaxi[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlacePark(int n) // v5.0. v5.3 : renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
+void centre_ville::SupprimePlacePark(int n) const // v5.0. v5.3 : renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
  {
   v[PlacePark[n].x][PlacePark[n].y].RetirePlacePark();
   PlacePark[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-void centre_ville::SupprimePlaceVehlib(int n) // v5.3
+void centre_ville::SupprimePlaceVehlib(int n) const // v5.3
  {
   v[PlaceVehlib[n].x][PlaceVehlib[n].y].RetirePlaceVehlib();
   PlaceVehlib[n].Initialise();
  }
 //-----------------------------------------------------------------------------
-sens centre_ville::SensPassagePietonsPossible(int x, int y)
+sens centre_ville::SensPassagePietonsPossible(int x, int y) const
  { // v2.0
   // 1. Sens suivant DirPoss (Directions de l'intérieur vers l'extérieur)
   sens Sens=SensPsgPt[v[x][y].DirPoss];
@@ -5209,13 +5209,13 @@ sens centre_ville::SensPassagePietonsPossible(int x, int y)
   return Sens;
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) // v2.0
+direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) const // v2.0
  {
   bool Trv = false;
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectPsgPt == 0)|| // NbMaxCasesDetectPsgPt et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5245,13 +5245,13 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
    }
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.0
+direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) const // v3.0
  {
   bool Trv = false;
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectArretBus == 0)|| // NbMaxCasesDetectArretBus et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5284,13 +5284,13 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
    }
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3.0
+direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) const // v3.0
  {
   bool Trv = false;
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectArretTram == 0)|| // NbMaxCasesDetectArretTram et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5323,13 +5323,13 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
    }
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3.6
+direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) const // v3.6
  {
   bool Trv = false;
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectFileTaxi == 0)|| // NbMaxCasesDetectFileTaxi et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5362,13 +5362,13 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
    }
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) // v5.3
+direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) const // v5.3
  {
   bool Trv = false;
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectFileVehlib == 0)|| // NbMaxCasesDetectFileVehlib et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5401,21 +5401,21 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) // 
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::DefinitArretBus(int n, int x, int y) // v3.0
+void centre_ville::DefinitArretBus(int n, int x, int y) const // v3.0
  {
   if ((n>0)&&(n<=NbArretsBus)) {
    ArretBus[n-1].Definit(x, y);
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::DefinitArretTram(int n, int x, int y) // v3.5
+void centre_ville::DefinitArretTram(int n, int x, int y) const // v3.5
  {
   if ((n>0)&&(n<=NbArretsTram)) {
    ArretTram[n-1].Definit(x, y);
 }
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::DirectionArretBus(int x, int y) // v3.0
+direction centre_ville::DirectionArretBus(int x, int y) const // v3.0
  {
   bool Ambiguite=false;
   int d = 0;
@@ -5432,7 +5432,7 @@ direction centre_ville::DirectionArretBus(int x, int y) // v3.0
   return static_cast<direction>(static_cast<int>(!Ambiguite)*Dir);
  }
 //-----------------------------------------------------------------------------
-position_arret_bus_tram centre_ville::PositionArretBus(int x, int y, direction d) // v3.0
+position_arret_bus_tram centre_ville::PositionArretBus(int x, int y, direction d) const // v3.0
  {
   switch(  static_cast<int>(_V(x,y,AGaucheDe[d]).NumArretBus==v[x][y].NumArretBus)+
          (2*static_cast<int>(_V(x,y,ADroiteDe[d]).NumArretBus==v[x][y].NumArretBus)))
@@ -5444,7 +5444,7 @@ position_arret_bus_tram centre_ville::PositionArretBus(int x, int y, direction d
    }
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::ArretsBusVoisinsDifferents(int x, int y) // v3.0
+bool centre_ville::ArretsBusVoisinsDifferents(int x, int y) const // v3.0
  {
   voie *Voie = nullptr;
   bool DiffTrv=false;
@@ -5465,7 +5465,7 @@ bool centre_ville::ArretsBusVoisinsDifferents(int x, int y) // v3.0
   return DiffTrv;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::ArretsTramVoisinsDifferents(int x, int y) // v3.5
+bool centre_ville::ArretsTramVoisinsDifferents(int x, int y) const // v3.5
  {
   voie *Voie = nullptr;
   bool DiffTrv=false;
@@ -5486,7 +5486,7 @@ bool centre_ville::ArretsTramVoisinsDifferents(int x, int y) // v3.5
   return DiffTrv;
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::DirArretBusVoisin(int x, int y) // v3.0
+direction centre_ville::DirArretBusVoisin(int x, int y) const // v3.0
  {
   voie *Voie = nullptr;
   int d = 0;
@@ -5503,7 +5503,7 @@ direction centre_ville::DirArretBusVoisin(int x, int y) // v3.0
   return static_cast<direction>(DirArretBusVoisin);
  }
 //-----------------------------------------------------------------------------
-direction centre_ville::DirArretTramVoisin(int x, int y) // v3.5
+direction centre_ville::DirArretTramVoisin(int x, int y) const // v3.5
  {
   voie *Voie = nullptr;
   int d = 0;
@@ -5568,10 +5568,10 @@ bool centre_ville::AjoutArretTramPossible(int x, int y) // v3.5
 
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::SuppressionArretBusPossible(int x, int y) // v3.0
+bool centre_ville::SuppressionArretBusPossible(int x, int y) const // v3.0
  {
   int d = 0;
-  int i=v[x][y].NumArretBus;
+  int const i=v[x][y].NumArretBus;
   int n=0;
   for(d=nord; d<=ouest; d++) {
    n+=static_cast<int>(_V(x,y,d).NumArretBus==i);
@@ -5579,10 +5579,10 @@ bool centre_ville::SuppressionArretBusPossible(int x, int y) // v3.0
   return (n<2);
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::SuppressionArretTramPossible(int x, int y) // v3.5
+bool centre_ville::SuppressionArretTramPossible(int x, int y) const // v3.5
  {
   int d = 0;
-  int i=v[x][y].NumArretTram;
+  int const i=v[x][y].NumArretTram;
   int n=0;
   for(d=nord; d<=ouest; d++) {
    n+=static_cast<int>(_V(x,y,d).NumArretTram==i);
@@ -5608,7 +5608,7 @@ void centre_ville::InitialiseInfosLignesTram() // v3.5
 }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::InitialiseInfosTrajetLignesBus()
+void centre_ville::InitialiseInfosTrajetLignesBus() const
  {
   int i = 0;
   int j = 0;
@@ -5794,7 +5794,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
   return Ok;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::PrepareCalculDistances() // v3.0 : inclut également celui des arrêts de bus/tram. v3.6 ...Et des files de taxi
+bool centre_ville::PrepareCalculDistances() const // v3.0 : inclut également celui des arrêts de bus/tram. v3.6 ...Et des files de taxi
  {
   bool Ok=true;
   int i = 0;
@@ -5807,7 +5807,7 @@ bool centre_ville::PrepareCalculDistances() // v3.0 : inclut également celui de
   return Ok;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::LibereDistances() // v6.0.1
+void centre_ville::LibereDistances() const // v6.0.1
  {
   for(int i=0; i<NbX; i++) {
    for(int j=0; j<NbY; j++) {
@@ -5816,7 +5816,7 @@ void centre_ville::LibereDistances() // v6.0.1
 }
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::PrepareCalculAttenteTrafic()
+bool centre_ville::PrepareCalculAttenteTrafic() const
  {
   bool Ok=true;
   int i = 0;
@@ -5829,7 +5829,7 @@ bool centre_ville::PrepareCalculAttenteTrafic()
   return Ok;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::IncrementeTrafic(int NumVehicule)
+void centre_ville::IncrementeTrafic(int NumVehicule) const
  { // A VOIR : créer infos trafic pour les parkings extérieurs.
   vehicule *veh=Vehicule+(NumVehicule-1);
   if ((veh->NumParkingDepart != 0)&&(veh->NumParkingArrivee != 0)) {
@@ -5844,10 +5844,10 @@ void centre_ville::IncrementeTrafic(int NumVehicule)
   v[veh->x][veh->y].Trafic[0][0]++;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::IncrementeAttente(int NumVehicule)
+void centre_ville::IncrementeAttente(int NumVehicule) const
  { // A VOIR : créer infos trafic pour les parkings extérieurs.
   vehicule *veh=Vehicule+(NumVehicule-1);
-  int n=TourCrt-veh->TourDrnDepl-1;
+  int const n=TourCrt-veh->TourDrnDepl-1;
   if (n>0)
    {
     if ((veh->NumParkingDepart != 0)&&(veh->NumParkingArrivee != 0)) {
@@ -5889,9 +5889,9 @@ bool centre_ville::PrepareVehicules()
   int // v5.0
       NumPlaceParkArrivee = 0;
   int // v5.0
-      NumPrmVehiculePlacePark=NbVehicules-(2*NbPlacesPark);
+      const NumPrmVehiculePlacePark=NbVehicules-(2*NbPlacesPark);
   int // v5.0
-      NbVehiculesAvantCreation=NbVehicules;
+      const NbVehiculesAvantCreation=NbVehicules;
   if (DefinitNbVehicules(NbVehiculesAvantCreation)!=NbVehiculesAvantCreation) {
    return false;
 }
@@ -5936,7 +5936,7 @@ bool centre_ville::PrepareVehicules()
   return true;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
+void centre_ville::PlaceBus(int x, int y, int NumBus) const // v3.0
  {
   bus *b=Bus+NumBus-1;
   if (b->Defini()&&(b->DirDrnDepl != 0))
@@ -5972,7 +5972,7 @@ void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
   v[x][y].RedessineCase(false);
  }
 //-----------------------------------------------------------------------------
-void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
+void centre_ville::PlaceTram(int x, int y, int NumTram) const // v3.5
  {
   tram *t=Tram+NumTram-1;
   if (t->Defini()&&(t->DirDrnDepl != 0))
@@ -6009,7 +6009,7 @@ void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
   v[x][y].RedessineCase(false);
  }
 //-----------------------------------------------------------------------------
-void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
+void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) const // v3.6
  {
   taxi *t=Taxi+NumTaxi-1;
   int NumPlace = 0;
@@ -6045,7 +6045,7 @@ void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
+void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) const // v5.3
  {
   vehlib *vl=Vehlib+NumVehlib-1;
   int NumPlace = 0;
@@ -6210,7 +6210,7 @@ bool centre_ville::PrepareVehlibs() // v5.3. Les vehlibs ainsi que leurs places
     NbVehlibs=0;
     return true;
    }
-  int NbVehlibsADefinir=1+NUMVEHLIBPLACE(NbPlacesVehlib-1);
+  int const NbVehlibsADefinir=1+NUMVEHLIBPLACE(NbPlacesVehlib-1);
   int // On calcule le n° de vehlib pour la dernière place (NbPlacesVehlib-1) auquel on rajoute 1 pour avoir le nombre de vehlibs à créer.
       NumVehlib=0;
 
@@ -6243,7 +6243,7 @@ bool centre_ville::PreparePietons() // v2.0
   int x = 0;
   int y = 0;
   int i = 0;
-  int NbPietonsAvantCreation=NbPietons;
+  int const NbPietonsAvantCreation=NbPietons;
   direction Dir;
   if (DefinitNbPietons(NbPietonsAvantCreation)!=NbPietonsAvantCreation) {
    return false;
@@ -6258,7 +6258,7 @@ bool centre_ville::PreparePietons() // v2.0
   return true;
  }
 //-----------------------------------------------------------------------------
-void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) // v2.0
+void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) const // v2.0
  {
   v[Pieton[NumPieton].x][Pieton[NumPieton].y].RetirePieton(NumPieton);
   Pieton[NumPieton].Place(x,y);
@@ -6275,7 +6275,7 @@ void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) // v2
  }
 
 //-----------------------------------------------------------------------------
-bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENTION : dp = N|E|S|O
+bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) const // ATTENTION : dp = N|E|S|O
  { // On change si...
   voie *vv=&v[x][y];
   if ((!vv->PassagePietons)&& // v3.5
@@ -6292,7 +6292,7 @@ bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENT
 
  }
 //-----------------------------------------------------------------------------
-void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arrêts de bus. v3.5... Et des trams ! v3.6... Et des files de taxi !
+void centre_ville::CalculeDistances() const // v3.0 : inclut également celles des arrêts de bus. v3.5... Et des trams ! v3.6... Et des files de taxi !
  {
   int i = 0;
   vue->AfficheStatut(0, "Calcul des distances aux parkings..."); // portage
@@ -6356,7 +6356,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
    }
  }
 //-----------------------------------------------------------------------------
-void centre_ville::RessuscitePietons() // v4.3.1
+void centre_ville::RessuscitePietons() const // v4.3.1
  {
   for(int i=0; i<NbPietons; i++)
    {
@@ -6390,7 +6390,7 @@ void centre_ville::PlaceVehiculesSurPlacesPark() // v5.0
    }
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::ExisteFeuPietons(int x, int y) //v5.2
+bool centre_ville::ExisteFeuPietons(int x, int y) const //v5.2
  { // Utilisé pour empêcher de supprimer un passage piéton si des feux de piétons existent (à supprimer avant le passage piéton)
   bool Existe=false;
   int k = 0;
@@ -6403,7 +6403,7 @@ bool centre_ville::ExisteFeuPietons(int x, int y) //v5.2
   return Existe; 
  }
 //-----------------------------------------------------------------------------
-void centre_ville::PrepareFeuxPietons() // v5.2
+void centre_ville::PrepareFeuxPietons() const // v5.2
  {
   // On réinitialise d'abord
   for(int i=0; i<NbFeux; i++) {
@@ -6422,7 +6422,7 @@ void centre_ville::PrepareFeuxPietons() // v5.2
 }
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::FeuPietonsPossible(int x, int y, direction d) //v5.2
+bool centre_ville::FeuPietonsPossible(int x, int y, direction d) const //v5.2
  { // Utilisé pour savoir si l'on peut poser un feu piéton opposé (à l'extrémité du passage piétons)
   bool Possible=true; // Optimiste !
   int k = 0;
@@ -6432,7 +6432,7 @@ bool centre_ville::FeuPietonsPossible(int x, int y, direction d) //v5.2
   return Possible;
  }
 //-----------------------------------------------------------------------------
-bool centre_ville::PassagePietonFranchissable(int x, int y, direction d) // v5.2
+bool centre_ville::PassagePietonFranchissable(int x, int y, direction d) const // v5.2
  { // Permet de savoir si un feu piéton n'est pas au rouge dans le cas où en (x,y) il y a un passage piéton
   if (_V(x,y,InvDir[d]).PassagePietons) {  // Si le piéton n'était pas au bord du passage piétons alors 
    return true; // il a déjà commencé à traverser.
@@ -6629,7 +6629,7 @@ bool centre_ville::Charge(int hfile)
   int // v5.1
 	  NvNbPlacesVehlib=0; // v5.3
   bool Ok = false;
-  int Position=FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
+  int const Position=FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
   TailleFichierCharge=FileSeek(hfile, 0, 2);
   FileSeek(hfile, Position, 0);
   NbPietons=-1;
@@ -6999,10 +6999,10 @@ bool centre_ville::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void centre_ville::Verifie(AnsiString &asMsgErr)
  { // v5.0 : Calcul préalable pour le NbVehicules
-  int NbMinVehicules= (NbParkings*(NbParkings-1))
+  int const NbMinVehicules= (NbParkings*(NbParkings-1))
                      +(2*NbPlacesPark);
   int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
-      NbMaxVehicules= NbParkings<2?0: // v6.0.3 : division par zéro dans l'original (signalé plus bas)
+      const NbMaxVehicules= NbParkings<2?0: // v6.0.3 : division par zéro dans l'original (signalé plus bas)
                       ((NBMAXVEHICULES/(NbParkings*(NbParkings-1)))*NbParkings*(NbParkings-1))
                      +(2*NbPlacesPark); // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
   int i = 0;
@@ -7156,7 +7156,7 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
   DepotBus.Verifie(asMsgErr); // v3.03
  }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) // v3.0.4
+inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) const // v3.0.4
  {
   if ((TourCrt-Vehicule[NumeroVehicule].TourDepart)%NbVitesses <=
       ((Vehicule[NumeroVehicule].NivPriorite != 0)?NbVitesses-1:NumeroVehicule%NbVitesses)) {
@@ -7168,7 +7168,7 @@ inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) // v3.0.
    
  }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) // v5.3
+inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) const // v5.3
  {
   if ((TourCrt-Vehlib[NumeroVehlib].TourDepart)%NbVitesses <= NbVitesses-1) {
    return true;
@@ -7179,7 +7179,7 @@ inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) // v5.3
    
  }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) // v3.0
+inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) const // v3.0
  {
   if (((TourCrt-Bus[NumeroBus].TourDepart)%NbVitesses) == 0) {
    return true;
@@ -7190,7 +7190,7 @@ inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) // v3.0
    
  }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) // v3.5
+inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) const // v3.5
  {
   if ((TourCrt%NbVitesses) == 0) {
    return true;
@@ -7201,7 +7201,7 @@ inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) // v3.5
    
  }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementTaxi(int NumeroTaxi) // v3.6
+inline bool centre_ville::TourDeDeplacementTaxi(int NumeroTaxi) const // v3.6
  {
   if ((TourCrt%NbVitesses) == 0) {
    return true;
@@ -7269,7 +7269,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
     frmSimulation->DrawGridSimul->Col=x;
     frmSimulation->DrawGridSimul->Row=y;
     frmSimulation->RedessineCase(x,y,true); */
-    int l=1+((LgrMinSgmtRoute*((((d-1)%2) != 0)?NbX:NbY))/10)+ // Longueur du nouveau segment de route
+    int const l=1+((LgrMinSgmtRoute*((((d-1)%2) != 0)?NbX:NbY))/10)+ // Longueur du nouveau segment de route
           (rand()%(1+(((LgrMaxSgmtRoute-LgrMinSgmtRoute)*((((d-1)%2) != 0)?NbX:NbY))/10)));
     //AfficheMessage("Départ du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
     bool //MemeDir=false, // pour débogage
@@ -7300,7 +7300,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
           (!EntreeIntersection)) // OU SI arrivée sur une route refusée
        { // ALORS on part A GAUCHE OU A DROITE (on évite les deux problèmes)
         //AfficheMessage("DirOpposée||(!EntreeIntersection)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
-        int dd=1+((d+(2*(rand()%2)))%NBDIR);
+        int const dd=1+((d+(2*(rand()%2)))%NBDIR);
         if (k == 0) {
          DejaFait[dd]=true;
         } else {

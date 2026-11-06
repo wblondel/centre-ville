@@ -47,7 +47,7 @@ TfrmParamSimul::TfrmParamSimul(TComponent* Owner) : TForm(Owner)
   frmSimulation->AffecteGlyphe(GLYPHE_DEFF, BitBtnAppliqueDureeFeuRouge->Glyph);
  }
 //---------------------------------------------------------------------------
-bool TfrmParamSimul::AppliqueChoix()
+bool TfrmParamSimul::AppliqueChoix() const
  {
   frmSimulation->SimulationModifiee=true;
   if (NbVehiculesChange) { cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
@@ -74,7 +74,7 @@ bool TfrmParamSimul::AppliqueChoix()
   return true;
  }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditNbVehiculesChange(TObject *Sender)
+void TfrmParamSimul::CSpinEditNbVehiculesChange(TObject * /*Sender*/)
  {
   if (!Initialisation)
    {
@@ -83,7 +83,7 @@ void TfrmParamSimul::CSpinEditNbVehiculesChange(TObject *Sender)
    }
  }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditNbPietonsChange(TObject *Sender)
+void TfrmParamSimul::CSpinEditNbPietonsChange(TObject * /*Sender*/)
 { // v2.0
   if (!Initialisation)
    {
@@ -96,12 +96,12 @@ void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des pos
  {
   if (((cv->NbParkings*(cv->NbParkings-1))+(2*cv->NbPlacesPark))<=0) { return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
 }
-  int NbMinVehicules= (cv->NbParkings*(cv->NbParkings-1))
+  int const NbMinVehicules= (cv->NbParkings*(cv->NbParkings-1))
                      +(2*cv->NbPlacesPark);
   int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
-	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules);
+	  const NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules);
   int // v5.0.3
-      NbVehicules=NbMinVehicules*(CSpinEditNbVehicules->Value/NbMinVehicules); // v5.0.3
+      const NbVehicules=NbMinVehicules*(CSpinEditNbVehicules->Value/NbMinVehicules); // v5.0.3
     CSpinEditNbVehicules->Increment=NbMinVehicules;
     CSpinEditNbVehicules->MINVALUE=NbMinVehicules;
     CSpinEditNbVehicules->MAXVALUE=NbMaxVehicules;
@@ -114,18 +114,18 @@ void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des pos
      }
  }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::ButtonOkClick(TObject *Sender)
+void TfrmParamSimul::ButtonOkClick(TObject * /*Sender*/)
 {
  AppelleAuChaos();
  ButtonOk->ModalResult=AppliqueChoix()?mrOk:mrNone;
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::ButtonAppliquerClick(TObject *Sender)
+void TfrmParamSimul::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::FormShow(TObject *Sender)
+void TfrmParamSimul::FormShow(TObject * /*Sender*/)
 {
  if (RetourFicheFille) // v6.0.2 : la fiche se réaffiche après une fiche fille, qui ne change aucun de ses champs : ne pas recharger les valeurs du moteur, ce qui perdrait les saisies non appliquées
   {
@@ -200,7 +200,7 @@ void TfrmParamSimul::FormShow(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnAppliqueDureeFeuVertClick(
-      TObject *Sender)
+      TObject * /*Sender*/)
 {
  int i = 0;
  for(i=0; i<cv->NbFeux; i++) {
@@ -210,7 +210,7 @@ void TfrmParamSimul::BitBtnAppliqueDureeFeuVertClick(
 }
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnAppliqueDureeFeuRougeClick(
-      TObject *Sender)
+      TObject * /*Sender*/)
 {
  int i = 0;
  for(i=0; i<cv->NbFeux; i++) {
@@ -219,7 +219,7 @@ void TfrmParamSimul::BitBtnAppliqueDureeFeuRougeClick(
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditDureeVertChange(TObject *Sender)
+void TfrmParamSimul::CSpinEditDureeVertChange(TObject * /*Sender*/) const
 {
  if (!Initialisation)
   {
@@ -228,7 +228,7 @@ void TfrmParamSimul::CSpinEditDureeVertChange(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditDureeRougeChange(TObject *Sender)
+void TfrmParamSimul::CSpinEditDureeRougeChange(TObject * /*Sender*/) const
 {
  if (!Initialisation)
   {
@@ -237,17 +237,17 @@ void TfrmParamSimul::CSpinEditDureeRougeChange(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::Change(TObject *Sender)
+void TfrmParamSimul::Change(TObject * /*Sender*/) const
 {
  if (!Initialisation) { ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::BitBtnDefLignesBusClick(TObject *Sender)
+void TfrmParamSimul::BitBtnDefLignesBusClick(TObject * /*Sender*/)
 {
  if ((frmParamBus=new TfrmParamBus(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]
+   Finalement const f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -260,16 +260,16 @@ void TfrmParamSimul::BitBtnDefLignesBusClick(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::ButtonAideClick(TObject *Sender)
+void TfrmParamSimul::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::BitBtnDefLignesTramClick(TObject *Sender)
+void TfrmParamSimul::BitBtnDefLignesTramClick(TObject * /*Sender*/)
 { // v3.5
  if ((frmParamTram=new TfrmParamTram(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]
+   Finalement const f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -282,11 +282,11 @@ void TfrmParamSimul::BitBtnDefLignesTramClick(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
+void TfrmParamSimul::BitBtnDefTaxisClick(TObject * /*Sender*/)
 {
  if ((frmParamTaxi=new TfrmParamTaxi(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]
+   Finalement const f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -301,8 +301,8 @@ void TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
-void TfrmParamSimul::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmParamSimul::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);
@@ -310,11 +310,11 @@ void TfrmParamSimul::FormKeyDown(TObject *Sender, WORD &Key,
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamSimul::BitBtnDefVehlibsClick(TObject *Sender)
+void TfrmParamSimul::BitBtnDefVehlibsClick(TObject * /*Sender*/)
 { // v5.3
  if ((frmParamVehlib=new TfrmParamVehlib(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]
+   Finalement const f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2

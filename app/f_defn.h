@@ -13,17 +13,17 @@
 class TfrmDefNature : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-  TRadioGroup *RadioGroupNature;
-  TCheckBox *CheckBoxEcraser;
-  TButton *ButtonAppliquer;
-  TButton *ButtonFermer;
-  TButton *ButtonAide;
-  TLabel *LabelRq;
-  TCheckBox *CheckBoxPelouse;
-  void RadioGroupNatureClick(TObject *Sender);
-  void ButtonAppliquerClick(TObject *Sender);
+  TRadioGroup *RadioGroupNature{};
+  TCheckBox *CheckBoxEcraser{};
+  TButton *ButtonAppliquer{};
+  TButton *ButtonFermer{};
+  TButton *ButtonAide{};
+  TLabel *LabelRq{};
+  TCheckBox *CheckBoxPelouse{};
+  void RadioGroupNatureClick(TObject *Sender) const;
+  void ButtonAppliquerClick(TObject *Sender) const;
   void ButtonAideClick(TObject *Sender);
-  void FormShow(TObject *Sender);
+  void FormShow(TObject *Sender) const;
   void FormHide(TObject *Sender);
   void ButtonFermerClick(TObject *Sender);
         void FormKeyDown(TObject *Sender, WORD &Key,

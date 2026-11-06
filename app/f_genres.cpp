@@ -15,7 +15,7 @@ void GenereReseau()
  {
   if ((frmGeneration=new TfrmGeneration(Application)))
    { // portage : try/__finally -> garde RAII (Finalement)
-    Finalement f([&]
+    Finalement const f([&]
     {
      delete frmGeneration;
      frmGeneration=nullptr;
@@ -29,7 +29,7 @@ TfrmGeneration::TfrmGeneration(TComponent* Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmGeneration::ButtonOkClick(TObject *Sender)
+void TfrmGeneration::ButtonOkClick(TObject * /*Sender*/) const
 {
  cv->PrepareGenerationAleatoire( TrackBarTailleMinSegments->Position,
                                  TrackBarTailleMaxSegments->Position,
@@ -38,20 +38,20 @@ void TfrmGeneration::ButtonOkClick(TObject *Sender)
                                  TrackBarProbaTraverseeRoute->Position);
  // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
  // d'origine les évalue de gauche à droite (engine/README.md) : x, puis y, puis la direction
- int x=rand()%cv->NbX;
- int y=rand()%cv->NbY; auto d=static_cast<direction>(1+(rand()%NBDIR)); cv->Genere(x, y, d);
+ int const x=rand()%cv->NbX;
+ int const y=rand()%cv->NbY; auto const d=static_cast<direction>(1+(rand()%NBDIR)); cv->Genere(x, y, d);
  frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
 
-void TfrmGeneration::ButtonAideClick(TObject *Sender)
+void TfrmGeneration::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this);
 }
 //---------------------------------------------------------------------------
 
-void TfrmGeneration::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmGeneration::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

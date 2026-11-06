@@ -167,7 +167,7 @@ class infection // v5.4.1
   infection(const centre_ville *cv); // Patient zéro
   infection(int Tour, int NumPietonOrigine, int Rang);
   ~infection() { delete Svt; };
-  bool EstContagieux(int Tour)
+  bool EstContagieux(int Tour) const
    {
 	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return true;
@@ -179,7 +179,7 @@ class infection // v5.4.1
 }
    };
   bool Reinfecte(int Tour, int NumPieton, int Rang); // comme le constructeur mais pour une personne qui a déjà été infectée
-  int DonneRang(int Tour)
+  int DonneRang(int Tour) const
    {
 	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return DrnRang; // v5.4.2 : Au lieu de PrmRang
@@ -190,7 +190,7 @@ class infection // v5.4.1
 		return -1; // Non contagieux au moment du tour
 }
    };
-  int DonneChargeVirale(int Tour)
+  int DonneChargeVirale(int Tour) const
    {
 	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return ChargeVirale;
@@ -201,15 +201,15 @@ class infection // v5.4.1
         return 0;
 }
    };
-  bool DoitSuccomber(int Tour);
-  int NbInfections() { if (Svt) { return 1+Svt->NbInfections(); } return 1; 
+  bool DoitSuccomber(int Tour) const;
+  int NbInfections() const { if (Svt) { return 1+Svt->NbInfections(); } return 1; 
 };
-  int DonnePrmRang() { return PrmRang; }; // v5.4.2 : au lieu de DonneDrnRang()
-  int DonneTourFin() { if (Svt) { return Svt->DonneTourFin(); } return TourFin; 
+  int DonnePrmRang() const { return PrmRang; }; // v5.4.2 : au lieu de DonneDrnRang()
+  int DonneTourFin() const { if (Svt) { return Svt->DonneTourFin(); } return TourFin; 
 };
-  int DonneTourDeb(bool Dernier) { if (Dernier&&Svt) { return Svt->DonneTourDeb(true); } return TourDeb; 
+  int DonneTourDeb(bool Dernier) const { if (Dernier&&Svt) { return Svt->DonneTourDeb(true); } return TourDeb; 
 };
-  bool EstCondamne() { if (Svt) { return Svt->EstCondamne(); } return (TourFatal>0); 
+  bool EstCondamne() const { if (Svt) { return Svt->EstCondamne(); } return (TourFatal>0); 
 };
  };
 //---------------------------------------------------------------------------
@@ -217,36 +217,36 @@ class pieton // v2.0
  {
   int Numero;
   public:
-  int x, y,
-	  Dir, DemiCase,
-	  NumArretBus, // v3.0. Arrêt de bus d'attente (si >0). Le piéton se trouve à côté de cet arrêt (à droite de la tête de l'arrêt de bus)
-	  NumArretTram, // v3.5. Arrêt de tram d'attente (si >0). Le piéton se trouve à côté de cet arrêt (à droite de la tête de l'arrêt de tram)
-	  NumFileTaxi, // v3.6. File de taxi d'attente (si >0). Le piéton se trouve à côté de cette file (à droite de la tête de file de taxi)
-	  NumPlaceVehlib, // v5.3. Place vehlib d'attente (si >0). Le piéton se trouve à côté de cette place avant de monter dans le vehlib
-	  NumBus, // v3.0. Bus dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
-	  NumTram, // v3.5. Tram dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
-	  NumTaxi, // v3.6. Tram dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
-	  NumVehlib, // v5.3/ Vehlib dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
-	  NumFeuP, // v5.2. Feu piéton au pied duquel le piéton attend pour traverser (>0 si AttendFeuP)
-	  TourDrnDepl, TourDrnAff,
-	  TourAttBus, // v3.0. Tour à partir duquel le piéton attend le bus
-	  TourAttTram, // v3.5. Tour à partir duquel le piéton attend le tram
-	  TourAttTaxi, // v3.6. Tour à partir duquel le piéton attend le taxi
-	  DemiCasesParcourues; // v3.0. L'unité de longueur piétonne est la demi-case, pas la case !
-  bool PsgPtTrv,
-	   ArretBusTrv, // v3.0. Arrêt de bus trouvé
-	   AttendBus,  // v3.0. Attend un bus à l'arret NumArretBus
-	   ArretTramTrv, // v3.5. Arrêt de tram trouvé
-	   AttendTram,  // v3.5. Attend un tram à l'arret NumArretTram
-	   AttendFeuP,  // v5.2. Attend que le feu piéton NumFeuP l'autorise à traverser la voie (tram/route).
-	   FileTaxiTrv, // v3.5. File de taxi trouvée
-	   PlaceVehlibTrv, // v5.3. Place de vehlib trouvée
-	   AttendTaxi,  // v3.5. Attend un taxi à la file NumFileTaxi
-	   AttendVehlib, // v5.3. Attend un vehlib à la file NumFileVehlib
-	   VeutDescendre, // v3.0. Indique qu'il veut descendre du bus, du tram ou du taxi
-	   Ecrase, // v4.3. Indique si ce piéton a été écrasé : Si c'est le cas les coordonnées sont l'endroit du crime
-       Mort; // v5.4.1. Indique si ce piéton est victime de l'épidémie
-  infection *Infection; // v5.4.1
+  int x{}, y{},
+	  Dir{}, DemiCase{},
+	  NumArretBus{}, // v3.0. Arrêt de bus d'attente (si >0). Le piéton se trouve à côté de cet arrêt (à droite de la tête de l'arrêt de bus)
+	  NumArretTram{}, // v3.5. Arrêt de tram d'attente (si >0). Le piéton se trouve à côté de cet arrêt (à droite de la tête de l'arrêt de tram)
+	  NumFileTaxi{}, // v3.6. File de taxi d'attente (si >0). Le piéton se trouve à côté de cette file (à droite de la tête de file de taxi)
+	  NumPlaceVehlib{}, // v5.3. Place vehlib d'attente (si >0). Le piéton se trouve à côté de cette place avant de monter dans le vehlib
+	  NumBus{}, // v3.0. Bus dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
+	  NumTram{}, // v3.5. Tram dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
+	  NumTaxi{}, // v3.6. Tram dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
+	  NumVehlib{}, // v5.3/ Vehlib dans lequel se trouve le piéton (si >0. Dans ce cas, x=-1 et y=-1)
+	  NumFeuP{}, // v5.2. Feu piéton au pied duquel le piéton attend pour traverser (>0 si AttendFeuP)
+	  TourDrnDepl{}, TourDrnAff{},
+	  TourAttBus{}, // v3.0. Tour à partir duquel le piéton attend le bus
+	  TourAttTram{}, // v3.5. Tour à partir duquel le piéton attend le tram
+	  TourAttTaxi{}, // v3.6. Tour à partir duquel le piéton attend le taxi
+	  DemiCasesParcourues{}; // v3.0. L'unité de longueur piétonne est la demi-case, pas la case !
+  bool PsgPtTrv{},
+	   ArretBusTrv{}, // v3.0. Arrêt de bus trouvé
+	   AttendBus{},  // v3.0. Attend un bus à l'arret NumArretBus
+	   ArretTramTrv{}, // v3.5. Arrêt de tram trouvé
+	   AttendTram{},  // v3.5. Attend un tram à l'arret NumArretTram
+	   AttendFeuP{},  // v5.2. Attend que le feu piéton NumFeuP l'autorise à traverser la voie (tram/route).
+	   FileTaxiTrv{}, // v3.5. File de taxi trouvée
+	   PlaceVehlibTrv{}, // v5.3. Place de vehlib trouvée
+	   AttendTaxi{},  // v3.5. Attend un taxi à la file NumFileTaxi
+	   AttendVehlib{}, // v5.3. Attend un vehlib à la file NumFileVehlib
+	   VeutDescendre{}, // v3.0. Indique qu'il veut descendre du bus, du tram ou du taxi
+	   Ecrase{}, // v4.3. Indique si ce piéton a été écrasé : Si c'est le cas les coordonnées sont l'endroit du crime
+       Mort{}; // v5.4.1. Indique si ce piéton est victime de l'épidémie
+  infection *Infection{}; // v5.4.1
   void Initialise()
    {
 	x=y=-1; // v5.4.1 (xm, ym)
@@ -279,8 +279,8 @@ class pieton // v2.0
 	delete Infection; // v5.4.1
    };
   void ChercheFileTaxi(); // v3.6
-  bool Defini() { return (x>-1)&&(y>-1); };
-  void Verifie(AnsiString &asMsgErr);
+  bool Defini() const { return (x>-1)&&(y>-1); };
+  void Verifie(AnsiString &asMsgErr) const;
   void MonteDansBus(int b) { NumBus=b; AttendBus=false; x=-1; y=-1; }; // v3.6
   void MonteDansTram(int t) { NumTram=t; AttendTram=false; x=-1; y=-1; }; // v3.6
   void MonteDansTaxi(int t) { NumTaxi=t; AttendTaxi=false; NumFileTaxi=0; x=-1; y=-1; }; // v3.6
@@ -288,21 +288,21 @@ class pieton // v2.0
   void SeFaitEcraser() { Ecrase=true; PsgPtTrv=ArretBusTrv=ArretTramTrv=PlaceVehlibTrv=FileTaxiTrv=AttendVehlib=AttendBus=AttendTram=AttendTaxi=VeutDescendre=false; }; // v4.3 (création) v5.3 (vehlib)
   // v5.4.1 : gestion de l'épidémie
   void SuccombeInfection() { Mort=true;	PsgPtTrv=ArretBusTrv=ArretTramTrv=PlaceVehlibTrv=FileTaxiTrv=AttendVehlib=AttendBus=AttendTram=AttendTaxi=VeutDescendre=false; }; // v5.4.1
-  bool EstVivant() { return (!Ecrase)&&(!Mort); };
+  bool EstVivant() const { return (!Ecrase)&&(!Mort); };
   bool EstContagieux();
   void EstContaminePar(int NumPieton, int Rang); // v5.4.1. Utilisation : UnPieton->EstContaminePar(PietonContagieux->Numero+1, PietonContagieux->DonneRang()+1)
-  int DonneRang();
-  int DonneChargeVirale();
-  bool DoitSuccomber();
-  int NbInfections() { if (Infection) { return Infection->NbInfections(); } return 0; 
+  int DonneRang() const;
+  int DonneChargeVirale() const;
+  bool DoitSuccomber() const;
+  int NbInfections() const { if (Infection) { return Infection->NbInfections(); } return 0; 
 };
-  int DonnePrmRang() { if (Infection) { return Infection->DonnePrmRang(); } return -1; 
+  int DonnePrmRang() const { if (Infection) { return Infection->DonnePrmRang(); } return -1; 
 };
-  int DonneTourFin() { if (Infection) { return Infection->DonneTourFin(); } return -1; 
+  int DonneTourFin() const { if (Infection) { return Infection->DonneTourFin(); } return -1; 
 };
-  int DonneTourDeb(bool Dernier) { if (Infection) { return Infection->DonneTourDeb(Dernier); } return -1; 
+  int DonneTourDeb(bool Dernier) const { if (Infection) { return Infection->DonneTourDeb(Dernier); } return -1; 
 };
-  bool EstCondamne() { if (Infection) { return Infection->EstCondamne(); } return false; 
+  bool EstCondamne() const { if (Infection) { return Infection->EstCondamne(); } return false; 
 };
   void SupprimeInfection() { if (Infection) { delete Infection; Infection=nullptr; Mort=false; } }; // Utilisé par la résurrection !
   bool EstGueri() { return (!EstContagieux())&&(NbInfections()>0); }; // v5.4.2
@@ -313,23 +313,23 @@ class feu
   bool CopieEnCours; // v5.1
   int Numero; // v5.1 : devenu public
   public:
-  int x, y, Dir; // Orientation. Mais il peut y avoir max. 2 feux par case;
+  int x{}, y{}, Dir{}; // Orientation. Mais il peut y avoir max. 2 feux par case;
   etat_feu Etat, ProchainEtat;
-  int NbFeuxDmd, // Nbre de feux demandant le rouge
-	  NbFeuxAtt,// Nbre de feux devant être rouge pour que celui-ci (this) passe au vert
-	  NbFeuxPtn, // Nbre de feux piétons liés (v5.2). ATTENTION: défini au lancement de la simulation car le lien est établi depuis les feux de piétons.
+  int NbFeuxDmd{}, // Nbre de feux demandant le rouge
+	  NbFeuxAtt{},// Nbre de feux devant être rouge pour que celui-ci (this) passe au vert
+	  NbFeuxPtn{}, // Nbre de feux piétons liés (v5.2). ATTENTION: défini au lancement de la simulation car le lien est établi depuis les feux de piétons.
 	  *NumFeuxDmd, // Liste des feux demandant le rouge
 	  *NumFeuxAtt, // Liste des feux devant être rouge pour que celui-ci (this) passe au vert
 	  *NumFeuxPtn, // Liste des feux de piétons (v5.2). ATTENTION: définie au lancement de la simulation car le lien est établi depuis les feux de piétons.
-	  DureeRouge, DureeVert,
-	  TourDrnChgEtat; // Tour du dernier changement d'état
+	  DureeRouge{}, DureeVert{},
+	  TourDrnChgEtat{}; // Tour du dernier changement d'état
   dmd_vert TypeDmdVert; // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
   psg_rouge TypePsgRouge; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
-  bool DemandeVert, // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
-	   FeuxTousRouges, // Indique que les feux (FeuxAtt) sont tous rouges
-	   RougeDemande, // Indique qu'un feu demande le rouge
-	   ProchainVert, // Indique qu'il est autorisé à passer au vert
-	   VerifEnCours; // Drapeau pour Verifie()
+  bool DemandeVert{}, // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
+	   FeuxTousRouges{}, // Indique que les feux (FeuxAtt) sont tous rouges
+	   RougeDemande{}, // Indique qu'un feu demande le rouge
+	   ProchainVert{}, // Indique qu'il est autorisé à passer au vert
+	   VerifEnCours{}; // Drapeau pour Verifie()
   void Initialise()
    {
 	x=-1; y=-1; Dir=indefinie; ProchainEtat=Etat=inactif;
@@ -378,7 +378,7 @@ class feu
 	  if (NbFeuxPtn != 0) { delete[] NumFeuxPtn; NumFeuxPtn=nullptr;} // v5.2
 	 }
    };
-  bool Defini() { return (x>-1)&&(y>-1)&&(Dir>aucune); };
+  bool Defini() const { return (x>-1)&&(y>-1)&&(Dir>aucune); };
   void AjouteFeuDmd(int NumNvFeu);
   void AjouteFeuAtt(int NumNvFeu);
   void AjouteFeuPtn(int NumNvFeu); // v5.2
@@ -397,24 +397,24 @@ class feu_pieton // v5.2
   bool CopieEnCours;
   int Numero;
   public:
-  int x[NBFEUXPIETONSPARNUMERO],
-      y[NBFEUXPIETONSPARNUMERO],
-      Dir[NBFEUXPIETONSPARNUMERO], // Deux feux pitons sont positionnés de part et d'autre d'un passage piétons. NumFeuDir
-      iFeuDir[NBDIR]; // (Arch, qu'est-ce qu'y feut dire ?) ...Permet d'avoir directement les coordonnées du feu en fonction de la direction Attention à l'accès : iFeuDir[(direction)d-1]
+  int x[NBFEUXPIETONSPARNUMERO]{},
+      y[NBFEUXPIETONSPARNUMERO]{},
+      Dir[NBFEUXPIETONSPARNUMERO]{}, // Deux feux pitons sont positionnés de part et d'autre d'un passage piétons. NumFeuDir
+      iFeuDir[NBDIR]{}; // (Arch, qu'est-ce qu'y feut dire ?) ...Permet d'avoir directement les coordonnées du feu en fonction de la direction Attention à l'accès : iFeuDir[(direction)d-1]
   etat_feu Etat, ProchainEtat;
-  int NbFeux,// Nbre de feux de circulation liés
+  int NbFeux{},// Nbre de feux de circulation liés
       *NumFeux, // Liste des feux de circulation liés
-      DureeRouge,
-      DureeVert,
-      DureeTraversee, // Soit 1+2*Cases Passage piéton. Défini quand le feu opposé est placé
-      TourDrnChgEtat; // Tour du dernier changement d'état
+      DureeRouge{},
+      DureeVert{},
+      DureeTraversee{}, // Soit 1+2*Cases Passage piéton. Défini quand le feu opposé est placé
+      TourDrnChgEtat{}; // Tour du dernier changement d'état
   dmd_vert TypeDmdVert; // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
   psg_rouge TypePsgRouge; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
-  bool DemandeVert, // Indique qu'il demande le rouge (à ceux qui ont Numero dans NumFeuxPtn[])
-       FeuxTousRouges, // Indique que les feux (NumFeux) sont tous rouges
-       RougeDemande, // Indique qu'un feu demande le rouge
-       ProchainVert, // Indique qu'il est autorisé à passer au vert
-       VerifEnCours; // Drapeau pour Verifie()
+  bool DemandeVert{}, // Indique qu'il demande le rouge (à ceux qui ont Numero dans NumFeuxPtn[])
+       FeuxTousRouges{}, // Indique que les feux (NumFeux) sont tous rouges
+       RougeDemande{}, // Indique qu'un feu demande le rouge
+       ProchainVert{}, // Indique qu'il est autorisé à passer au vert
+       VerifEnCours{}; // Drapeau pour Verifie()
   void Initialise();
   feu_pieton() { Numero=0; Initialise(); NumFeux=nullptr; CopieEnCours=false; };
   void Copie(feu_pieton *f);
@@ -447,7 +447,7 @@ class parking
  {
   int Numero;
   public:
-  int x, y;
+  int x{}, y{};
   void Initialise() { x=-1; y=-1; };
   parking() { Numero=0; Initialise(); };
   void Copie(parking *p) // v5.1
@@ -458,11 +458,11 @@ class parking
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   ~parking() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
-  void PlaceProchainVehicule();
+  bool Defini() const { return (x>-1)&&(y>-1); };
+  void PlaceProchainVehicule() const;
   bool Charge(int hfile);
   bool Sauve(int hfile);
-  void Verifie(AnsiString &asMsgErr);
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 class voie; // v5.0 : utilisée en paramètre d'une méthode de vehicule
@@ -471,15 +471,15 @@ class vehicule // instances créées au lancement de la simulation
  {
   int Numero;
   public:
-  int x, y;
+  int x{}, y{};
   direction Dir, DirDrnDepl;
   niveau_priorite NivPriorite; // v2.2
-  int NumParkingDepart, NumParkingArrivee, // Index-1 de centre_ville::Parking[]
-      NumFileParkDepart, NumFileParkArrivee, // v5.0. NumParking{Depart|Arrivee} exclusif avec NumFilePark{Depart|Arrivee}. Index-1 de centre_ville.FilePark[]
-      TourDrnDepl, // Tour du dernier déplacement effectué
-      TourDepart, // Tour pdt lequel il a été placé sur le parking de départ
-      NbCasesParcourues, // Nombre de cases parcourues
-      NbToursRepos; // v2.2.4 : Tours pendant lesquels le véhicule ne s'est pas déplacé du fait de la vitesse réduite
+  int NumParkingDepart{}, NumParkingArrivee{}, // Index-1 de centre_ville::Parking[]
+      NumFileParkDepart{}, NumFileParkArrivee{}, // v5.0. NumParking{Depart|Arrivee} exclusif avec NumFilePark{Depart|Arrivee}. Index-1 de centre_ville.FilePark[]
+      TourDrnDepl{}, // Tour du dernier déplacement effectué
+      TourDepart{}, // Tour pdt lequel il a été placé sur le parking de départ
+      NbCasesParcourues{}, // Nombre de cases parcourues
+      NbToursRepos{}; // v2.2.4 : Tours pendant lesquels le véhicule ne s'est pas déplacé du fait de la vitesse réduite
   void Initialise()
    {
     x=-1; y=-1;
@@ -497,12 +497,12 @@ class vehicule // instances créées au lancement de la simulation
                int NumFileDepart, int NumFileArrivee, // v5.0
                niveau_priorite NivPriorite0); // v2.2
   ~vehicule() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
-  bool EstDestination(const voie *v); // v5.0 : indique si v est la case destination (parking ou place de parking)
+  bool Defini() const { return (x>-1)&&(y>-1); };
+  bool EstDestination(const voie *v) const; // v5.0 : indique si v est la case destination (parking ou place de parking)
   void CalculeProchaineDirection();
-  direction ProchaineDirectionAuCarrefour();
-  bool PeutPasser();
-  void Verifie(AnsiString &asMsgErr);
+  direction ProchaineDirectionAuCarrefour() const;
+  bool PeutPasser() const;
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 // Classes de GESTION DES BUS
@@ -510,16 +510,16 @@ class vehicule // instances créées au lancement de la simulation
 class depot_bus // v3.0 ATTENTION : il n'y en a qu'un !
  {
   public:
-  int x, y, NumDrnBusSorti;
+  int x{}, y{}, NumDrnBusSorti{};
   void Initialise() { x=-1; y=-1; NumDrnBusSorti=0; };
   depot_bus() { Initialise(); };
   void Definit(int x0, int y0) { x=x0; y=y0; NumDrnBusSorti=0; };
   ~depot_bus() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
+  bool Defini() const { return (x>-1)&&(y>-1); };
   void PlaceProchainBus();
   bool Charge(int hfile);
   bool Sauve(int hfile);
-  void Verifie(AnsiString &asMsgErr);
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 class bus// v3.0 instances créées au lancement de la simulation
@@ -527,16 +527,16 @@ class bus// v3.0 instances créées au lancement de la simulation
   int Numero;
   public:
   direction Dir, DirDrnDepl, DirAvtDrnDepl;
-  int x, y, NumLigne,
-	  NumDrnArret, NumArretSvt, // Index-1 de centre_ville::ArretBus
-	  NbPersonnes, // Correspond aux nombre de Pieton ayant NumBus = Numero (piétons dans le bus)
-	  TourDrnDepl, // Tour du dernier déplacement effectué
-	  TourDepart, // Tour pdt lequel il a été placé sur la case du dépot
-	  TourArriveDrnArret, // Tour lorsque le bus est arrêté au dernier arrêt
-	  TourDepartArretSvt, // Tour pour le départ vers l'arrêt suivant
-	  NbCasesParcourues, // Nombre de cases parcourues
-	  NbCasesParcouruesDepuisDrnArret, // Idem mais remis à 0 à chaque arrêt de bus
-	  NbToursRepos; // Tours pendant lesquels le bus ne s'est pas déplacé du fait de la vitesse réduite
+  int x{}, y{}, NumLigne{},
+	  NumDrnArret{}, NumArretSvt{}, // Index-1 de centre_ville::ArretBus
+	  NbPersonnes{}, // Correspond aux nombre de Pieton ayant NumBus = Numero (piétons dans le bus)
+	  TourDrnDepl{}, // Tour du dernier déplacement effectué
+	  TourDepart{}, // Tour pdt lequel il a été placé sur la case du dépot
+	  TourArriveDrnArret{}, // Tour lorsque le bus est arrêté au dernier arrêt
+	  TourDepartArretSvt{}, // Tour pour le départ vers l'arrêt suivant
+	  NbCasesParcourues{}, // Nombre de cases parcourues
+	  NbCasesParcouruesDepuisDrnArret{}, // Idem mais remis à 0 à chaque arrêt de bus
+	  NbToursRepos{}; // Tours pendant lesquels le bus ne s'est pas déplacé du fait de la vitesse réduite
   void Initialise()
    {
 	x=-1; y=-1;
@@ -550,31 +550,31 @@ class bus// v3.0 instances créées au lancement de la simulation
   void Definit(int NumLigne0, int NumArretSvt0)
    { NumLigne=NumLigne0; NumArretSvt=NumArretSvt0; };
   ~bus() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
+  bool Defini() const { return (x>-1)&&(y>-1); };
   void FaitMonterPieton(int NumPietonAFaireMonter);
   void FaitMonterEtDescendre(); // v3.0
   void CalculeProchaineDirection();
-  direction ProchaineDirectionAuCarrefour();
-  bool PeutPasser();
-  int NumeroArretSuivant();
-  void Verifie(AnsiString &asMsgErr);
+  direction ProchaineDirectionAuCarrefour() const;
+  bool PeutPasser() const;
+  int NumeroArretSuivant() const;
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 class arret_bus // v3.0
  {
   int Numero;
   public:
-  int x, y; // Position de la tête de l'arrêt de bus (indiquant les couleurs de lignes)
-  bool Ligne[NBMAXLIGNESBUSTRAM]; // Indique si une ligne de bus passe par cet arrêt (Index-1)
-  int NbLignes,
-	  NumLigne[NBMAXLIGNESBUSTRAM]; // Liste des lignes de bus passant par cet arrêt (Index-1)
+  int x{}, y{}; // Position de la tête de l'arrêt de bus (indiquant les couleurs de lignes)
+  bool Ligne[NBMAXLIGNESBUSTRAM]{}; // Indique si une ligne de bus passe par cet arrêt (Index-1)
+  int NbLignes{},
+	  NumLigne[NBMAXLIGNESBUSTRAM]{}; // Liste des lignes de bus passant par cet arrêt (Index-1)
   void Initialise();
   arret_bus() { Numero=0; Initialise(); };
   void Copie(arret_bus *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   ~arret_bus() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
+  bool Defini() const { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesBus();
   void AjouteLigneBus(int n);
   AnsiString asListeLignesBus(); // v3.0.5
@@ -587,10 +587,10 @@ class ligne_bus // v3.0
  {
   int Numero; // Numéro de la ligne (CoulLigneBus[Numero]=Couleur de la ligne)
   public:
-  int NbArrets, // Nb arrêts de la ligne
-      NumArret[NBMAXARRETSBUSTRAMPARLIGNE], // Ordre des arrêts à effectuer
-      NbBus, // Nb bus de la ligne
-      NumBus[NBMAXBUSTRAMPARLIGNE]; // N° des bus de la ligne
+  int NbArrets{}, // Nb arrêts de la ligne
+      NumArret[NBMAXARRETSBUSTRAMPARLIGNE]{}, // Ordre des arrêts à effectuer
+      NbBus{}, // Nb bus de la ligne
+      NumBus[NBMAXBUSTRAMPARLIGNE]{}; // N° des bus de la ligne
   void Initialise();
   ligne_bus() { Numero=0; Initialise(); };
   void AffecteNumero(int Num) { Numero=Num; };
@@ -607,16 +607,16 @@ class tram // v3.5 instances créées au lancement de la simulation
  {
   int Numero;
   public:
-  int x, y, NumLigne;
+  int x{}, y{}, NumLigne{};
   direction Dir, DirDrnDepl, DirAvtDrnDepl;
-  int NumDrnArret, NumArretSvt, // Index-1 de centre_ville::ArretTram
-	  NbPersonnes, // Correspond aux nombre de Pieton ayant NumTram = Numero (piétons dans le tram)
-      TourDrnDepl, // Tour du dernier déplacement effectué
-      TourArriveDrnArret, // Tour lorsque le tram est arrêté au dernier arrêt
-      TourDepartArretSvt, // Tour pour le départ vers l'arrêt suivant
-      NbCasesParcourues, // Nombre de cases parcourues
-      NbCasesParcouruesDepuisDrnArret, // Idem mais remis à 0 à chaque arrêt de tram
-      NbToursRepos; // Tours pendant lesquels le tram ne s'est pas déplacé du fait de la vitesse réduite
+  int NumDrnArret{}, NumArretSvt{}, // Index-1 de centre_ville::ArretTram
+	  NbPersonnes{}, // Correspond aux nombre de Pieton ayant NumTram = Numero (piétons dans le tram)
+      TourDrnDepl{}, // Tour du dernier déplacement effectué
+      TourArriveDrnArret{}, // Tour lorsque le tram est arrêté au dernier arrêt
+      TourDepartArretSvt{}, // Tour pour le départ vers l'arrêt suivant
+      NbCasesParcourues{}, // Nombre de cases parcourues
+      NbCasesParcouruesDepuisDrnArret{}, // Idem mais remis à 0 à chaque arrêt de tram
+      NbToursRepos{}; // Tours pendant lesquels le tram ne s'est pas déplacé du fait de la vitesse réduite
   void Initialise()
    {
     x=-1; y=-1;
@@ -630,31 +630,31 @@ class tram // v3.5 instances créées au lancement de la simulation
   void Definit(int NumLigne0, int NumArretSvt0)
    { NumLigne=NumLigne0; NumArretSvt=NumArretSvt0; };
   ~tram() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
+  bool Defini() const { return (x>-1)&&(y>-1); };
   void FaitMonterPieton(int NumPietonAFaireMonter);
   void FaitMonterEtDescendre();
   void CalculeProchaineDirection();
-  direction ProchaineDirectionAuCarrefour();
-  bool PeutPasser();
-  int NumeroArretSuivant();
-  void Verifie(AnsiString &asMsgErr);
+  direction ProchaineDirectionAuCarrefour() const;
+  bool PeutPasser() const;
+  int NumeroArretSuivant() const;
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 class arret_tram // v3.5
  {
   int Numero;
   public:
-  int x, y; // Position de la tête de l'arrêt de tram (indiquant les couleurs de lignes)
-  bool Ligne[NBMAXLIGNESBUSTRAM]; // Indique si une ligne de tram passe par cet arrêt (Index-1)
-  int NbLignes,
-      NumLigne[NBMAXLIGNESBUSTRAM]; // Liste des lignes de tram passant par cet arrêt (Index-1)
+  int x{}, y{}; // Position de la tête de l'arrêt de tram (indiquant les couleurs de lignes)
+  bool Ligne[NBMAXLIGNESBUSTRAM]{}; // Indique si une ligne de tram passe par cet arrêt (Index-1)
+  int NbLignes{},
+      NumLigne[NBMAXLIGNESBUSTRAM]{}; // Liste des lignes de tram passant par cet arrêt (Index-1)
   void Initialise();
   arret_tram() { Numero=0; Initialise(); };
   void Copie(arret_tram *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   ~arret_tram() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
+  bool Defini() const { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesTram();
   void AjouteLigneTram(int n);
   AnsiString asListeLignesTram(); 
@@ -667,10 +667,10 @@ class ligne_tram // v3.5
  {
   int Numero; // Numéro de la ligne (CoulLigneTram[Numero]=Couleur de la ligne)
   public:
-  int NbArrets, // Nb arrêts de la ligne
-      NumArret[NBMAXARRETSBUSTRAMPARLIGNE], // Ordre des arrêts à effectuer
-      NbTrams, // Nb tram de la ligne
-      NumTram[NBMAXBUSTRAMPARLIGNE]; // N° des tram de la ligne
+  int NbArrets{}, // Nb arrêts de la ligne
+      NumArret[NBMAXARRETSBUSTRAMPARLIGNE]{}, // Ordre des arrêts à effectuer
+      NbTrams{}, // Nb tram de la ligne
+      NumTram[NBMAXBUSTRAMPARLIGNE]{}; // N° des tram de la ligne
   void Initialise();
   ligne_tram() { Numero=0; Initialise(); };
   void AffecteNumero(int Num) { Numero=Num; };
@@ -687,8 +687,8 @@ class place_taxi // v3.6
  {
   int Numero;
   public:
-  int x, y,
-      NumFile; // 0 <= NumFile < NbFilesTaxi
+  int x{}, y{},
+      NumFile{}; // 0 <= NumFile < NbFilesTaxi
   void Initialise() { x=-1; y=-1; NumFile=-1; };
   place_taxi() { Numero=0; Initialise(); };
   void Copie(place_taxi *p)
@@ -698,18 +698,18 @@ class place_taxi // v3.6
 	NumFile=p->NumFile;
    };
   void AffecteNumero(int Num) { Numero=Num; };
-  bool Definie() { return (x>-1)&&(y>-1); };
+  bool Definie() const { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   void DefinitFile(int n) {NumFile=n; };
   ~place_taxi() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
-  bool EstQueueFile(); // v3.6
-  bool EstTeteFile(); // v3.6
-  int PlaceQueueFile(); // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
-  int PlaceTeteFile(); // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
-  direction DirPlaceSvtMemeFile(); // Retourne la direction vers laquelle il y a une place de la même file
+  bool EstQueueFile() const; // v3.6
+  bool EstTeteFile() const; // v3.6
+  int PlaceQueueFile() const; // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
+  int PlaceTeteFile() const; // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
+  direction DirPlaceSvtMemeFile() const; // Retourne la direction vers laquelle il y a une place de la même file
  };
 //---------------------------------------------------------------------------
 class file_taxi // v3.6 instances créées au lancement de la simulation
@@ -728,17 +728,17 @@ class taxi // v3.6 instances créées au lancement de la simulation
   int Numero;
   public:
   situation_taxi Situation;
-  int x, y,
-      NumFile, // 0 <= NumFile < NbTaxis
-      NbPersonnes,
-      NbCourses,
-      TourDrnDepl, // Tour du dernier déplacement effectué
-      TourDepartDrnCourse, // Tour pour le départ d'une course
-      TourDepotDrnCourse, // Tour lors duquel le ou les derniers clients ont été déposés
-      TourRetourDrnCourse, // Tour du retour à la file (pour attente nouvelle course)
-      NbCasesParcourues, // Nombre de cases parcourues
-      NbCasesParcouruesDrnCourse, // Idem mais remis à 0 à chaque départ d'une course
-      NbToursRepos; // Tours pendant lesquels le bus ne s'est pas déplacé du fait de la vitesse réduite
+  int x{}, y{},
+      NumFile{}, // 0 <= NumFile < NbTaxis
+      NbPersonnes{},
+      NbCourses{},
+      TourDrnDepl{}, // Tour du dernier déplacement effectué
+      TourDepartDrnCourse{}, // Tour pour le départ d'une course
+      TourDepotDrnCourse{}, // Tour lors duquel le ou les derniers clients ont été déposés
+      TourRetourDrnCourse{}, // Tour du retour à la file (pour attente nouvelle course)
+      NbCasesParcourues{}, // Nombre de cases parcourues
+      NbCasesParcouruesDrnCourse{}, // Idem mais remis à 0 à chaque départ d'une course
+      NbToursRepos{}; // Tours pendant lesquels le bus ne s'est pas déplacé du fait de la vitesse réduite
   direction Dir, DirDrnDepl;
   void Initialise()
    {
@@ -753,25 +753,25 @@ class taxi // v3.6 instances créées au lancement de la simulation
   ~taxi() = default;
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int f) { NumFile=f; }; // 0 <= f < NbFilesTaxi
-  bool Defini() { return (x>-1)&&(y>-1); }; // v6.0.2 (Rechercher)
+  bool Defini() const { return (x>-1)&&(y>-1); }; // v6.0.2 (Rechercher)
   void Place(int x0, int y0) { x=x0; y=y0; };
   void Place(int p); // 0 <= p < NbPlacesTaxi
   void CalculeProchaineDirection();
-  direction ProchaineDirectionAuCarrefour();
-  bool PeutPasser();
+  direction ProchaineDirectionAuCarrefour() const;
+  bool PeutPasser() const;
   void DefinitEtPlace(int f, int p) { Definit(f); Place(p); };
-  void FaitDescendrePietons();
+  void FaitDescendrePietons() const;
   void FaitMonterPieton(int NumPietonAFaireMonter);
   int NbPietonsQuiSontMontes(); // retourne true si des piétons attendaient et sont montés
-  void Verifie(AnsiString &asMsgErr);
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 class place_park // v5.0
  {
   int Numero;
   public:
-  int x, y,
-      NumFile; // 0 <= NumFile < NbFilesPark. -1 si non défini
+  int x{}, y{},
+      NumFile{}; // 0 <= NumFile < NbFilesPark. -1 si non défini
   void Initialise() { x=-1; y=-1; NumFile=-1; };
   place_park() { Numero=0; Initialise(); };
   void Copie(place_park *p)
@@ -781,16 +781,16 @@ class place_park // v5.0
     NumFile=p->NumFile;
    };
   void AffecteNumero(int Num) { Numero=Num; };
-  bool Definie() { return (x>-1)&&(y>-1); };
+  bool Definie() const { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   void DefinitFile(int n) {NumFile=n; };
   ~place_park() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
-  void Verifie(AnsiString &asMsgErr);
-  bool EstQueueFile(); // v3.6
+  void Verifie(AnsiString &asMsgErr) const;
+  bool EstQueueFile() const; // v3.6
   bool EstTeteFile(); // v3.6
-  int PlaceQueueFile(); // Retourne 1+NumPlace si elle existe, 0 sinon.
+  int PlaceQueueFile() const; // Retourne 1+NumPlace si elle existe, 0 sinon.
   int PlaceTeteFile(); // Retourne 1+NumPlace si elle existe, 0 sinon.
  };
 //---------------------------------------------------------------------------
@@ -809,8 +809,8 @@ class place_vehlib // v5.3
  {
   int Numero;
   public:
-  int x, y;
-  int NumVehlibReserve; // si réservé alors > 0 et c'est le n° vehlib (+1) qui a réservé, sinon 0
+  int x{}, y{};
+  int NumVehlibReserve{}; // si réservé alors > 0 et c'est le n° vehlib (+1) qui a réservé, sinon 0
   void Initialise() { x=-1; y=-1; NumVehlibReserve=0; };
   place_vehlib() { Numero=0; Initialise(); };
   void Copie(place_vehlib *p)
@@ -820,13 +820,13 @@ class place_vehlib // v5.3
     NumVehlibReserve=p->NumVehlibReserve;
    };
   void AffecteNumero(int Num) { Numero=Num; };
-  bool Definie() { return (x>-1)&&(y>-1); };
+  bool Definie() const { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   ~place_vehlib() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
-  void Verifie(AnsiString &asMsgErr);
-  bool EstLibre();
+  void Verifie(AnsiString &asMsgErr) const;
+  bool EstLibre() const;
  };
 //---------------------------------------------------------------------------
 class vehlib // v5.3 instances créées au lancement de la simulation
@@ -834,15 +834,15 @@ class vehlib // v5.3 instances créées au lancement de la simulation
   int Numero;
   public:
   situation_vehlib Situation;
-  int x, y;
+  int x{}, y{};
   direction Dir, DirDrnDepl;
-  int NumPlaceDepart,  // Place de départ. 0 = pas placé sinon index+1 de centre_ville.PlaceVehlib[].
-      NumPlaceArrivee, // Place réservée. 0 = pas encore réservé sinon Index+1 de centre_ville.PlaceVehlib[].
-      NbPersonnes,
-      TourDrnDepl, // Tour du dernier déplacement effectué
-      TourDepart, // Tour pdt lequel il a été placé sur le parking de départ
-	  NbCasesParcourues, // Nombre de cases parcourues
-      NbToursRepos; // Tours pendant lesquels le véhicule ne s'est pas déplacé du fait de la vitesse réduite
+  int NumPlaceDepart{},  // Place de départ. 0 = pas placé sinon index+1 de centre_ville.PlaceVehlib[].
+      NumPlaceArrivee{}, // Place réservée. 0 = pas encore réservé sinon Index+1 de centre_ville.PlaceVehlib[].
+      NbPersonnes{},
+      TourDrnDepl{}, // Tour du dernier déplacement effectué
+      TourDepart{}, // Tour pdt lequel il a été placé sur le parking de départ
+	  NbCasesParcourues{}, // Nombre de cases parcourues
+      NbToursRepos{}; // Tours pendant lesquels le véhicule ne s'est pas déplacé du fait de la vitesse réduite
   void Initialise()
    {
     Situation=svAttente;
@@ -859,16 +859,16 @@ class vehlib // v5.3 instances créées au lancement de la simulation
   void Definit(int p) { NumPlaceDepart=p+1; }; // ATTENTION: 0 <= p < NbPlacesVehlib
   void DefinitEtPlace(int p) { Definit(p); Place(p); }; // ATTENTION: 0 <= p < NbPlacesVehlib
   ~vehlib() = default;
-  bool Defini() { return (x>-1)&&(y>-1); };
-  bool EstDestination(const voie *v);
+  bool Defini() const { return (x>-1)&&(y>-1); };
+  bool EstDestination(const voie *v) const;
   void CalculeProchaineDirection();
-  direction ProchaineDirectionAuCarrefour();
-  bool PeutPasser();
-  void FaitDescendrePietons();
+  direction ProchaineDirectionAuCarrefour() const;
+  bool PeutPasser() const;
+  void FaitDescendrePietons() const;
   bool ReservePlaceVehlibCible(); // v6.0.1 : false si aucune place n'est libre
   void FaitMonterPieton(int NumPietonAFaireMonter);
   int NbPietonsQuiSontMontes(); // retourne true si des piétons attendaient et sont montés
-  void Verifie(AnsiString &asMsgErr);
+  void Verifie(AnsiString &asMsgErr) const;
  };
 //---------------------------------------------------------------------------
 // Classes de GESTION GENERALE de la SIMULATION
@@ -879,34 +879,34 @@ class voie
   public:
   dirposs DirPoss;
   sens_voie_tram SensVoieTram; // v3.5. 0 = aucune voie. Sinon 0<SensVoieTram<64.
-  priorite Priorite[4];
+  priorite Priorite[4]{};
   nature Nature; // v3.8. 0 = rien (fond noir), poids fort = type (voies,trottoirs,immeubles), poid faible = décors (arbre, pelouse, etc.)
-  bool ToutDroit,
-       PassagePietons, // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
-       PassageBus, // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
-       LigneBus[NBMAXLIGNESBUSTRAM], // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation par la fiche paramètres du réseau de bus UNIQUEMENT)
-	   LigneTram[NBMAXLIGNESBUSTRAM]; // v3.5. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation par la fiche paramètres du réseau de tram UNIQUEMENT)
-  int NumFeu[NBFEUXPARCASE], // >0 si feu éventuel (=index+1 de cv->Feu) (v5.2: NBFEUXPARCASE)
-      NumFeuP[NBFEUXPARCASE],// v5.2. >0 si feu piéton éventuel (=index+1 de cv->FeuP)
-      NumVehicule, // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
-      NumVehlib, // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
-      NumBus, // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
-      NumTram, // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
-      NumParking, // >0 si c'est un parking (=index+1 de cv->parking)
-      NumProchVeh, // >0 si un véhicule doit passer sur la case lors du prochain mouvement
-      NumProchVL,  // >0 si un vehlib doit passer sur la case lors du prochain mouvement
-      NumProchBus, // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement
-      NumProchTram, // v3.5. >0 si un tram doit passer sur la case lors du prochain mouvement
-      NumProchTaxi, // v3.6. >0 si un taxi doit passer sur la case lors du prochain mouvement
-      NbPietons, // v2.0. Nombre de pietons sur cette case
-      NumArretBus, // v3.0. >0 si arrêt de bus (=index+1 de cv->ArretBus)
-      NumArretTram, // v3.5. >0 si arrêt de tram (=index+1 de cv->ArretTram)
-      NumTaxi, // v3.6. >0 si taxi (=index+1 de cv->Taxi)
-      NumPlaceTaxi, // v3.6. >0 si taxi (=index+1 de cv->PlaceTaxi)
-      NumPlacePark, // v5.0. >0 si place de parking (=index+1 de cv->PlacePark)
-      NumPlaceVehlib, // v5.3. >0 si place de vehlib (=index+1 de cv->PlaceVehlib)
-      NumSpotVehlib, // v5.3. >0 si spot vehlib (=index+1 de cv->SpotVehlib)
-      NumPieton[NBMAXPIETONSPARCASE]; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
+  bool ToutDroit{},
+       PassagePietons{}, // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
+       PassageBus{}, // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
+       LigneBus[NBMAXLIGNESBUSTRAM]{}, // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation par la fiche paramètres du réseau de bus UNIQUEMENT)
+	   LigneTram[NBMAXLIGNESBUSTRAM]{}; // v3.5. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation par la fiche paramètres du réseau de tram UNIQUEMENT)
+  int NumFeu[NBFEUXPARCASE]{}, // >0 si feu éventuel (=index+1 de cv->Feu) (v5.2: NBFEUXPARCASE)
+      NumFeuP[NBFEUXPARCASE]{},// v5.2. >0 si feu piéton éventuel (=index+1 de cv->FeuP)
+      NumVehicule{}, // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
+      NumVehlib{}, // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
+      NumBus{}, // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
+      NumTram{}, // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
+      NumParking{}, // >0 si c'est un parking (=index+1 de cv->parking)
+      NumProchVeh{}, // >0 si un véhicule doit passer sur la case lors du prochain mouvement
+      NumProchVL{},  // >0 si un vehlib doit passer sur la case lors du prochain mouvement
+      NumProchBus{}, // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement
+      NumProchTram{}, // v3.5. >0 si un tram doit passer sur la case lors du prochain mouvement
+      NumProchTaxi{}, // v3.6. >0 si un taxi doit passer sur la case lors du prochain mouvement
+      NbPietons{}, // v2.0. Nombre de pietons sur cette case
+      NumArretBus{}, // v3.0. >0 si arrêt de bus (=index+1 de cv->ArretBus)
+      NumArretTram{}, // v3.5. >0 si arrêt de tram (=index+1 de cv->ArretTram)
+      NumTaxi{}, // v3.6. >0 si taxi (=index+1 de cv->Taxi)
+      NumPlaceTaxi{}, // v3.6. >0 si taxi (=index+1 de cv->PlaceTaxi)
+      NumPlacePark{}, // v5.0. >0 si place de parking (=index+1 de cv->PlacePark)
+      NumPlaceVehlib{}, // v5.3. >0 si place de vehlib (=index+1 de cv->PlaceVehlib)
+      NumSpotVehlib{}, // v5.3. >0 si spot vehlib (=index+1 de cv->SpotVehlib)
+      NumPieton[NBMAXPIETONSPARCASE]{}; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
   // 2 nids de pointeurs (natifs) : alloués dans voie donc détruits dans ~voie()
   int ***DistParking, // Autant de Distances (en cases) que de parkings ssi 2 DirPoss sinon NULL. Natif. v3.5
       // v2.2.7. Statistiques sur les passages de véhicules.
@@ -928,7 +928,7 @@ class voie
   void Initialise();
   void Initialise(type_voie TypeVoie); // v3.5
   void Definit(int x0, int y0) { x=x0; y=y0; Initialise(); };
-  voie *v(direction d); // v3.0
+  voie *v(direction d) const; // v3.0
   bool PrepareCalculDistances(); // v3.0 : inclut également celui des arrêts de bus/tram
   void LibereDistances(); // v6.0.1
   bool PrepareCalculAttenteTrafic(); // v2.2.7
@@ -945,33 +945,33 @@ class voie
   void RetirePlaceTaxi(); // v3.6
   void RetirePlacePark(); // v5.0
   void RetirePlaceVehlib(); // v5.3
-  bool EstTeteArretBus(); // v3.0
-  bool EstTeteArretBus(int NumeroArretBus); // v3.0
-  bool EstTeteArretTram(); // v3.5
-  bool EstTeteArretTram(int NumeroArretTram); // v3.5
-  bool EstTeteBus(); // v3.0
-  bool EstTeteTram(); // v3.5
+  bool EstTeteArretBus() const; // v3.0
+  bool EstTeteArretBus(int NumeroArretBus) const; // v3.0
+  bool EstTeteArretTram() const; // v3.5
+  bool EstTeteArretTram(int NumeroArretTram) const; // v3.5
+  bool EstTeteBus() const; // v3.0
+  bool EstTeteTram() const; // v3.5
 
-  bool EstQueueFileTaxis(); // v3.6
-  bool EstTeteFileTaxis(); // v3.6
-  int PlaceQueueFileTaxi(); // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
+  bool EstQueueFileTaxis() const; // v3.6
+  bool EstTeteFileTaxis() const; // v3.6
+  int PlaceQueueFileTaxi() const; // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
   int PlaceTeteFileTaxi(); // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
-  bool ExistePlusieursQueuesFileTaxis(); // v3.6
-  bool ExistePlusieursTetesFileTaxis(); // v3.6
+  bool ExistePlusieursQueuesFileTaxis() const; // v3.6
+  bool ExistePlusieursTetesFileTaxis() const; // v3.6
 
-  bool EstQueueFilePark(); // v5.0
-  bool EstTeteFilePark(); // v5.0
-  int PlaceQueueFilePark(); // v5.0. Retourne 1+NumPlace si elle existe, 0 sinon.
-  bool ExistePlusieursQueuesFilePark(); // v5.0
-  bool ExistePlusieursTetesFilePark(); // v5.0
+  bool EstQueueFilePark() const; // v5.0
+  bool EstTeteFilePark() const; // v5.0
+  int PlaceQueueFilePark() const; // v5.0. Retourne 1+NumPlace si elle existe, 0 sinon.
+  bool ExistePlusieursQueuesFilePark() const; // v5.0
+  bool ExistePlusieursTetesFilePark() const; // v5.0
 
-  int OrientationPlaceVehlib(); // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
+  int OrientationPlaceVehlib() const; // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
 
-  void DefinitArretBus(int n); // v3.0
-  void DefinitArretTram(int n); // v3.5
-  void RedessineCasesArretBus(direction d0); // v3.0
-  void RedessineCasesArretTram(direction d0); // v3.5
-  bool EstDepotBus(); // v3.0
+  void DefinitArretBus(int n) const; // v3.0
+  void DefinitArretTram(int n) const; // v3.5
+  void RedessineCasesArretBus(direction d0) const; // v3.0
+  void RedessineCasesArretTram(direction d0) const; // v3.5
+  bool EstDepotBus() const; // v3.0
 
   void CalculeDistanceParking(int e, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
   void CalculeDistanceArretBus(int ab, int Distance, direction DirOrig); // v3.0
@@ -982,15 +982,15 @@ class voie
   void InitialiseInfosLignesBus(); // v3.0
   void ModifieSensVoieTram(direction DirOrig, direction DirDest); // v3.5
   direction DirSensVoieTram(direction DirOrigine, int iDir); // v3.5
-  bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination); // v3.5
+  bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) const; // v3.5
   int NumDirPossSensVoieTram(direction DirOrigine, direction DirDestination); // v3.5
   int NbDirPossSensVoieTram(direction DirOrigine); // v3.5
   bool SupprimePassagePietonsInvalide(); // v3.5
   bool ExisteVoieDansDirection(type_voie TypeVoie, direction d); // v3.5 // v5.4 : pas de inline pour éviter avertissement "non trouvé"
   void DefinitNature(nature NvNature, bool Ecraser);
   void TuePietons(); // v4.3. Appelée par centre_ville::PlaceXXX (XXX = Vehicule, Bus, Tram, VehiculeTaxi ou VehiculeVehlib v5.3)
-  bool FeuPietonsPossible(); //v5.2
-  void RedessineCase(bool EffaceFond); // v3.0
+  bool FeuPietonsPossible() const; //v5.2
+  void RedessineCase(bool EffaceFond) const; // v3.0
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -1016,8 +1016,8 @@ class stats
 //---------------------------------------------------------------------------
 class centre_ville
  {
-  void IncrementeAttente(int NumVehicule); // v2.2.7
-  void IncrementeTrafic(int NumVehicule); // v2.2.7
+  void IncrementeAttente(int NumVehicule) const; // v2.2.7
+  void IncrementeTrafic(int NumVehicule) const; // v2.2.7
   public:
   bool TourEnCours,
        CopieEnCours; // v4.0.1 Copie en cours de la sélection dans un fichier
@@ -1031,7 +1031,7 @@ class centre_ville
       NbVehlibs, // v5.3. Nombre de vehlib générés pour la simulation
       NbBus,// v3.0. Nombre de bus générés pour la simulation
       NbTrams, // v3.5. Nombre de trams
-      NbPietons, // v2.0. Nombre de piétons générés pour la simulation
+      NbPietons{}, // v2.0. Nombre de piétons générés pour la simulation
       NbArretsBus, // v3.0. Nombre d'arrêts de bus à utiliser
       NbLignesBus, // v3.0. Nombre de lignes de bus
       NbArretsTram, // v3.5. Nombre d'arrêts de tram
@@ -1045,7 +1045,7 @@ class centre_ville
       DureeVert, // Durée du vert PAR DEFAUT (à la création d'un feu)
       DureeOrange, // Duree de l'orange dans la simulation;
       DureeRouge, // Durée du rouge PAR DEFAUT (à la création d'un feu)
-      xErr, yErr, // Coordonnées de la case concernant la dernière erreur
+      xErr{}, yErr{}, // Coordonnées de la case concernant la dernière erreur
 	  // stats véhicules
 	  NbVehiculesDeplaces,
 	  NbVehiculesArrives,
@@ -1099,7 +1099,7 @@ class centre_ville
   bool VerifOk, DistancesCalculees, QuadrillageStats;
   type_stats TypeStats;
 
-  voie **v; // Dimensions modifiables (v4.0)
+  voie **v{}; // Dimensions modifiables (v4.0)
   feu *Feu; // Tableau de feux
   feu_pieton *FeuP; // v5.2 Tableau de feux piéton
   parking *Parking; // Tableau des parkings
@@ -1121,7 +1121,7 @@ class centre_ville
   place_vehlib *PlaceVehlib; // v5.3. Tableau de places de vehlib
   stats *Stats; // Tableau de statistiques
   void CreeZone(); // v4.0 (allocation dynamique si NbX*NbY>0)
-  void RetablitVoisinages(); // v6.0.2 : dx et dy (globales) suivent le dernier réseau créé : à rappeler quand on revient à un réseau existant
+  void RetablitVoisinages() const; // v6.0.2 : dx et dy (globales) suivent le dernier réseau créé : à rappeler quand on revient à un réseau existant
   centre_ville(bool NbElementsParDefaut, int NbX, int NbY); // v4.0 (NbX, NbY)
   ~centre_ville();
   int DefinitNbFeux(int n);
@@ -1143,103 +1143,103 @@ class centre_ville
   int DefinitFilesPark(); // v5.0. Renvoie le nombre de files créées. Défini à partir de PlacePark.
 
 
-  int NbFeuxLibres();
-  int NumeroFeuLibre();
-  int NumeroFeuPietonsLibre(); // v5.2
-  int NumeroParkingLibre();
-  int ArretBusExistant(int x, int y); // v3.0
-  int ArretTramExistant(int x, int y); // v3.5
+  int NbFeuxLibres() const;
+  int NumeroFeuLibre() const;
+  int NumeroFeuPietonsLibre() const; // v5.2
+  int NumeroParkingLibre() const;
+  int ArretBusExistant(int x, int y) const; // v3.0
+  int ArretTramExistant(int x, int y) const; // v3.5
   int NumeroArretBusLibre(int x, int y); //v3.0
   int NumeroArretTramLibre(int x, int y); //v3.5
-  int NumeroPlaceTaxiLibre(); // v3.6
-  int NumeroPlaceParkLibre(); // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre avec NumeroPlaceVehlibLibre()
-  int NumeroPlaceVehlibLibre(); // v5.3
+  int NumeroPlaceTaxiLibre() const; // v3.6
+  int NumeroPlaceParkLibre() const; // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre avec NumeroPlaceVehlibLibre()
+  int NumeroPlaceVehlibLibre() const; // v5.3
   int AjouteFeu(int x, int y, direction d);
   int AjouteFeuPietons(int x, int y, direction d); // v5.2
-  void SupprimeFeu(int n);
-  void SupprimeFeuPietons(int n); // v5.2
+  void SupprimeFeu(int n) const;
+  void SupprimeFeuPietons(int n) const; // v5.2
   void SupprimeFeuxVoie(int x, int y, type_voie TypeVoie); // v3.5 (TypeVoie)
-  void SupprimeParkingVoie(int x, int y); // v3.6
-  void SupprimeArretBusVoie(int x, int y); // v3.6
+  void SupprimeParkingVoie(int x, int y) const; // v3.6
+  void SupprimeArretBusVoie(int x, int y) const; // v3.6
   void SupprimeDepotBusVoie(int x, int y); // v3.6
-  void SupprimeArretTramVoie(int x, int y); // v3.6
-  void SupprimePlaceTaxiVoie(int x, int y); // v3.6
-  void SupprimePlaceParkVoie(int x, int y); // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
-  void SupprimePlaceVehlibVoie(int x, int y); // v5.3
+  void SupprimeArretTramVoie(int x, int y) const; // v3.6
+  void SupprimePlaceTaxiVoie(int x, int y) const; // v3.6
+  void SupprimePlaceParkVoie(int x, int y) const; // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
+  void SupprimePlaceVehlibVoie(int x, int y) const; // v5.3
   int AjouteParking(int x, int y);
-  void SupprimeParking(int n);
+  void SupprimeParking(int n) const;
   int AjouteArretBus(int x, int y); // v3.0
   int AjouteArretTram(int x, int y); // v3.5
   int AjoutePlaceTaxi(int x, int y); // v3.6
   int AjoutePlacePark(int x, int y); // v5.0, v5.1 : ancien nom AjoutePlace
   int AjoutePlaceVehlib(int x, int y); // v5.3
-  bool ExisteCaseArretBus(int x, int y); // v3.0
-  bool ExisteCaseArretTram(int x, int y); // v3.5
+  bool ExisteCaseArretBus(int x, int y) const; // v3.0
+  bool ExisteCaseArretTram(int x, int y) const; // v3.5
   void SupprimeArretBus(int x, int y); // v3.0. Supprime sur une case seulement
-  void SupprimeArretBus(int n); // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
+  void SupprimeArretBus(int n) const; // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
   void SupprimeArretTram(int x, int y); // v3.5. Supprime sur une case seulement
-  void SupprimeArretTram(int n); // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
-  void SupprimePlaceTaxi(int n); // v3.6
-  void SupprimePlacePark(int n); // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
-  void SupprimePlaceVehlib(int n); // v5.3
-  sens SensPassagePietonsPossible(int x, int y); // v3.5
-  direction CherchePassagePietons(int x, int y, sens SensRecherche); // v2.0
-  direction ChercheArretBus(int x, int y, sens SensRecherche); // v3.0
-  direction ChercheArretTram(int x, int y, sens SensRecherche); // v3.5
-  direction CherchePlaceTaxi(int x, int y, sens SensRecherche); // v3.6
-  direction CherchePlaceVehlib(int x, int y, sens SensRecherche); // v5.3
-  void DefinitArretBus(int n, int x, int y); // v3.0
-  void DefinitArretTram(int n, int x, int y); // v3.5
-  direction DirectionArretBus(int x, int y); // v3.0
-  position_arret_bus_tram PositionArretBus(int x, int y, direction d); // v3.0
-  bool ArretsBusVoisinsDifferents(int x, int y); // v3.0
-  bool ArretsTramVoisinsDifferents(int x, int y); // v3.5
-  direction DirArretBusVoisin(int x, int y); // v3.0
-  direction DirArretTramVoisin(int x, int y); // v3.5
+  void SupprimeArretTram(int n) const; // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
+  void SupprimePlaceTaxi(int n) const; // v3.6
+  void SupprimePlacePark(int n) const; // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
+  void SupprimePlaceVehlib(int n) const; // v5.3
+  sens SensPassagePietonsPossible(int x, int y) const; // v3.5
+  direction CherchePassagePietons(int x, int y, sens SensRecherche) const; // v2.0
+  direction ChercheArretBus(int x, int y, sens SensRecherche) const; // v3.0
+  direction ChercheArretTram(int x, int y, sens SensRecherche) const; // v3.5
+  direction CherchePlaceTaxi(int x, int y, sens SensRecherche) const; // v3.6
+  direction CherchePlaceVehlib(int x, int y, sens SensRecherche) const; // v5.3
+  void DefinitArretBus(int n, int x, int y) const; // v3.0
+  void DefinitArretTram(int n, int x, int y) const; // v3.5
+  direction DirectionArretBus(int x, int y) const; // v3.0
+  position_arret_bus_tram PositionArretBus(int x, int y, direction d) const; // v3.0
+  bool ArretsBusVoisinsDifferents(int x, int y) const; // v3.0
+  bool ArretsTramVoisinsDifferents(int x, int y) const; // v3.5
+  direction DirArretBusVoisin(int x, int y) const; // v3.0
+  direction DirArretTramVoisin(int x, int y) const; // v3.5
   bool AjoutArretBusPossible(int x, int y); // v3.0
   bool AjoutArretTramPossible(int x, int y); // v3.5
-  bool SuppressionArretBusPossible(int x, int y); // v3.0
-  bool SuppressionArretTramPossible(int x, int y); // v3.5
+  bool SuppressionArretBusPossible(int x, int y) const; // v3.0
+  bool SuppressionArretTramPossible(int x, int y) const; // v3.5
   void InitialiseInfosLignesBus(); // v3.0
   void InitialiseInfosLignesTram(); // v3.5
-  void InitialiseInfosTrajetLignesBus(); // v3.0
+  void InitialiseInfosTrajetLignesBus() const; // v3.0
   void CalculeTrajetLignesBus(); // v3.0
   void CalculeTrajetLignesTram(); // v3.5
   bool VerifieCalculDistances(type_distance &TypeDistance); // v3.5 : inclut également celui des arrêts de bus & tram
-  bool PrepareCalculDistances(); // v3.5 : inclut également celui des arrêts de bus & tram
-  void LibereDistances(); // v6.0.1 : distances obsolètes (réseau modifié après un échec de Marche)
-  bool PrepareCalculAttenteTrafic(); // v2.2.7
+  bool PrepareCalculDistances() const; // v3.5 : inclut également celui des arrêts de bus & tram
+  void LibereDistances() const; // v6.0.1 : distances obsolètes (réseau modifié après un échec de Marche)
+  bool PrepareCalculAttenteTrafic() const; // v2.2.7
   void PlaceVehicule(int x, int y, int NumVehicule); // v2.2.7
   bool PrepareVehicules();
-  void PlaceBus(int x, int y, int NumBus); // v3.0
+  void PlaceBus(int x, int y, int NumBus) const; // v3.0
   void DefinitBus(int NumBus, int NumLigne); // v3.0
   bool PrepareBus(); // v3.0
-  void PlaceTram(int x, int y, int NumTram); // v3.5
+  void PlaceTram(int x, int y, int NumTram) const; // v3.5
   void DefinitTram(int NumTram, int NumLigne); // v3.5
-  void PlaceVehiculeTaxi(int x, int y, int NumTaxi); // v3.6
-  void PlaceVehiculeVehlib(int x, int y, int NumVehlib); // v5.3
+  void PlaceVehiculeTaxi(int x, int y, int NumTaxi) const; // v3.6
+  void PlaceVehiculeVehlib(int x, int y, int NumVehlib) const; // v5.3
   bool PrepareTrams(); // v3.5
   bool PrepareTaxis(); // v3.6. Les taxis ainsi que leurs places et leurs files
   bool PrepareVehlibs(); // v5.3. Les vehlibs ainsi que leurs places et leurs files
   bool PreparePietons(); // v2.0
-  void DeplacePieton(int NumPieton, int x, int y, direction d); // v2.0
-  bool ChangeDirectionSiPossible(int x, int y, dirposs dp);
-  void CalculeDistances();
-  void RessuscitePietons(); // v4.3.1
+  void DeplacePieton(int NumPieton, int x, int y, direction d) const; // v2.0
+  bool ChangeDirectionSiPossible(int x, int y, dirposs dp) const;
+  void CalculeDistances() const;
+  void RessuscitePietons() const; // v4.3.1
   void PlaceVehiculesSurPlacesPark(); // v5.0
-  bool ExisteFeuPietons(int x, int y); //v5.2
-  void PrepareFeuxPietons(); // v5.2
-  bool FeuPietonsPossible(int x, int y, direction d); //v5.2
-  bool PassagePietonFranchissable(int x, int y, direction d); // v5.2
+  bool ExisteFeuPietons(int x, int y) const; //v5.2
+  void PrepareFeuxPietons() const; // v5.2
+  bool FeuPietonsPossible(int x, int y, direction d) const; //v5.2
+  bool PassagePietonFranchissable(int x, int y, direction d) const; // v5.2
   void /*__fastcall*/ EffectueTourSimulation(); // portage : convention d'appel C++Builder retirée
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
-  inline bool TourDeDeplacementVehicule(int NumeroVehicule);
-  inline bool TourDeDeplacementVehlib(int NumeroVehlib);
-  inline bool TourDeDeplacementBus(int NumeroBus);
-  inline bool TourDeDeplacementTram(int NumeroTram); // v3.5
-  inline bool TourDeDeplacementTaxi(int NumeroTaxi); // v3.6
+  inline bool TourDeDeplacementVehicule(int NumeroVehicule) const;
+  inline bool TourDeDeplacementVehlib(int NumeroVehlib) const;
+  inline bool TourDeDeplacementBus(int NumeroBus) const;
+  inline bool TourDeDeplacementTram(int NumeroTram) const; // v3.5
+  inline bool TourDeDeplacementTaxi(int NumeroTaxi) const; // v3.6
   void TopChrono() // v3.9.2
    {
     dtTop=Time();

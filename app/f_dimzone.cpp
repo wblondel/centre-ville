@@ -18,7 +18,7 @@ bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
   if ((frmDimensionsZone=new TfrmDimensionsZone(Application)))
    {
 	{ // portage : try/__finally -> garde RAII (Finalement)
-	 Finalement f([&]
+	 Finalement const f([&]
 	 {
 	  delete frmDimensionsZone;
 	  frmDimensionsZone=nullptr;
@@ -48,7 +48,7 @@ TfrmDimensionsZone::TfrmDimensionsZone(TComponent* Owner)
 
 }
 //---------------------------------------------------------------------------
-void TfrmDimensionsZone::FormShow(TObject *Sender)
+void TfrmDimensionsZone::FormShow(TObject * /*Sender*/) const
 {
  CSpinEditNbX->Value=NbX;
  CSpinEditNbY->Value=NbY;
@@ -56,7 +56,7 @@ void TfrmDimensionsZone::FormShow(TObject *Sender)
  CSpinEditNbX->Tag=0;
 }
 //---------------------------------------------------------------------------
-void TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
+void TfrmDimensionsZone::ButtonCreerClick(TObject * /*Sender*/)
 {
  NbX=CSpinEditNbX->Value;
  NbY=CSpinEditNbY->Value;
@@ -76,15 +76,15 @@ void TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDimensionsZone::ButtonAideClick(TObject *Sender)
+void TfrmDimensionsZone::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
 
-void TfrmDimensionsZone::FormKeyPress(TObject *Sender,
-      char &Key)
+void TfrmDimensionsZone::FormKeyPress(TObject * /*Sender*/,
+      char &Key) const
 {
  if (CSpinEditNbX->Focused()||CSpinEditNbY->Focused()) {
   switch(Key)
@@ -98,8 +98,8 @@ void TfrmDimensionsZone::FormKeyPress(TObject *Sender,
 //---------------------------------------------------------------------------
 
 
-void TfrmDimensionsZone::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDimensionsZone::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

@@ -15,20 +15,20 @@
 class TfrmDefVoie : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label1;
-    TLabel *LabelCoordonnees;
-    TRadioGroup *RadioGroupPrioriteNord;
-    TRadioGroup *RadioGroupPrioriteOuest;
-    TRadioGroup *RadioGroupPrioriteEst;
-    TRadioGroup *RadioGroupPrioriteSud;
-    TButton *ButtonOk;
-    TButton *ButtonAnnuler;
-    TBitBtn *BitBtnDefFeuN;
-    TBitBtn *BitBtnDefFeuO;
-    TBitBtn *BitBtnDefFeuE;
-    TBitBtn *BitBtnDefFeuS;
-    TButton *ButtonAppliquer;
-    TButton *ButtonAide;
+    TLabel *Label1{};
+    TLabel *LabelCoordonnees{};
+    TRadioGroup *RadioGroupPrioriteNord{};
+    TRadioGroup *RadioGroupPrioriteOuest{};
+    TRadioGroup *RadioGroupPrioriteEst{};
+    TRadioGroup *RadioGroupPrioriteSud{};
+    TButton *ButtonOk{};
+    TButton *ButtonAnnuler{};
+    TBitBtn *BitBtnDefFeuN{};
+    TBitBtn *BitBtnDefFeuO{};
+    TBitBtn *BitBtnDefFeuE{};
+    TBitBtn *BitBtnDefFeuS{};
+    TButton *ButtonAppliquer{};
+    TButton *ButtonAide{};
     void FormShow(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
     void ButtonAppliquerClick(TObject *Sender);
@@ -41,10 +41,10 @@ public: // portage : __published	// Composants gérés par l'EDI
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
 private:	// Déclarations de l'utilisateur
-    voie *v;
-    int x, y;
-    TBitBtn *BitBtn[NBDIR]; // v5.2 
-    void DefinitFeu(direction Dir);
+    voie *v{};
+    int x{}, y{};
+    TBitBtn *BitBtn[NBDIR]{}; // v5.2 
+    void DefinitFeu(direction Dir) const;
 public:		// Déclarations de l'utilisateur
     TfrmDefVoie(TComponent* Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)

@@ -73,27 +73,27 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
   try
    {
     // --- En-tête (centre_ville::Charge / Sauve)
-    int v=l.Entier();
+    int const v=l.Entier();
     if (v<0x300) { throw std::runtime_error("version non stockée (< 0x300) : non prise en charge");
 }
     if (v>0x530) { throw std::runtime_error("version ultérieure à 0x530");
 }
     c.Version=v;
     e.Entier("Version", 0x530);
-    int NbFeux=l.Entier();
+    int const NbFeux=l.Entier();
     e.Entier("NbFeux", NbFeux);
     int NbX=99;
     int NbY=63;
     if (v>=0x400) { NbX=l.Entier(); NbY=l.Entier(); }
     e.Entier("NbX", NbX);
     e.Entier("NbY", NbY);
-    int NbFeuxPieton=(v>=0x520)?l.Entier():0;
+    int const NbFeuxPieton=(v>=0x520)?l.Entier():0;
     e.Entier("NbFeuxPieton", NbFeuxPieton);
-    int NbParkings=l.Entier();
+    int const NbParkings=l.Entier();
     e.Entier("NbParkings", NbParkings);
     e.Entier("NbVehicules", l.Entier());
     e.Entier("NbPietons", l.Entier());
-    int NbArretsBus=l.Entier();
+    int const NbArretsBus=l.Entier();
     e.Entier("NbArretsBus", NbArretsBus);
     e.Entier("NbLignesBus", l.Entier());
     int NbArretsTram=0;
@@ -106,7 +106,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     if (v>=0x360) { NbPlacesTaxi=l.Entier(); NbTaxis=l.Entier(); }
     e.Entier("NbPlacesTaxi", NbPlacesTaxi);
     e.Entier("NbTaxis", NbTaxis);
-    int NbPlacesPark=(v>=0x500)?l.Entier():0;
+    int const NbPlacesPark=(v>=0x500)?l.Entier():0;
     e.Entier("NbPlacesPark", NbPlacesPark);
     int NbPlacesVehlib=0;
     int NbVehlibs=0; // < 0x530 : champ non initialisé par le constructeur (0 dans les tests)
@@ -144,14 +144,14 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     // --- Feux (feu::Charge / Sauve)
     for(int f=1; f<=NbFeux; f++)
      {
-      std::string n="feu"+std::to_string(f)+".";
+      std::string const n="feu"+std::to_string(f)+".";
       e.Entier(n+"Numero", l.Entier());
       e.Entier(n+"x", l.Entier());
       e.Entier(n+"y", l.Entier());
       e.Entier(n+"Dir", l.Entier());
       e.Brut(n+"Etat", l.Octet());
-      int NbDmd=l.Entier();
-      int NbAtt=l.Entier();
+      int const NbDmd=l.Entier();
+      int const NbAtt=l.Entier();
       e.Entier(n+"NbFeuxDmd", NbDmd);
       e.Entier(n+"NbFeuxAtt", NbAtt);
       e.Brut(n+"TypeDmdVert", l.Octet());
@@ -168,7 +168,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     // --- Feux piétons (feu_pieton::Charge / Sauve), v5.2
     for(int f=1; f<=NbFeuxPieton; f++)
      {
-      std::string n="feup"+std::to_string(f)+".";
+      std::string const n="feup"+std::to_string(f)+".";
       e.Entier(n+"Numero", l.Entier());
       for(int i=0; i<2; i++) { e.Entier(Indice(n+"x", i), l.Entier());
 }
@@ -179,7 +179,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
       for(int i=0; i<NB_DIR; i++) { e.Entier(Indice(n+"iFeuDir", i), l.Entier());
 }
       e.Brut(n+"Etat", l.Octet());
-      int Nb=l.Entier();
+      int const Nb=l.Entier();
       e.Entier(n+"NbFeux", Nb);
       e.Brut(n+"TypeDmdVert", l.Octet());
       e.Brut(n+"TypePsgRouge", l.Octet());
@@ -193,7 +193,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     // --- Parkings
     for(int p=1; p<=NbParkings; p++)
      {
-      std::string n="parking"+std::to_string(p)+".";
+      std::string const n="parking"+std::to_string(p)+".";
       e.Entier(n+"Numero", l.Entier());
       e.Entier(n+"x", l.Entier());
       e.Entier(n+"y", l.Entier());
@@ -203,7 +203,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     e.Entier("depot.y", l.Entier());
     for(int a=1; a<=NbArretsBus; a++)
      {
-      std::string n="arret_bus"+std::to_string(a)+".";
+      std::string const n="arret_bus"+std::to_string(a)+".";
       e.Entier(n+"Numero", l.Entier());
       e.Entier(n+"x", l.Entier());
       e.Entier(n+"y", l.Entier());
@@ -215,7 +215,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
      }
     for(int k=1; k<=NB_LIGNES; k++)
      {
-      std::string n="ligne_bus"+std::to_string(k)+".";
+      std::string const n="ligne_bus"+std::to_string(k)+".";
       e.Entier(n+"Numero", l.Entier());
       e.Entier(n+"NbArrets", l.Entier());
       for(int i=0; i<NB_ARRETS_PAR_LIGNE; i++) { e.Entier(Indice(n+"NumArret", i), l.Entier());
@@ -224,7 +224,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     // --- Arrêts et lignes de tram (v3.5)
     for(int a=1; a<=NbArretsTram; a++)
      {
-      std::string n="arret_tram"+std::to_string(a)+".";
+      std::string const n="arret_tram"+std::to_string(a)+".";
       e.Entier(n+"Numero", l.Entier());
       e.Entier(n+"x", l.Entier());
       e.Entier(n+"y", l.Entier());
@@ -236,7 +236,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
      }
     for(int k=1; k<=NB_LIGNES; k++)
      {
-      std::string n="ligne_tram"+std::to_string(k)+".";
+      std::string const n="ligne_tram"+std::to_string(k)+".";
       if (v>=0x350)
        {
         e.Entier(n+"Numero", l.Entier());
@@ -258,7 +258,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     for(int t=0; t<3; t++) {
      for(int p=1; p<=NbPlaces[t]; p++)
       {
-       std::string n=std::string(Places[t])+std::to_string(p)+".";
+       std::string const n=std::string(Places[t])+std::to_string(p)+".";
        e.Entier(n+"Numero", l.Entier());
        e.Entier(n+"x", l.Entier());
        e.Entier(n+"y", l.Entier());
@@ -268,7 +268,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     for(int x=0; x<NbX; x++) {
      for(int y=0; y<NbY; y++)
       {
-       std::string n="case("+std::to_string(x)+","+std::to_string(y)+").";
+       std::string const n="case("+std::to_string(x)+","+std::to_string(y)+").";
        e.Entier(n+"x", l.Entier());
        e.Entier(n+"y", l.Entier());
        e.Brut(n+"DirPoss", l.Octet());
@@ -310,7 +310,7 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
 std::vector<std::string> EcartsParChamp(const conversion_cvw &Reference, const std::string &asObtenu)
  {
   std::vector<std::string> Ecarts;
-  auto Valeur=[](const std::string &s, std::size_t Debut, std::size_t Taille)->std::string
+  auto const Valeur=[](const std::string &s, std::size_t Debut, std::size_t Taille)->std::string
    {
     if (Debut+Taille>s.size()) { return "<absent>";
 }

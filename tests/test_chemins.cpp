@@ -190,7 +190,7 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
     std::vector<int> NumLigne;
     bool operator==(const arret &) const = default;
    };
-  auto Arrets=[](auto *a, int n)
+  auto const Arrets=[](auto *a, int n)
    {
     std::vector<arret> l;
     l.reserve(static_cast<std::size_t>(n));
@@ -199,7 +199,7 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
     return l;
    };
   // Case de route (Bus) ou de voie de tram seule, sans arrêt ni arrêt voisin
-  auto CaseLibre=[](bool Bus)
+  auto const CaseLibre=[](bool Bus)
    {
     for(int x=1; x<cv->NbX-1; x++) {
      for(int y=1; y<cv->NbY-1; y++)
@@ -252,7 +252,7 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
       std::vector<int> NumFeux;
       bool operator==(const feu_p &) const = default;
      };
-    auto FeuxP=[](int n)
+    auto const FeuxP=[](int n)
      {
       std::vector<feu_p> l;
       l.reserve(static_cast<std::size_t>(n));

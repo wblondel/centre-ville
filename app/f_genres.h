@@ -14,23 +14,23 @@
 class TfrmGeneration : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-  TGroupBox *GroupBox;
-  TTrackBar *TrackBarTailleMinSegments;
-  TLabel *Label1;
-  TLabel *Label2;
-  TTrackBar *TrackBarProbaSortieIntersection;
-  TTrackBar *TrackBarTailleMaxSegments;
-  TLabel *Label3;
-  TLabel *Label4;
-  TButton *ButtonAnnuler;
-  TButton *ButtonOk;
-  TLabel *Label5;
-  TTrackBar *TrackBarProbaEntreeIntersection;
-  TLabel *Label6;
-  TTrackBar *TrackBarProbaTraverseeRoute;
-  TLabel *LabelRq;
-  TButton *ButtonAide;
-  void ButtonOkClick(TObject *Sender);
+  TGroupBox *GroupBox{};
+  TTrackBar *TrackBarTailleMinSegments{};
+  TLabel *Label1{};
+  TLabel *Label2{};
+  TTrackBar *TrackBarProbaSortieIntersection{};
+  TTrackBar *TrackBarTailleMaxSegments{};
+  TLabel *Label3{};
+  TLabel *Label4{};
+  TButton *ButtonAnnuler{};
+  TButton *ButtonOk{};
+  TLabel *Label5{};
+  TTrackBar *TrackBarProbaEntreeIntersection{};
+  TLabel *Label6{};
+  TTrackBar *TrackBarProbaTraverseeRoute{};
+  TLabel *LabelRq{};
+  TButton *ButtonAide{};
+  void ButtonOkClick(TObject *Sender) const;
   void ButtonAideClick(TObject *Sender);
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);

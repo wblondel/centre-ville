@@ -140,30 +140,30 @@ void TfrmInfosBus::RafraichitInfos()
   RendreVisibleInfos(Afficher);
  }
 //---------------------------------------------------------------------------
-void TfrmInfosBus::FormShow(TObject *Sender)
+void TfrmInfosBus::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailBus->Checked=true;
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosBus::FormHide(TObject *Sender)
+void TfrmInfosBus::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailBus->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmInfosBus::ButtonOkClick(TObject *Sender)
+void TfrmInfosBus::ButtonOkClick(TObject * /*Sender*/)
 {
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosBus::ButtonAideClick(TObject *Sender)
+void TfrmInfosBus::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
-void TfrmInfosBus::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmInfosBus::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

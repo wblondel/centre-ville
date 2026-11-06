@@ -14,47 +14,47 @@
 class TfrmParamSimul : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonOk;
-    TButton *ButtonAnnuler;
-    TGroupBox *GroupBoxNbElements;
-    TLabel *LabelNbVehicules;
-	TCSpinEdit *CSpinEditNbVehicules;
-	TGroupBox *GroupBoxFonctionnement;
-	TCSpinEdit *CSpinEditAttenteAvChx;
-	TLabel *LabelTours;
-	TLabel *LabelAttenteAvChx;
-	TButton *ButtonAppliquer;
-	TLabel *LabelNbToursParSeconde;
-	TCSpinEdit *CSpinEditNbToursParSeconde;
-	TLabel *LabelDureeOrange;
-	TCSpinEdit *CSpinEditDureeOrange;
-	TLabel *LabelDureeRouge;
-	TCSpinEdit *CSpinEditDureeRouge;
-	TLabel *LabelDureeVert;
-	TCSpinEdit *CSpinEditDureeVert;
-	TBitBtn *BitBtnAppliqueDureeFeuVert;
-	TBitBtn *BitBtnAppliqueDureeFeuRouge;
-	TRadioGroup *RadioGroupVitesses;
-	TLabel *LabelNbPietons;
-	TCSpinEdit *CSpinEditNbPietons;
-	TLabel *Label1;
-	TGroupBox *GroupBoxPietons;
-	TLabel *LabelNbCasesMaxPsgPtn;
-	TCSpinEdit *CSpinEditNbCasesMaxPsgPtn;
-	TLabel *Label4;
-	TLabel *LabelProbaPsgPt;
-	TCSpinEdit *CSpinEditProbaPsgPt;
-	TLabel *Label6;
-	TLabel *Label7;
-	TLabel *LabelNbArretsBus;
-	TBitBtn *BitBtnDefLignesBus;
-	TButton *ButtonAide;
-	TLabel *LabelNbArretsTram;
-	TBitBtn *BitBtnDefLignesTram;
-	TLabel *LabelNbPlacesTaxi;
-	TBitBtn *BitBtnDefTaxis;
-	TLabel *Label2;
-	TBitBtn *BitBtnDefVehlibs;
+    TButton *ButtonOk{};
+    TButton *ButtonAnnuler{};
+    TGroupBox *GroupBoxNbElements{};
+    TLabel *LabelNbVehicules{};
+	TCSpinEdit *CSpinEditNbVehicules{};
+	TGroupBox *GroupBoxFonctionnement{};
+	TCSpinEdit *CSpinEditAttenteAvChx{};
+	TLabel *LabelTours{};
+	TLabel *LabelAttenteAvChx{};
+	TButton *ButtonAppliquer{};
+	TLabel *LabelNbToursParSeconde{};
+	TCSpinEdit *CSpinEditNbToursParSeconde{};
+	TLabel *LabelDureeOrange{};
+	TCSpinEdit *CSpinEditDureeOrange{};
+	TLabel *LabelDureeRouge{};
+	TCSpinEdit *CSpinEditDureeRouge{};
+	TLabel *LabelDureeVert{};
+	TCSpinEdit *CSpinEditDureeVert{};
+	TBitBtn *BitBtnAppliqueDureeFeuVert{};
+	TBitBtn *BitBtnAppliqueDureeFeuRouge{};
+	TRadioGroup *RadioGroupVitesses{};
+	TLabel *LabelNbPietons{};
+	TCSpinEdit *CSpinEditNbPietons{};
+	TLabel *Label1{};
+	TGroupBox *GroupBoxPietons{};
+	TLabel *LabelNbCasesMaxPsgPtn{};
+	TCSpinEdit *CSpinEditNbCasesMaxPsgPtn{};
+	TLabel *Label4{};
+	TLabel *LabelProbaPsgPt{};
+	TCSpinEdit *CSpinEditProbaPsgPt{};
+	TLabel *Label6{};
+	TLabel *Label7{};
+	TLabel *LabelNbArretsBus{};
+	TBitBtn *BitBtnDefLignesBus{};
+	TButton *ButtonAide{};
+	TLabel *LabelNbArretsTram{};
+	TBitBtn *BitBtnDefLignesTram{};
+	TLabel *LabelNbPlacesTaxi{};
+	TBitBtn *BitBtnDefTaxis{};
+	TLabel *Label2{};
+	TBitBtn *BitBtnDefVehlibs{};
 	void CSpinEditNbVehiculesChange(TObject *Sender);
 	void ButtonOkClick(TObject *Sender);
 
@@ -63,10 +63,10 @@ public: // portage : __published	// Composants gérés par l'EDI
 
 	void BitBtnAppliqueDureeFeuVertClick(TObject *Sender);
 	void BitBtnAppliqueDureeFeuRougeClick(TObject *Sender);
-	void CSpinEditDureeVertChange(TObject *Sender);
-	void CSpinEditDureeRougeChange(TObject *Sender);
+	void CSpinEditDureeVertChange(TObject *Sender) const;
+	void CSpinEditDureeRougeChange(TObject *Sender) const;
     void CSpinEditNbPietonsChange(TObject *Sender);
-    void Change(TObject *Sender);
+    void Change(TObject *Sender) const;
     void BitBtnDefLignesBusClick(TObject *Sender);
     
     void ButtonAideClick(TObject *Sender);
@@ -85,8 +85,8 @@ private:	// Déclarations de l'utilisateur
          NbPlacesTaxiChange, // v3.6
          NbPlacesParkChange, // v5.0
 		 RetourFicheFille, // v6.0.2 : prochain FormShow au retour d'une fiche fille
-		 Initialisation;
-	bool AppliqueChoix();
+		 Initialisation{};
+	bool AppliqueChoix() const;
     void CalculeChoixPossiblesNbVehicules(); // v5.0
 public:		// Déclarations de l'utilisateur
     TfrmParamSimul(TComponent* Owner);

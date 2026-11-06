@@ -316,19 +316,19 @@ void TfrmInfosPieton::RafraichitInfos()
 	// v5.4.1 : partie Epidémie
 	if (frmSimulation->EpidemieActivee)
 	 {
-	  bool Infection=p->EstContagieux();
-	  int NbInfections=p->NbInfections();
+	  bool const Infection=p->EstContagieux();
+	  int const NbInfections=p->NbInfections();
 	  LabelInfecte->Caption=asOuiNon[!!Infection];
 	  LabelInfections->Caption=IntToStr(NbInfections); // portage : conversion implicite int -> AnsiString de C++Builder
 	  if (NbInfections>0)
 	   {
-		int Rang=p->DonnePrmRang();
+		int const Rang=p->DonnePrmRang();
 		int // v5.4.2 : au lieu de DonneRang()
-			DrnRang=p->DonneRang();
+			const DrnRang=p->DonneRang();
 		int // v5.4.2 : au lieu de DonneDrnRang()
-			PrmTourDeb=p->DonneTourDeb(PREMIER);
-		int DrnTourDeb=p->DonneTourDeb(DERNIER);
-		int DrnTourFin=p->DonneTourFin();
+			const PrmTourDeb=p->DonneTourDeb(PREMIER);
+		int const DrnTourDeb=p->DonneTourDeb(DERNIER);
+		int const DrnTourFin=p->DonneTourFin();
 		LabelRangs->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((Rang, DrnRang)));
 		LabelTours->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((PrmTourDeb, DrnTourDeb)));
 		if (Infection&&(DrnTourFin-DrnTourDeb>0)) {
@@ -359,30 +359,30 @@ void TfrmInfosPieton::RafraichitInfos()
   RendreVisibleInfos(NumPieton>0);
  }
 //---------------------------------------------------------------------------
-void TfrmInfosPieton::FormShow(TObject *Sender)
+void TfrmInfosPieton::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailPieton->Checked=true;
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosPieton::FormHide(TObject *Sender)
+void TfrmInfosPieton::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailPieton->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmInfosPieton::ButtonOkClick(TObject *Sender)
+void TfrmInfosPieton::ButtonOkClick(TObject * /*Sender*/)
 {
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosPieton::ButtonAideClick(TObject *Sender)
+void TfrmInfosPieton::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
-void TfrmInfosPieton::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmInfosPieton::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

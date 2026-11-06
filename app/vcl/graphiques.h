@@ -154,7 +154,7 @@ class TBitmap
   TBitmap() = default;
   TBitmap(const TBitmap &b) : Image(b.Image) {}
   TBitmap &operator=(const TBitmap &b) { Image=b.Image; Changed(); return *this; }
-  void Changed() { if (OnChange) { OnChange(); 
+  void Changed() const { if (OnChange) { OnChange(); 
 }}
  };
 //---------------------------------------------------------------------------

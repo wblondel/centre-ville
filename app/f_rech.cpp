@@ -108,14 +108,14 @@ void TfrmRecherche::RafraichitAffichage()
    }
  }
 //---------------------------------------------------------------------------
-void TfrmRecherche::RadioButtonClick(TObject *Sender)
+void TfrmRecherche::RadioButtonClick(TObject * /*Sender*/)
 {
  RafraichitAffichage();
 }
 //---------------------------------------------------------------------------
 static void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 : tirée de FixeNumeroMax
  {
-  TNotifyEvent Change=CSpinEdit->OnChange;
+  TNotifyEvent const Change=CSpinEdit->OnChange;
   CSpinEdit->OnChange=nullptr;
   CSpinEdit->Value=Valeur;
   CSpinEdit->OnChange=Change;
@@ -145,11 +145,11 @@ static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int
 }
  }
 //---------------------------------------------------------------------------
-void TfrmRecherche::FormShow(TObject *Sender)
+void TfrmRecherche::FormShow(TObject * /*Sender*/) const
 {
  int i = 0;
- int x=frmSimulation->DrawGridSimul->Col;
- int y=frmSimulation->DrawGridSimul->Row;
+ int const x=frmSimulation->DrawGridSimul->Col;
+ int const y=frmSimulation->DrawGridSimul->Row;
  voie *v=&cv->v[x][y];
  frmSimulation->ActionRechercher->Checked=true;
  FixeNumeroMax(CSpinEditParking, cv->NbParkings);
@@ -188,7 +188,7 @@ void TfrmRecherche::FormShow(TObject *Sender)
 	 CSpinEditPieton->Value=v->NumPieton[1];
 	}
   }
- auto Ailleurs=[x, y](int xe, int ye) { return (xe!=x)||(ye!=y); }; // v6.0.12 : voir FixeNumeroCase
+ auto const Ailleurs=[x, y](int xe, int ye) { return (xe!=x)||(ye!=y); }; // v6.0.12 : voir FixeNumeroCase
  if (v->NumBus != 0) { FixeNumeroCase(CSpinEditBus, RadioButtonBus, v->NumBus, Ailleurs(cv->Bus[v->NumBus-1].x, cv->Bus[v->NumBus-1].y)); // v3.0. v6.0.12 : FixeNumeroCase
 }
  if (v->NumArretBus != 0) { FixeNumeroCase(CSpinEditArretBus, RadioButtonArretBus, v->NumArretBus, Ailleurs(cv->ArretBus[v->NumArretBus-1].x, cv->ArretBus[v->NumArretBus-1].y)); // v3.0. v6.0.12
@@ -201,14 +201,14 @@ void TfrmRecherche::FormShow(TObject *Sender)
 }
  if (v->NumPlaceTaxi != 0)
   {
-   int f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile; // v6.0.12 : queue de la file, si la simulation a défini les files (sinon OnChange ne déplace pas le curseur)
+   int const f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile; // v6.0.12 : queue de la file, si la simulation a défini les files (sinon OnChange ne déplace pas le curseur)
    place_taxi *q=(cv->FileTaxi&&(f>=0)&&(f<cv->NbFilesTaxi))?cv->PlaceTaxi+cv->FileTaxi[f].NumPlaceQueue:nullptr;
    CSpinEditPlaceTaxi->Value=v->NumPlaceTaxi; // v3.6
    FixeNumeroCase(CSpinEditFileTaxi, RadioButtonFileTaxi, f+1, (q != nullptr)&&Ailleurs(q->x, q->y)); // v3.6. v6.0.12
   }
  if (v->NumPlacePark != 0) // v5.0
   {
-   int f=cv->PlacePark[v->NumPlacePark-1].NumFile; // v6.0.12 : comme pour les taxis
+   int const f=cv->PlacePark[v->NumPlacePark-1].NumFile; // v6.0.12 : comme pour les taxis
    place_park *q=(cv->FilePark&&(f>=0)&&(f<cv->NbFilesPark))?cv->PlacePark+cv->FilePark[f].NumPlaceQueue:nullptr;
    CSpinEditPlacePark->Value=v->NumPlacePark;
    FixeNumeroCase(CSpinEditFilePark, RadioButtonFilePark, f+1, (q != nullptr)&&Ailleurs(q->x, q->y)); // v6.0.12
@@ -221,19 +221,19 @@ void TfrmRecherche::FormShow(TObject *Sender)
  frmSimulation->TimerClignotementLocalisation->Enabled=true; // v4.4.1 : on fait à présent clignoter le curseur
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditXChange(TObject *Sender)
+void TfrmRecherche::CSpinEditXChange(TObject * /*Sender*/) const
 {
  frmSimulation->DrawGridSimul->Col=CSpinEditX->Value;
  StatusBar->SimpleText="";
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditYChange(TObject *Sender)
+void TfrmRecherche::CSpinEditYChange(TObject * /*Sender*/) const
 {
  frmSimulation->DrawGridSimul->Row=CSpinEditY->Value;
  StatusBar->SimpleText="";
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditParkingChange(TObject *Sender)
+void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->Parking)||
@@ -255,7 +255,7 @@ void TfrmRecherche::CSpinEditParkingChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditFeuChange(TObject *Sender)
+void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->Feu)||
@@ -277,7 +277,7 @@ void TfrmRecherche::CSpinEditFeuChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditVehiculeChange(TObject *Sender)
+void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->Vehicule)||
@@ -299,7 +299,7 @@ void TfrmRecherche::CSpinEditVehiculeChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
+void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->Pieton)||
@@ -365,12 +365,12 @@ void TfrmRecherche::CSpinEditPietonChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::ButtonAnnulerClick(TObject *Sender)
+void TfrmRecherche::ButtonAnnulerClick(TObject * /*Sender*/)
 {
  Close();
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::FormHide(TObject *Sender)
+void TfrmRecherche::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionRechercher->Checked=false;
  frmSimulation->TimerClignotementLocalisation->Enabled=false; // v4.4.1 : on arrête le clignotement
@@ -378,12 +378,12 @@ void TfrmRecherche::FormHide(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmRecherche::ButtonAideClick(TObject *Sender)
+void TfrmRecherche::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditArretBusChange(TObject *Sender)
+void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/) const
 { // v3.0
  if ((!cv)||
      (!cv->ArretBus)||
@@ -405,7 +405,7 @@ void TfrmRecherche::CSpinEditArretBusChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditBusChange(TObject *Sender)
+void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/) const
 { // v3.0
  if ((!cv)||
      (!cv->Bus)||
@@ -427,7 +427,7 @@ void TfrmRecherche::CSpinEditBusChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditArretTramChange(TObject *Sender)
+void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/) const
 { // v3.5
  if ((!cv)||
      (!cv->ArretTram)||
@@ -449,7 +449,7 @@ void TfrmRecherche::CSpinEditArretTramChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditTramChange(TObject *Sender)
+void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/) const
 { // v3.5
  if ((!cv)||
      (!cv->Tram)||
@@ -471,7 +471,7 @@ void TfrmRecherche::CSpinEditTramChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditTaxiChange(TObject *Sender)
+void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->Taxi)||
@@ -493,7 +493,7 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
+void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->PlaceTaxi)||
@@ -515,7 +515,7 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditFileTaxiChange(TObject *Sender)
+void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->FileTaxi)||
@@ -535,7 +535,7 @@ void TfrmRecherche::CSpinEditFileTaxiChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmRecherche::CSpinEditPlaceParkChange(TObject *Sender)
+void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->PlacePark)||
@@ -558,7 +558,7 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmRecherche::CSpinEditFileParkChange(TObject *Sender)
+void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/) const
 {
  if ((!cv)||
      (!cv->FilePark)||
@@ -577,7 +577,7 @@ void TfrmRecherche::CSpinEditFileParkChange(TObject *Sender)
                                               cv->PlacePark[fp->NumPlaceQueue].y)));
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditVehlibChange(TObject *Sender)
+void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/) const
 { // v5.3
  if ((!cv)||
      (!cv->Vehlib)||
@@ -599,7 +599,7 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject *Sender)
+void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/) const
 { // v5.3
  if ((!cv)||
      (!cv->PlaceVehlib)||
@@ -621,8 +621,8 @@ void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmRecherche::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

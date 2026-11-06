@@ -111,29 +111,29 @@ void TfrmInfosVehlib::RafraichitInfos()
   RendreVisibleInfos(Afficher);
  }
 //---------------------------------------------------------------------------
-void TfrmInfosVehlib::FormShow(TObject *Sender)
+void TfrmInfosVehlib::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailVehlib->Checked=true;
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosVehlib::FormHide(TObject *Sender)
+void TfrmInfosVehlib::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDetailVehlib->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmInfosVehlib::ButtonOkClick(TObject *Sender)
+void TfrmInfosVehlib::ButtonOkClick(TObject * /*Sender*/)
 {
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmInfosVehlib::ButtonAideClick(TObject *Sender)
+void TfrmInfosVehlib::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmInfosVehlib::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmInfosVehlib::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

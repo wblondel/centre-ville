@@ -45,7 +45,7 @@ namespace
    {
     if (fd<0) { return -1;
 }
-    std::scoped_lock g(Verrou);
+    std::scoped_lock const g(Verrou);
     for(std::size_t i=0; i<Fichiers.size(); i++) {
      if (Fichiers[i].fd<0)
       {
@@ -84,7 +84,7 @@ namespace
 #ifdef _WIN32
       int k=_write(fd, Tampon+Total, (unsigned)(n-Total));
 #else
-      ssize_t k=write(fd, Tampon+Total, n-Total);
+      ssize_t const k=write(fd, Tampon+Total, n-Total);
 #endif
       if (k<=0) { return false;
 }
@@ -113,7 +113,7 @@ namespace
 }
       f->Ecriture.clear();
      }
-    std::size_t Restant=f->Lecture.size()-f->PosLecture;
+    std::size_t const Restant=f->Lecture.size()-f->PosLecture;
     if (Restant != 0u) {
      DeplaceSysteme(f->fd, -static_cast<long long>(Restant), SEEK_CUR);
 }
@@ -205,7 +205,7 @@ int FileCreate(const AnsiString &asNomFichier)
 //---------------------------------------------------------------------------
 int FileRead(int Handle, void *Tampon, unsigned NbOctets)
  { // Comme ReadFile : jusqu'à NbOctets, moins en fin de fichier
-  std::scoped_lock g(Verrou);
+  std::scoped_lock const g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return -1;
 }
@@ -219,7 +219,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
      {
       if (NbOctets-Total>=TAILLE_TAMPON)
        { // Gros bloc : lecture directe
-        long long n=LitSysteme(f->fd, Destination+Total, NbOctets-Total);
+        long long const n=LitSysteme(f->fd, Destination+Total, NbOctets-Total);
         if (n<0) { return -1;
 }
         if (n==0) { break;
@@ -228,7 +228,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
         continue;
        }
       f->Lecture.resize(TAILLE_TAMPON);
-      long long n=LitSysteme(f->fd, f->Lecture.data(), TAILLE_TAMPON);
+      long long const n=LitSysteme(f->fd, f->Lecture.data(), TAILLE_TAMPON);
       if (n<0) { f->Lecture.clear(); f->PosLecture=0; return -1; }
       f->Lecture.resize(static_cast<std::size_t>(n));
       f->PosLecture=0;
@@ -246,7 +246,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
 //---------------------------------------------------------------------------
 int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
  {
-  std::scoped_lock g(Verrou);
+  std::scoped_lock const g(Verrou);
   fichier *f=Trouve(Handle);
   if ((!f)||f->Erreur) { return -1;
 }
@@ -260,19 +260,19 @@ int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
 //---------------------------------------------------------------------------
 int FileSeek(int Handle, int Decalage, int Origine)
  {
-  std::scoped_lock g(Verrou);
+  std::scoped_lock const g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return -1;
 }
   if (!Synchronise(f)) { return -1;
 }
-  long long p=DeplaceSysteme(f->fd, Decalage, Origine);
+  long long const p=DeplaceSysteme(f->fd, Decalage, Origine);
   return (p<0)?-1:static_cast<int>(p);
  }
 //---------------------------------------------------------------------------
 bool FileFlush(int Handle)
  {
-  std::scoped_lock g(Verrou);
+  std::scoped_lock const g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return false;
 }
@@ -284,7 +284,7 @@ void FileClose(int Handle)
  {
   int fd=-1;
    {
-    std::scoped_lock g(Verrou);
+    std::scoped_lock const g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return;
 }
@@ -323,7 +323,7 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
 #ifdef _WIN32
     int fd=OuvreChemin(Cible, _O_WRONLY);
 #else
-    int fd=OuvreChemin(Cible, O_WRONLY);
+    int const fd=OuvreChemin(Cible, O_WRONLY);
 #endif
     if (fd<0) { return -1;
 }
@@ -333,10 +333,10 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
   if (Dossier.empty()) { Dossier=".";
 }
   fs::path Temporaire;
-  int fd=CreeTemporaire(Dossier, Temporaire);
+  int const fd=CreeTemporaire(Dossier, Temporaire);
   if (fd<0)
    {
-    int Erreur=errno;
+    int const Erreur=errno;
 #ifdef _WIN32
     const bool Interdit=(Erreur==EACCES);
 #else
@@ -349,15 +349,15 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
     return FileCreate(asNomFichier);
    }
 #ifndef _WIN32
-  struct stat Etat;
+  struct stat Etat{};
   if (Existe&&(stat(Cible.c_str(), &Etat)==0))
    {
     fchmod(fd, Etat.st_mode&07777);
     (void)(fchown(fd, Etat.st_uid, Etat.st_gid) == 0); // Refusé si le fichier est à un autre : il reste à l'utilisateur
    }
 #endif
-  int Handle=Enregistre(fd);
-  std::scoped_lock g(Verrou);
+  int const Handle=Enregistre(fd);
+  std::scoped_lock const g(Verrou);
   fichier *f=Trouve(Handle);
   if (f)
    {
@@ -375,7 +375,7 @@ bool FileCommitRemplacement(int Handle)
   fs::path Temporaire;
   fs::path Cible;
    {
-    std::scoped_lock g(Verrou);
+    std::scoped_lock const g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return false;
 }
@@ -410,7 +410,7 @@ void FileAbandonRemplacement(int Handle)
  {
   std::filesystem::path Temporaire;
    {
-    std::scoped_lock g(Verrou);
+    std::scoped_lock const g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return;
 }

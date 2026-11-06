@@ -13,9 +13,9 @@
 class TfrmAffDistParkings : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-  TStringGrid *StringGridDistances;
-  TCheckBox *CheckBoxCouloirsBus;
-  TPanel *Panel;
+  TStringGrid *StringGridDistances{};
+  TCheckBox *CheckBoxCouloirsBus{};
+  TPanel *Panel{};
   void FormShow(TObject *Sender);
   void FormHide(TObject *Sender);
   void CheckBoxCouloirsBusClick(TObject *Sender);
@@ -25,7 +25,7 @@ private:	// Déclarations de l'utilisateur
 public:		// Déclarations de l'utilisateur
   TfrmAffDistParkings(TComponent* Owner);
   void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
-  void EffaceInfos();
+  void EffaceInfos() const;
   void RafraichitInfos();
 };
 //---------------------------------------------------------------------------

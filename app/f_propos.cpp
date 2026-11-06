@@ -49,7 +49,7 @@ namespace
    };
   void DessineTrait(QImage &Image, const Trait &t, int x, QRgb Clair, QRgb Ombre)
    {
-    int y=1+(3*t.Bande);
+    int const y=1+(3*t.Bande);
     for(int i=t.x0; i<=t.x1; i++)
      {
       Image.setPixel(x+i, y, Clair);
@@ -62,16 +62,16 @@ namespace
 //---------------------------------------------------------------------------
 QPixmap ImageDeVersion(int Majeure, int Mineure)
  {
-  QString stMajeure=QString::number(Majeure);
-  QString stMineure=QString::number(Mineure);
+  QString const stMajeure=QString::number(Majeure);
+  QString const stMineure=QString::number(Mineure);
   QImage Image((13*(stMajeure.size()+stMineure.size()))+2, 22, QImage::Format_ARGB32);
   Image.fill(qRgb(0x00, 0x00, 0x00));
   int x=0;
-  for(QChar c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+  for(QChar const c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }
   DessineTrait(Image, {.Bande=6, .x0=0, .x1=1}, x, qRgb(0xFF, 0xFF, 0x00), qRgb(0x80, 0x80, 0x00)); // virgule
   x+=2;
-  for(QChar c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+  for(QChar const c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }
   return QPixmap::fromImage(Image);
  }
@@ -88,7 +88,7 @@ TfrmAPropos::TfrmAPropos(TComponent* Owner) : TForm(Owner)
   LabelHDPI->Caption = LabelHDPI->Caption + FormatFloat("0.0", Screen->PixelsPerInch/96.0); // v5.4.1
  }
 //---------------------------------------------------------------------------
-void TfrmAPropos::TimerTimer(TObject *Sender)
+void TfrmAPropos::TimerTimer(TObject * /*Sender*/)
  {
   switch((TempsEcoule++)%10)
    {
@@ -110,7 +110,7 @@ void TfrmAPropos::TimerTimer(TObject *Sender)
    }
  }
 //---------------------------------------------------------------------------
-void TfrmAPropos::FormShow(TObject *Sender)
+void TfrmAPropos::FormShow(TObject * /*Sender*/)
 {
  TempsEcoule=0;
  Bitmap=new TBITMAP;
@@ -119,36 +119,36 @@ void TfrmAPropos::FormShow(TObject *Sender)
  Timer->Enabled=true;
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::FormHide(TObject *Sender)
+void TfrmAPropos::FormHide(TObject * /*Sender*/)
 {
  Timer->Enabled=false;
  delete Bitmap;
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::LabelURLClick(TObject *Sender)
+void TfrmAPropos::LabelURLClick(TObject * /*Sender*/) const
 { // v5.4 : conversion BCB6>BCBX (string)
  // portage : ShellExecute(NULL, L"open", LabelURL->Caption.c_str(), NULL, NULL, SW_SHOWMAXIMIZED)
  QDesktopServices::openUrl(QUrl(Q(LabelURL->Caption)));
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::LabelEMailClick(TObject *Sender)
+void TfrmAPropos::LabelEMailClick(TObject * /*Sender*/) const
 { // v5.4 : conversion BCB6>BCBX (string)
  // portage : ShellExecute(NULL, L"open", String("mailto:"+...).c_str(), NULL, NULL, SW_SHOWMAXIMIZED)
  QDesktopServices::openUrl(QUrl(Q(String("mailto:"+LabelEMail->Caption+"?subject=Centre-ville"))));
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::FormCreate(TObject *Sender)
+void TfrmAPropos::FormCreate(TObject * /*Sender*/)
 {
  FermetureAutomatique=false;
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::FormKeyPress(TObject *Sender, char &Key)
+void TfrmAPropos::FormKeyPress(TObject * /*Sender*/, char &Key) const
 {
  if ((Key==13)||(Key==27)) { SpeedButtonOk->Click();
 }
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::LabelClick(TObject *Sender)
+void TfrmAPropos::LabelClick(TObject * /*Sender*/)
 { // v5.2.3. : où que l'on clique, ça apparaît + Texte revu
  AppelleAuChaos(); // v5.2.3 : Déplacé ici
  // v5.4 : conversion BCB6>BCBX (Application-> supprimé + String)

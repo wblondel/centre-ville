@@ -43,31 +43,31 @@ namespace
   int RegenereGolden(const std::string &asMaps, const std::string &asGolden)
    {
     for(const carte &c : Cartes) {
-     for(auto k : ConfigsGolden)
+     for(auto const k : ConfigsGolden)
       {
-       std::string Texte=ProduitGolden(asMaps+"/"+c.Fichier, c.Nom, k);
-       std::filesystem::path p=Chemin(asGolden)/Chemin(FichierGolden(c.Nom, k));
+       std::string const Texte=ProduitGolden(asMaps+"/"+c.Fichier, c.Nom, k);
+       std::filesystem::path const p=Chemin(asGolden)/Chemin(FichierGolden(c.Nom, k));
        std::filesystem::create_directories(p.parent_path());
        std::ofstream f(p, std::ios::binary);
        f<<Texte;
        std::cout<<p.string()<<" ("<<Texte.size()<<" octets)\n";
       }
 }
-    std::filesystem::path Temp=std::filesystem::temp_directory_path()/"cvsim";
+    std::filesystem::path const Temp=std::filesystem::temp_directory_path()/"cvsim";
     std::filesystem::create_directories(Temp);
-    std::string asTemp=Temp.string();
+    std::string const asTemp=Temp.string();
     for(const auto & k : ConfigsGeneration)
      {
-      std::string Texte=ProduitGoldenGeneration(k, asTemp+"/generation.cvw");
-      std::filesystem::path p=Chemin(asGolden)/"generation"/(std::string(k.Nom)+".txt");
+      std::string const Texte=ProduitGoldenGeneration(k, asTemp+"/generation.cvw");
+      std::filesystem::path const p=Chemin(asGolden)/"generation"/(std::string(k.Nom)+".txt");
       std::filesystem::create_directories(p.parent_path());
       std::ofstream(p, std::ios::binary)<<Texte;
       std::cout<<p.string()<<" ("<<Texte.size()<<" octets)\n";
      }
     for(const carte &c : Cartes)
      {
-      std::string Texte=ProduitGoldenCopie(asMaps+"/"+c.Fichier, c.Nom, asTemp);
-      std::filesystem::path p=Chemin(asGolden)/"copie"/(std::string(c.Nom)+".txt");
+      std::string const Texte=ProduitGoldenCopie(asMaps+"/"+c.Fichier, c.Nom, asTemp);
+      std::filesystem::path const p=Chemin(asGolden)/"copie"/(std::string(c.Nom)+".txt");
       std::filesystem::create_directories(p.parent_path());
       std::ofstream(p, std::ios::binary)<<Texte;
       std::cout<<p.string()<<" ("<<Texte.size()<<" octets)\n";
@@ -76,7 +76,7 @@ namespace
    }
  }
 //---------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main(int argc, char * const*argv)
  {
   if (argc<2) { return Usage();
 }
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 }
     return RegenereGolden(argv[2], argv[3]);
    }
-  std::string asCarte=argv[1];
+  std::string const asCarte=argv[1];
   std::string asSortie;
   int NbTours=100;
   int TourResurrection=0;

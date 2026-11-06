@@ -60,7 +60,7 @@ GrilleSimulation::GrilleSimulation(QWidget *Parent) : ControleVcl<QAbstractScrol
      // (plusieurs cases par tic, selon la distance)
     if (!SelectionEnCours) { return;
 }
-    QPoint p=DernierePosition;
+    QPoint const p=DernierePosition;
     TGridCoord a=Ancre;
     if (p.x()<0) { if (a.X>0) { a.X--; 
 }}
@@ -125,15 +125,15 @@ int GrilleSimulation::LimiteVisible(bool Colonne) const
 //---------------------------------------------------------------------------
 TRect GrilleSimulation::CellRect(int ACol, int ARow) const
  { // TCustomGrid::CellRect : rectangle dans le contrôle (bords droit et bas exclus)
-  int x=(ACol-HautGauche.X)*DefaultColWidth;
-  int y=(ARow-HautGauche.Y)*DefaultRowHeight;
+  int const x=(ACol-HautGauche.X)*DefaultColWidth;
+  int const y=(ARow-HautGauche.Y)*DefaultRowHeight;
   return {x, y, x+DefaultColWidth, y+DefaultRowHeight};
  }
 //---------------------------------------------------------------------------
 QRect GrilleSimulation::RectGrille(const TGridRect &r) const
  {
-  TRect a=CellRect(r.Left, r.Top);
-  TRect b=CellRect(r.Right, r.Bottom);
+  TRect const a=CellRect(r.Left, r.Top);
+  TRect const b=CellRect(r.Right, r.Bottom);
   return {a.Left, a.Top, b.Right-a.Left, b.Bottom-a.Top};
  }
 //---------------------------------------------------------------------------
@@ -150,9 +150,9 @@ TGridCoord GrilleSimulation::CaseEn(const QPoint &p) const
 //---------------------------------------------------------------------------
 void GrilleSimulation::MetAJourDefilement()
  { // Défilement par cases entières ; barres seulement si la grille déborde
-  QSize Max=maximumViewportSize();
-  int w=NbColonnes*DefaultColWidth;
-  int h=NbLignes*DefaultRowHeight;
+  QSize const Max=maximumViewportSize();
+  int const w=NbColonnes*DefaultColWidth;
+  int const h=NbLignes*DefaultRowHeight;
   bool BarreH=w>Max.width();
   bool BarreV=h>Max.height();
   int lh=horizontalScrollBar()->sizeHint().height();
@@ -163,10 +163,10 @@ void GrilleSimulation::MetAJourDefilement()
 }
   if (BarreV&&!BarreH) { BarreH=w>Max.width()-lv;
 }
-  int Largeur=Max.width()-(BarreV?lv:0);
-  int Hauteur=Max.height()-(BarreH?lh:0);
-  int MaxGauche=BarreH?qMax(0, NbColonnes-qMax(1, Largeur/DefaultColWidth)):0;
-  int MaxHaut=BarreV?qMax(0, NbLignes-qMax(1, Hauteur/DefaultRowHeight)):0;
+  int const Largeur=Max.width()-(BarreV?lv:0);
+  int const Hauteur=Max.height()-(BarreH?lh:0);
+  int const MaxGauche=BarreH?qMax(0, NbColonnes-qMax(1, Largeur/DefaultColWidth)):0;
+  int const MaxHaut=BarreV?qMax(0, NbLignes-qMax(1, Hauteur/DefaultRowHeight)):0;
   horizontalScrollBar()->setRange(0, MaxGauche);
   horizontalScrollBar()->setPageStep(qMax(1, Largeur/DefaultColWidth));
   horizontalScrollBar()->setSingleStep(1);
@@ -193,8 +193,8 @@ void GrilleSimulation::DefinitHautGauche(int Gauche, int Haut)
 //---------------------------------------------------------------------------
 void GrilleSimulation::scrollContentsBy(int /*dx*/, int /*dy*/)
  {
-  int g=horizontalScrollBar()->value();
-  int h=verticalScrollBar()->value();
+  int const g=horizontalScrollBar()->value();
+  int const h=verticalScrollBar()->value();
   if ((g!=HautGauche.X)||(h!=HautGauche.Y))
    {
     HautGauche.X=g;
@@ -242,8 +242,8 @@ void GrilleSimulation::MoveCurrent(int ACol, int ARow, bool MoveAnchor)
  { // TCustomGrid::MoveCurrent
   ACol=qBound(0, ACol, NbColonnes-1);
   ARow=qBound(0, ARow, NbLignes-1);
-  TGridRect Ancienne=Selection;
-  TGridCoord AncienneCourante=Courante;
+  TGridRect const Ancienne=Selection;
+  TGridCoord const AncienneCourante=Courante;
   Courante.X=ACol;
   Courante.Y=ARow;
   if (MoveAnchor||!Options.Contains(goRangeSelect)) { Ancre=Courante;
@@ -263,7 +263,7 @@ void GrilleSimulation::MoveAnchor(TGridCoord NouvelleAncre)
    }
   if ((NouvelleAncre.X==Ancre.X)&&(NouvelleAncre.Y==Ancre.Y)) { return;
 }
-  TGridRect Ancienne=Selection;
+  TGridRect const Ancienne=Selection;
   Ancre=NouvelleAncre;
   MetAJourSelection();
   ClampInView(Ancre);
@@ -297,9 +297,9 @@ void GrilleSimulation::paintEvent(QPaintEvent *e)
   QPainter p(viewport());
   const QRegion &Zone=e->region();
   Canvas->Commence(&p);
-  bool Focus=hasFocus();
-  int Largeur=viewport()->width();
-  int Hauteur=viewport()->height();
+  bool const Focus=hasFocus();
+  int const Largeur=viewport()->width();
+  int const Hauteur=viewport()->height();
   int y=0;
   int r=HautGauche.Y;
   for(; (y<Hauteur)&&(r<NbLignes); r++, y+=DefaultRowHeight)
@@ -312,8 +312,8 @@ void GrilleSimulation::paintEvent(QPaintEvent *e)
       if (!Zone.intersects(Where.Qt())) { continue; // RectVisible
 }
       TGridDrawState Etat;
-      bool Selectionnee=(c>=Selection.Left)&&(c<=Selection.Right)&&(r>=Selection.Top)&&(r<=Selection.Bottom);
-      bool Active=Focus&&(c==Courante.X)&&(r==Courante.Y);
+      bool const Selectionnee=(c>=Selection.Left)&&(c<=Selection.Right)&&(r>=Selection.Top)&&(r<=Selection.Bottom);
+      bool const Active=Focus&&(c==Courante.X)&&(r==Courante.Y);
       if (Selectionnee) { Etat<<gdSelected;
 }
       if (Active) { Etat<<gdFocused;
@@ -354,7 +354,7 @@ void GrilleSimulation::mousePressEvent(QMouseEvent *e)
   setFocus(Qt::MouseFocusReason);
   if (e->button()!=Qt::LeftButton) { return; // clic droit : pas de changement de case
 }
-  TGridCoord c=CaseEn(e->position().toPoint());
+  TGridCoord const c=CaseEn(e->position().toPoint());
   if (c.X<0) { return;
 }
   SelectionEnCours=true;
@@ -376,7 +376,7 @@ void GrilleSimulation::mouseMoveEvent(QMouseEvent *e)
   if (!SelectionEnCours) { return;
 }
   DernierePosition=e->position().toPoint();
-  TGridCoord c=CaseEn(DernierePosition);
+  TGridCoord const c=CaseEn(DernierePosition);
   if ((DernierePosition.x()>=0)&&(DernierePosition.y()>=0)&&(c.X>=0)&&
       (c.X<=DerniereVisible(true)+1)&&(c.Y<=DerniereVisible(false)+1)) { // v6.0.12
    MoveAnchor(c);
@@ -430,8 +430,8 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
      { // Touche Menu / Maj+F10 : sous la case courante. v6.0.12 : si elle n'est pas
        // entièrement visible, en haut à gauche des cases, comme la VCL (le menu s'ouvrait
        // hors de la grille)
-      TRect r=CellRect(Courante.X, Courante.Y);
-      bool Visible=viewport()->rect().contains(r.Qt());
+      TRect const r=CellRect(Courante.X, Courante.Y);
+      bool const Visible=viewport()->rect().contains(r.Qt());
       g=viewport()->mapToGlobal(Visible?QPoint(r.Left, r.Bottom):QPoint(0, 0));
      }
     PopupMenu->Popup(g.x(), g.y());

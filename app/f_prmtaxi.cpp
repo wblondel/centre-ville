@@ -17,23 +17,23 @@ TfrmParamTaxi::TfrmParamTaxi(TComponent* Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::ButtonOkClick(TObject *Sender)
+void TfrmParamTaxi::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  ModalResult=mrOk;
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::ButtonAppliquerClick(TObject *Sender)
+void TfrmParamTaxi::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::ButtonAideClick(TObject *Sender)
+void TfrmParamTaxi::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::FormShow(TObject *Sender)
+void TfrmParamTaxi::FormShow(TObject * /*Sender*/)
 {
  InitialisationEnCours=true;
  CSpinEditNbMaxPersonnesTaxi->Value=cv->NbMaxPersonnesTaxi;
@@ -44,7 +44,7 @@ void TfrmParamTaxi::FormShow(TObject *Sender)
  InitialisationEnCours=false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::AppliqueChoix()
+void TfrmParamTaxi::AppliqueChoix() const
  {
   cv->NbMaxPersonnesTaxi=CSpinEditNbMaxPersonnesTaxi->Value;
   cv->NbMaxCasesDetectFileTaxi=CSpinEditNbCasesMaxPlaceTaxi->Value;
@@ -56,14 +56,14 @@ void TfrmParamTaxi::AppliqueChoix()
  }
 //---------------------------------------------------------------------------
 void TfrmParamTaxi::CSpinEditParametresChange(
-      TObject *Sender)
+      TObject * /*Sender*/) const
 {
  if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmParamTaxi::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

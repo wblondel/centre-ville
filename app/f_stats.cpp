@@ -14,27 +14,27 @@ TfrmStatistiques *frmStatistiques;
 //---------------------------------------------------------------------------
 TfrmStatistiques::TfrmStatistiques(TComponent* Owner) : TForm(Owner) { AffichageEpidemique=false; ChargeFiche(); } // portage : membre à zéro (TObject::NewInstance), chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
+void TfrmStatistiques::PaintBoxStatsPaint(TObject * /*Sender*/) const
 {
- bool ParNbVehicules=(cv->TypeStats==par_nombre);
+ bool const ParNbVehicules=(cv->TypeStats==par_nombre);
  int i = 0;
  int j = 0;
  int x = 0;
  int y = 0;
- int NbTours=cv->NbToursStats;
+ int const NbTours=cv->NbToursStats;
  int // v6.0.2 : dernier tour dont les statistiques sont calculées. Le moteur dessine pendant
 	 // le tour, puis passe au suivant : entre deux tours (fenêtre découverte, pause), TourCrt
 	 // est le tour à venir, et Stats[TourCrt%NbTours] celles d'il y a NbTours tours. Sauf
 	 // avant le premier tour et après le dernier, où TourCrt n'avance plus
-	 DrnTour=(cv->TourEnCours||(cv->TourCrt == 0)||(cv->NbVehiculesArrives==cv->NbVehicules))?cv->TourCrt:cv->TourCrt-1;
- int PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1);
- int NbVehicules=cv->NbVehicules;
- int NbPietons=cv->NbPietons;
+	 const DrnTour=(cv->TourEnCours||(cv->TourCrt == 0)||(cv->NbVehiculesArrives==cv->NbVehicules))?cv->TourCrt:cv->TourCrt-1;
+ int const PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1);
+ int const NbVehicules=cv->NbVehicules;
+ int const NbPietons=cv->NbPietons;
  int // v5.4.1
-	 NbMarques=ParNbVehicules?(NbVehicules/10):10;
- int dt=1+(9*static_cast<int>(NbTours>=100L));
- int xMax=PaintBoxStats->Width;
- int yMax=PaintBoxStats->Height;
+	 const NbMarques=ParNbVehicules?(NbVehicules/10):10;
+ int const dt=1+(9*static_cast<int>(NbTours>=100L));
+ int const xMax=PaintBoxStats->Width;
+ int const yMax=PaintBoxStats->Height;
  int NbRestants = 0;
 
  // 0. légende selon le mode
@@ -114,17 +114,17 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmStatistiques::FormShow(TObject *Sender)
+void TfrmStatistiques::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionEvolution->Checked=true;
 }
 //---------------------------------------------------------------------------
-void TfrmStatistiques::FormHide(TObject *Sender)
+void TfrmStatistiques::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionEvolution->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmStatistiques::FormCreate(TObject *Sender)
+void TfrmStatistiques::FormCreate(TObject * /*Sender*/) const
 {
  PaintBoxStats->Canvas->Pen->Style=psSolid;
  PaintBoxStats->Canvas->Pen->Mode=pmCopy;
@@ -132,8 +132,8 @@ void TfrmStatistiques::FormCreate(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmStatistiques::FormKeyDown(TObject *Sender, WORD &Key,
-	  TShiftState Shift)
+void TfrmStatistiques::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+	  TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

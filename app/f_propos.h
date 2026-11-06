@@ -22,37 +22,37 @@ class QPixmap; // portage
 class TfrmAPropos : public TForm
 {
 public: // portage : __published
-  TTimer *Timer;
-  TLabel *LabelCV1;
-  TLabel *LabelAuteur1;
-  TLabel *LabelEMail;
-  TLabel *LabelURL;
-  TLabel *LabelTexte;
-  TSpeedButton *SpeedButtonOk;
-  TLabel *LabelCV2;
-  TLabel *LabelAuteur2;
-  TLabel *LabelSousVersion;
-  TLabel *LabelGPL1;
-  TLabel *LabelGPL2;
-  TImage *ImageVersion;
-  TImageCollection *ImageCollection;
-  TVirtualImageList *VirtualImageList;
-	TLabel *LabelAlignement;
-	TImage *ImageEditionSpeciale;
-	TLabel *LabelHDPI;
+  TTimer *Timer{};
+  TLabel *LabelCV1{};
+  TLabel *LabelAuteur1{};
+  TLabel *LabelEMail{};
+  TLabel *LabelURL{};
+  TLabel *LabelTexte{};
+  TSpeedButton *SpeedButtonOk{};
+  TLabel *LabelCV2{};
+  TLabel *LabelAuteur2{};
+  TLabel *LabelSousVersion{};
+  TLabel *LabelGPL1{};
+  TLabel *LabelGPL2{};
+  TImage *ImageVersion{};
+  TImageCollection *ImageCollection{};
+  TVirtualImageList *VirtualImageList{};
+	TLabel *LabelAlignement{};
+	TImage *ImageEditionSpeciale{};
+	TLabel *LabelHDPI{};
   void TimerTimer(TObject *Sender);
   void FormShow(TObject *Sender);
   void FormHide(TObject *Sender);
-  void LabelURLClick(TObject *Sender);
-  void LabelEMailClick(TObject *Sender);
+  void LabelURLClick(TObject *Sender) const;
+  void LabelEMailClick(TObject *Sender) const;
   void FormCreate(TObject *Sender);
-  void FormKeyPress(TObject *Sender, char &Key);
+  void FormKeyPress(TObject *Sender, char &Key) const;
   void LabelClick(TObject *Sender);
 private:
-    int TempsEcoule;
-    TBITMAP *Bitmap;
+    int TempsEcoule{};
+    TBITMAP *Bitmap{};
 public:		// Déclarations de l'utilisateur
-    bool FermetureAutomatique;
+    bool FermetureAutomatique{};
     TfrmAPropos(TComponent* Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

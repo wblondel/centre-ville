@@ -31,7 +31,7 @@ TVirtualImageList::TVirtualImageList(const char *const *Ressources, int NbImages
 //---------------------------------------------------------------------------
 const QPixmap &TVirtualImageList::Image(int Index, qreal Echelle) const
  {
-  int Cle=qRound(Echelle*100);
+  int const Cle=qRound(Echelle*100);
   if (Cle==100) { return Images[static_cast<std::size_t>(Index)];
 }
   std::vector<QPixmap> &v=Agrandies[Cle];

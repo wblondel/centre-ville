@@ -18,7 +18,7 @@ bool harnais::Ouvre(const std::string &asNomFichier)
   FileSeek(hfile, 0, 0);
   if (cv) { delete cv; cv=nullptr; }
   cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0);
-  bool Ok=cv->Charge(hfile);
+  bool const Ok=cv->Charge(hfile);
   FileClose(hfile);
   return Ok;
  }
@@ -28,7 +28,7 @@ bool harnais::SauveSansChaos(const std::string &asNomFichier)
   int hfile = 0;
   if ((hfile=FileCreate(asNomFichier.c_str()))<0) { return false;
 }
-  bool Ok=cv->Sauve(hfile);
+  bool const Ok=cv->Sauve(hfile);
   FileClose(hfile);
   return Ok;
  }
@@ -359,7 +359,7 @@ void harnais::Ferme()
 std::string harnais::LitFichier(const std::string &asNomFichier)
  {
   std::string Contenu;
-  int hfile=FileOpen(asNomFichier.c_str(), fmOpenRead);
+  int const hfile=FileOpen(asNomFichier.c_str(), fmOpenRead);
   if (hfile<0) { return Contenu;
 }
   char Tampon[65536];

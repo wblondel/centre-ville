@@ -193,7 +193,7 @@ class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
  {
   bool ControleActif=false; // contrôle actif de sa fiche (entre CM_ENTER et CM_EXIT)
   bool AffectationEnCours=false; // v6.0.2 : le texte change par Value=..., pas par la frappe
-  int CheckValue(int v);
+  int CheckValue(int v) const;
   public:
   Propriete<int> Value, MinValue, MaxValue, Increment;
   TNotifyEvent OnChange;

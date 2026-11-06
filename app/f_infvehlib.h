@@ -13,33 +13,33 @@
 class TfrmInfosVehlib : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonOk;
-    TLabel *Label0;
-    TLabel *LabelCoordonnees;
-    TRadioButton *RadioButtonAucunVehlib;
-    TGroupBox *GroupBoxVehlib;
-    TRadioButton *RadioButtonVehlibNumero;
-    TLabel *Label6;
-    TLabel *LabelParcours;
-    TLabel *Label2;
-    TLabel *LabelDirection;
-        TLabel *Label10;
-    TLabel *LabelVitesse;
-    TButton *ButtonAide;
-    TLabel *Label3;
-        TLabel *LabelNumeroPlaceDepart;
-    TLabel *Label8;
-    TLabel *LabelParcoursDepuisDepart;
-    TLabel *Label7;
-    TLabel *LabelToursDepuisDepart;
-    TLabel *Label1;
-    TLabel *LabelSituation;
-        TLabel *Label9;
-        TLabel *LabelDistancePlaceArrivee;
-        TLabel *Label4;
-        TLabel *LabelNumeroPlaceArrivee;
-        TLabel *Label5;
-    TLabel *LabelNbPersonnes;
+    TButton *ButtonOk{};
+    TLabel *Label0{};
+    TLabel *LabelCoordonnees{};
+    TRadioButton *RadioButtonAucunVehlib{};
+    TGroupBox *GroupBoxVehlib{};
+    TRadioButton *RadioButtonVehlibNumero{};
+    TLabel *Label6{};
+    TLabel *LabelParcours{};
+    TLabel *Label2{};
+    TLabel *LabelDirection{};
+        TLabel *Label10{};
+    TLabel *LabelVitesse{};
+    TButton *ButtonAide{};
+    TLabel *Label3{};
+        TLabel *LabelNumeroPlaceDepart{};
+    TLabel *Label8{};
+    TLabel *LabelParcoursDepuisDepart{};
+    TLabel *Label7{};
+    TLabel *LabelToursDepuisDepart{};
+    TLabel *Label1{};
+    TLabel *LabelSituation{};
+        TLabel *Label9{};
+        TLabel *LabelDistancePlaceArrivee{};
+        TLabel *Label4{};
+        TLabel *LabelNumeroPlaceArrivee{};
+        TLabel *Label5{};
+    TLabel *LabelNbPersonnes{};
     void FormShow(TObject *Sender);
     void FormHide(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
@@ -47,9 +47,9 @@ public: // portage : __published	// Composants gérés par l'EDI
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
 private:	// Déclarations de l'utilisateur
-    voie *v;
-    vehlib *Vehlib;
-    int x, y;
+    voie *v{};
+    vehlib *Vehlib{};
+    int x{}, y{};
     void RendreVisibleInfos(bool Visible);
 public:		// Déclarations de l'utilisateur
     TfrmInfosVehlib(TComponent* Owner);

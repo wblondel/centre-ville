@@ -30,7 +30,7 @@ TfrmDefVoie::TfrmDefVoie(TComponent* Owner) : TForm(Owner)
   frmSimulation->AffecteGlyphe(GLYPHE_DEFF, BitBtnDefFeuO->Glyph);
  }
 
-void TfrmDefVoie::DefinitFeu(direction Dir)
+void TfrmDefVoie::DefinitFeu(direction Dir) const
  {
   frmDefFeux->Direction=Dir;
   frmDefFeux->x=x;
@@ -40,7 +40,7 @@ void TfrmDefVoie::DefinitFeu(direction Dir)
 //---------------------------------------------------------------------------
 void TfrmDefVoie::AppliqueChoix()
  {
-  AnsiString asMsg;
+  AnsiString const asMsg;
   TRadioGroup *RadioGroupPriorite[NBDIR]={ RadioGroupPrioriteNord,
                                            RadioGroupPrioriteEst,
                                            RadioGroupPrioriteSud,
@@ -170,12 +170,12 @@ void TfrmDefVoie::RafraichitInfos()
     frmDefVoiePietons->Show();
     return;
    }
-  bool VoiesTramEtRoutes=(v->SensVoieTram != 0)&&(v->DirPoss != 0);
-  bool VoieTram[NBDIR]={ v->EstDirPossSensVoieTram(indefinie, nord),
+  bool const VoiesTramEtRoutes=(v->SensVoieTram != 0)&&(v->DirPoss != 0);
+  bool const VoieTram[NBDIR]={ v->EstDirPossSensVoieTram(indefinie, nord),
                          v->EstDirPossSensVoieTram(indefinie, est),
                          v->EstDirPossSensVoieTram(indefinie, sud),
                          v->EstDirPossSensVoieTram(indefinie, ouest),};
-  int NbDirVoiesTram= static_cast<int>(VoieTram[nord-1])+
+  int const NbDirVoiesTram= static_cast<int>(VoieTram[nord-1])+
                       static_cast<int>(VoieTram[est-1])+
                       static_cast<int>(VoieTram[sud-1])+
                       static_cast<int>(VoieTram[ouest-1]);
@@ -215,7 +215,7 @@ void TfrmDefVoie::RafraichitInfos()
   ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation implicite donc Appliquer ne peut être actif.
  }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::FormShow(TObject *Sender)
+void TfrmDefVoie::FormShow(TObject * /*Sender*/)
 {
  if (frmDefVoiePietons&&frmDefVoiePietons->Visible) { frmDefVoiePietons->Hide(); // v5.2: fenêtres non modales exclusives.
 }
@@ -223,31 +223,31 @@ void TfrmDefVoie::FormShow(TObject *Sender)
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::ButtonOkClick(TObject *Sender)
+void TfrmDefVoie::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::ButtonAppliquerClick(TObject *Sender)
+void TfrmDefVoie::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::ButtonAnnulerClick(TObject *Sender)
+void TfrmDefVoie::ButtonAnnulerClick(TObject * /*Sender*/)
 {
  ButtonAppliquer->Enabled=false;
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::FormHide(TObject *Sender)
+void TfrmDefVoie::FormHide(TObject * /*Sender*/)
 {
  if (frmDefFeux&&frmDefFeux->Visible) { frmDefFeux->Hide();
 }
  frmSimulation->ActionPriorites->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::ButtonAideClick(TObject *Sender)
+void TfrmDefVoie::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
@@ -257,7 +257,7 @@ void TfrmDefVoie::BitBtnDefFeuClick(TObject *Sender)
  DefinitFeu(static_cast<direction>(TagDe(static_cast<TComponent*>(Sender)))); // v5.2 : Factorisation ! // portage : TComponent::Tag -> TagDe
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoie::FormCreate(TObject *Sender)
+void TfrmDefVoie::FormCreate(TObject * /*Sender*/)
 { // v5.2 : Pour factorisation
  BitBtn[0]=BitBtnDefFeuN;
  BitBtn[1]=BitBtnDefFeuE;
@@ -277,8 +277,8 @@ void TfrmDefVoie::RadioGroupPrioriteClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmDefVoie::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDefVoie::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

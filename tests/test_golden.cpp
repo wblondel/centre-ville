@@ -32,8 +32,8 @@ namespace
     std::string lb;
     for(int n=1; ; n++)
      {
-      bool fa=(bool)std::getline(ia, la);
-      bool fb=(bool)std::getline(ib, lb);
+      bool const fa=(bool)std::getline(ia, la);
+      bool const fb=(bool)std::getline(ib, lb);
       if (!fa&&!fb) { return "aucune";
 }
       if ((fa!=fb)||(la!=lb)) {
@@ -45,7 +45,7 @@ namespace
 //---------------------------------------------------------------------------
 TEST_CASE("Golden master : simulation à graine fixe", "[golden][simulation]")
  {
-  for(auto Config : ConfigsGolden) {
+  for(auto const Config : ConfigsGolden) {
    for(const carte &c : Cartes)
     {
      DYNAMIC_SECTION(Config.Nom << "/" << c.Nom)

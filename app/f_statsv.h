@@ -13,11 +13,11 @@
 class TfrmStatsVehicules : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonFermer;
-    TTabControl *TabControl;
-    TStringGrid *StringGridStatsVehicules;
-    TStringGrid *StringGridCoordParkings;
-    TButton *ButtonAide;
+    TButton *ButtonFermer{};
+    TTabControl *TabControl{};
+    TStringGrid *StringGridStatsVehicules{};
+    TStringGrid *StringGridCoordParkings{};
+    TButton *ButtonAide{};
     void FormShow(TObject *Sender);
     void FormHide(TObject *Sender);
     void ButtonFermerClick(TObject *Sender);
@@ -29,7 +29,7 @@ private:	// Déclarations de l'utilisateur
 public:		// Déclarations de l'utilisateur
     TfrmStatsVehicules(TComponent* Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
-    void RafraichitInfos();
+    void RafraichitInfos() const;
 };
 //---------------------------------------------------------------------------
 extern TfrmStatsVehicules *frmStatsVehicules;

@@ -16,12 +16,12 @@ const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
 //---------------------------------------------------------------------------
 TfrmAffDistParkings::TfrmAffDistParkings(TComponent* Owner) : TForm(Owner) { ChargeFiche(); } // portage : chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmAffDistParkings::EffaceInfos()
+void TfrmAffDistParkings::EffaceInfos() const
  {
   int i = 0;
-  int NbCol=StringGridDistances->ColCount;
-  int NbLig=StringGridDistances->RowCount;
-  int NbCases=NbCol*NbLig;
+  int const NbCol=StringGridDistances->ColCount;
+  int const NbLig=StringGridDistances->RowCount;
+  int const NbCases=NbCol*NbLig;
   for(i=0; i<NbCases; i++) { StringGridDistances->Cells[i%NbCol][i/NbCol]="";
 }
  }
@@ -32,8 +32,8 @@ void TfrmAffDistParkings::RafraichitInfos()
   int NbCases = 0;
   int NbX = 0;
   int de = 0;
-  int x=frmSimulation->DrawGridSimul->Col;
-  int y=frmSimulation->DrawGridSimul->Row;
+  int const x=frmSimulation->DrawGridSimul->Col;
+  int const y=frmSimulation->DrawGridSimul->Row;
   voie *v=&cv->v[x][y];
   EffaceInfos();
   if (!v->DistParking) { return;
@@ -55,7 +55,7 @@ void TfrmAffDistParkings::RafraichitInfos()
    }
  }
 //---------------------------------------------------------------------------
-void TfrmAffDistParkings::FormShow(TObject *Sender)
+void TfrmAffDistParkings::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesParkings->Checked=true;
  StringGridDistances->RowCount=1+cv->NbParkings;
@@ -64,20 +64,20 @@ void TfrmAffDistParkings::FormShow(TObject *Sender)
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmAffDistParkings::FormHide(TObject *Sender)
+void TfrmAffDistParkings::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesParkings->Checked=false;
 }
 //---------------------------------------------------------------------------
 void TfrmAffDistParkings::CheckBoxCouloirsBusClick(
-      TObject *Sender)
+      TObject * /*Sender*/)
 {
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
 
-void TfrmAffDistParkings::FormKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void TfrmAffDistParkings::FormKeyDown(TObject * /*Sender*/,
+      WORD &Key, TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

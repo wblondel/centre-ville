@@ -125,25 +125,25 @@ bool TfrmDefFeux::AppliqueChoix()
   return true;
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RafraichitInfosFeuxDmd()
+void TfrmDefFeux::RafraichitInfosFeuxDmd() const
  {
   ButtonAppliquer->Enabled=true;
   LabelNbFeuxDmd->Caption=IntToStr(NbFeuxDmd);
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RafraichitInfosFeuxAtt()
+void TfrmDefFeux::RafraichitInfosFeuxAtt() const
  {
   ButtonAppliquer->Enabled=true;
   LabelNbFeuxAtt->Caption=IntToStr(NbFeuxAtt);
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::FormShow(TObject *Sender)
+void TfrmDefFeux::FormShow(TObject * /*Sender*/)
 {
  if (!RafraichitInfos()) { Hide(); } else { frmSimulation->RedessineCase(x, y, true);
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::FormHide(TObject *Sender)
+void TfrmDefFeux::FormHide(TObject * /*Sender*/) const
 {
  int i = 0;
  frmSimulation->ActionPriorites->Enabled=true;
@@ -168,25 +168,25 @@ void TfrmDefFeux::FormHide(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::ButtonOkClick(TObject *Sender)
+void TfrmDefFeux::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::ButtonAnnulerClick(TObject *Sender)
+void TfrmDefFeux::ButtonAnnulerClick(TObject * /*Sender*/)
 {
  ButtonAppliquer->Enabled=false;
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::ButtonAppliquerClick(TObject *Sender)
+void TfrmDefFeux::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  if (!AppliqueChoix()) { Hide();
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RadioGroupEtatClick(TObject *Sender)
+void TfrmDefFeux::RadioGroupEtatClick(TObject * /*Sender*/)
 {
  f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupEtat->ItemIndex!=f->Etat) {
@@ -194,7 +194,7 @@ void TfrmDefFeux::RadioGroupEtatClick(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject *Sender)
+void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject * /*Sender*/)
 {
  f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert) {
@@ -202,12 +202,12 @@ void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::CSpinEditDureeVertChange(TObject *Sender)
+void TfrmDefFeux::CSpinEditDureeVertChange(TObject * /*Sender*/) const
 {
  ButtonAppliquer->Enabled=true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject *Sender)
+void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject * /*Sender*/) const
 {
  int i = 0;
  if (SpeedButtonSelFeuxDmd->Down&&(!SpeedButtonSelFeuxAtt->Down)) {
@@ -220,7 +220,7 @@ void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject *Sender)
  frmSimulation->ActionPriorites->Enabled=!(frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject *Sender)
+void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject * /*Sender*/) const
 {
  int i = 0;
  if (SpeedButtonSelFeuxAtt->Down&&(!SpeedButtonSelFeuxDmd->Down)) {
@@ -233,7 +233,7 @@ void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject *Sender)
  frmSimulation->ActionPriorites->Enabled=!(frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RadioGroupTypePsgRougeClick(TObject *Sender)
+void TfrmDefFeux::RadioGroupTypePsgRougeClick(TObject * /*Sender*/)
 {
  f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge) {
@@ -241,13 +241,13 @@ void TfrmDefFeux::RadioGroupTypePsgRougeClick(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::ButtonAideClick(TObject *Sender)
+void TfrmDefFeux::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDefFeux::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

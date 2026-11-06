@@ -67,9 +67,9 @@ void TfrmDefFeuxPietons::RafraichitFeuxPietons()
                                 true);
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
+void TfrmDefFeuxPietons::AnalyseEtatFeux() const // v5.2.1
  {
-  auto EtatFP=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
+  auto const EtatFP=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
   etat_feu EtatFC=inactif;
   etat_feu EtatCrt;
   bool FeuxFCDifferents=false;
@@ -163,13 +163,13 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
   return true;
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::RafraichitInfosFeux()
+void TfrmDefFeuxPietons::RafraichitInfosFeux() const
  {
   ButtonAppliquer->Enabled=true;
   LabelNbFeux->Caption=IntToStr(NbFeux);
  }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::FormShow(TObject *Sender)
+void TfrmDefFeuxPietons::FormShow(TObject * /*Sender*/)
 {
  if (!RafraichitInfos()) {
   Hide();
@@ -178,7 +178,7 @@ void TfrmDefFeuxPietons::FormShow(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::FormHide(TObject *Sender)
+void TfrmDefFeuxPietons::FormHide(TObject * /*Sender*/)
 {
  int i = 0;
  frmSimulation->ActionPrioritesPietons->Enabled=true;
@@ -198,44 +198,44 @@ void TfrmDefFeuxPietons::FormHide(TObject *Sender)
  frmSimulation->DrawGridSimulClick(frmSimulation);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::ButtonOkClick(TObject *Sender)
+void TfrmDefFeuxPietons::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::ButtonAnnulerClick(TObject *Sender)
+void TfrmDefFeuxPietons::ButtonAnnulerClick(TObject * /*Sender*/)
 {
  ButtonAppliquer->Enabled=false;
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::ButtonAppliquerClick(TObject *Sender)
+void TfrmDefFeuxPietons::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  if (!AppliqueChoix()) { Hide();
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::RadioGroupEtatClick(TObject *Sender)
+void TfrmDefFeuxPietons::RadioGroupEtatClick(TObject * /*Sender*/)
 {
  if (static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2))!=f->Etat) {
   ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::RadioGroupTypeDmdVertClick(TObject *Sender)
+void TfrmDefFeuxPietons::RadioGroupTypeDmdVertClick(TObject * /*Sender*/)
 {
  if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert) {
   ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject *Sender)
+void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject * /*Sender*/) const
 {
  ButtonAppliquer->Enabled=true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject *Sender)
+void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject * /*Sender*/) const
 {
  int i = 0;
  frmSimulation->SelectionFeuxPtn=SpeedButtonSelFeux->Down;
@@ -245,20 +245,20 @@ void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject *Sender)
  frmSimulation->ActionPriorites->Enabled=!frmSimulation->SelectionFeuxPtn;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::RadioGroupTypePsgRougeClick(TObject *Sender)
+void TfrmDefFeuxPietons::RadioGroupTypePsgRougeClick(TObject * /*Sender*/)
 {
  if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge) {
   ButtonAppliquer->Enabled=true;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::ButtonAideClick(TObject *Sender)
+void TfrmDefFeuxPietons::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDefFeuxPietons::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

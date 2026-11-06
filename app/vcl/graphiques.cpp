@@ -14,7 +14,7 @@ QColor CouleurQt(TColor Couleur)
  {
   if ((static_cast<unsigned>(Couleur)&0x80000000U) != 0u)
    { // Couleur système : palette de Qt (équivalents des COLOR_xxx de Windows)
-    QPalette p=QApplication::palette();
+    QPalette const p=QApplication::palette();
     switch(static_cast<unsigned>(Couleur)&0xFFU)
      {
       case 0x05: return p.color(QPalette::Base); // clWindow
@@ -46,7 +46,7 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
     {"clHighlightText", clHighlightText}, {"clBtnFace", clBtnFace}, {"clBtnShadow", clBtnShadow},
     {"clGrayText", clGrayText}, {"clBtnText", clBtnText}, {"clBtnHighlight", clBtnHighlight},
     {"clInfoBk", clInfoBk},};
-  auto i=Noms.find(asCouleur.str());
+  auto const i=Noms.find(asCouleur.str());
   if (i!=Noms.end()) { return i->second;
 }
   return static_cast<TColor>(std::stoul(asCouleur.str(), nullptr, 0));
@@ -149,11 +149,11 @@ void TCanvas::LineTo(int x, int y)
   if (Peintre)
    {
     PrepareStylo();
-    QPoint Fin(x, y);
-    QPoint d=Fin-PenPos;
+    QPoint const Fin(x, y);
+    QPoint const d=Fin-PenPos;
     if ((d.x() != 0)||(d.y() != 0))
      {
-      QPoint Avant=Fin-QPoint(static_cast<int>(d.x()>0)-static_cast<int>(d.x()<0), static_cast<int>(d.y()>0)-static_cast<int>(d.y()<0));
+      QPoint const Avant=Fin-QPoint(static_cast<int>(d.x()>0)-static_cast<int>(d.x()<0), static_cast<int>(d.y()>0)-static_cast<int>(d.y()<0));
       if (Avant==PenPos) {
        Peintre->drawPoint(PenPos);
       } else {
@@ -168,9 +168,9 @@ void TCanvas::TextOut(int x, int y, const AnsiString &asTexte)
  { // Fond opaque à la couleur de la brosse, sauf brosse bsClear (SetBkMode)
   if (!Peintre) { return;
 }
-  QFont f=Font->Qt();
-  QFontMetrics m(f);
-  QString t=Q(asTexte);
+  QFont const f=Font->Qt();
+  QFontMetrics const m(f);
+  QString const t=Q(asTexte);
   if (Brush->Style!=bsClear) {
    Peintre->fillRect(QRect(x, y, m.horizontalAdvance(t), m.height()), CouleurQt(Brush->Color));
 }

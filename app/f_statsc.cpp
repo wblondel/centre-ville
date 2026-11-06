@@ -20,7 +20,7 @@ void Composition()
  {
   if ((frmStatsComposition=new TfrmStatsComposition(Application)))
    { // portage : try/__finally -> garde RAII (Finalement)
-    Finalement f([&]
+    Finalement const f([&]
     {
      frmStatsComposition->Release();
      frmStatsComposition=nullptr;
@@ -34,7 +34,7 @@ TfrmStatsComposition::TfrmStatsComposition(TComponent* Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmStatsComposition::FormShow(TObject *Sender)
+void TfrmStatsComposition::FormShow(TObject * /*Sender*/) const
 {
  voie *vv = nullptr;
  int i = 0;
@@ -211,7 +211,7 @@ void TfrmStatsComposition::FormShow(TObject *Sender)
   }
 }
 //---------------------------------------------------------------------------
-void TfrmStatsComposition::ButtonAideClick(TObject *Sender)
+void TfrmStatsComposition::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
@@ -219,8 +219,8 @@ void TfrmStatsComposition::ButtonAideClick(TObject *Sender)
 
 
 
-void TfrmStatsComposition::FormKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void TfrmStatsComposition::FormKeyDown(TObject * /*Sender*/,
+      WORD &Key, TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

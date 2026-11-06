@@ -22,7 +22,7 @@ TfrmDefVoiePietons::TfrmDefVoiePietons(TComponent* Owner) : TForm(Owner)
   frmSimulation->AffecteGlyphe(GLYPHE_DEFFP, SpeedButtonO->Glyph);
  }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::DefinitFeu(direction Dir)
+void TfrmDefVoiePietons::DefinitFeu(direction Dir) const
  {
   frmDefFeuxPietons->Direction=Dir;
   frmDefFeuxPietons->x=x;
@@ -32,7 +32,7 @@ void TfrmDefVoiePietons::DefinitFeu(direction Dir)
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::AppliqueChoix()
  {
-  AnsiString asMsg;
+  AnsiString const asMsg;
   frmSimulation->SimulationModifiee=true;
 
   // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
@@ -97,7 +97,7 @@ void TfrmDefVoiePietons::RafraichitInfos()
   ButtonAppliquer->Enabled=false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation implicite donc Appliquer ne peut être actif.
  }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::FormShow(TObject *Sender)
+void TfrmDefVoiePietons::FormShow(TObject * /*Sender*/)
 {
  if (frmDefVoie&&frmDefVoie->Visible) { frmDefVoie->Hide(); // Fenêtres non modales exclusives
 }
@@ -107,18 +107,18 @@ void TfrmDefVoiePietons::FormShow(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::ButtonOkClick(TObject *Sender)
+void TfrmDefVoiePietons::ButtonOkClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::ButtonAppliquerClick(TObject *Sender)
+void TfrmDefVoiePietons::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::ButtonAnnulerClick(TObject *Sender)
+void TfrmDefVoiePietons::ButtonAnnulerClick(TObject * /*Sender*/)
 {
  // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
  for(int d=nord; d<=ouest; d++) {
@@ -147,7 +147,7 @@ void TfrmDefVoiePietons::ButtonAnnulerClick(TObject *Sender)
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::FormHide(TObject *Sender)
+void TfrmDefVoiePietons::FormHide(TObject * /*Sender*/)
 {
  try // Voir pourquoi
   {
@@ -158,12 +158,12 @@ void TfrmDefVoiePietons::FormHide(TObject *Sender)
  catch(...) {}; // portage : __except(true) (exceptions structurées de Windows) -> catch(...)
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::ButtonAideClick(TObject *Sender)
+void TfrmDefVoiePietons::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this);
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::FormCreate(TObject *Sender)
+void TfrmDefVoiePietons::FormCreate(TObject * /*Sender*/)
 {
  SpeedButton[0]=SpeedButtonN;
  SpeedButton[1]=SpeedButtonE;
@@ -178,7 +178,7 @@ void TfrmDefVoiePietons::FormCreate(TObject *Sender)
 void TfrmDefVoiePietons::SpeedButtonClick(TObject *Sender)
 {
  auto *SpeedButtonNESO=static_cast<TSpeedButton*>(Sender);
- auto d=static_cast<direction>(TagDe(static_cast<TComponent*>(Sender))+1); // portage : TComponent::Tag -> TagDe
+ auto const d=static_cast<direction>(TagDe(static_cast<TComponent*>(Sender))+1); // portage : TComponent::Tag -> TagDe
  ButtonAppliquer->Enabled=true;
  if (SpeedButtonNESO->Down)
   {
@@ -203,8 +203,8 @@ Placez un trottoir à l'extrémité du passage piétons puis réessayez.", asTit
 //---------------------------------------------------------------------------
 
 
-void TfrmDefVoiePietons::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDefVoiePietons::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

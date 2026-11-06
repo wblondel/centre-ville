@@ -16,12 +16,12 @@ const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
 //---------------------------------------------------------------------------
 TfrmAffDistPlacesVehlib::TfrmAffDistPlacesVehlib(TComponent* Owner) : TForm(Owner) { ChargeFiche(); } // portage : chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmAffDistPlacesVehlib::EffaceInfos()
+void TfrmAffDistPlacesVehlib::EffaceInfos() const
  {
   int i = 0;
-  int NbCol=StringGridDistances->ColCount;
-  int NbLig=StringGridDistances->RowCount;
-  int NbCases=NbCol*NbLig;
+  int const NbCol=StringGridDistances->ColCount;
+  int const NbLig=StringGridDistances->RowCount;
+  int const NbCases=NbCol*NbLig;
   for(i=0; i<NbCases; i++) { StringGridDistances->Cells[i%NbCol][i/NbCol]="";
 }
  }
@@ -32,8 +32,8 @@ void TfrmAffDistPlacesVehlib::RafraichitInfos()
   int NbCases = 0;
   int NbX = 0;
   int de = 0;
-  int x=frmSimulation->DrawGridSimul->Col;
-  int y=frmSimulation->DrawGridSimul->Row;
+  int const x=frmSimulation->DrawGridSimul->Col;
+  int const y=frmSimulation->DrawGridSimul->Row;
   voie *v=&cv->v[x][y];
   EffaceInfos();
   if (!v->DistPlaceVehlib) { return;
@@ -55,7 +55,7 @@ void TfrmAffDistPlacesVehlib::RafraichitInfos()
    }
  }
 //---------------------------------------------------------------------------
-void TfrmAffDistPlacesVehlib::FormShow(TObject *Sender)
+void TfrmAffDistPlacesVehlib::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesPlacesVehlib->Checked=true;
  StringGridDistances->RowCount=1+cv->NbPlacesVehlib;
@@ -64,13 +64,13 @@ void TfrmAffDistPlacesVehlib::FormShow(TObject *Sender)
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmAffDistPlacesVehlib::FormHide(TObject *Sender)
+void TfrmAffDistPlacesVehlib::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesPlacesVehlib->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmAffDistPlacesVehlib::FormKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void TfrmAffDistPlacesVehlib::FormKeyDown(TObject * /*Sender*/,
+      WORD &Key, TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

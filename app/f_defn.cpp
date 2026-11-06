@@ -22,7 +22,7 @@ TfrmDefNature::TfrmDefNature(TComponent* Owner)
  //Height=Height*Screen->PixelsPerInch/96;
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::RadioGroupNatureClick(TObject *Sender)
+void TfrmDefNature::RadioGroupNatureClick(TObject * /*Sender*/) const
 {
  if (RadioGroupNature->ItemIndex==1) {
   CheckBoxPelouse->Enabled=true;
@@ -34,7 +34,7 @@ void TfrmDefNature::RadioGroupNatureClick(TObject *Sender)
  ButtonAppliquer->Enabled=(RadioGroupNature->ItemIndex>-1);
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::ButtonAppliquerClick(TObject *Sender)
+void TfrmDefNature::ButtonAppliquerClick(TObject * /*Sender*/) const
 {
  bool BordGauche = false;
  bool BordDroit = false;
@@ -70,12 +70,12 @@ void TfrmDefNature::ButtonAppliquerClick(TObject *Sender)
 }
  }
 //---------------------------------------------------------------------------
-void TfrmDefNature::ButtonAideClick(TObject *Sender)
+void TfrmDefNature::ButtonAideClick(TObject * /*Sender*/)
 {
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::FormShow(TObject *Sender)
+void TfrmDefNature::FormShow(TObject * /*Sender*/) const
 {
  frmSimulation->ActionDefinirNature->Checked=true;
  RadioGroupNature->ItemIndex=-1;
@@ -84,18 +84,18 @@ void TfrmDefNature::FormShow(TObject *Sender)
  ButtonAppliquer->Enabled=false;
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::FormHide(TObject *Sender)
+void TfrmDefNature::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDefinirNature->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::ButtonFermerClick(TObject *Sender)
+void TfrmDefNature::ButtonFermerClick(TObject * /*Sender*/)
 {
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmDefNature::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

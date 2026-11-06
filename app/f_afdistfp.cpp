@@ -16,12 +16,12 @@ const AnsiString asDir1[NBDIR+1]={"", "   ­", "   ®", "   ¯", "   ¬"};
 //---------------------------------------------------------------------------
 TfrmAffDistFilesPark::TfrmAffDistFilesPark(TComponent* Owner) : TForm(Owner) { ChargeFiche(); } // portage : chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmAffDistFilesPark::EffaceInfos()
+void TfrmAffDistFilesPark::EffaceInfos() const
  {
   int i = 0;
-  int NbCol=StringGridDistances->ColCount;
-  int NbLig=StringGridDistances->RowCount;
-  int NbCases=NbCol*NbLig;
+  int const NbCol=StringGridDistances->ColCount;
+  int const NbLig=StringGridDistances->RowCount;
+  int const NbCases=NbCol*NbLig;
   for(i=0; i<NbCases; i++) { StringGridDistances->Cells[i%NbCol][i/NbCol]="";
 }
  }
@@ -32,8 +32,8 @@ void TfrmAffDistFilesPark::RafraichitInfos()
   int NbCases = 0;
   int NbX = 0;
   int de = 0;
-  int x=frmSimulation->DrawGridSimul->Col;
-  int y=frmSimulation->DrawGridSimul->Row;
+  int const x=frmSimulation->DrawGridSimul->Col;
+  int const y=frmSimulation->DrawGridSimul->Row;
   voie *v=&cv->v[x][y];
   EffaceInfos();
   if (!v->DistFilePark) { return;
@@ -55,7 +55,7 @@ void TfrmAffDistFilesPark::RafraichitInfos()
    }
  }
 //---------------------------------------------------------------------------
-void TfrmAffDistFilesPark::FormShow(TObject *Sender)
+void TfrmAffDistFilesPark::FormShow(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesFilesPark->Checked=true;
  StringGridDistances->RowCount=1+cv->NbFilesPark;
@@ -64,20 +64,20 @@ void TfrmAffDistFilesPark::FormShow(TObject *Sender)
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmAffDistFilesPark::FormHide(TObject *Sender)
+void TfrmAffDistFilesPark::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionDistancesFilesPark->Checked=false;
 }
 //---------------------------------------------------------------------------
 void TfrmAffDistFilesPark::CheckBoxCouloirsBusClick(
-      TObject *Sender)
+      TObject * /*Sender*/)
 {
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
 
-void TfrmAffDistFilesPark::FormKeyDown(TObject *Sender,
-      WORD &Key, TShiftState Shift)
+void TfrmAffDistFilesPark::FormKeyDown(TObject * /*Sender*/,
+      WORD &Key, TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

@@ -14,24 +14,24 @@
 class TfrmDimensionsZone : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-  TCSpinEdit *CSpinEditNbX;
-  TCSpinEdit *CSpinEditNbY;
-  TLabel *Label1;
-  TLabel *Label2;
-  TButton *ButtonCreer;
-  TButton *ButtonAnnuler;
-  TButton *ButtonAide;
-  TCheckBox *CheckBoxAfficherParametres;
-  TCheckBox *CheckBoxGenererReseau;
-  void FormShow(TObject *Sender);
+  TCSpinEdit *CSpinEditNbX{};
+  TCSpinEdit *CSpinEditNbY{};
+  TLabel *Label1{};
+  TLabel *Label2{};
+  TButton *ButtonCreer{};
+  TButton *ButtonAnnuler{};
+  TButton *ButtonAide{};
+  TCheckBox *CheckBoxAfficherParametres{};
+  TCheckBox *CheckBoxGenererReseau{};
+  void FormShow(TObject *Sender) const;
   void ButtonCreerClick(TObject *Sender);
   void ButtonAideClick(TObject *Sender);
-  void FormKeyPress(TObject *Sender, char &Key);
+  void FormKeyPress(TObject *Sender, char &Key) const;
         void FormKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
 private:	// Déclarations de l'utilisateur
 public:		// Déclarations de l'utilisateur
-  int NbX, NbY;
+  int NbX{}, NbY{};
   TfrmDimensionsZone(TComponent* Owner);
   void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

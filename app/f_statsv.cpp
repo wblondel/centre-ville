@@ -21,10 +21,10 @@ TfrmStatsVehicules::TfrmStatsVehicules(TComponent* Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::FormShow(TObject *Sender)
+void TfrmStatsVehicules::FormShow(TObject * /*Sender*/)
 {
  int i = 0;
- int ne=cv->NbParkings;
+ int const ne=cv->NbParkings;
  frmSimulation->ActionStatsParkings->Checked=true;
  frmStatsVehicules->Caption=Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
  StringGridCoordParkings->RowCount=1+ne;
@@ -45,22 +45,22 @@ void TfrmStatsVehicules::FormShow(TObject *Sender)
  RafraichitInfos(); // v6.0.2 : l'original laissait la grille vide jusqu'au tour suivant
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::FormHide(TObject *Sender)
+void TfrmStatsVehicules::FormHide(TObject * /*Sender*/)
 {
  frmSimulation->ActionStatsParkings->Checked=false;
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::ButtonFermerClick(TObject *Sender)
+void TfrmStatsVehicules::ButtonFermerClick(TObject * /*Sender*/)
 {
  Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::RafraichitInfos()
+void TfrmStatsVehicules::RafraichitInfos() const
 {
  int i = 0;
  int ed = 0;
  int ea = 0;
- int n=StringGridStatsVehicules->ColCount-1;
+ int const n=StringGridStatsVehicules->ColCount-1;
  int Record = 0;
  int Minimum = 0;
  int Maximum = 0;
@@ -127,19 +127,19 @@ void TfrmStatsVehicules::RafraichitInfos()
  StringGridStatsVehicules->Repaint();
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::TabControlChange(TObject *Sender)
+void TfrmStatsVehicules::TabControlChange(TObject * /*Sender*/)
 {
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::ButtonAideClick(TObject *Sender)
+void TfrmStatsVehicules::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
-void TfrmStatsVehicules::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmStatsVehicules::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

@@ -31,7 +31,7 @@ TfrmParamBus::TfrmParamBus(TComponent* Owner)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::RafraichitNbBus()
+void TfrmParamBus::RafraichitNbBus() const
  {
   int i = 0;
   int NbBus=0;
@@ -43,7 +43,7 @@ void TfrmParamBus::RafraichitNbBus()
   LabelNbBus->Caption=IntToStr(NbBus);
  }
 //---------------------------------------------------------------------------
-void TfrmParamBus::FormShow(TObject *Sender)
+void TfrmParamBus::FormShow(TObject * /*Sender*/)
 {
  int i = 0;
  int j = 0;
@@ -109,8 +109,8 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 {
  auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
  int i = 0;
- int k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
- int n=CSpinEdit->Value;
+ int const k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
+ int const n=CSpinEdit->Value;
  int AncNumArretBusAMontrer = 0;
  switch(k/10)
   {
@@ -151,7 +151,7 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 void TfrmParamBus::CSpinEditExit(TObject *Sender)
 { // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
  auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
- int n=CSpinEdit->Value;
+ int const n=CSpinEdit->Value;
  if ((n<=0)||(n>cv->NbArretsBus)) {
   CSpinEdit->Value=0;
  } else
@@ -160,7 +160,7 @@ void TfrmParamBus::CSpinEditExit(TObject *Sender)
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::ButtonAideClick(TObject *Sender)
+void TfrmParamBus::ButtonAideClick(TObject * /*Sender*/)
 { // v3.0
  AfficheAideContextuelle(this); // v3.8
 }
@@ -172,12 +172,12 @@ void TfrmParamBus::MenuItemClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::BitBtnDirClick(TObject *Sender)
+void TfrmParamBus::BitBtnDirClick(TObject *Sender) const
 {
- int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
+ int const n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
  int // portage : TComponent::Name -> NomDe
-     dx=(n/10)-2;
- int dy=(n%10)-2;
+     const dx=(n/10)-2;
+ int const dy=(n%10)-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)
@@ -205,7 +205,7 @@ void TfrmParamBus::BitBtnDirClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::TimerClignotementTimer(TObject *Sender)
+void TfrmParamBus::TimerClignotementTimer(TObject * /*Sender*/) const
 {
  TimerClignotement->Tag^=1;
  if (NumArretBusAMontrer != 0) {
@@ -273,13 +273,13 @@ bool TfrmParamBus::AppliqueChoix()
   return true;
  }
 //---------------------------------------------------------------------------
-void TfrmParamBus::ButtonOkClick(TObject *Sender)
+void TfrmParamBus::ButtonOkClick(TObject * /*Sender*/)
 {
  if (AppliqueChoix()) { ModalResult=mrOk;
 }
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::ButtonAppliquerClick(TObject *Sender)
+void TfrmParamBus::ButtonAppliquerClick(TObject * /*Sender*/)
 {
  AppliqueChoix();
 }
@@ -287,7 +287,7 @@ void TfrmParamBus::ButtonAppliquerClick(TObject *Sender)
 
 
 void TfrmParamBus::CSpinEditParametresChange(
-      TObject *Sender)
+      TObject * /*Sender*/) const
 {
  if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
 }
@@ -306,7 +306,7 @@ void TfrmParamBus::CheckBoxClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::CheckBoxToutClick(TObject *Sender)
+void TfrmParamBus::CheckBoxToutClick(TObject * /*Sender*/)
 {
  CheckBoxTout->Tag=1;
  for(int i=0; i<NBMAXLIGNESBUSTRAM; i++) {
@@ -320,8 +320,8 @@ void TfrmParamBus::CheckBoxToutClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
+void TfrmParamBus::FormKeyDown(TObject * /*Sender*/, WORD &Key,
+      TShiftState  /*Shift*/)
 {// v5.3 (nécessite TForm:KeyPreview à true)
  if (Key==112) {
    AfficheAideContextuelle(this);

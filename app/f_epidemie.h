@@ -14,26 +14,26 @@
 class TfrmEpidemie : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
-	TGroupBox *GroupBox;
-	TCSpinEdit *CSpinEditInfectiosite;
-	TLabel *Label1;
-	TCSpinEdit *CSpinEditPatientZero;
-	TLabel *Label2;
-	TLabel *Label3;
-	TLabel *Label4;
-	TCSpinEdit *CSpinEditChargeViraleFatale;
-	TLabel *Label5;
-	TButton *ButtonOk;
-	TButton *ButtonAnnuler;
-	TButton *ButtonAide;
-	TLabel *Label6;
-	TCheckBox *CheckBoxActiver;
-	TLabel *Label7;
-	TLabel *Label8;
-	TCheckBox *CheckBoxReinfections;
-	void ButtonOkClick(TObject *Sender);
+	TGroupBox *GroupBox{};
+	TCSpinEdit *CSpinEditInfectiosite{};
+	TLabel *Label1{};
+	TCSpinEdit *CSpinEditPatientZero{};
+	TLabel *Label2{};
+	TLabel *Label3{};
+	TLabel *Label4{};
+	TCSpinEdit *CSpinEditChargeViraleFatale{};
+	TLabel *Label5{};
+	TButton *ButtonOk{};
+	TButton *ButtonAnnuler{};
+	TButton *ButtonAide{};
+	TLabel *Label6{};
+	TCheckBox *CheckBoxActiver{};
+	TLabel *Label7{};
+	TLabel *Label8{};
+	TCheckBox *CheckBoxReinfections{};
+	void ButtonOkClick(TObject *Sender) const;
 	void ButtonAideClick(TObject *Sender);
-	void FormShow(TObject *Sender);
+	void FormShow(TObject *Sender) const;
 private:	// Déclarations utilisateur
 public:		// Déclarations utilisateur
 	TfrmEpidemie(TComponent* Owner);

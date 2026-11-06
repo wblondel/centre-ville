@@ -26,7 +26,7 @@ int AnsiString::Pos(const AnsiString &asSousChaine) const
  {
   if (asSousChaine.IsEmpty()) { return 0;
 }
-  std::size_t p=s.find(asSousChaine.s);
+  std::size_t const p=s.find(asSousChaine.s);
   return (p==std::string::npos)?0:static_cast<int>(p)+1;
  }
 //---------------------------------------------------------------------------
@@ -62,12 +62,12 @@ namespace
    { // Delphi : "-d.ddd...E+ddd", Precision = nombre total de chiffres, exposant sur 3 chiffres
     Precision = std::max(Precision, 1);
     std::string Brut=Imprime("%.*E", Precision-1, Valeur);
-    std::size_t e=Brut.find('E');
+    std::size_t const e=Brut.find('E');
     if (e==std::string::npos) { return Brut;
 }
-    std::string Mantisse=Brut.substr(0, e);
-    char Signe=Brut[e+1];
-    int Exposant=std::atoi(Brut.c_str()+e+2);
+    std::string const Mantisse=Brut.substr(0, e);
+    char const Signe=Brut[e+1];
+    int const Exposant=std::atoi(Brut.c_str()+e+2);
     char Tampon[16];
     std::snprintf(Tampon, sizeof(Tampon), "E%c%03d", Signe, Exposant);
     return Mantisse+Tampon;
@@ -75,7 +75,7 @@ namespace
   //-------------------------------------------------------------------------
   std::string AvecSeparateurMilliers(const std::string &Nombre)
    {
-    std::size_t Debut=(!Nombre.empty()&&(Nombre[0]=='-'))?1:0;
+    std::size_t const Debut=(!Nombre.empty()&&(Nombre[0]=='-'))?1:0;
     std::size_t Fin=Nombre.find('.');
     if (Fin==std::string::npos) { Fin=Nombre.size();
 }
@@ -98,7 +98,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
   std::size_t n=f.size();
   std::size_t iArg=0;
   // Lecture d'un nombre ou de '*' (valeur prise dans les arguments)
-  auto LitNombre=[&](int &Valeur)->bool
+  auto const LitNombre=[&](int &Valeur)->bool
    {
     if ((i<n)&&(f[i]=='*'))
      {
@@ -132,8 +132,8 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
     int Largeur=0;
     int Precision=0;
     int Nombre=0;
-    std::size_t Debut=i;
-    std::size_t iArgDebut=iArg;
+    std::size_t const Debut=i;
+    std::size_t const iArgDebut=iArg;
     // [index ":"]
     if (LitNombre(Nombre)&&(i<n)&&(f[i]==':'))
      {
@@ -156,7 +156,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
      }
     if (i>=n) { ErreurFormat(f, "type manquant");
 }
-    char Type=static_cast<char>(std::toupper(static_cast<unsigned char>(f[i++])));
+    char const Type=static_cast<char>(std::toupper(static_cast<unsigned char>(f[i++])));
     if (iArg>=Args.size()) { ErreurFormat(f, "argument manquant");
 }
     const TVarRec &a=Args[iArg++];
@@ -168,7 +168,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
        {
         if (a.Genre!=TVarRec::vtEntier) { ErreurFormat(f, "%d/%u attend un entier");
 }
-        long long v=a.Entier;
+        long long const v=a.Entier;
         bool Negatif=false;
         unsigned long long Absolu = 0;
         if (Type=='U') {
@@ -189,7 +189,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
        {
         if (a.Genre!=TVarRec::vtEntier) { ErreurFormat(f, "%x attend un entier");
 }
-        unsigned long long v=((a.Entier<0)&&(a.Entier>=-2147483648LL))?
+        unsigned long long const v=((a.Entier<0)&&(a.Entier>=-2147483648LL))?
                              static_cast<unsigned long long>(static_cast<unsigned int>(a.Entier)):
                              static_cast<unsigned long long>(a.Entier);
         char Tampon[32];
@@ -218,7 +218,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
          }
         { // portage : séparateurs de FormatSettings (le texte ne contient que des chiffres, signes, 'E', '.' et ',')
          std::string Local;
-         for(char c : Texte) {
+         for(char const c : Texte) {
           if (c=='.') { Local+=FormatSettings.DecimalSeparator;
           } else if (c==',') { Local+=FormatSettings.ThousandSeparator;
           } else { Local+=c;
@@ -254,7 +254,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
      }
     if (LargeurDefinie&&std::cmp_less(Texte.size(),Largeur))
      {
-      std::string Bourrage(static_cast<std::size_t>(Largeur)-Texte.size(), ' ');
+      std::string const Bourrage(static_cast<std::size_t>(Largeur)-Texte.size(), ' ');
       Texte=AGauche?Texte+Bourrage:Bourrage+Texte;
      }
     Resultat+=Texte;
