@@ -152,7 +152,7 @@ int OuvreChemin(const std::filesystem::path &p, int Drapeaux)
     }
     return fd;
 #else
-    return open(p.c_str(), Drapeaux, 0666);
+    return open(p.c_str(), Drapeaux, 0666); // NOLINT(cppcoreguidelines-pro-type-vararg) : open() de POSIX
 #endif
 }
 //-------------------------------------------------------------------------
