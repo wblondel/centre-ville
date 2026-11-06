@@ -1644,7 +1644,7 @@ bool TfrmSimulation::VerifieReseau()
         if (cv->ArretBus[i].Defini())
         {
             Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1);
-            if ((!Ok))
+            if (!Ok)
             { // v3.0.3
                 xErr = cv->ArretBus[i].x;
                 yErr = cv->ArretBus[i].y;
@@ -1659,7 +1659,7 @@ bool TfrmSimulation::VerifieReseau()
         if (cv->ArretTram[i].Defini())
         {
             Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1);
-            if ((!Ok))
+            if (!Ok)
             { // v3.0.3
                 xErr = cv->ArretTram[i].x;
                 yErr = cv->ArretTram[i].y;
@@ -2358,7 +2358,7 @@ bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie Type
                 if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
                     NumFeu = cv->v[x][y].NumFeu[d];
-                    if ((NumFeu != 0))
+                    if (NumFeu != 0)
                     {
                         for (i = 0; (!Abandon) && (i < cv->NbFeuxPieton); i++)
                         {
@@ -2457,7 +2457,7 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
                 if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
                     NumFeu = cv->v[x][y].NumFeu[d];
-                    if ((NumFeu != 0))
+                    if (NumFeu != 0)
                     {
                         for (i = 0; i < cv->NbFeuxPieton; i++)
                         {
