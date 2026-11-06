@@ -325,7 +325,7 @@ void TfrmInfosPieton::RafraichitInfos()
         else
         {
             LabelBusTramTaxiVehlib->Caption = "Aucun";
-            LabelPosition->Caption = asPosition[!(p->DemiCase == 0)];
+            LabelPosition->Caption = asPosition[(p->DemiCase == 0) ? 0 : 1];
         }
         if (p->NumArretBus != 0)
         {
@@ -360,7 +360,7 @@ void TfrmInfosPieton::RafraichitInfos()
         {
             const bool Infection = p->EstContagieux();
             const int NbInfections = p->NbInfections();
-            LabelInfecte->Caption = asOuiNon[!!Infection];
+            LabelInfecte->Caption = asOuiNon[Infection ? 1 : 0];
             LabelInfections->Caption = IntToStr(NbInfections); // portage : conversion implicite int -> AnsiString de
                                                                // C++Builder
             if (NbInfections > 0)
@@ -383,7 +383,7 @@ void TfrmInfosPieton::RafraichitInfos()
                 }
                 if (Infection)
                 {
-                    LabelEtatFinal->Caption = asEtatFinal[!!p->EstCondamne()];
+                    LabelEtatFinal->Caption = asEtatFinal[p->EstCondamne() ? 1 : 0];
                 }
                 else
                 {
@@ -444,8 +444,10 @@ void TfrmInfosPieton::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmInfosPieton::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmInfosPieton::ChargeFiche()
 {
     Ui::frmInfosPieton().setupUi(this);

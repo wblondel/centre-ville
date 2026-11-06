@@ -103,8 +103,8 @@ void TfrmDefVoie::AppliqueChoix()
             { // A. On a trouvé des références au feu à supprimer
                 if (AfficheMessage(Format(asFrmMsgSuppr,
                                           TableauDeConstantes(asDir[d],
-                                                              asVoieOuPieton[!RefVoie], // v6.0.5 : l'original testait
-                                                                                        // !NumRef
+                                                              asVoieOuPieton[RefVoie ? 0 : 1], // v6.0.5 : l'original
+                                                                                               // testait !NumRef
                                                               (RefVoie ? NumRef : NumRefP) + 1,
                                                               RefVoie ? cv->Feu[NumRef].x : cv->FeuP[NumRefP].x[0],
                                                               RefVoie ? cv->Feu[NumRef].y : cv->FeuP[NumRefP].y[0])),
@@ -323,8 +323,10 @@ void TfrmDefVoie::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*Shi
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmDefVoie::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmDefVoie::ChargeFiche()
 {
     Ui::frmDefVoie().setupUi(this);

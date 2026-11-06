@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------
 // compat/chaine.h - Portage de Centre-Ville hors de C++Builder
-//
+
 // Remplace <dstring.h> pour le moteur : sous-ensemble d'AnsiString,
 // Format(..., ARRAYOFCONST((...))) et IntToStr, en C++ standard.
-//
+
 // Différence assumée avec C++Builder : les littéraux du dépôt sont en UTF-8
 // (et non plus en Windows-1252). Length() compte donc des octets ; le moteur
 // ne dépend jamais de la longueur d'une chaîne accentuée.
@@ -24,13 +24,12 @@ class AnsiString
 
 public:
     AnsiString() = default;
-    AnsiString(const char *src)
-        : s(src ? src : "") {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    AnsiString(std::string src)
-        : s(std::move(src)) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    AnsiString(char c)
-        : s(1, c) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL ; comme C++Builder :
-                     // chaîne d'un caractère
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(const char *src) : s(src ? src : "") {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(std::string src) : s(std::move(src)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
     [[nodiscard]] const char *c_str() const { return s.c_str(); }
     [[nodiscard]] const std::string &str() const { return s; }
     [[nodiscard]] int Length() const { return static_cast<int>(s.size()); }
@@ -75,37 +74,31 @@ public:
     double Reel = 0.0;
     std::string Chaine;
     const void *Pointeur = nullptr;
-    template <class T, std::enable_if_t<
-                           std::is_integral_v<T> && (!std::is_same_v<T, char>) && (!std::is_same_v<T, bool>), int> = 0>
+    template <class T>
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     TVarRec(T v)
-        : Genre(vtEntier), Entier(static_cast<long long>(v)) // NOLINT(*-explicit-constructor) : conversion implicite
-                                                             // voulue, comme la VCL
+        requires(std::is_integral_v<T> && (!std::is_same_v<T, char>) && (!std::is_same_v<T, bool>))
+        : Genre(vtEntier), Entier(static_cast<long long>(v))
     {}
-    TVarRec(char c)
-        : Genre(vtCaractere), Chaine(1, c)
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(bool b)
-        : Genre(vtBooleen), Entier(static_cast<long long>(b))
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(double d)
-        : Genre(vtReel), Reel(d) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(float f)
-        : Genre(vtReel), Reel(f) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(long double d)          // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-        : Genre(vtReel), Reel(static_cast<double>(d))
-    {} // portage : (long double) de f_simul.cpp (AfficheBilan)
-    TVarRec(const char *c)
-        : Genre(vtChaine), Chaine(c ? c : "")
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(std::string c)
-        : Genre(vtChaine), Chaine(std::move(c))
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(const AnsiString &as)
-        : Genre(vtChaine), Chaine(as.str())
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    TVarRec(const void *p)
-        : Genre(vtPointeur), Pointeur(p)
-    {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(char c) : Genre(vtCaractere), Chaine(1, c) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(bool b) : Genre(vtBooleen), Entier(static_cast<long long>(b)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(double d) : Genre(vtReel), Reel(d) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(float f) : Genre(vtReel), Reel(f) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(long double d)
+        : Genre(vtReel), Reel(static_cast<double>(d)) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const char *c) : Genre(vtChaine), Chaine(c ? c : "") {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(std::string c) : Genre(vtChaine), Chaine(std::move(c)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const void *p) : Genre(vtPointeur), Pointeur(p) {}
 };
 //---------------------------------------------------------------------------
 // portage : point d'extension, pour que l'interface puisse passer ses

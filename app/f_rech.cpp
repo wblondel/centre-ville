@@ -688,8 +688,10 @@ void TfrmRecherche::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*S
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmRecherche::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmRecherche::ChargeFiche()
 {
     Ui::frmRecherche().setupUi(this);

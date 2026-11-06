@@ -852,12 +852,12 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             {
                 asMsg = asMsg + Format("Arrêt bus %d %s. ", // ajout de "bus" pour différencier avec "tram" (v3.5)
                                        TableauDeConstantes(v->NumArretBus,
-                                                           asAsterisque[v->EstTeteArretBus()])); // v3.1 !!!
+                                                           asAsterisque[v->EstTeteArretBus() ? 1 : 0])); // v3.1 !!!
             }
             else
             {
                 asMsg = asMsg + Format("Arrêt bus %d %s (%s). ", // ajout de "bus" pour différencier avec "tram" (v3.5)
-                                       TableauDeConstantes(v->NumArretBus, asAsterisque[v->EstTeteArretBus()],
+                                       TableauDeConstantes(v->NumArretBus, asAsterisque[v->EstTeteArretBus() ? 1 : 0],
                                                            asListeLignes)); // v3.1 !!!
             }
         }
@@ -866,13 +866,14 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             asListeLignes = cv->ArretTram[v->NumArretTram - 1].asListeLignesTram();
             if (asListeLignes.IsEmpty())
             {
-                asMsg = asMsg + Format("Arrêt tram %d %s. ",
-                                       TableauDeConstantes(v->NumArretTram, asAsterisque[v->EstTeteArretTram()]));
+                asMsg =
+                    asMsg + Format("Arrêt tram %d %s. ",
+                                   TableauDeConstantes(v->NumArretTram, asAsterisque[v->EstTeteArretTram() ? 1 : 0]));
             }
             else
             {
                 asMsg = asMsg + Format("Arrêt tram %d %s (%s). ",
-                                       TableauDeConstantes(v->NumArretTram, asAsterisque[v->EstTeteArretTram()],
+                                       TableauDeConstantes(v->NumArretTram, asAsterisque[v->EstTeteArretTram() ? 1 : 0],
                                                            asListeLignes));
             }
         }
@@ -910,14 +911,15 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         }
         if (v->NumBus != 0)
         { // v3.0
-            asMsg = asMsg + Format("Bus %d%s ligne %d. ", TableauDeConstantes(v->NumBus, asAsterisque[v->EstTeteBus()],
-                                                                              cv->Bus[v->NumBus - 1].NumLigne));
+            asMsg = asMsg +
+                    Format("Bus %d%s ligne %d. ", TableauDeConstantes(v->NumBus, asAsterisque[v->EstTeteBus() ? 1 : 0],
+                                                                      cv->Bus[v->NumBus - 1].NumLigne));
         }
         if (v->NumTram != 0)
         { // v3.5
-            asMsg =
-                asMsg + Format("Tram %d%s ligne %d. ", TableauDeConstantes(v->NumTram, asAsterisque[v->EstTeteTram()],
-                                                                           cv->Tram[v->NumTram - 1].NumLigne));
+            asMsg = asMsg + Format("Tram %d%s ligne %d. ",
+                                   TableauDeConstantes(v->NumTram, asAsterisque[v->EstTeteTram() ? 1 : 0],
+                                                       cv->Tram[v->NumTram - 1].NumLigne));
         }
         if (v->PassagePietons)
         {
@@ -969,7 +971,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         { // v3.6
             asMsg = asMsg + Format("Place Taxi %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlaceTaxi,
-                                                       asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
+                                                       asSupInf[v->EstTeteFileTaxis() ? 1 : 0],  // v4.3 (asSupInf
+                                                                                                 // remplace as12)
                                                        asSupInf[v->EstQueueFileTaxis() ? 2 : 0], // v4.3 (asSupInf
                                                                                                  // remplace as12)
                                                        cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
@@ -983,7 +986,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         { // v5.0
             asMsg = asMsg + Format("Place Prkg %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlacePark,
-                                                       asSupInf[v->EstTeteFilePark()],                   // v5.0
+                                                       asSupInf[v->EstTeteFilePark() ? 1 : 0],           // v5.0
                                                        asSupInf[v->EstQueueFilePark() ? 2 : 0],          // v5.0
                                                        cv->PlacePark[v->NumPlacePark - 1].NumFile + 1)); // v5.3
         }
@@ -3358,7 +3361,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject * /*Sender*/)
             {
                 RedessineCase(xErr, yErr, true);
             }
-            AfficheMessage(Format(asFrmReseauNonConnexe[TypeDistance == parkings],
+            AfficheMessage(Format(asFrmReseauNonConnexe[(TypeDistance == parkings) ? 1 : 0],
                                   TableauDeConstantes(asTypeDistance[TypeDistance])),
                            asAvertissement, tmAvertissement, 0, 0);
             switch (TypeDistance) // v3.9.3
@@ -4862,8 +4865,10 @@ void TfrmSimulation::ActionAfficherInfectionExecute(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 // portage : code propre au portage (pas d'équivalent dans src/f_simul.cpp)
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmSimulation::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 //---------------------------------------------------------------------------
 // Implémentation d'IVueSimulation : les accès du moteur à frmSimulation et aux
 // autres fiches (engine/README.md, inventaire), un pour un

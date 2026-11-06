@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 // vcl/proprietes.h - Portage de Centre-Ville : propriétés façon C++Builder
-//
+
 // Les fiches d'origine lisent et écrivent les propriétés des composants
 // (__property de la VCL) : ActionX->Checked^=true, Caption=Caption+"*",
 // StatusBar->Panels->Items[0]->Text=..., etc. Propriete<T> reproduit cette
@@ -30,9 +30,14 @@ public:
         Ecrit = std::move(Ecriture);
     }
     [[nodiscard]] T Valeur() const { return Lit(); }
-    operator T() const { return Lit(); } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    operator T() const { return Lit(); }
     // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
-    template <class E, std::enable_if_t<std::is_enum_v<E>, int> = 0> explicit operator E() const { return (E)Lit(); }
+    template <class E>
+    explicit operator E() const
+        requires(std::is_enum_v<E>)
+    {
+        return (E)Lit();
+    }
     Propriete &operator=(const T &v)
     {
         Ecrit(v);
@@ -84,10 +89,8 @@ public:
         Ecrit = std::move(Ecriture);
     }
     [[nodiscard]] AnsiString Valeur() const { return Lit(); }
-    operator AnsiString() const
-    {
-        return Lit();
-    } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    operator AnsiString() const { return Lit(); }
     Propriete &operator=(const AnsiString &v)
     {
         Ecrit(v);

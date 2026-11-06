@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 // vcl/controles.h - Portage de Centre-Ville : contrôles de la VCL sur Qt
-//
+
 // Chaque classe porte le nom du contrôle VCL qu'elle remplace et dérive du
 // widget Qt le plus proche (TLabel : QLabel, TCSpinEdit : QAbstractSpinBox...) :
 // les .ui générés par tools/dfm2ui.py les « promeuvent », et uic les instancie
@@ -15,7 +15,7 @@
 // (AllowAllUp), Click() n'appelle qu'OnClick (sans changer Down).
 // Les propriétés que Qt Designer ne connaît pas arrivent en propriétés
 // dynamiques « vcl... » et sont appliquées par PrepareVcl() après setupUi.
-//
+
 // Composants non visuels : TTimer, TOpenDialog, TSaveDialog (créés à partir
 // de la propriété dynamique « vcl_<Nom> » de la fiche).
 //---------------------------------------------------------------------------
@@ -403,10 +403,8 @@ public:
 
         public:
             Cellule(TStringGrid *gg, int cc, int rr) : g(gg), c(cc), r(rr) {}
-            operator AnsiString() const
-            {
-                return g->LitCellule(c, r);
-            } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+            // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+            operator AnsiString() const { return g->LitCellule(c, r); }
             Cellule &operator=(const AnsiString &as)
             {
                 g->EcritCellule(c, r, as);

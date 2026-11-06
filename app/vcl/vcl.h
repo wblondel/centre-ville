@@ -1,11 +1,11 @@
 //---------------------------------------------------------------------------
 // vcl/vcl.h - Portage de Centre-Ville : sous-ensemble de la VCL au-dessus de Qt
-//
+
 // Remplace <vcl.h> et les en-têtes *.hpp de C++Builder pour le code des
 // fiches. Seul ce qu'utilisent les fiches de Centre-Ville est reproduit, avec
 // la sémantique de la VCL (événements implicites compris, PLAN_PORTAGE.md
 // §4.4), pour que le code porté reste lisible ligne à ligne face à l'original.
-//
+
 // Correspondances de base :
 //   TObject, TComponent -> QObject ; String -> AnsiString (UTF-8) étendue ;
 //   TColor -> entier 0x00BBGGRR (vcl/couleurs.h) ; __property -> Propriete<T>.
@@ -33,12 +33,12 @@ class String : public AnsiString
 {
 public:
     String() = default;
-    String(const char *s)
-        : AnsiString(s) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    String(const AnsiString &as)
-        : AnsiString(as) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
-    String(const std::string &s)
-        : AnsiString(s) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const char *s) : AnsiString(s) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const AnsiString &as) : AnsiString(as) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const std::string &s) : AnsiString(s) {}
     [[nodiscard]] String UpperCase() const;
 };
 using UnicodeString = String;

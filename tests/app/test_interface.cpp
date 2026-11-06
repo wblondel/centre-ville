@@ -218,7 +218,7 @@ const dirposs DirPossC4x4[4][4] = {
 // Case libre : sans voie, nature, parking, arrêt, place ni feu
 bool CaseLibre(int x, int y)
 {
-    voie &v = cv->v[(x + cv->NbX) % cv->NbX][(y + cv->NbY) % cv->NbY];
+    voie const &v = cv->v[(x + cv->NbX) % cv->NbX][(y + cv->NbY) % cv->NbY];
     return (v.DirPoss == 0) && (v.SensVoieTram == 0) && (NatureSansDecor(&v) == 0) && (v.NumParking == 0) &&
            (v.NumArretBus == 0) && (v.NumArretTram == 0) && (v.NumPlaceTaxi == 0) && (v.NumPlacePark == 0) &&
            (v.NumPlaceVehlib == 0) && !v.PassagePietons && !v.EstDepotBus() && (v.NumFeu[0] == 0) &&
@@ -573,7 +573,7 @@ public:
               std::unique_lock<std::mutex> v(Verrou);
               if (!Fin.wait_for(v, std::chrono::seconds(Secondes), [this] { return Termine; }))
               {
-                  std::cerr << std::format("FAIL! : blocage de plus de {} s : {}", Secondes, Quoi) << std::endl;
+                  std::cerr << std::format("FAIL! : blocage de plus de {} s : {}", Secondes, Quoi) << '\n';
                   std::_Exit(3);
               }
           })
@@ -767,7 +767,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         w->setFocus(Qt::OtherFocusReason);
         QTest::keyClick(w, Touche);
     }
-    void CliqueChoix(TRadioGroup *g, int i)
+    static void CliqueChoix(TRadioGroup *g, int i)
     { // Clic sur le i-ème bouton d'un TRadioGroup (<Nom>_<i> créés par dfm2ui)
         auto *b = g->findChild<QRadioButton *>(g->objectName() + "_" + QString::number(i));
         QVERIFY(b);
@@ -843,7 +843,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         QApplication::processEvents();
     }
     // Tours joués jusqu'à ce que Fin() soit vraie (au plus NbMax tours)
-    bool JoueTours(const std::function<bool()> &Fin, int NbMax)
+    static bool JoueTours(const std::function<bool()> &Fin, int NbMax)
     {
         for (int i = 0; (i < NbMax) && !Fin() && frmSimulation->SimulationEnCours; i++)
         {
@@ -1039,7 +1039,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         OuvreFichier(f);
         return f;
     }
-    bool Arrete()
+    static bool Arrete()
     { // Arrêt par la barre d'outils : bilan, puis rechargement du réseau
         QTest::mouseClick(frmSimulation->ToolButtonArret, Qt::LeftButton);
         RelanceMinuteur();
@@ -1058,7 +1058,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
                           QPoint((r.Left + r.Right) / 2, (r.Top + r.Bottom) / 2));
         g->Repaint();
     }
-    int TrouveCase(const std::function<int(voie *)> &Numero)
+    static int TrouveCase(const std::function<int(voie *)> &Numero)
     { // Premier objet trouvé sur la carte (Numero(v) > 0), cliqué par l'utilisateur
         for (int y = 0; y < cv->NbY; y++)
         {
@@ -1075,8 +1075,8 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         return 0;
     }
     void VerifieFichesDistances(const QString &asCarte, bool Captures);
-    void SuitObjet(const char *Type, const std::function<QString(long)> &Ecart,
-                   const std::function<bool(int &, int &)> &Position, int NbTours);
+    static void SuitObjet(const char *Type, const std::function<QString(long)> &Ecart,
+                          const std::function<bool(int &, int &)> &Position, int NbTours);
     bool DimensionsPilotees = false; // La fiche Dimensions répond par une étape, pas par défaut
     void NouvelleZone(int NbX, int NbY)
     { // Nouveau : zone vide, sans génération ni paramètres, sans enregistrer la précédente
@@ -1098,7 +1098,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         Messages.clear();
         Focalise();
     }
-    void ExecuteSurSelection(int x1, int y1, int x2, int y2, TAction *Action)
+    static void ExecuteSurSelection(int x1, int y1, int x2, int y2, TAction *Action)
     { // Sélection de (x1, y1) à (x2, y2), puis la commande, qui doit être disponible
         Selectionne(x1, y1, x2, y2);
         if (QTest::currentTestFailed())
@@ -1108,7 +1108,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         QVERIFY2(Action->Enabled, qPrintable(QString("(%1, %2) - (%3, %4)").arg(x1).arg(y1).arg(x2).arg(y2)));
         Action->Execute();
     }
-    void TraceSegment(int x1, int y1, int x2, int y2)
+    static void TraceSegment(int x1, int y1, int x2, int y2)
     { // Clic sur le début, Maj+clic sur la fin, puis la commande
         Selectionne(x1, y1, x2, y2);
         if (QTest::currentTestFailed())
@@ -1298,7 +1298,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         PoseFeu(8, 4, frmDefVoie->RadioGroupPrioriteSud);
         Messages.clear();
     }
-    void OuvreFicheFeu(int x, int y, direction d)
+    static void OuvreFicheFeu(int x, int y, direction d)
     { // Fiche Priorités de la case, puis bouton du feu : les deux fiches restent ouvertes
         TBitBtn *Boutons[NBDIR] = {
             frmDefVoie->BitBtnDefFeuN,
@@ -1340,7 +1340,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         Messages.clear();
         return cv->v[6][7].NumFeuP[sud - 1];
     }
-    void ExecuteSurCase(int x, int y, TAction *Action)
+    static void ExecuteSurCase(int x, int y, TAction *Action)
     { // Commande d'une case : clic, puis l'action, qui doit être disponible
         CliqueCase(x, y);
         QVERIFY2(Action->Enabled, qPrintable(QString("(%1, %2)").arg(x).arg(y)));
@@ -1631,9 +1631,10 @@ void TestInterface::init()
     Messages.clear();
 }
 //---------------------------------------------------------------------------
-void TestInterface::aProposAuDemarrage()
-{ // f_simul FormShow : « À propos » affichée (non modale), feu vert puis texte
-  // en vert au premier tic du minuteur, fermeture automatique au deuxième (2 s)
+void TestInterface::aProposAuDemarrage() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
+                                         // (slot de Qt Test)
+{                                        // f_simul FormShow : « À propos » affichée (non modale), feu vert puis texte
+                                         // en vert au premier tic du minuteur, fermeture automatique au deuxième (2 s)
     QVERIFY(frmAPropos);
     QVERIFY(frmAPropos->isVisible());
     QVERIFY(!QApplication::activeModalWidget());
@@ -1692,7 +1693,8 @@ void TestInterface::ouvertureParLigneDeCommande()
     Capture("demo_tour0.png");
 }
 //---------------------------------------------------------------------------
-void TestInterface::raccourcisSelonLeMode()
+void TestInterface::raccourcisSelonLeMode() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
+                                            // (slot de Qt Test)
 { // Ctrl+B : « Passage de bus » (menu contextuel d'édition) avant la simulation
     int x = -1;
     int y = -1;

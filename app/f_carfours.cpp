@@ -322,8 +322,10 @@ void TfrmCarrefours::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmCarrefours::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmCarrefours::ChargeFiche()
 {
     Ui::frmCarrefours().setupUi(this);

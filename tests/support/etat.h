@@ -87,7 +87,7 @@ class ExportEtat // ami de la classe infection (champs privés)
 public:
     // Exporte une partie de l'état de cv ; Detail : tableaux attente/trafic
     // complets (sinon seulement les totaux [0][0], suffisants tour par tour)
-    template <class P> static void Exporte(const centre_ville *cv, partie_etat Partie, P &p, bool Detail);
+    template <class P> static void Exporte(const centre_ville *cv, partie_etat Partie, P &s, bool Detail);
     // Toutes les parties (sauf les distances), en texte
     static std::string Texte(const centre_ville *cv, bool Detail);
     static std::uint64_t Empreinte(const centre_ville *cv, partie_etat Partie, bool Detail);

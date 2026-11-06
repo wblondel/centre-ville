@@ -109,8 +109,10 @@ void TfrmAffDistFilesPark::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftSt
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmAffDistFilesPark::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmAffDistFilesPark::ChargeFiche()
 {
     Ui::frmAffDistFilesPark().setupUi(this);

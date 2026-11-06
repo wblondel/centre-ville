@@ -4,7 +4,6 @@
 #include "etat.h"
 #include <format>
 #include <cstdint>
-#include <cstdio>
 #include <string>
 #include "compat/alea.h"
 #include "simul.h"
@@ -78,7 +77,7 @@ template <class P, class T> void CT(P &s, const char *Nom, const T &Tableau, int
 {
     for (int k = 0; k < n; k++)
     {
-        std::string NomCase;
+        std::string NomCase; // NOLINT(misc-const-correctness) : modifié dans une branche if constexpr
         if constexpr (P::Noms)
         {
             NomCase = Nom + std::to_string(k);
@@ -100,7 +99,7 @@ template <class P> void ExportEtat::ExporteInfections(const pieton *p, P &s)
         const char *Noms[8] = {"deb", "fin", "fatal", "prm", "drn", "prmrang", "drnrang", "charge"};
         for (int j = 0; j < 8; j++)
         {
-            std::string n;
+            std::string n; // NOLINT(misc-const-correctness) : modifié dans une branche if constexpr
             if constexpr (P::Noms)
             {
                 n = std::format("inf{}.{}", k, Noms[j]);
@@ -621,7 +620,8 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                             {
                                 if (v->Attente[a][b] || v->Trafic[a][b])
                                 {
-                                    std::string n;
+                                    std::string n; // NOLINT(misc-const-correctness) : modifié dans une branche if
+                                                   // constexpr
                                     if constexpr (P::Noms)
                                     {
                                         n = std::format("att{}.{}", a, b);

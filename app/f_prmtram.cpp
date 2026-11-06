@@ -291,7 +291,7 @@ bool TfrmParamTram::AppliqueChoix()
                 if (CSpinEditNum->Value == 0)
                 {
                     asMsg = asMsg + Format(" - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
-                                           TableauDeConstantes(j, asOrdre[(j - 1) == 0], i));
+                                           TableauDeConstantes(j, asOrdre[((j - 1) == 0) ? 1 : 0], i));
                 }
             }
         }
@@ -396,8 +396,10 @@ void TfrmParamTram::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*S
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
 #define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
     Connecte(Composant->Evenement, this, &TfrmParamTram::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmParamTram::ChargeFiche()
 {
     Ui::frmParamTram().setupUi(this);
