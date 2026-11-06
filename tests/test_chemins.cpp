@@ -3,11 +3,16 @@
 //
 // Repérés par le rapport de couverture (job « Couverture des tests ») :
 // modifications du réseau faites depuis l'interface (places et arrêts
-// supprimés), puis option « Réinfections » de l'épidémie.
+// supprimés), option « Réinfections » de l'épidémie, puis distances avec des
+// cases « Tout droit » sur deux cases.
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
+#include <array>
+#include <cstdint>
 #include <cstdlib>
+#include <format>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -52,6 +57,68 @@ void Simule(int NbTours)
     {
         REQUIRE(harnais::Tick());
     }
+}
+//-------------------------------------------------------------------------
+// Empreinte FNV-1a (64 bits) d'un texte
+std::uint64_t Empreinte(const std::string &Texte)
+{
+    std::uint64_t h = 0xcbf29ce484222325ULL;
+    for (const char c : Texte)
+    {
+        h ^= static_cast<unsigned char>(c);
+        h *= 0x100000001b3ULL;
+    }
+    return h;
+}
+//-------------------------------------------------------------------------
+// Tables de distances de chaque case (voie::CalculeDistance*), en texte
+std::string TablesDistances()
+{
+    std::string Texte;
+    for (int x = 0; x < cv->NbX; x++)
+    {
+        for (int y = 0; y < cv->NbY; y++)
+        {
+            const voie &V = cv->v[x][y];
+            Texte += std::format("{} {} :", x, y);
+            for (int k = 0; k < V.NbDirDist; k++)
+            {
+                for (int e = 0; e < V.NbParkingsDist; e++)
+                {
+                    Texte += std::format(" P{},{}", V.DistParking[e][k][0], V.DistParking[e][k][1]);
+                }
+                for (int e = 0; e < V.NbFilesParkDist; e++)
+                {
+                    Texte += std::format(" F{},{}", V.DistFilePark[e][k][0], V.DistFilePark[e][k][1]);
+                }
+                for (int e = 0; e < V.NbArretsBusDist; e++)
+                {
+                    Texte += std::format(" B{}", V.DistArretBus[e][k]);
+                }
+                for (int e = 0; e < V.NbFilesTaxiDist; e++)
+                {
+                    Texte += std::format(" T{}", V.DistFileTaxi[e][k]);
+                }
+                for (int e = 0; e < V.NbPlacesVehlibDist; e++)
+                {
+                    Texte += std::format(" V{}", V.DistPlaceVehlib[e][k]);
+                }
+            }
+            if (V.SensVoieTram > 0)
+            {
+                const int nd = V.NbDirPossSensVoieTram(indefinie);
+                for (int e = 0; e < V.NbArretsTramDist; e++)
+                {
+                    for (int k = 0; k < nd; k++)
+                    {
+                        Texte += std::format(" R{}", V.DistArretTram[e][k]);
+                    }
+                }
+            }
+            Texte += '\n';
+        }
+    }
+    return Texte;
 }
 } // namespace
 //---------------------------------------------------------------------------
@@ -373,6 +440,77 @@ TEST_CASE("Épidémie avec réinfections : un piéton guéri retombe malade", "[
     CHECK(NbReinfectes > 0);
     CHECK(NombreAllocationsVives() == Avant);
     alea::LibereGraine();
+    vue = nullptr;
+}
+//---------------------------------------------------------------------------
+TEST_CASE("Distances avec des cases « Tout droit » et des passages de bus ajoutés : valeurs de la 6.0.16",
+          "[chemins][distances]")
+{ // Aucune carte livrée ne parcourt le « Tout droit » sur deux cases de voie::CalculeDistance (v3.9.1). Cases tirées
+  // au hasard (std::mt19937, identique partout) parmi les voies dont toutes les voisines atteintes sont des voies ;
+  // empreintes des tables calculées par le moteur 6.0.16, avant la réécriture des parcours (6.0.17). Géant est la
+  // seule carte où le saut de deux cases change aussi les distances simples (arrêts de bus, taxis, vehlibs)
+    struct cas
+    {
+        int Carte;
+        unsigned Graine;
+        int PctToutDroit, PctPassageBus;
+        std::uint64_t Empreinte;
+    };
+    const auto Cas = std::to_array<cas>({
+        {.Carte = 3, .Graine = 1, .PctToutDroit = 20, .PctPassageBus = 5, .Empreinte = 0x1da54af89b52d89cULL},
+        {.Carte = 3, .Graine = 1, .PctToutDroit = 100, .PctPassageBus = 50, .Empreinte = 0x2db2793e1e3d9c3eULL},
+        {.Carte = 1, .Graine = 1, .PctToutDroit = 20, .PctPassageBus = 5, .Empreinte = 0x7294ff367e4cdb6aULL},
+        {.Carte = 5, .Graine = 1, .PctToutDroit = 20, .PctPassageBus = 5, .Empreinte = 0x6e86b30c33250619ULL},
+        {.Carte = 4, .Graine = 1, .PctToutDroit = 20, .PctPassageBus = 5, .Empreinte = 0x358fd7283164eb42ULL},
+    });
+    VueNulle Vue;
+    vue = &Vue;
+    for (const cas &c : Cas)
+    {
+        INFO(Cartes[c.Carte].Nom << ", " << c.PctToutDroit << " % tout droit, " << c.PctPassageBus
+                                 << " % passages de bus");
+        REQUIRE(harnais::Ouvre(CheminCarte(Cartes[c.Carte])));
+        std::mt19937 Alea(c.Graine);
+        int NbToutDroit = 0;
+        int NbPassagesBus = 0;
+        for (int x = 0; x < cv->NbX; x++)
+        {
+            for (int y = 0; y < cv->NbY; y++)
+            {
+                voie &V = cv->v[x][y];
+                if (V.DirPoss == 0)
+                {
+                    continue;
+                }
+                bool VoisinesVoies = true;
+                for (int d = nord; d <= ouest; d++)
+                {
+                    if (((V.DirPoss & PossDir[d]) == PossDir[d]) && (cv->Voisine(x, y, d).DirPoss == 0))
+                    {
+                        VoisinesVoies = false;
+                    }
+                }
+                if (VoisinesVoies && std::cmp_less(Alea() % 100, c.PctToutDroit))
+                {
+                    V.ToutDroit = true;
+                    NbToutDroit++;
+                }
+                if (std::cmp_less(Alea() % 100, c.PctPassageBus))
+                {
+                    V.PassageBus = !V.PassageBus;
+                    NbPassagesBus++;
+                }
+            }
+        }
+        cv->DefinitFilesTaxi();
+        cv->DefinitFilesPark();
+        REQUIRE(cv->PrepareCalculDistances());
+        cv->CalculeDistances();
+        const std::string Tables =
+            std::format("tout droit {}, passages de bus {}\n", NbToutDroit, NbPassagesBus) + TablesDistances();
+        CHECK(Empreinte(Tables) == c.Empreinte);
+        harnais::Ferme();
+    }
     vue = nullptr;
 }
 //---------------------------------------------------------------------------
