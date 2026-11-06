@@ -44,7 +44,7 @@ void TfrmAffDistArretsBus::RafraichitInfos()
     const int y = frmSimulation->DrawGridSimul->Row;
     voie *v = &cv->v[x][y];
     EffaceInfos();
-    if (!v->DistArretBus)
+    if (v->DistArretBus.empty())
     {
         return;
     }

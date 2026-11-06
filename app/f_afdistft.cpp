@@ -44,7 +44,7 @@ void TfrmAffDistFilesTaxi::RafraichitInfos()
     const int y = frmSimulation->DrawGridSimul->Row;
     voie *v = &cv->v[x][y];
     EffaceInfos();
-    if (!v->DistFileTaxi)
+    if (v->DistFileTaxi.empty())
     {
         return;
     }

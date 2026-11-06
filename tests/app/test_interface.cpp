@@ -2401,7 +2401,7 @@ void TestInterface::interruptionReseauNonConnexe()
         QVERIFY(!frmSimulation->ToolButtonArret->isEnabled());
         QVERIFY(!frmSimulation->MenuItemArret->ElementQt()->isEnabled());
         QVERIFY(frmAffDistParkings->isVisible());
-        QVERIFY(cv->v[4][2].DistParking);
+        QVERIFY(!cv->v[4][2].DistParking.empty());
         QVERIFY(OctetsReseau() == Reseau);
         QVERIFY(Contenu(f) == Reseau);
     }
@@ -2410,7 +2410,7 @@ void TestInterface::interruptionReseauNonConnexe()
     frmSimulation->ActionDirectionDroite->Execute();
     QCOMPARE((int)cv->v[6][3].DirPoss, (int)(S | E));
     QVERIFY(frmSimulation->SimulationModifiee);
-    QVERIFY(!cv->v[4][2].DistParking);                               // distances obsolètes libérées...
+    QVERIFY(cv->v[4][2].DistParking.empty());                        // distances obsolètes libérées...
     frmSimulation->DrawGridSimulClick(frmSimulation->DrawGridSimul); // ... et la fiche encore ouverte le voit
     for (int x = 7; x <= 9; x++)
     {
@@ -4499,7 +4499,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Parkings";
                     t.Nb = cv->NbParkings;
-                    t.Definie = v->DistParking;
+                    t.Definie = !v->DistParking.empty();
                     t.Distance = [v, c](int k, int d) { return v->DistParking[k][d][c]; };
                     return t;
                 },
@@ -4517,7 +4517,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = QString::fromUtf8("Arrêts bus");
                     t.Nb = cv->NbArretsBus;
-                    t.Definie = v->DistArretBus;
+                    t.Definie = !v->DistArretBus.empty();
                     t.Distance = [v](int k, int d) { return v->DistArretBus[k][d]; };
                     return t;
                 },
@@ -4535,7 +4535,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t;
                     t.Titre = QString::fromUtf8("Arrêts tram");
                     t.Nb = cv->NbArretsTram;
-                    t.Definie = v->DistArretTram;
+                    t.Definie = !v->DistArretTram.empty();
                     t.NbDir = v->NbDirPossSensVoieTram(indefinie);
                     t.Dir = [v](int d) { return v->DirSensVoieTram(indefinie, d); };
                     t.Distance = [v](int k, int d) { return v->DistArretTram[k][d]; };
@@ -4555,7 +4555,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Files taxi";
                     t.Nb = cv->NbFilesTaxi;
-                    t.Definie = v->DistFileTaxi;
+                    t.Definie = !v->DistFileTaxi.empty();
                     t.Distance = [v](int k, int d) { return v->DistFileTaxi[k][d]; };
                     return t;
                 },
@@ -4573,7 +4573,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Files parking";
                     t.Nb = cv->NbFilesPark;
-                    t.Definie = v->DistFilePark;
+                    t.Definie = !v->DistFilePark.empty();
                     t.Distance = [v, c](int k, int d) { return v->DistFilePark[k][d][c]; };
                     return t;
                 },
@@ -4591,7 +4591,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Places vehlib";
                     t.Nb = cv->NbPlacesVehlib;
-                    t.Definie = v->DistPlaceVehlib;
+                    t.Definie = !v->DistPlaceVehlib.empty();
                     t.Distance = [v](int k, int d) { return v->DistPlaceVehlib[k][d]; };
                     return t;
                 },
@@ -5590,7 +5590,7 @@ void TestInterface::fichePietonSuiviAilleurs()
 void TestInterface::dimensionsZoneBornees()
 { // v6.0.3 : l'original n'avait aucune limite haute (99999x99999 : 2,5 To)
     QVERIFY(!OuvreDemo("dimensions_zone.cvw").isEmpty());
-    voie **Zone = cv->v;
+    const voie *Zone = &cv->v[0][0];
     bool Refuse = false;
     bool Ouverte = false;
     Messages.clear();
@@ -5617,7 +5617,7 @@ void TestInterface::dimensionsZoneBornees()
     QVERIFY(Etapes.empty());
     QVERIFY(Refuse);
     QVERIFY(Ouverte);
-    QCOMPARE(cv->v, Zone); // Réseau ouvert gardé
+    QCOMPARE(static_cast<const voie *>(&cv->v[0][0]), Zone); // Réseau ouvert gardé
     // La plus grande zone possible
     Messages.clear();
     QuandModale([] { return frmDimensionsZone; },
@@ -8047,7 +8047,7 @@ TotauxFluidite CalculeFluidite(int ed, int ea)
                 continue;
             }
             r.n++;
-            if (!v->Attente || !v->Trafic)
+            if (v->Attente.empty() || v->Trafic.empty())
             {
                 continue;
             }
@@ -8062,7 +8062,7 @@ TotauxFluidite CalculeFluidite(int ed, int ea)
 // Couleur d'une case : du vert (0) au rouge (maximum) en passant par le jaune
 TColor CouleurFluidite(const TotauxFluidite &r, int ts, int ed, int ea, voie *v)
 {
-    if ((r.m[ts] == 0) || !v->Trafic || !v->Attente)
+    if ((r.m[ts] == 0) || v->Trafic.empty() || v->Attente.empty())
     {
         return 0;
     }
@@ -8695,7 +8695,7 @@ void TestInterface::ficheFluiditeTrafic()
         g->Repaint();
         voie *v = &cv->v[g->Col][g->Row];
         QString Detail;
-        if (r.m[ts] && v->Trafic && v->Attente)
+        if (r.m[ts] && !v->Trafic.empty() && !v->Attente.empty())
         {
             const int Valeur = ts ? v->Trafic[ed][ea] : v->Attente[ed][ea];
             Detail = QString::fromUtf8(ts ? "Trafic en (%1, %2) au tour %3 : %4 véhicules (Max. %5) soit %6%"
@@ -8737,7 +8737,7 @@ void TestInterface::ficheFluiditeTrafic()
                         for (int x = 2; (x < cv->NbX - 2) && Depart.isNull(); x++)
                         {
                             voie *v = &cv->v[x][y];
-                            if ((v->DirPoss > aucune) && !v->NumParking && v->Trafic && v->Trafic[0][0] &&
+                            if ((v->DirPoss > aucune) && !v->NumParking && !v->Trafic.empty() && v->Trafic[0][0] &&
                                 g->viewport()->rect().contains(g->CellRect(x + 1, y + 1).Qt()))
                             {
                                 Depart = QPoint(x, y);

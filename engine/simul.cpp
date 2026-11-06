@@ -3087,115 +3087,22 @@ voie::voie()
     x = -1;
     y = -1;
     Initialise();
-    DistParking = nullptr;
-    Attente = nullptr;
-    Trafic = nullptr;
-    DistArretBus = nullptr;    // v3.0
-    DistArretTram = nullptr;   // v3.5
-    DistFileTaxi = nullptr;    // v3.6
-    DistFilePark = nullptr;    // v5.0
-    DistPlaceVehlib = nullptr; // v5.3
-    NbDirDist = NbParkingsDist = NbArretsBusDist = NbArretsTramDist = NbFilesTaxiDist = NbFilesParkDist =
-        NbPlacesVehlibDist = NbParkingsAttente = 0; // v6.0.1
-}
-//-----------------------------------------------------------------------------
-voie::~voie()
-{
-    LibereDistances();     // v6.0.1 : avec les dimensions de l'allocation
-    LibereAttenteTrafic(); // v6.0.1 : idem
 }
 //-----------------------------------------------------------------------------
 void voie::LibereDistances() // v6.0.1
-{                            // Dimensions de l'allocation : le réseau a pu changer depuis (réseau non
-                             // connexe, l'utilisateur le répare puis relance) ; l'original les relisait
-                             // ici dans DirPoss et les compteurs de cv, et libérait n'importe quoi
-    int i = 0;
-    int j = 0;
-    if (DistParking)
-    {
-        for (i = 0; i < NbParkingsDist; i++)
-        {
-            for (j = 0; j < NbDirDist; j++)
-            {
-                delete[] DistParking[i][j];
-            }
-            delete[] DistParking[i];
-        }
-        delete[] DistParking;
-    }
-    DistParking = nullptr;
-    if (DistArretBus) // v3.0
-    {
-        for (i = 0; i < NbArretsBusDist; i++)
-        {
-            delete[] DistArretBus[i];
-        }
-        delete[] DistArretBus;
-    }
-    DistArretBus = nullptr;
-    if (DistArretTram) // v3.5
-    {
-        for (i = 0; i < NbArretsTramDist; i++)
-        {
-            delete[] DistArretTram[i];
-        }
-        delete[] DistArretTram;
-    }
-    DistArretTram = nullptr;
-    if (DistFileTaxi) // v3.6
-    {
-        for (i = 0; i < NbFilesTaxiDist; i++)
-        {
-            delete[] DistFileTaxi[i];
-        }
-        delete[] DistFileTaxi;
-    }
-    DistFileTaxi = nullptr;
-    if (DistFilePark) // v5.0
-    {
-        for (i = 0; i < NbFilesParkDist; i++)
-        {
-            for (j = 0; j < NbDirDist; j++)
-            {
-                delete[] DistFilePark[i][j];
-            }
-            delete[] DistFilePark[i];
-        }
-        delete[] DistFilePark;
-    }
-    DistFilePark = nullptr;
-    if (DistPlaceVehlib) // v5.3
-    {
-        for (i = 0; i < NbPlacesVehlibDist; i++)
-        {
-            delete[] DistPlaceVehlib[i];
-        }
-        delete[] DistPlaceVehlib;
-    }
-    DistPlaceVehlib = nullptr;
+{
+    DistParking.clear();
+    DistArretBus.clear();    // v3.0
+    DistArretTram.clear();   // v3.5
+    DistFileTaxi.clear();    // v3.6
+    DistFilePark.clear();    // v5.0
+    DistPlaceVehlib.clear(); // v5.3
 }
 //-----------------------------------------------------------------------------
 void voie::LibereAttenteTrafic() // v6.0.1
 {
-    int i = 0;
-    if (Attente)
-    {
-        for (i = 0; i <= NbParkingsAttente; i++)
-        {
-            delete[] Attente[i];
-        }
-        delete[] Attente;
-    }
-    Attente = nullptr;
-    if (Trafic)
-    {
-        for (i = 0; i <= NbParkingsAttente; i++)
-        {
-            delete[] Trafic[i];
-        }
-        delete[] Trafic;
-    }
-    Trafic = nullptr;
+    Attente.clear();
+    Trafic.clear();
 }
 //-----------------------------------------------------------------------------
 void voie::Initialise()
@@ -3282,8 +3189,6 @@ voie *voie::v(direction d) const
 bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation des distances aux arrêts de bus.
 {                                   // v3.5... Et des trams ! v3.6...Et des taxis ! v5.0...Et des places de parking
     bool Ok = true;
-    int i = 0;
-    int j = 0;
     int nd = NbDir[DirPoss];
     const int ne = cv->NbParkings;
     const int nab = cv->NbArretsBus;
@@ -3301,150 +3206,47 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
     NbPlacesVehlibDist = npv; // v6.0.1
     if (nd > 0)
     {
-        if ((ne > 0) && (Ok = (!((DistParking = new int **[ne]) == nullptr))))
-
-        {                                    // D'abord le nombre de parkings
-            for (i = 0; Ok && (i < ne); i++) // Puis le nombre de directions possibles
-            {
-                DistParking[i] = nullptr;
-                if ((Ok = (!((DistParking[i] = new int *[nd]) == nullptr))))
-                {
-                    for (j = 0; Ok && (j < nd); j++)
-                    { // v3.5
-                        if ((Ok = (!((DistParking[i][j] = new int[2]) == nullptr))))
-                        {
-                            DistParking[i][j][0] = DistParking[i][j][1] = DIST_INDEFINIE;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ((nab > 0) && (Ok = (!((DistArretBus = new int *[nab]) == nullptr)))) // v3.0
-
-        {                                     // D'abord le nombre d'arrêts de bus
-            for (i = 0; Ok && (i < nab); i++) // Puis le nombre de directions possibles
-            {
-                DistArretBus[i] = nullptr;
-                if ((Ok = (!((DistArretBus[i] = new int[nd]) == nullptr))))
-                {
-                    for (j = 0; j < nd; j++)
-                    {
-                        DistArretBus[i][j] = DIST_INDEFINIE;
-                    }
-                }
-            }
-        }
-
-        if ((nft > 0) && (Ok = (!((DistFileTaxi = new int *[nft]) == nullptr)))) // v3.6
-
-        {                                     // D'abord le nombre de files de taxi
-            for (i = 0; Ok && (i < nft); i++) // Puis le nombre de directions possibles
-            {
-                DistFileTaxi[i] = nullptr;
-                if ((Ok = (!((DistFileTaxi[i] = new int[nd]) == nullptr))))
-                {
-                    for (j = 0; j < nd; j++)
-                    {
-                        DistFileTaxi[i][j] = DIST_INDEFINIE;
-                    }
-                }
-            }
-        }
-
-        if ((nfp > 0) && (Ok = (!((DistFilePark = new int **[nfp]) == nullptr)))) // v5.0
-
-        {                                     // D'abord le nombre de files de parkings
-            for (i = 0; Ok && (i < nfp); i++) // Puis le nombre de directions possibles
-            {
-                DistFilePark[i] = nullptr;
-                if ((Ok = (!((DistFilePark[i] = new int *[nd]) == nullptr))))
-                {
-                    for (j = 0; j < nd; j++)
-                    {
-                        if ((Ok = (!((DistFilePark[i][j] = new int[2]) == nullptr))))
-                        {
-                            DistFilePark[i][j][0] = DistFilePark[i][j][1] = DIST_INDEFINIE;
-                        }
-                    }
-                }
-            }
-        }
-
-        if ((npv > 0) && (Ok = (!((DistPlaceVehlib = new int *[npv]) == nullptr)))) // v5.3
-
-        {                                     // D'abord le nombre de places de vehlib
-            for (i = 0; Ok && (i < npv); i++) // Puis le nombre de directions possibles
-            {
-                DistPlaceVehlib[i] = nullptr;
-                if ((Ok = (!((DistPlaceVehlib[i] = new int[nd]) == nullptr))))
-                {
-                    for (j = 0; j < nd; j++)
-                    {
-                        DistPlaceVehlib[i][j] = DIST_INDEFINIE;
-                    }
-                }
-            }
-        }
-    }
-    nd = NbDirPossSensVoieTram(indefinie);                                                  // v3.5
-    if (((nd > 0) && (nat > 0)) && (Ok = (!((DistArretTram = new int *[nat]) == nullptr)))) // v3.5
-
-    {                                     // D'abord le nombre d'arrêts de tram
-        for (i = 0; Ok && (i < nat); i++) // Puis le nombre de directions possibles
+        const std::vector<std::array<int, 2>> Indefinies2(nd, {DIST_INDEFINIE, DIST_INDEFINIE});
+        const std::vector<int> Indefinies(nd, DIST_INDEFINIE);
+        if (ne > 0) // D'abord le nombre de parkings, puis le nombre de directions possibles
         {
-            DistArretTram[i] = nullptr;
-            if ((Ok = (!((DistArretTram[i] = new int[nd]) == nullptr))))
-            {
-                for (j = 0; j < nd; j++)
-                {
-                    DistArretTram[i][j] = DIST_INDEFINIE;
-                }
-            }
+            DistParking.assign(ne, Indefinies2);
+        }
+        if (nab > 0) // v3.0. D'abord le nombre d'arrêts de bus
+        {
+            DistArretBus.assign(nab, Indefinies);
+        }
+        if (nft > 0) // v3.6. D'abord le nombre de files de taxi
+        {
+            DistFileTaxi.assign(nft, Indefinies);
+        }
+        if (nfp > 0) // v5.0. D'abord le nombre de files de parkings
+        {
+            DistFilePark.assign(nfp, Indefinies2);
+        }
+        if (npv > 0) // v5.3. D'abord le nombre de places de vehlib
+        {
+            DistPlaceVehlib.assign(npv, Indefinies);
         }
     }
-
+    nd = NbDirPossSensVoieTram(indefinie); // v3.5
+    if ((nd > 0) && (nat > 0))             // D'abord le nombre d'arrêts de tram
+    {
+        DistArretTram.assign(nat, std::vector<int>(nd, DIST_INDEFINIE));
+    }
     return Ok;
 }
 //-----------------------------------------------------------------------------
 bool voie::PrepareCalculAttenteTrafic()
 {
     bool Ok = true;
-    int i = 0;
-    int j = 0;
     const int ne = cv->NbParkings;
     LibereAttenteTrafic();  // v6.0.1
     NbParkingsAttente = ne; // v6.0.1
     if (ne > 0)
     {
-        if ((Ok = (!((Attente = new int *[ne + 1]) == nullptr))))
-        {
-            for (i = 0; Ok && (i <= ne); i++)
-            {
-                Attente[i] = nullptr;
-                if ((Ok = (!((Attente[i] = new int[ne + 1]) == nullptr))))
-                {
-                    for (j = 0; j <= ne; j++)
-                    {
-                        Attente[i][j] = 0;
-                    }
-                }
-            }
-        }
-        if ((Ok = Ok && (!((Trafic = new int *[ne + 1]) == nullptr))))
-        {
-            for (i = 0; Ok && (i <= ne); i++)
-            {
-                Trafic[i] = nullptr;
-                if ((Ok = (!((Trafic[i] = new int[ne + 1]) == nullptr))))
-                {
-                    for (j = 0; j <= ne; j++)
-                    {
-                        Trafic[i][j] = 0;
-                    }
-                }
-            }
-        }
+        Attente.assign(ne + 1, std::vector<int>(ne + 1, 0));
+        Trafic.assign(ne + 1, std::vector<int>(ne + 1, 0));
     }
     return Ok;
 }
@@ -5106,25 +4908,19 @@ void centre_ville::CreeZone() // v4.0 (allocation dynamique)
 {
     if ((NbX > 0) && (NbY > 0))
     {
-        v = new voie *[NbX];
+        v = std::vector<std::vector<voie>>(NbX);
         for (int i = 0; i < NbX; i++)
         {
-            v[i] = new voie[NbY];
-        }
-        for (int i = 0; i < NbX; i++)
-        {
+            v[i] = std::vector<voie>(NbY);
             for (int j = 0; j < NbY; j++)
             {
-                if (v + i + j)
-                {
-                    v[i][j].Definit(i, j);
-                }
+                v[i][j].Definit(i, j);
             }
         }
     }
     else
     {
-        v = nullptr;
+        v.clear();
     }
     RetablitVoisinages();
 }
@@ -5220,19 +5016,7 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY) // v4.0 (
 //-----------------------------------------------------------------------------
 centre_ville::~centre_ville()
 {
-    if (v)
-    {
-        for (int i = 0; i < NbX; i++)
-        {
-            if (v[i])
-            {
-                delete[] v[i];
-                v[i] = nullptr;
-            }
-        }
-        delete[] v;
-        v = nullptr;
-    }
+    v.clear();
     if (!Feu.empty())
     {
         Feu.clear();
@@ -5696,7 +5480,7 @@ int centre_ville::ArretTramExistant(int x, int y) const // v3.5
 { // Pour les trams on ne change pas la tête de l'arrêt car il peut y avoir un double sens sur la voie
     int d = 0;
     int i = 0;
-    voie *Voie = nullptr;
+    const voie *Voie = nullptr;
     for (d = nord; (i == 0) && (d <= ouest); d++)
     {
         Voie = &Voisine(x, y, d);
@@ -6023,7 +5807,7 @@ int centre_ville::AjoutePlaceVehlib(int x, int y) // v5.3
     return i;
 }
 //-----------------------------------------------------------------------------
-bool centre_ville::ExisteCaseArretBus(int x, int y) const // v3.0
+bool centre_ville::ExisteCaseArretBus(int x, int y) // v3.0
 {
     bool Existe = false;
     int d = 0;
@@ -6044,7 +5828,7 @@ bool centre_ville::ExisteCaseArretBus(int x, int y) const // v3.0
     return Existe;
 }
 //-----------------------------------------------------------------------------
-bool centre_ville::ExisteCaseArretTram(int x, int y) const // v3.5
+bool centre_ville::ExisteCaseArretTram(int x, int y) // v3.5
 {
     bool Existe = false;
     int d = 0;
@@ -6466,7 +6250,7 @@ position_arret_bus_tram centre_ville::PositionArretBus(int x, int y, direction d
 //-----------------------------------------------------------------------------
 bool centre_ville::ArretsBusVoisinsDifferents(int x, int y) const // v3.0
 {
-    voie *Voie = nullptr;
+    const voie *Voie = nullptr;
     bool DiffTrv = false;
     int d = 0;
     int n = 0;
@@ -6493,7 +6277,7 @@ bool centre_ville::ArretsBusVoisinsDifferents(int x, int y) const // v3.0
 //-----------------------------------------------------------------------------
 bool centre_ville::ArretsTramVoisinsDifferents(int x, int y) const // v3.5
 {
-    voie *Voie = nullptr;
+    const voie *Voie = nullptr;
     bool DiffTrv = false;
     int d = 0;
     int n = 0;
@@ -6521,7 +6305,7 @@ bool centre_ville::ArretsTramVoisinsDifferents(int x, int y) const // v3.5
 //-----------------------------------------------------------------------------
 direction centre_ville::DirArretBusVoisin(int x, int y) const // v3.0
 {
-    voie *Voie = nullptr;
+    const voie *Voie = nullptr;
     int d = 0;
     int DirArretBusVoisin = indefinie;
     for (d = nord; (DirArretBusVoisin == 0) && (d <= ouest); d++)
@@ -6539,7 +6323,7 @@ direction centre_ville::DirArretBusVoisin(int x, int y) const // v3.0
 //-----------------------------------------------------------------------------
 direction centre_ville::DirArretTramVoisin(int x, int y) const // v3.5
 {
-    voie *Voie = nullptr;
+    const voie *Voie = nullptr;
     int d = 0;
     int DirArretTramVoisin = indefinie;
     for (d = nord; (DirArretTramVoisin == 0) && (d <= ouest); d++)

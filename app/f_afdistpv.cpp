@@ -44,7 +44,7 @@ void TfrmAffDistPlacesVehlib::RafraichitInfos()
     const int y = frmSimulation->DrawGridSimul->Row;
     voie *v = &cv->v[x][y];
     EffaceInfos();
-    if (!v->DistPlaceVehlib)
+    if (v->DistPlaceVehlib.empty())
     {
         return;
     }

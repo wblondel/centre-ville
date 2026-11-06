@@ -44,7 +44,7 @@ void TfrmAffDistArretsTram::RafraichitInfos()
     const int y = frmSimulation->DrawGridSimul->Row;
     voie *v = &cv->v[x][y];
     EffaceInfos();
-    if (!v->DistArretTram)
+    if (v->DistArretTram.empty())
     {
         return;
     }

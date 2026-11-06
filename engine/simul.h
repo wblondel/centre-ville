@@ -1283,27 +1283,24 @@ public:
         NumPlaceVehlib{},                 // v5.3. >0 si place de vehlib (=index+1 de cv->PlaceVehlib)
         NumSpotVehlib{},                  // v5.3. >0 si spot vehlib (=index+1 de cv->SpotVehlib)
         NumPieton[NBMAXPIETONSPARCASE]{}; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
-    // 2 nids de pointeurs (natifs) : alloués dans voie donc détruits dans ~voie()
-    int ***DistParking,    // Autant de Distances (en cases) que de parkings ssi 2 DirPoss sinon NULL. Natif. v3.5
-                           // v2.2.7. Statistiques sur les passages de véhicules.
-                           // Attente[ed][ea] & Trafic[ed][ea] avec ed=ParkingDépart, ea=ParkingArrivée
-                           //  · Si ed=0, Stats par ParkingArrivée (toute ParkingDépart confondue)
-                           //  · Si ea=0, Stats par ParkingDépart  (toute ParkingArrivée confondue)
-                           //  · Si ed=ea=0, Stats tous véhicules.
-        **Attente,         // v2.2.7. Nombre de tours pendant lesquels un véhicule est resté sur la case
-        **Trafic,          // v2.2.7. Nombre de véhicules passés par la case
-        **DistArretBus,    // v3.0. Distance à un arrêt de bus (même principe que DistParking)
-        **DistArretTram,   // v3.5. Distance à un arrêt de tram (même principe que DistParking mais uniquement quand
-                           // SensVoieTram>aucune_voie)
-        **DistFileTaxi,    // v3.6. Distance juqu'à la queue de la file de taxis.
-        ***DistFilePark,   // v5.0. Distance juqu'à la queue de la file parkings.
-        **DistPlaceVehlib, // v5.3. Distance jusqu'à une place de vehlib (pas de notion de priorité d'où le ** au lieu
-                           // de ***).
-        // v6.0.1 : dimensions des nids de pointeurs à leur allocation (pour les libérer si le réseau a changé depuis)
-        NbDirDist, NbParkingsDist, NbArretsBusDist, NbArretsTramDist, NbFilesTaxiDist, NbFilesParkDist,
-        NbPlacesVehlibDist, NbParkingsAttente;
+    // Distances (en cases) aux éléments, par élément puis par direction possible de la case. DistParking et
+    // DistFilePark ont deux valeurs par direction : sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS).
+    // Vides tant que la case n'a pas de direction possible ou que le réseau n'a pas l'élément.
+    std::vector<std::vector<std::array<int, 2>>> DistParking, // v3.5. Distances aux parkings
+        DistFilePark;                                         // v5.0. Distance jusqu'à la queue de la file de parkings
+    std::vector<std::vector<int>> DistArretBus,               // v3.0. Distance à un arrêt de bus
+        DistArretTram,   // v3.5. Distance à un arrêt de tram (uniquement quand SensVoieTram>aucune_voie)
+        DistFileTaxi,    // v3.6. Distance jusqu'à la queue de la file de taxis
+        DistPlaceVehlib; // v5.3. Distance jusqu'à une place de vehlib (sans notion de priorité)
+    // v2.2.7. Statistiques sur les passages de véhicules : Attente[ed][ea] et Trafic[ed][ea] avec
+    // ed=ParkingDépart, ea=ParkingArrivée. Si ed=0, par ParkingArrivée (toute ParkingDépart confondue) ;
+    // si ea=0, par ParkingDépart (toute ParkingArrivée confondue) ; si ed=ea=0, tous véhicules.
+    std::vector<std::vector<int>> Attente, // v2.2.7. Nombre de tours pendant lesquels un véhicule est resté sur la case
+        Trafic;                            // v2.2.7. Nombre de véhicules passés par la case
+    // v6.0.1 : dimensions des tableaux à leur allocation
+    int NbDirDist{}, NbParkingsDist{}, NbArretsBusDist{}, NbArretsTramDist{}, NbFilesTaxiDist{}, NbFilesParkDist{},
+        NbPlacesVehlibDist{}, NbParkingsAttente{};
     voie();
-    ~voie();
     void Initialise();
     void Initialise(type_voie TypeVoie); // v3.5
     void Definit(int x0, int y0)
@@ -1500,10 +1497,12 @@ public:
     bool VerifOk, DistancesCalculees, QuadrillageStats;
     type_stats TypeStats;
 
-    voie **v{}; // Dimensions modifiables (v4.0)
+    std::vector<std::vector<voie>> v; // v[x][y]. Dimensions modifiables (v4.0)
     // Case voisine dans la direction d, ou à n cases dans la direction d, sur le tore (macros V, _V, V_, _V_)
-    [[nodiscard]] voie &Voisine(int x, int y, int d) const;
-    [[nodiscard]] voie &Voisine(int x, int y, int n, int d) const;
+    [[nodiscard]] voie &Voisine(int x, int y, int d);
+    [[nodiscard]] const voie &Voisine(int x, int y, int d) const;
+    [[nodiscard]] voie &Voisine(int x, int y, int n, int d);
+    [[nodiscard]] const voie &Voisine(int x, int y, int n, int d) const;
     std::vector<feu> Feu;                     // Tableau de feux
     std::vector<feu_pieton> FeuP;             // v5.2 Tableau de feux piéton
     std::vector<parking> Parking;             // Tableau des parkings
@@ -1574,21 +1573,21 @@ public:
     void SupprimePlaceVehlibVoie(int x, int y); // v5.3
     int AjouteParking(int x, int y);
     void SupprimeParking(int n);
-    int AjouteArretBus(int x, int y);                           // v3.0
-    int AjouteArretTram(int x, int y);                          // v3.5
-    int AjoutePlaceTaxi(int x, int y);                          // v3.6
-    int AjoutePlacePark(int x, int y);                          // v5.0, v5.1 : ancien nom AjoutePlace
-    int AjoutePlaceVehlib(int x, int y);                        // v5.3
-    [[nodiscard]] bool ExisteCaseArretBus(int x, int y) const;  // v3.0
-    [[nodiscard]] bool ExisteCaseArretTram(int x, int y) const; // v3.5
-    void SupprimeArretBus(int x, int y);                        // v3.0. Supprime sur une case seulement
-    void SupprimeArretBus(int n);         // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
-    void SupprimeArretTram(int x, int y); // v3.5. Supprime sur une case seulement
-    void SupprimeArretTram(int n);        // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
-    void SupprimePlaceTaxi(int n);        // v3.6
-    void SupprimePlacePark(int n);        // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec
-                                          // SupprimePlaceVehlib(n)
-    void SupprimePlaceVehlib(int n);      // v5.3
+    int AjouteArretBus(int x, int y);                     // v3.0
+    int AjouteArretTram(int x, int y);                    // v3.5
+    int AjoutePlaceTaxi(int x, int y);                    // v3.6
+    int AjoutePlacePark(int x, int y);                    // v5.0, v5.1 : ancien nom AjoutePlace
+    int AjoutePlaceVehlib(int x, int y);                  // v5.3
+    [[nodiscard]] bool ExisteCaseArretBus(int x, int y);  // v3.0
+    [[nodiscard]] bool ExisteCaseArretTram(int x, int y); // v3.5
+    void SupprimeArretBus(int x, int y);                  // v3.0. Supprime sur une case seulement
+    void SupprimeArretBus(int n);                         // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
+    void SupprimeArretTram(int x, int y);                 // v3.5. Supprime sur une case seulement
+    void SupprimeArretTram(int n);                        // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
+    void SupprimePlaceTaxi(int n);                        // v3.6
+    void SupprimePlacePark(int n);   // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec
+                                     // SupprimePlaceVehlib(n)
+    void SupprimePlaceVehlib(int n); // v5.3
     [[nodiscard]] sens SensPassagePietonsPossible(int x, int y) const;                       // v3.5
     [[nodiscard]] direction CherchePassagePietons(int x, int y, sens SensRecherche);         // v2.0
     [[nodiscard]] direction ChercheArretBus(int x, int y, sens SensRecherche);               // v3.0
@@ -1718,11 +1717,19 @@ extern int dx[NBDIR + 1], dy[NBDIR + 1],
     SvgNbPlacesTaxi; // v3.6
 extern centre_ville *cv;
 //---------------------------------------------------------------------------
-inline voie &centre_ville::Voisine(int x, int y, int d) const
+inline voie &centre_ville::Voisine(int x, int y, int d)
 {
     return v[(x + dx[d]) % NbX][(y + dy[d]) % NbY];
 }
-inline voie &centre_ville::Voisine(int x, int y, int n, int d) const
+inline const voie &centre_ville::Voisine(int x, int y, int d) const
+{
+    return v[(x + dx[d]) % NbX][(y + dy[d]) % NbY];
+}
+inline voie &centre_ville::Voisine(int x, int y, int n, int d)
+{
+    return v[(x + (n * dx[d])) % NbX][(y + (n * dy[d])) % NbY];
+}
+inline const voie &centre_ville::Voisine(int x, int y, int n, int d) const
 {
     return v[(x + (n * dx[d])) % NbX][(y + (n * dy[d])) % NbY];
 }

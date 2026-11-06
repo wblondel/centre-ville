@@ -551,7 +551,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                 if constexpr (P::Noms)
                 { // Cases vides omises du texte (toujours dans l'empreinte)
                     bool AttenteTraficNuls = true;
-                    if (v->Attente && v->Trafic)
+                    if (!v->Attente.empty() && !v->Trafic.empty())
                     {
                         for (int a = 0; AttenteTraficNuls && (a <= ne); a++)
                         {
@@ -610,7 +610,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                 C(s, "NumPlaceVehlib", v->NumPlaceVehlib);
                 C(s, "NumSpotVehlib", v->NumSpotVehlib);
                 CT(s, "NumPieton", v->NumPieton, NBMAXPIETONSPARCASE);
-                if (v->Attente && v->Trafic)
+                if (!v->Attente.empty() && !v->Trafic.empty())
                 {
                     if (Detail)
                     {
@@ -659,7 +659,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                 const int nd = NbDir[v->DirPoss];
                 const int ndt = v->NbDirPossSensVoieTram(indefinie);
                 s.Objet("distances", (x * 1000) + y);
-                if (v->DistParking)
+                if (!v->DistParking.empty())
                 {
                     for (int e = 0; e < cv->NbParkings; e++)
                     {
@@ -670,7 +670,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                         }
                     }
                 }
-                if (v->DistArretBus)
+                if (!v->DistArretBus.empty())
                 {
                     for (int e = 0; e < cv->NbArretsBus; e++)
                     {
@@ -680,7 +680,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                         }
                     }
                 }
-                if (v->DistArretTram)
+                if (!v->DistArretTram.empty())
                 {
                     for (int e = 0; e < cv->NbArretsTram; e++)
                     {
@@ -690,7 +690,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                         }
                     }
                 }
-                if (v->DistFileTaxi)
+                if (!v->DistFileTaxi.empty())
                 {
                     for (int e = 0; e < cv->NbFilesTaxi; e++)
                     {
@@ -700,7 +700,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                         }
                     }
                 }
-                if (v->DistFilePark)
+                if (!v->DistFilePark.empty())
                 {
                     for (int e = 0; e < cv->NbFilesPark; e++)
                     {
@@ -711,7 +711,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                         }
                     }
                 }
-                if (v->DistPlaceVehlib)
+                if (!v->DistPlaceVehlib.empty())
                 {
                     for (int e = 0; e < cv->NbPlacesVehlib; e++)
                     {

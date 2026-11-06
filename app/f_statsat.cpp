@@ -78,7 +78,7 @@ TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
         return static_cast<TColor>(0); // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans
                                        // l'original)
     }
-    if ((m[ts] != 0) && cv->v[x][y].Trafic && cv->v[x][y].Attente) // v3.0
+    if ((m[ts] != 0) && !cv->v[x][y].Trafic.empty() && !cv->v[x][y].Attente.empty()) // v3.0
     {
         if (ts != 0)
         {
@@ -104,7 +104,7 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
     {
         return asMsg; // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans l'original)
     }
-    if ((m[ts] != 0) && cv->v[x][y].Trafic && cv->v[x][y].Attente)
+    if ((m[ts] != 0) && !cv->v[x][y].Trafic.empty() && !cv->v[x][y].Attente.empty())
     {
         if (ts != 0)
         {
@@ -145,7 +145,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
             if ((cv->v[x][y].DirPoss > aucune) && (cv->v[x][y].NumParking == 0))
             {
                 n++;
-                if (cv->v[x][y].Attente && cv->v[x][y].Trafic)
+                if (!cv->v[x][y].Attente.empty() && !cv->v[x][y].Trafic.empty())
                 {
                     m[ATTENTE] = std::max(cv->v[x][y].Attente[ed][ea], m[ATTENTE]);
                     t[ATTENTE] += cv->v[x][y].Attente[ed][ea];
