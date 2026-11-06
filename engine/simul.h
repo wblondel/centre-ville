@@ -302,7 +302,7 @@ public:
 //---------------------------------------------------------------------------
 class pieton // v2.0
 {
-    int Numero;
+    int Numero{0};
 
 public:
     pieton(const pieton &) = delete;
@@ -351,7 +351,7 @@ public:
                                                                                           // (vehlib), v5.4.1 (Mort)
         Infection = nullptr;
     }
-    pieton() : Numero(0) { Initialise(); }
+    pieton() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void Place(int x0, int y0)
     {
@@ -504,7 +504,7 @@ public:
 //---------------------------------------------------------------------------
 class feu
 {
-    int Numero; // v5.1 : devenu public
+    int Numero{0}; // v5.1 : devenu public
 public:
     feu(const feu &) = delete;
     feu &operator=(const feu &) = delete;
@@ -542,7 +542,7 @@ public:
         ProchainVert = RougeDemande = FeuxTousRouges = DemandeVert = false;
         VerifEnCours = false;
     }
-    feu() : Numero(0) { Initialise(); }
+    feu() { Initialise(); }
     void Copie(feu *f) // v5.1 (f est ensuite détruit : ses listes lui sont prises)
     {
         Numero = f->Numero;
@@ -592,7 +592,7 @@ public:
 //---------------------------------------------------------------------------
 class feu_pieton // v5.2
 {
-    int Numero;
+    int Numero{0};
 
 public:
     feu_pieton(const feu_pieton &) = delete;
@@ -621,7 +621,7 @@ public:
         ProchainVert{},       // Indique qu'il est autorisé à passer au vert
         VerifEnCours{};       // Drapeau pour Verifie()
     void Initialise();
-    feu_pieton() : Numero(0) { Initialise(); }
+    feu_pieton() { Initialise(); }
     void Copie(feu_pieton *f); // f est ensuite détruit : sa liste lui est prise
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int x0, int y0, int Dir0)
@@ -649,7 +649,7 @@ public:
 //---------------------------------------------------------------------------
 class parking
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{};
@@ -658,7 +658,7 @@ public:
         x = -1;
         y = -1;
     }
-    parking() : Numero(0) { Initialise(); }
+    parking() { Initialise(); }
     void Copie(parking *p) // v5.1
     {
         Numero = p->Numero;
@@ -683,7 +683,7 @@ class voie; // v5.0 : utilisée en paramètre d'une méthode de vehicule
 //---------------------------------------------------------------------------
 class vehicule // instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{};
@@ -707,7 +707,7 @@ public:
         NumParkingDepart = NumParkingArrivee = 0;
         NumFileParkDepart = NumFileParkArrivee = 0; // v5.0
     }
-    vehicule() : Numero(0) { Initialise(); }
+    vehicule() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void Place(int x0, int y0)
     {
@@ -756,7 +756,7 @@ public:
 //---------------------------------------------------------------------------
 class bus // v3.0 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
     direction Dir{}, DirDrnDepl{}, DirAvtDrnDepl{};
@@ -778,7 +778,7 @@ public:
             TourDepartArretSvt = TourDepart = TourDrnDepl = 0L;
         NumDrnArret = NumArretSvt = 0;
     }
-    bus() : Numero(0) { Initialise(); }
+    bus() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void Place(int x0, int y0)
     {
@@ -803,7 +803,7 @@ public:
 //---------------------------------------------------------------------------
 class arret_bus // v3.0
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{}; // Position de la tête de l'arrêt de bus (indiquant les couleurs de lignes)
@@ -811,7 +811,7 @@ public:
     int NbLignes{};
     std::array<int, NBMAXLIGNESBUSTRAM> NumLigne{}; // Liste des lignes de bus passant par cet arrêt (Index-1)
     void Initialise();
-    arret_bus() : Numero(0) { Initialise(); }
+    arret_bus() { Initialise(); }
     void Copie(arret_bus *a); // v5.1
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int x0, int y0)
@@ -831,14 +831,14 @@ public:
 //---------------------------------------------------------------------------
 class ligne_bus // v3.0
 {
-    int Numero; // Numéro de la ligne (CoulLigneBus[Numero]=Couleur de la ligne)
+    int Numero{0}; // Numéro de la ligne (CoulLigneBus[Numero]=Couleur de la ligne)
 public:
     int NbArrets{};                                         // Nb arrêts de la ligne
     int NbBus{};                                            // Nb bus de la ligne
     std::array<int, NBMAXARRETSBUSTRAMPARLIGNE> NumArret{}; // Ordre des arrêts à effectuer
     std::array<int, NBMAXBUSTRAMPARLIGNE> NumBus{};         // N° des bus de la ligne
     void Initialise();
-    ligne_bus() : Numero(0) { Initialise(); }
+    ligne_bus() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void AjouteBus(int NumeroBus);
     ~ligne_bus() = default;
@@ -851,7 +851,7 @@ public:
 //---------------------------------------------------------------------------
 class tram // v3.5 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{}, NumLigne{};
@@ -873,7 +873,7 @@ public:
             TourDepartArretSvt = TourDrnDepl = 0L;
         NumDrnArret = NumArretSvt = 0;
     }
-    tram() : Numero(0) { Initialise(); }
+    tram() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void Place(int x0, int y0)
     {
@@ -898,7 +898,7 @@ public:
 //---------------------------------------------------------------------------
 class arret_tram // v3.5
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{}; // Position de la tête de l'arrêt de tram (indiquant les couleurs de lignes)
@@ -906,7 +906,7 @@ public:
     int NbLignes{};
     std::array<int, NBMAXLIGNESBUSTRAM> NumLigne{}; // Liste des lignes de tram passant par cet arrêt (Index-1)
     void Initialise();
-    arret_tram() : Numero(0) { Initialise(); }
+    arret_tram() { Initialise(); }
     void Copie(arret_tram *a); // v5.1
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int x0, int y0)
@@ -926,14 +926,14 @@ public:
 //---------------------------------------------------------------------------
 class ligne_tram // v3.5
 {
-    int Numero; // Numéro de la ligne (CoulLigneTram[Numero]=Couleur de la ligne)
+    int Numero{0}; // Numéro de la ligne (CoulLigneTram[Numero]=Couleur de la ligne)
 public:
     int NbArrets{};                                         // Nb arrêts de la ligne
     int NbTrams{};                                          // Nb tram de la ligne
     std::array<int, NBMAXARRETSBUSTRAMPARLIGNE> NumArret{}; // Ordre des arrêts à effectuer
     std::array<int, NBMAXBUSTRAMPARLIGNE> NumTram{};        // N° des tram de la ligne
     void Initialise();
-    ligne_tram() : Numero(0) { Initialise(); }
+    ligne_tram() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void AjouteTram(int NumeroTram);
     ~ligne_tram() = default;
@@ -946,7 +946,7 @@ public:
 //---------------------------------------------------------------------------
 class place_taxi // v3.6
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{}, NumFile{}; // 0 <= NumFile < NbFilesTaxi
@@ -956,7 +956,7 @@ public:
         y = -1;
         NumFile = -1;
     }
-    place_taxi() : Numero(0) { Initialise(); }
+    place_taxi() { Initialise(); }
     void Copie(place_taxi *p)
     {
         Numero = p->Numero;
@@ -986,11 +986,11 @@ public:
 //---------------------------------------------------------------------------
 class file_taxi // v3.6 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
-    int NumPlaceQueue; // 0 <= NumPlaceQueue < NbPlacesTaxi
-    file_taxi() : Numero(0), NumPlaceQueue(-1) {}
+    int NumPlaceQueue{-1}; // 0 <= NumPlaceQueue < NbPlacesTaxi
+    file_taxi() = default;
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int NumPlace) { NumPlaceQueue = NumPlace; }
     ~file_taxi() = default;
@@ -998,7 +998,7 @@ public:
 //---------------------------------------------------------------------------
 class taxi // v3.6 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
     situation_taxi Situation{};
@@ -1020,7 +1020,7 @@ public:
         TourDrnDepl = TourDepartDrnCourse = TourDepotDrnCourse = TourRetourDrnCourse = NbCasesParcourues =
             NbCasesParcouruesDrnCourse = NbToursRepos = 0;
     }
-    taxi() : Numero(0) { Initialise(); }
+    taxi() { Initialise(); }
     ~taxi() = default;
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int f) { NumFile = f; }                               // 0 <= f < NbFilesTaxi
@@ -1047,7 +1047,7 @@ public:
 //---------------------------------------------------------------------------
 class place_park // v5.0
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{}, NumFile{}; // 0 <= NumFile < NbFilesPark. -1 si non défini
@@ -1057,7 +1057,7 @@ public:
         y = -1;
         NumFile = -1;
     }
-    place_park() : Numero(0) { Initialise(); }
+    place_park() { Initialise(); }
     void Copie(place_park *p)
     {
         Numero = p->Numero;
@@ -1085,11 +1085,11 @@ public:
 //---------------------------------------------------------------------------
 class file_park // v5.0 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
-    int NumPlaceQueue; // 0 <= NumPlaceQueue < NbPlacesPark. -1 : Place non encore définie
-    file_park() : Numero(0), NumPlaceQueue(-1) {}
+    int NumPlaceQueue{-1}; // 0 <= NumPlaceQueue < NbPlacesPark. -1 : Place non encore définie
+    file_park() = default;
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int NumPlace) { NumPlaceQueue = NumPlace; }
     ~file_park() = default;
@@ -1097,7 +1097,7 @@ public:
 //---------------------------------------------------------------------------
 class place_vehlib // v5.3
 {
-    int Numero;
+    int Numero{0};
 
 public:
     int x{}, y{};
@@ -1108,7 +1108,7 @@ public:
         y = -1;
         NumVehlibReserve = 0;
     }
-    place_vehlib() : Numero(0) { Initialise(); }
+    place_vehlib() { Initialise(); }
     void Copie(place_vehlib *p)
     {
         Numero = p->Numero;
@@ -1132,7 +1132,7 @@ public:
 //---------------------------------------------------------------------------
 class vehlib // v5.3 instances créées au lancement de la simulation
 {
-    int Numero;
+    int Numero{0};
 
 public:
     situation_vehlib Situation{};
@@ -1154,7 +1154,7 @@ public:
         NumPlaceArrivee = NumPlaceDepart = 0;
         NbPersonnes = 0;
     }
-    vehlib() : Numero(0) { Initialise(); }
+    vehlib() { Initialise(); }
     void AffecteNumero(int Num) { Numero = Num; }
     void Place(int x0, int y0)
     {
@@ -1185,7 +1185,8 @@ public:
 //---------------------------------------------------------------------------
 class voie
 {
-    int x, y;
+    int x{-1};
+    int y{-1};
 
 public:
     voie(const voie &) = delete;
@@ -1358,7 +1359,7 @@ public:
     centre_ville(const centre_ville &) = delete;
     centre_ville &operator=(const centre_ville &) = delete;
     bool TourEnCours{}, CopieEnCours{}; // v4.0.1 Copie en cours de la sélection dans un fichier
-    TDateTime dtTop{}, dtTemps{};       // v3.9.2
+    TDateTime dtTop, dtTemps;           // v3.9.2
     int NbX, NbY,                       // v4.0
         TourCrt{}, NbFeux{},            // Nombre de feux max. pouvant être utilisés
         NbFeuxPieton{},                 // v5.2. Nombre de feux pietons max. pouvant être utilisés
@@ -1392,10 +1393,10 @@ public:
         ProbaDirPsgPt{50}, // v2.0. Probabilité pour un piéton de se diriger vers un passage piéton en changeant de
                            // direction
         NbMaxCasesDetectArretBus{3}, // v3.0. Maximum de cases qu'un piéton peut contrôler pour détecter un arret de bus
-        NbMaxCasesDetectArretTram{3}, // v3.5. Maximum de cases qu'un piéton peut contrôler pour détecter un arret de
-                                      // tram
-        NbMaxCasesDetectFileTaxi{3},  // v3.6. Maximum de cases qu'un piéton peut contrôler pour détecter une file de
-                                      // taxis
+        NbMaxCasesDetectArretTram{3},  // v3.5. Maximum de cases qu'un piéton peut contrôler pour détecter un arret de
+                                       // tram
+        NbMaxCasesDetectFileTaxi{3},   // v3.6. Maximum de cases qu'un piéton peut contrôler pour détecter une file de
+                                       // taxis
         NbMaxCasesDetectFileVehlib{3}, // v5.3. Maximum de cases qu'un piéton peut contrôler pour détecter une file de
                                        // vehlibs
         ProbaDirArretBus{50},          // v3.0. Probabilité pour un piéton de se diriger vers un arrêt de bus

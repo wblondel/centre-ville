@@ -542,7 +542,7 @@ private:
     affichage Affichage{};
     bool SimulEnCours{}, SimulModifiee{}, EnregistrerAvant{}, DeplacementFeuEnCours{}, RedimensionnementEnCours{};
     int xErr{}, yErr{}, xDeplFeu{}, yDeplFeu{}, xCrt, yCrt, xPrc, yPrc; // Détecteurs de direction du curseur. v3.5
-    direction DirOrigVoieTram;                                          // v3.5
+    direction DirOrigVoieTram{indefinie};                               // v3.5
     // v5.4 : conversion BCB6>BCBX : (AnsiString>String)
     String asNomFichAuto;
     AnsiString asMsgErr;

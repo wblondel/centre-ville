@@ -20,8 +20,8 @@ public:
 
 private: // Déclarations de l'utilisateur
 public:
-    bool AffichageEpidemique; // Déclarations de l'utilisateur // v5.4.1. Définit avant l'appel à FormShow par
-                              // frmSimulation
+    bool AffichageEpidemique{false}; // Déclarations de l'utilisateur // v5.4.1. Définit avant l'appel à FormShow par
+                                     // frmSimulation
     explicit TfrmStatistiques(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

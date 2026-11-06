@@ -75,7 +75,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     for (i = 0; Ok && (i < cv->NbParkings); i++)
     { // v3.0
         Ok = cv->Parking[i].Defini();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = Format("Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                               TableauDeConstantes(i + 1, cv->NbParkings));
@@ -85,7 +85,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     for (i = 0; Ok && (i < cv->NbPlacesPark); i++)
     { // v5.0
         Ok = cv->PlacePark[i].Definie();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr =
                 Format("Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
@@ -96,7 +96,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     for (i = 0; Ok && (i < cv->NbPlacesVehlib); i++)
     { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
         Ok = cv->PlaceVehlib[i].Definie();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = Format("Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                               TableauDeConstantes(i + 1));
@@ -166,14 +166,14 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0
     {
         Ok = cv->DepotBus.Defini();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = "Si des arrêts et des lignes de bus sont définis, un dépôt de bus est obligatoire.";
         }
         else
         {
             Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune);
-            if (!(Ok))
+            if (!Ok)
             {
                 xErr = cv->DepotBus.x;
                 yErr = cv->DepotBus.y;
@@ -182,7 +182,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
             for (d = nord; Ok && (d <= ouest); d++)
             {
                 Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0);
-                if (!(Ok))
+                if (!Ok)
                 {
                     xErr = (cv->DepotBus.x + dx[d]) % cv->NbX;
                     yErr = (cv->DepotBus.y + dy[d]) % cv->NbY;

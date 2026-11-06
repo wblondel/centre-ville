@@ -660,7 +660,7 @@ void feu::Evolue()
             }
             // v5.2 : on vérifie les feux piétons (comme ci-dessus)
             DemandeVert = (i < NbFeuxAtt);
-            if (!(DemandeVert)) // Si pas de demande de vert dans les feux de circulation
+            if (!DemandeVert) // Si pas de demande de vert dans les feux de circulation
             {
                 for (i = 0; (i < NbFeuxPtn) && ((cv->FeuP[NumFeuxPtn[i] - 1].Etat != vert) || // ETAT=Etat pour les
                                                                                               // feux adverses et
@@ -2984,12 +2984,8 @@ int place_park::PlaceQueueFile() // Retourne 1+NumPlace si elle existe sinon 0
     return cv->v[x][y].PlaceQueueFilePark();
 }
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
 voie::voie()
 {
-    x = -1;
-    y = -1;
     Initialise();
 }
 //-----------------------------------------------------------------------------
@@ -6427,7 +6423,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                         Voisine(i, j, Dirdp[d][v[i][j].DirPoss]).PassageBus) // pointe sur un passage de bus
                     { // On ne teste que la distance AVEC passage de bus
                         Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE);
-                        if (!(Ok))
+                        if (!Ok)
                         {
                             xErr = i;
                             yErr = j;
@@ -6438,7 +6434,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                     {
                         Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
                              (v[i][j].DistParking[k][d][SANSPSGBUS] < DIST_INDEFINIE);
-                        if (!(Ok))
+                        if (!Ok)
                         {
                             xErr = i;
                             yErr = j;
@@ -6462,7 +6458,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 for (k = 0; Ok && (k < NbFilesTaxi); k++)
                 { // v3.6
                     Ok = (v[i][j].DistFileTaxi[k][d] < DIST_INDEFINIE);
-                    if (!(Ok))
+                    if (!Ok)
                     {
                         xErr = i;
                         yErr = j;

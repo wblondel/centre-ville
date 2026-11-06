@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------
 TfrmStatistiques *frmStatistiques;
 //---------------------------------------------------------------------------
-TfrmStatistiques::TfrmStatistiques(TComponent *Owner) : TForm(Owner), AffichageEpidemique(false)
+TfrmStatistiques::TfrmStatistiques(TComponent *Owner) : TForm(Owner)
 {
 
     ChargeFiche();

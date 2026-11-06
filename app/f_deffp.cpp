@@ -18,7 +18,7 @@
 //---------------------------------------------------------------------------
 TfrmDefFeuxPietons *frmDefFeuxPietons = nullptr;
 //---------------------------------------------------------------------------
-TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent *Owner) : TForm(Owner), NbFeux(0)
+TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent *Owner) : TForm(Owner)
 {
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 

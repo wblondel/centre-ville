@@ -57,7 +57,7 @@ public:
 private:
     voie *v{}; // Déclarations de l'utilisateur
     pieton *p{};
-    int x{}, y{}, NumPieton;
+    int x{}, y{}, NumPieton{0};
     void RendreVisibleInfos(bool Visible);
 
 public: // Déclarations de l'utilisateur

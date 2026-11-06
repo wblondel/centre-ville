@@ -251,9 +251,8 @@ Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?";
 constexpr std::array<const char *, 4> asTypeVoie = {"", "routes", "voies de trams", ""};
 constexpr std::array<const char *, 4> asTypeArret = {"", "de bus", "de tram", ""};
 //---------------------------------------------------------------------------
-TfrmSimulation::TfrmSimulation(TComponent *Owner)
-    : TFormPrincipale(Owner), DirOrigVoieTram(indefinie) // portage : TForm -> QMainWindow
-{                                                        // Constructeur de la fiche
+TfrmSimulation::TfrmSimulation(TComponent *Owner) : TFormPrincipale(Owner) // portage : TForm -> QMainWindow
+{                                                                          // Constructeur de la fiche
     ChargeFiche();
     yCrt = xCrt = yPrc = xPrc = -1;
     // v3.5 // portage : ChargeFiche() = chargement du .dfm et OnCreate
@@ -1590,7 +1589,7 @@ bool TfrmSimulation::VerifieReseau()
     for (i = 0; Ok && (i < cv->NbParkings); i++)
     { // v3.0
         Ok = cv->Parking[i].Defini();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = Format("Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                               TableauDeConstantes(i + 1, cv->NbParkings));
@@ -1600,7 +1599,7 @@ bool TfrmSimulation::VerifieReseau()
     for (i = 0; Ok && (i < cv->NbPlacesPark); i++)
     { // v5.0
         Ok = cv->PlacePark[i].Definie();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr =
                 Format("Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
@@ -1611,7 +1610,7 @@ bool TfrmSimulation::VerifieReseau()
     for (i = 0; Ok && (i < cv->NbPlacesVehlib); i++)
     { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
         Ok = cv->PlaceVehlib[i].Definie();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = Format("Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                               TableauDeConstantes(i + 1));
@@ -1681,14 +1680,14 @@ bool TfrmSimulation::VerifieReseau()
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0
     {
         Ok = cv->DepotBus.Defini();
-        if (!(Ok))
+        if (!Ok)
         {
             asMsgErr = "Si des arrêts et des lignes de bus sont définis, un dépôt de bus est obligatoire.";
         }
         else
         {
             Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune);
-            if (!(Ok))
+            if (!Ok)
             {
                 xErr = cv->DepotBus.x;
                 yErr = cv->DepotBus.y;
@@ -1697,7 +1696,7 @@ bool TfrmSimulation::VerifieReseau()
             for (d = nord; Ok && (d <= ouest); d++)
             {
                 Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0);
-                if (!(Ok))
+                if (!Ok)
                 {
                     xErr = (cv->DepotBus.x + dx[d]) % cv->NbX;
                     yErr = (cv->DepotBus.y + dy[d]) % cv->NbY;
