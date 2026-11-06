@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.15)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.16)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -373,7 +373,9 @@ chiffre, puis Tab le ramène au dernier parking, retrouvé.
 `champEntreeBorne` et `numeroArretPendantLaFrappe` : Entrée dans un champ, frappe d'un
 n° d'arrêt de bus et de tram.
 `interface.audit_bornes` : `tools/audit_bornes.py` sur les fiches.
-Couche VCL (`controleCSpinEdit`, sur un `TCSpinEdit` seul) : `MinValue=` et
+Couche VCL (`textesResserres`, `couleursLisibles`, `ongletsEntiers` : voir
+« Corrections de la 6.0.16 ») ;
+`controleCSpinEdit`, sur un `TCSpinEdit` seul : `MinValue=` et
 `MaxValue=` sans effet ni `OnChange` ; `Value=` borné, `OnChange` seulement si
 le texte change ; frappe hors bornes acceptée (lettres refusées), ramenée
 dans les bornes au clic sur un bouton mais pas à la perte d'activation de la
@@ -641,11 +643,12 @@ Visuel :
 - **Polices** : MS Sans Serif et Small Fonts sont des polices « raster » que
   Qt ne dessine pas, même sous Windows (où il les trouve, puis prend une
   police de secours plus large). `FamillesQt` (`vcl/graphiques.cpp`) met
-  devant leurs équivalents TrueType : Microsoft Sans Serif, aux mêmes mesures
-  (fournie par Windows et par macOS), et Verdana ou Tahoma pour Small Fonts
-  (barre d'état, numéros d'arrêts sur la carte) ; sous Linux, police du
-  système (substitutions de `application.cpp`). Les tailles en pixels de la
-  VCL sont conservées.
+  devant elles leur équivalent TrueType, Microsoft Sans Serif, aux mêmes
+  mesures (fournie par Windows et par macOS), y compris pour Small Fonts
+  (notes en petits caractères, barre d'état, numéros sur la carte) depuis la
+  6.0.16 ; sous Linux, Arial ou ses équivalents libres aux mêmes largeurs
+  (Liberation Sans, Arimo), puis la police du système (substitutions de
+  `application.cpp`). Les tailles en pixels de la VCL sont conservées.
 - **Style sous Windows** : « windowsvista » (contrôles de Windows 10) plutôt
   que « windows11 », le style par défaut de Qt sous Windows 11, dont les
   flèches côte à côte cachaient la valeur des champs numériques étroits.
@@ -664,7 +667,9 @@ Visuel :
 - **Thème sombre** (macOS) : les fiches suivent l'apparence du système, sauf
   les couleurs fixées dans les `.dfm` (fond noir d'« À propos » et
   d'« Évolution », fond sarcelle des priorités, couleurs des lignes de bus et
-  de tram...).
+  de tram...). Depuis la 6.0.16, une couleur de texte fixée qui se lit mal
+  sur le fond du système (contraste sous 3 : bleu marine, bordeaux et violet
+  de Composition) est éclaircie à teinte égale (`CouleurLisible`).
 - **Boutons** (`TButton`/`TBitBtn`) : hauteur et rendu du style du système
   (sous macOS, boutons arrondis plus bas que les 25 pixels de la VCL).
 - **Glyphes désactivés** des `TSpeedButton` à une seule image (Carrefours) :
@@ -673,13 +678,22 @@ Visuel :
   utilisent bien la seconde.
 - **Groupes désactivés** (`TGroupBox`, `TRadioGroup`) : Qt grise aussi leur
   contenu ; la VCL rendait seulement les contrôles inaccessibles.
-- **Textes longs** : avec les polices de remplacement, certains libellés à
-  largeur fixe débordent ou sont coupés (texte d'« À propos », libellés de
-  Paramètres, des lignes de bus et de tram, des fiches d'informations, de la
-  première colonne de Composition, de Fluidité et trafic, des numéros à
-  quatre chiffres de Rechercher...) ;
-  les valeurs écrites par le code (`AutoSize`) restent entières, quitte à
-  recouvrir la fin du libellé voisin.
+- **Cadres de groupe** (`TGroupBox`, `TRadioGroup`) : dessin du style du
+  système, mais à la place de la VCL, le trait du haut au milieu du titre,
+  titre à 8 pixels du bord (`DessineCadreVcl`, depuis la 6.0.16). Le style de
+  macOS met le titre au-dessus du cadre, qui commence plus bas : les contrôles
+  chevauchaient le haut du cadre. Si le style place déjà le cadre ainsi,
+  son dessin ne change pas.
+- **Textes longs** : les polices de remplacement sont un peu plus larges que
+  celles de Windows (Microsoft Sans Serif sous macOS : 2 % en moyenne, jusqu'à
+  8 %). Depuis la 6.0.16, le texte d'un libellé, d'une case à cocher, d'un
+  bouton radio ou d'un bouton qui ne tient pas à sa place est resserré au
+  dessin (`QFont::setStretch`, `PoliceResserree`), juste assez, au plus à 90 ;
+  la taille et la position du contrôle restent celles du `.dfm`. Sous macOS,
+  la largeur suit le carré de l'étirement (0,81 à 90). Sous Linux, la case
+  des boutons radio et des cases à cocher du style Fusion, plus grande, peut
+  encore couper un texte. Les valeurs écrites par le code (`AutoSize`)
+  restent entières, quitte à recouvrir la fin du libellé voisin.
 - **Tableaux de distances** (`TStringGrid`) : cases fixes au style des
   en-têtes du système (Windows : en-têtes du thème), flèches de la police
   Symbol dessinées dans la police du système ; nombres alignés par les
@@ -689,9 +703,10 @@ Visuel :
   comme avec le cadre que suppose le code d'origine. L'auteur prévoyait de
   revoir ce calcul, pour déduire la taille de la fiche de celle de la grille
   (`src/A_FAIRE.txt`).
-- **Onglets** (`TTabControl` de Statistiques véhicules) : style du système ;
-  avec la police de remplacement, les deux libellés sont élidés (« … ») pour
-  tenir dans la largeur de la VCL.
+- **Onglets** (`TTabControl` de Statistiques véhicules) : style du système,
+  police de la fiche comme dans la VCL (depuis la 6.0.16 : Qt donnait la
+  police du système, plus grande sous macOS, et les deux libellés étaient
+  abrégés), resserrée tant qu'un libellé serait abrégé (`AjusteOnglets`).
 - **Évolution** : traits de `QPainter` ; comme GDI, `LineTo` n'allume pas le
   point d'arrivée, mais les pixels des segments obliques peuvent différer
   d'un pixel de ceux de Windows.
@@ -738,6 +753,37 @@ l'ancien qu'une fois le chargement réussi (`Charge` travaille sur le global `cv
 pointe sur le nouveau le temps de la lecture). En cas d'échec, message et réseau gardé,
 `RetablitVoisinages` rétablissant `dx` et `dy`. L'application ne se ferme plus : cette
 fermeture évitait de travailler sur un réseau incomplet, ce qui n'arrive plus.
+
+## Corrections de la 6.0.16 (annotées `// v6.0.16`)
+
+Affichage vérifié contrôle par contrôle sous macOS (plateforme `cocoa`, style
+`macos`) : le test d'interface complet, avec un relevé de chaque fiche affichée.
+Avant ces corrections, 282 contrôles de 23 fiches avaient un texte coupé. Après,
+il n'en reste aucun, hors exposants « 1 » de Composition (3 pixels de large, le
+chiffre reste visible).
+
+| Élément | 6.0.15 | 6.0.16 |
+|---|---|---|
+| Texte d'un `TLabel`, `TCheckBox`, `TRadioButton`, élément de `TRadioGroup`, `TButton` ou `TBitBtn` (`vcl/controles.cpp`) | Dessiné dans la police du contrôle, coupé s'il ne tient pas : sous macOS, fin de mot coupée dans 23 fiches. | `PoliceResserree` : police resserrée au dessin (`QFont::setStretch`, au plus à 90), juste assez pour que le texte tienne, en largeur, et en hauteur s'il va à la ligne. Police inchangée si le texte tient ; résultat mémorisé (fiches d'informations redessinées à chaque tour). |
+| Small Fonts (notes « (*) », barre d'état, numéros de la carte ; `FamillesQt`) | Verdana, plus large de 13 % en moyenne, jusqu'à 35 % : notes coupées de moitié. | Microsoft Sans Serif, aux largeurs de Small Fonts (2 % de moins en moyenne) ; sous Linux, Arial, Liberation Sans ou Arimo, comme pour MS Sans Serif. |
+| Cadre d'un `TGroupBox` ou d'un `TRadioGroup` (`DessineCadreVcl`) | Style de macOS : titre au-dessus du cadre ; les contrôles, placés pour la VCL, chevauchent le haut du cadre. | Cadre du style, mais placé comme dans la VCL (trait du haut au milieu du titre), quand le style le place plus bas. |
+| Couleur de texte fixée par le `.dfm` sur le fond du système (`CouleurLisible`) | Bleu marine, bordeaux, violet de Composition presque invisibles en mode sombre (contraste de 1,0 à 1,4 sur le fond de macOS). | Sous un contraste de 3, éclaircie (ou foncée sur fond clair) à teinte égale jusqu'au contraste de 4,5. Mode clair : inchangée. |
+| Onglets d'un `TTabControl` (`AjusteOnglets`) | Police du système pour `QTabBar` (plus grande sous macOS) : libellés de Véhicules abrégés. | Police du contrôle, comme dans la VCL, resserrée tant qu'un libellé serait abrégé. |
+
+Tests ajoutés en 6.0.16 (`test_interface.cpp`) :
+
+- `textesResserres` : `PoliceResserree` rend la police inchangée si le texte
+  tient, resserrée juste assez sinon (un cran de moins ne tiendrait pas), au
+  plus à 90, et resserrée pour tenir en hauteur avec le retour à la ligne.
+  Avec Microsoft Sans Serif (Windows, macOS), chaque libellé des fiches créées
+  au démarrage tient une fois resserré. Sauté si le moteur de polices ignore
+  `setStretch`.
+- `couleursLisibles` : bleu marine, bordeaux et violet éclaircis sur fond
+  sombre jusqu'au contraste de 4,5, à teinte égale ; vert et rouge inchangés
+  sur fond sombre ; aucune couleur de la VCL changée sur fond clair ; jaune
+  foncé sur fond clair.
+- `ongletsEntiers` : onglets de Véhicules dans la police de la fiche, aucun
+  libellé abrégé.
 
 ## Corrections de la 6.0.12 (annotées `// v6.0.12`)
 
