@@ -30,6 +30,9 @@ git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp
 git diff --no-index --word-diff src/f_prmsim.cpp app/f_prmsim.cpp
 ```
 
+Depuis la 6.0.17, les fiches sont modernisées comme le moteur (`engine/README.md`) : la
+comparaison ligne à ligne avec `src/` se fait dans le tag `v6.0.16`.
+
 ## Construction et lancement
 
 Qt 6.5 ou plus récent (CI : Qt 6.8 LTS ; Homebrew : `brew install qt`).
@@ -96,7 +99,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.16)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.17)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par

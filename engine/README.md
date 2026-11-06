@@ -12,6 +12,12 @@ les écarts avec l'original ligne à ligne :
 git diff --no-index --ignore-cr-at-eol --word-diff src/simul.cpp engine/simul.cpp
 ```
 
+Depuis la 6.0.17, le moteur est modernisé : `std::vector` et `std::array` au lieu des
+tableaux alloués à la main, constantes `constexpr` au lieu des macros, plus d'affectation
+dans les conditions, mise en forme par `clang-format`. La comparaison ligne à ligne avec
+`src/` se fait donc dans le tag `v6.0.16` ; la simulation, elle, reste identique (golden
+master). Les annotations `// portage` et `// v6.0.x` sont gardées.
+
 ## Construction et tests
 
 ```bash

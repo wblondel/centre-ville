@@ -4,6 +4,52 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.17] — code C++ modernisé, lint bloquant
+
+Cette version ne change ni l'interface, ni la simulation des cartes livrées (golden master
+identique), ni le format des fichiers `.cvw` (0x530). Elle met tout le code C++ (moteur,
+interface, tests) aux bonnes pratiques actuelles, et rend le lint réellement bloquant : le
+code n'a plus à rester comparable ligne à ligne à celui de la version d'origine (`src/`).
+
+### Lint et mise en forme
+
+- **clang-tidy sans constats tolérés** : la liste des 249 constats acceptés
+  (`tools/lint/clang-tidy-reference.txt`) est retirée ; le moindre constat fait échouer la
+  CI. Les règles couvrent les bogues, CERT, l'analyseur statique, la concurrence, les C++ Core
+  Guidelines, la modernisation, la performance, la portabilité et la lisibilité. Les quelques
+  règles écartées le sont avec leur motif dans `.clang-tidy` (nombres magiques des fiches,
+  `(x, y)` dans toutes les signatures, classes de données du moteur…). Une fausse alerte
+  s'annote dans le code, avec son motif.
+- **clang-format** : tout le C++ est mis en forme (`.clang-format`), et la CI le vérifie
+  (`tools/format_cpp.py --verifie`). Les fichiers générés gardent la forme de leur générateur.
+- **Aucun avertissement de compilation**.
+
+### Code
+
+- **Mémoire gérée par la bibliothèque standard** : les tableaux du moteur (feux, véhicules,
+  piétons, arrêts, places…), la grille et les distances de chaque case sont des
+  `std::vector` ; il ne reste ni `new[]`, ni `delete[]`, ni arithmétique de pointeurs. Les
+  tableaux de taille fixe sont des `std::array`, les listes d'images des `std::span`.
+- **Constantes et fonctions** au lieu des macros (`constexpr`, `Voisine()`,
+  `TableauDeConstantes(…)` pour `ARRAYOFCONST((…))`) ; `alea::Rand()` au lieu de la macro
+  `rand()`.
+- **Conversions explicites** : casts C++, `dynamic_cast` vers les classes dérivées,
+  constructeurs `explicit` (sauf les conversions de la VCL, annotées), conversions
+  booléennes explicites.
+- **Plus d'affectation cachée dans les conditions** : elles sont faites avant le test, sans
+  changer l'ordre d'évaluation.
+- **Initialisation** : variables et membres initialisés, valeurs par défaut dans la
+  déclaration des classes ; classes qui possèdent des ressources non copiables.
+- `std::format` au lieu de `snprintf`, chaînes constantes `constexpr`, espaces de noms
+  anonymes, `const` et `[[nodiscard]]` là où ils s'appliquent.
+
+### Corrections
+
+- **Message de vérification d'un feu** : quand l'abscisse d'un feu ne correspondait pas à
+  sa case, le message donnait l'ordonnée d'un feu précédent.
+- **Indicateurs inutilisés** : six indicateurs de la fiche Paramètres, jamais relus, sont
+  retirés.
+
 ## [6.0.16] — textes entiers et fiches lisibles sous macOS
 
 Cette version corrige l'affichage des fiches, vérifié contrôle par contrôle sous macOS : 282
