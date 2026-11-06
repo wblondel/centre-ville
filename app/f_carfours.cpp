@@ -91,39 +91,55 @@ void TfrmCarrefours::Active(int Colonnes, int Lignes)
  {
   int i;
   TComponent *Component;
-  AnsiString asType,
-             asTaille=IntToStr(Colonnes)+IntToStr(Lignes); // v6.0.10 : au lieu de IntToStr(10*Colonnes+Lignes), « 34 » aussi pour 2 x 14 (voir app/README.md)
-  for(i=0; i<ComponentCount; i++) // v5.4 : plus facile de tester les inclusions que les exclusions ;^)
+  AnsiString asType;
+  AnsiString asTaille=IntToStr(Colonnes)+IntToStr(Lignes); // v6.0.10 : au lieu de IntToStr(10*Colonnes+Lignes), « 34 » aussi pour 2 x 14 (voir app/README.md)
+  for(i=0; i<ComponentCount; i++) { // v5.4 : plus facile de tester les inclusions que les exclusions ;^)
    if ((NomDe(Components[i]).SubString(1, 8)=="GroupBox")|| // portage : TComponent::Name -> NomDe
 	   (NomDe(Components[i]).SubString(1, 11)=="SpeedButton"))
 	{
-	 Component=(TComponent*)Components[i];
+	 Component=Components[i];
 	 asType=AnsiString(NomClasseDe(Component)); // portage : TObject::ClassName() -> NomClasseDe
-	 ((QWidget*)Component)->setEnabled(((asType=="TGroupBox")&& // portage : TControl::Enabled -> QWidget::setEnabled
+	 (static_cast<QWidget*>(Component))->setEnabled(((asType=="TGroupBox")&& // portage : TControl::Enabled -> QWidget::setEnabled
 									  (NomDe(Component).SubString(9, 2)==asTaille))|| // v6.0.10
 									 ((asType=="TSpeedButton")&&
                                       (NomDe(Component).SubString(12, 2)==asTaille))); // v6.0.10
     }
+}
  }
 //---------------------------------------------------------------------------
 void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
 {
- int i, x, y, x1, y1, x2, y2, x3, y3, d1, d2, d3,
-     xd=frmSimulation->DrawGridSimul->Selection.Left,
-     yd=frmSimulation->DrawGridSimul->Selection.Top,
-     xf=frmSimulation->DrawGridSimul->Selection.Right,
-     yf=frmSimulation->DrawGridSimul->Selection.Bottom,
-     mrRep=((TSpeedButton*)Sender)->Tag,
-     Dimensions=mrRep/100,
-     Orientation=(mrRep%100)/10,
-     Type=mrRep%10,
-     NumFeux[4];
- if ((Dimensions<44)&&(Type>1))
-  while(cv->NbFeuxLibres()<3)
+ int i;
+ int x;
+ int y;
+ int x1;
+ int y1;
+ int x2;
+ int y2;
+ int x3;
+ int y3;
+ int d1;
+ int d2;
+ int d3;
+ int xd=frmSimulation->DrawGridSimul->Selection.Left;
+ int yd=frmSimulation->DrawGridSimul->Selection.Top;
+ int xf=frmSimulation->DrawGridSimul->Selection.Right;
+ int yf=frmSimulation->DrawGridSimul->Selection.Bottom;
+ int mrRep=(static_cast<TSpeedButton*>(Sender))->Tag;
+ int Dimensions=mrRep/100;
+ int Orientation=(mrRep%100)/10;
+ int Type=mrRep%10;
+ int NumFeux[4];
+ if ((Dimensions<44)&&(Type>1)) {
+  while(cv->NbFeuxLibres()<3) {
    IncrementeNombre(&(cv->Feu), cv->NbFeux);
- if ((Dimensions==44)&&(Type>1))
-  while(cv->NbFeuxLibres()<4)
+}
+}
+ if ((Dimensions==44)&&(Type>1)) {
+  while(cv->NbFeuxLibres()<4) {
    IncrementeNombre(&(cv->Feu), cv->NbFeux);
+}
+}
  if (frmSimulation->SupprimeToutDansSelection(tvTout))
   {
    switch(Dimensions)
@@ -131,61 +147,66 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
      case 34:
      case 43: if (Dimensions==34)
                {
-                for(x=xd; x<=xf; x++)
+                for(x=xd; x<=xf; x++) {
                  for(y=yd; y<=yf; y++)
                   {
-                   if (Orientation==2)
+                   if (Orientation==2) {
                     cv->v[x][y].DirPoss=RotPossDir[R90D][DirPossC3x4[xf-x][y-yd]];
-                   else
+                   } else {
                     cv->v[x][y].DirPoss=RotPossDir[R90G][DirPossC3x4[x-xd][yf-y]];
+}
                    frmSimulation->RedessineCase(x,y,true);
                   }
+}
                 cv->v[x1=xd+2*(Orientation-1)][y1=yd+3*(Orientation-1)].Priorite[d1=sud-1-2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                 cv->v[x2=xd+2-2*(Orientation-1)][y2=yd+1+1*(Orientation-1)].Priorite[d2=ouest-1-2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                 cv->v[x3=xd+1][y3=yd+3-3*(Orientation-1)].Priorite[d3=nord-1+2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                }
               else
                {
-                for(x=xd; x<=xf; x++)
+                for(x=xd; x<=xf; x++) {
                  for(y=yd; y<=yf; y++)
                   {
-                   if (Orientation==2)
+                   if (Orientation==2) {
                     cv->v[x][y].DirPoss=DirPossC3x4[y-yd][x-xd];
-                   else
+                   } else {
                     cv->v[x][y].DirPoss=RotPossDir[R180][DirPossC3x4[yf-y][xf-x]];
+}
                    frmSimulation->RedessineCase(x,y,true);
                   }
+}
                 cv->v[x1=xd+3*(Orientation-1)][y1=yd+2-2*(Orientation-1)].Priorite[d1=est-1+2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                 cv->v[x2=xd+1+1*(Orientation-1)][y2=yd+2*(Orientation-1)].Priorite[d2=sud-1-2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                 cv->v[x3=xd+3-3*(Orientation-1)][y3=yd+1].Priorite[d3=ouest-1-2*(Orientation-1)]=(Type>1)?feux:cedez_le_passage;
                }
               if (Type>1) // Avec Feux
                {
-                NumFeux[d1]=cv->AjouteFeu(x1, y1, (direction)(d1+1));
-                NumFeux[d2]=cv->AjouteFeu(x2, y2, (direction)(d2+1));
-                NumFeux[d3]=cv->AjouteFeu(x3, y3, (direction)(d3+1));
+                NumFeux[d1]=cv->AjouteFeu(x1, y1, static_cast<direction>(d1+1));
+                NumFeux[d2]=cv->AjouteFeu(x2, y2, static_cast<direction>(d2+1));
+                NumFeux[d3]=cv->AjouteFeu(x3, y3, static_cast<direction>(d3+1));
                 cv->Feu[NumFeux[d1]-1].AjouteFeuDmd(NumFeux[d2]);
                 cv->Feu[NumFeux[d1]-1].AjouteFeuAtt(NumFeux[d2]);
-                cv->Feu[NumFeux[d1]-1].Etat=(etat_feu)(1+2*(Type%2));
+                cv->Feu[NumFeux[d1]-1].Etat=static_cast<etat_feu>(1+2*(Type%2));
                 cv->Feu[NumFeux[d2]-1].AjouteFeuDmd(NumFeux[d1]);
                 cv->Feu[NumFeux[d2]-1].AjouteFeuDmd(NumFeux[d3]);
                 cv->Feu[NumFeux[d2]-1].AjouteFeuAtt(NumFeux[d1]);
                 cv->Feu[NumFeux[d2]-1].AjouteFeuAtt(NumFeux[d3]);
-                cv->Feu[NumFeux[d2]-1].Etat=(etat_feu)(1+2*((1+Type)%2));
+                cv->Feu[NumFeux[d2]-1].Etat=static_cast<etat_feu>(1+2*((1+Type)%2));
                 cv->Feu[NumFeux[d3]-1].AjouteFeuDmd(NumFeux[d2]);
                 cv->Feu[NumFeux[d3]-1].AjouteFeuAtt(NumFeux[d2]);
-                cv->Feu[NumFeux[d3]-1].Etat=(etat_feu)(1+2*(Type%2));
+                cv->Feu[NumFeux[d3]-1].Etat=static_cast<etat_feu>(1+2*(Type%2));
                 frmSimulation->RedessineCase(x1,y1,true);
                 frmSimulation->RedessineCase(x2,y2,true);
                 frmSimulation->RedessineCase(x3,y3,true);
                }
               break;
-     case 44: for(x=xd; x<=xf; x++)
+     case 44: for(x=xd; x<=xf; x++) {
                for(y=yd; y<=yf; y++)
                 {
                  cv->v[x][y].DirPoss=DirPossC4x4[x-xd][y-yd];
                  frmSimulation->RedessineCase(x,y,true);
                 }
+}
               cv->v[xd+1][yd].Priorite[sud-1]=(Type>1)?feux:cedez_le_passage;
               cv->v[xd+3][yd+1].Priorite[ouest-1]=(Type>1)?feux:cedez_le_passage;
               cv->v[xd+2][yd+3].Priorite[nord-1]=(Type>1)?feux:cedez_le_passage;
@@ -202,7 +223,7 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
                   cv->Feu[NumFeux[i]-1].AjouteFeuDmd(NumFeux[(i+3)%NBDIR]);
                   cv->Feu[NumFeux[i]-1].AjouteFeuAtt(NumFeux[(i+1)%NBDIR]);
                   cv->Feu[NumFeux[i]-1].AjouteFeuAtt(NumFeux[(i+3)%NBDIR]);
-                  cv->Feu[NumFeux[i]-1].Etat=(etat_feu)(1+2*((1+Type+i)%2));
+                  cv->Feu[NumFeux[i]-1].Etat=static_cast<etat_feu>(1+2*((1+Type+i)%2));
                  }
                 frmSimulation->RedessineCase(xd+1,yd,true);
                 frmSimulation->RedessineCase(xd+3,yd+1,true);
@@ -210,12 +231,13 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
                 frmSimulation->RedessineCase(xd,yd+2,true);
                }
               break;
-     case 66: for(x=xd; x<=xf; x++)
+     case 66: for(x=xd; x<=xf; x++) {
                for(y=yd; y<=yf; y++)
                 {
                  cv->v[x][y].DirPoss=DirPossC6x6[Type-1][x-xd][y-yd];
                  frmSimulation->RedessineCase(x,y,true);
                 }
+}
               cv->v[xd+2][yd].Priorite[sud-1]=cedez_le_passage;
               cv->v[xd+5][yd+2].Priorite[ouest-1]=cedez_le_passage;
               cv->v[xd+3][yd+5].Priorite[nord-1]=cedez_le_passage;
@@ -225,12 +247,13 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
               frmSimulation->RedessineCase(xd+3,yd+5,true);
               frmSimulation->RedessineCase(xd,yd+3,true);
               break;
-     case 88: for(x=xd; x<=xf; x++)
+     case 88: for(x=xd; x<=xf; x++) {
                for(y=yd; y<=yf; y++)
                 {
                  cv->v[x][y].DirPoss=DirPossC8x8[x-xd][y-yd];
                  frmSimulation->RedessineCase(x,y,true);
                 }
+}
               cv->v[xd+3][yd].Priorite[sud-1]=cedez_le_passage;
               cv->v[xd+7][yd+3].Priorite[ouest-1]=cedez_le_passage;
               cv->v[xd+4][yd+7].Priorite[nord-1]=cedez_le_passage;
@@ -243,8 +266,9 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
     }
    ModalResult=mrRep;
   }
- else
+ else {
   ModalResult=mrCancel;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmCarrefours::ButtonAideClick(TObject *Sender)
@@ -256,8 +280,9 @@ void TfrmCarrefours::ButtonAideClick(TObject *Sender)
 void TfrmCarrefours::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -271,6 +296,7 @@ void TfrmCarrefours::ChargeFiche()
   COMPOSANTS_frmCarrefours(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmCarrefours(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

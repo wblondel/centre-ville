@@ -3,6 +3,8 @@
 //#pragma hdrstop // portage
 //---------------------------------------------------------------------------
 #include "f_inftaxi.h"
+
+#include <algorithm>
 #include "f_simul.h"
 #include "base.h"
 //---------------------------------------------------------------------------
@@ -35,12 +37,14 @@ void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
                                        ARRAYOFCONST((v->NumTaxi, Taxi->x, Taxi->y)))+
                                " ";
    }
-  else
+  else {
    RadioButtonAucunTaxi->Checked=true;
+}
   RadioButtonTaxiNumero->Enabled=ARendreVisible;
   RadioButtonAucunTaxi->Enabled=!ARendreVisible;
-  for(i=1; i<13; i++)
-   ((TLabel*)FindComponent("Label"+IntToStr(i)))->Enabled=ARendreVisible;
+  for(i=1; i<13; i++) {
+   (static_cast<TLabel*>(FindComponent("Label"+IntToStr(i))))->Enabled=ARendreVisible;
+}
   LabelSituation->Visible=ARendreVisible;
   LabelDirection->Visible=ARendreVisible;
   LabelNumeroFile->Visible=ARendreVisible;
@@ -57,14 +61,14 @@ void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::RafraichitInfos()
  {
-  int i,
-      NumPlaceTeteFile,
-      MinDistFile=0x7FFFFFFF;
+  int i;
+  int NumPlaceTeteFile;
+  int MinDistFile=0x7FFFFFFF;
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
-  Taxi=NULL;
+  Taxi=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumTaxi>0)))
    {
@@ -80,8 +84,10 @@ void TfrmInfosTaxi::RafraichitInfos()
     LabelToursDepuisDepot->Caption=IntToStr(cv->TourCrt-Taxi->TourDepotDrnCourse);
     LabelToursDepuisRetour->Caption=IntToStr(cv->TourCrt-Taxi->TourRetourDrnCourse);
     LabelParcoursDepuisDepart->Caption=IntToStr(Taxi->NbCasesParcouruesDrnCourse);
-    for(i=0; i<NbDir[v->DirPoss]; i++)
-     if (v->DistFileTaxi[Taxi->NumFile][i]<MinDistFile) MinDistFile=v->DistFileTaxi[Taxi->NumFile][i]; // v6.0.2 : indices dans l'ordre [file][direction] (lecture hors du tableau)
+    for(i=0; i<NbDir[v->DirPoss]; i++) {
+     MinDistFile = std::min(v->DistFileTaxi[Taxi->NumFile][i], MinDistFile); // v6.0.2 : indices dans l'ordre [file][direction] (lecture hors du tableau)
+
+}
     LabelDistanceTeteFileDepart->Caption=IntToStr(MinDistFile);
     LabelVitesse->Caption=Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
    }
@@ -113,8 +119,9 @@ void TfrmInfosTaxi::ButtonAideClick(TObject *Sender)
 void TfrmInfosTaxi::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -128,6 +135,7 @@ void TfrmInfosTaxi::ChargeFiche()
   COMPOSANTS_frmInfosTaxi(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmInfosTaxi(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

@@ -12,7 +12,6 @@
 //#include <ImgList.hpp> // portage
 //#include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //#include <Vcl.Imaging.pngimage.hpp> // portage
 //#include <Vcl.BaseImageCollection.hpp> // portage
 //#include <Vcl.ImageCollection.hpp> // portage

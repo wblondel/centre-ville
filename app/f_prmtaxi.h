@@ -9,7 +9,6 @@
 //#include <Controls.hpp> // portage
 //#include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmParamTaxi : public TForm
 {

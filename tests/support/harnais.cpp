@@ -13,9 +13,10 @@ bool harnais::Ouvre(const std::string &asNomFichier)
  { // f_simul.cpp, TfrmSimulation::ActionOuvrirExecute (partie moteur)
   int hfile;
   AppelleAuChaos();
-  if ((hfile=FileOpen(asNomFichier.c_str(), fmOpenRead))<0) return false; // harnais : -1 si échec
+  if ((hfile=FileOpen(asNomFichier.c_str(), fmOpenRead))<0) { return false; // harnais : -1 si échec
+}
   FileSeek(hfile, 0, 0);
-  if (cv) { delete cv; cv=NULL; }
+  if (cv) { delete cv; cv=nullptr; }
   cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0);
   bool Ok=cv->Charge(hfile);
   FileClose(hfile);
@@ -25,7 +26,8 @@ bool harnais::Ouvre(const std::string &asNomFichier)
 bool harnais::SauveSansChaos(const std::string &asNomFichier)
  {
   int hfile;
-  if ((hfile=FileCreate(asNomFichier.c_str()))<0) return false;
+  if ((hfile=FileCreate(asNomFichier.c_str()))<0) { return false;
+}
   bool Ok=cv->Sauve(hfile);
   FileClose(hfile);
   return Ok;
@@ -40,53 +42,67 @@ bool harnais::Sauve(const std::string &asNomFichier)
 bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, TfrmSimulation::VerifieReseau()
  {
   bool Ok=true;
-  int i, j, d,
-      NbDirPossSansPsgBus, // v3.5
+  int i;
+  int j;
+  int d;
+  int NbDirPossSansPsgBus;
+  int // v3.5
       NbCasesPietonPeutAller=0; // v3.8
   const AnsiString asMsgOk="Réseau correct.";
   asMsgErr=""; // harnais : variable locale devenue paramètre
   dirposs dp;
-  voie *v, *vv;
+  voie *v;
+  voie *vv;
   cv->VerifOk=false;
   // On enleve le clignotement si actif. v3.5
   // harnais : if (TimerClignotementErreur->Enabled) TimerClignotementErreur->Enabled=false;
   // harnais : if ((xErr>-1)&&(yErr>-1)) RedessineCase(xErr, yErr, true);
-  int xErr=-1, yErr=-1; // harnais : membres de TfrmSimulation
-  for(i=0; Ok&&(i<cv->NbParkings); i++) // v3.0
-   if (!(Ok=cv->Parking[i].Defini()))
+  int xErr=-1;
+  int yErr=-1; // harnais : membres de TfrmSimulation
+  for(i=0; Ok&&(i<cv->NbParkings); i++) { // v3.0
+   if (!(Ok=cv->Parking[i].Defini())) {
     asMsgErr=Format( "Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                      ARRAYOFCONST((i+1, cv->NbParkings)));
+}
+}
 
-  for(i=0; Ok&&(i<cv->NbPlacesPark); i++) // v5.0
-   if (!(Ok=cv->PlacePark[i].Definie()))
+  for(i=0; Ok&&(i<cv->NbPlacesPark); i++) { // v5.0
+   if (!(Ok=cv->PlacePark[i].Definie())) {
     asMsgErr=Format( "Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                      ARRAYOFCONST((i+1, cv->NbPlacesPark)));
+}
+}
 
-  for(i=0; Ok&&(i<cv->NbPlacesVehlib); i++) // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
-   if (!(Ok=cv->PlaceVehlib[i].Definie()))
+  for(i=0; Ok&&(i<cv->NbPlacesVehlib); i++) { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
+   if (!(Ok=cv->PlaceVehlib[i].Definie())) {
     asMsgErr=Format( "Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                      ARRAYOFCONST((i+1)));
+}
+}
 
-  for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++)
+  for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) {
    for(j=0; Ok&&(j<NBMAXARRETSBUSTRAMPARLIGNE); j++)
     {
-     if (j<cv->LigneBus[i].NbArrets) // v3.5 : Oubli du test du nombre d'arrêts
+     if (j<cv->LigneBus[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
       if (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))
        {
         asMsgErr=Format( "La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((i+1, cv->LigneBus[i].NumArret[j])));
         break;
        }
-     if (j<cv->LigneTram[i].NbArrets) // v3.5 : Oubli du test du nombre d'arrêts
+}
+     if (j<cv->LigneTram[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
       if (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))
        {
         asMsgErr=Format( "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((AnsiString((char)('A'+i)), cv->LigneTram[i].NumArret[j])));
         break;
        }
+}
     }
-  for(i=0; Ok&&(i<cv->NbArretsBus); i++)
-   if (cv->ArretBus[i].Defini())
+}
+  for(i=0; Ok&&(i<cv->NbArretsBus); i++) {
+   if (cv->ArretBus[i].Defini()) {
     if (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))
      { // v3.0.3
       xErr=cv->ArretBus[i].x; yErr=cv->ArretBus[i].y;
@@ -94,8 +110,10 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
                        ARRAYOFCONST((i+1)));
       break;
      }
-  for(i=0; Ok&&(i<cv->NbArretsTram); i++)
-   if (cv->ArretTram[i].Defini())
+}
+}
+  for(i=0; Ok&&(i<cv->NbArretsTram); i++) {
+   if (cv->ArretTram[i].Defini()) {
     if (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))
      { // v3.0.3
       xErr=cv->ArretTram[i].x; yErr=cv->ArretTram[i].y;
@@ -103,6 +121,8 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 					   ARRAYOFCONST((i+1)));
 	  break;
 	 }
+}
+}
   if (Ok&&(cv->NbArretsBus>0)&&(cv->NbLignesBus>0))  // v3.0
    {
 	if (!(Ok=cv->DepotBus.Defini()))
@@ -118,7 +138,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 	   }
 	  for(d=nord; Ok&&(d<=ouest); d++)
 	   {
-		if (!(Ok=!(cv->V(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss&InvPossDir[d])))
+		if (!(Ok=((cv->V(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss&InvPossDir[d]) == 0)))
 		 {
 		  xErr=(cv->DepotBus.x+dx[d])%cv->NbX; yErr=(cv->DepotBus.y+dy[d])%cv->NbY;
 		  asMsgErr="On ne peut diriger une case vers le dépôt de bus (il est en SORTIE SEULE).";
@@ -126,7 +146,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 	   }
 	 }
    }
-  for(i=0; Ok&&(i<cv->NbX); i++)
+  for(i=0; Ok&&(i<cv->NbX); i++) {
    for(j=0; Ok&&(j<cv->NbY); j++)
 	{
      v=&(cv->v[i][j]);
@@ -136,17 +156,17 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
        if ((v->DirPoss&PossDir[d])==PossDir[d])
         {
          vv=&(cv->V(i,j,d));
-         NbDirPossSansPsgBus+=!vv->PassageBus;
+         NbDirPossSansPsgBus+=static_cast<int>(!vv->PassageBus);
          dp=vv->DirPoss;
          if ((dp==InvPossDir[d])&&
-             (!vv->NumPlaceVehlib)) // v5.3 sauf Places vehlib pour lesquelles il faut pouvoir entrer et sortir (pas de file de vehlib)
+             (vv->NumPlaceVehlib == 0)) // v5.3 sauf Places vehlib pour lesquelles il faut pouvoir entrer et sortir (pas de file de vehlib)
           {
            Ok=false; xErr=i; yErr=j;
            asMsgErr=Format("Demi-tour obligé entre les cases (%d, %d) et (%d, %d).",
                            ARRAYOFCONST((i, j, (i+dx[d])%cv->NbX, (j+dy[d])%cv->NbY)));
            break;
           }
-         if (!dp)
+         if (dp == 0)
           {
            Ok=false; xErr=i; yErr=j;
            asMsgErr=Format("La case (%d, %d) pointe sur (%d, %d) qui n'a aucune direction possible.",
@@ -156,7 +176,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          if ((!v->PassageBus)&& // Si ce n'est pas un passage réservé aux bus ET
              v->ToutDroit&& // il y a obligation d'aller tout droit ET
              vv->PassageBus&& // la case voisine est réservée aux bus ET
-             (cv->V(i,j,InvDir[d]).DirPoss&PossDir[d])&& // On peut venir de la case opposée
+             ((cv->V(i,j,InvDir[d]).DirPoss&PossDir[d]) != 0)&& // On peut venir de la case opposée
              (!cv->V(i,j,InvDir[d]).PassageBus)) // qui n'est pas réservé aux bus ALORS...
           { // ...Il y a possibilité de blocage. v3.5
            Ok=false; xErr=i; yErr=j;
@@ -175,26 +195,28 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          break;
         }
       } // v5.2.2
-     if (!Ok) break; // v3.5 (oubli !)
-     if (v->DirPoss&&
+     if (!Ok) { break; // v3.5 (oubli !)
+}
+     if ((v->DirPoss != 0)&&
          (!v->PassageBus)&&
-         (!NbDirPossSansPsgBus)) // v3.5
+         (NbDirPossSansPsgBus == 0)) // v3.5
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La case (%d, %d) n'a aucune direction possible en dehors des passages de bus.",
                        ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumParking)
+     if (v->NumParking != 0)
       {
-       if (!v->DirPoss)
+       if (v->DirPoss == 0)
         {
          Ok=false; xErr=i; yErr=j;
          asMsgErr=Format("La case (%d, %d) est un parking mais n'a aucune direction possible.",
                          ARRAYOFCONST((i, j)));
          break;
         }
-       for(d=nord; (d<=ouest)&&(!(cv->V(i,j,d).DirPoss&InvPossDir[d])); d++);
+       for(d=nord; (d<=ouest)&&((cv->V(i,j,d).DirPoss&InvPossDir[d]) == 0); d++) {;
+}
        if (d>ouest)
         {
          Ok=false; xErr=i; yErr=j;
@@ -203,10 +225,11 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          break;
        }
       }
-     if (v->NumArretBus) // v3.0
+     if (v->NumArretBus != 0) // v3.0
       {
-       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++)
+       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++) {
         Ok=(cv->V(i,j,d).NumArretBus==v->NumArretBus);
+}
        if (!Ok)
         {
          xErr=i; yErr=j;
@@ -214,10 +237,11 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          break;
         }
       }
-     if (v->NumArretTram) // v3.5
+     if (v->NumArretTram != 0) // v3.5
       {
-       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++)
+       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++) {
         Ok=(cv->V(i,j,d).NumArretTram==v->NumArretTram);
+}
        if (!Ok)
         {
          xErr=i; yErr=j;
@@ -225,7 +249,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          break;
         }
       }
-     if ((v->PassagePietons)&&(!cv->SensPassagePietonsPossible(i, j)))
+     if ((v->PassagePietons)&&(cv->SensPassagePietonsPossible(i, j) == 0))
       {
        Ok=false; xErr=i; yErr=j;
 
@@ -234,34 +258,36 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
        vue->DefinitSimulationModifiee(true); // harnais : SimulationModifiee=true;
        break;
       }
-     if (v->NumPlaceTaxi&&v->ExistePlusieursQueuesFileTaxis()) // v3.6
+     if ((v->NumPlaceTaxi != 0)&&v->ExistePlusieursQueuesFileTaxis()) // v3.6
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("Plusieurs files de taxi sont dirigées sur la place de taxi de la case (%d, %d).", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlaceTaxi&&v->ExistePlusieursTetesFileTaxis()) // v3.6
+     if ((v->NumPlaceTaxi != 0)&&v->ExistePlusieursTetesFileTaxis()) // v3.6
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La place de taxi de la case (%d, %d) pointe sur plus d'une file de taxis.", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlacePark&&v->ExistePlusieursQueuesFilePark()) // v5.0
+     if ((v->NumPlacePark != 0)&&v->ExistePlusieursQueuesFilePark()) // v5.0
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("Plusieurs files de parkings sont dirigées sur la place de parking de la case (%d, %d).", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlacePark&&v->ExistePlusieursTetesFilePark()) // v5.0
+     if ((v->NumPlacePark != 0)&&v->ExistePlusieursTetesFilePark()) // v5.0
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La place de parking de la case (%d, %d) pointe sur plus d'une file de parking.", ARRAYOFCONST((i, j)));
        break;
       }
      // Vérification du nombre de cases potentielles avec 1 piéton par case minimal. v3.8
-     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller((direction)d)); d++); // v6.0.2 : borne testée avant, comme f_simul.cpp
-     NbCasesPietonPeutAller+=(d<=ouest);
+     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller(static_cast<direction>(d))); d++) {; // v6.0.2 : borne testée avant, comme f_simul.cpp
+}
+     NbCasesPietonPeutAller+=static_cast<int>(d<=ouest);
     }
+}
   if (Ok&&(NbCasesPietonPeutAller<cv->NbPietons)) // v4.2
    {
     Ok=false;
@@ -279,8 +305,10 @@ bool harnais::Demarre(AnsiString &asMsgErr)
   type_distance TypeDistance=type_indefini;
   int i;
   asMsgErr="";
-  if (!VerifieReseau(asMsgErr)) return false;
-  for(i=0; (i<cv->NbParkings)&&cv->Parking[i].Defini(); i++);
+  if (!VerifieReseau(asMsgErr)) { return false;
+}
+  for(i=0; (i<cv->NbParkings)&&cv->Parking[i].Defini(); i++) {;
+}
   if (i<cv->NbParkings) { asMsgErr="Nombre de parkings insuffisant"; return false; }
   cv->DefinitFilesTaxi();
   cv->DefinitFilesPark();
@@ -308,36 +336,41 @@ bool harnais::Demarre(AnsiString &asMsgErr)
   // VerifierAvantSimulation : faux par défaut
   // ActionEnregistrer->Execute() : seul effet sur le moteur
   AppelleAuChaos();
-  if ((cv->Stats=new stats[cv->NbToursStats]))
+  if ((cv->Stats=new stats[cv->NbToursStats])) {
    cv->Stats[0].Definit();
-  else
+  } else {
    return false;
+}
   return true;
  }
 //---------------------------------------------------------------------------
 bool harnais::Tick()
  { // f_simul.cpp, TfrmSimulation::TimerSimulTimer
-  if (cv->TourEnCours) return true;
-  if (cv->NbVehiculesArrives==cv->NbVehicules)
+  if (cv->TourEnCours) { return true;
+}
+  if (cv->NbVehiculesArrives==cv->NbVehicules) {
    return false; // « Simulation terminée » : TypeDemande=tdArret
+}
   cv->EffectueTourSimulation();
   return true;
  }
 //---------------------------------------------------------------------------
 void harnais::Ferme()
  {
-  if (cv) { delete cv; cv=NULL; }
+  if (cv) { delete cv; cv=nullptr; }
  }
 //---------------------------------------------------------------------------
 std::string harnais::LitFichier(const std::string &asNomFichier)
  {
   std::string Contenu;
   int hfile=FileOpen(asNomFichier.c_str(), fmOpenRead);
-  if (hfile<0) return Contenu;
+  if (hfile<0) { return Contenu;
+}
   char Tampon[65536];
   int n;
-  while((n=FileRead(hfile, Tampon, sizeof(Tampon)))>0)
-   Contenu.append(Tampon, (std::size_t)n);
+  while((n=FileRead(hfile, Tampon, sizeof(Tampon)))>0) {
+   Contenu.append(Tampon, static_cast<std::size_t>(n));
+}
   FileClose(hfile);
   return Contenu;
  }

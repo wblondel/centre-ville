@@ -68,17 +68,18 @@ class LieurComposants
    }
   template <class T> static const char *NomClasse()
    {
-    if constexpr (std::is_same_v<T, TAction>) return "TAction";
-    else if constexpr (std::is_same_v<T, TActionList>) return "TActionList";
-    else if constexpr (std::is_same_v<T, TMenuItem>) return "TMenuItem";
-    else if constexpr (std::is_same_v<T, TPopupMenu>) return "TPopupMenu";
-    else if constexpr (std::is_same_v<T, TMainMenu>) return "TMainMenu";
-    else if constexpr (std::is_same_v<T, TTimer>) return "TTimer";
-    else if constexpr (std::is_same_v<T, TSaveDialog>) return "TSaveDialog";
-    else if constexpr (std::is_same_v<T, TOpenDialog>) return "TOpenDialog";
-    else if constexpr (std::is_same_v<T, TVirtualImageList>) return "TVirtualImageList";
-    else if constexpr (std::is_same_v<T, TImageCollection>) return "TImageCollection";
-    else return "";
+    if constexpr (std::is_same_v<T, TAction>) { return "TAction";
+    } else if constexpr (std::is_same_v<T, TActionList>) { return "TActionList";
+    } else if constexpr (std::is_same_v<T, TMenuItem>) { return "TMenuItem";
+    } else if constexpr (std::is_same_v<T, TPopupMenu>) { return "TPopupMenu";
+    } else if constexpr (std::is_same_v<T, TMainMenu>) { return "TMainMenu";
+    } else if constexpr (std::is_same_v<T, TTimer>) { return "TTimer";
+    } else if constexpr (std::is_same_v<T, TSaveDialog>) { return "TSaveDialog";
+    } else if constexpr (std::is_same_v<T, TOpenDialog>) { return "TOpenDialog";
+    } else if constexpr (std::is_same_v<T, TVirtualImageList>) { return "TVirtualImageList";
+    } else if constexpr (std::is_same_v<T, TImageCollection>) { return "TImageCollection";
+    } else { return "";
+}
    }
   void Termine(); // arbres des menus, liens des boutons, PrepareVcl
  };
@@ -129,37 +130,42 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     const std::vector<QObject *> &Liste;
     public:
     explicit TableauComposants(const std::vector<QObject *> &l) : Liste(l) {}
-    TComponent *operator[](int i) const { return Liste.at((std::size_t)i); }
+    TComponent *operator[](int i) const { return Liste.at(static_cast<std::size_t>(i)); }
    } Components{ListeComposants};
   explicit TFormT(TComponent *Owner) : B(ParentDe(Owner))
    {
     QWidget *w=this;
-    ComponentCount.Definit([this]() { return (int)ListeComposants.size(); }, [](const int &) {});
-    Caption.Definit([w]() { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
-    Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
-    Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
-    Width.Definit([this, w]() { return w->width()+CadreLargeur; }, [this, w](const int &v) { w->resize(v-CadreLargeur, w->height()); });
-    Height.Definit([this, w]() { return w->height()+CadreHauteur; }, [this, w](const int &v) { w->resize(w->width(), v-CadreHauteur); });
-    ClientWidth.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
-    ClientHeight.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
-    ModalResult.Definit([this]() { return iModalResult; }, [this](const int &mr) { DefinitModalResult(mr); });
-    Visible.Definit([w]() { return w->isVisible(); }, [this](const bool &v) { if (v) Show(); else Hide(); });
-    Enabled.Definit([w]() { return w->isEnabled(); }, [w](const bool &v) { w->setEnabled(v); });
-    WindowState.Definit([w]() { return w->isMaximized()?wsMaximized:(w->isMinimized()?wsMinimized:wsNormal); },
+    ComponentCount.Definit([this] { return (int)ListeComposants.size(); }, [](const int &) {});
+    Caption.Definit([w] { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
+    Left.Definit([w] { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
+    Top.Definit([w] { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
+    Width.Definit([this, w] { return w->width()+CadreLargeur; }, [this, w](const int &v) { w->resize(v-CadreLargeur, w->height()); });
+    Height.Definit([this, w] { return w->height()+CadreHauteur; }, [this, w](const int &v) { w->resize(w->width(), v-CadreHauteur); });
+    ClientWidth.Definit([w] { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
+    ClientHeight.Definit([w] { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
+    ModalResult.Definit([this] { return iModalResult; }, [this](const int &mr) { DefinitModalResult(mr); });
+    Visible.Definit([w] { return w->isVisible(); }, [this](const bool &v) { if (v) { Show(); } else { Hide(); 
+}});
+    Enabled.Definit([w] { return w->isEnabled(); }, [w](const bool &v) { w->setEnabled(v); });
+    WindowState.Definit([w] { return w->isMaximized()?wsMaximized:(w->isMinimized()?wsMinimized:wsNormal); },
                         [w](const TWindowState &s)
                          {
-                          if (s==wsMaximized) w->showMaximized();
-                          else if (s==wsMinimized) w->showMinimized();
-                          else if (w->isMaximized()||w->isMinimized()) w->showNormal();
+                          if (s==wsMaximized) { w->showMaximized();
+                          } else if (s==wsMinimized) { w->showMinimized();
+                          } else if (w->isMaximized()||w->isMinimized()) { w->showNormal();
+}
                          });
-    Cursor.Definit([w]() { return w->cursor().shape()==Qt::WaitCursor?crHourGlass:crDefault; },
-                   [w](const TCursor &c) { if (c==crHourGlass) w->setCursor(Qt::WaitCursor); else w->unsetCursor(); });
-    if constexpr (std::is_base_of_v<QDialog, B>) // done() (ModalResult, Close) : fin de la boucle modale
+    Cursor.Definit([w] { return w->cursor().shape()==Qt::WaitCursor?crHourGlass:crDefault; },
+                   [w](const TCursor &c) { if (c==crHourGlass) { w->setCursor(Qt::WaitCursor); } else { w->unsetCursor(); 
+}});
+    if constexpr (std::is_base_of_v<QDialog, B>) { // done() (ModalResult, Close) : fin de la boucle modale
      QObject::connect(this, &QDialog::finished, this, [this](int)
       {
        BoucleTerminee=true;
-       if (BoucleModale) BoucleModale->exit();
+       if (BoucleModale) { BoucleModale->exit();
+}
       });
+}
    }
   ~TFormT() override
    {
@@ -168,7 +174,8 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
   static QWidget *ParentDe(TComponent *Owner)
    { // Fiches secondaires au-dessus de la fiche principale (MainFormOnTaskBar)
     QWidget *p=qobject_cast<QWidget *>(Owner);
-    if (!p) p=FichePrincipaleQt;
+    if (!p) { p=FichePrincipaleQt;
+}
     return p?p->window():nullptr;
    }
   void Show()
@@ -180,7 +187,8 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
   void Hide() { B::hide(); }
   void Close() { B::close(); }
   void Release() { B::hide(); B::deleteLater(); }
-  void Repaint() { if (TCanvas::NbDessinsEnCours) B::update(); else B::repaint(); } // voir ControleVcl::Repaint
+  void Repaint() { if (TCanvas::NbDessinsEnCours != 0) { B::update(); } else { B::repaint(); 
+}} // voir ControleVcl::Repaint
   void SetFocus() { B::activateWindow(); }
   int ShowModal()
    { // TCustomForm::ShowModal : « repeat HandleMessage until ModalResult<>0 ». La
@@ -198,30 +206,39 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
       BoucleModale=&Boucle;
       BoucleTerminee=false;
       B::show();
-      if (!BoucleTerminee) Boucle.exec(QEventLoop::DialogExec);
-      if (!Garde) return mrCancel;
+      if (!BoucleTerminee) { Boucle.exec(QEventLoop::DialogExec);
+}
+      if (!Garde) { return mrCancel;
+}
       BoucleModale=nullptr;
-      if (!EtaitModale) this->setAttribute(Qt::WA_ShowModal, false);
+      if (!EtaitModale) { this->setAttribute(Qt::WA_ShowModal, false);
+}
       Modale=false;
-      if (iModalResult==mrNone) iModalResult=mrCancel;
+      if (iModalResult==mrNone) { iModalResult=mrCancel;
+}
       return iModalResult;
      }
-    else
+    else {
      return mrNone;
+}
    }
   void DefinitModalResult(int mr) override
    { // ModalResult<>0 pendant ShowModal : la boucle modale ferme la fiche après le
      // traitement du message en cours (le gestionnaire OnClick va jusqu'au bout)
     iModalResult=mr;
-    if constexpr (std::is_base_of_v<QDialog, B>)
-     if (Modale&&(mr!=mrNone))
-      QMetaObject::invokeMethod(this, [this]() { if (Modale&&(iModalResult!=mrNone)) B::done(iModalResult); },
+    if constexpr (std::is_base_of_v<QDialog, B>) {
+     if (Modale&&(mr!=mrNone)) {
+      QMetaObject::invokeMethod(this, [this] { if (Modale&&(iModalResult!=mrNone)) { B::done(iModalResult); 
+}},
                                 Qt::QueuedConnection);
+}
+}
    }
   QObject *FindComponent(const AnsiString &asNom)
    {
     auto i=Composants.find(Q(asNom));
-    if (i!=Composants.end()) return i->second;
+    if (i!=Composants.end()) { return i->second;
+}
     return B::template findChild<QObject *>(Q(asNom));
    }
   protected:
@@ -232,9 +249,11 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     HelpContext=w->property("vclHelpContext").toInt();
     QString Bord=w->property("vclBorderStyle").toString();
     Qt::WindowFlags f=w->windowFlags();
-    if ((Bord=="bsToolWindow")||(Bord=="bsSizeToolWin")) f|=Qt::Tool;
-    if (w->property("vclFormStyle").toString()=="fsStayOnTop") f|=Qt::WindowStaysOnTopHint;
-    if constexpr (std::is_base_of_v<QDialog, B>)
+    if ((Bord=="bsToolWindow")||(Bord=="bsSizeToolWin")) { f|=Qt::Tool;
+}
+    if (w->property("vclFormStyle").toString()=="fsStayOnTop") { f|=Qt::WindowStaysOnTopHint;
+}
+    if constexpr (std::is_base_of_v<QDialog, B>) {
      if (w->property("vclBorderIcons").isValid())
       { // BorderIcons : boutons de la barre de titre (biMinimize : f_prmbus réduit sa fiche)
        QString Icones=w->property("vclBorderIcons").toString();
@@ -244,16 +263,20 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
        if (Icones.contains("biSystemMenu"))
         {
          f|=Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint;
-         if (Icones.contains("biMinimize")) f|=Qt::WindowMinimizeButtonHint;
-         if (Icones.contains("biMaximize")) f|=Qt::WindowMaximizeButtonHint;
+         if (Icones.contains("biMinimize")) { f|=Qt::WindowMinimizeButtonHint;
+}
+         if (Icones.contains("biMaximize")) { f|=Qt::WindowMaximizeButtonHint;
+}
         }
       }
-    if (f!=w->windowFlags()) w->setWindowFlags(f);
+}
+    if (f!=w->windowFlags()) { w->setWindowFlags(f);
+}
     QVariant Couleur=w->property("vclColor");
     if (Couleur.isValid())
      { // Color de la fiche, si elle n'est pas une couleur système (bit 31)
       TColor c=CouleurDepuisTexte(A(Couleur.toString()));
-      if (!(c&0xFF000000))
+      if ((c&0xFF000000) == 0u)
        {
         QPalette p=w->palette();
         p.setColor(QPalette::Window, CouleurQt(c));
@@ -261,11 +284,14 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
         w->setAutoFillBackground(true);
        }
      }
-    if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) w->setFixedSize(w->size());
+    if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) { w->setFixedSize(w->size());
+}
     QString Actif=w->property("vclActiveControl").toString();
-    if (!Actif.isEmpty())
-     if (QWidget *c=w->findChild<QWidget *>(Actif))
+    if (!Actif.isEmpty()) {
+     if (auto *c=w->findChild<QWidget *>(Actif)) {
       c->setFocus(Qt::OtherFocusReason); // fiche cachée : le focus lui sera donné à l'activation
+}
+}
     if (Bord=="bsSizeToolWin")
      { // Cadre que supposent les .dfm et le code des distances : Constraints de
        // 141 pour ClientWidth=125 ; Height=26+21*RowCount pour une grille (bord
@@ -275,57 +301,77 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
      }
     // Constraints (taille de la fenêtre, cadre compris)
     QVariant c=w->property("vclConstraintsMinWidth");
-    if (c.isValid()) w->setMinimumWidth(c.toInt()-CadreLargeur);
-    if ((c=w->property("vclConstraintsMaxWidth")).isValid()) w->setMaximumWidth(c.toInt()-CadreLargeur);
-    if ((c=w->property("vclConstraintsMinHeight")).isValid()) w->setMinimumHeight(c.toInt()-CadreHauteur);
-    if ((c=w->property("vclConstraintsMaxHeight")).isValid()) w->setMaximumHeight(c.toInt()-CadreHauteur);
+    if (c.isValid()) { w->setMinimumWidth(c.toInt()-CadreLargeur);
+}
+    if ((c=w->property("vclConstraintsMaxWidth")).isValid()) { w->setMaximumWidth(c.toInt()-CadreLargeur);
+}
+    if ((c=w->property("vclConstraintsMinHeight")).isValid()) { w->setMinimumHeight(c.toInt()-CadreHauteur);
+}
+    if ((c=w->property("vclConstraintsMaxHeight")).isValid()) { w->setMaximumHeight(c.toInt()-CadreHauteur);
+}
    }
   bool Apercu(QKeyEvent *e, bool Relache)
    { // KeyPreview : OnKeyDown/OnKeyUp puis OnKeyPress de la fiche avant le contrôle actif ;
      // sans KeyPreview, la fiche ne les reçoit que si elle a elle-même le focus
      // (aucun contrôle actif : TWinControl::DoKeyDown de la fiche)
     QWidget *Focus=QApplication::focusWidget();
-    if (!KeyPreview&&Focus&&(Focus!=this)) return false;
-    WORD Key=(WORD)ToucheVirtuelleDe(e);
-    if (Key)
+    if (!KeyPreview&&Focus&&(Focus!=this)) { return false;
+}
+    WORD Key=static_cast<WORD>(ToucheVirtuelleDe(e));
+    if (Key != 0u)
      {
-      if (Relache) { if (OnKeyUp) OnKeyUp(this, Key, EtatTouches(e)); }
-      else { if (OnKeyDown) OnKeyDown(this, Key, EtatTouches(e)); }
-      if (!Key) return true;
+      if (Relache) { if (OnKeyUp) { OnKeyUp(this, Key, EtatTouches(e)); 
+}}
+      else { if (OnKeyDown) { OnKeyDown(this, Key, EtatTouches(e)); 
+}}
+      if (Key == 0u) { return true;
+}
      }
     if (!Relache&&OnKeyPress&&!e->text().isEmpty()&&(e->text().at(0).unicode()<256))
      {
-      char c=(char)e->text().at(0).unicode();
+      char c=static_cast<char>(e->text().at(0).unicode());
       OnKeyPress(this, c);
-      if (!c) return true;
+      if (c == 0) { return true;
+}
      }
     return false;
    }
   bool ToucheDialogue(QKeyEvent *e)
    { // TButton::CMDialogKey : Entrée = bouton qui a le focus, sinon bouton Default ;
      // Échap = premier bouton Cancel ; sans bouton concerné, la touche continue
-    if (e->modifiers()&~(Qt::KeypadModifier)) return false;
-    bool Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter), Echap=(e->key()==Qt::Key_Escape);
-    if (!Entree&&!Echap) return false;
-    if (Entree) // v6.0.2 : la VCL n'envoie pas CM_EXIT : le bouton aurait lu la valeur tapée, hors des bornes
-     if (TCSpinEdit *c=dynamic_cast<TCSpinEdit *>(QApplication::focusWidget()))
-      if (c->window()==this) c->Valide();
-    if (Entree)
-     if (TButton *b=dynamic_cast<TButton *>(QApplication::focusWidget()))
+    if ((e->modifiers()&~Qt::KeypadModifier) != Qt::NoModifier) { return false;
+}
+    bool Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter);
+    bool Echap=(e->key()==Qt::Key_Escape);
+    if (!Entree&&!Echap) { return false;
+}
+    if (Entree) { // v6.0.2 : la VCL n'envoie pas CM_EXIT : le bouton aurait lu la valeur tapée, hors des bornes
+     if (auto *c=dynamic_cast<TCSpinEdit *>(QApplication::focusWidget())) {
+      if (c->window()==this) { c->Valide();
+}
+}
+}
+    if (Entree) {
+     if (auto *b=dynamic_cast<TButton *>(QApplication::focusWidget())) {
       if (b->window()==this) { b->Click(); return true; }
-    for(QPushButton *p : this->template findChildren<QPushButton *>())
-     if (TButton *b=dynamic_cast<TButton *>(p))
+}
+}
+    for(QPushButton *p : this->template findChildren<QPushButton *>()) {
+     if (auto *b=dynamic_cast<TButton *>(p)) {
       if ((Entree?b->Default:b->Cancel)&&b->isVisible()&&b->isEnabled())
        {
         b->Click();
         return true;
        }
+}
+}
     return false;
    }
   void showEvent(QShowEvent *e) override
    {
     B::showEvent(e);
-    if (e->spontaneous()) return;
+    if (e->spontaneous()) { return;
+}
     if (PremierAffichage)
      {
       PremierAffichage=false;
@@ -339,47 +385,57 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
         this->move(g.topLeft());
        }
      }
-    if (OnShow) OnShow(this);
+    if (OnShow) { OnShow(this);
+}
    }
   void hideEvent(QHideEvent *e) override
    {
     B::hideEvent(e);
-    if (!e->spontaneous()&&OnHide) OnHide(this);
+    if (!e->spontaneous()&&OnHide) { OnHide(this);
+}
    }
   void closeEvent(QCloseEvent *e) override
    { // TCustomForm::Close : CloseQuery, puis caHide (fiche secondaire) ou fin de l'application
     bool CanClose=true;
-    if (OnCloseQuery) OnCloseQuery(this, CanClose);
+    if (OnCloseQuery) { OnCloseQuery(this, CanClose);
+}
     if (!CanClose) { e->ignore(); return; }
-    if (Modale&&(iModalResult==mrNone)) iModalResult=mrCancel;
+    if (Modale&&(iModalResult==mrNone)) { iModalResult=mrCancel;
+}
     B::closeEvent(e);
-    if (e->isAccepted()&&EstPrincipale) QCoreApplication::quit();
+    if (e->isAccepted()&&EstPrincipale) { QCoreApplication::quit();
+}
    }
   void mousePressEvent(QMouseEvent *e) override
    {
     B::mousePressEvent(e);
-    if (e->button()==Qt::LeftButton) e->accept();
+    if (e->button()==Qt::LeftButton) { e->accept();
+}
    }
   void mouseReleaseEvent(QMouseEvent *e) override
    { // TControl::WMLButtonUp : OnClick de la fiche (clic hors des contrôles)
     B::mouseReleaseEvent(e);
-    if ((e->button()==Qt::LeftButton)&&this->rect().contains(e->position().toPoint())&&OnClick) OnClick(this);
+    if ((e->button()==Qt::LeftButton)&&this->rect().contains(e->position().toPoint())&&OnClick) { OnClick(this);
+}
    }
   void contextMenuEvent(QContextMenuEvent *e) override
    { // TControl::WMContextMenu : menu contextuel de la fiche (les contrôles sans menu laissent passer le clic droit)
-    if (AvecMenuContextuel::PopupMenu) AvecMenuContextuel::PopupMenu->Popup(e->globalPos().x(), e->globalPos().y());
-    else B::contextMenuEvent(e);
+    if (AvecMenuContextuel::PopupMenu) { AvecMenuContextuel::PopupMenu->Popup(e->globalPos().x(), e->globalPos().y());
+    } else { B::contextMenuEvent(e);
+}
    }
   void keyPressEvent(QKeyEvent *e) override
    {
-    if constexpr (std::is_base_of_v<QDialog, B>)
-     if ((e->key()==Qt::Key_Escape)||(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter))
+    if constexpr (std::is_base_of_v<QDialog, B>) {
+     if ((e->key()==Qt::Key_Escape)||(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter)) {
       return; // touches de dialogue déjà traitées (ToucheDialogue) : pas de reject() de QDialog
+}
+}
     B::keyPressEvent(e);
    }
  };
 //---------------------------------------------------------------------------
-typedef TFormT<QDialog> TForm;
-typedef TFormT<QMainWindow> TFormPrincipale;
+using TForm = TFormT<QDialog>;
+using TFormPrincipale = TFormT<QMainWindow>;
 //---------------------------------------------------------------------------
 #endif

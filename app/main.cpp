@@ -24,8 +24,9 @@ int main(int argc, char *argv[])
  // v6.0.1 : cartes embarquées dans l'exécutable (app/CMakeLists.txt).
  // stRepLocalAppData se rabat sur le dossier de l'exécutable s'il ne peut créer
  // le sien : on n'écrit pas dans le paquet (signature)
- if (Q(stRepLocalAppData())!=QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/"))
+ if (Q(stRepLocalAppData())!=QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/")) {
   CopieCartesExemple(":/cartes", Q(stRepLocalAppData()));
+}
 #endif
  OuvertureFichiers Ouverture;
  App.installEventFilter(&Ouverture);
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
  try
 	{
 		CreeFiches(Ouverture.EnAttente);
-		Resultat=App.exec(); // Application->Run();
+		Resultat=QApplication::exec(); // Application->Run();
 		DetruitFiches();
 	}
  catch (std::exception &exception)

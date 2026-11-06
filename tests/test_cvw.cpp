@@ -19,28 +19,34 @@ namespace
   long long PremierEcart(const std::string &a, const std::string &b)
    {
     std::size_t n=a.size()<b.size()?a.size():b.size();
-    for(std::size_t i=0; i<n; i++)
-     if (a[i]!=b[i]) return (long long)i;
-    return (a.size()==b.size())?-1:(long long)n;
+    for(std::size_t i=0; i<n; i++) {
+     if (a[i]!=b[i]) { return static_cast<long long>(i);
+}
+}
+    return (a.size()==b.size())?-1:static_cast<long long>(n);
    }
   //-------------------------------------------------------------------------
   const champ_cvw &Champ(const conversion_cvw &c, const std::string &Nom)
    {
-    for(const champ_cvw &ch : c.Champs)
-     if (ch.Nom==Nom) return ch;
+    for(const champ_cvw &ch : c.Champs) {
+     if (ch.Nom==Nom) { return ch;
+}
+}
     throw std::runtime_error("champ introuvable : "+Nom);
    }
   //-------------------------------------------------------------------------
   int LitEntier(const std::string &o, const champ_cvw &ch)
    {
     unsigned u=0;
-    for(int i=3; i>=0; i--) u=(u<<8)|(unsigned char)o[ch.Debut+(std::size_t)i];
-    return (int)u;
+    for(int i=3; i>=0; i--) { u=(u<<8)|static_cast<unsigned char>(o[ch.Debut+static_cast<std::size_t>(i)]);
+}
+    return static_cast<int>(u);
    }
   //-------------------------------------------------------------------------
   void EcritEntier(std::string &o, const champ_cvw &ch, int v)
    {
-    for(int i=0; i<4; i++) o[ch.Debut+(std::size_t)i]=(char)(((unsigned)v>>(8*i))&0xFF);
+    for(int i=0; i<4; i++) { o[ch.Debut+static_cast<std::size_t>(i)]=static_cast<char>((static_cast<unsigned>(v)>>(8*i))&0xFF);
+}
    }
   //-------------------------------------------------------------------------
   void EcritFichier(const std::string &asChemin, const std::string &asContenu)
@@ -54,16 +60,21 @@ namespace
   // Lignes d'écarts attendus : lignes du fichier de référence hors commentaires (#)
   std::string EcartsAttendus(const std::string &asFichier)
    {
-    std::string asLignes, l;
-    for(std::size_t i=0; i<=asFichier.size(); i++)
+    std::string asLignes;
+    std::string l;
+    for(std::size_t i=0; i<=asFichier.size(); i++) {
      if ((i==asFichier.size())||(asFichier[i]=='\n'))
       {
-       if (!l.empty()&&(l.back()=='\r')) l.pop_back();
-       if (!l.empty()&&(l[0]!='#')) asLignes+=l+"\n";
+       if (!l.empty()&&(l.back()=='\r')) { l.pop_back();
+}
+       if (!l.empty()&&(l[0]!='#')) { asLignes+=l+"\n";
+}
        l.clear();
       }
-     else
+     else {
       l+=asFichier[i];
+}
+}
     return asLignes;
    }
  }
@@ -74,8 +85,10 @@ TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes et les 3 
   vue=&Vue;
   struct carte_roundtrip { carte c; std::string asChemin; };
   std::vector<carte_roundtrip> Liste;
-  for(const carte &c : Cartes) Liste.push_back({c, CheminCarte(c)});
-  for(const carte &c : CartesTutoriel) Liste.push_back({c, CheminCarteTutoriel(c)});
+  for(const carte &c : Cartes) { Liste.push_back({c, CheminCarte(c)});
+}
+  for(const carte &c : CartesTutoriel) { Liste.push_back({c, CheminCarteTutoriel(c)});
+}
   for(const carte_roundtrip &r : Liste)
    {
     const carte &c=r.c;
@@ -101,7 +114,8 @@ TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes et les 3 
       // Écarts champ par champ avec la référence : ils doivent être exactement
       // ceux, expliqués, de tests/golden/roundtrip/<carte>.txt
       std::string asEcarts;
-      for(const std::string &l : EcartsParChamp(Reference, asSauve)) asEcarts+=l+"\n";
+      for(const std::string &l : EcartsParChamp(Reference, asSauve)) { asEcarts+=l+"\n";
+}
       const std::string asRelatif=std::string("roundtrip/")+c.Nom+".txt";
       const std::string asFichierAttendu=harnais::LitFichier(std::string(CV_DOSSIER_GOLDEN)+"/"+asRelatif);
       REQUIRE_FALSE(asFichierAttendu.empty());
@@ -193,23 +207,29 @@ TEST_CASE("Chargement : élimination des feux fantômes (v5.1.1)", "[cvw][roundt
   conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(Ref.Version==VERSION);
-  const int NbX=LitEntier(asCarte, Champ(Ref, "NbX")), NbY=LitEntier(asCarte, Champ(Ref, "NbY"));
+  const int NbX=LitEntier(asCarte, Champ(Ref, "NbX"));
+  const int NbY=LitEntier(asCarte, Champ(Ref, "NbY"));
   // Premier feu défini et première case sans feu au nord, ailleurs que ce feu
-  int NumFeu=0, xf=-1, yf=-1;
-  for(int f=1; (!NumFeu)&&(f<=LitEntier(asCarte, Champ(Ref, "NbFeux"))); f++)
+  int NumFeu=0;
+  int xf=-1;
+  int yf=-1;
+  for(int f=1; (NumFeu == 0)&&(f<=LitEntier(asCarte, Champ(Ref, "NbFeux"))); f++) {
    if ((xf=LitEntier(asCarte, Champ(Ref, "feu"+std::to_string(f)+".x")))>=0)
     {
      NumFeu=f;
      yf=LitEntier(asCarte, Champ(Ref, "feu"+std::to_string(f)+".y"));
     }
+}
   REQUIRE(NumFeu>0);
   std::string asNomChamp;
-  for(int x=0; asNomChamp.empty()&&(x<NbX); x++)
+  for(int x=0; asNomChamp.empty()&&(x<NbX); x++) {
    for(int y=0; asNomChamp.empty()&&(y<NbY); y++)
     {
      std::string n="case("+std::to_string(x)+","+std::to_string(y)+").NumFeu[0]";
-     if (((x!=xf)||(y!=yf))&&!LitEntier(asCarte, Champ(Ref, n))) asNomChamp=n;
+     if (((x!=xf)||(y!=yf))&&(LitEntier(asCarte, Champ(Ref, n)) == 0)) { asNomChamp=n;
+}
     }
+}
   REQUIRE_FALSE(asNomChamp.empty());
   EcritEntier(asCarte, Champ(Ref, asNomChamp), NumFeu); // feu fantôme
   const std::string asFantome=FichierSortie("feu_fantome.cvw");
@@ -233,7 +253,8 @@ TEST_CASE("Chargement : parkings indéfinis retirés et renumérotés (v5.1)", "
   conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(LitEntier(asCarte, Champ(Ref, "NbParkings"))==4);
-  int x[5], y[5];
+  int x[5];
+  int y[5];
   for(int p=1; p<=4; p++)
    {
     x[p]=LitEntier(asCarte, Champ(Ref, "parking"+std::to_string(p)+".x"));

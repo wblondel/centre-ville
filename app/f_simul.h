@@ -543,18 +543,20 @@ private:
   bool EnregistreModificationsAvant(operation_avant Operation);
   bool VerifieIntegrite();
   bool VerifieReseau();
-  void AfficheMsgInfoNonDisp(const AnsiString asTitre); // v3.7
+  void AfficheMsgInfoNonDisp(const AnsiString& asTitre); // v3.7
   // Définition de la propriété SimulEnCours
   bool SimulEstEnCours() { return SimulEnCours; };
   void MarcheArretSimul(bool EnCours)
    {
     bool EtaitEnCours=SimulEnCours; // v6.0.2 : Arrêt en pause : le chrono est déjà arrêté
     SimulEnCours=EnCours;
-    if (EnCours)
+    if (EnCours) {
      cv->TopChrono();
-    else
-     if (EtaitEnCours) cv->StopChrono(); // v3.9.2
-    if (!EnCours) Application->Title=asTitreCV;
+    } else
+     if (EtaitEnCours) { cv->StopChrono(); // v3.9.2
+}
+    if (!EnCours) { Application->Title=asTitreCV;
+}
 
     if ((!Pause)&&(!EnCours))
      {
@@ -626,7 +628,7 @@ private:
     if (SimulEnCours)
      {
       TypeDemande=tdRien;
-      TimerSimul->Interval=(unsigned)(0.5+1000.0/(cv->NbToursParSeconde));
+      TimerSimul->Interval=static_cast<unsigned>(0.5+1000.0/(cv->NbToursParSeconde));
       TimerSimul->Enabled=true;
      }
     InitialiseDeplacementFeu(); // v3.5
@@ -638,15 +640,18 @@ private:
     SimulModifiee=Modifiee;
     // v6.0.1 : réseau modifié après un échec de Marche (réseau non connexe) :
     // les distances encore affichées par les fiches ne valent plus
-    if (Modifiee&&cv&&(!SimulEnCours)&&(!Pause)) cv->LibereDistances();
+    if (Modifiee&&cv&&(!SimulEnCours)&&(!Pause)) { cv->LibereDistances();
+}
     if (Modifiee)
      {
-      if (Caption[Caption.Length()]!='*')
+      if (Caption[Caption.Length()]!='*') {
        Caption=Caption+"*";
+}
      }
     else
-     if (Caption[Caption.Length()]=='*')
+     if (Caption[Caption.Length()]=='*') {
       Caption=Caption.SubString(1, Caption.Length()-1);
+}
    };
   bool SimulEstSanglante() { return ActionSanglante->Checked; }; // v4.3
   void ModifieModeSanglant(bool Sanglant) { ActionSanglante->Checked=Sanglant; }; // v4.3

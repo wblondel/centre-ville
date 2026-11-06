@@ -37,28 +37,29 @@ namespace
   //-------------------------------------------------------------------------
   std::filesystem::path Chemin(const std::string &s)
    {
-    return std::filesystem::path(std::u8string(s.begin(), s.end()));
+    return {std::u8string(s.begin(), s.end())};
    }
   //-------------------------------------------------------------------------
   int RegenereGolden(const std::string &asMaps, const std::string &asGolden)
    {
-    for(const carte &c : Cartes)
-     for(int k=0; k<NB_CONFIGS_GOLDEN; k++)
+    for(const carte &c : Cartes) {
+     for(auto k : ConfigsGolden)
       {
-       std::string Texte=ProduitGolden(asMaps+"/"+c.Fichier, c.Nom, ConfigsGolden[k]);
-       std::filesystem::path p=Chemin(asGolden)/Chemin(FichierGolden(c.Nom, ConfigsGolden[k]));
+       std::string Texte=ProduitGolden(asMaps+"/"+c.Fichier, c.Nom, k);
+       std::filesystem::path p=Chemin(asGolden)/Chemin(FichierGolden(c.Nom, k));
        std::filesystem::create_directories(p.parent_path());
        std::ofstream f(p, std::ios::binary);
        f<<Texte;
        std::cout<<p.string()<<" ("<<Texte.size()<<" octets)\n";
       }
+}
     std::filesystem::path Temp=std::filesystem::temp_directory_path()/"cvsim";
     std::filesystem::create_directories(Temp);
     std::string asTemp=Temp.string();
-    for(int k=0; k<NB_CONFIGS_GENERATION; k++)
+    for(const auto & k : ConfigsGeneration)
      {
-      std::string Texte=ProduitGoldenGeneration(ConfigsGeneration[k], asTemp+"/generation.cvw");
-      std::filesystem::path p=Chemin(asGolden)/"generation"/(std::string(ConfigsGeneration[k].Nom)+".txt");
+      std::string Texte=ProduitGoldenGeneration(k, asTemp+"/generation.cvw");
+      std::filesystem::path p=Chemin(asGolden)/"generation"/(std::string(k.Nom)+".txt");
       std::filesystem::create_directories(p.parent_path());
       std::ofstream(p, std::ios::binary)<<Texte;
       std::cout<<p.string()<<" ("<<Texte.size()<<" octets)\n";
@@ -77,30 +78,37 @@ namespace
 //---------------------------------------------------------------------------
 int main(int argc, char **argv)
  {
-  if (argc<2) return Usage();
-  if (!std::strcmp(argv[1], "--golden"))
+  if (argc<2) { return Usage();
+}
+  if (std::strcmp(argv[1], "--golden") == 0)
    {
-    if (argc!=4) return Usage();
+    if (argc!=4) { return Usage();
+}
     return RegenereGolden(argv[2], argv[3]);
    }
-  std::string asCarte=argv[1], asSortie;
-  int NbTours=100, TourResurrection=0;
-  bool Etat=false, GraineFixee=false;
+  std::string asCarte=argv[1];
+  std::string asSortie;
+  int NbTours=100;
+  int TourResurrection=0;
+  bool Etat=false;
+  bool GraineFixee=false;
   unsigned Graine=0;
   VueNulle Vue;
   for(int i=2; i<argc; i++)
    {
-    if (!std::strcmp(argv[i], "--tours")&&(i+1<argc)) NbTours=std::atoi(argv[++i]);
-    else if (!std::strcmp(argv[i], "--graine")&&(i+1<argc)) { Graine=(unsigned)std::strtoul(argv[++i], nullptr, 0); GraineFixee=true; }
-    else if (!std::strcmp(argv[i], "--sanglante")) Vue.Sanglante=true;
-    else if (!std::strcmp(argv[i], "--epidemie")) Vue.Epidemie=true;
-    else if (!std::strcmp(argv[i], "--resurrection")&&(i+1<argc)) TourResurrection=std::atoi(argv[++i]);
-    else if (!std::strcmp(argv[i], "--sauve")&&(i+1<argc)) asSortie=argv[++i];
-    else if (!std::strcmp(argv[i], "--etat")) Etat=true;
-    else return Usage();
+    if ((std::strcmp(argv[i], "--tours") == 0)&&(i+1<argc)) { NbTours=std::atoi(argv[++i]);
+    } else if ((std::strcmp(argv[i], "--graine") == 0)&&(i+1<argc)) { Graine=static_cast<unsigned>(std::strtoul(argv[++i], nullptr, 0)); GraineFixee=true; }
+    else if (std::strcmp(argv[i], "--sanglante") == 0) { Vue.Sanglante=true;
+    } else if (std::strcmp(argv[i], "--epidemie") == 0) { Vue.Epidemie=true;
+    } else if ((std::strcmp(argv[i], "--resurrection") == 0)&&(i+1<argc)) { TourResurrection=std::atoi(argv[++i]);
+    } else if ((std::strcmp(argv[i], "--sauve") == 0)&&(i+1<argc)) { asSortie=argv[++i];
+    } else if (std::strcmp(argv[i], "--etat") == 0) { Etat=true;
+    } else { return Usage();
+}
    }
   vue=&Vue;
-  if (GraineFixee) alea::FixeGraine(Graine);
+  if (GraineFixee) { alea::FixeGraine(Graine);
+}
   if (!harnais::Ouvre(asCarte))
    {
     std::cerr<<"Chargement impossible : "<<asCarte<<"\n";
@@ -118,25 +126,29 @@ int main(int argc, char **argv)
   int t;
   for(t=0; t<NbTours; t++)
    {
-    if (TourResurrection&&(t+1==TourResurrection)) Vue.Resurrection=true; // comme le golden master
+    if ((TourResurrection != 0)&&(t+1==TourResurrection)) { Vue.Resurrection=true; // comme le golden master
+}
     if (!harnais::Tick())
      {
       std::cout<<"Simulation terminée ("<<cv->NbVehicules<<" véhicules)\n";
       break;
      }
-    if (!((t+1)%10)||(t+1==NbTours))
+    if ((((t+1)%10) == 0)||(t+1==NbTours)) {
      std::cout<<"Tour "<<cv->TourCrt<<" : "<<cv->NbVehiculesSortis<<" sortis, "<<cv->NbVehiculesArrives
               <<" arrivés, "<<cv->NbVehiculesDeplaces<<" déplacés\n";
+}
    }
-  for(const VueNulle::message &m : Vue.Messages)
+  for(const VueNulle::message &m : Vue.Messages) {
    std::cout<<"Message : "<<m.asTitre<<" | "<<m.asMessage<<"\n";
-  if (Etat) std::cout<<ExportEtat::Texte(cv, true);
+}
+  if (Etat) { std::cout<<ExportEtat::Texte(cv, true);
+}
   int Retour=0;
   if (!asSortie.empty())
    {
-    if (harnais::Sauve(asSortie))
+    if (harnais::Sauve(asSortie)) {
      std::cout<<"Enregistré : "<<asSortie<<"\n";
-    else
+    } else
      {
       std::cerr<<"Enregistrement impossible : "<<asSortie<<"\n";
       Retour=1;

@@ -12,10 +12,10 @@
 //---------------------------------------------------------------------------
 QColor CouleurQt(TColor Couleur)
  {
-  if ((unsigned)Couleur&0x80000000u)
+  if ((static_cast<unsigned>(Couleur)&0x80000000U) != 0u)
    { // Couleur système : palette de Qt (équivalents des COLOR_xxx de Windows)
     QPalette p=QApplication::palette();
-    switch((unsigned)Couleur&0xFFu)
+    switch(static_cast<unsigned>(Couleur)&0xFFU)
      {
       case 0x05: return p.color(QPalette::Base); // clWindow
       case 0x08: return p.color(QPalette::Text); // clWindowText
@@ -30,7 +30,7 @@ QColor CouleurQt(TColor Couleur)
       default: return p.color(QPalette::Window);
      }
    }
-  return QColor(Couleur&0xFF, (Couleur>>8)&0xFF, (Couleur>>16)&0xFF);
+  return {Couleur&0xFF, (Couleur>>8)&0xFF, (Couleur>>16)&0xFF};
  }
 //---------------------------------------------------------------------------
 TColor CouleurDepuisTexte(const AnsiString &asCouleur)
@@ -47,8 +47,9 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
     {"clGrayText", clGrayText}, {"clBtnText", clBtnText}, {"clBtnHighlight", clBtnHighlight},
     {"clInfoBk", clInfoBk}};
   auto i=Noms.find(asCouleur.str());
-  if (i!=Noms.end()) return i->second;
-  return (TColor)std::stoul(asCouleur.str(), nullptr, 0);
+  if (i!=Noms.end()) { return i->second;
+}
+  return static_cast<TColor>(std::stoul(asCouleur.str(), nullptr, 0));
  }
 //---------------------------------------------------------------------------
 // MS Sans Serif et Small Fonts, polices « raster » des fiches, ne sont pas
@@ -63,8 +64,9 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
 //---------------------------------------------------------------------------
 QStringList FamillesQt(const QString &Famille)
  {
-  if ((Famille==QLatin1String("MS Sans Serif"))||(Famille==QLatin1String("Small Fonts")))
+  if ((Famille==QLatin1String("MS Sans Serif"))||(Famille==QLatin1String("Small Fonts"))) {
    return {"Microsoft Sans Serif", Famille};
+}
   return {Famille};
  }
 //---------------------------------------------------------------------------
@@ -72,11 +74,12 @@ QFont TFont::Qt() const
  {
   QFont f;
   f.setFamilies(FamillesQt(Q(Name)));
-  if (Height<0)
+  if (Height<0) {
    f.setPixelSize(-Height); // Font.Height négatif = hauteur des caractères en pixels
-  else
-   if (Height>0)
-    f.setPixelSize(qMax(1, (int)(0.85*Height+0.5))); // hauteur de cellule
+  } else
+   if (Height>0) {
+    f.setPixelSize(qMax(1, static_cast<int>(0.85*Height+0.5))); // hauteur de cellule
+}
   f.setBold(Style.Contains(fsBold));
   f.setItalic(Style.Contains(fsItalic));
   f.setUnderline(Style.Contains(fsUnderline));
@@ -88,9 +91,9 @@ QFont TFont::Qt() const
 //---------------------------------------------------------------------------
 void TCanvas::PrepareStylo()
  {
-  if (Pen->Style==psClear)
+  if (Pen->Style==psClear) {
    Peintre->setPen(::Qt::NoPen);
-  else
+  } else
    {
     QPen p(CouleurQt(Pen->Color));
     p.setWidth(Pen->Width);
@@ -104,30 +107,34 @@ void TCanvas::PrepareStylo()
      }
     Peintre->setPen(p);
    }
-  if (Brush->Style==bsClear)
+  if (Brush->Style==bsClear) {
    Peintre->setBrush(::Qt::NoBrush);
-  else
+  } else {
    Peintre->setBrush(CouleurQt(Brush->Color));
+}
  }
 //---------------------------------------------------------------------------
 int TCanvas::NbDessinsEnCours=0;
 //---------------------------------------------------------------------------
 void TCanvas::FillRect(const TRect &r)
  {
-  if (!Peintre||(Brush->Style==bsClear)) return;
+  if (!Peintre||(Brush->Style==bsClear)) { return;
+}
   Peintre->fillRect(r.Qt(), CouleurQt(Brush->Color));
  }
 //---------------------------------------------------------------------------
 void TCanvas::Rectangle(int x1, int y1, int x2, int y2)
  { // GDI : contour au crayon, intérieur à la brosse, bords droit et bas exclus
-  if (!Peintre) return;
+  if (!Peintre) { return;
+}
   PrepareStylo();
   Peintre->drawRect(QRect(x1, y1, x2-x1-1, y2-y1-1));
  }
 //---------------------------------------------------------------------------
 void TCanvas::Ellipse(int x1, int y1, int x2, int y2)
  {
-  if (!Peintre) return;
+  if (!Peintre) { return;
+}
   PrepareStylo();
   Peintre->drawEllipse(QRect(x1, y1, x2-x1-1, y2-y1-1));
  }
@@ -142,14 +149,16 @@ void TCanvas::LineTo(int x, int y)
   if (Peintre)
    {
     PrepareStylo();
-    QPoint Fin(x, y), d=Fin-PenPos;
-    if (d.x()||d.y())
+    QPoint Fin(x, y);
+    QPoint d=Fin-PenPos;
+    if ((d.x() != 0)||(d.y() != 0))
      {
-      QPoint Avant=Fin-QPoint((d.x()>0)-(d.x()<0), (d.y()>0)-(d.y()<0));
-      if (Avant==PenPos)
+      QPoint Avant=Fin-QPoint(static_cast<int>(d.x()>0)-static_cast<int>(d.x()<0), static_cast<int>(d.y()>0)-static_cast<int>(d.y()<0));
+      if (Avant==PenPos) {
        Peintre->drawPoint(PenPos);
-      else
+      } else {
        Peintre->drawLine(PenPos, Avant);
+}
      }
    }
   PenPos=QPoint(x, y);
@@ -157,12 +166,14 @@ void TCanvas::LineTo(int x, int y)
 //---------------------------------------------------------------------------
 void TCanvas::TextOut(int x, int y, const AnsiString &asTexte)
  { // Fond opaque à la couleur de la brosse, sauf brosse bsClear (SetBkMode)
-  if (!Peintre) return;
+  if (!Peintre) { return;
+}
   QFont f=Font->Qt();
   QFontMetrics m(f);
   QString t=Q(asTexte);
-  if (Brush->Style!=bsClear)
+  if (Brush->Style!=bsClear) {
    Peintre->fillRect(QRect(x, y, m.horizontalAdvance(t), m.height()), CouleurQt(Brush->Color));
+}
   Peintre->setFont(f);
   Peintre->setPen(CouleurQt(Font->Color));
   Peintre->drawText(QPoint(x, y+m.ascent()), t);
@@ -181,7 +192,8 @@ int TCanvas::TextHeight(const AnsiString &asTexte)
 //---------------------------------------------------------------------------
 void TCanvas::DrawFocusRect(const TRect &r)
  { // DrawFocusRect de Windows : pointillés en OU exclusif
-  if (!Peintre) return;
+  if (!Peintre) { return;
+}
   Peintre->save();
   Peintre->setCompositionMode(QPainter::RasterOp_NotDestination);
   QPen p(::Qt::white, 1, ::Qt::DotLine);

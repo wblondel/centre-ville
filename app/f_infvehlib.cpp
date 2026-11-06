@@ -3,6 +3,8 @@
 //#pragma hdrstop // portage
 //---------------------------------------------------------------------------
 #include "f_infvehlib.h"
+
+#include <algorithm>
 #include "f_simul.h"
 #include "base.h"
 //---------------------------------------------------------------------------
@@ -36,12 +38,14 @@ void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
                                        ARRAYOFCONST((v->NumVehlib, Vehlib->x, Vehlib->y)))+
                                " ";
    }
-  else
+  else {
    RadioButtonAucunVehlib->Checked=true;
+}
   RadioButtonVehlibNumero->Enabled=ARendreVisible;
   RadioButtonAucunVehlib->Enabled=!ARendreVisible;
-  for(i=1; i<=10; i++)
-   ((TLabel*)FindComponent("Label"+IntToStr(i)))->Enabled=ARendreVisible;
+  for(i=1; i<=10; i++) {
+   (static_cast<TLabel*>(FindComponent("Label"+IntToStr(i))))->Enabled=ARendreVisible;
+}
   LabelSituation->Visible=ARendreVisible;
   LabelDirection->Visible=ARendreVisible;
   LabelNumeroPlaceDepart->Visible=ARendreVisible;
@@ -56,13 +60,13 @@ void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosVehlib::RafraichitInfos()
  {
-  int i,
-      MinDistPlace=0x7FFFFFFF;
+  int i;
+  int MinDistPlace=0x7FFFFFFF;
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
-  Vehlib=NULL;
+  Vehlib=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumVehlib>0)))
    {
@@ -73,13 +77,14 @@ void TfrmInfosVehlib::RafraichitInfos()
                                             ARRAYOFCONST(( Vehlib->NumPlaceDepart,
                                                            cv->PlaceVehlib[Vehlib->NumPlaceDepart-1].x,
                                                            cv->PlaceVehlib[Vehlib->NumPlaceDepart-1].y)));
-    if (Vehlib->NumPlaceArrivee)
+    if (Vehlib->NumPlaceArrivee != 0) {
       LabelNumeroPlaceArrivee->Caption=Format( asFrmNumeroCoordonnees,
                                                ARRAYOFCONST(( Vehlib->NumPlaceArrivee,
                                                               cv->PlaceVehlib[Vehlib->NumPlaceArrivee-1].x,
                                                               cv->PlaceVehlib[Vehlib->NumPlaceArrivee-1].y)));
-    else
+    } else {
       LabelNumeroPlaceArrivee->Caption=asAucune;
+}
     LabelNbPersonnes->Caption=IntToStr(Vehlib->NbPersonnes);
     LabelParcours->Caption=IntToStr(Vehlib->NbCasesParcourues);
     switch(Vehlib->Situation)
@@ -91,15 +96,16 @@ void TfrmInfosVehlib::RafraichitInfos()
                       LabelParcoursDepuisDepart->Caption=asNonDemarre;
                       break;
      }
-    if (Vehlib->NumPlaceArrivee)
+    if (Vehlib->NumPlaceArrivee != 0)
      {
-      for(i=0; i<NbDir[v->DirPoss]; i++)
-       if (v->DistPlaceVehlib[Vehlib->NumPlaceArrivee-1][i]<MinDistPlace)
-        MinDistPlace=v->DistPlaceVehlib[Vehlib->NumPlaceArrivee-1][i];
+      for(i=0; i<NbDir[v->DirPoss]; i++) {
+       MinDistPlace = std::min(v->DistPlaceVehlib[Vehlib->NumPlaceArrivee-1][i], MinDistPlace);
+}
       LabelDistancePlaceArrivee->Caption=IntToStr(MinDistPlace);
      }
-     else
+     else {
       LabelDistancePlaceArrivee->Caption=asNA;
+}
     LabelVitesse->Caption=Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
    }
   RendreVisibleInfos(Afficher);
@@ -129,8 +135,9 @@ void TfrmInfosVehlib::ButtonAideClick(TObject *Sender)
 void TfrmInfosVehlib::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -144,6 +151,7 @@ void TfrmInfosVehlib::ChargeFiche()
   COMPOSANTS_frmInfosVehlib(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmInfosVehlib(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

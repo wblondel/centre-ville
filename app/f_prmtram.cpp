@@ -19,40 +19,49 @@ TfrmParamTram::TfrmParamTram(TComponent* Owner)
     : TForm(Owner)
 { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
  // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
- for(int i=0; i<9; i++)
-  if (i!=4) // v5.4 : plus de zoom !
-   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, ((TBitBtn*)(FindComponent((UnicodeString)("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
- for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) // v6.0.2 : champs des n° d'arrêts
-  for(int j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
-   Connecte(((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->OnExit, this, &TfrmParamTram::CSpinEditExit);
+ for(int i=0; i<9; i++) {
+  if (i!=4) { // v5.4 : plus de zoom !
+   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, (static_cast<TBitBtn*>(FindComponent(UnicodeString("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
+}
+}
+ for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) { // v6.0.2 : champs des n° d'arrêts
+  for(int j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++) {
+   Connecte((static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->OnExit, this, &TfrmParamTram::CSpinEditExit);
+}
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamTram::RafraichitNbTrams()
  {
-  int i, NbTrams=0;
-  for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   if (cv->LigneTram[i].NbArrets)
+  int i;
+  int NbTrams=0;
+  for(i=0; i<NBMAXLIGNESBUSTRAM; i++) {
+   if (cv->LigneTram[i].NbArrets != 0) {
     NbTrams+=1+(cv->LigneTram[i].NbArrets-1)/3; // On définit 1 tram de 1 à 3 arrêts. 2 trams de 4 à 6 arrêts et 3 trams de 7 à 9 arrêts
+}
+}
   LabelNbTrams->Caption=IntToStr(NbTrams);
  }
 //---------------------------------------------------------------------------
 void TfrmParamTram::FormShow(TObject *Sender)
 {
- int i, j;
+ int i;
+ int j;
  AnsiString asNumLigne;
  TShape* Shape;
  NumArretTramAMontrer=0;
  InitialisationEnCours=true;
- for(NbArretsTram=i=0; i<cv->NbArretsTram; i++) NbArretsTram+=cv->ArretTram[i].Defini();
+ for(NbArretsTram=i=0; i<cv->NbArretsTram; i++) { NbArretsTram+=static_cast<int>(cv->ArretTram[i].Defini());
+}
  LabelNbArretsTram->Caption=IntToStr(NbArretsTram);
  LabelNbMaxArretsTram->Caption=IntToStr(cv->NbArretsTram);
  RafraichitNbTrams();
- if (NbArretsTram)
+ if (NbArretsTram != 0)
   {
    CheckBoxTout->Visible=(cv->TourCrt>0);
    LabelT->Visible=(cv->TourCrt>0);
    ShapeT->Visible=(cv->TourCrt>0);
-   if (!cv->TourCrt)
+   if (cv->TourCrt == 0)
     {
      LabelLigne->Caption="Ligne";
      LabelLigne->Left=LabelLigne->Left+8;
@@ -60,28 +69,30 @@ void TfrmParamTram::FormShow(TObject *Sender)
    LabelRqCochesLignesTram->Visible=(cv->TourCrt>0);
    for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
     {
-     if (cv->NbArretsTram<NBMAXARRETSBUSTRAMPARLIGNE)
-      ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->MAXVALUE=cv->NbArretsTram;
-     ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Value=cv->LigneTram[i-1].NbArrets;
-     ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Enabled=!cv->TourCrt;
-     ((TCheckBox*)FindComponent("CheckBox"+IntToStr(i)))->Visible=(cv->TourCrt>0)&&(cv->LigneTram[i-1].NbArrets>0);
+     if (cv->NbArretsTram<NBMAXARRETSBUSTRAMPARLIGNE) {
+      (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i))))->MAXVALUE=cv->NbArretsTram;
+}
+     (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i))))->Value=cv->LigneTram[i-1].NbArrets;
+     (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i))))->Enabled=cv->TourCrt == 0;
+     (static_cast<TCheckBox*>(FindComponent("CheckBox"+IntToStr(i))))->Visible=(cv->TourCrt>0)&&(cv->LigneTram[i-1].NbArrets>0);
      for(j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
       {
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->MAXVALUE=cv->NbArretsTram;
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->Value=cv->LigneTram[i-1].NumArret[j-1];
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->Enabled=!cv->TourCrt;
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->MAXVALUE=cv->NbArretsTram;
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->Value=cv->LigneTram[i-1].NumArret[j-1];
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->Enabled=cv->TourCrt == 0;
       }
      asNumLigne=IntToStr(i);
-     Shape=(TShape*)FindComponent("Shape"+asNumLigne);
+     Shape=static_cast<TShape*>(FindComponent("Shape"+asNumLigne));
      Shape->Brush->Color=CoulLigneBusTram[i-1];
      Shape->Pen->Color=CoulLigneBusTram[i-1];
-     ((TLabel*)FindComponent("LabelL"+asNumLigne))->Font->Color=CoulTLigneBusTram[i-1];
+     (static_cast<TLabel*>(FindComponent("LabelL"+asNumLigne)))->Font->Color=CoulTLigneBusTram[i-1];
     }
   }
  else
   {
-   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-    ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Visible=false;
+   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++) {
+    (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i))))->Visible=false;
+}
    AfficheMessage( "Vous devez poser au moins un arrêt de tram sur le réseau pour pouvoir définir le réseau de lignes de tram.",
                    "Impossible de paramétrer le réseau de lignes de tram", tmAvertissement, 0, 0);
   }
@@ -96,28 +107,31 @@ void TfrmParamTram::FormShow(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamTram::CSpinEditChange(TObject *Sender)
 {
- TCSpinEdit *CSpinEdit=(TCSpinEdit*)Sender;
- int i,
-     k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9)),
-     n=CSpinEdit->Value,
-     AncNumArretTramAMontrer;
+ auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
+ int i;
+ int k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
+ int n=CSpinEdit->Value;
+ int AncNumArretTramAMontrer;
  switch(k/10)
   {
    case 0: // Nombre d'arrêts
-           for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++)
-            ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
+           for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++) {
+            (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i))))->Visible=(i<=n);
+}
            break;
    default:// N°d'arrêt de tram
            // v6.0.2 : pendant la frappe, le texte n'est pas réécrit (l'original le remettait à 0 ou au suivant à chaque chiffre) : voir CSpinEditExit
            if ((n<=0)||(n>cv->NbArretsTram)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de ArretTram dans l'original)
-            { if (!CSpinEdit->Frappe()) CSpinEdit->Value=0; }
+            { if (!CSpinEdit->Frappe()) { CSpinEdit->Value=0; 
+}}
            else
             if (!cv->ArretTram[n-1].Defini())
-             { if (!CSpinEdit->Frappe()) CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsTram; }
+             { if (!CSpinEdit->Frappe()) { CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsTram; 
+}}
             else
              if (!InitialisationEnCours)
               {
-			   if ((AncNumArretTramAMontrer=NumArretTramAMontrer))
+			   if ((AncNumArretTramAMontrer=NumArretTramAMontrer) != 0)
                 {
                  NumArretTramAMontrer=0;
                  cv->v[cv->ArretTram[AncNumArretTramAMontrer-1].x]
@@ -130,18 +144,20 @@ void TfrmParamTram::CSpinEditChange(TObject *Sender)
               }
            break;
   }
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+ if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamTram::CSpinEditExit(TObject *Sender)
 { // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
- TCSpinEdit *CSpinEdit=(TCSpinEdit*)Sender;
+ auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
  int n=CSpinEdit->Value;
- if ((n<=0)||(n>cv->NbArretsTram))
+ if ((n<=0)||(n>cv->NbArretsTram)) {
   CSpinEdit->Value=0;
- else
-  if (!cv->ArretTram[n-1].Defini())
+ } else
+  if (!cv->ArretTram[n-1].Defini()) {
    CSpinEdit->Value=1+n%cv->NbArretsTram;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamTram::ButtonAideClick(TObject *Sender)
@@ -152,14 +168,16 @@ void TfrmParamTram::ButtonAideClick(TObject *Sender)
 
 void TfrmParamTram::MenuItemClick(TObject *Sender)
 {
- ((TBitBtn*)FindComponent("BitBtn"+IntToStr(TagDe((TComponent*)Sender))))->Click(); // portage : TComponent::Tag -> TagDe
+ (static_cast<TBitBtn*>(FindComponent("BitBtn"+IntToStr(TagDe(static_cast<TComponent*>(Sender))))))->Click(); // portage : TComponent::Tag -> TagDe
 }
 //---------------------------------------------------------------------------
 
 void TfrmParamTram::BitBtnDirClick(TObject *Sender)
 {
- int n=StrToInt(NomDe((TComponent*)Sender).SubString(7, NomDe((TComponent*)Sender).Length()-6)), // portage : TComponent::Name -> NomDe
-     dx=n/10-2, dy=n%10-2;
+ int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
+ int // portage : TComponent::Name -> NomDe
+     dx=n/10-2;
+ int dy=n%10-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)
@@ -176,11 +194,13 @@ void TfrmParamTram::BitBtnDirClick(TObject *Sender)
  else
   {
    if ((frmSimulation->DrawGridSimul->Col+dx>=0)&&
-       (frmSimulation->DrawGridSimul->Col+dx<frmSimulation->DrawGridSimul->ColCount))
+       (frmSimulation->DrawGridSimul->Col+dx<frmSimulation->DrawGridSimul->ColCount)) {
     frmSimulation->DrawGridSimul->Col+=dx;
+}
    if ((frmSimulation->DrawGridSimul->Row+dy>=0)&&
-       (frmSimulation->DrawGridSimul->Row+dy<frmSimulation->DrawGridSimul->RowCount))
+       (frmSimulation->DrawGridSimul->Row+dy<frmSimulation->DrawGridSimul->RowCount)) {
     frmSimulation->DrawGridSimul->Row+=dy;
+}
   }
 }
 //---------------------------------------------------------------------------
@@ -188,29 +208,33 @@ void TfrmParamTram::BitBtnDirClick(TObject *Sender)
 void TfrmParamTram::TimerClignotementTimer(TObject *Sender)
 {
  TimerClignotement->Tag^=1;
- if (NumArretTramAMontrer)
+ if (NumArretTramAMontrer != 0) {
   cv->v[cv->ArretTram[NumArretTramAMontrer-1].x]
        [cv->ArretTram[NumArretTramAMontrer-1].y].RedessineCasesArretTram(indefinie);
+}
 }
 //---------------------------------------------------------------------------
 bool TfrmParamTram::AppliqueChoix()
  {
   AnsiString asMsg;
-  int i, j;
-  TCSpinEdit *CSpinEditNb, *CSpinEditNum;
+  int i;
+  int j;
+  TCSpinEdit *CSpinEditNb;
+  TCSpinEdit *CSpinEditNum;
   // 1. On vérifie que tous les arrêts sont définis
   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
    {
-    CSpinEditNb=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
-    if (CSpinEditNb->Value)
+    CSpinEditNb=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i)));
+    if (CSpinEditNb->Value != 0)
      {
       for(j=1; j<=CSpinEditNb->Value; j++)
        {
-        CSpinEditNum=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
-        if (!CSpinEditNum->Value)
+        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)));
+        if (CSpinEditNum->Value == 0) {
          asMsg= asMsg+
                 Format( " - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
                         ARRAYOFCONST(( j, asOrdre[!(j-1)], i)));
+}
        }
      }
    }
@@ -225,13 +249,13 @@ bool TfrmParamTram::AppliqueChoix()
   cv->InitialiseInfosLignesTram();
   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
    {
-    CSpinEditNb=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
-    if ((cv->LigneTram[i-1].NbArrets=CSpinEditNb->Value))
+    CSpinEditNb=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(i)));
+    if ((cv->LigneTram[i-1].NbArrets=CSpinEditNb->Value) != 0)
      {
       cv->NbLignesTram++;
       for(j=1; j<=CSpinEditNb->Value; j++)
        {
-        CSpinEditNum=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
+        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)));
         cv->LigneTram[i-1].NumArret[j-1]=CSpinEditNum->Value;
         cv->ArretTram[CSpinEditNum->Value-1].AjouteLigneTram(i); // v3.0.5
        }
@@ -251,7 +275,8 @@ bool TfrmParamTram::AppliqueChoix()
 //---------------------------------------------------------------------------
 void TfrmParamTram::ButtonOkClick(TObject *Sender)
 {
- if (AppliqueChoix()) ModalResult=mrOk;
+ if (AppliqueChoix()) { ModalResult=mrOk;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamTram::ButtonAppliquerClick(TObject *Sender)
@@ -264,16 +289,18 @@ void TfrmParamTram::ButtonAppliquerClick(TObject *Sender)
 void TfrmParamTram::CSpinEditParametresChange(
       TObject *Sender)
 {
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+ if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 
 void TfrmParamTram::CheckBoxClick(TObject *Sender)
 {
- if (!CheckBoxTout->Tag)
+ if (CheckBoxTout->Tag == 0)
   {
-   if (((TCheckBox*)Sender)->Checked) // v5.3
+   if ((static_cast<TCheckBox*>(Sender))->Checked) { // v5.3
      WindowState=wsMinimized;
+}
    frmSimulation->DrawGridSimul->Repaint();
   }
 }
@@ -282,11 +309,13 @@ void TfrmParamTram::CheckBoxClick(TObject *Sender)
 void TfrmParamTram::CheckBoxToutClick(TObject *Sender)
 {
  CheckBoxTout->Tag=1;
- for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   ((TCheckBox*)FindComponent("CheckBox"+IntToStr(i+1)))->Checked=(cv->LigneTram[i].NbArrets>0)?CheckBoxTout->Checked:false;
+ for(int i=0; i<NBMAXLIGNESBUSTRAM; i++) {
+   (static_cast<TCheckBox*>(FindComponent("CheckBox"+IntToStr(i+1))))->Checked=(cv->LigneTram[i].NbArrets>0)?CheckBoxTout->Checked:false;
+}
  CheckBoxTout->Tag=0;
- if (CheckBoxTout->Checked) // v5.3
+ if (CheckBoxTout->Checked) { // v5.3
    WindowState=wsMinimized;
+}
  frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -294,8 +323,9 @@ void TfrmParamTram::CheckBoxToutClick(TObject *Sender)
 void TfrmParamTram::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -309,6 +339,7 @@ void TfrmParamTram::ChargeFiche()
   COMPOSANTS_frmParamTram(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmParamTram(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

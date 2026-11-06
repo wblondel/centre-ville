@@ -41,12 +41,14 @@ void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
                                        ARRAYOFCONST((v->NumTram, Tram->x, Tram->y)))+
                                " ";
    }
-  else
+  else {
    RadioButtonAucunTram->Checked=true;
+}
   RadioButtonTramNumero->Enabled=ARendreVisible;
   RadioButtonAucunTram->Enabled=!ARendreVisible;
-  for(i=1; i<16; i++)
-   ((TLabel*)FindComponent("Label"+IntToStr(i)))->Enabled=ARendreVisible;
+  for(i=1; i<16; i++) {
+   (static_cast<TLabel*>(FindComponent("Label"+IntToStr(i))))->Enabled=ARendreVisible;
+}
   LabelDirection->Visible=ARendreVisible;
   LabelNumeroLigne->Visible=ARendreVisible;
   LabelNbPersonnes->Visible=ARendreVisible;
@@ -66,27 +68,27 @@ void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosTram::RafraichitInfos()
  {
-  int i,
-      NbTours,
-      NumDrnArret,
-      NumArretSvt,
-      NbDirPoss,
-      DejaParcouru,
-      ResteAParcourir,
-      DistMin;
+  int i;
+  int NbTours;
+  int NumDrnArret;
+  int NumArretSvt;
+  int NbDirPoss;
+  int DejaParcouru;
+  int ResteAParcourir;
+  int DistMin;
   voie *DrnArret;
   bool Afficher;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
-  Tram=NULL;
+  Tram=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumTram>0)))
    {
 	Tram=cv->Tram+v->NumTram-1;
 	LabelDirection->Caption=asDir[Tram->Dir];
-	LabelNumeroLigne->Caption=AnsiString(char('A'+Tram->NumLigne-1));
-	if ((NumDrnArret=Tram->NumDrnArret))
+	LabelNumeroLigne->Caption=AnsiString(static_cast<char>('A'+Tram->NumLigne-1));
+	if ((NumDrnArret=Tram->NumDrnArret) != 0)
 	 {
 	  LabelDernierArret->Caption=Format( asFrmNumeroCoordonnees[DRN],
                                          ARRAYOFCONST(( NumDrnArret,
@@ -119,16 +121,18 @@ void TfrmInfosTram::RafraichitInfos()
     LabelParcoursEntreArrets->Caption=IntToStr(DejaParcouru=Tram->NbCasesParcouruesDepuisDrnArret);
     LabelDistance->Caption=IntToStr(ResteAParcourir=v->DistArretTram[NumArretSvt-1][v->NumDirPossSensVoieTram(indefinie, Tram->Dir)]);
     NbDirPoss=DrnArret->NbDirPossSensVoieTram(indefinie);
-    for(i=0, DistMin=DIST_INDEFINIE; i<NbDirPoss; i++)
+    for(i=0, DistMin=DIST_INDEFINIE; i<NbDirPoss; i++) {
      DistMin=min(DistMin, DrnArret->DistArretTram[NumArretSvt-1][i]);
+}
 	LabelDistanceMin->Caption=IntToStr(DistMin);
 	// v1.8.4 : FormatFloat au lieu de Format
 	LabelParcoursEffectue->Caption=FormatFloat(asFrmPourcentage, (100.0*DejaParcouru)/(DejaParcouru+ResteAParcourir));
 	LabelDetour->Caption=FormatFloat(asFrmPourcentage, (100.0*(DejaParcouru+ResteAParcourir))/DistMin-100.0);
-	if (NbTours)
+	if (NbTours != 0) {
 	 LabelAttente->Caption=FormatFloat(asFrmPourcentage, (100.0*(NbTours-DejaParcouru))/NbTours);
-    else
+    } else {
      LabelAttente->Caption="0,000%";
+}
     LabelVitesse->Caption=Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
    }
   RendreVisibleInfos(Afficher);
@@ -159,8 +163,9 @@ void TfrmInfosTram::ButtonAideClick(TObject *Sender)
 void TfrmInfosTram::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -174,6 +179,7 @@ void TfrmInfosTram::ChargeFiche()
   COMPOSANTS_frmInfosTram(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmInfosTram(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

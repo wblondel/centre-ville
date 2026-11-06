@@ -87,7 +87,7 @@ QIcon IconeGlyphe(const QPixmap &Glyphe, int NumGlyphs, qreal Echelle);
 class FicheVclBase
  {
   public:
-  virtual ~FicheVclBase() {}
+  virtual ~FicheVclBase() = default;
   virtual void DefinitModalResult(int mr) = 0;
  };
 //---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ class FicheVclBase
 class ControleVclBase
  {
   public:
-  virtual ~ControleVclBase() {}
+  virtual ~ControleVclBase() = default;
   virtual void PrepareVcl() {}
  };
 //---------------------------------------------------------------------------
@@ -125,28 +125,29 @@ template <class B> class ControleVcl : public B, public ControleVclBase
    {
     QWidget *w=this;
     FocusAuClic(w);
-    Name.Definit([w]() { return A(w->objectName()); }, [w](const AnsiString &as) { w->setObjectName(Q(as)); });
+    Name.Definit([w] { return A(w->objectName()); }, [w](const AnsiString &as) { w->setObjectName(Q(as)); });
     // Color et Font->Color : mêmes propriétés « vclColor »/« vclFontColor » que le .ui (PrepareVcl)
-    Color.Definit([w]() { return w->property("vclColor").isValid()?CouleurDepuisTexte(A(w->property("vclColor").toString())):clBtnFace; },
+    Color.Definit([w] { return w->property("vclColor").isValid()?CouleurDepuisTexte(A(w->property("vclColor").toString())):clBtnFace; },
                   [w](const TColor &c) { DefinitCouleurControle(w, "vclColor", c); });
-    Font->Color.Definit([w]() { return w->property("vclFontColor").isValid()?CouleurDepuisTexte(A(w->property("vclFontColor").toString())):clWindowText; },
+    Font->Color.Definit([w] { return w->property("vclFontColor").isValid()?CouleurDepuisTexte(A(w->property("vclFontColor").toString())):clWindowText; },
                         [w](const TColor &c) { DefinitCouleurControle(w, "vclFontColor", c); });
-    Left.Definit([w]() { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
-    Top.Definit([w]() { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
-    Width.Definit([w]() { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
-    Height.Definit([w]() { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
-    Tag.Definit([w]() { return w->property("vclTag").toInt(); },
+    Left.Definit([w] { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
+    Top.Definit([w] { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });
+    Width.Definit([w] { return w->width(); }, [w](const int &v) { w->resize(v, w->height()); });
+    Height.Definit([w] { return w->height(); }, [w](const int &v) { w->resize(w->width(), v); });
+    Tag.Definit([w] { return w->property("vclTag").toInt(); },
                 [w](const int &v) { w->setProperty("vclTag", v); });
     // Visible et Enabled de la VCL : l'état propre du contrôle, pas celui hérité des parents
-    Visible.Definit([w]() { return !w->isHidden(); }, [w](const bool &v) { w->setVisible(v); });
-    Enabled.Definit([w]() { return !w->testAttribute(Qt::WA_ForceDisabled); },
+    Visible.Definit([w] { return !w->isHidden(); }, [w](const bool &v) { w->setVisible(v); });
+    Enabled.Definit([w] { return !w->testAttribute(Qt::WA_ForceDisabled); },
                     [w](const bool &v) { w->setEnabled(v); });
-    Hint.Definit([w]() { return A(w->statusTip()); },
+    Hint.Definit([w] { return A(w->statusTip()); },
                  [w](const AnsiString &as) { w->setStatusTip(Q(as)); w->setToolTip(Q(as)); });
    }
   // TControl::Repaint : dessin immédiat, sauf pendant le dessin d'un autre
   // contrôle (RafraichitActionsEdition depuis OnDrawCell) : dessin différé
-  void Repaint() { if (TCanvas::NbDessinsEnCours) B::update(); else B::repaint(); }
+  void Repaint() { if (TCanvas::NbDessinsEnCours != 0) { B::update(); } else { B::repaint(); 
+}}
   void SetFocus() { B::setFocus(); }
   bool Focused() const { return B::hasFocus(); }
   void PrepareVcl() override; // police, couleurs, curseur
@@ -355,16 +356,16 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
       Cellule(TStringGrid *gg, int cc, int rr) : g(gg), c(cc), r(rr) {}
       operator AnsiString() const { return g->LitCellule(c, r); }
       Cellule &operator=(const AnsiString &as) { g->EcritCellule(c, r, as); return *this; }
-      Cellule &operator=(const Cellule &x) { g->EcritCellule(c, r, (AnsiString)x); return *this; }
+      Cellule &operator=(const Cellule &x) { g->EcritCellule(c, r, AnsiString(x)); return *this; }
      };
-    Cellule operator[](int r) { return Cellule(g, c, r); }
+    Cellule operator[](int r) { return {g, c, r}; }
    };
   class Cellules
    {
     TStringGrid *g;
     public:
     explicit Cellules(TStringGrid *gg) : g(gg) {}
-    Colonne operator[](int c) { return Colonne(g, c); }
+    Colonne operator[](int c) { return {g, c}; }
    } Cells;
   class Tailles
    { // ColWidths[i], RowHeights[i]
@@ -378,7 +379,7 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
       Taille &operator=(int v) { g->EcritTaille(Colonnes, i, v); return *this; }
      };
     Tailles(TStringGrid *gg, bool c) : g(gg), Colonnes(c) {}
-    Taille operator[](int i) { return Taille(g, Colonnes, i); }
+    Taille operator[](int i) { return {g, Colonnes, i}; }
    } ColWidths, RowHeights;
   Propriete<int> ColCount, RowCount, FixedCols, FixedRows, DefaultColWidth, DefaultRowHeight,
                  GridLineWidth, Col, Row, LeftCol, TopRow;
@@ -389,7 +390,8 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
   void EcritCellule(int c, int r, const AnsiString &as);
   void EcritTaille(bool Colonne, int i, int Taille);
   TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
-  void Repaint() { if (TCanvas::NbDessinsEnCours) viewport()->update(); else viewport()->repaint(); }
+  void Repaint() { if (TCanvas::NbDessinsEnCours != 0) { viewport()->update(); } else { viewport()->repaint(); 
+}}
   void PrepareVcl() override;
   protected:
   void paintEvent(QPaintEvent *e) override;
@@ -412,8 +414,8 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
   int CumulMolette=0;
   void DefinitColonnes(int n);
   void DefinitLignes(int n);
-  int Largeur(int c) const { return ((c>=0)&&(c<(int)Largeurs.size()))?Largeurs[(std::size_t)c]:LargeurDefaut; }
-  int Hauteur(int r) const { return ((r>=0)&&(r<(int)Hauteurs.size()))?Hauteurs[(std::size_t)r]:HauteurDefaut; }
+  int Largeur(int c) const { return ((c>=0)&&(c<static_cast<int>(Largeurs.size())))?Largeurs[static_cast<std::size_t>(c)]:LargeurDefaut; }
+  int Hauteur(int r) const { return ((r>=0)&&(r<static_cast<int>(Hauteurs.size())))?Hauteurs[static_cast<std::size_t>(r)]:HauteurDefaut; }
   int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
   int DebutLigne(int r) const;
   void MetAJourDefilement();

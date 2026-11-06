@@ -140,6 +140,7 @@
 #include <thread>
 #ifndef _WIN32
  #include <csignal>
+#include <utility>
  #include <sys/resource.h>
 #endif
 #include "application.h"
@@ -206,40 +207,46 @@ namespace
   bool CaseLibre(int x, int y)
    {
     voie &v=cv->v[(x+cv->NbX)%cv->NbX][(y+cv->NbY)%cv->NbY];
-    return !v.DirPoss&&!v.SensVoieTram&&!NATURE(&v)&&!v.NumParking&&!v.NumArretBus&&!v.NumArretTram&&
-           !v.NumPlaceTaxi&&!v.NumPlacePark&&!v.NumPlaceVehlib&&!v.PassagePietons&&!v.EstDepotBus()&&
-           !v.NumFeu[0]&&!v.NumFeu[1]&&!v.NumFeu[2]&&!v.NumFeu[3]&&
-           !v.NumFeuP[0]&&!v.NumFeuP[1]&&!v.NumFeuP[2]&&!v.NumFeuP[3];
+    return (v.DirPoss == 0)&&(v.SensVoieTram == 0)&&!NATURE(&v)&&(v.NumParking == 0)&&(v.NumArretBus == 0)&&(v.NumArretTram == 0)&&
+           (v.NumPlaceTaxi == 0)&&(v.NumPlacePark == 0)&&(v.NumPlaceVehlib == 0)&&!v.PassagePietons&&!v.EstDepotBus()&&
+           (v.NumFeu[0] == 0)&&(v.NumFeu[1] == 0)&&(v.NumFeu[2] == 0)&&(v.NumFeu[3] == 0)&&
+           (v.NumFeuP[0] == 0)&&(v.NumFeuP[1] == 0)&&(v.NumFeuP[2] == 0)&&(v.NumFeuP[3] == 0);
    }
   //-------------------------------------------------------------------------
   // Zone libre de l à h cases entourée d'une marge libre, en haut à gauche de
   // la carte (visible sans défilement), hors des zones déjà prises
   bool ZoneLibre(int l, int h, int &xz, int &yz, const std::vector<QRect> &Prises={})
    {
-    for(int y=1; y+h<24; y++)
+    for(int y=1; y+h<24; y++) {
      for(int x=1; x+l<36; x++)
       {
        QRect r(x-1, y-1, l+2, h+2);
        bool Ok=true;
-       for(const QRect &p : Prises) Ok=Ok&&!p.intersects(r);
-       for(int i=-1; Ok&&(i<=l); i++)
-        for(int j=-1; Ok&&(j<=h); j++)
+       for(const QRect &p : Prises) { Ok=Ok&&!p.intersects(r);
+}
+       for(int i=-1; Ok&&(i<=l); i++) {
+        for(int j=-1; Ok&&(j<=h); j++) {
          Ok=CaseLibre(x+i, y+j);
+}
+}
        if (Ok) { xz=x; yz=y; return true; }
       }
+}
     return false;
    }
   //-------------------------------------------------------------------------
   int NbFeuxPietonsDefinis()
    {
     int n=0;
-    for(int i=0; i<cv->NbFeuxPieton; i++) n+=cv->FeuP[i].Defini();
+    for(int i=0; i<cv->NbFeuxPieton; i++) { n+=static_cast<int>(cv->FeuP[i].Defini());
+}
     return n;
    }
   int NbFeuxDefinis()
    {
     int n=0;
-    for(int i=0; i<cv->NbFeux; i++) n+=cv->Feu[i].Defini();
+    for(int i=0; i<cv->NbFeux; i++) { n+=static_cast<int>(cv->Feu[i].Defini());
+}
     return n;
    }
   //-------------------------------------------------------------------------
@@ -282,42 +289,52 @@ namespace
   QStringList EcartsCarrefour(const BoutonCarrefour &b, int xd, int yd, int NbFeuxAvant)
    {
     QStringList Ecarts;
-    const int dxc[NBDIR+1]={0, 0, 1, 0, -1}, dyc[NBDIR+1]={0, -1, 0, 1, 0};
+    const int dxc[NBDIR+1]={0, 0, 1, 0, -1};
+    const int dyc[NBDIR+1]={0, -1, 0, 1, 0};
     const QString Nom=QString::fromUtf8(b.Nom)+" : ";
     auto Dedans=[&](int x, int y) { return (x>=xd)&&(x<xd+b.Colonnes)&&(y>=yd)&&(y<yd+b.Lignes); };
     auto Case=[](int x, int y) -> voie & { return cv->v[x][y]; };
     struct Entree { int x, y, d; };
     std::vector<Entree> Entrees;
     QSet<QString> Sorties;
-    for(int x=xd; x<xd+b.Colonnes; x++)
+    for(int x=xd; x<xd+b.Colonnes; x++) {
      for(int y=yd; y<yd+b.Lignes; y++)
       {
        const int p=Case(x, y).DirPoss;
        bool Rejointe=false;
        for(int d=nord; d<=ouest; d++)
         {
-         const int xs=x+dxc[d], ys=y+dyc[d], xp=x-dxc[d], yp=y-dyc[d];
-         if (p&PossDir[d])
+         const int xs=x+dxc[d];
+         const int ys=y+dyc[d];
+         const int xp=x-dxc[d];
+         const int yp=y-dyc[d];
+         if ((p&PossDir[d]) != 0)
           {
-           if (!Dedans(xs, ys)) Sorties<<QString("%1,%2,%3").arg(x).arg(y).arg(d);
-           else if (!Case(xs, ys).DirPoss) Ecarts<<Nom+QString("impasse en (%1, %2) vers %3").arg(x).arg(y).arg(d);
+           if (!Dedans(xs, ys)) { Sorties<<QString("%1,%2,%3").arg(x).arg(y).arg(d);
+           } else if (Case(xs, ys).DirPoss == 0) { Ecarts<<Nom+QString("impasse en (%1, %2) vers %3").arg(x).arg(y).arg(d);
+}
           }
-         Rejointe=Rejointe||(Dedans(xp, yp)&&(Case(xp, yp).DirPoss&PossDir[d]));
+         Rejointe=Rejointe||(Dedans(xp, yp)&&((Case(xp, yp).DirPoss&PossDir[d]) != 0));
         }
-       if (p&&!Rejointe)
+       if ((p != 0)&&!Rejointe)
         { // Entrée : une seule direction, depuis le bord de la zone
          int d=nord;
-         while ((d<ouest)&&(p!=PossDir[d])) d++;
-         if ((p!=PossDir[d])||Dedans(x-dxc[d], y-dyc[d]))
+         while ((d<ouest)&&(p!=PossDir[d])) { d++;
+}
+         if ((p!=PossDir[d])||Dedans(x-dxc[d], y-dyc[d])) {
           Ecarts<<Nom+QString("entrée (%1, %2) de directions %3").arg(x).arg(y).arg(p);
-         else
+         } else {
           Entrees.push_back({x, y, d});
+}
         }
       }
+}
     int Sens=aucune;
-    for(const Entree &e : Entrees) Sens|=PossDir[e.d];
-    if ((Sens!=b.Entrees)||((int)Entrees.size()!=NbDir[b.Entrees])||(Sorties.size()!=(int)Entrees.size()))
-     Ecarts<<Nom+QString("%1 entrées de sens %2 au lieu de %3, %4 sorties").arg(Entrees.size()).arg(Sens).arg((int)b.Entrees).arg(Sorties.size());
+    for(const Entree &e : Entrees) { Sens|=PossDir[e.d];
+}
+    if ((Sens!=b.Entrees)||(static_cast<int>(Entrees.size())!=NbDir[b.Entrees])||(Sorties.size()!=static_cast<int>(Entrees.size()))) {
+     Ecarts<<Nom+QString("%1 entrées de sens %2 au lieu de %3, %4 sorties").arg(Entrees.size()).arg(Sens).arg(static_cast<int>(b.Entrees)).arg(Sorties.size());
+}
     for(const Entree &e : Entrees)
      { // Sorties atteintes depuis l'entrée
       QSet<QString> Atteintes;
@@ -327,52 +344,72 @@ namespace
        {
         const QPoint c=File.front();
         File.pop_front();
-        for(int d=nord; d<=ouest; d++)
-         if (Case(c.x(), c.y()).DirPoss&PossDir[d])
+        for(int d=nord; d<=ouest; d++) {
+         if ((Case(c.x(), c.y()).DirPoss&PossDir[d]) != 0)
           {
-           const int xs=c.x()+dxc[d], ys=c.y()+dyc[d];
-           if (!Dedans(xs, ys)) Atteintes<<QString("%1,%2,%3").arg(c.x()).arg(c.y()).arg(d);
-           else if (!Vues.contains(xs*1000+ys)) { Vues<<xs*1000+ys; File.push_back(QPoint(xs, ys)); }
+           const int xs=c.x()+dxc[d];
+           const int ys=c.y()+dyc[d];
+           if (!Dedans(xs, ys)) { Atteintes<<QString("%1,%2,%3").arg(c.x()).arg(c.y()).arg(d);
+           } else if (!Vues.contains(xs*1000+ys)) { Vues<<xs*1000+ys; File.emplace_back(xs, ys); }
           }
+}
        }
-      if (Atteintes!=Sorties)
+      if (Atteintes!=Sorties) {
        Ecarts<<Nom+QString("depuis l'entrée (%1, %2), %3 sorties sur %4").arg(e.x).arg(e.y).arg(Atteintes.size()).arg(Sorties.size());
+}
      }
     // Priorités : seulement aux entrées ; un feu par entrée s'il y en a
     std::map<int, int> NumFeu; // sens d'une entrée -> numéro de son feu
-    for(int x=xd; x<xd+b.Colonnes; x++)
-     for(int y=yd; y<yd+b.Lignes; y++)
+    for(int x=xd; x<xd+b.Colonnes; x++) {
+     for(int y=yd; y<yd+b.Lignes; y++) {
       for(int d=nord; d<=ouest; d++)
        {
         bool EstEntree=false;
-        for(const Entree &e : Entrees) EstEntree=EstEntree||((e.x==x)&&(e.y==y)&&(e.d==d));
-        const int Attendue=EstEntree?(b.Feux?feux:cedez_le_passage):a_droite, n=Case(x, y).NumFeu[d-1];
-        if (Case(x, y).Priorite[d-1]!=Attendue)
-         Ecarts<<Nom+QString("priorité %1 en (%2, %3) vers %4").arg((int)Case(x, y).Priorite[d-1]).arg(x).arg(y).arg(d);
+        for(const Entree &e : Entrees) { EstEntree=EstEntree||((e.x==x)&&(e.y==y)&&(e.d==d));
+}
+        const int Attendue=EstEntree?(b.Feux?feux:cedez_le_passage):a_droite;
+        const int n=Case(x, y).NumFeu[d-1];
+        if (Case(x, y).Priorite[d-1]!=Attendue) {
+         Ecarts<<Nom+QString("priorité %1 en (%2, %3) vers %4").arg(static_cast<int>(Case(x, y).Priorite[d-1])).arg(x).arg(y).arg(d);
+}
         if (EstEntree&&b.Feux)
          {
-          if ((n<1)||(n>cv->NbFeux)||(cv->Feu[n-1].x!=x)||(cv->Feu[n-1].y!=y)||(cv->Feu[n-1].Dir!=d))
+          if ((n<1)||(n>cv->NbFeux)||(cv->Feu[n-1].x!=x)||(cv->Feu[n-1].y!=y)||(cv->Feu[n-1].Dir!=d)) {
            Ecarts<<Nom+QString("feu %1 de l'entrée (%2, %3)").arg(n).arg(x).arg(y);
-          else
+          } else {
            NumFeu[d]=n;
+}
          }
-        else if (n)
+        else if (n != 0) {
          Ecarts<<Nom+QString("feu %1 en (%2, %3) vers %4").arg(n).arg(x).arg(y).arg(d);
+}
        }
-    if (NbFeuxDefinis()!=NbFeuxAvant+(b.Feux?(int)Entrees.size():0))
-     Ecarts<<Nom+QString("%1 feux au lieu de %2").arg(NbFeuxDefinis()).arg(NbFeuxAvant+(b.Feux?(int)Entrees.size():0));
-    if (!b.Feux||(NumFeu.size()!=Entrees.size())) return Ecarts;
+}
+}
+    if (NbFeuxDefinis()!=NbFeuxAvant+(b.Feux?static_cast<int>(Entrees.size()):0)) {
+     Ecarts<<Nom+QString("%1 feux au lieu de %2").arg(NbFeuxDefinis()).arg(NbFeuxAvant+(b.Feux?static_cast<int>(Entrees.size()):0));
+}
+    if (!b.Feux||(NumFeu.size()!=Entrees.size())) { return Ecarts;
+}
     for(const auto &[d, n] : NumFeu)
      {
       const feu &f=cv->Feu[n-1];
-      const etat_feu Etat=(b.Vertes&PossDir[d])?vert:rouge;
-      if (f.Etat!=Etat) Ecarts<<Nom+QString("feu %1 (sens %2) : état %3 au lieu de %4").arg(n).arg(d).arg((int)f.Etat).arg((int)Etat);
-      QSet<int> Conflits, Dmd, Att;
-      for(const auto &[d2, n2] : NumFeu) if ((d2-d)%2) Conflits<<n2;
-      for(int i=0; i<f.NbFeuxDmd; i++) Dmd<<f.NumFeuxDmd[i];
-      for(int i=0; i<f.NbFeuxAtt; i++) Att<<f.NumFeuxAtt[i];
-      if ((Dmd!=Conflits)||(Att!=Conflits)||(f.NbFeuxDmd!=Conflits.size())||(f.NbFeuxAtt!=Conflits.size()))
+      const etat_feu Etat=((b.Vertes&PossDir[d]) != 0)?vert:rouge;
+      if (f.Etat!=Etat) { Ecarts<<Nom+QString("feu %1 (sens %2) : état %3 au lieu de %4").arg(n).arg(d).arg(static_cast<int>(f.Etat)).arg(static_cast<int>(Etat));
+}
+      QSet<int> Conflits;
+      QSet<int> Dmd;
+      QSet<int> Att;
+      for(const auto &[d2, n2] : NumFeu) { if (((d2-d)%2) != 0) { Conflits<<n2;
+}
+}
+      for(int i=0; i<f.NbFeuxDmd; i++) { Dmd<<f.NumFeuxDmd[i];
+}
+      for(int i=0; i<f.NbFeuxAtt; i++) { Att<<f.NumFeuxAtt[i];
+}
+      if ((Dmd!=Conflits)||(Att!=Conflits)||(f.NbFeuxDmd!=Conflits.size())||(f.NbFeuxAtt!=Conflits.size())) {
        Ecarts<<Nom+QString("feu %1 (sens %2) : listes de %3 et %4 feux").arg(n).arg(d).arg(f.NbFeuxDmd).arg(f.NbFeuxAtt);
+}
      }
     return Ecarts;
    }
@@ -386,10 +423,10 @@ namespace
     bool Termine=false;
     std::thread Fil;
     public:
-    LimiteDeTemps(const char *Quoi, int Secondes) : Fil([this, Quoi, Secondes]()
+    LimiteDeTemps(const char *Quoi, int Secondes) : Fil([this, Quoi, Secondes]
      {
       std::unique_lock<std::mutex> v(Verrou);
-      if (!Fin.wait_for(v, std::chrono::seconds(Secondes), [this]() { return Termine; }))
+      if (!Fin.wait_for(v, std::chrono::seconds(Secondes), [this] { return Termine; }))
        {
         std::fprintf(stderr, "FAIL! : blocage de plus de %d s : %s\n", Secondes, Quoi);
         std::fflush(stderr);
@@ -423,7 +460,8 @@ namespace
     QTemporaryDir Dossier;
     QString f=Dossier.path()+"/reseau.cvw";
     int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
-    if (hfile==-1) return QByteArray();
+    if (hfile==-1) { return {};
+}
     bool Ok=cv->Sauve(hfile);
     FileClose(hfile);
     return Ok?Contenu(f):QByteArray();
@@ -433,12 +471,18 @@ namespace
   QString EmpreinteSimulation()
    {
     QString e=QString("%1 %2 %3:").arg(cv->TourCrt).arg(cv->NbVehiculesSortis).arg(cv->NbVehiculesArrives);
-    for(int i=0; i<cv->NbVehicules; i++) e+=QString(" %1,%2").arg(cv->Vehicule[i].x).arg(cv->Vehicule[i].y);
-    for(int i=0; i<cv->NbPietons; i++) e+=QString(" %1,%2").arg(cv->Pieton[i].x).arg(cv->Pieton[i].y);
-    for(int i=0; i<cv->NbBus; i++) e+=QString(" %1,%2").arg(cv->Bus[i].x).arg(cv->Bus[i].y);
-    for(int i=0; i<cv->NbTrams; i++) e+=QString(" %1,%2").arg(cv->Tram[i].x).arg(cv->Tram[i].y);
-    for(int i=0; i<cv->NbTaxis; i++) e+=QString(" %1,%2").arg(cv->Taxi[i].x).arg(cv->Taxi[i].y);
-    for(int i=0; i<cv->NbVehlibs; i++) e+=QString(" %1,%2").arg(cv->Vehlib[i].x).arg(cv->Vehlib[i].y);
+    for(int i=0; i<cv->NbVehicules; i++) { e+=QString(" %1,%2").arg(cv->Vehicule[i].x).arg(cv->Vehicule[i].y);
+}
+    for(int i=0; i<cv->NbPietons; i++) { e+=QString(" %1,%2").arg(cv->Pieton[i].x).arg(cv->Pieton[i].y);
+}
+    for(int i=0; i<cv->NbBus; i++) { e+=QString(" %1,%2").arg(cv->Bus[i].x).arg(cv->Bus[i].y);
+}
+    for(int i=0; i<cv->NbTrams; i++) { e+=QString(" %1,%2").arg(cv->Tram[i].x).arg(cv->Tram[i].y);
+}
+    for(int i=0; i<cv->NbTaxis; i++) { e+=QString(" %1,%2").arg(cv->Taxi[i].x).arg(cv->Taxi[i].y);
+}
+    for(int i=0; i<cv->NbVehlibs; i++) { e+=QString(" %1,%2").arg(cv->Vehlib[i].x).arg(cv->Vehlib[i].y);
+}
     return e;
    }
   //-------------------------------------------------------------------------
@@ -448,7 +492,7 @@ namespace
    }
   void ChoisitFichier(const QString &asFichier)
    {
-    QFileDialog *d=qobject_cast<QFileDialog *>(QApplication::activeModalWidget());
+    auto *d=qobject_cast<QFileDialog *>(QApplication::activeModalWidget());
     // (selectFile n'écrit pas dans le champ du nom quand celui-ci a le focus)
     d->findChild<QLineEdit *>("fileNameEdit")->setText(asFichier);
     QMetaObject::invokeMethod(d, "accept"); // créneau protégé
@@ -477,8 +521,9 @@ namespace
      {
       getrlimit(RLIMIT_FSIZE, &Ancienne);
       AncienSignal=std::signal(SIGXFSZ, SIG_IGN);
-      if (Etape.isEmpty()) Pose();
-      else frmSimulation->StatusBar->installEventFilter(this);
+      if (Etape.isEmpty()) { Pose();
+      } else { frmSimulation->StatusBar->installEventFilter(this);
+}
      }
     ~LimiteFichiers() override
      {
@@ -487,7 +532,8 @@ namespace
      }
     bool eventFilter(QObject *o, QEvent *e) override
      {
-      if ((e->type()==QEvent::Paint)&&(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)==Etape)) Pose();
+      if ((e->type()==QEvent::Paint)&&(Q(frmSimulation->StatusBar->Panels->Items[0]->Text)==Etape)) { Pose();
+}
       return QObject::eventFilter(o, e);
      }
    };
@@ -514,7 +560,8 @@ class TestInterface : public QObject
    }
   void CaptureFiche(QWidget *Fiche, const QString &asNom)
    {
-    if (DossierCaptures.isEmpty()) return;
+    if (DossierCaptures.isEmpty()) { return;
+}
     QDir().mkpath(DossierCaptures);
     QApplication::processEvents();
     QVERIFY(Fiche->grab().save(DossierCaptures+"/"+asNom));
@@ -522,10 +569,11 @@ class TestInterface : public QObject
   void Clique(QWidget *w)
    { // Cases à cocher et boutons radio : clic à l'extrémité droite, hors du
      // texte (la VCL y réagit ; Qt, seulement sur la case et le texte)
-    if (qobject_cast<QCheckBox *>(w)||qobject_cast<QRadioButton *>(w))
+    if (qobject_cast<QCheckBox *>(w)||qobject_cast<QRadioButton *>(w)) {
      QTest::mouseClick(w, Qt::LeftButton, Qt::KeyboardModifiers(), QPoint(w->width()-3, w->height()/2));
-    else
+    } else {
      QTest::mouseClick(w, Qt::LeftButton);
+}
    }
   void Touche(QWidget *w, Qt::Key Touche)
    { // Touche frappée dans le contrôle actif (qui reçoit le clavier)
@@ -535,7 +583,7 @@ class TestInterface : public QObject
    }
   void CliqueChoix(TRadioGroup *g, int i)
    { // Clic sur le i-ème bouton d'un TRadioGroup (<Nom>_<i> créés par dfm2ui)
-    QRadioButton *b=g->findChild<QRadioButton *>(g->objectName()+"_"+QString::number(i));
+    auto *b=g->findChild<QRadioButton *>(g->objectName()+"_"+QString::number(i));
     QVERIFY(b);
     Clique(b);
    }
@@ -571,7 +619,8 @@ class TestInterface : public QObject
    { // Copie neuve de maps/Démo.cvw, ouverte
     QString f=QFileInfo(Carte).absolutePath()+"/"+asNom;
     QFile::remove(f);
-    if (!QFile::copy(ArgumentsTest.value(2), f)) return QString();
+    if (!QFile::copy(ArgumentsTest.value(2), f)) { return {};
+}
     OuvreFichier(f);
     return f;
    }
@@ -582,13 +631,14 @@ class TestInterface : public QObject
    }
   void Capture(const QString &asNom)
    {
-    if (DossierCaptures.isEmpty()) return;
+    if (DossierCaptures.isEmpty()) { return;
+}
     QDir().mkpath(DossierCaptures);
     QVERIFY(frmSimulation->grab().save(DossierCaptures+"/"+asNom));
    }
   bool AttendTour(long Tour, int DelaiMs)
    {
-    return QTest::qWaitFor([Tour]() { return cv&&(cv->TourCrt>=Tour); }, DelaiMs);
+    return QTest::qWaitFor([Tour] { return cv&&(cv->TourCrt>=Tour); }, DelaiMs);
    }
   // Simulation pas à pas : un tic du minuteur de la simulation (TimerSimulTimer,
   // par OnTimer comme le QTimer), puis les événements en attente (dessins), comme
@@ -600,27 +650,30 @@ class TestInterface : public QObject
     QApplication::processEvents();
    }
   // Tours joués jusqu'à ce que Fin() soit vraie (au plus NbMax tours)
-  bool JoueTours(std::function<bool()> Fin, int NbMax)
+  bool JoueTours(const std::function<bool()>& Fin, int NbMax)
    {
-    for(int i=0; (i<NbMax)&&!Fin()&&frmSimulation->SimulationEnCours; i++) JoueTour();
+    for(int i=0; (i<NbMax)&&!Fin()&&frmSimulation->SimulationEnCours; i++) { JoueTour();
+}
     return Fin();
    }
   bool JoueJusquAuTour(long Tour)
    {
-    return JoueTours([Tour]() { return cv->TourCrt>=Tour; }, 10000);
+    return JoueTours([Tour] { return cv->TourCrt>=Tour; }, 10000);
    }
   // Arrêt et Interruption ne sont traités qu'au tic suivant du minuteur
   // (TypeDemande) : relancé après la demande, son premier tic la traite sans
   // jouer de tour
   void RelanceMinuteur()
    {
-    if (frmSimulation->SimulationEnCours) frmSimulation->TimerSimul->Enabled=true;
+    if (frmSimulation->SimulationEnCours) { frmSimulation->TimerSimul->Enabled=true;
+}
    }
   QString OuvreCarte(const QString &asCarte, const QString &asNom)
    { // Copie neuve de maps/<asCarte>, ouverte
     QString f=QFileInfo(Carte).absolutePath()+"/"+asNom;
     QFile::remove(f);
-    if (!QFile::copy(QFileInfo(ArgumentsTest.value(2)).absolutePath()+"/"+asCarte, f)) return QString();
+    if (!QFile::copy(QFileInfo(ArgumentsTest.value(2)).absolutePath()+"/"+asCarte, f)) { return {};
+}
     OuvreFichier(f);
     return f;
    }
@@ -676,19 +729,27 @@ class TestInterface : public QObject
     cv->DefinitNbPietons(0);
     for(int x0 : {2, 10})
      {
-      const int x1=x0+4, y0=2, y1=6;
-      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
-      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
-      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
-      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+      const int x1=x0+4;
+      const int y0=2;
+      const int y1=6;
+      for(int x=x0; x<x1; x++) { cv->v[x][y0].DirPoss=E;
+}
+      for(int y=y0; y<y1; y++) { cv->v[x1][y].DirPoss=S;
+}
+      for(int x=x1; x>x0; x--) { cv->v[x][y1].DirPoss=O;
+}
+      for(int y=y1; y>y0; y--) { cv->v[x0][y].DirPoss=N;
+}
       cv->AjouteParking(x0+2, y0);
      }
     int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
     bool Ok=(hfile!=-1)&&cv->Sauve(hfile);
-    if (hfile!=-1) FileClose(hfile);
+    if (hfile!=-1) { FileClose(hfile);
+}
     delete cv;
     cv=Precedent;
-    if (!Ok) return QString();
+    if (!Ok) { return {};
+}
     OuvreFichier(f);
     return f;
    }
@@ -706,21 +767,32 @@ class TestInterface : public QObject
     cv->DefinitNbPietons(0);
     for(int x0 : {2, 12})
      {
-      const int x1=x0+6, y0=2, y1=6;
-      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
-      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
-      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
-      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+      const int x1=x0+6;
+      const int y0=2;
+      const int y1=6;
+      for(int x=x0; x<x1; x++) { cv->v[x][y0].DirPoss=E;
+}
+      for(int y=y0; y<y1; y++) { cv->v[x1][y].DirPoss=S;
+}
+      for(int x=x1; x>x0; x--) { cv->v[x][y1].DirPoss=O;
+}
+      for(int y=y1; y>y0; y--) { cv->v[x0][y].DirPoss=N;
+}
      }
-    cv->v[12][4].DirPoss=(dirposs)(N|O); // sortie de la boucle secondaire...
-    for(int x=9; x<12; x++) cv->v[x][4].DirPoss=O; // ... vers la principale
+    cv->v[12][4].DirPoss=static_cast<dirposs>(N|O); // sortie de la boucle secondaire...
+    for(int x=9; x<12; x++) { cv->v[x][4].DirPoss=O; // ... vers la principale
+}
     cv->AjouteParking(4, 2);
     cv->AjouteParking(4, 6);
     for(int x0 : {2, 12})
      { // anneau de voies de tram de (x0, 8) à (x0+4, 11)
-      const int x1=x0+4, y0=8, y1=11;
-      for(int x=x0+1; x<x1; x++) cv->v[x][y0].SensVoieTram=cv->v[x][y1].SensVoieTram=est_ouest;
-      for(int y=y0+1; y<y1; y++) cv->v[x0][y].SensVoieTram=cv->v[x1][y].SensVoieTram=nord_sud;
+      const int x1=x0+4;
+      const int y0=8;
+      const int y1=11;
+      for(int x=x0+1; x<x1; x++) { cv->v[x][y0].SensVoieTram=cv->v[x][y1].SensVoieTram=est_ouest;
+}
+      for(int y=y0+1; y<y1; y++) { cv->v[x0][y].SensVoieTram=cv->v[x1][y].SensVoieTram=nord_sud;
+}
       cv->v[x0][y0].SensVoieTram=sud_est;
       cv->v[x1][y0].SensVoieTram=sud_ouest;
       cv->v[x1][y1].SensVoieTram=nord_ouest;
@@ -729,10 +801,12 @@ class TestInterface : public QObject
     Ajoute();
     int hfile=FileCreate(A(QDir::toNativeSeparators(f)));
     bool Ok=(hfile!=-1)&&cv->Sauve(hfile);
-    if (hfile!=-1) FileClose(hfile);
+    if (hfile!=-1) { FileClose(hfile);
+}
     delete cv;
     cv=Precedent;
-    if (!Ok) return QString();
+    if (!Ok) { return {};
+}
     OuvreFichier(f);
     return f;
    }
@@ -740,7 +814,7 @@ class TestInterface : public QObject
    { // Arrêt par la barre d'outils : bilan, puis rechargement du réseau
     QTest::mouseClick(frmSimulation->ToolButtonArret, Qt::LeftButton);
     RelanceMinuteur();
-    return QTest::qWaitFor([]() { return !frmSimulation->SimulationEnCours&&!frmSimulation->Pause&&(cv->TourCrt==0); }, 10000);
+    return QTest::qWaitFor([] { return !frmSimulation->SimulationEnCours&&!frmSimulation->Pause&&(cv->TourCrt==0); }, 10000);
    }
   void CliqueCase(int x, int y)
    { // Clic de l'utilisateur sur la case (x, y), amenée dans la vue, puis le
@@ -753,25 +827,27 @@ class TestInterface : public QObject
     QTest::mouseClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), QPoint((r.Left+r.Right)/2, (r.Top+r.Bottom)/2));
     g->Repaint();
    }
-  int TrouveCase(std::function<int(voie *)> Numero)
+  int TrouveCase(const std::function<int(voie *)>& Numero)
    { // Premier objet trouvé sur la carte (Numero(v) > 0), cliqué par l'utilisateur
-    for(int y=0; y<cv->NbY; y++)
-     for(int x=0; x<cv->NbX; x++)
+    for(int y=0; y<cv->NbY; y++) {
+     for(int x=0; x<cv->NbX; x++) {
       if (int n=Numero(&cv->v[x][y]))
        {
         Focalise();
         CliqueCase(x, y);
         return n;
        }
+}
+}
     return 0;
    }
   void VerifieFichesDistances(const QString &asCarte, bool Captures);
-  void SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours);
+  void SuitObjet(const char *Type, const std::function<QString(long)>& Ecart, const std::function<bool(int &, int &)>& Position, int NbTours);
   bool DimensionsPilotees=false; // La fiche Dimensions répond par une étape, pas par défaut
   void NouvelleZone(int NbX, int NbY)
    { // Nouveau : zone vide, sans génération ni paramètres, sans enregistrer la précédente
     ReponseQuestions=QMessageBox::No;
-    QuandModale([]() { return frmDimensionsZone; }, [this, NbX, NbY]()
+    QuandModale([] { return frmDimensionsZone; }, [this, NbX, NbY]
      {
       frmDimensionsZone->CSpinEditNbX->Value=NbX;
       frmDimensionsZone->CSpinEditNbY->Value=NbY;
@@ -791,14 +867,16 @@ class TestInterface : public QObject
   void ExecuteSurSelection(int x1, int y1, int x2, int y2, TAction *Action)
    { // Sélection de (x1, y1) à (x2, y2), puis la commande, qui doit être disponible
     Selectionne(x1, y1, x2, y2);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QVERIFY2(Action->Enabled, qPrintable(QString("(%1, %2) - (%3, %4)").arg(x1).arg(y1).arg(x2).arg(y2)));
     Action->Execute();
    }
   void TraceSegment(int x1, int y1, int x2, int y2)
    { // Clic sur le début, Maj+clic sur la fin, puis la commande
     Selectionne(x1, y1, x2, y2);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QCOMPARE(frmSimulation->DrawGridSimul->Col, x1);
     QCOMPARE(frmSimulation->DrawGridSimul->Row, y1);
     QVERIFY(frmSimulation->ActionSegmentRoute->Enabled);
@@ -814,88 +892,102 @@ class TestInterface : public QObject
     std::function<int()> Lu;
     int Cible=0;
    };
-  ChampFiche ChampSpin(const char *Nom, std::function<TCSpinEdit *()> Champ, std::function<int()> Lu)
+  ChampFiche ChampSpin(const char *Nom, const std::function<TCSpinEdit *()>& Champ, std::function<int()> Lu)
    {
     ChampFiche c;
     c.Nom=Nom;
-    c.Min=[Champ]() { return (int)Champ()->MinValue; };
-    c.Max=[Champ]() { return (int)Champ()->MaxValue; };
-    c.Ecran=[Champ]() { return (int)Champ()->Value; };
+    c.Min=[Champ] { return (int)Champ()->MinValue; };
+    c.Max=[Champ] { return (int)Champ()->MaxValue; };
+    c.Ecran=[Champ] { return (int)Champ()->Value; };
     c.Saisit=[Champ](int v) { Champ()->Value=v; };
-    c.Lu=Lu;
+    c.Lu=std::move(Lu);
     return c;
    }
-  ChampFiche ChampRadio(const char *Nom, std::function<TRadioGroup *()> Groupe, std::function<int()> Lu)
+  ChampFiche ChampRadio(const char *Nom, const std::function<TRadioGroup *()>& Groupe, std::function<int()> Lu)
    {
     ChampFiche c;
     c.Nom=Nom;
-    c.Min=[]() { return 0; };
-    c.Max=[Groupe]()
+    c.Min=[] { return 0; };
+    c.Max=[Groupe]
      {
       int n=0;
-      while (Groupe()->findChild<QRadioButton *>(Groupe()->objectName()+"_"+QString::number(n+1))) n++;
+      while (Groupe()->findChild<QRadioButton *>(Groupe()->objectName()+"_"+QString::number(n+1))) { n++;
+}
       return n;
      };
-    c.Ecran=[Groupe]() { return (int)Groupe()->ItemIndex; };
+    c.Ecran=[Groupe] { return (int)Groupe()->ItemIndex; };
     c.Saisit=[this, Groupe](int v) { CliqueChoix(Groupe(), v); };
-    c.Lu=Lu;
+    c.Lu=std::move(Lu);
     return c;
    }
   // Annuler n'écrit rien ; OK écrit chaque champ ; enregistrer et rouvrir garde les valeurs, que
   // la fiche réaffiche. Valeurs différentes entre champs si possible : un champ écrit à la place
   // d'un autre se voit. Dans : ouvre la fiche, y exécute l'action, referme ce qui l'entoure
-  void VerifieChamps(const char *Fiche, const QString &asFichier, std::function<void(std::function<void()>)> Dans,
+  void VerifieChamps(const char *Fiche, const QString &asFichier, const std::function<void(std::function<void()>)>& Dans,
                      std::function<QWidget *()> BoutonOk, std::function<QWidget *()> BoutonAnnuler, std::vector<ChampFiche> Champs)
    {
     QStringList Ecarts;
-    auto Saisit=[&Champs]()
+    auto Saisit=[&Champs]
      {
       QList<int> Prises;
       for(ChampFiche &c : Champs)
        {
-        const int Actuel=c.Ecran(), Min=c.Min(), Max=c.Max();
+        const int Actuel=c.Ecran();
+        const int Min=c.Min();
+        const int Max=c.Max();
         int Choix=Actuel;
         for(int Ecart=1; (Ecart<=Max-Min)&&(Choix==Actuel||Prises.contains(Choix)); Ecart++)
          {
-          if ((Actuel+Ecart<=Max)&&!Prises.contains(Actuel+Ecart)) Choix=Actuel+Ecart;
-          else if ((Actuel-Ecart>=Min)&&!Prises.contains(Actuel-Ecart)) Choix=Actuel-Ecart;
+          if ((Actuel+Ecart<=Max)&&!Prises.contains(Actuel+Ecart)) { Choix=Actuel+Ecart;
+          } else if ((Actuel-Ecart>=Min)&&!Prises.contains(Actuel-Ecart)) { Choix=Actuel-Ecart;
+}
          }
-        if (Choix==Actuel) Choix=(Actuel<Max)?Actuel+1:Actuel-1; // Trop peu de valeurs : la même qu'un autre champ
+        if (Choix==Actuel) { Choix=(Actuel<Max)?Actuel+1:Actuel-1; // Trop peu de valeurs : la même qu'un autre champ
+}
         c.Cible=Choix;
         Prises<<Choix;
         c.Saisit(Choix);
        }
      };
-    auto Compare=[&](const char *Etape, std::function<int(const ChampFiche &)> Attendu, std::function<int(const ChampFiche &)> Obtenu)
+    auto Compare=[&](const char *Etape, const std::function<int(const ChampFiche &)>& Attendu, const std::function<int(const ChampFiche &)>& Obtenu)
      {
-      for(const ChampFiche &c : Champs)
-       if (Obtenu(c)!=Attendu(c))
+      for(const ChampFiche &c : Champs) {
+       if (Obtenu(c)!=Attendu(c)) {
         Ecarts<<QString::fromUtf8("%1, %2, %3 : %4 au lieu de %5").arg(QString::fromUtf8(Fiche), QString::fromUtf8(Etape), QString::fromUtf8(c.Nom))
                                                                   .arg(Obtenu(c)).arg(Attendu(c));
+}
+}
      };
     std::vector<int> Avant;
-    for(const ChampFiche &c : Champs) Avant.push_back(c.Lu());
+    Avant.reserve(Champs.size());
+for(const ChampFiche &c : Champs) { Avant.push_back(c.Lu());
+}
     // Annuler
-    Dans([&]() { Saisit(); Clique(BoutonAnnuler()); });
-    if (QTest::currentTestFailed()) return;
-    for(size_t i=0; i<Champs.size(); i++)
-     if (Champs[i].Lu()!=Avant[i])
+    Dans([&] { Saisit(); Clique(BoutonAnnuler()); });
+    if (QTest::currentTestFailed()) { return;
+}
+    for(size_t i=0; i<Champs.size(); i++) {
+     if (Champs[i].Lu()!=Avant[i]) {
       Ecarts<<QString::fromUtf8("%1, Annuler, %2 : écrit").arg(QString::fromUtf8(Fiche), QString::fromUtf8(Champs[i].Nom));
+}
+}
     // OK
     Messages.clear();
-    Dans([&]() { Saisit(); Clique(BoutonOk()); });
-    if (QTest::currentTestFailed()) return;
+    Dans([&] { Saisit(); Clique(BoutonOk()); });
+    if (QTest::currentTestFailed()) { return;
+}
     Compare("OK", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Lu(); });
     // Enregistrer et rouvrir, puis la fiche réaffiche
     Enregistre(asFichier);
     OuvreFichier(asFichier);
     Compare("réouverture", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Lu(); });
-    Dans([&]()
+    Dans([&]
      {
       Compare("réaffichage", [](const ChampFiche &c) { return c.Cible; }, [](const ChampFiche &c) { return c.Ecran(); });
       Clique(BoutonAnnuler());
      });
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QVERIFY2(Etapes.empty(), Fiche);
     QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
    }
@@ -923,10 +1015,12 @@ class TestInterface : public QObject
   void ReseauAvecFeux()
    { // Zone vide, deux routes, trois feux : (4,8) et (10,8) vers l'est, (8,4) vers le sud
     NouvelleZone(20, 20);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     TraceSegment(2, 8, 14, 8);
     TraceSegment(8, 2, 8, 6);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     PoseFeu(4, 8, frmDefVoie->RadioGroupPrioriteEst);
     PoseFeu(10, 8, frmDefVoie->RadioGroupPrioriteEst);
     PoseFeu(8, 4, frmDefVoie->RadioGroupPrioriteSud);
@@ -991,22 +1085,22 @@ class TestInterface : public QObject
   static std::vector<FicheLignes> FichesLignes()
    {
     return {{"bus", "bus", "Bus", "LabelNbBus", "PDRDB", []() -> TForm * { return frmParamBus; }, &TfrmParamSimul::BitBtnDefLignesBus,
-             [](int n) { return (int)cv->LigneBus[n-1].NbArrets; }, []() { return (int)cv->NbLignesBus; },
+             [](int n) { return cv->LigneBus[n-1].NbArrets; }, [] { return cv->NbLignesBus; },
              [](int n) { return Q(cv->ArretBus[n-1].asListeLignesBus()); },
              [](int n) { return QPoint(cv->ArretBus[n-1].x, cv->ArretBus[n-1].y); },
-             []() { return frmParamBus->NumArretBusAMontrer; }},
+             [] { return frmParamBus->NumArretBusAMontrer; }},
             {"tram", "trams", "Tram", "LabelNbTrams", "PDRDT", []() -> TForm * { return frmParamTram; }, &TfrmParamSimul::BitBtnDefLignesTram,
-             [](int n) { return (int)cv->LigneTram[n-1].NbArrets; }, []() { return (int)cv->NbLignesTram; },
+             [](int n) { return cv->LigneTram[n-1].NbArrets; }, [] { return cv->NbLignesTram; },
              [](int n) { return Q(cv->ArretTram[n-1].asListeLignesTram()); },
              [](int n) { return QPoint(cv->ArretTram[n-1].x, cv->ArretTram[n-1].y); },
-             []() { return frmParamTram->NumArretTramAMontrer; }}};
+             [] { return frmParamTram->NumArretTramAMontrer; }}};
    }
   template<class T> static T *Composant(TForm *Fiche, const QString &Nom) { return (T *)Fiche->FindComponent(A(Nom)); }
   void DansFicheLignes(const FicheLignes &l, const std::function<void(TForm *)> &Action)
    { // Paramètres, la fiche des lignes (Action), puis Annuler dans Paramètres
-    QuandModale([]() { return frmParamSimul; }, [this, &l]() { Clique(frmParamSimul->*l.Bouton); });
-    QuandModale(l.Fiche, [&l, &Action]() { Action(l.Fiche()); }); // étapes jouées pendant Clique
-    QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->ButtonAnnuler); });
+    QuandModale([] { return frmParamSimul; }, [this, &l] { Clique(frmParamSimul->*l.Bouton); });
+    QuandModale(l.Fiche, [&l, &Action] { Action(l.Fiche()); }); // étapes jouées pendant Clique
+    QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
     Clique(frmSimulation->ToolButtonParametres);
    }
   QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
@@ -1023,7 +1117,8 @@ class TestInterface : public QObject
     UrlsOuvertes.clear();
     Touche(Champ, Qt::Key_F1);
     qsizetype NbF1=UrlsOuvertes.size();
-    if (BoutonAide) Clique(BoutonAide);
+    if (BoutonAide) { Clique(BoutonAide);
+}
     QDesktopServices::unsetUrlHandler("file");
     QString Fiche=Champ->window()->objectName();
     QVERIFY2(NbF1==(F1?1:0), qPrintable(QString("%1 : %2 page(s) ouverte(s) par F1").arg(Fiche).arg(NbF1)));
@@ -1031,8 +1126,9 @@ class TestInterface : public QObject
              qPrintable(QString("%1 : %2 page(s) ouverte(s) par le bouton Aide").arg(Fiche).arg(UrlsOuvertes.size()-NbF1)));
     QUrl Rubrique=QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html");
     Rubrique.setFragment(Ancre);
-    for(const QUrl &u : UrlsOuvertes)
+    for(const QUrl &u : UrlsOuvertes) {
      QVERIFY2(AdresseAide(u)==Rubrique, qPrintable(QString("%1 : %2 au lieu de #%3").arg(Fiche, AdresseAide(u).toString(), Ancre)));
+}
    }
   public slots:
   void UrlOuverte(const QUrl &Url) { UrlsOuvertes<<Url; }
@@ -1142,7 +1238,7 @@ void TestInterface::initTestCase()
  {
   // Les boîtes de message reçoivent « Non » (ou OK) et sont mémorisées
   Repondeur.setInterval(20);
-  QObject::connect(&Repondeur, &QTimer::timeout, this, [this]()
+  QObject::connect(&Repondeur, &QTimer::timeout, this, [this]
    {
     QWidget *Modale=QApplication::activeModalWidget();
     if (Modale&&!Etapes.empty()&&(Modale==Etapes.front().Fiche()))
@@ -1155,7 +1251,8 @@ void TestInterface::initTestCase()
      }
     if (frmDimensionsZone&&(Modale==frmDimensionsZone))
      { // Nouveau : dimensions proposées, génération aléatoire, sans les paramètres
-      if (DimensionsPilotees) return; // Une étape vient d'y répondre : la fiche va se fermer
+      if (DimensionsPilotees) { return; // Une étape vient d'y répondre : la fiche va se fermer
+}
       frmDimensionsZone->CheckBoxAfficherParametres->Checked=false;
       frmDimensionsZone->CheckBoxGenererReseau->Checked=true;
       QTest::mouseClick(frmDimensionsZone->ButtonCreer, Qt::LeftButton);
@@ -1166,7 +1263,7 @@ void TestInterface::initTestCase()
       QTest::mouseClick(frmGeneration->ButtonOk, Qt::LeftButton);
       return;
      }
-    QMessageBox *b=qobject_cast<QMessageBox *>(Modale);
+    auto *b=qobject_cast<QMessageBox *>(Modale);
     if (!b)
      { // Fiche modale sans étape prévue : fermée au bout de 10 s (le test échoue sans rester bloqué)
       if (Modale!=ModaleSansReponse) { ModaleSansReponse=Modale; DureeSansReponse.start(); }
@@ -1180,9 +1277,12 @@ void TestInterface::initTestCase()
      }
     Messages<<(b->windowTitle()+" : "+b->text());
     QAbstractButton *r=b->button(ReponseQuestions);
-    if (!r) r=b->button(QMessageBox::Ok);
-    if (!r) r=b->buttons().value(0);
-    if (r) r->click();
+    if (!r) { r=b->button(QMessageBox::Ok);
+}
+    if (!r) { r=b->buttons().value(0);
+}
+    if (r) { r->click();
+}
    });
   Repondeur.start();
   Carte=ArgumentsTest.value(1);
@@ -1197,7 +1297,8 @@ void TestInterface::init()
   Messages.clear();
   ReponseQuestions=QMessageBox::No;
   // Simulation laissée en cours ou en pause par un test en échec : arrêtée
-  if (frmSimulation->SimulationEnCours||frmSimulation->Pause) (void)Arrete();
+  if (frmSimulation->SimulationEnCours||frmSimulation->Pause) { (void)Arrete();
+}
   alea::LibereGraine();
   Messages.clear();
  }
@@ -1218,8 +1319,10 @@ void TestInterface::aProposAuDemarrage()
    { // pixels seulement (QImage::operator== compare aussi l'espace colorimétrique du PNG)
     QImage i=p.toImage().convertToFormat(QImage::Format_ARGB32);
     QList<QRgb> Pixels;
-    for(int y=0; y<i.height(); y++)
-     for(int x=0; x<i.width(); x++) Pixels<<i.pixel(x, y);
+    for(int y=0; y<i.height(); y++) {
+     for(int x=0; x<i.width(); x++) { Pixels<<i.pixel(x, y);
+}
+}
     return QPair<QSize, QList<QRgb>>(i.size(), Pixels);
    };
   QCOMPARE(ImageARGB(ImageDeVersion(5, 4)), ImageARGB(QPixmap(":/images/f_propos/ImageVersion.png")));
@@ -1258,11 +1361,14 @@ void TestInterface::ouvertureParLigneDeCommande()
 //---------------------------------------------------------------------------
 void TestInterface::raccourcisSelonLeMode()
  { // Ctrl+B : « Passage de bus » (menu contextuel d'édition) avant la simulation
-  int x=-1, y=-1;
-  for(int i=0; (x<0)&&(i<cv->NbX); i++)
-   for(int j=0; j<cv->NbY; j++)
-    if (cv->v[i][j].DirPoss&&!cv->v[i][j].PassageBus&&!cv->v[i][j].Priorite[0]&&!cv->v[i][j].NumParking)
+  int x=-1;
+  int y=-1;
+  for(int i=0; (x<0)&&(i<cv->NbX); i++) {
+   for(int j=0; j<cv->NbY; j++) {
+    if ((cv->v[i][j].DirPoss != 0)&&!cv->v[i][j].PassageBus&&(cv->v[i][j].Priorite[0] == 0)&&(cv->v[i][j].NumParking == 0))
      { x=i; y=j; break; }
+}
+}
   QVERIFY(x>=0);
   Focalise();
   frmSimulation->DrawGridSimul->Col=x;
@@ -1335,7 +1441,8 @@ void TestInterface::marcheInterruptionArret()
 void TestInterface::enregistrementIdentique()
  { // Enregistrer, rouvrir, réenregistrer sous un autre nom : mêmes octets
   QString Dossier=QFileInfo(Carte).absolutePath();
-  QString f1=Dossier+"/enregistrement1.cvw", f2=Dossier+"/enregistrement2.cvw";
+  QString f1=Dossier+"/enregistrement1.cvw";
+  QString f2=Dossier+"/enregistrement2.cvw";
   frmSimulation->SaveDialog->FileName=A(QDir::toNativeSeparators(f1));
   frmSimulation->ActionEnregistrer->Execute();
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement effectué."));
@@ -1349,7 +1456,8 @@ void TestInterface::enregistrementIdentique()
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
   frmSimulation->SaveDialog->FileName=A(QDir::toNativeSeparators(f2));
   frmSimulation->ActionEnregistrer->Execute();
-  QByteArray o1=Contenu(f1), o2=Contenu(f2);
+  QByteArray o1=Contenu(f1);
+  QByteArray o2=Contenu(f2);
   QVERIFY(!o1.isEmpty());
   QVERIFY(o1==o2);
   // ... et identique à la conversion de référence de la carte d'origine au format 0x530
@@ -1384,7 +1492,8 @@ void TestInterface::enregistrementImpossible()
   }
   QStringList FichiersAvant=QDir(Dossier).entryList(QDir::Files|QDir::Hidden);
   bool ModifieeAvant=frmSimulation->SimulationModifiee;
-  struct rlimit Ancienne, Limite;
+  struct rlimit Ancienne;
+  struct rlimit Limite;
   QVERIFY(getrlimit(RLIMIT_FSIZE, &Ancienne)==0);
   Limite=Ancienne;
   Limite.rlim_cur=1000;
@@ -1466,14 +1575,17 @@ void TestInterface::verificationApresOuverture()
   std::string Octets=Reference.Octets;
   auto Debut=[&Reference](const std::string &Nom) -> long long
    {
-    for(const champ_cvw &ch : Reference.Champs) if (ch.Nom==Nom) return (long long)ch.Debut;
+    for(const champ_cvw &ch : Reference.Champs) { if (ch.Nom==Nom) { return static_cast<long long>(ch.Debut);
+}
+}
     return -1;
    };
   int NumFeu=1; // premier feu défini (x>=0) : les places libres ne sont pas vérifiées
-  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&(Octets[(std::size_t)d+3]&0x80); NumFeu++);
+  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&((Octets[static_cast<std::size_t>(d)+3]&0x80) != 0); NumFeu++) {;
+}
   const long long DmdVert=Debut("feu"+std::to_string(NumFeu)+".TypeDmdVert");
   QVERIFY(DmdVert>=0);
-  Octets[(std::size_t)DmdVert]=9;
+  Octets[static_cast<std::size_t>(DmdVert)]=9;
   QString f=QFileInfo(Carte).absolutePath()+"/verification.cvw";
   QFile Fichier(f);
   QVERIFY(Fichier.open(QIODevice::WriteOnly|QIODevice::Truncate));
@@ -1497,8 +1609,10 @@ void TestInterface::ouvertureImpossible()
   QString f=OuvreCarte("Démo.cvw", "ouverture.cvw");
   QVERIFY(!f.isEmpty());
   centre_ville *Reseau=cv;
-  AnsiString asTitre=frmSimulation->Caption, asOuvrir=frmSimulation->OpenDialog->FileName, asEnregistrer=frmSimulation->SaveDialog->FileName;
-  auto VerifieReseauGarde=[&]()
+  AnsiString asTitre=frmSimulation->Caption;
+  AnsiString asOuvrir=frmSimulation->OpenDialog->FileName;
+  AnsiString asEnregistrer=frmSimulation->SaveDialog->FileName;
+  auto VerifieReseauGarde=[&]
    {
     QVERIFY(cv==Reseau);
     QCOMPARE(Messages.size(), 1);
@@ -1512,7 +1626,8 @@ void TestInterface::ouvertureImpossible()
   Messages.clear();
   OuvreFichier(QFileInfo(f).absolutePath()+"/inexistant.cvw");
   VerifieReseauGarde();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
 #ifndef _WIN32
   // Fichier sans droit de lecture
   QString Protege=QFileInfo(f).absolutePath()+"/protege.cvw";
@@ -1526,7 +1641,8 @@ void TestInterface::ouvertureImpossible()
       Messages.clear();
       OuvreFichier(Protege);
       VerifieReseauGarde();
-      if (QTest::currentTestFailed()) return;
+      if (QTest::currentTestFailed()) { return;
+}
      }
    }
 #endif
@@ -1551,7 +1667,8 @@ void TestInterface::ouvertureEnEchec()
    {
     QString f=Dossier+"/"+asNom;
     QFile s(f);
-    if (s.open(QIODevice::WriteOnly|QIODevice::Truncate)) s.write(Donnees);
+    if (s.open(QIODevice::WriteOnly|QIODevice::Truncate)) { s.write(Donnees);
+}
     return f;
    };
   QByteArray Futur=Fichier;
@@ -1621,9 +1738,11 @@ void TestInterface::marcheLectureSeuleNonModifie()
 
   QString f=OuvreCarte("Géant.cvw", "lecture_seule.cvw");
   QVERIFY(!f.isEmpty());
-  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  QByteArray Origine=Contenu(f);
+  QByteArray Reseau=OctetsReseau();
   LectureSeule Droits(f);
-  if (!Droits.Effective()) QSKIP("Droits de fichier sans effet (root)");
+  if (!Droits.Effective()) { QSKIP("Droits de fichier sans effet (root)");
+}
   for(int Essai=0; Essai<2; Essai++)
    {
     QVERIFY2(DemarreSansBlocage("Marche, fichier en lecture seule"), qPrintable(Messages.join('\n')));
@@ -1652,21 +1771,26 @@ void TestInterface::marcheLectureSeuleModifie()
  { // Le fichier n'a pas les modifications : question, « Enregistrer sous », sinon pas de démarrage
   QString f=OuvreCarte("Géant.cvw", "lecture_seule_modifie.cvw");
   QVERIFY(!f.isEmpty());
-  QString Dossier=QFileInfo(f).absolutePath(), Copie=Dossier+"/lecture_seule_copie.cvw", Refuse=Dossier+"/lecture_seule_refuse.cvw";
+  QString Dossier=QFileInfo(f).absolutePath();
+  QString Copie=Dossier+"/lecture_seule_copie.cvw";
+  QString Refuse=Dossier+"/lecture_seule_refuse.cvw";
   QFile::remove(Copie);
   QFile::remove(Refuse);
   QVERIFY(QFile::copy(f, Refuse));
   QByteArray Origine=Contenu(f);
-  LectureSeule Droits(f), DroitsRefuse(Refuse);
-  if (!Droits.Effective()) QSKIP("Droits de fichier sans effet (root)");
+  LectureSeule Droits(f);
+  LectureSeule DroitsRefuse(Refuse);
+  if (!Droits.Effective()) { QSKIP("Droits de fichier sans effet (root)");
+}
   cv->AttenteMaxVeh=77; // modification de l'utilisateur
   frmSimulation->SimulationModifiee=true;
   QByteArray Reseau=OctetsReseau();
   AnsiString asNom=frmSimulation->SaveDialog->FileName;
-  auto VerifieNonDemarreModifie=[&]()
+  auto VerifieNonDemarreModifie=[&]
    {
     VerifieNonDemarre(Reseau);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QCOMPARE(cv->AttenteMaxVeh, 77L);
     QVERIFY(frmSimulation->SimulationModifiee);
     QVERIFY(Contenu(f)==Origine);
@@ -1679,7 +1803,8 @@ void TestInterface::marcheLectureSeuleModifie()
     QCOMPARE(Messages.size(), 1);
     QVERIFY2(Messages.first().contains("lecture seule"), qPrintable(Messages.first()));
     VerifieNonDemarreModifie();
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
    }
   // « Oui », boîte annulée
   ReponseQuestions=QMessageBox::Yes;
@@ -1687,16 +1812,18 @@ void TestInterface::marcheLectureSeuleModifie()
   QVERIFY(!DemarreSansBlocage("Marche, fichier en lecture seule modifié, boîte annulée"));
   QVERIFY(Etapes.empty());
   VerifieNonDemarreModifie();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // « Oui », nom d'un autre fichier en lecture seule : refusé, comme tout échec
-  QuandModale(BoiteFichier, []() { ChoisitFichier(QFileInfo(frmSimulation->OpenDialog->FileName.c_str()).absolutePath()+"/lecture_seule_refuse.cvw"); });
+  QuandModale(BoiteFichier, [] { ChoisitFichier(QFileInfo(frmSimulation->OpenDialog->FileName.c_str()).absolutePath()+"/lecture_seule_refuse.cvw"); });
   QVERIFY(!DemarreSansBlocage("Marche, fichier en lecture seule modifié, autre fichier refusé"));
   QVERIFY(Etapes.empty());
   QVERIFY2(Messages.last().contains("Impossible de créer le fichier"), qPrintable(Messages.join('\n')));
   VerifieNonDemarreModifie();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // « Oui », autre nom : le réseau y est enregistré, la simulation démarre, et Arrêt recharge ce fichier
-  QuandModale(BoiteFichier, [Copie]() { ChoisitFichier(Copie); });
+  QuandModale(BoiteFichier, [Copie] { ChoisitFichier(Copie); });
   QVERIFY2(DemarreSansBlocage("Marche, fichier en lecture seule modifié, enregistré sous"), qPrintable(Messages.join('\n')));
   QVERIFY(Etapes.empty());
   QVERIFY(QFile::exists(Copie));
@@ -1719,16 +1846,19 @@ void TestInterface::interruptionErreursIntegrite()
   QVERIFY(Reference.Ok);
   auto Debut=[&Reference](const std::string &Nom) -> long long
    {
-    for(const champ_cvw &ch : Reference.Champs) if (ch.Nom==Nom) return (long long)ch.Debut;
+    for(const champ_cvw &ch : Reference.Champs) { if (ch.Nom==Nom) { return static_cast<long long>(ch.Debut);
+}
+}
     return -1;
    };
   int NumFeu=1;
-  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&(Reference.Octets[(std::size_t)d+3]&0x80); NumFeu++);
+  for(long long d; ((d=Debut("feu"+std::to_string(NumFeu)+".x"))>=0)&&((Reference.Octets[static_cast<std::size_t>(d)+3]&0x80) != 0); NumFeu++) {;
+}
   const long long DmdVert=Debut("feu"+std::to_string(NumFeu)+".TypeDmdVert");
   QVERIFY(DmdVert>=0);
   std::string Octets=Reference.Octets;
-  const char Bon=Octets[(std::size_t)DmdVert];
-  Octets[(std::size_t)DmdVert]=9;
+  const char Bon=Octets[static_cast<std::size_t>(DmdVert)];
+  Octets[static_cast<std::size_t>(DmdVert)]=9;
   QFile::remove(f);
   QFile Fichier(f);
   QVERIFY(Fichier.open(QIODevice::WriteOnly));
@@ -1738,7 +1868,8 @@ void TestInterface::interruptionErreursIntegrite()
   QVERIFY(!VerifierAvantSimulation);
   frmSimulation->ActionVerifierAvantSimulation->Execute();
   QVERIFY(VerifierAvantSimulation);
-  Finalement Decoche([]() { if (VerifierAvantSimulation) frmSimulation->ActionVerifierAvantSimulation->Execute(); });
+  Finalement Decoche([] { if (VerifierAvantSimulation) { frmSimulation->ActionVerifierAvantSimulation->Execute(); 
+}});
   QByteArray Reseau=OctetsReseau();
   QByteArray Disque=Contenu(f);
   for(int Essai=0; Essai<3; Essai++)
@@ -1747,7 +1878,8 @@ void TestInterface::interruptionErreursIntegrite()
     QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
     QVERIFY2(Messages.first().contains(QString::fromUtf8("type de demande du vert incorrect (9)")), qPrintable(Messages.first()));
     VerifieNonDemarre(Reseau);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QVERIFY(!frmSimulation->SimulationModifiee);
     QVERIFY(Contenu(f)==Disque); // rien d'enregistré
    }
@@ -1757,7 +1889,7 @@ void TestInterface::interruptionErreursIntegrite()
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
   // Le réseau corrigé démarre, sur le réseau rétabli
   OuvreFichier(f);
-  cv->Feu[NumFeu-1].TypeDmdVert=(dmd_vert)Bon;
+  cv->Feu[NumFeu-1].TypeDmdVert=static_cast<dmd_vert>(Bon);
   frmSimulation->SimulationModifiee=true;
   QVERIFY2(DemarreSansBlocage("Marche, réseau corrigé"), qPrintable(Messages.join('\n')));
   QVERIFY(JoueJusquAuTour(5));
@@ -1771,20 +1903,24 @@ void TestInterface::interruptionTramsImpossibles()
   QString f=OuvreCarte("Géant.cvw", "trams.cvw");
   QVERIFY(!f.isEmpty());
   int Ligne=0;
-  while((Ligne<NBMAXLIGNESBUSTRAM)&&(cv->LigneTram[Ligne].NbArrets<2)) Ligne++;
+  while((Ligne<NBMAXLIGNESBUSTRAM)&&(cv->LigneTram[Ligne].NbArrets<2)) { Ligne++;
+}
   QVERIFY(Ligne<NBMAXLIGNESBUSTRAM);
-  const int Arret1=cv->LigneTram[Ligne].NumArret[0], Arret2=cv->LigneTram[Ligne].NumArret[1];
+  const int Arret1=cv->LigneTram[Ligne].NumArret[0];
+  const int Arret2=cv->LigneTram[Ligne].NumArret[1];
   // Trois lignes d'un tram chacune sur les deux mêmes arrêts
   struct ligne { int NbArrets; std::vector<int> NumArret; };
   std::vector<ligne> Lignes;
-  for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   Lignes.push_back({cv->LigneTram[i].NbArrets, std::vector<int>(cv->LigneTram[i].NumArret, cv->LigneTram[i].NumArret+NBMAXARRETSBUSTRAMPARLIGNE)});
-  auto Retablit=[&Lignes]()
+  for(auto & i : cv->LigneTram) {
+   Lignes.push_back({i.NbArrets, std::vector<int>(i.NumArret, i.NumArret+NBMAXARRETSBUSTRAMPARLIGNE)});
+}
+  auto Retablit=[&Lignes]
    {
     for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
      {
       cv->LigneTram[i].NbArrets=Lignes[i].NbArrets;
-      for(int a=0; a<NBMAXARRETSBUSTRAMPARLIGNE; a++) cv->LigneTram[i].NumArret[a]=Lignes[i].NumArret[a];
+      for(int a=0; a<NBMAXARRETSBUSTRAMPARLIGNE; a++) { cv->LigneTram[i].NumArret[a]=Lignes[i].NumArret[a];
+}
      }
    };
   for(int i : {0, 1, 2})
@@ -1793,7 +1929,8 @@ void TestInterface::interruptionTramsImpossibles()
     cv->LigneTram[i].NumArret[0]=Arret1;
     cv->LigneTram[i].NumArret[1]=Arret2;
    }
-  for(int i=3; i<NBMAXLIGNESBUSTRAM; i++) cv->LigneTram[i].NbArrets=0;
+  for(int i=3; i<NBMAXLIGNESBUSTRAM; i++) { cv->LigneTram[i].NbArrets=0;
+}
   Enregistre(f);
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Enregistrement effectué."));
   QByteArray Reseau=OctetsReseau();
@@ -1803,7 +1940,8 @@ void TestInterface::interruptionTramsImpossibles()
     QVERIFY2(Messages.size()==1, qPrintable(Messages.join('\n')));
     QVERIFY2(Messages.first().contains("placer tous les trams"), qPrintable(Messages.first()));
     VerifieNonDemarre(Reseau);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
    }
   // L'utilisateur rétablit ses lignes : la simulation démarre, avec les bus et les trams de chaque ligne
   Retablit();
@@ -1847,17 +1985,20 @@ void TestInterface::interruptionReseauNonConnexe()
   QVERIFY(frmSimulation->SimulationModifiee);
   QVERIFY(!cv->v[4][2].DistParking); // distances obsolètes libérées...
   frmSimulation->DrawGridSimulClick(frmSimulation->DrawGridSimul); // ... et la fiche encore ouverte le voit
-  for(int x=7; x<=9; x++) cv->v[x][3].DirPoss=E;
+  for(int x=7; x<=9; x++) { cv->v[x][3].DirPoss=E;
+}
   PlaceCurseur(10, 5);
   frmSimulation->ActionDirectionGauche->Execute();
   QCOMPARE((int)cv->v[10][5].DirPoss, (int)(N|O));
-  for(int x=7; x<=9; x++) cv->v[x][5].DirPoss=O;
+  for(int x=7; x<=9; x++) { cv->v[x][5].DirPoss=O;
+}
   QVERIFY2(DemarreSansBlocage("Marche, réseau réparé"), qPrintable(Messages.join('\n')));
   QVERIFY(frmSimulation->ToolButtonArret->isEnabled());
   QVERIFY(JoueJusquAuTour(5));
   QVERIFY(Arrete());
   QCOMPARE((int)cv->v[6][3].DirPoss, (int)(S|E));
-  if (frmAffDistParkings->isVisible()) frmAffDistParkings->Hide();
+  if (frmAffDistParkings->isVisible()) { frmAffDistParkings->Hide();
+}
  }
 //---------------------------------------------------------------------------
 void TestInterface::interruptionEnregistrementAnnule()
@@ -1876,7 +2017,8 @@ void TestInterface::interruptionEnregistrementAnnule()
     QVERIFY(!DemarreSansBlocage("Marche, enregistrement annulé"));
     QVERIFY(Etapes.empty());
     VerifieNonDemarre(Reseau);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QVERIFY(frmSimulation->SaveDialog->FileName.IsEmpty());
     QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
    }
@@ -1885,7 +2027,7 @@ void TestInterface::interruptionEnregistrementAnnule()
   frmSimulation->ActionOuvrir->Execute();
   QVERIFY(Etapes.empty());
   // Nom choisi : la simulation démarre et Arrêt recharge ce fichier, sans demander lequel
-  QuandModale(BoiteFichier, [f]() { ChoisitFichier(f); });
+  QuandModale(BoiteFichier, [f] { ChoisitFichier(f); });
   QVERIFY2(DemarreSansBlocage("Marche, enregistrement accepté"), qPrintable(Messages.join('\n')));
   QVERIFY(Etapes.empty());
   QVERIFY(JoueJusquAuTour(5));
@@ -1903,7 +2045,8 @@ void TestInterface::interruptionEnregistrementEnEchec()
 #else
   QString f=OuvreCarte("Géant.cvw", "disque_plein.cvw");
   QVERIFY(!f.isEmpty());
-  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  QByteArray Origine=Contenu(f);
+  QByteArray Reseau=OctetsReseau();
   // Copie du réseau impossible (dossier temporaire plein) : aucun démarrage, rien de préparé
   for(int Essai=0; Essai<2; Essai++)
    {
@@ -1913,7 +2056,8 @@ void TestInterface::interruptionEnregistrementEnEchec()
     QVERIFY2(Messages.first().contains("dossier temporaire"), qPrintable(Messages.first()));
    }
   VerifieNonDemarre(Reseau);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(Contenu(f)==Origine);
   // Disque plein pendant l'enregistrement : message, pas de démarrage ; v6.0.2 : le fichier reste entier
   for(int Essai=0; Essai<2; Essai++)
@@ -1925,7 +2069,8 @@ void TestInterface::interruptionEnregistrementEnEchec()
     frmSimulation->StatusBar->removeEventFilter(&Limite);
    }
   VerifieNonDemarre(Reseau);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(!frmSimulation->SimulationModifiee);
   QVERIFY(Contenu(f)==Origine);
   // L'espace revenu, Marche enregistre puis démarre
@@ -1950,7 +2095,8 @@ void TestInterface::arretFichierInaccessible()
   QVERIFY(QTest::qWaitFor([this]() { return Messages.size()>=2; }, 5000));
   QVERIFY2(Messages.last().contains("Impossible d'ouvrir le fichier"), qPrintable(Messages.join('\n')));
   VerifieNonDemarre(Reseau);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(frmSimulation->SimulationModifiee);
   QCOMPARE(Q(frmSimulation->Caption), QString("Centre-Ville - ")+QDir::toNativeSeparators(f)+"*");
   // Dossier toujours là : Marche réécrit le fichier
@@ -1965,11 +2111,13 @@ void TestInterface::carteDUnVolumeEnLectureSeule()
    // CV_CARTE_LECTURE_SEULE, sur un vrai système de fichiers en lecture seule et
    // de préférence dans l'affichage natif. En temps réel, comme marcheInterruptionArret
   QString f=qEnvironmentVariable("CV_CARTE_LECTURE_SEULE");
-  if (f.isEmpty()) QSKIP("CV_CARTE_LECTURE_SEULE non définie");
+  if (f.isEmpty()) { QSKIP("CV_CARTE_LECTURE_SEULE non définie");
+}
   QVERIFY2(!QFile(f).open(QIODevice::ReadWrite), "La carte n'est pas en lecture seule");
   OuvreFichier(f);
   QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement effectué."));
-  QByteArray Origine=Contenu(f), Reseau=OctetsReseau();
+  QByteArray Origine=Contenu(f);
+  QByteArray Reseau=OctetsReseau();
   for(int Essai=0; Essai<2; Essai++)
    {
     Messages.clear();
@@ -1980,7 +2128,7 @@ void TestInterface::carteDUnVolumeEnLectureSeule()
     QVERIFY2(frmSimulation->SimulationEnCours, qPrintable(Messages.join('\n')));
     QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
     QVERIFY(AttendTour(100, 120000));
-    Capture(Essai?"volume_lecture_seule_2.png":"volume_lecture_seule_1.png");
+    Capture((Essai != 0)?"volume_lecture_seule_2.png":"volume_lecture_seule_1.png");
     QVERIFY(Arrete());
     QVERIFY(QTest::qWaitFor([this]() { return !Messages.isEmpty(); }, 5000));
     QVERIFY2(Messages.first().contains(QString::fromUtf8("Bilan au tour n°")), qPrintable(Messages.first()));
@@ -1995,7 +2143,7 @@ void TestInterface::nouveauEtGeneration()
   QVERIFY(!OuvreDemo("avant_generation.cvw").isEmpty()); // Dimensions proposées : celles du réseau ouvert
   alea::FixeGraine(12345);
   Messages.clear();
-  QuandModale([]() { return frmGeneration; }, [this]()
+  QuandModale([] { return frmGeneration; }, [this]
    { // Dimensions : réponse par défaut (génération, sans les paramètres)
     VerifieAide(frmGeneration->TrackBarTailleMinSegments, frmGeneration->ButtonAide, "GADUR"); // HelpContext 3112
     Clique(frmGeneration->ButtonOk);
@@ -2013,23 +2161,27 @@ void TestInterface::nouveauEtGeneration()
   // Réseau généré = golden master « defaut_12345 » (tests/golden/generation)
   std::ifstream f(std::string(CV_DOSSIER_GOLDEN)+"/generation/defaut_12345.txt");
   QVERIFY(f.good());
-  std::string Ligne, Attendu, Obtenu;
+  std::string Ligne;
+  std::string Attendu;
+  std::string Obtenu;
   bool Carte=false;
   while(std::getline(f, Ligne))
    {
-    if (Ligne.rfind("DirPoss", 0)==0) { Carte=true; continue; }
-    if (Carte&&(Ligne.rfind("etat=", 0)==0)) break;
-    if (Carte) Attendu+=Ligne+"\n";
+    if (Ligne.starts_with("DirPoss")) { Carte=true; continue; }
+    if (Carte&&(Ligne.starts_with("etat="))) { break;
+}
+    if (Carte) { Attendu+=Ligne+"\n";
+}
    }
   char Tampon[4];
   for(int j=0; j<cv->NbY; j++)
    {
     for(int i=0; i<cv->NbX; i++)
      {
-      std::snprintf(Tampon, sizeof(Tampon), "%x", (int)cv->v[i][j].DirPoss);
+      std::snprintf(Tampon, sizeof(Tampon), "%x", static_cast<int>(cv->v[i][j].DirPoss));
       Obtenu+=Tampon;
      }
-    Obtenu+="\n";
+    Obtenu+='\n';
    }
   QVERIFY(!Attendu.empty());
   QVERIFY(Obtenu==Attendu);
@@ -2044,14 +2196,18 @@ void TestInterface::ficheAPropos()
    // accéléré) ; Échap = clic sur le feu = boîte « Licence »
   QVERIFY(!OuvreDemo("lot1_apropos.cvw").isEmpty());
   frmAPropos->Timer->Interval=20;
-  bool Vert=false, Jaune=false, Rouge=false, GlypheRouge=false, Modale=false;
+  bool Vert=false;
+  bool Jaune=false;
+  bool Rouge=false;
+  bool GlypheRouge=false;
+  bool Modale=false;
   Messages.clear();
-  QuandModale([]() { return frmAPropos; }, [&]()
+  QuandModale([] { return frmAPropos; }, [&]
    {
     Modale=frmAPropos->isModal()&&!frmAPropos->FermetureAutomatique;
-    Vert=QTest::qWaitFor([]() { return frmAPropos->LabelTexte->Font->Color==clLime; }, 2000);
-    Jaune=QTest::qWaitFor([]() { return frmAPropos->LabelTexte->Font->Color==clYellow; }, 2000);
-    Rouge=QTest::qWaitFor([]() { return frmAPropos->LabelTexte->Font->Color==clRed; }, 2000);
+    Vert=QTest::qWaitFor([] { return frmAPropos->LabelTexte->Font->Color==clLime; }, 2000);
+    Jaune=QTest::qWaitFor([] { return frmAPropos->LabelTexte->Font->Color==clYellow; }, 2000);
+    Rouge=QTest::qWaitFor([] { return frmAPropos->LabelTexte->Font->Color==clRed; }, 2000);
     GlypheRouge=frmAPropos->SpeedButtonOk->Glyph.Ref().Image.toImage()==frmAPropos->VirtualImageList->Pixmap(2).toImage();
     frmAPropos->Timer->Enabled=false; // capture au feu rouge
     CaptureFiche(frmAPropos, "fiche_propos.png");
@@ -2076,10 +2232,12 @@ void TestInterface::ficheEpidemie()
  { // Menu Simulation > Épidémie (AutoCheck) : la fiche modale s'ouvre quand l'action se coche
   QVERIFY(!OuvreDemo("lot1_epidemie.cvw").isEmpty());
   QVERIFY(!frmSimulation->ActionEpidemie->Checked);
-  int Infectiosite=cv->EpidemieInfectiosite, PatientZero=cv->EpidemieIterationPatientZero,
-      Charge=cv->EpidemieChargeFatale;
-  bool Reinfections=cv->EpidemieReinfections, Affichage=false;
-  QuandModale([]() { return frmEpidemie; }, [&]()
+  int Infectiosite=cv->EpidemieInfectiosite;
+  int PatientZero=cv->EpidemieIterationPatientZero;
+  int Charge=cv->EpidemieChargeFatale;
+  bool Reinfections=cv->EpidemieReinfections != 0;
+  bool Affichage=false;
+  QuandModale([] { return frmEpidemie; }, [&]
    {
     Affichage=frmEpidemie->CheckBoxActiver->Checked&&frmEpidemie->GroupBox->Enabled&&
               (frmEpidemie->CSpinEditInfectiosite->Value==Infectiosite)&&
@@ -2106,7 +2264,7 @@ void TestInterface::ficheEpidemie()
   QVERIFY(!frmSimulation->ActionEpidemie->Checked);
   QVERIFY(!frmEpidemie->isVisible());
   bool Relu=false;
-  QuandModale([]() { return frmEpidemie; }, [&]()
+  QuandModale([] { return frmEpidemie; }, [&]
    {
     Relu=(frmEpidemie->CSpinEditInfectiosite->Value==Infectiosite+11)&&(frmEpidemie->CheckBoxReinfections->Checked==!Reinfections);
     frmEpidemie->CSpinEditInfectiosite->Value=Infectiosite+50;
@@ -2117,7 +2275,7 @@ void TestInterface::ficheEpidemie()
   QVERIFY(Relu);
   QCOMPARE(cv->EpidemieInfectiosite, Infectiosite+11);
   frmSimulation->Epidemie1->ElementQt()->trigger();
-  QuandModale([]() { return frmEpidemie; }, [&]()
+  QuandModale([] { return frmEpidemie; }, [&]
    {
     frmEpidemie->CSpinEditPatientZero->Value=PatientZero+50;
     Touche(frmEpidemie->CSpinEditPatientZero, Qt::Key_Escape);
@@ -2132,7 +2290,8 @@ void TestInterface::ficheEpidemie()
 void TestInterface::ficheNature()
  { // Sélection de 4 x 2 cases libres, bouton « Nature » : fiche non modale
   QVERIFY(!OuvreDemo("lot1_nature.cvw").isEmpty());
-  int xz, yz;
+  int xz;
+  int yz;
   QVERIFY(ZoneLibre(4, 2, xz, yz));
   Focalise();
   Selectionne(xz, yz, xz+3, yz+1);
@@ -2150,9 +2309,11 @@ void TestInterface::ficheNature()
   CaptureFiche(frmDefNature, "fiche_nature.png");
   VerifieAide(frmDefNature->CheckBoxPelouse, frmDefNature->ButtonAide, "DDLNDUZ"); // HelpContext 45
   Clique(frmDefNature->ButtonAppliquer);
-  for(int i=0; i<4; i++)
-   for(int j=0; j<2; j++)
+  for(int i=0; i<4; i++) {
+   for(int j=0; j<2; j++) {
     QCOMPARE((int)NATURE(&cv->v[xz+i][yz+j]), (int)trottoirs);
+}
+}
   QVERIFY(frmSimulation->SimulationModifiee);
   QVERIFY(frmDefNature->isVisible()); // Appliquer laisse la fiche ouverte
   // Pelouse puis Fermer (bouton Cancel) : rien ne change, fiche cachée
@@ -2175,20 +2336,25 @@ void TestInterface::ficheNature()
 void TestInterface::fichesPrioritesEtFeux()
  { // Case de route : Priorités (non modale), Stop, puis Feu et fiche Feux (non modale)
   QVERIFY(!OuvreDemo("lot1_priorites.cvw").isEmpty());
-  int x=-1, y=-1, d=0;
-  for(int i=0; (x<0)&&(i<cv->NbX); i++)
+  int x=-1;
+  int y=-1;
+  int d=0;
+  for(int i=0; (x<0)&&(i<cv->NbX); i++) {
    for(int j=0; (x<0)&&(j<cv->NbY); j++)
     {
      voie &v=cv->v[i][j];
-     int n=((v.DirPoss&N)==N)+((v.DirPoss&E)==E)+((v.DirPoss&S)==S)+((v.DirPoss&O)==O);
-     if ((n>=2)&&!v.SensVoieTram&&!v.NumParking&&!v.EstDepotBus()&&
-         !v.Priorite[0]&&!v.Priorite[1]&&!v.Priorite[2]&&!v.Priorite[3])
+     int n=static_cast<int>((v.DirPoss&N)==N)+static_cast<int>((v.DirPoss&E)==E)+static_cast<int>((v.DirPoss&S)==S)+static_cast<int>((v.DirPoss&O)==O);
+     if ((n>=2)&&(v.SensVoieTram == 0)&&(v.NumParking == 0)&&!v.EstDepotBus()&&
+         (v.Priorite[0] == 0)&&(v.Priorite[1] == 0)&&(v.Priorite[2] == 0)&&(v.Priorite[3] == 0))
       { x=i; y=j; }
     }
+}
   QVERIFY(x>=0);
   voie *v=&cv->v[x][y];
-  for(int k=nord; (!d)&&(k<=ouest); k++)
-   if ((v->DirPoss&PossDir[k])==PossDir[k]) d=k;
+  for(int k=nord; (d == 0)&&(k<=ouest); k++) {
+   if ((v->DirPoss&PossDir[k])==PossDir[k]) { d=k;
+}
+}
   TRadioGroup *Groupes[NBDIR]={frmDefVoie->RadioGroupPrioriteNord, frmDefVoie->RadioGroupPrioriteEst,
                                frmDefVoie->RadioGroupPrioriteSud, frmDefVoie->RadioGroupPrioriteOuest};
   TBitBtn *BoutonsFeu[NBDIR]={frmDefVoie->BitBtnDefFeuN, frmDefVoie->BitBtnDefFeuE,
@@ -2225,14 +2391,16 @@ void TestInterface::fichesPrioritesEtFeux()
   QVERIFY(frmDefVoie->isVisible());
   QVERIFY(!BoutonsFeu[d-1]->Enabled);
   int NbFeux=0;
-  for(int i=0; i<cv->NbFeux; i++) NbFeux+=cv->Feu[i].Defini();
+  for(int i=0; i<cv->NbFeux; i++) { NbFeux+=static_cast<int>(cv->Feu[i].Defini());
+}
   CliqueChoix(Groupe, feux);
   Clique(frmDefVoie->ButtonAppliquer);
   QCOMPARE((int)v->Priorite[d-1], (int)feux);
   int n=v->NumFeu[d-1];
   QVERIFY(n>0);
   int NbFeuxApres=0;
-  for(int i=0; i<cv->NbFeux; i++) NbFeuxApres+=cv->Feu[i].Defini();
+  for(int i=0; i<cv->NbFeux; i++) { NbFeuxApres+=static_cast<int>(cv->Feu[i].Defini());
+}
   QCOMPARE(NbFeuxApres, NbFeux+1);
   QVERIFY(BoutonsFeu[d-1]->Enabled);
   QVERIFY(!BoutonsFeu[d-1]->icon().isNull());
@@ -2271,22 +2439,27 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
  { // Route est-ouest (k voies) entre deux trottoirs, passage piétons :
    // Priorités piétons (non modale) et fiche Feux de piétons (non modale)
   QVERIFY(!OuvreDemo("lot1_pietons.cvw").isEmpty());
-  int x=-1, y=-1, k=0;
-  for(int i=1; (x<0)&&(i<cv->NbX-1); i++)
-   for(int j=1; (x<0)&&(j<cv->NbY-4); j++)
+  int x=-1;
+  int y=-1;
+  int k=0;
+  for(int i=1; (x<0)&&(i<cv->NbX-1); i++) {
+   for(int j=1; (x<0)&&(j<cv->NbY-4); j++) {
     for(int l=1; (x<0)&&(l<=3); l++)
      {
       bool Ok=CaseLibre(i, j-1)&&CaseLibre(i, j+l);
       for(int m=0; Ok&&(m<l); m++)
        {
         voie &v=cv->v[i][j+m];
-        Ok=v.DirPoss&&!(v.DirPoss&(N|S))&&!v.SensVoieTram&&!v.NumParking&&!v.EstDepotBus()&&!v.NumArretBus&&
-           !v.Priorite[0]&&!v.Priorite[1]&&!v.Priorite[2]&&!v.Priorite[3];
+        Ok=(v.DirPoss != 0)&&((v.DirPoss&(N|S)) == 0)&&(v.SensVoieTram == 0)&&(v.NumParking == 0)&&!v.EstDepotBus()&&(v.NumArretBus == 0)&&
+           (v.Priorite[0] == 0)&&(v.Priorite[1] == 0)&&(v.Priorite[2] == 0)&&(v.Priorite[3] == 0);
        }
       if (Ok) { x=i; y=j; k=l; }
      }
+}
+}
   QVERIFY(x>=0);
-  int yn=y-1, ys=y+k; // trottoirs nord et sud
+  int yn=y-1;
+  int ys=y+k; // trottoirs nord et sud
   Focalise();
   // Trottoirs (Nature > Trottoir), passage piétons sur chaque voie
   for(int j : {yn, ys})
@@ -2372,10 +2545,13 @@ void TestInterface::fichesParametres()
   QVERIFY(!Fichier.isEmpty());
   Focalise();
   // Arrêt de bus et places de taxi et de vehlib sur trois cases de route
-  int xb=-1, yb=-1;
-  for(int i=0; (xb<0)&&(i<cv->NbX); i++)
-   for(int j=0; (xb<0)&&(j<cv->NbY); j++)
-    if (cv->AjoutArretBusPossible(i, j)&&!cv->v[i][j].NumParking&&!cv->v[i][j].EstDepotBus()) { xb=i; yb=j; }
+  int xb=-1;
+  int yb=-1;
+  for(int i=0; (xb<0)&&(i<cv->NbX); i++) {
+   for(int j=0; (xb<0)&&(j<cv->NbY); j++) {
+    if (cv->AjoutArretBusPossible(i, j)&&(cv->v[i][j].NumParking == 0)&&!cv->v[i][j].EstDepotBus()) { xb=i; yb=j; }
+}
+}
   QVERIFY(xb>=0);
   PlaceCurseur(xb, yb);
   QVERIFY(frmSimulation->ActionArretBusTram->Enabled);
@@ -2383,11 +2559,14 @@ void TestInterface::fichesParametres()
   int NumArretBus=cv->v[xb][yb].NumArretBus;
   QVERIFY(NumArretBus>0);
   std::vector<std::pair<int, int>> Routes;
-  for(int i=0; (Routes.size()<2)&&(i<cv->NbX); i++)
-   for(int j=0; (Routes.size()<2)&&(j<cv->NbY); j++)
-    if (cv->v[i][j].DirPoss&&!cv->v[i][j].NumParking&&!cv->v[i][j].EstDepotBus()&&!cv->v[i][j].NumArretBus&&
-        ((i!=xb)||(j!=yb))&&(Routes.empty()||(Routes[0]!=std::make_pair(i, j))))
-     Routes.push_back({i, j});
+  for(int i=0; (Routes.size()<2)&&(i<cv->NbX); i++) {
+   for(int j=0; (Routes.size()<2)&&(j<cv->NbY); j++) {
+    if ((cv->v[i][j].DirPoss != 0)&&(cv->v[i][j].NumParking == 0)&&!cv->v[i][j].EstDepotBus()&&(cv->v[i][j].NumArretBus == 0)&&
+        ((i!=xb)||(j!=yb))&&(Routes.empty()||(Routes[0]!=std::make_pair(i, j)))) {
+     Routes.emplace_back(i, j);
+}
+}
+}
   QCOMPARE((int)Routes.size(), 2);
   PlaceCurseur(Routes[0].first, Routes[0].second);
   QVERIFY(frmSimulation->ActionPlaceTaxi->Enabled);
@@ -2398,7 +2577,8 @@ void TestInterface::fichesParametres()
   frmSimulation->ActionPlaceVehlib->Execute();
   QVERIFY(cv->NbPlacesVehlib>0);
   // Voie de tram d'une case (de l'ouest vers l'est) dans une zone libre, et son arrêt
-  int xt, yt;
+  int xt;
+  int yt;
   QVERIFY(ZoneLibre(3, 1, xt, yt));
   xt++;
   PlaceCurseur(xt-1, yt);
@@ -2412,12 +2592,22 @@ void TestInterface::fichesParametres()
   int NumArretTram=cv->v[xt][yt].NumArretTram;
   QVERIFY(NumArretTram>0);
   // Paramètres : durées des feux, vitesses, piétons ; puis chaque fiche fille
-  int DureeVert=cv->DureeVert, DureeOrange=cv->DureeOrange, NbTours=cv->NbToursParSeconde,
-      ProbaPsgPt=cv->ProbaDirPsgPt, NbMaxBus=cv->NbMaxPersonnesBus, NbMaxTram=cv->NbMaxPersonnesTram,
-      NbMaxTaxi=cv->NbMaxPersonnesTaxi, TauxVehlib=cv->TauxRemplissageVehlib;
+  int DureeVert=cv->DureeVert;
+  int DureeOrange=cv->DureeOrange;
+  int NbTours=cv->NbToursParSeconde;
+  int ProbaPsgPt=cv->ProbaDirPsgPt;
+  int NbMaxBus=cv->NbMaxPersonnesBus;
+  int NbMaxTram=cv->NbMaxPersonnesTram;
+  int NbMaxTaxi=cv->NbMaxPersonnesTaxi;
+  int TauxVehlib=cv->TauxRemplissageVehlib;
   QVERIFY(cv->NbVitesses!=3);
-  bool Affichage=false, CacheeBus=false, Revenue=false, CacheeTram=false, CacheeTaxi=false, CacheeVehlib=false;
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  bool Affichage=false;
+  bool CacheeBus=false;
+  bool Revenue=false;
+  bool CacheeTram=false;
+  bool CacheeTaxi=false;
+  bool CacheeVehlib=false;
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     Affichage=Q(frmParamSimul->Caption).endsWith(QString(" [%1x%2]").arg(cv->NbX).arg(cv->NbY))&&
               frmParamSimul->BitBtnDefLignesBus->Enabled&&frmParamSimul->BitBtnDefLignesTram->Enabled&&
@@ -2430,7 +2620,7 @@ void TestInterface::fichesParametres()
     QVERIFY(frmParamSimul->ButtonAppliquer->Enabled);
     Clique(frmParamSimul->BitBtnDefLignesBus);
    });
-  QuandModale([]() { return frmParamBus; }, [&]()
+  QuandModale([] { return frmParamBus; }, [&]
    { // Ligne 1 : un arrêt, le n° NumArretBus
     CacheeBus=!frmParamSimul->isVisible();
     frmParamBus->CSpinEdit1->Value=1;
@@ -2439,13 +2629,13 @@ void TestInterface::fichesParametres()
     CaptureFiche(frmParamBus, "fiche_parametres_bus.png");
     Clique(frmParamBus->ButtonOk);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     Revenue=frmParamSimul->isVisible()&&(frmParamSimul->CSpinEditDureeVert->Value==DureeVert+1)&&
             frmParamSimul->ButtonAppliquer->Enabled&&(cv->DureeVert==DureeVert)&&!frmParamBus;
     Clique(frmParamSimul->BitBtnDefLignesTram);
    });
-  QuandModale([]() { return frmParamTram; }, [&]()
+  QuandModale([] { return frmParamTram; }, [&]
    {
     CacheeTram=!frmParamSimul->isVisible();
     frmParamTram->CSpinEdit1->Value=1;
@@ -2454,8 +2644,8 @@ void TestInterface::fichesParametres()
     CaptureFiche(frmParamTram, "fiche_parametres_tram.png");
     Clique(frmParamTram->ButtonOk);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefTaxis); });
-  QuandModale([]() { return frmParamTaxi; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->BitBtnDefTaxis); });
+  QuandModale([] { return frmParamTaxi; }, [&]
    {
     CacheeTaxi=!frmParamSimul->isVisible();
     frmParamTaxi->CSpinEditNbMaxPersonnesTaxi->Value=NbMaxTaxi+1;
@@ -2463,8 +2653,8 @@ void TestInterface::fichesParametres()
     VerifieAide(frmParamTaxi->CSpinEditNbMaxPersonnesTaxi, frmParamTaxi->ButtonAide, "PDT"); // HelpContext 3123
     Clique(frmParamTaxi->ButtonOk);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefVehlibs); });
-  QuandModale([]() { return frmParamVehlib; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->BitBtnDefVehlibs); });
+  QuandModale([] { return frmParamVehlib; }, [&]
    {
     CacheeVehlib=!frmParamSimul->isVisible();
     frmParamVehlib->CSpinEditTauxRemplissage->Value=TauxVehlib-20;
@@ -2472,7 +2662,7 @@ void TestInterface::fichesParametres()
     VerifieAide(frmParamVehlib->CSpinEditTauxRemplissage, frmParamVehlib->ButtonAide, "PDV"); // HelpContext 3124
     Clique(frmParamVehlib->ButtonOk);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     frmParamSimul->CSpinEditDureeVert->Value=DureeVert+2;
     frmParamSimul->CSpinEditDureeOrange->Value=DureeOrange+1;
@@ -2505,17 +2695,17 @@ void TestInterface::fichesParametres()
   QCOMPARE(cv->TauxRemplissageVehlib, TauxVehlib-20);
   QVERIFY(frmSimulation->SimulationModifiee);
   // Annuler (et Échap dans une fiche fille) : rien ne change
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     frmParamSimul->CSpinEditDureeVert->Value=DureeVert+5;
     Clique(frmParamSimul->BitBtnDefTaxis);
    });
-  QuandModale([]() { return frmParamTaxi; }, [&]()
+  QuandModale([] { return frmParamTaxi; }, [&]
    {
     frmParamTaxi->CSpinEditNbMaxPersonnesTaxi->Value=NbMaxTaxi+3;
     Touche(frmParamTaxi->CSpinEditNbMaxPersonnesTaxi, Qt::Key_Escape);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->ButtonAnnuler); });
   frmSimulation->MenuItemParametres->ElementQt()->trigger();
   QVERIFY(Etapes.empty());
   QCOMPARE(cv->DureeVert, DureeVert+2);
@@ -2538,22 +2728,23 @@ void TestInterface::fichesParametres()
   QCOMPARE(cv->NbMaxPersonnesTram, NbMaxTram-20);
   QCOMPARE(cv->NbMaxPersonnesTaxi, NbMaxTaxi+1);
   QCOMPARE(cv->TauxRemplissageVehlib, TauxVehlib-20);
-  bool Relu=false, ReluBus=false;
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  bool Relu=false;
+  bool ReluBus=false;
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     Relu=(frmParamSimul->CSpinEditDureeVert->Value==DureeVert+2)&&(frmParamSimul->CSpinEditDureeOrange->Value==DureeOrange+1)&&
          (frmParamSimul->CSpinEditNbToursParSeconde->Value==NbTours-9)&&(frmParamSimul->CSpinEditProbaPsgPt->Value==ProbaPsgPt-10)&&
          (frmParamSimul->RadioGroupVitesses->ItemIndex==2)&&!frmParamSimul->ButtonAppliquer->Enabled;
     Clique(frmParamSimul->BitBtnDefLignesBus);
    });
-  QuandModale([]() { return frmParamBus; }, [&]()
+  QuandModale([] { return frmParamBus; }, [&]
    {
     ReluBus=(frmParamBus->CSpinEdit1->Value==1)&&(frmParamBus->CSpinEdit11->Value==NumArretBus)&&
             (frmParamBus->CSpinEditNbMaxPersonnesBus->Value==NbMaxBus-10)&&(Q(frmParamBus->LabelNbBus->Caption)=="1")&&
             !frmParamBus->ButtonAppliquer->Enabled;
     Clique(frmParamBus->ButtonAnnuler);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->ButtonAnnuler); });
   Clique(frmSimulation->ToolButtonParametres);
   QVERIFY(Etapes.empty());
   QVERIFY(Relu);
@@ -2566,18 +2757,19 @@ void TestInterface::champEntreeBorne()
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "champ_entree.cvw").isEmpty());
   int Max=0;
   QString Ecart;
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefTaxis); });
-  QuandModale([]() { return frmParamTaxi; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->BitBtnDefTaxis); });
+  QuandModale([] { return frmParamTaxi; }, [&]
    {
     TCSpinEdit *Champ=frmParamTaxi->CSpinEditNbMaxPersonnesTaxi;
     Max=Champ->MaxValue;
     Champ->setFocus(Qt::OtherFocusReason);
     Champ->selectAll();
     QTest::keyClicks(Champ, QString::number(100*Max));
-    if (Champ->Value!=100*Max) Ecart=QString::fromUtf8("frappe bornée");
+    if (Champ->Value!=100*Max) { Ecart=QString::fromUtf8("frappe bornée");
+}
     QTest::keyClick(Champ, Qt::Key_Return);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->ButtonAnnuler); });
   Clique(frmSimulation->ToolButtonParametres);
   QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
   QVERIFY2(Ecart.isEmpty(), qPrintable(Ecart));
@@ -2597,8 +2789,9 @@ void TestInterface::numeroArretPendantLaFrappe()
    {
     auto Attendu=[&](const char *Quoi, const QString &Texte)
      {
-      if (Champ->text()!=Texte)
+      if (Champ->text()!=Texte) {
        Ecarts<<QString::fromUtf8("%1, %2 : « %3 » au lieu de « %4 »").arg(Nom, Quoi, Champ->text(), Texte);
+}
      };
     Nb->Value=2;
     QVERIFY(Champ->isVisible());
@@ -2632,19 +2825,19 @@ void TestInterface::numeroArretPendantLaFrappe()
     Attendu("non défini, en quittant le champ", "2");
     xNonDefini=xAvant;
    };
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefLignesBus); });
-  QuandModale([]() { return frmParamBus; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->BitBtnDefLignesBus); });
+  QuandModale([] { return frmParamBus; }, [&]
    {
     Verifie("bus", frmParamBus->CSpinEdit1, frmParamBus->CSpinEdit11, cv->NbArretsBus, cv->ArretBus[0].x);
     Clique(frmParamBus->ButtonAnnuler);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->BitBtnDefLignesTram); });
-  QuandModale([]() { return frmParamTram; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->BitBtnDefLignesTram); });
+  QuandModale([] { return frmParamTram; }, [&]
    {
     Verifie("tram", frmParamTram->CSpinEdit1, frmParamTram->CSpinEdit11, cv->NbArretsTram, cv->ArretTram[0].x);
     Clique(frmParamTram->ButtonAnnuler);
    });
-  QuandModale([]() { return frmParamSimul; }, [&]() { Clique(frmParamSimul->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [&] { Clique(frmParamSimul->ButtonAnnuler); });
   Clique(frmSimulation->ToolButtonParametres);
   QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
@@ -2664,14 +2857,15 @@ void TestInterface::lignesAppliqueesEtArretRepete()
   const struct { int Ligne, NumArret, NbPassages, NbVehicules; const char *Liste; } Cas[]=
    {{4, 25, 9, 12, "3,4"}, {5, 16, 3, 11, "A,D,E"}};
   std::vector<FicheLignes> Fiches=FichesLignes();
-  for(int i=0; i<2; i++)
+  for(int i=0; i<2; i++) {
    DansFicheLignes(Fiches[i], [&, i](TForm *f)
     {
      const FicheLignes &l=Fiches[i];
      const auto &c=Cas[i];
-     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
+     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) { Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; 
+}};
      auto Spin=[f](int k) { return Composant<TCSpinEdit>(f, QString("CSpinEdit%1").arg(k)); };
-     TButton *Appliquer=Composant<TButton>(f, "ButtonAppliquer");
+     auto *Appliquer=Composant<TButton>(f, "ButtonAppliquer");
      const int NbLignes=l.NbLignes();
      const QString Refus=QString::fromUtf8("Le réseau de %1 n'est pas correct :\n"
                                            " - Le 1er arrêt de la ligne n°%2 n'est pas défini.\n"
@@ -2684,7 +2878,8 @@ void TestInterface::lignesAppliqueesEtArretRepete()
      Ecart((Messages.size()==2)&&Messages[0].endsWith(Refus)&&Messages[1].endsWith(Refus), "refus : "+Messages.join(" | "));
      Ecart(f->isVisible()&&Appliquer->Enabled&&!l.NbArrets(c.Ligne)&&(l.NbLignes()==NbLignes), "appliqué malgré le refus");
      Spin(c.Ligne)->Value=c.NbPassages;
-     for(int j=1; j<=c.NbPassages; j++) Spin(10*c.Ligne+j)->Value=c.NumArret;
+     for(int j=1; j<=c.NbPassages; j++) { Spin(10*c.Ligne+j)->Value=c.NumArret;
+}
      Messages.clear();
      Clique(Appliquer);
      Ecart(Messages.isEmpty(), "Appliquer : "+Messages.join(" | "));
@@ -2696,15 +2891,19 @@ void TestInterface::lignesAppliqueesEtArretRepete()
      Ecart(NbVehicules==QString::number(c.NbVehicules), "nombre de véhicules : "+NbVehicules);
      Clique(Composant<TButton>(f, "ButtonAnnuler"));
     });
+}
   QVERIFY2(Etapes.empty(), qPrintable(Messages.join('\n')));
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
   QCOMPARE((int)cv->LigneBus[3].NbArrets, 9);
   QCOMPARE((int)cv->LigneTram[4].NbArrets, 3);
   QVERIFY2(DemarreSansBlocage("Marche, lignes passant plusieurs fois par le même arrêt"), qPrintable(Messages.join('\n')));
   QVERIFY(JoueJusquAuTour(50));
-  int NbBus=0, NbTrams=0;
-  for(int i=0; i<cv->NbBus; i++) NbBus+=(cv->Bus[i].NumLigne==4);
-  for(int i=0; i<cv->NbTrams; i++) NbTrams+=(cv->Tram[i].NumLigne==5);
+  int NbBus=0;
+  int NbTrams=0;
+  for(int i=0; i<cv->NbBus; i++) { NbBus+=static_cast<int>(cv->Bus[i].NumLigne==4);
+}
+  for(int i=0; i<cv->NbTrams; i++) { NbTrams+=static_cast<int>(cv->Tram[i].NumLigne==5);
+}
   QCOMPARE(NbBus, 3);
   QCOMPARE(NbTrams, 1);
   QVERIFY(Arrete());
@@ -2716,16 +2915,19 @@ void TestInterface::lignesSansArretDefini()
    // les nombres d'arrêts des lignes ; OK : aucune ligne
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 2, 12, 2);
   ExecuteSurSelection(15, 4, 15, 12, s->ActionSegmentTram);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   for(int i=0; i<2; i++)
    {
     ExecuteSurCase(5, 2, s->ActionArretBusTram);
     ExecuteSurCase(15, 6, s->ActionArretBusTram);
    }
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE((int)cv->NbArretsBus, 1);
   QCOMPARE((int)cv->NbArretsTram, 1);
   QVERIFY(!cv->ArretBus[0].Defini());
@@ -2736,17 +2938,21 @@ void TestInterface::lignesSansArretDefini()
     Messages.clear();
     DansFicheLignes(l, [&](TForm *f)
      {
-      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
-      for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++)
+      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) { Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; 
+}};
+      for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) {
        Ecart(!Composant<TCSpinEdit>(f, QString("CSpinEdit%1").arg(i))->isVisible(), QString("nombre d'arrêts de la ligne %1 visible").arg(i));
+}
       Ecart((Q(Composant<TLabel>(f, QString("LabelNbArrets")+l.Suffixe)->Caption)=="0")&&
             (Q(Composant<TLabel>(f, QString("LabelNbMaxArrets")+l.Suffixe)->Caption)=="1")&&
             (Q(Composant<TLabel>(f, l.LabelNb)->Caption)=="0"), "nombres affichés");
       Clique(Composant<TButton>(f, "ButtonOk"));
      });
     const QString Message=QString::fromUtf8("Vous devez poser au moins un arrêt de %1 sur le réseau pour pouvoir définir le réseau de lignes de %1.").arg(l.Nom);
-    if ((Messages.size()!=1)||!Messages[0].endsWith(Message)) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Messages.join(" | ");
-    if (l.NbLignes()) Ecarts<<QString::fromUtf8("%1 : %2 lignes").arg(l.Nom).arg(l.NbLignes());
+    if ((Messages.size()!=1)||!Messages[0].endsWith(Message)) { Ecarts<<QString::fromUtf8(l.Nom)+" : "+Messages.join(" | ");
+}
+    if (l.NbLignes() != 0) { Ecarts<<QString::fromUtf8("%1 : %2 lignes").arg(l.Nom).arg(l.NbLignes());
+}
    }
   QVERIFY(Etapes.empty());
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
@@ -2760,7 +2966,8 @@ void TestInterface::lignesDeplacementsEtClignotement()
   Messages.clear(); // « Voulez-vous enregistrer… » d'un réseau laissé modifié
   QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
   GrilleSimulation *g=frmSimulation->DrawGridSimul;
-  const int xMax=g->ColCount-1, yMax=g->RowCount-1;
+  const int xMax=g->ColCount-1;
+  const int yMax=g->RowCount-1;
   // Bouton (BitBtn<colonne><ligne>, 2 = sans déplacement), avec « Coins », case de départ, case attendue
   const struct { int Bouton; bool Coins; int x0, y0, x, y; } Deplacements[]=
    {{32, false, 10, 10, 11, 10}, {23, false, 11, 10, 11, 11}, {11, false, 11, 11, 10, 10}, {13, false, 10, 10, 9, 11},
@@ -2775,8 +2982,9 @@ void TestInterface::lignesDeplacementsEtClignotement()
     UrlsOuvertes.clear();
     DansFicheLignes(l, [&](TForm *f)
      {
-      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
-      TCheckBox *Coins=Composant<TCheckBox>(f, "CheckBoxCoins");
+      auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) { Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; 
+}};
+      auto *Coins=Composant<TCheckBox>(f, "CheckBoxCoins");
       for(const auto &d : Deplacements)
        {
         Coins->Checked=d.Coins;
@@ -2788,24 +2996,25 @@ void TestInterface::lignesDeplacementsEtClignotement()
        }
       Coins->Checked=false;
       // Premier arrêt de la ligne 1 remplacé par le 2, puis par le 3 : le curseur suit
-      TCSpinEdit *Champ=Composant<TCSpinEdit>(f, "CSpinEdit11");
-      TTimer *Clignotement=Composant<TTimer>(f, "TimerClignotement");
+      auto *Champ=Composant<TCSpinEdit>(f, "CSpinEdit11");
+      auto *Clignotement=Composant<TTimer>(f, "TimerClignotement");
       for(int n : {2, 3})
        {
         Champ->Value=n;
         Ecart((l.NumArretAMontrer()==n)&&(QPoint(g->Col, g->Row)==l.Arret(n)), QString("arrêt %1 non montré").arg(n));
        }
       const int Tag=Clignotement->Tag;
-      Ecart(QTest::qWaitFor([&]() { return Clignotement->Tag!=Tag; }, 2000), "pas de clignotement");
-      Ecart(QTest::qWaitFor([&]() { return Clignotement->Tag==Tag; }, 2000), "clignotement arrêté");
+      Ecart(QTest::qWaitFor([&] { return Clignotement->Tag!=Tag; }, 2000), "pas de clignotement");
+      Ecart(QTest::qWaitFor([&] { return Clignotement->Tag==Tag; }, 2000), "clignotement arrêté");
       Touche(Champ, Qt::Key_F1);
       Clique(Composant<TButton>(f, "ButtonAide"));
       Clique(Composant<TButton>(f, "ButtonAnnuler"));
      });
     QUrl Rubrique=QUrl::fromLocalFile(stDossier+"/html/index.html");
     Rubrique.setFragment(l.Rubrique);
-    if ((UrlsOuvertes.size()!=2)||(AdresseAide(UrlsOuvertes[0])!=Rubrique)||(AdresseAide(UrlsOuvertes[1])!=Rubrique))
+    if ((UrlsOuvertes.size()!=2)||(AdresseAide(UrlsOuvertes[0])!=Rubrique)||(AdresseAide(UrlsOuvertes[1])!=Rubrique)) {
      Ecarts<<QString::fromUtf8("%1 : aide (%2 pages)").arg(l.Nom).arg(UrlsOuvertes.size());
+}
    }
   QDesktopServices::unsetUrlHandler("file");
   QVERIFY(Etapes.empty());
@@ -2825,20 +3034,25 @@ void TestInterface::lignesToutesCochees()
   QVERIFY2(DemarreSansBlocage("Marche, Géant"), qPrintable(Messages.join('\n')));
   QVERIFY(JoueJusquAuTour(3));
   QStringList Ecarts;
-  for(const FicheLignes &l : FichesLignes())
+  for(const FicheLignes &l : FichesLignes()) {
    DansFicheLignes(l, [&](TForm *f)
     {
-     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; };
-     auto Cochees=[&]()
+     auto Ecart=[&](bool Ok, const QString &Quoi) { if (!Ok) { Ecarts<<QString::fromUtf8(l.Nom)+" : "+Quoi; 
+}};
+     auto Cochees=[&]
       {
        QString Liste;
-       for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-        if (Composant<TCheckBox>(f, QString("CheckBox%1").arg(i))->Checked) Liste+=QString::number(i);
+       for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) {
+        if (Composant<TCheckBox>(f, QString("CheckBox%1").arg(i))->Checked) { Liste+=QString::number(i);
+}
+}
        return Liste;
       };
      QString Attendues;
-     for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) if (l.NbArrets(i)) Attendues+=QString::number(i);
-     TCheckBox *Tout=Composant<TCheckBox>(f, "CheckBoxTout");
+     for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) { if (l.NbArrets(i)) { Attendues+=QString::number(i);
+}
+}
+     auto *Tout=Composant<TCheckBox>(f, "CheckBoxTout");
      Ecart(Tout->isVisible()&&!Tout->Checked, "« Tout » caché ou coché");
      Clique(Tout);
      Ecart(Tout->Checked&&(Cochees()==Attendues), "cochées : "+Cochees()+" au lieu de "+Attendues);
@@ -2849,6 +3063,7 @@ void TestInterface::lignesToutesCochees()
      Ecart(!Tout->Checked&&Cochees().isEmpty()&&(f->WindowState==wsNormal), "décochées : "+Cochees());
      Clique(Composant<TButton>(f, "ButtonAnnuler"));
     });
+}
   QVERIFY(Etapes.empty());
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
@@ -2860,18 +3075,22 @@ void TestInterface::ficheCarrefours()
    // Annuler ; enregistrer et rouvrir
   QString Fichier=OuvreDemo("lot1_carrefours.cvw");
   QVERIFY(!Fichier.isEmpty());
-  int xd, yd, xa, ya;
+  int xd;
+  int yd;
+  int xa;
+  int ya;
   QVERIFY(ZoneLibre(4, 4, xd, yd));
   QVERIFY(ZoneLibre(4, 4, xa, ya, {QRect(xd-1, yd-1, 6, 6)}));
   Focalise();
   Selectionne(xd, yd, xd+3, yd+3);
   QVERIFY(frmSimulation->ActionCarrefours->Enabled);
   int NbFeux=0;
-  for(int i=0; i<cv->NbFeux; i++) NbFeux+=cv->Feu[i].Defini();
+  for(int i=0; i<cv->NbFeux; i++) { NbFeux+=static_cast<int>(cv->Feu[i].Defini());
+}
   bool Active=false;
   ReponseQuestions=QMessageBox::Yes; // « Êtes-vous bien sûr(e) de vouloir effacer... »
   Messages.clear();
-  QuandModale([]() { return frmCarrefours; }, [&]()
+  QuandModale([] { return frmCarrefours; }, [&]
    {
     Active=frmCarrefours->GroupBox44->isEnabled()&&frmCarrefours->SpeedButton44a->isEnabled()&&
            frmCarrefours->SpeedButton44b->isEnabled()&&!frmCarrefours->GroupBox34->isEnabled()&&
@@ -2887,12 +3106,15 @@ void TestInterface::ficheCarrefours()
   QVERIFY(!frmCarrefours->isVisible());
   QCOMPARE(Messages.size(), 1);
   QVERIFY2(Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")), qPrintable(Messages.first()));
-  auto VerifieCarrefour=[&]()
+  auto VerifieCarrefour=[&]
    {
-    for(int i=0; i<4; i++)
-     for(int j=0; j<4; j++)
+    for(int i=0; i<4; i++) {
+     for(int j=0; j<4; j++) {
       QCOMPARE((int)cv->v[xd+i][yd+j].DirPoss, (int)DirPossC4x4[i][j]);
-    const int xf[NBDIR]={xd+1, xd+3, xd+2, xd}, yf[NBDIR]={yd, yd+1, yd+3, yd+2};
+}
+}
+    const int xf[NBDIR]={xd+1, xd+3, xd+2, xd};
+    const int yf[NBDIR]={yd, yd+1, yd+3, yd+2};
     const direction df[NBDIR]={sud, ouest, nord, est};
     int NumFeux[NBDIR];
     for(int i=0; i<NBDIR; i++)
@@ -2910,23 +3132,27 @@ void TestInterface::ficheCarrefours()
       QCOMPARE(f.NumFeuxDmd[1], NumFeux[(i+3)%NBDIR]);
      }
     int NbFeuxApres=0;
-    for(int i=0; i<cv->NbFeux; i++) NbFeuxApres+=cv->Feu[i].Defini();
+    for(int i=0; i<cv->NbFeux; i++) { NbFeuxApres+=cv->Feu[i].Defini();
+}
     QCOMPARE(NbFeuxApres, NbFeux+4);
    };
   VerifieCarrefour();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(frmSimulation->SimulationModifiee);
   // Échap (bouton Annuler invisible, de 0 x 0 pixel) sur une autre zone : rien ne change
   Selectionne(xa, ya, xa+3, ya+3);
   Messages.clear();
-  QuandModale([]() { return frmCarrefours; }, [&]() { Touche(frmCarrefours->SpeedButton44a, Qt::Key_Escape); });
+  QuandModale([] { return frmCarrefours; }, [&] { Touche(frmCarrefours->SpeedButton44a, Qt::Key_Escape); });
   frmSimulation->MenuItemCarrefours->ElementQt()->trigger();
   QVERIFY(Etapes.empty());
   QVERIFY(!frmCarrefours->isVisible());
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
-  for(int i=0; i<4; i++)
-   for(int j=0; j<4; j++)
+  for(int i=0; i<4; i++) {
+   for(int j=0; j<4; j++) {
     QVERIFY(CaseLibre(xa+i, ya+j));
+}
+}
   // Enregistrer, rouvrir : carrefour et feux conservés
   Enregistre(Fichier);
   QVERIFY(!OuvreDemo("lot1_autre.cvw").isEmpty());
@@ -2942,10 +3168,14 @@ namespace
   QStringList CarrefoursActifs()
    {
     QStringList Actifs;
-    for(const char *g : GroupesCarrefours)
-     if (((QWidget *)frmCarrefours->FindComponent(g))->isEnabled()) Actifs<<g;
-    for(const BoutonCarrefour &b : BoutonsCarrefours)
-     if (((QWidget *)frmCarrefours->FindComponent(b.Nom))->isEnabled()) Actifs<<b.Nom;
+    for(const char *g : GroupesCarrefours) {
+     if ((static_cast<QWidget *>(frmCarrefours->FindComponent(g)))->isEnabled()) { Actifs<<g;
+}
+}
+    for(const BoutonCarrefour &b : BoutonsCarrefours) {
+     if ((static_cast<QWidget *>(frmCarrefours->FindComponent(b.Nom)))->isEnabled()) { Actifs<<b.Nom;
+}
+}
     return Actifs;
    }
   //-------------------------------------------------------------------------
@@ -2954,38 +3184,46 @@ namespace
   QStringList EcartsFichesPriorites(const QString &Quoi)
    {
     QStringList Ecarts;
-    const int x=frmSimulation->DrawGridSimul->Col, y=frmSimulation->DrawGridSimul->Row;
+    const int x=frmSimulation->DrawGridSimul->Col;
+    const int y=frmSimulation->DrawGridSimul->Row;
     const voie &v=cv->v[x][y];
-    const bool Voies=v.DirPoss||v.SensVoieTram;
+    const bool Voies=(v.DirPoss != 0)||(v.SensVoieTram != 0);
     const QString Case=QString("%1, %2").arg(x, 2, 10, QChar('0')).arg(y, 2, 10, QChar('0'));
-    if (frmDefVoie->isVisible()!=Voies)
+    if (frmDefVoie->isVisible()!=Voies) {
      Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités %1 en (%2)").arg(Voies?"fermée":"ouverte", Case);
-    if (frmDefVoiePietons->isVisible()==Voies)
+}
+    if (frmDefVoiePietons->isVisible()==Voies) {
      Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités piétons %1 en (%2)").arg(Voies?"ouverte":"fermée", Case);
+}
     if (frmDefVoie->isVisible())
      {
       TRadioGroup *Groupes[NBDIR]={frmDefVoie->RadioGroupPrioriteNord, frmDefVoie->RadioGroupPrioriteEst,
                                    frmDefVoie->RadioGroupPrioriteSud, frmDefVoie->RadioGroupPrioriteOuest};
-      if (Q(frmDefVoie->LabelCoordonnees->Caption)!=Case)
+      if (Q(frmDefVoie->LabelCoordonnees->Caption)!=Case) {
        Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités en (%1) au lieu de (%2)").arg(Q(frmDefVoie->LabelCoordonnees->Caption), Case);
+}
       for(int d=nord; d<=ouest; d++)
        {
-        if ((int)Groupes[d-1]->ItemIndex!=(int)v.Priorite[d-1])
-         Ecarts<<Quoi+QString::fromUtf8(" : priorité %1 affichée au lieu de %2 (direction %3)").arg((int)Groupes[d-1]->ItemIndex).arg((int)v.Priorite[d-1]).arg(d);
-        if (!v.SensVoieTram&&!v.NumParking&&((bool)Groupes[d-1]->Enabled!=!!(v.DirPoss&PossDir[d])))
+        if ((int)Groupes[d-1]->ItemIndex!=static_cast<int>(v.Priorite[d-1])) {
+         Ecarts<<Quoi+QString::fromUtf8(" : priorité %1 affichée au lieu de %2 (direction %3)").arg((int)Groupes[d-1]->ItemIndex).arg(static_cast<int>(v.Priorite[d-1])).arg(d);
+}
+        if ((v.SensVoieTram == 0)&&(v.NumParking == 0)&&((bool)Groupes[d-1]->Enabled!=!((v.DirPoss&PossDir[d]) == 0))) {
          Ecarts<<Quoi+QString::fromUtf8(" : direction %1 %2 dans la fiche").arg(d).arg(Groupes[d-1]->Enabled?"active":"inactive");
+}
        }
      }
-    if (frmDefVoiePietons->isVisible()&&(Q(frmDefVoiePietons->LabelCoordonnees->Caption)!=Case))
+    if (frmDefVoiePietons->isVisible()&&(Q(frmDefVoiePietons->LabelCoordonnees->Caption)!=Case)) {
      Ecarts<<Quoi+QString::fromUtf8(" : fiche Priorités piétons en (%1) au lieu de (%2)").arg(Q(frmDefVoiePietons->LabelCoordonnees->Caption), Case);
+}
     return Ecarts;
    }
   // Ce qui, sur une case, dépend de la fiche Priorités
   QString EtatPriorites(int x, int y)
    {
     const voie &v=cv->v[x][y];
-    QString e=QString("%1 %2 :").arg((int)v.DirPoss).arg((int)v.SensVoieTram);
-    for(int d=0; d<NBDIR; d++) e+=QString(" %1/%2").arg((int)v.Priorite[d]).arg(v.NumFeu[d]);
+    QString e=QString("%1 %2 :").arg(static_cast<int>(v.DirPoss)).arg(static_cast<int>(v.SensVoieTram));
+    for(int d=0; d<NBDIR; d++) { e+=QString(" %1/%2").arg(static_cast<int>(v.Priorite[d])).arg(v.NumFeu[d]);
+}
     return e+QString(" (%1 feux)").arg(NbFeuxDefinis());
    }
  }
@@ -3001,25 +3239,35 @@ void TestInterface::carrefoursDeChaqueBouton()
   for(const BoutonCarrefour &b : BoutonsCarrefours)
    {
     NouvelleZone(12, 12);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QCOMPARE(cv->NbFeux, NBFEUXDEFAUT);
     QCOMPARE(cv->NbFeuxLibres(), NBFEUXDEFAUT);
-    const int xd=2, yd=2, xf=xd+b.Colonnes-1, yf=yd+b.Lignes-1;
+    const int xd=2;
+    const int yd=2;
+    const int xf=xd+b.Colonnes-1;
+    const int yf=yd+b.Lignes-1;
     Selectionne(xd, yd, xf, yf);
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     QVERIFY(frmSimulation->ActionCarrefours->Enabled);
-    QStringList Actifs, Attendus;
-    for(const char *g : GroupesCarrefours)
-     if (QString(g).endsWith(QString("%1%2").arg(b.Colonnes).arg(b.Lignes))) Attendus<<g;
-    for(const BoutonCarrefour &a : BoutonsCarrefours)
-     if ((a.Colonnes==b.Colonnes)&&(a.Lignes==b.Lignes)) Attendus<<a.Nom;
+    QStringList Actifs;
+    QStringList Attendus;
+    for(const char *g : GroupesCarrefours) {
+     if (QString(g).endsWith(QString("%1%2").arg(b.Colonnes).arg(b.Lignes))) { Attendus<<g;
+}
+}
+    for(const BoutonCarrefour &a : BoutonsCarrefours) {
+     if ((a.Colonnes==b.Colonnes)&&(a.Lignes==b.Lignes)) { Attendus<<a.Nom;
+}
+}
     bool Glyphe=false;
     ReponseQuestions=QMessageBox::Yes; // « Êtes-vous bien sûr(e) de vouloir effacer... »
     Messages.clear();
-    QuandModale([]() { return frmCarrefours; }, [&]()
+    QuandModale([] { return frmCarrefours; }, [&]
      {
       Actifs=CarrefoursActifs();
-      TSpeedButton *s=(TSpeedButton *)frmCarrefours->FindComponent(b.Nom);
+      TSpeedButton *s=static_cast<TSpeedButton *>(frmCarrefours->FindComponent(b.Nom));
       Glyphe=!s->icon().isNull();
       Clique(s);
      });
@@ -3033,22 +3281,31 @@ void TestInterface::carrefoursDeChaqueBouton()
     QVERIFY2(Etapes.empty(), b.Nom);
     QVERIFY2(!frmCarrefours->isVisible(), b.Nom);
     const QString Nom=QString::fromUtf8(b.Nom)+" : ";
-    if (Actifs!=Attendus) Ecarts<<Nom+"actifs "+Actifs.join(", ");
-    if (!Glyphe) Ecarts<<Nom+"sans image";
-    if ((Messages.size()!=1)||!Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")))
+    if (Actifs!=Attendus) { Ecarts<<Nom+"actifs "+Actifs.join(", ");
+}
+    if (!Glyphe) { Ecarts<<Nom+"sans image";
+}
+    if ((Messages.size()!=1)||!Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer"))) {
      Ecarts<<Nom+Messages.join(" | ");
+}
     Ecarts<<EcartsCarrefour(b, xd, yd, 0);
     // Table des feux : les deux feux libres, puis ce qui manque
     const int NbEntrees=NbDir[b.Entrees];
-    if (b.Feux&&((cv->NbFeux!=NbEntrees)||cv->NbFeuxLibres()))
+    if (b.Feux&&((cv->NbFeux!=NbEntrees)||(cv->NbFeuxLibres() != 0))) {
      Ecarts<<Nom+QString("table de %1 feux, %2 libres").arg(cv->NbFeux).arg(cv->NbFeuxLibres());
-    if (!b.Feux&&(cv->NbFeux!=NBFEUXDEFAUT))
+}
+    if (!b.Feux&&(cv->NbFeux!=NBFEUXDEFAUT)) {
      Ecarts<<Nom+QString("table de %1 feux").arg(cv->NbFeux);
+}
     // Rien autour de la zone
-    for(int x=0; x<cv->NbX; x++)
-     for(int y=0; y<cv->NbY; y++)
-      if (((x<xd)||(x>xf)||(y<yd)||(y>yf))&&!CaseLibre(x, y)) Ecarts<<Nom+QString("case (%1, %2) modifiée").arg(x).arg(y);
-    if (!frmSimulation->SimulationModifiee) Ecarts<<Nom+"carte non modifiée";
+    for(int x=0; x<cv->NbX; x++) {
+     for(int y=0; y<cv->NbY; y++) {
+      if (((x<xd)||(x>xf)||(y<yd)||(y>yf))&&!CaseLibre(x, y)) { Ecarts<<Nom+QString("case (%1, %2) modifiée").arg(x).arg(y);
+}
+}
+}
+    if (!frmSimulation->SimulationModifiee) { Ecarts<<Nom+"carte non modifiée";
+}
    }
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
@@ -3059,7 +3316,8 @@ void TestInterface::carrefoursSelectionDUneAutreTaille()
    // activait les boutons (corrigé en 6.0.10). F1 et Aide ouvrent la rubrique, F2 rien ; Échap
    // (bouton Annuler invisible, de 0 x 0 pixel) ne dessine rien
   NouvelleZone(30, 30);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
   UrlsOuvertes.clear();
   const struct { int Colonnes, Lignes; } Tailles[]=
@@ -3069,9 +3327,10 @@ void TestInterface::carrefoursSelectionDUneAutreTaille()
   for(const auto &t : Tailles)
    {
     Selectionne(1, 1, t.Colonnes, t.Lignes);
-    if (QTest::currentTestFailed()) break;
+    if (QTest::currentTestFailed()) { break;
+}
     QStringList Actifs;
-    QuandModale([]() { return frmCarrefours; }, [&]()
+    QuandModale([] { return frmCarrefours; }, [&]
      {
       Actifs=CarrefoursActifs();
       if (Aide)
@@ -3085,14 +3344,17 @@ void TestInterface::carrefoursSelectionDUneAutreTaille()
      });
     Clique(frmSimulation->ToolButtonCarrefours);
     if (!Etapes.empty()) { Ecarts<<QString("%1 x %2 : fiche non ouverte").arg(t.Colonnes).arg(t.Lignes); Etapes.clear(); }
-    if (!Actifs.isEmpty()) Ecarts<<QString("%1 x %2 : %3").arg(t.Colonnes).arg(t.Lignes).arg(Actifs.join(", "));
+    if (!Actifs.isEmpty()) { Ecarts<<QString("%1 x %2 : %3").arg(t.Colonnes).arg(t.Lignes).arg(Actifs.join(", "));
+}
    }
   QDesktopServices::unsetUrlHandler("file");
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
   QVERIFY2(Messages.isEmpty(), qPrintable(Messages.join('\n')));
-  for(int x=0; x<cv->NbX; x++)
-   for(int y=0; y<cv->NbY; y++)
+  for(int x=0; x<cv->NbX; x++) {
+   for(int y=0; y<cv->NbY; y++) {
     QVERIFY(CaseLibre(x, y));
+}
+}
   QVERIFY(!frmSimulation->SimulationModifiee);
   QUrl Rubrique=QUrl::fromLocalFile(QCoreApplication::applicationDirPath()+"/html/index.html");
   Rubrique.setFragment("C"); // HelpContext 432
@@ -3106,19 +3368,23 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
    // carrefour prend d'abord. Effacement refusé (« Non ») : rien n'est dessiné, la carte
    // n'est pas modifiée, mais la table reste agrandie (original, sans effet)
   NouvelleZone(30, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(cv->NbFeux, NBFEUXDEFAUT);
   QCOMPARE(cv->NbFeuxLibres(), NBFEUXDEFAUT);
   auto Carrefour=[&](const char *Nom, int xd, int yd, QMessageBox::StandardButton Reponse, int NbFeuxRemplaces=0)
    {
     const BoutonCarrefour *b=nullptr;
-    for(const BoutonCarrefour &a : BoutonsCarrefours) if (!qstrcmp(a.Nom, Nom)) b=&a;
+    for(const BoutonCarrefour &a : BoutonsCarrefours) { if (!qstrcmp(a.Nom, Nom)) { b=&a;
+}
+}
     Selectionne(xd, yd, xd+b->Colonnes-1, yd+b->Lignes-1);
-    if (QTest::currentTestFailed()) return QStringList("sélection");
+    if (QTest::currentTestFailed()) { return QStringList("sélection");
+}
     const int NbFeuxAvant=NbFeuxDefinis();
     ReponseQuestions=Reponse;
     Messages.clear();
-    QuandModale([]() { return frmCarrefours; }, [Nom, this]() { Clique((TSpeedButton *)frmCarrefours->FindComponent(Nom)); });
+    QuandModale([] { return frmCarrefours; }, [Nom, this] { Clique(static_cast<TSpeedButton *>(frmCarrefours->FindComponent(Nom))); });
     Clique(frmSimulation->ToolButtonCarrefours);
     ReponseQuestions=QMessageBox::No;
     if (!Etapes.empty()) { Etapes.clear(); return QStringList(QString::fromUtf8(Nom)+" : fiche non ouverte"); }
@@ -3127,10 +3393,14 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
   auto Feux=[](int xd, int yd, int l, int h)
    {
     QSet<int> n;
-    for(int x=xd; x<xd+l; x++)
-     for(int y=yd; y<yd+h; y++)
-      for(int d=0; d<NBDIR; d++)
-       if (cv->v[x][y].NumFeu[d]) n<<cv->v[x][y].NumFeu[d];
+    for(int x=xd; x<xd+l; x++) {
+     for(int y=yd; y<yd+h; y++) {
+      for(int d : cv->v[x][y].NumFeu) {
+       if (d) { n<<d;
+}
+}
+}
+}
     return n;
    };
   // Effacement refusé : 3 x 4 à feux, la table est agrandie d'un feu avant la question
@@ -3138,9 +3408,11 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
   QCOMPARE(Messages.size(), 1);
   QVERIFY(Messages.first().contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")));
-  for(int x=0; x<cv->NbX; x++)
-   for(int y=0; y<cv->NbY; y++)
+  for(int x=0; x<cv->NbX; x++) {
+   for(int y=0; y<cv->NbY; y++) {
     QVERIFY(CaseLibre(x, y));
+}
+}
   QVERIFY(!frmSimulation->SimulationModifiee);
   QCOMPARE(cv->NbFeux, 3);
   QCOMPARE(cv->NbFeuxLibres(), 3);
@@ -3198,24 +3470,27 @@ void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
    // bien son feu. En 6.0.10, elle restait ouverte ; l'original y gardait l'adresse du feu
    // dans l'ancienne table, libérée (voir aussi ficheFeuPendantUnAjoutDeFeu)
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const int a=cv->v[4][8].NumFeu[est-1];
   QVERIFY(a>0);
   QCOMPARE(cv->NbFeuxLibres(), 0);
   QCOMPARE((int)cv->Feu[a-1].Etat, (int)inactif);
   OuvreFicheFeu(4, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   CliqueChoix(frmDefFeux->RadioGroupEtat, rouge); // choix laissé en suspens
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   QVERIFY(frmSimulation->SelectionFeuxDmd);
   Selectionne(11, 11, 14, 14);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(frmDefFeux->isVisible());
   QVERIFY(frmSimulation->ActionCarrefours->Enabled);
   const int NbFeuxAvant=NbFeuxDefinis();
   ReponseQuestions=QMessageBox::Yes;
   Messages.clear();
-  QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton44b); });
+  QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton44b); });
   Clique(frmSimulation->ToolButtonCarrefours);
   ReponseQuestions=QMessageBox::No;
   QVERIFY(Etapes.empty());
@@ -3255,18 +3530,21 @@ void TestInterface::carrefoursSurLeFeuDeLaFicheFeu()
    // écrivait rien. L'original y écrivait les valeurs et les listes de la fiche : le feu du
    // carrefour n'attendait plus le rouge des autres
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const int a=cv->v[4][8].NumFeu[est-1];
   QVERIFY(a>0);
   OuvreFicheFeu(4, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   Selectionne(3, 7, 6, 10);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const int NbFeuxAvant=NbFeuxDefinis();
   ReponseQuestions=QMessageBox::Yes;
   Messages.clear();
-  QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton44b); });
+  QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton44b); });
   Clique(frmSimulation->ToolButtonCarrefours);
   ReponseQuestions=QMessageBox::No;
   QVERIFY(Etapes.empty());
@@ -3288,20 +3566,25 @@ void TestInterface::ficheFeuPendantUnAjoutDeFeu()
    // fiche Priorités y ajoute un feu (Appliquer) sans feu libre, ce qui agrandit la table
    // des feux ; la fiche Feu, restée ouverte, modifie ensuite le sien (corrigé en 6.0.10)
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 8, 14, 8);
   TraceSegment(8, 2, 8, 14);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE((int)cv->v[8][8].DirPoss, (int)SE);
   PoseFeu(4, 8, frmDefVoie->RadioGroupPrioriteEst);
   PoseFeu(8, 8, frmDefVoie->RadioGroupPrioriteEst);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(cv->NbFeuxLibres(), 0);
-  const int a=cv->v[8][8].NumFeu[est-1], NbFeux=cv->NbFeux;
+  const int a=cv->v[8][8].NumFeu[est-1];
+  const int NbFeux=cv->NbFeux;
   QVERIFY(a>0);
   Messages.clear();
   OuvreFicheFeu(8, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
   Clique(frmDefVoie->ButtonAppliquer);
   QCOMPARE(cv->NbFeux, NbFeux+1); // table agrandie, donc déplacée
@@ -3326,13 +3609,17 @@ void TestInterface::prioritesApresUneCommandeSurLaSelection()
    // d'un carrefour (corrigé en 6.0.11)
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(30, 24);
-  if (QTest::currentTestFailed()) return;
-  for(int y : {2, 6, 10, 14}) TraceSegment(2, y, 12, y); // routes vers l'est
+  if (QTest::currentTestFailed()) { return;
+}
+  for(int y : {2, 6, 10, 14}) { TraceSegment(2, y, 12, y); // routes vers l'est
+}
   TraceSegment(14, 2, 22, 2);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   PoseFeu(4, 2, frmDefVoie->RadioGroupPrioriteEst);
   PoseFeu(4, 6, frmDefVoie->RadioGroupPrioriteEst);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   Selectionne(2, 18, 12, 18); // voie de tram
   s->ActionSegmentTram->Execute();
   CliqueCase(12, 18);
@@ -3349,29 +3636,34 @@ void TestInterface::prioritesApresUneCommandeSurLaSelection()
     ReponseQuestions=QMessageBox::Yes; // effacements confirmés
     Commande();
     ReponseQuestions=QMessageBox::No;
-    if (EtatPriorites(x, y)==Avant) Ecarts<<Quoi+QString::fromUtf8(" : case non modifiée par la commande");
+    if (EtatPriorites(x, y)==Avant) { Ecarts<<Quoi+QString::fromUtf8(" : case non modifiée par la commande");
+}
     Ecarts<<EcartsFichesPriorites(Quoi);
     const QString Apres=EtatPriorites(x, y);
-    if (frmDefVoie->isVisible()) Clique(frmDefVoie->ButtonOk);
-    if (frmDefVoiePietons->isVisible()) Clique(frmDefVoiePietons->ButtonOk);
-    if (EtatPriorites(x, y)!=Apres) Ecarts<<Quoi+QString::fromUtf8(" : OK a changé la case : ")+Apres+" -> "+EtatPriorites(x, y);
+    if (frmDefVoie->isVisible()) { Clique(frmDefVoie->ButtonOk);
+}
+    if (frmDefVoiePietons->isVisible()) { Clique(frmDefVoiePietons->ButtonOk);
+}
+    if (EtatPriorites(x, y)!=Apres) { Ecarts<<Quoi+QString::fromUtf8(" : OK a changé la case : ")+Apres+" -> "+EtatPriorites(x, y);
+}
    };
-  Verifie(QString::fromUtf8("Effacer les routes"), 4, 2, 6, 3, [s]() { s->ActionEffacerRoutes->Execute(); });
-  Verifie(QString::fromUtf8("Carrefours"), 4, 6, 6, 9, [this, s]()
+  Verifie(QString::fromUtf8("Effacer les routes"), 4, 2, 6, 3, [s] { s->ActionEffacerRoutes->Execute(); });
+  Verifie(QString::fromUtf8("Carrefours"), 4, 6, 6, 9, [this, s]
    {
-    QuandModale([]() { return frmCarrefours; }, [this]() { Clique(frmCarrefours->SpeedButton34a2); });
+    QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton34a2); });
     s->ActionCarrefours->Execute();
    });
-  Verifie(QString::fromUtf8("Segment de route"), 4, 10, 6, 10, [s]() { s->ActionSegmentRoute->Execute(); });
-  Verifie(QString::fromUtf8("Coin supérieur gauche"), 4, 14, 7, 17, [s]() { s->ActionCoinSuperieurGauche->Execute(); });
-  Verifie(QString::fromUtf8("Périphérique extérieur"), 16, 2, 20, 6, [s]() { s->ActionPeripheriqueExterieur->Execute(); });
-  Verifie(QString::fromUtf8("Segment de voie de tram"), 4, 18, 6, 18, [s]() { s->ActionSegmentTram->Execute(); });
-  Verifie(QString::fromUtf8("Effacer les voies de tram"), 8, 18, 10, 19, [s]() { s->ActionEffacerVoiesTram->Execute(); });
-  Verifie(QString::fromUtf8("Segment de route sur une case vide"), 4, 22, 8, 22, [s]() { s->ActionSegmentRoute->Execute(); });
+  Verifie(QString::fromUtf8("Segment de route"), 4, 10, 6, 10, [s] { s->ActionSegmentRoute->Execute(); });
+  Verifie(QString::fromUtf8("Coin supérieur gauche"), 4, 14, 7, 17, [s] { s->ActionCoinSuperieurGauche->Execute(); });
+  Verifie(QString::fromUtf8("Périphérique extérieur"), 16, 2, 20, 6, [s] { s->ActionPeripheriqueExterieur->Execute(); });
+  Verifie(QString::fromUtf8("Segment de voie de tram"), 4, 18, 6, 18, [s] { s->ActionSegmentTram->Execute(); });
+  Verifie(QString::fromUtf8("Effacer les voies de tram"), 8, 18, 10, 19, [s] { s->ActionEffacerVoiesTram->Execute(); });
+  Verifie(QString::fromUtf8("Segment de route sur une case vide"), 4, 22, 8, 22, [s] { s->ActionSegmentRoute->Execute(); });
   QVERIFY(Etapes.empty());
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
-  for(const QString &m : Messages)
+  for(const QString &m : Messages) {
    QVERIFY2(m.contains(QString::fromUtf8("Êtes-vous bien sûr(e) de vouloir effacer")), qPrintable(m));
+}
  }
 //---------------------------------------------------------------------------
 // Lot 2 des fiches secondaires : distances et informations
@@ -3383,7 +3675,7 @@ namespace
   QString Fleche(direction d)
    {
     const char16_t Symboles[NBDIR+1]={0, 0xAD, 0xAE, 0xAF, 0xAC};
-    return d?QString("   ")+QChar(Symboles[d]):QString();
+    return (d != 0)?QString("   ")+QChar(Symboles[d]):QString();
    }
   //-------------------------------------------------------------------------
   // Tableau attendu d'une fiche de distances pour une case, d'après le moteur
@@ -3417,7 +3709,8 @@ namespace
   // Différences entre deux textes, pour les fiches d'informations
   void Compare(QStringList &Ecarts, const char *Nom, const AnsiString &asObtenu, const QString &Attendu)
    {
-    if (Q(asObtenu)!=Attendu) Ecarts<<QString::fromUtf8("%1 : « %2 » au lieu de « %3 »").arg(QString::fromUtf8(Nom), Q(asObtenu), Attendu);
+    if (Q(asObtenu)!=Attendu) { Ecarts<<QString::fromUtf8("%1 : « %2 » au lieu de « %3 »").arg(QString::fromUtf8(Nom), Q(asObtenu), Attendu);
+}
    }
   QString NumeroCoordonnees(int n, int x, int y) { return QString::asprintf("%d (%02d, %02d)", n, x, y); }
   QString Cadre(int n, int x, int y) { return QString(27, ' ')+NumeroCoordonnees(n, x, y)+" "; }
@@ -3447,7 +3740,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v, c](int k, int d) { return v->DistParking[k][d][c]; };
        return t;
       },
-     [s]() { s->MenuItemInfosDistancesEtapes->ElementQt()->trigger(); }},
+     [s] { s->MenuItemInfosDistancesEtapes->ElementQt()->trigger(); }},
     {"arrets_bus", "ADDJAADB", frmAffDistArretsBus, frmAffDistArretsBus->StringGridDistances, s->ActionDistancesArretsBus, nullptr,
      [](voie *v, bool)
       {
@@ -3456,7 +3749,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v](int k, int d) { return v->DistArretBus[k][d]; };
        return t;
       },
-     [s]() { s->MenuItemDistancesArretsBus->ElementQt()->trigger(); }}, // menu contextuel de simulation
+     [s] { s->MenuItemDistancesArretsBus->ElementQt()->trigger(); }}, // menu contextuel de simulation
     {"arrets_tram", "ADDJAADT", frmAffDistArretsTram, frmAffDistArretsTram->StringGridDistances, s->ActionDistancesArretsTram, nullptr,
      [](voie *v, bool)
       {
@@ -3467,7 +3760,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v](int k, int d) { return v->DistArretTram[k][d]; };
        return t;
       },
-     []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); }},
+     [] { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); }},
     {"files_taxi", "ADDJAFDT", frmAffDistFilesTaxi, frmAffDistFilesTaxi->StringGridDistances, s->ActionDistancesFilesTaxi, nullptr,
      [](voie *v, bool)
       {
@@ -3476,7 +3769,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v](int k, int d) { return v->DistFileTaxi[k][d]; };
        return t;
       },
-     [s]() { s->MenuItemInfosDistancesFilesTaxi->ElementQt()->trigger(); }},
+     [s] { s->MenuItemInfosDistancesFilesTaxi->ElementQt()->trigger(); }},
     {"files_parkings", "ADDJAFDP", frmAffDistFilesPark, frmAffDistFilesPark->StringGridDistances, s->ActionDistancesFilesPark,
      frmAffDistFilesPark->CheckBoxCouloirsBus,
      [](voie *v, bool c)
@@ -3486,7 +3779,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v, c](int k, int d) { return v->DistFilePark[k][d][c]; };
        return t;
       },
-     []() { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); }},
+     [] { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); }},
     {"places_vehlib", "ADDJAPDV", frmAffDistPlacesVehlib, frmAffDistPlacesVehlib->StringGridDistances, s->ActionDistancesPlacesVehlib, nullptr,
      [](voie *v, bool)
       {
@@ -3495,27 +3788,33 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
        t.Distance=[v](int k, int d) { return v->DistPlaceVehlib[k][d]; };
        return t;
       },
-     [s]() { s->ActionDistancesPlacesVehlib->Execute(); }},
+     [s] { s->ActionDistancesPlacesVehlib->Execute(); }},
    };
   // Tableau affiché pour la case courante
   auto Verifie=[](const FicheDistances &f) -> QString
    {
-    int x=frmSimulation->DrawGridSimul->Col, y=frmSimulation->DrawGridSimul->Row;
+    int x=frmSimulation->DrawGridSimul->Col;
+    int y=frmSimulation->DrawGridSimul->Row;
     voie *v=&cv->v[x][y];
     TableDistances t=f.Table(v, f.Couloirs&&f.Couloirs->Checked);
     TStringGrid *g=f.Grille;
     QStringList e;
     if (!t.Definie)
      { // EffaceInfos seul
-      for(int c=0; c<g->ColCount; c++)
-       for(int r=0; r<g->RowCount; r++)
-        if (!Q(g->Cells[c][r]).isEmpty()) e<<QString("case [%1][%2] non vide").arg(c).arg(r);
+      for(int c=0; c<g->ColCount; c++) {
+       for(int r=0; r<g->RowCount; r++) {
+        if (!Q(g->Cells[c][r]).isEmpty()) { e<<QString("case [%1][%2] non vide").arg(c).arg(r);
+}
+}
+}
       return e.join('\n');
      }
     Compare(e, "titre", f.Fiche->Caption, QString("%1 (%2, %3)").arg(t.Titre).arg(x).arg(y));
-    if (g->RowCount!=1+t.Nb) e<<QString("RowCount %1 au lieu de %2").arg((int)g->RowCount).arg(1+t.Nb);
+    if (g->RowCount!=1+t.Nb) { e<<QString("RowCount %1 au lieu de %2").arg((int)g->RowCount).arg(1+t.Nb);
+}
     Compare(e, "[0][0]", g->Cells[0][0], QString());
-    for(int d=0; d<t.NbDir; d++) Compare(e, "en-tête", g->Cells[d+1][0], Fleche(t.Dir(d)));
+    for(int d=0; d<t.NbDir; d++) { Compare(e, "en-tête", g->Cells[d+1][0], Fleche(t.Dir(d)));
+}
     for(int k=1; k<=t.Nb; k++)
      {
       Compare(e, "numéro", g->Cells[0][k], QString::asprintf("%5d", k));
@@ -3524,7 +3823,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
         int de=t.Distance(k-1, d);
         Compare(e, "distance", g->Cells[d+1][k], (de==DIST_INDEFINIE)?QString("     "):QString::asprintf("%5d", de));
        }
-      for(int c=t.NbDir+1; c<g->ColCount; c++) Compare(e, "colonne vide", g->Cells[c][k], QString());
+      for(int c=t.NbDir+1; c<g->ColCount; c++) { Compare(e, "colonne vide", g->Cells[c][k], QString());
+}
      }
     return e.join('\n');
    };
@@ -3533,22 +3833,29 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
   auto CaseDe=[](const FicheDistances &f, int xh, int yh, int &xc, int &yc)
    {
     int Meilleur=-1;
-    for(int y=1; y<22; y++)
+    for(int y=1; y<22; y++) {
      for(int x=1; x<34; x++)
       {
        voie *v=&cv->v[x][y];
-       if (((x==xh)&&(y==yh))||v->NumParking) continue;
+       if (((x==xh)&&(y==yh))||v->NumParking) { continue;
+}
        TableDistances t=f.Table(v, false);
-       if (!(f.Fiche==frmAffDistArretsTram?(v->SensVoieTram>aucune_voie):(v->DirPoss>aucune))) continue;
+       if (!(f.Fiche==frmAffDistArretsTram?(v->SensVoieTram>aucune_voie):(v->DirPoss>aucune))) { continue;
+}
        int Note=2*t.Definie+(t.NbDir>=2);
        if (Note>Meilleur) { Meilleur=Note; xc=x; yc=y; }
       }
+}
     return Meilleur>=0;
    };
   for(const FicheDistances &f : Fiches)
    {
-    int x=0, y=0, x2=0, y2=0;
-    if ((f.Fiche==frmAffDistArretsTram)&&!cv->NbArretsTram) continue; // pas de voie de tram (Démo)
+    int x=0;
+    int y=0;
+    int x2=0;
+    int y2=0;
+    if ((f.Fiche==frmAffDistArretsTram)&&(cv->NbArretsTram == 0)) { continue; // pas de voie de tram (Démo)
+}
     QVERIFY2(CaseDe(f, -1, -1, x, y), f.Nom);
     QVERIFY2(CaseDe(f, x, y, x2, y2), f.Nom);
     Focalise();
@@ -3567,7 +3874,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
     TableDistances t=f.Table(&cv->v[x][y], false);
     // (v6.0.2 : f_afdistfp compte aussi le panneau de sa case à cocher, comme
     // f_afdistp : 43 et 300 ; sa grille était plus courte de 17 pixels)
-    int Panneau=f.Couloirs?17:0, Lignes=1+t.Nb;
+    int Panneau=f.Couloirs?17:0;
+    int Lignes=1+t.Nb;
     int Hauteur=(t.Nb>10)?283+Panneau:26+Panneau+21*Lignes;
     QCOMPARE((int)f.Fiche->Height, Hauteur);
     QCOMPARE(f.Fiche->height(), Hauteur-22);
@@ -3585,8 +3893,10 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
       QCOMPARE(f.Grille->verticalScrollBar()->maximum(), 0);
       QCOMPARE((int)f.Grille->FixedRows, 0);
      }
-    if (Captures) CaptureFiche(f.Fiche, QString("fiche_distances_%1.png").arg(f.Nom));
-    if (Captures) VerifieAide(f.Grille, nullptr, f.Rubrique); // HelpContext 63, 641 à 645 ; sans bouton Aide
+    if (Captures) { CaptureFiche(f.Fiche, QString("fiche_distances_%1.png").arg(f.Nom));
+}
+    if (Captures) { VerifieAide(f.Grille, nullptr, f.Rubrique); // HelpContext 63, 641 à 645 ; sans bouton Aide
+}
     if (t.Nb>10)
      { // Clavier (TCustomGrid::KeyDown) : la case courante descend d'une page, la
        // grille défile pour la garder visible ; Ctrl+Début revient en haut
@@ -3624,8 +3934,10 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
   // Fiches ouvertes à l'arrêt : refermées (TimerSimulTimer, tdArret)
   for(const FicheDistances &f : Fiches)
    {
-    int x=0, y=0;
-    if ((f.Fiche==frmAffDistArretsTram)&&!cv->NbArretsTram) continue;
+    int x=0;
+    int y=0;
+    if ((f.Fiche==frmAffDistArretsTram)&&(cv->NbArretsTram == 0)) { continue;
+}
     QVERIFY(CaseDe(f, -1, -1, x, y));
     Focalise();
     PlaceCurseur(x, y);
@@ -3645,13 +3957,15 @@ void TestInterface::fichesDistances()
    // arrêts et les places), Démo (4 parkings, aucun arrêt, file ni place : tableaux
    // vides), puis de nouveau Géant : ces grilles retrouvent leur ligne fixe (v6.0.2)
   VerifieFichesDistances(QString::fromUtf8("Géant.cvw"), true);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   VerifieFichesDistances(QString::fromUtf8("Démo.cvw"), false);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   VerifieFichesDistances(QString::fromUtf8("Géant.cvw"), false);
  }
 //---------------------------------------------------------------------------
-void TestInterface::SuitObjet(const char *Type, std::function<QString(long)> Ecart, std::function<bool(int &, int &)> Position, int NbTours)
+void TestInterface::SuitObjet(const char *Type, const std::function<QString(long)>& Ecart, const std::function<bool(int &, int &)>& Position, int NbTours)
  { // À chaque tour, la fiche montre l'objet de la case courante (rafraîchissement
    // demandé par le moteur) ; si l'objet suivi s'est déplacé, l'utilisateur clique
    // sur sa nouvelle case et la fiche le retrouve
@@ -3662,8 +3976,10 @@ void TestInterface::SuitObjet(const char *Type, std::function<QString(long)> Eca
     QCOMPARE((long)cv->TourCrt, Tour+1);
     QString e=Ecart(cv->TourCrt-1); // rafraîchissement en fin de tour, avant TourCrt++
     QVERIFY2(e.isEmpty(), qPrintable(QString("%1, tour %2 :\n%3").arg(Type).arg(cv->TourCrt).arg(e)));
-    int x, y;
-    if (!Position(x, y)) break; // arrivé ou monté dans un véhicule
+    int x;
+    int y;
+    if (!Position(x, y)) { break; // arrivé ou monté dans un véhicule
+}
     if ((x!=frmSimulation->DrawGridSimul->Col)||(y!=frmSimulation->DrawGridSimul->Row))
      {
       Focalise();
@@ -3682,19 +3998,21 @@ void TestInterface::fichesInfos()
   Focalise();
   QVERIFY2(Demarre(), qPrintable(Messages.join('\n')));
   QVERIFY(JoueJusquAuTour(15));
-  auto Case=[]() { return &cv->v[frmSimulation->DrawGridSimul->Col][frmSimulation->DrawGridSimul->Row]; };
-  auto Coordonnees=[]() { return QString::asprintf("%02d, %02d", (int)frmSimulation->DrawGridSimul->Col, (int)frmSimulation->DrawGridSimul->Row); };
+  auto Case=[] { return &cv->v[frmSimulation->DrawGridSimul->Col][frmSimulation->DrawGridSimul->Row]; };
+  auto Coordonnees=[] { return QString::asprintf("%02d, %02d", (int)frmSimulation->DrawGridSimul->Col, (int)frmSimulation->DrawGridSimul->Row); };
   // Premier objet trouvé sur la carte (Numero(v) > 0), case courante
-  auto Trouve=[this](std::function<int(voie *)> Numero) -> int
+  auto Trouve=[this](const std::function<int(voie *)>& Numero) -> int
    {
-    for(int y=0; y<cv->NbY; y++)
-     for(int x=0; x<cv->NbX; x++)
+    for(int y=0; y<cv->NbY; y++) {
+     for(int x=0; x<cv->NbX; x++) {
       if (int n=Numero(&cv->v[x][y]))
        {
         Focalise();
         CliqueCase(x, y);
         return n;
        }
+}
+}
     return 0;
    };
   //-------------------------------------------------------------------------
@@ -3712,7 +4030,8 @@ void TestInterface::fichesInfos()
       {
        vehicule *Veh=cv->Vehicule+v->NumVehicule-1;
        const char *Priorites[]={"Normal", "Urgences", "Police"};
-       if (!f->RadioButtonVehiculeNumero->Checked||f->LabelDirection->isHidden()) e<<QString::fromUtf8("véhicule non affiché");
+       if (!f->RadioButtonVehiculeNumero->Checked||f->LabelDirection->isHidden()) { e<<QString::fromUtf8("véhicule non affiché");
+}
        Compare(e, "cadre", f->GroupBoxVehicule->Caption, Cadre(v->NumVehicule, Veh->x, Veh->y));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[Veh->Dir]));
        Compare(e, "priorité", f->LabelNivPriorite->Caption, Priorites[Veh->NivPriorite]);
@@ -3720,14 +4039,18 @@ void TestInterface::fichesInfos()
        Compare(e, "tours", f->LabelTours->Caption, QString::number(Tour-Veh->TourDepart));
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(Veh->NbCasesParcourues));
        Compare(e, "vitesse", f->LabelVitesse->Caption, QString::asprintf("%d/%d", 1+(v->NumVehicule-1)%cv->NbVitesses, cv->NbVitesses));
-       if (Veh->NumParkingArrivee)
+       if (Veh->NumParkingArrivee) {
         Compare(e, "parking d'arrivée", f->LabelParkingArrivee->Caption,
                 NumeroCoordonnees(Veh->NumParkingArrivee, cv->Parking[Veh->NumParkingArrivee-1].x, cv->Parking[Veh->NumParkingArrivee-1].y));
-       for(TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente})
-        if (!Pourcentage.match(Q(l->Caption)).hasMatch()) e<<("pourcentage : "+Q(l->Caption));
+}
+       for(TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente}) {
+        if (!Pourcentage.match(Q(l->Caption)).hasMatch()) { e<<("pourcentage : "+Q(l->Caption));
+}
+}
       }
      else
-      if (!f->RadioButtonAucunVehicule->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun véhicule » non affiché");
+      if (!f->RadioButtonAucunVehicule->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun véhicule » non affiché");
+}
      return e.join('\n');
     };
    QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_V, Qt::ControlModifier);
@@ -3746,7 +4069,8 @@ void TestInterface::fichesInfos()
      x=Veh->x; y=Veh->y;
      return (x>=0)&&(y>=0)&&(cv->v[x][y].NumVehicule==n);
     }, 8);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Clique(f->ButtonOk); // « Vu »
    QVERIFY(!f->isVisible());
    QVERIFY(!frmSimulation->ActionDetailVehicule->Checked);
@@ -3758,8 +4082,9 @@ void TestInterface::fichesInfos()
    // tours sont joués jusqu'à ce que les deux diffèrent)
    QVERIFY(JoueTours([]()
     {
-     for(int i=1; i<cv->NbBus; i++)
+     for(int i=1; i<cv->NbBus; i++) {
       if (cv->Bus[i].Defini()&&(cv->Bus[i].TourDepartArretSvt!=cv->Bus->TourDepartArretSvt)) return true;
+}
      return false;
     }, 2000));
    int n=Trouve([](voie *v) { return ((v->NumBus>1)&&(cv->Bus[v->NumBus-1].TourDepartArretSvt!=cv->Bus->TourDepartArretSvt))?v->NumBus:0; });
@@ -3773,7 +4098,8 @@ void TestInterface::fichesInfos()
      if (v->NumBus>0)
       {
        bus *b=cv->Bus+v->NumBus-1;
-       if (!f->RadioButtonBusNumero->Checked||f->LabelDirection->isHidden()) e<<"bus non affiché";
+       if (!f->RadioButtonBusNumero->Checked||f->LabelDirection->isHidden()) { e<<"bus non affiché";
+}
        Compare(e, "cadre", f->GroupBoxBus->Caption, Cadre(v->NumBus, b->x, b->y));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[b->Dir]));
        Compare(e, "ligne", f->LabelNumeroLigne->Caption, QString::number(b->NumLigne));
@@ -3789,7 +4115,8 @@ void TestInterface::fichesInfos()
        Compare(e, "vitesse", f->LabelVitesse->Caption, QString::asprintf("1/%d", cv->NbVitesses));
       }
      else
-      if (!f->RadioButtonAucunBus->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun bus » non affiché");
+      if (!f->RadioButtonAucunBus->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun bus » non affiché");
+}
      return e.join('\n');
     };
    frmSimulation->MenuItemInfosBus->ElementQt()->trigger();
@@ -3804,7 +4131,8 @@ void TestInterface::fichesInfos()
      x=cv->Bus[n-1].x; y=cv->Bus[n-1].y;
      return (x>=0)&&(y>=0)&&(cv->v[x][y].NumBus==n);
     }, 6);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Touche(f->ButtonOk, Qt::Key_Escape); // « Vu » est le bouton Cancel
    QVERIFY(!f->isVisible());
    QVERIFY(!frmSimulation->ActionDetailBus->Checked);
@@ -3814,8 +4142,9 @@ void TestInterface::fichesInfos()
   {
    QVERIFY(JoueTours([]()
     {
-     for(int i=1; i<cv->NbTrams; i++)
+     for(int i=1; i<cv->NbTrams; i++) {
       if (cv->Tram[i].Defini()&&(cv->Tram[i].TourDepartArretSvt!=cv->Tram->TourDepartArretSvt)) return true;
+}
      return false;
     }, 2000));
    int n=Trouve([](voie *v) { return ((v->NumTram>1)&&(cv->Tram[v->NumTram-1].TourDepartArretSvt!=cv->Tram->TourDepartArretSvt))?v->NumTram:0; });
@@ -3829,7 +4158,8 @@ void TestInterface::fichesInfos()
      if (v->NumTram>0)
       {
        tram *t=cv->Tram+v->NumTram-1;
-       if (!f->RadioButtonTramNumero->Checked||f->LabelDirection->isHidden()) e<<"tram non affiché";
+       if (!f->RadioButtonTramNumero->Checked||f->LabelDirection->isHidden()) { e<<"tram non affiché";
+}
        Compare(e, "cadre", f->GroupBoxTram->Caption, Cadre(v->NumTram, t->x, t->y));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[t->Dir]));
        Compare(e, "ligne", f->LabelNumeroLigne->Caption, QString(QChar('A'+t->NumLigne-1)));
@@ -3840,11 +4170,14 @@ void TestInterface::fichesInfos()
                QString(" depuis le tour %1").arg(t->TourDepartArretSvt));
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(t->NbCasesParcourues));
        Compare(e, "tours depuis l'arrêt", f->LabelToursEntreArrets->Caption, QString::number(Tour-t->TourArriveDrnArret));
-       for(TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente})
-        if (!Pourcentage.match(Q(l->Caption)).hasMatch()) e<<("pourcentage : "+Q(l->Caption));
+       for(TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente}) {
+        if (!Pourcentage.match(Q(l->Caption)).hasMatch()) { e<<("pourcentage : "+Q(l->Caption));
+}
+}
       }
      else
-      if (!f->RadioButtonAucunTram->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun tram » non affiché");
+      if (!f->RadioButtonAucunTram->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun tram » non affiché");
+}
      return e.join('\n');
     };
    frmSimulation->MenuItemDetailTram->ElementQt()->trigger();
@@ -3859,7 +4192,8 @@ void TestInterface::fichesInfos()
      x=cv->Tram[n-1].x; y=cv->Tram[n-1].y;
      return (x>=0)&&(y>=0)&&(cv->v[x][y].NumTram==n);
     }, 6);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Clique(f->ButtonOk);
    QVERIFY(!f->isVisible());
    QVERIFY(!frmSimulation->ActionDetailTram->Checked);
@@ -3879,7 +4213,8 @@ void TestInterface::fichesInfos()
      if (v->NumTaxi>0)
       {
        taxi *t=cv->Taxi+v->NumTaxi-1;
-       if (!f->RadioButtonTaxiNumero->Checked||f->LabelDirection->isHidden()) e<<"taxi non affiché";
+       if (!f->RadioButtonTaxiNumero->Checked||f->LabelDirection->isHidden()) { e<<"taxi non affiché";
+}
        Compare(e, "cadre", f->GroupBoxTaxi->Caption, Cadre(v->NumTaxi, t->x, t->y));
        Compare(e, "situation", f->LabelSituation->Caption, QString::fromUtf8(Situations[t->Situation]));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[t->Dir]));
@@ -3889,11 +4224,13 @@ void TestInterface::fichesInfos()
        Compare(e, "tours depuis le départ", f->LabelToursDepuisDepart->Caption, QString::number(Tour-t->TourDepartDrnCourse));
        // v6.0.2 : DistFileTaxi[file][direction] (l'original inversait les indices)
        int Min=0x7FFFFFFF;
-       for(int d=0; d<NbDir[v->DirPoss]; d++) Min=qMin(Min, v->DistFileTaxi[t->NumFile][d]);
+       for(int d=0; d<NbDir[v->DirPoss]; d++) { Min=qMin(Min, v->DistFileTaxi[t->NumFile][d]);
+}
        Compare(e, "distance à la tête de file", f->LabelDistanceTeteFileDepart->Caption, QString::number(Min));
       }
      else
-      if (!f->RadioButtonAucunTaxi->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun taxi » non affiché");
+      if (!f->RadioButtonAucunTaxi->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun taxi » non affiché");
+}
      return e.join('\n');
     };
    QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_I, Qt::ControlModifier);
@@ -3908,7 +4245,8 @@ void TestInterface::fichesInfos()
      x=cv->Taxi[n-1].x; y=cv->Taxi[n-1].y;
      return (x>=0)&&(y>=0)&&(cv->v[x][y].NumTaxi==n);
     }, 4);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Clique(f->ButtonOk);
    QVERIFY(!f->isVisible());
   }
@@ -3924,7 +4262,8 @@ void TestInterface::fichesInfos()
      if (v->NumVehlib>0)
       {
        vehlib *l=cv->Vehlib+v->NumVehlib-1;
-       if (!f->RadioButtonVehlibNumero->Checked||f->LabelDirection->isHidden()) e<<"vehlib non affiché";
+       if (!f->RadioButtonVehlibNumero->Checked||f->LabelDirection->isHidden()) { e<<"vehlib non affiché";
+}
        Compare(e, "cadre", f->GroupBoxVehlib->Caption, Cadre(v->NumVehlib, l->x, l->y));
        Compare(e, "situation", f->LabelSituation->Caption, QString::fromUtf8(Situations[l->Situation]));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[l->Dir]));
@@ -3936,7 +4275,8 @@ void TestInterface::fichesInfos()
                (l->Situation==svDepart)?QString::number(Tour-l->TourDepart):QString("N/D"));
       }
      else
-      if (!f->RadioButtonAucunVehlib->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun vehlib » non affiché");
+      if (!f->RadioButtonAucunVehlib->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun vehlib » non affiché");
+}
      return e.join('\n');
     };
    QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_E, Qt::ControlModifier);
@@ -3951,7 +4291,8 @@ void TestInterface::fichesInfos()
      x=cv->Vehlib[n-1].x; y=cv->Vehlib[n-1].y;
      return (x>=0)&&(y>=0)&&(cv->v[x][y].NumVehlib==n);
     }, 4);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Clique(f->ButtonOk);
    QVERIFY(!f->isVisible());
   }
@@ -3971,7 +4312,8 @@ void TestInterface::fichesInfos()
       {
        pieton *p=&cv->Pieton[Num-1];
        const char *Positions[2]={"Entrée de la case", "Sortie de la case"};
-       if (!f->RadioButtonPietonNumero->Checked||f->LabelDirection->isHidden()) e<<QString::fromUtf8("piéton non affiché");
+       if (!f->RadioButtonPietonNumero->Checked||f->LabelDirection->isHidden()) { e<<QString::fromUtf8("piéton non affiché");
+}
        Compare(e, "cadre", f->GroupBoxPieton->Caption, Cadre(Num, p->x, p->y));
        Compare(e, "direction", f->LabelDirection->Caption, Q(asDir[p->Dir]));
        Compare(e, "parcours", f->LabelParcours->Caption, QString::number(p->DemiCasesParcourues/2.0, 'f', 1).replace('.', ','));
@@ -3979,7 +4321,8 @@ void TestInterface::fichesInfos()
        Compare(e, "véhicule", f->LabelBusTramTaxiVehlib->Caption, "Aucun");
       }
      else
-      if (!f->RadioButtonAucunPieton->Checked||!f->LabelDirection->isHidden()) e<<QString::fromUtf8("« Aucun piéton » non affiché");
+      if (!f->RadioButtonAucunPieton->Checked||!f->LabelDirection->isHidden()) { e<<QString::fromUtf8("« Aucun piéton » non affiché");
+}
      return e.join('\n');
     };
    QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_P, Qt::ControlModifier);
@@ -3995,7 +4338,8 @@ void TestInterface::fichesInfos()
      x=p->x; y=p->y;
      return (x>=0)&&(y>=0)&&((cv->v[x][y].NumPieton[0]==n)||(cv->v[x][y].NumPieton[1]==n));
     }, 6);
-   if (QTest::currentTestFailed()) return;
+   if (QTest::currentTestFailed()) { return;
+}
    Clique(f->ButtonOk);
    QVERIFY(!f->isVisible());
   }
@@ -4006,7 +4350,8 @@ void TestInterface::fichesInfos()
   // l'original lisait au clic suivant sur la carte
   int n=Trouve([](voie *v) { return (v->NumVehicule>0)&&!v->NumParking?v->NumVehicule:0; });
   QVERIFY(n>0);
-  int x=frmSimulation->DrawGridSimul->Col, y=frmSimulation->DrawGridSimul->Row;
+  int x=frmSimulation->DrawGridSimul->Col;
+  int y=frmSimulation->DrawGridSimul->Row;
   QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_V, Qt::ControlModifier);
   QVERIFY(frmInfosVehicule->isVisible());
   QVERIFY(frmInfosVehicule->RadioButtonVehiculeNumero->Checked);
@@ -4015,8 +4360,9 @@ void TestInterface::fichesInfos()
   frmRecherche->CSpinEditPieton->Value=1;
   frmRecherche->RadioButtonPieton->Checked=true;
   for(TAction *a : {frmSimulation->ActionDetailBus, frmSimulation->ActionDetailTram, frmSimulation->ActionDetailTaxi,
-                    frmSimulation->ActionDetailVehlib, frmSimulation->ActionDetailPieton})
+                    frmSimulation->ActionDetailVehlib, frmSimulation->ActionDetailPieton}) {
    a->Execute();
+}
   QVERIFY(frmInfosPieton->RadioButtonPietonNumero->Checked);
   Focalise();
   CliqueCase(x, y); // Rechercher a déplacé le curseur : de nouveau sur le véhicule
@@ -4088,10 +4434,14 @@ void TestInterface::fichePietonDansUnVehicule()
     {"taxi", "Dans un taxi", "Attend dans le taxi", [](pieton *p) { return p->NumTaxi; }, [](int k) { return QPoint(cv->Taxi[k-1].x, cv->Taxi[k-1].y); }, false},
     {"vehlib", "Dans un vehlib", "Attend dans le vehlib", [](pieton *p) { return p->NumVehlib; }, [](int k) { return QPoint(cv->Vehlib[k-1].x, cv->Vehlib[k-1].y); }, false},
    };
-  bool VersTaxi=false, VersVehlib=false, FileTaxi=false;
-  auto Fini=[&]()
+  bool VersTaxi=false;
+  bool VersVehlib=false;
+  bool FileTaxi=false;
+  auto Fini=[&]
    {
-    for(const Sorte &o : Sortes) if (!o.Vue) return false;
+    for(const Sorte &o : Sortes) { if (!o.Vue) { return false;
+}
+}
     return VersTaxi&&VersVehlib&&FileTaxi;
    };
   for(int Tour=0; (Tour<6000)&&!Fini()&&!QTest::currentTestFailed(); Tour++)
@@ -4100,8 +4450,8 @@ void TestInterface::fichePietonDansUnVehicule()
     for(int i=0; i<cv->NbPietons; i++)
      {
       pieton *p=&cv->Pieton[i];
-      for(Sorte &o : Sortes)
-       if (!o.Vue&&o.Numero(p))
+      for(Sorte &o : Sortes) {
+       if (!o.Vue&&(o.Numero(p) != 0))
         {
          o.Vue=true;
          QPoint c=o.Place(o.Numero(p));
@@ -4110,15 +4460,19 @@ void TestInterface::fichePietonDansUnVehicule()
          r->CSpinEditPieton->Value=i+1;
          r->CSpinEditPietonChange(r->CSpinEditPieton);
          Compare(e, "Rechercher", r->StatusBar->SimpleText, QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(i+1).arg(o.Nom).arg(o.Numero(p)).arg(c.x()).arg(c.y()));
-         if ((s->DrawGridSimul->Col!=c.x())||(s->DrawGridSimul->Row!=c.y())) e<<QString("curseur en (%1, %2)").arg((int)s->DrawGridSimul->Col).arg((int)s->DrawGridSimul->Row);
+         if ((s->DrawGridSimul->Col!=c.x())||(s->DrawGridSimul->Row!=c.y())) { e<<QString("curseur en (%1, %2)").arg((int)s->DrawGridSimul->Col).arg((int)s->DrawGridSimul->Row);
+}
          Montre(i+1, c.x(), c.y());
          Compare(e, "cadre", f->GroupBoxPieton->Caption, Cadre(i+1, c.x(), c.y()));
          Compare(e, "position", f->LabelPosition->Caption, QString::fromUtf8(o.Position));
          Compare(e, "véhicule", f->LabelBusTramTaxiVehlib->Caption, NumeroCoordonnees(o.Numero(p), c.x(), c.y()));
-         if (Libre(p)) Compare(e, "situation", f->LabelSituation->Caption, QString::fromUtf8(o.Situation));
+         if (Libre(p)) { Compare(e, "situation", f->LabelSituation->Caption, QString::fromUtf8(o.Situation));
+}
          QVERIFY2(e.isEmpty(), qPrintable(QString("%1 : %2").arg(o.Nom, e.join('\n'))));
         }
-      if (!p->Defini()||p->NumBus||p->NumTram||p->NumTaxi||p->NumVehlib||!Libre(p)) continue;
+}
+      if (!p->Defini()||(p->NumBus != 0)||(p->NumTram != 0)||(p->NumTaxi != 0)||(p->NumVehlib != 0)||!Libre(p)) { continue;
+}
       if (p->PlaceVehlibTrv&&!VersVehlib)
        {
         VersVehlib=true;
@@ -4131,7 +4485,7 @@ void TestInterface::fichePietonDansUnVehicule()
         Montre(i+1, p->x, p->y);
         QCOMPARE(Q(f->LabelSituation->Caption), QString::fromUtf8("Se dirige vers une file de taxis"));
        }
-      if (p->NumFileTaxi&&!p->NumArretBus&&!p->NumArretTram&&!FileTaxi)
+      if ((p->NumFileTaxi != 0)&&(p->NumArretBus == 0)&&(p->NumArretTram == 0)&&!FileTaxi)
        { // Tête de la file, dont le numéro de place commence à 1 (l'original lisait la place suivante)
         FileTaxi=true;
         Montre(i+1, p->x, p->y);
@@ -4141,13 +4495,19 @@ void TestInterface::fichePietonDansUnVehicule()
                  NumeroCoordonnees(p->NumFileTaxi, cv->PlaceTaxi[Tete-1].x, cv->PlaceTaxi[Tete-1].y));
        }
      }
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
    }
   QStringList Manque;
-  for(const Sorte &o : Sortes) if (!o.Vue) Manque<<o.Nom;
-  if (!VersTaxi) Manque<<"vers un taxi";
-  if (!VersVehlib) Manque<<"vers un vehlib";
-  if (!FileTaxi) Manque<<"file de taxis";
+  for(const Sorte &o : Sortes) { if (!o.Vue) { Manque<<o.Nom;
+}
+}
+  if (!VersTaxi) { Manque<<"vers un taxi";
+}
+  if (!VersVehlib) { Manque<<"vers un vehlib";
+}
+  if (!FileTaxi) { Manque<<"file de taxis";
+}
   QVERIFY2(Manque.isEmpty(), qPrintable(Manque.join(", ")));
   Clique(r->ButtonAnnuler);
   Clique(f->ButtonOk);
@@ -4175,18 +4535,21 @@ void TestInterface::fichePietonSuiviAilleurs()
     return p->Defini()&&!p->NumBus&&!p->NumTram&&!p->NumTaxi&&!p->NumVehlib&&
            (cv->v[p->x][p->y].NumPieton[0]==i+1);
    };
-  int Suivi=0, Autre=0;
-  for(int Tour=0; (Tour<2000)&&!Autre&&!QTest::currentTestFailed(); Tour++)
+  int Suivi=0;
+  int Autre=0;
+  for(int Tour=0; (Tour<2000)&&(Autre == 0)&&!QTest::currentTestFailed(); Tour++)
    {
     JoueTour();
     Suivi=0;
-    for(int i=0; (i<cv->NbPietons)&&!Autre; i++)
+    for(int i=0; (i<cv->NbPietons)&&(Autre == 0); i++) {
      if (APied(i))
       {
-       if (!Suivi) Suivi=i+1;
-       else
-        if ((cv->Pieton[i].x!=cv->Pieton[Suivi-1].x)||(cv->Pieton[i].y!=cv->Pieton[Suivi-1].y)) Autre=i+1;
+       if (Suivi == 0) { Suivi=i+1;
+       } else
+        if ((cv->Pieton[i].x!=cv->Pieton[Suivi-1].x)||(cv->Pieton[i].y!=cv->Pieton[Suivi-1].y)) { Autre=i+1;
+}
       }
+}
    }
   QVERIFY(Autre);
   auto Fiche=[f, this](int x, int y)
@@ -4195,7 +4558,8 @@ void TestInterface::fichePietonSuiviAilleurs()
     f->RafraichitInfos();
     return Q(f->GroupBoxPieton->Caption);
    };
-  pieton *a=cv->Pieton+Autre-1, *b=cv->Pieton+Suivi-1;
+  pieton *a=cv->Pieton+Autre-1;
+  pieton *b=cv->Pieton+Suivi-1;
   const QString asAutre=Fiche(a->x, a->y); // Piéton de la case, rien n'étant suivi
   r->RadioButtonPieton->Checked=true;
   r->CSpinEditPieton->Value=Suivi;
@@ -4203,13 +4567,15 @@ void TestInterface::fichePietonSuiviAilleurs()
   QVERIFY(asAutre!=asSuivi);
   QCOMPARE(Fiche(a->x, a->y), asAutre);
   // Case sans piéton ni véhicule
-  int xVide=-1, yVide=-1;
-  for(int x=0; (x<cv->NbX)&&(xVide<0); x++)
+  int xVide=-1;
+  int yVide=-1;
+  for(int x=0; (x<cv->NbX)&&(xVide<0); x++) {
    for(int y=0; (y<cv->NbY)&&(xVide<0); y++)
     {
      voie *v=&cv->v[x][y];
-     if (!v->NumPieton[0]&&!v->NumPieton[1]&&!v->NumBus&&!v->NumTram&&!v->NumTaxi&&!v->NumVehlib) { xVide=x; yVide=y; }
+     if ((v->NumPieton[0] == 0)&&(v->NumPieton[1] == 0)&&(v->NumBus == 0)&&(v->NumTram == 0)&&(v->NumTaxi == 0)&&(v->NumVehlib == 0)) { xVide=x; yVide=y; }
     }
+}
   QVERIFY(xVide>=0);
   QCOMPARE(Fiche(xVide, yVide), asSuivi);
   Clique(r->ButtonAnnuler);
@@ -4221,9 +4587,10 @@ void TestInterface::dimensionsZoneBornees()
  { // v6.0.3 : l'original n'avait aucune limite haute (99999x99999 : 2,5 To)
   QVERIFY(!OuvreDemo("dimensions_zone.cvw").isEmpty());
   voie **Zone=cv->v;
-  bool Refuse=false, Ouverte=false;
+  bool Refuse=false;
+  bool Ouverte=false;
   Messages.clear();
-  QuandModale([]() { return frmDimensionsZone; }, [&]()
+  QuandModale([] { return frmDimensionsZone; }, [&]
    {
     VerifieAide(frmDimensionsZone->CSpinEditNbX, frmDimensionsZone->ButtonAide, "DDDDLZDS"); // HelpContext 3111
     frmDimensionsZone->CSpinEditNbX->Value=NBXMAX+1;
@@ -4247,7 +4614,7 @@ void TestInterface::dimensionsZoneBornees()
   QCOMPARE(cv->v, Zone); // Réseau ouvert gardé
   // La plus grande zone possible
   Messages.clear();
-  QuandModale([]() { return frmDimensionsZone; }, [&]()
+  QuandModale([] { return frmDimensionsZone; }, [&]
    {
     frmDimensionsZone->CSpinEditNbX->Value=NBXMAX;
     frmDimensionsZone->CSpinEditNbY->Value=NBYMAX;
@@ -4270,14 +4637,16 @@ void TestInterface::parcoursEdition()
    // réouverture à l'identique, simulation
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(!s->SimulationModifiee);
   // Quatre segments : sens du premier clic vers le second, sans la dernière case
   TraceSegment(2, 2, 12, 2);
   TraceSegment(12, 2, 12, 12);
   TraceSegment(12, 12, 2, 12);
   TraceSegment(2, 12, 2, 2);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(s->SimulationModifiee);
   for(int i=2; i<12; i++)
    {
@@ -4287,7 +4656,7 @@ void TestInterface::parcoursEdition()
     QCOMPARE((int)cv->v[2][14-i].DirPoss, (int)N);
    }
   // Parkings : créés dans les places existantes, puis en plus ; numéro d'un supprimé réutilisé
-  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  auto Statut=[s] { return Q(s->StatusBar->Panels->Items[0]->Text); };
   ExecuteSurCase(6, 2, s->ActionParking);
   QCOMPARE((int)cv->v[6][2].NumParking, 1);
   QCOMPARE(Statut(), QString::fromUtf8("Le parking créé a le numéro 1."));
@@ -4334,9 +4703,12 @@ void TestInterface::parcoursEdition()
   QCOMPARE((int)cv->v[9][2].NumFeu[est-1], NumFeu);
   QCOMPARE((int)cv->Feu[NumFeu-1].x, 9);
   // Trottoirs : de la place pour les 30 piétons par défaut
-  for(int x=3; x<12; x++)
-   for(int y=3; y<7; y++) ExecuteSurCase(x, y, s->ActionNatureTrottoir);
-  if (QTest::currentTestFailed()) return;
+  for(int x=3; x<12; x++) {
+   for(int y=3; y<7; y++) { ExecuteSurCase(x, y, s->ActionNatureTrottoir);
+}
+}
+  if (QTest::currentTestFailed()) { return;
+}
   // Vérification : le parking supprimé laisse une place vide, signalée
   Messages.clear();
   s->ActionVerifierReseau->Execute();
@@ -4344,7 +4716,7 @@ void TestInterface::parcoursEdition()
   // Enregistrer sous : nom, titre, plus de modification
   const QString f=QFileInfo(Carte).absolutePath()+"/edition.cvw";
   QFile::remove(f);
-  QuandModale([this]() { return BoiteFichier(); }, [this, f]() { ChoisitFichier(f); });
+  QuandModale([this] { return BoiteFichier(); }, [this, f] { ChoisitFichier(f); });
   s->ActionEnregistrerSous->Execute();
   QVERIFY(Etapes.empty());
   QVERIFY(QFile::exists(f));
@@ -4355,7 +4727,8 @@ void TestInterface::parcoursEdition()
   QVERIFY(Contenu(f)==Reseau);
   // Réouverture après une autre zone : même réseau, éléments retrouvés
   NouvelleZone(10, 10);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(cv->NbX, 10);
   OuvreFichier(f);
   QCOMPARE(cv->NbX, 20);
@@ -4388,11 +4761,13 @@ void TestInterface::editionMarqueLaCarteModifiee()
  { // Toute modification de la carte doit proposer d'enregistrer avant de la quitter
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 2, 12, 2);
   TraceSegment(2, 4, 12, 4);
   TraceSegment(2, 6, 12, 6);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const QString f=QFileInfo(Carte).absolutePath()+"/edition_modifiee.cvw";
   QStringList Ecarts;
   struct Edition { const char *Nom; int x, y; TAction *Action; };
@@ -4431,8 +4806,10 @@ void TestInterface::editionMarqueLaCarteModifiee()
     if (!e.Action->Enabled) { Ecarts<<QString::fromUtf8("%1 : action indisponible").arg(e.Nom); continue; }
     QByteArray Avant=OctetsReseau();
     e.Action->Execute();
-    if (OctetsReseau()==Avant) Ecarts<<QString::fromUtf8("%1 : carte inchangée").arg(e.Nom);
-    if (!s->SimulationModifiee) Ecarts<<QString::fromUtf8("%1 : carte non marquée modifiée").arg(e.Nom);
+    if (OctetsReseau()==Avant) { Ecarts<<QString::fromUtf8("%1 : carte inchangée").arg(e.Nom);
+}
+    if (!s->SimulationModifiee) { Ecarts<<QString::fromUtf8("%1 : carte non marquée modifiée").arg(e.Nom);
+}
     Enregistre(f);
    }
   // Voie de tram : segment, puis une case effacée
@@ -4453,7 +4830,8 @@ void TestInterface::quitterAvecModifications()
    // écrire ; Oui écrit le fichier. Le fichier n'est relu qu'à la fin
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const QString f=QFileInfo(Carte).absolutePath()+"/quitter.cvw";
   QFile::remove(f);
   Enregistre(f);
@@ -4466,7 +4844,8 @@ void TestInterface::quitterAvecModifications()
   QVERIFY(Peut);
   QVERIFY(Messages.isEmpty());
   TraceSegment(2, 2, 12, 2);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Annuler (Échap) : on reste, sans écrire
   ReponseQuestions=QMessageBox::Cancel;
   Messages.clear();
@@ -4491,11 +4870,13 @@ void TestInterface::quitterAvecModifications()
   QVERIFY(!s->SimulationModifiee);
   // Oui sans nom de fichier, boîte annulée : on reste, carte toujours modifiée
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 2, 12, 2);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   ReponseQuestions=QMessageBox::Yes;
-  QuandModale([this]() { return BoiteFichier(); }, [this]() { AnnuleBoiteFichier(); });
+  QuandModale([this] { return BoiteFichier(); }, [this] { AnnuleBoiteFichier(); });
   Peut=true;
   s->FormCloseQuery(s, Peut);
   QVERIFY(Etapes.empty());
@@ -4508,9 +4889,10 @@ void TestInterface::copierVersUnFichier()
    // nom et ses modifications non enregistrées ne changent pas
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
-  const QString Original=QFileInfo(Carte).absolutePath()+"/copier_original.cvw",
-                Copie=QFileInfo(Carte).absolutePath()+"/copier_copie.cvw";
+  if (QTest::currentTestFailed()) { return;
+}
+  const QString Original=QFileInfo(Carte).absolutePath()+"/copier_original.cvw";
+  const QString Copie=QFileInfo(Carte).absolutePath()+"/copier_copie.cvw";
   QFile::remove(Original);
   QFile::remove(Copie);
   Enregistre(Original);
@@ -4518,7 +4900,8 @@ void TestInterface::copierVersUnFichier()
   TraceSegment(3, 3, 9, 3);
   TraceSegment(9, 3, 9, 9);
   ExecuteSurCase(5, 3, s->ActionParking);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Moins de 8x8 : refusé
   Messages.clear();
   Selectionne(2, 2, 6, 6);
@@ -4536,7 +4919,7 @@ void TestInterface::copierVersUnFichier()
   Messages.clear();
   Selectionne(2, 2, 11, 11);
   QVERIFY(s->ActionCopierVers->Enabled);
-  QuandModale([this]() { return BoiteFichier(); }, [this, Copie]() { ChoisitFichier(Copie); });
+  QuandModale([this] { return BoiteFichier(); }, [this, Copie] { ChoisitFichier(Copie); });
   s->ActionCopierVers->Execute();
   QVERIFY(Etapes.empty());
   QVERIFY2(QFile::exists(Copie), qPrintable(Messages.join('\n')));
@@ -4566,12 +4949,14 @@ void TestInterface::effacerRoutesDeLaSelection()
  { // Effacer les routes de la sélection : la question, puis tout ce qui s'y trouve
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 2, 12, 2);
   TraceSegment(2, 8, 12, 8);
   ExecuteSurCase(5, 2, s->ActionParking);
   ExecuteSurCase(5, 8, s->ActionParking);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Non : rien ne change
   ReponseQuestions=QMessageBox::No;
   const QByteArray Reseau=OctetsReseau();
@@ -4602,12 +4987,15 @@ void TestInterface::effacerSelectionAvecArretsDeBus()
    // sous ASan)
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 2, 12, 2);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   ExecuteSurCase(5, 2, s->ActionArretBusTram);
   ExecuteSurCase(6, 2, s->ActionArretBusTram);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE((int)cv->NbArretsBus, 1);
   QCOMPARE((int)cv->v[5][2].NumArretBus, 1);
   QCOMPARE((int)cv->v[6][2].NumArretBus, 1);
@@ -4623,18 +5011,20 @@ void TestInterface::placeVehlibSupprimee()
  { // v6.0.7 : VerifieReseau ne contrôlait pas les places de vehlib (v5.3) : une place
    // supprimée, la simulation démarrait et CalculeDistances lisait la case (-1,-1)
   TfrmSimulation *s=frmSimulation;
-  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  auto Statut=[s] { return Q(s->StatusBar->Panels->Items[0]->Text); };
   QString f=OuvreCarte("Géant.cvw", "place_vehlib.cvw");
   QVERIFY(!f.isEmpty());
   QCOMPARE((int)cv->NbPlacesVehlib, 32);
-  const int x=cv->PlaceVehlib[1].x, y=cv->PlaceVehlib[1].y;
+  const int x=cv->PlaceVehlib[1].x;
+  const int y=cv->PlaceVehlib[1].y;
   ExecuteSurCase(x, y, s->ActionPlaceVehlib);
   QCOMPARE(Statut(), QString::fromUtf8("La place de vehlib numéro 2 a été supprimée."));
   const QByteArray Reseau=OctetsReseau();
   QVERIFY(!DemarreSansBlocage("Marche après la suppression d'une place de vehlib"));
   QVERIFY2(Statut().contains(QString::fromUtf8("Place de vehlib n°2 non définie")), qPrintable(Statut()));
   VerifieNonDemarre(Reseau);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // « Pour renuméroter : sauvez puis rouvrez le réseau »
   Enregistre(f);
   OuvreFichier(f);
@@ -4651,7 +5041,8 @@ void TestInterface::epidemieSansPietonDansLaBarreDEtat()
   TfrmSimulation *s=frmSimulation;
   struct Retablit
    { // Affichage d'origine pour les tests suivants, même après un échec
-    ~Retablit() { try { if (frmSimulation->ActionAfficherInfection->Checked) frmSimulation->ActionAfficherInfection->Execute(); } catch (...) { qWarning("Affichage épidémie non rétabli"); } }
+    ~Retablit() { try { if (frmSimulation->ActionAfficherInfection->Checked) { frmSimulation->ActionAfficherInfection->Execute(); 
+}} catch (...) { qWarning("Affichage épidémie non rétabli"); } }
    } r;
   QVERIFY(!OuvreCarte("8x8.cvw", "sans_pieton.cvw").isEmpty());
   QCOMPARE((int)cv->NbPietons, 0);
@@ -4672,7 +5063,7 @@ void TestInterface::verificationDuReseauMessageParMessage()
    // en cause clignote avec le curseur d'erreur
   TfrmSimulation *s=frmSimulation;
   GrilleSimulation *g=s->DrawGridSimul;
-  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  auto Statut=[s] { return Q(s->StatusBar->Panels->Items[0]->Text); };
   const QString f=OuvreCarte("Géant.cvw", "verification.cvw");
   QVERIFY(!f.isEmpty());
   s->ActionVerifierReseau->Execute();
@@ -4684,22 +5075,31 @@ void TestInterface::verificationDuReseauMessageParMessage()
     return !v.DirPoss&&(v.SensVoieTram==aucune_voie)&&!v.PassagePietons&&!v.PassageBus&&!v.NumParking&&!v.NumArretBus&&
            !v.NumArretTram&&!v.NumPlaceTaxi&&!v.NumPlacePark&&!v.NumPlaceVehlib&&!v.ToutDroit;
    };
-  int x=-1, y=-1;
-  for(int i=0; (x<0)&&(i+7<=cv->NbX); i++)
+  int x=-1;
+  int y=-1;
+  for(int i=0; (x<0)&&(i+7<=cv->NbX); i++) {
    for(int j=0; (x<0)&&(j+5<=cv->NbY); j++)
     {
      bool Ok=true;
-     for(int a=0; Ok&&(a<7); a++) for(int b=0; Ok&&(b<5); b++) Ok=Vide(i+a, j+b);
+     for(int a=0; Ok&&(a<7); a++) { for(int b=0; Ok&&(b<5); b++) { Ok=Vide(i+a, j+b);
+}
+}
      if (Ok) { x=i+2; y=j+2; }
     }
+}
   QVERIFY(x>=0);
-  const int nb=cv->LigneBus[0].NumArret[0], nt=cv->LigneTram[0].NumArret[0],
-            bx=cv->ArretBus[0].x, by=cv->ArretBus[0].y, tx=cv->ArretTram[0].x, ty=cv->ArretTram[0].y,
-            dx0=cv->DepotBus.x, dy0=cv->DepotBus.y;
+  const int nb=cv->LigneBus[0].NumArret[0];
+  const int nt=cv->LigneTram[0].NumArret[0];
+  const int bx=cv->ArretBus[0].x;
+  const int by=cv->ArretBus[0].y;
+  const int tx=cv->ArretTram[0].x;
+  const int ty=cv->ArretTram[0].y;
+  const int dx0=cv->DepotBus.x;
+  const int dy0=cv->DepotBus.y;
   QVERIFY((nb>0)&&(nt>0)&&(dx0>=0));
   auto C=[](const char *Texte) { return QString::fromUtf8(Texte); };
   auto Ici=[x, y](const char *Texte) { return QString::fromUtf8(Texte).arg(x).arg(y); };
-  auto DeplaceParking=[x, y]()
+  auto DeplaceParking=[x, y]
    {
     parking &p=cv->Parking[0];
     cv->v[p.x][p.y].NumParking=0; p.x=x; p.y=y; cv->v[x][y].NumParking=1;
@@ -4708,82 +5108,86 @@ void TestInterface::verificationDuReseauMessageParMessage()
   struct defaut { const char *Nom; std::function<void()> Pose; QString Message; int cx, cy; };
   const std::vector<defaut> Defauts=
    {
-    {"place de parking", []() { if (cv->PlacePark[1].Definie()) cv->SupprimePlacePark(1); },
+    {"place de parking", [] { if (cv->PlacePark[1].Definie()) { cv->SupprimePlacePark(1); 
+}},
      C("Place de parking n°2 non définie. Pour renuméroter : sauvez puis rouvrez le réseau."), -1, -1},
-    {"arrêt d'une ligne de bus", [nb]() { if (cv->ArretBus[nb-1].Defini()) cv->SupprimeArretBus(nb-1); },
+    {"arrêt d'une ligne de bus", [nb] { if (cv->ArretBus[nb-1].Defini()) { cv->SupprimeArretBus(nb-1); 
+}},
      C("La ligne de bus n°1 utilise l'arrêt n°%1 qui n'est pas défini.").arg(nb), -1, -1},
-    {"arrêt d'une ligne de tram", [nt]() { if (cv->ArretTram[nt-1].Defini()) cv->SupprimeArretTram(nt-1); },
+    {"arrêt d'une ligne de tram", [nt] { if (cv->ArretTram[nt-1].Defini()) { cv->SupprimeArretTram(nt-1); 
+}},
      C("La ligne de tram n°A utilise l'arrêt n°%1 qui n'est pas défini.").arg(nt), -1, -1},
-    {"tête d'arrêt de bus", [bx, by]() { cv->v[bx][by].NumArretBus=0; },
+    {"tête d'arrêt de bus", [bx, by] { cv->v[bx][by].NumArretBus=0; },
      C("La tête de l'arrêt de bus n°1 n'est pas définie ou est incorrecte."), bx, by},
-    {"tête d'arrêt de tram", [tx, ty]() { cv->v[tx][ty].NumArretTram=0; },
+    {"tête d'arrêt de tram", [tx, ty] { cv->v[tx][ty].NumArretTram=0; },
      C("La tête de l'arrêt de tram n°1 n'est pas définie ou est incorrecte."), tx, ty},
-    {"dépôt absent", []() { cv->DepotBus.Initialise(); },
+    {"dépôt absent", [] { cv->DepotBus.Initialise(); },
      C("Si des arrêts et des lignes de bus sont définis, un dépôt de bus est obligatoire."), -1, -1},
-    {"dépôt sans direction", [dx0, dy0]() { cv->v[dx0][dy0].DirPoss=aucune; },
+    {"dépôt sans direction", [dx0, dy0] { cv->v[dx0][dy0].DirPoss=aucune; },
      C("Un dépôt de bus doit avoir au moins une direction possible vers l'extérieur."), dx0, dy0},
-    {"case dirigée vers le dépôt", [dx0, dy0]() { voie &w=cv->V(dx0, dy0, est); w.DirPoss=(dirposs)(w.DirPoss|O); },
+    {"case dirigée vers le dépôt", [dx0, dy0] { voie &w=cv->V(dx0, dy0, est); w.DirPoss=static_cast<dirposs>(w.DirPoss|O); },
      C("On ne peut diriger une case vers le dépôt de bus (il est en SORTIE SEULE)."), (dx0+1)%cv->NbX, dy0},
-    {"demi-tour", [x, y]() { cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=O; },
+    {"demi-tour", [x, y] { cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=O; },
      C("Demi-tour obligé entre les cases (%1, %2) et (%3, %2).").arg(x).arg(y).arg(x+1), x, y},
-    {"case suivante sans direction", [x, y]() { cv->v[x][y].DirPoss=E; },
+    {"case suivante sans direction", [x, y] { cv->v[x][y].DirPoss=E; },
      C("La case (%1, %2) pointe sur (%3, %2) qui n'a aucune direction possible.").arg(x).arg(y).arg(x+1), x, y},
-    {"tout droit vers un passage de bus", [x, y]()
+    {"tout droit vers un passage de bus", [x, y]
       {
        cv->v[x-1][y].DirPoss=E; cv->v[x][y].DirPoss=E; cv->v[x][y].ToutDroit=true;
        cv->v[x+1][y].DirPoss=E; cv->v[x+1][y].PassageBus=true; cv->v[x+2][y].DirPoss=E;
       },
      Ici("L'obligation d'aller tout droit sur la case (%1, %2) oblige à aller sur le passage bus Est."), x, y},
-    {"voie de tram en cul-de-sac", [x, y]() { cv->v[x][y].SensVoieTram=est_ouest; },
+    {"voie de tram en cul-de-sac", [x, y] { cv->v[x][y].SensVoieTram=est_ouest; },
      Ici("La voie de tram (%1, %2) est un cul-de-sac dans la direction Est. Le réseau des voies de tram doit toujours boucler."), x, y},
-    {"seule direction vers un passage de bus", [x, y]()
+    {"seule direction vers un passage de bus", [x, y]
       {
        cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=E; cv->v[x+1][y].PassageBus=true; cv->v[x+2][y].DirPoss=E;
       },
      Ici("La case (%1, %2) n'a aucune direction possible en dehors des passages de bus."), x, y},
     {"parking sans direction", DeplaceParking,
      Ici("La case (%1, %2) est un parking mais n'a aucune direction possible."), x, y},
-    {"parking inaccessible", [x, y, DeplaceParking]()
+    {"parking inaccessible", [x, y, DeplaceParking]
       {
        DeplaceParking();
        cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=E; cv->v[x+2][y].DirPoss=S;
       },
      Ici("La case (%1, %2) est un parking mais il est impossible d'y accéder."), x, y},
-    {"arrêt de bus d'une case", [x, y]() { cv->v[x][y].NumArretBus=1; },
+    {"arrêt de bus d'une case", [x, y] { cv->v[x][y].NumArretBus=1; },
      C("L'arrêt de bus n°1 n'est défini que sur la case (%1, %2).").arg(x).arg(y), x, y},
-    {"arrêt de tram d'une case", [x, y]() { cv->v[x][y].NumArretTram=1; },
+    {"arrêt de tram d'une case", [x, y] { cv->v[x][y].NumArretTram=1; },
      C("L'arrêt de tram n°1 n'est défini que sur la case (%1, %2).").arg(x).arg(y), x, y},
-    {"passage piétons sans sens", [x, y]() { cv->v[x][y].PassagePietons=true; },
+    {"passage piétons sans sens", [x, y] { cv->v[x][y].PassagePietons=true; },
      Ici("Le passage piéton sur la case (%1, %2) ne peut avoir de sens. Il a été retiré."), x, y},
-    {"files de taxi convergentes", [x, y]()
+    {"files de taxi convergentes", [x, y]
       {
        cv->v[x][y].NumPlaceTaxi=1; cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=E;
        cv->v[x][y-1].NumPlaceTaxi=2; cv->v[x][y-1].DirPoss=S;
        cv->v[x-1][y].NumPlaceTaxi=3; cv->v[x-1][y].DirPoss=E;
       },
      Ici("Plusieurs files de taxi sont dirigées sur la place de taxi de la case (%1, %2)."), x, y},
-    {"place de taxi vers deux files", [x, y]()
+    {"place de taxi vers deux files", [x, y]
       {
-       cv->v[x][y].NumPlaceTaxi=1; cv->v[x][y].DirPoss=(dirposs)(E|S);
+       cv->v[x][y].NumPlaceTaxi=1; cv->v[x][y].DirPoss=static_cast<dirposs>(E|S);
        cv->v[x+1][y].NumPlaceTaxi=2; cv->v[x+1][y].DirPoss=E;
        cv->v[x][y+1].NumPlaceTaxi=3; cv->v[x][y+1].DirPoss=S;
       },
      Ici("La place de taxi de la case (%1, %2) pointe sur plus d'une file de taxis."), x, y},
-    {"files de parking convergentes", [x, y]()
+    {"files de parking convergentes", [x, y]
       {
        cv->v[x][y].NumPlacePark=1; cv->v[x][y].DirPoss=E; cv->v[x+1][y].DirPoss=E;
        cv->v[x][y-1].NumPlacePark=2; cv->v[x][y-1].DirPoss=S;
        cv->v[x-1][y].NumPlacePark=3; cv->v[x-1][y].DirPoss=E;
       },
      Ici("Plusieurs files de parkings sont dirigées sur la place de parking de la case (%1, %2)."), x, y},
-    {"place de parking vers deux files", [x, y]()
+    {"place de parking vers deux files", [x, y]
       {
-       cv->v[x][y].NumPlacePark=1; cv->v[x][y].DirPoss=(dirposs)(E|S);
+       cv->v[x][y].NumPlacePark=1; cv->v[x][y].DirPoss=static_cast<dirposs>(E|S);
        cv->v[x+1][y].NumPlacePark=2; cv->v[x+1][y].DirPoss=E;
        cv->v[x][y+1].NumPlacePark=3; cv->v[x][y+1].DirPoss=S;
       },
      Ici("La place de parking de la case (%1, %2) pointe sur plus d'une file de parking."), x, y},
-    {"trop de piétons", []() { if (cv->NbPietons!=cv->NbX*cv->NbY+1) cv->DefinitNbPietons(cv->NbX*cv->NbY+1); },
+    {"trop de piétons", [] { if (cv->NbPietons!=cv->NbX*cv->NbY+1) { cv->DefinitNbPietons(cv->NbX*cv->NbY+1); 
+}},
      C("Il n'y a pas assez de place pour %1 piétons (2028 possibles). Ajoutez des trottoirs.").arg(97*60+1), -1, -1},
    };
   QStringList Ecarts;
@@ -4796,13 +5200,15 @@ void TestInterface::verificationDuReseauMessageParMessage()
     d.Pose(); // VerifieReseau a pu corriger le défaut (passage piétons retiré)
     s->ActionVerifierReseau->Execute();
     const QString m=Statut();
-    if (OkHarnais||(Q(asHarnais)!=d.Message))
+    if (OkHarnais||(Q(asHarnais)!=d.Message)) {
      Ecarts<<QString::fromUtf8("%1, harnais : %2").arg(QString::fromUtf8(d.Nom), Q(asHarnais));
-    if (m!=d.Message)
+}
+    if (m!=d.Message) {
      Ecarts<<QString::fromUtf8("%1 : « %2 » au lieu de « %3 »").arg(QString::fromUtf8(d.Nom), m, d.Message);
-    if (s->TimerClignotementErreur->Enabled!=(d.cx>=0))
+}
+    if (s->TimerClignotementErreur->Enabled!=(d.cx>=0)) {
      Ecarts<<QString::fromUtf8("%1 : clignotement %2").arg(QString::fromUtf8(d.Nom), s->TimerClignotementErreur->Enabled?"actif":"arrêté");
-    else if (d.cx>=0)
+    } else if (d.cx>=0)
      { // Deux tics du clignotement, la case en vue : curseur d'erreur, puis la case
       g->LeftCol=qMax(0, d.cx-4);
       g->TopRow=qMax(0, d.cy-4);
@@ -4825,30 +5231,40 @@ void TestInterface::commandesDeTraceDeLaSelection()
    // du premier clic ; sélections refusées par un message
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(30, 30);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QStringList Ecarts;
   auto Attend=[&Ecarts](const char *Trace, int x, int y, int Dir)
    {
-    if ((int)cv->v[x][y].DirPoss!=Dir)
+    if (static_cast<int>(cv->v[x][y].DirPoss)!=Dir) {
      Ecarts<<QString::fromUtf8("%1 : (%2, %3) a %4 au lieu de %5").arg(QString::fromUtf8(Trace)).arg(x).arg(y)
-                                                                   .arg((int)cv->v[x][y].DirPoss).arg(Dir);
+                                                                   .arg(static_cast<int>(cv->v[x][y].DirPoss)).arg(Dir);
+}
    };
   // Coins : la route va de la case du premier clic à l'autre bout, par le coin
   ExecuteSurSelection(2, 2, 8, 6, s->ActionCoinSuperieurDroit);
-  for(int x=2; x<8; x++) Attend("coin supérieur droit", x, 2, E);
-  for(int y=2; y<6; y++) Attend("coin supérieur droit", 8, y, S);
+  for(int x=2; x<8; x++) { Attend("coin supérieur droit", x, 2, E);
+}
+  for(int y=2; y<6; y++) { Attend("coin supérieur droit", 8, y, S);
+}
   Attend("coin supérieur droit", 8, 6, aucune);
   ExecuteSurSelection(12, 2, 18, 6, s->ActionCoinInferieurGauche);
-  for(int y=2; y<6; y++) Attend("coin inférieur gauche", 12, y, S);
-  for(int x=12; x<18; x++) Attend("coin inférieur gauche", x, 6, E);
+  for(int y=2; y<6; y++) { Attend("coin inférieur gauche", 12, y, S);
+}
+  for(int x=12; x<18; x++) { Attend("coin inférieur gauche", x, 6, E);
+}
   Attend("coin inférieur gauche", 18, 6, aucune);
   ExecuteSurSelection(8, 10, 2, 14, s->ActionCoinSuperieurGauche);
-  for(int x=3; x<=8; x++) Attend("coin supérieur gauche", x, 10, O);
-  for(int y=10; y<14; y++) Attend("coin supérieur gauche", 2, y, S);
+  for(int x=3; x<=8; x++) { Attend("coin supérieur gauche", x, 10, O);
+}
+  for(int y=10; y<14; y++) { Attend("coin supérieur gauche", 2, y, S);
+}
   Attend("coin supérieur gauche", 2, 14, aucune);
   ExecuteSurSelection(18, 10, 12, 14, s->ActionCoinInferieurDroit);
-  for(int y=10; y<14; y++) Attend("coin inférieur droit", 18, y, S);
-  for(int x=13; x<=18; x++) Attend("coin inférieur droit", x, 14, O);
+  for(int y=10; y<14; y++) { Attend("coin inférieur droit", 18, y, S);
+}
+  for(int x=13; x<=18; x++) { Attend("coin inférieur droit", x, 14, O);
+}
   Attend("coin inférieur droit", 12, 14, aucune);
   // Périphériques : boucle sur le bord de la sélection, dans un sens ou dans l'autre
   ExecuteSurSelection(2, 18, 8, 24, s->ActionPeripheriqueExterieur);
@@ -4884,7 +5300,8 @@ void TestInterface::commandesDeTraceDeLaSelection()
    }
   Attend("segment horizontal", 26, 13, aucune);
   Attend("segment horizontal", 20, 12, aucune);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Sélections refusées : rien n'est tracé
   Messages.clear();
   ExecuteSurSelection(22, 2, 22, 8, s->ActionPeripheriqueExterieur);
@@ -4893,18 +5310,22 @@ void TestInterface::commandesDeTraceDeLaSelection()
   ExecuteSurSelection(10, 26, 11, 27, s->ActionSegmentRoute);
   ExecuteSurSelection(14, 26, 17, 29, s->ActionSegmentTram);
   ExecuteSurSelection(20, 26, 21, 27, s->ActionSegmentTram);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // (titre des boîtes de message vide sous macOS : textes seulement)
   QVERIFY2((Messages.filter(QString::fromUtf8("Pour tracer ou effacer un périphérique")).size()==2)&&
            (Messages.filter(QString::fromUtf8("Vous ne devez sélectionner...")).size()==2)&&
            (Messages.filter(QString::fromUtf8("doit être différent du nombre de colonnes")).size()==2), qPrintable(Messages.join('\n')));
-  for(int x=0; x<30; x++)
+  for(int x=0; x<30; x++) {
    for(int y=26; y<30; y++)
     {
      Attend("sélection refusée", x, y, aucune);
-     if (cv->v[x][y].SensVoieTram!=aucune_voie) Ecarts<<QString::fromUtf8("sélection refusée : voie de tram en (%1, %2)").arg(x).arg(y);
+     if (cv->v[x][y].SensVoieTram!=aucune_voie) { Ecarts<<QString::fromUtf8("sélection refusée : voie de tram en (%1, %2)").arg(x).arg(y);
+}
     }
-  for(int y=2; y<=8; y++) Attend("sélection refusée", 22, y, aucune);
+}
+  for(int y=2; y<=8; y++) { Attend("sélection refusée", 22, y, aucune);
+}
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
 //---------------------------------------------------------------------------
@@ -4913,17 +5334,20 @@ void TestInterface::voiesEtArretsDeTram()
    // case selon la case précédente du curseur, arrêts de tram, effacement de la sélection
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(30, 20);
-  if (QTest::currentTestFailed()) return;
-  auto Statut=[s]() { return Q(s->StatusBar->Panels->Items[0]->Text); };
+  if (QTest::currentTestFailed()) { return;
+}
+  auto Statut=[s] { return Q(s->StatusBar->Panels->Items[0]->Text); };
   QStringList Ecarts;
   auto Attend=[&Ecarts](const char *Trace, int x, int y, int Sens)
    {
-    if ((int)cv->v[x][y].SensVoieTram!=Sens)
+    if (static_cast<int>(cv->v[x][y].SensVoieTram)!=Sens) {
      Ecarts<<QString::fromUtf8("%1 : (%2, %3) a %4 au lieu de %5").arg(QString::fromUtf8(Trace)).arg(x).arg(y)
-                                                                   .arg((int)cv->v[x][y].SensVoieTram).arg(Sens);
+                                                                   .arg(static_cast<int>(cv->v[x][y].SensVoieTram)).arg(Sens);
+}
    };
   ExecuteSurSelection(3, 2, 3, 8, s->ActionSegmentTram);
-  for(int y=2; y<8; y++) Attend("segment vertical", 3, y, nord_sud);
+  for(int y=2; y<8; y++) { Attend("segment vertical", 3, y, nord_sud);
+}
   Attend("segment vertical", 3, 8, aucune_voie);
   ExecuteSurSelection(6, 2, 7, 8, s->ActionSegmentTram);
   for(int y=2; y<8; y++)
@@ -4939,8 +5363,10 @@ void TestInterface::voiesEtArretsDeTram()
     Attend("segment horizontal de deux voies", x+1, 4, est_ouest);
    }
   ExecuteSurSelection(3, 2, 3, 8, s->ActionSegmentTram);
-  for(int y=2; y<8; y++) Attend("segment retracé", 3, y, aucune_voie);
-  if (QTest::currentTestFailed()) return;
+  for(int y=2; y<8; y++) { Attend("segment retracé", 3, y, aucune_voie);
+}
+  if (QTest::currentTestFailed()) { return;
+}
   // Case par case : la voie relie la case précédente du curseur à la direction choisie
   auto Voie=[this](int xPrc, int yPrc, int x, int y, TAction *Action)
    {
@@ -4959,7 +5385,8 @@ void TestInterface::voiesEtArretsDeTram()
   Attend("de l'est vers l'ouest", 23, 12, est_ouest);
   Voie(26, 2, 26, 3, s->ActionDirectionBasTram);
   Attend("du nord vers le sud", 26, 3, nord_sud);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Arrêts de tram : création, case voisine ajoutée au même arrêt, case retirée
   ExecuteSurCase(6, 4, s->ActionArretBusTram);
   const int n=cv->v[6][4].NumArretTram;
@@ -4977,8 +5404,10 @@ void TestInterface::voiesEtArretsDeTram()
   ReponseQuestions=QMessageBox::Yes;
   ExecuteSurSelection(10, 4, 16, 5, s->ActionEffacerVoiesTram);
   ReponseQuestions=QMessageBox::No;
-  for(int x=10; x<=16; x++)
-   for(int y=4; y<=5; y++) Attend("voies effacées", x, y, aucune_voie);
+  for(int x=10; x<=16; x++) {
+   for(int y=4; y<=5; y++) { Attend("voies effacées", x, y, aucune_voie);
+}
+}
   Attend("hors de la sélection", 6, 4, nord_sud);
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
@@ -4988,9 +5417,11 @@ void TestInterface::directionsEtDoubleClic()
    // Priorités sur une route, Priorités piétons ailleurs, parking supprimé sur un parking
   TfrmSimulation *s=frmSimulation;
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(2, 5, 8, 5);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   ExecuteSurCase(4, 5, s->ActionDirectionHaut);
   QCOMPARE((int)cv->v[4][5].DirPoss, (int)(E|N));
   ExecuteSurCase(4, 5, s->ActionDirectionBas);
@@ -5003,21 +5434,25 @@ void TestInterface::directionsEtDoubleClic()
   CliqueCase(5, 5);
   Clique(s->ToolButtonPriorites);
   QVERIFY(frmDefVoie->isVisible());
-  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionGauche, s->ActionDirectionDroite})
+  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionGauche, s->ActionDirectionDroite}) {
    ExecuteSurCase(5, 5, a);
+}
   QCOMPARE((int)cv->v[5][5].DirPoss, (int)(N|S|O));
-  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionGauche, s->ActionDirectionDroite})
+  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionGauche, s->ActionDirectionDroite}) {
    ExecuteSurCase(5, 5, a);
+}
   QCOMPARE((int)cv->v[5][5].DirPoss, (int)E);
   Clique(frmDefVoie->ButtonOk);
   QVERIFY(!frmDefVoie->isVisible());
   CliqueCase(5, 7);
   s->MenuItemPrioritesPietons->ElementQt()->trigger();
   QVERIFY(frmDefVoiePietons->isVisible());
-  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionHaut, s->ActionDirectionBas})
+  for(TAction *a : {s->ActionDirectionHaut, s->ActionDirectionBas, s->ActionDirectionHaut, s->ActionDirectionBas}) {
    ExecuteSurCase(5, 7, a);
+}
   QCOMPARE((int)cv->v[5][7].DirPoss, (int)aucune);
-  if (frmDefVoiePietons->isVisible()) Clique(frmDefVoiePietons->ButtonOk);
+  if (frmDefVoiePietons->isVisible()) { Clique(frmDefVoiePietons->ButtonOk);
+}
   QVERIFY(!s->ActionPriorites->Checked&&!s->ActionPrioritesPietons->Checked);
   // Arrêt de bus de deux cases : une case retirée, l'autre garde l'arrêt
   ExecuteSurCase(2, 5, s->ActionArretBusTram);
@@ -5056,8 +5491,10 @@ void TestInterface::deplacementDeFeuRefuse()
  { // Feu déplacé sur une case qui a déjà un feu de même orientation : refusé, rien ne bouge
   TfrmSimulation *s=frmSimulation;
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
-  const int a=cv->v[4][8].NumFeu[est-1], b=cv->v[10][8].NumFeu[est-1];
+  if (QTest::currentTestFailed()) { return;
+}
+  const int a=cv->v[4][8].NumFeu[est-1];
+  const int b=cv->v[10][8].NumFeu[est-1];
   QVERIFY((a>0)&&(b>0));
   ExecuteSurCase(4, 8, s->ActionDeplacerFeuSource);
   ExecuteSurCase(10, 8, s->ActionDeplacerFeuDestination);
@@ -5113,11 +5550,12 @@ void TestInterface::commandesDAffichage()
   for(const auto &t : Tours)
    {
     t.Action->Execute();
-    cv->TypeStats=(t.NbTours%20)?par_nombre:par_pourcentage;
+    cv->TypeStats=((t.NbTours%20) != 0)?par_nombre:par_pourcentage;
     Enregistre(f);
     OuvreFichier(f);
     QCOMPARE((int)cv->NbToursStats, t.NbTours);
-    for(const auto &u : Tours) QCOMPARE((bool)u.Menu->Checked, &u==&t);
+    for(const auto &u : Tours) { QCOMPARE((bool)u.Menu->Checked, &u==&t);
+}
     QCOMPARE((bool)s->MenuItemParNbVehicules->Checked, (bool)(t.NbTours%20));
     QCOMPARE((bool)s->MenuItemParPourcentage->Checked, !(t.NbTours%20));
    }
@@ -5129,9 +5567,10 @@ void TestInterface::dessinsPendantLaSimulation()
    // dans les fiches Paramètres des bus et des trams ; « Suivre... » ouvre Rechercher
   TfrmSimulation *s=frmSimulation;
   GrilleSimulation *g=s->DrawGridSimul;
-  auto FermeRecherche=[]()
+  auto FermeRecherche=[]
    {
-    if (frmRecherche->isVisible()) QTest::mouseClick(frmRecherche->ButtonAnnuler, Qt::LeftButton);
+    if (frmRecherche->isVisible()) { QTest::mouseClick(frmRecherche->ButtonAnnuler, Qt::LeftButton);
+}
     frmSimulation->ActionRechercher->Checked=false;
    };
   struct Retablit
@@ -5142,16 +5581,19 @@ void TestInterface::dessinsPendantLaSimulation()
       try
        {
         TfrmSimulation *s=frmSimulation;
-        if (s->ActionAfficherInfection->Checked) s->ActionAfficherInfection->Execute();
-        if (s->SimulationSanglante) s->ActionSanglante->Execute();
-        if (s->ActionEpidemie->Checked) s->Epidemie1->ElementQt()->trigger();
+        if (s->ActionAfficherInfection->Checked) { s->ActionAfficherInfection->Execute();
+}
+        if (s->SimulationSanglante) { s->ActionSanglante->Execute();
+}
+        if (s->ActionEpidemie->Checked) { s->Epidemie1->ElementQt()->trigger();
+}
         FermeRecherche();
        }
       catch (...) { qWarning("Modes d'affichage et de simulation non rétablis"); }
      }
    } r{FermeRecherche};
   QVERIFY(!OuvreCarte("Géant.cvw", "dessins.cvw").isEmpty());
-  QuandModale([]() { return frmEpidemie; }, [this]() { Clique(frmEpidemie->ButtonOk); });
+  QuandModale([] { return frmEpidemie; }, [this] { Clique(frmEpidemie->ButtonOk); });
   s->Epidemie1->ElementQt()->trigger();
   QVERIFY(Etapes.empty());
   QVERIFY(s->ActionEpidemie->Checked);
@@ -5162,8 +5604,10 @@ void TestInterface::dessinsPendantLaSimulation()
   QVERIFY2(DemarreSansBlocage("Marche, Géant sanglant avec épidémie"), qPrintable(Messages.join('\n')));
   auto Pieton=[](const std::function<bool(const pieton &)> &Condition) -> const pieton *
    {
-    for(int i=0; i<cv->NbPietons; i++)
-     if ((cv->Pieton[i].x>=0)&&Condition(cv->Pieton[i])) return &cv->Pieton[i];
+    for(int i=0; i<cv->NbPietons; i++) {
+     if ((cv->Pieton[i].x>=0)&&Condition(cv->Pieton[i])) { return &cv->Pieton[i];
+}
+}
     return nullptr;
    };
   QVERIFY(JoueTours([&]() { return Pieton([](const pieton &p) { return p.Ecrase; })&&Pieton([](const pieton &p) { return p.Mort; }); }, 1500));
@@ -5176,7 +5620,8 @@ void TestInterface::dessinsPendantLaSimulation()
     g->Repaint();
    }
   // Résurrection : traitée au tour suivant (qui peut écraser quelques piétons de nouveau)
-  auto NbEcrases=[]() { int n=0; for(int i=0; i<cv->NbPietons; i++) n+=cv->Pieton[i].Ecrase; return n; };
+  auto NbEcrases=[] { int n=0; for(int i=0; i<cv->NbPietons; i++) { n+=cv->Pieton[i].Ecrase; 
+}return n; };
   const int Ecrases=NbEcrases();
   QVERIFY(Ecrases>10);
   s->ActionResurrection->Execute();
@@ -5185,24 +5630,26 @@ void TestInterface::dessinsPendantLaSimulation()
   QVERIFY(!s->ResurrectionDemandee);
   QVERIFY2(NbEcrases()<Ecrases/2, qPrintable(QString("%1 puis %2").arg(Ecrases).arg(NbEcrases())));
   // Trajet des lignes cochées dans les fiches Paramètres des bus et des trams
-  int NbBus=0, NbTrams=0;
+  int NbBus=0;
+  int NbTrams=0;
   auto CocheLignes=[g](TForm *Fiche, int &NbCochees)
    {
-    for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-     if (TCheckBox *c=(TCheckBox *)Fiche->FindComponent("CheckBox"+IntToStr(i)); c->Visible)
+    for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) {
+     if (TCheckBox *c=static_cast<TCheckBox *>(Fiche->FindComponent("CheckBox"+IntToStr(i))); c->Visible)
       {
        c->Checked=true;
        NbCochees++;
       }
+}
     g->LeftCol=0;
     g->TopRow=0;
     g->Repaint();
    };
-  QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->BitBtnDefLignesBus); });
-  QuandModale([]() { return frmParamBus; }, [&]() { CocheLignes(frmParamBus, NbBus); Clique(frmParamBus->ButtonAnnuler); });
-  QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->BitBtnDefLignesTram); });
-  QuandModale([]() { return frmParamTram; }, [&]() { CocheLignes(frmParamTram, NbTrams); Clique(frmParamTram->ButtonAnnuler); });
-  QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->BitBtnDefLignesBus); });
+  QuandModale([] { return frmParamBus; }, [&] { CocheLignes(frmParamBus, NbBus); Clique(frmParamBus->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->BitBtnDefLignesTram); });
+  QuandModale([] { return frmParamTram; }, [&] { CocheLignes(frmParamTram, NbTrams); Clique(frmParamTram->ButtonAnnuler); });
+  QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
   QVERIFY(s->ActionParametres->Enabled);
   s->ActionParametres->Execute();
   QVERIFY(Etapes.empty());
@@ -5222,8 +5669,9 @@ void TestInterface::dessinsPendantLaSimulation()
    {
     FermeRecherche();
     int n=0;
-    for(int t=0; (t<300)&&!(n=TrouveCase(u.Numero)); t++) JoueTour(); // un objet sur la carte
-    if (!n) { Absents<<Q(u.Action->Caption); continue; }
+    for(int t=0; (t<300)&&((n=TrouveCase(u.Numero)) == 0); t++) { JoueTour(); // un objet sur la carte
+}
+    if (n == 0) { Absents<<Q(u.Action->Caption); continue; }
     QVERIFY2(u.Action->Enabled, qPrintable(Q(u.Action->Caption)));
     u.Action->Execute();
     QVERIFY2(frmRecherche->isVisible()&&s->ActionRechercher->Checked, qPrintable(Q(u.Action->Caption)));
@@ -5241,47 +5689,57 @@ void TestInterface::effacementDeLaSelectionConfirme()
    {
     return [Texte]() -> QWidget *
      {
-      QMessageBox *b=qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+      auto *b=qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
       return (b&&b->text().contains(QString::fromUtf8(Texte)))?b:nullptr;
      };
    };
   auto Repond=[this](QMessageBox::StandardButton Reponse)
    {
-    return [this, Reponse]()
+    return [this, Reponse]
      {
-      if (QMessageBox *b=qobject_cast<QMessageBox *>(QApplication::activeModalWidget()))
+      if (auto *b=qobject_cast<QMessageBox *>(QApplication::activeModalWidget()))
        {
         Messages<<b->text();
-        if (QAbstractButton *k=b->button(Reponse)) k->click();
+        if (QAbstractButton *k=b->button(Reponse)) { k->click();
+}
        }
      };
    };
-  const char *Attend="doit être rouge pour que le premier passe au vert", *Demande="demande que le premier soit rouge",
-             *Pietons="Le feu de piétons n°", *Arret="est dans la sélection";
-  int a=0, b=0, c=0;
+  const char *Attend="doit être rouge pour que le premier passe au vert";
+  const char *Demande="demande que le premier soit rouge";
+  const char *Pietons="Le feu de piétons n°";
+  const char *Arret="est dans la sélection";
+  int a=0;
+  int b=0;
+  int c=0;
   auto Reseau=[&](bool Dmd, bool Att, bool FeuPietons)
    { // Feux a (4,8), b (10,8) et c (8,4) ; b attend a, c demande a, ou un feu de piétons dépend de a
     ReseauAvecFeux();
-    if (QTest::currentTestFailed()) return;
+    if (QTest::currentTestFailed()) { return;
+}
     a=cv->v[4][8].NumFeu[est-1]; b=cv->v[10][8].NumFeu[est-1]; c=cv->v[8][4].NumFeu[sud-1];
-    if (Att) cv->Feu[b-1].AjouteFeuAtt(a);
-    if (Dmd) cv->Feu[c-1].AjouteFeuDmd(a);
-    if (FeuPietons) (void)PoseFeuPietonsLie(4, 8);
+    if (Att) { cv->Feu[b-1].AjouteFeuAtt(a);
+}
+    if (Dmd) { cv->Feu[c-1].AjouteFeuDmd(a);
+}
+    if (FeuPietons) { (void)PoseFeuPietonsLie(4, 8);
+}
     ReponseQuestions=QMessageBox::Yes; // « Êtes-vous bien sûr(e)... » de l'effacement
    };
-  auto Efface=[&]()
+  auto Efface=[&]
    {
     ExecuteSurSelection(3, 7, 5, 9, s->ActionEffacerRoutes);
     QVERIFY(Etapes.empty());
    };
-  auto Garde=[&]()
+  auto Garde=[&]
    {
     QCOMPARE((int)cv->v[4][8].DirPoss, (int)E);
     QCOMPARE((int)cv->v[4][8].NumFeu[est-1], a);
    };
   // Non à la première dépendance (b attend a) ; Oui puis Non à la seconde (c demande a)
   Reseau(true, true, false);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QuandModale(Boite(Attend), Repond(QMessageBox::No));
   Efface();
   Garde();
@@ -5300,14 +5758,16 @@ void TestInterface::effacementDeLaSelectionConfirme()
   QCOMPARE(cv->Feu[c-1].NbFeuxDmd, 0);
   // Oui pour tout dès la première dépendance
   Reseau(false, true, false);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QuandModale(Boite(Attend), Repond(QMessageBox::YesToAll));
   Efface();
   QVERIFY(!cv->Feu[a-1].Defini());
   QCOMPARE(cv->Feu[b-1].NbFeuxAtt, 0);
   // Feu de piétons lié à a : Non, puis Oui pour tout
   Reseau(false, false, true);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const int p=cv->v[6][7].NumFeuP[sud-1];
   QVERIFY(p>0);
   QCOMPARE(cv->FeuP[p-1].NbFeux, 1);
@@ -5321,7 +5781,8 @@ void TestInterface::effacementDeLaSelectionConfirme()
   QCOMPARE(cv->FeuP[p-1].NbFeux, 0);
   // Arrêt de tram dans la sélection : Non, puis Oui pour tout (l'arrêt est supprimé en entier)
   NouvelleZone(20, 20);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   ExecuteSurSelection(2, 5, 10, 5, s->ActionSegmentTram);
   ExecuteSurCase(5, 5, s->ActionArretBusTram);
   ExecuteSurCase(6, 5, s->ActionArretBusTram);
@@ -5337,7 +5798,8 @@ void TestInterface::effacementDeLaSelectionConfirme()
   ExecuteSurSelection(2, 4, 5, 6, s->ActionEffacerVoiesTram);
   QVERIFY(Etapes.empty());
   ReponseQuestions=QMessageBox::No;
-  for(int x=2; x<=5; x++) QCOMPARE((int)cv->v[x][5].SensVoieTram, (int)aucune_voie);
+  for(int x=2; x<=5; x++) { QCOMPARE((int)cv->v[x][5].SensVoieTram, (int)aucune_voie);
+}
   QCOMPARE((int)cv->v[6][5].SensVoieTram, (int)est_ouest);
   QCOMPARE((int)cv->v[6][5].NumArretTram, 0);
   QVERIFY(!cv->ArretTram[n-1].Defini());
@@ -5350,11 +5812,11 @@ void TestInterface::reseauNonConnexeSansParking()
   // v6.0.8 : la v5.0 nommait « file de parkings » les files de taxis, et lisait hors de
   // asTypeDistance pour les files de parkings et les places de vehlib
   const struct { const char *Type; std::function<void()> Ajoute; TForm *Fiche; } Cas[]=
-   {{"à un arrêt de bus", []() { cv->AjouteArretBus(13, 2); cv->AjouteArretBus(14, 2); }, frmAffDistArretsBus},
-    {"à une file de taxis", []() { cv->AjoutePlaceTaxi(13, 2); cv->AjoutePlaceTaxi(14, 2); }, frmAffDistFilesTaxi},
-    {"à une file de parkings", []() { cv->AjoutePlacePark(13, 2); cv->AjoutePlacePark(14, 2); cv->DefinitNbVehicules(12); }, frmAffDistFilesPark},
-    {"à une place de vehlib", []() { cv->AjoutePlaceVehlib(13, 2); cv->AjoutePlaceVehlib(14, 2); }, frmAffDistPlacesVehlib},
-    {"à un arrêt de tram", []() { cv->AjouteArretTram(3, 8); cv->AjouteArretTram(4, 8); }, frmAffDistArretsTram}};
+   {{"à un arrêt de bus", [] { cv->AjouteArretBus(13, 2); cv->AjouteArretBus(14, 2); }, frmAffDistArretsBus},
+    {"à une file de taxis", [] { cv->AjoutePlaceTaxi(13, 2); cv->AjoutePlaceTaxi(14, 2); }, frmAffDistFilesTaxi},
+    {"à une file de parkings", [] { cv->AjoutePlacePark(13, 2); cv->AjoutePlacePark(14, 2); cv->DefinitNbVehicules(12); }, frmAffDistFilesPark},
+    {"à une place de vehlib", [] { cv->AjoutePlaceVehlib(13, 2); cv->AjoutePlaceVehlib(14, 2); }, frmAffDistPlacesVehlib},
+    {"à un arrêt de tram", [] { cv->AjouteArretTram(3, 8); cv->AjouteArretTram(4, 8); }, frmAffDistArretsTram}};
   QStringList Ecarts;
   for(const auto &c : Cas)
    {
@@ -5368,19 +5830,25 @@ void TestInterface::reseauNonConnexeSansParking()
       QVERIFY(Arrete());
       continue;
      }
-    const QString Message=QString::fromUtf8("Le réseau n'est pas connexe : une distance %1 n'a pas pu être définie !").arg(QString::fromUtf8(c.Type)),
-                  Statut=Q(frmSimulation->StatusBar->Panels->Items[0]->Text);
-    if ((Messages.size()!=1)||!Messages.first().contains(Message))
+    const QString Message=QString::fromUtf8("Le réseau n'est pas connexe : une distance %1 n'a pas pu être définie !").arg(QString::fromUtf8(c.Type));
+    const QString Statut=Q(frmSimulation->StatusBar->Panels->Items[0]->Text);
+    if ((Messages.size()!=1)||!Messages.first().contains(Message)) {
      Ecarts<<QString::fromUtf8("%1 : %2").arg(QString::fromUtf8(c.Type), Messages.join(" / "));
-    if (!Statut.contains(QString::fromUtf8(" a une distance %1 indéfinie.").arg(QString::fromUtf8(c.Type))))
+}
+    if (!Statut.contains(QString::fromUtf8(" a une distance %1 indéfinie.").arg(QString::fromUtf8(c.Type)))) {
      Ecarts<<QString::fromUtf8("%1 : barre d'état « %2 »").arg(QString::fromUtf8(c.Type), Statut);
-    if (!c.Fiche->isVisible())
+}
+    if (!c.Fiche->isVisible()) {
      Ecarts<<QString::fromUtf8("%1 : fiche des distances fermée").arg(QString::fromUtf8(c.Type));
-    if (OctetsReseau()!=Reseau)
+}
+    if (OctetsReseau()!=Reseau) {
      Ecarts<<QString::fromUtf8("%1 : réseau modifié").arg(QString::fromUtf8(c.Type));
+}
     for(TForm *Fiche : {(TForm *)frmAffDistParkings, (TForm *)frmAffDistArretsBus, (TForm *)frmAffDistArretsTram,
-                        (TForm *)frmAffDistFilesTaxi, (TForm *)frmAffDistFilesPark, (TForm *)frmAffDistPlacesVehlib})
-     if (Fiche->isVisible()) Fiche->Hide();
+                        (TForm *)frmAffDistFilesTaxi, (TForm *)frmAffDistFilesPark, (TForm *)frmAffDistPlacesVehlib}) {
+     if (Fiche->isVisible()) { Fiche->Hide();
+}
+}
    }
   QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
  }
@@ -5390,8 +5858,11 @@ void TestInterface::ficheFeuxEtListes()
    // listes par double-clic sur la carte, gardées à l'enregistrement
   TfrmSimulation *s=frmSimulation;
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
-  const int a=cv->v[4][8].NumFeu[est-1], b=cv->v[10][8].NumFeu[est-1], c=cv->v[8][4].NumFeu[sud-1];
+  if (QTest::currentTestFailed()) { return;
+}
+  const int a=cv->v[4][8].NumFeu[est-1];
+  const int b=cv->v[10][8].NumFeu[est-1];
+  const int c=cv->v[8][4].NumFeu[sud-1];
   QVERIFY((a>0)&&(b>0)&&(c>0));
   const QString f=QFileInfo(Carte).absolutePath()+"/feux.cvw";
   QFile::remove(f);
@@ -5400,7 +5871,8 @@ void TestInterface::ficheFeuxEtListes()
   const int Vert=Feu->DureeVert;
   // Annuler : rien n'est écrit ; chaque contrôle active Appliquer
   OuvreFicheFeu(4, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(!frmDefFeux->ButtonAppliquer->Enabled);
   frmDefFeux->CSpinEditDureeVert->Value=Vert+3;
   QVERIFY(frmDefFeux->ButtonAppliquer->Enabled);
@@ -5486,25 +5958,30 @@ void TestInterface::selectionCaseADeuxFeux()
    // autre feu de la liste reste. L'original écrivait hors de la liste en retirant son
    // dernier élément (visible sous ASan)
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(12, 8, 12, 12); // (12,8) : vers l'est et vers le sud
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   CliqueCase(12, 8);
   Clique(frmSimulation->ToolButtonPriorites);
   CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, feux);
   CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
   Clique(frmDefVoie->ButtonOk);
-  const int f1=cv->v[12][8].NumFeu[est-1], f2=cv->v[12][8].NumFeu[sud-1],
-            Autre=cv->v[10][8].NumFeu[est-1];
+  const int f1=cv->v[12][8].NumFeu[est-1];
+  const int f2=cv->v[12][8].NumFeu[sud-1];
+  const int Autre=cv->v[10][8].NumFeu[est-1];
   QVERIFY((f1>0)&&(f2>0)&&(f1!=f2));
   auto Liste=[](int *NumFeux, int NbFeux)
    {
     QList<int> l;
-    for(int i=0; i<NbFeux; i++) l<<NumFeux[i];
+    for(int i=0; i<NbFeux; i++) { l<<NumFeux[i];
+}
     return l;
    };
   OuvreFicheFeu(4, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Liste « demande »
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   DoubleCliqueCase(10, 8);
@@ -5553,20 +6030,24 @@ void TestInterface::selectionCaseATroisFeux()
    // tableau de deux (trouvé par clang-tidy, visible sous ASan). Le double-clic parcourt les
    // deux premiers, comme sur une case à deux feux
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   TraceSegment(12, 8, 12, 12); // (12,8) : vers l'est et vers le sud
   TraceSegment(12, 8, 12, 4); // et vers le nord
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   CliqueCase(12, 8);
   Clique(frmSimulation->ToolButtonPriorites);
   CliqueChoix(frmDefVoie->RadioGroupPrioriteNord, feux);
   CliqueChoix(frmDefVoie->RadioGroupPrioriteEst, feux);
   CliqueChoix(frmDefVoie->RadioGroupPrioriteSud, feux);
   Clique(frmDefVoie->ButtonOk);
-  const int fn=cv->v[12][8].NumFeu[nord-1], fe=cv->v[12][8].NumFeu[est-1];
+  const int fn=cv->v[12][8].NumFeu[nord-1];
+  const int fe=cv->v[12][8].NumFeu[est-1];
   QVERIFY((fn>0)&&(fe>0)&&(cv->v[12][8].NumFeu[sud-1]>0));
   OuvreFicheFeu(4, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   DoubleCliqueCase(12, 8);
   QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
@@ -5583,12 +6064,15 @@ void TestInterface::suppressionFeuReference()
    // le feu et toutes ses références (feux et feux de piétons)
   TfrmSimulation *s=frmSimulation;
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
-  const int a=cv->v[4][8].NumFeu[est-1], c=cv->v[8][4].NumFeu[sud-1];
+  if (QTest::currentTestFailed()) { return;
+}
+  const int a=cv->v[4][8].NumFeu[est-1];
+  const int c=cv->v[8][4].NumFeu[sud-1];
   QCOMPARE(c, cv->NbFeux); // Le feu qui référence est le dernier du tableau
   // c demande a
   OuvreFicheFeu(8, 4, sud);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   DoubleCliqueCase(4, 8);
   QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
@@ -5625,10 +6109,12 @@ void TestInterface::suppressionFeuReferenceParUnFeuPietons()
  { // Un feu de piétons référence le feu : message et retrait de la référence
   TfrmSimulation *s=frmSimulation;
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const int a=cv->v[4][8].NumFeu[est-1];
   const int n=PoseFeuPietonsLie(4, 8);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(cv->FeuP[n-1].NbFeux, 1);
   QCOMPARE(cv->FeuP[n-1].NumFeux[0], a);
   CliqueCase(4, 8);
@@ -5649,17 +6135,21 @@ void TestInterface::effacerSelectionAvecFeuReference()
    // aucune référence au feu effacé, depuis les feux comme depuis les feux de piétons
   TfrmSimulation *s=frmSimulation;
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
-  const int a=cv->v[4][8].NumFeu[est-1], b=cv->v[10][8].NumFeu[est-1];
+  if (QTest::currentTestFailed()) { return;
+}
+  const int a=cv->v[4][8].NumFeu[est-1];
+  const int b=cv->v[10][8].NumFeu[est-1];
   OuvreFicheFeu(10, 8, est);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   Clique(frmDefFeux->SpeedButtonSelFeuxDmd);
   DoubleCliqueCase(4, 8);
   QCOMPARE(frmDefFeux->NbFeuxDmd, 1);
   Clique(frmDefFeux->ButtonOk);
   Clique(frmDefVoie->ButtonOk);
   const int n=PoseFeuPietonsLie(4, 8);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(cv->Feu[b-1].NumFeuxDmd[0], a);
   QCOMPARE(cv->FeuP[n-1].NumFeux[0], a);
   ReponseQuestions=QMessageBox::No;
@@ -5684,7 +6174,7 @@ void TestInterface::nouvelleZoneGenereePlusPetite()
    // dimensions pendant la génération, hors du réseau (visible sous ASan)
   QVERIFY(!OuvreDemo("avant_petite_zone.cvw").isEmpty());
   QVERIFY((cv->NbX>NBXMIN+2)&&(cv->NbY>NBYMIN+2));
-  QuandModale([]() { return frmDimensionsZone; }, [this]()
+  QuandModale([] { return frmDimensionsZone; }, [this]
    {
     frmDimensionsZone->CSpinEditNbX->Value=NBXMIN+2;
     frmDimensionsZone->CSpinEditNbY->Value=NBYMIN+2;
@@ -5716,102 +6206,110 @@ void TestInterface::parametresChampParChamp()
   // Paramètres de la simulation
   auto DansParametres=[this](std::function<void()> Action)
    {
-    QuandModale([]() { return frmParamSimul; }, Action);
+    QuandModale([] { return frmParamSimul; }, std::move(Action));
     Clique(frmSimulation->ToolButtonParametres);
    };
   auto DansFille=[this](std::function<QWidget *()> Fiche, TBitBtn *TfrmParamSimul::*Bouton, std::function<void()> Action)
    {
-    QuandModale([]() { return frmParamSimul; }, [this, Bouton]() { Clique(frmParamSimul->*Bouton); });
-    QuandModale(Fiche, Action);
-    QuandModale([]() { return frmParamSimul; }, [this]() { Clique(frmParamSimul->ButtonAnnuler); });
+    QuandModale([] { return frmParamSimul; }, [this, Bouton] { Clique(frmParamSimul->*Bouton); });
+    QuandModale(std::move(Fiche), std::move(Action));
+    QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
     Clique(frmSimulation->ToolButtonParametres);
    };
-  VerifieChamps("Paramètres", f, DansParametres, []() { return frmParamSimul->ButtonOk; }, []() { return frmParamSimul->ButtonAnnuler; },
+  VerifieChamps("Paramètres", f, DansParametres, [] { return frmParamSimul->ButtonOk; }, [] { return frmParamSimul->ButtonAnnuler; },
    {
-    ChampSpin("durée du vert", []() { return frmParamSimul->CSpinEditDureeVert; }, []() { return (int)cv->DureeVert; }),
-    ChampSpin("durée de l'orange", []() { return frmParamSimul->CSpinEditDureeOrange; }, []() { return (int)cv->DureeOrange; }),
-    ChampSpin("durée du rouge", []() { return frmParamSimul->CSpinEditDureeRouge; }, []() { return (int)cv->DureeRouge; }),
-    ChampSpin("attente avant choix", []() { return frmParamSimul->CSpinEditAttenteAvChx; }, []() { return (int)cv->AttenteMaxVeh; }),
-    ChampSpin("tours par seconde", []() { return frmParamSimul->CSpinEditNbToursParSeconde; }, []() { return (int)cv->NbToursParSeconde; }),
-    ChampSpin("cases du passage piéton", []() { return frmParamSimul->CSpinEditNbCasesMaxPsgPtn; }, []() { return (int)cv->NbMaxCasesDetectPsgPt; }),
-    ChampSpin("probabilité du passage piéton", []() { return frmParamSimul->CSpinEditProbaPsgPt; }, []() { return (int)cv->ProbaDirPsgPt; }),
-    ChampRadio("vitesses", []() { return frmParamSimul->RadioGroupVitesses; }, []() { return (int)cv->NbVitesses-1; }),
+    ChampSpin("durée du vert", [] { return frmParamSimul->CSpinEditDureeVert; }, [] { return cv->DureeVert; }),
+    ChampSpin("durée de l'orange", [] { return frmParamSimul->CSpinEditDureeOrange; }, [] { return cv->DureeOrange; }),
+    ChampSpin("durée du rouge", [] { return frmParamSimul->CSpinEditDureeRouge; }, [] { return cv->DureeRouge; }),
+    ChampSpin("attente avant choix", [] { return frmParamSimul->CSpinEditAttenteAvChx; }, [] { return cv->AttenteMaxVeh; }),
+    ChampSpin("tours par seconde", [] { return frmParamSimul->CSpinEditNbToursParSeconde; }, [] { return cv->NbToursParSeconde; }),
+    ChampSpin("cases du passage piéton", [] { return frmParamSimul->CSpinEditNbCasesMaxPsgPtn; }, [] { return cv->NbMaxCasesDetectPsgPt; }),
+    ChampSpin("probabilité du passage piéton", [] { return frmParamSimul->CSpinEditProbaPsgPt; }, [] { return cv->ProbaDirPsgPt; }),
+    ChampRadio("vitesses", [] { return frmParamSimul->RadioGroupVitesses; }, [] { return cv->NbVitesses-1; }),
    });
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Bus
-  VerifieChamps("Bus", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamBus; }, &TfrmParamSimul::BitBtnDefLignesBus, Action); },
-                []() { return frmParamBus->ButtonOk; }, []() { return frmParamBus->ButtonAnnuler; },
+  VerifieChamps("Bus", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamBus; }, &TfrmParamSimul::BitBtnDefLignesBus, std::move(Action)); },
+                [] { return frmParamBus->ButtonOk; }, [] { return frmParamBus->ButtonAnnuler; },
    {
-    ChampSpin("personnes par bus", []() { return frmParamBus->CSpinEditNbMaxPersonnesBus; }, []() { return (int)cv->NbMaxPersonnesBus; }),
-    ChampSpin("arrêt aux stations", []() { return frmParamBus->CSpinEditNbToursStopArretBus; }, []() { return (int)cv->NbToursStopArretBus; }),
-    ChampSpin("cases vers un arrêt", []() { return frmParamBus->CSpinEditNbCasesMaxArretBus; }, []() { return (int)cv->NbMaxCasesDetectArretBus; }),
-    ChampSpin("probabilité vers un arrêt", []() { return frmParamBus->CSpinEditProbaDirArretBus; }, []() { return (int)cv->ProbaDirArretBus; }),
-    ChampSpin("attente maximale", []() { return frmParamBus->CSpinEditNbMaxToursAttenteBus; }, []() { return (int)cv->NbMaxToursAttenteBus; }),
-    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamBus->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretBusDmd; }),
+    ChampSpin("personnes par bus", [] { return frmParamBus->CSpinEditNbMaxPersonnesBus; }, [] { return cv->NbMaxPersonnesBus; }),
+    ChampSpin("arrêt aux stations", [] { return frmParamBus->CSpinEditNbToursStopArretBus; }, [] { return cv->NbToursStopArretBus; }),
+    ChampSpin("cases vers un arrêt", [] { return frmParamBus->CSpinEditNbCasesMaxArretBus; }, [] { return cv->NbMaxCasesDetectArretBus; }),
+    ChampSpin("probabilité vers un arrêt", [] { return frmParamBus->CSpinEditProbaDirArretBus; }, [] { return cv->ProbaDirArretBus; }),
+    ChampSpin("attente maximale", [] { return frmParamBus->CSpinEditNbMaxToursAttenteBus; }, [] { return cv->NbMaxToursAttenteBus; }),
+    ChampSpin("probabilité d'arrêt à la demande", [] { return frmParamBus->CSpinEditProbaArretDmd; }, [] { return cv->ProbaArretBusDmd; }),
    });
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Tram
-  VerifieChamps("Tram", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTram; }, &TfrmParamSimul::BitBtnDefLignesTram, Action); },
-                []() { return frmParamTram->ButtonOk; }, []() { return frmParamTram->ButtonAnnuler; },
+  VerifieChamps("Tram", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTram; }, &TfrmParamSimul::BitBtnDefLignesTram, std::move(Action)); },
+                [] { return frmParamTram->ButtonOk; }, [] { return frmParamTram->ButtonAnnuler; },
    {
-    ChampSpin("personnes par tram", []() { return frmParamTram->CSpinEditNbMaxPersonnesTram; }, []() { return (int)cv->NbMaxPersonnesTram; }),
-    ChampSpin("arrêt aux stations", []() { return frmParamTram->CSpinEditNbToursStopArretTram; }, []() { return (int)cv->NbToursStopArretTram; }),
-    ChampSpin("cases vers un arrêt", []() { return frmParamTram->CSpinEditNbCasesMaxArretTram; }, []() { return (int)cv->NbMaxCasesDetectArretTram; }),
-    ChampSpin("probabilité vers un arrêt", []() { return frmParamTram->CSpinEditProbaDirArretTram; }, []() { return (int)cv->ProbaDirArretTram; }),
-    ChampSpin("attente maximale", []() { return frmParamTram->CSpinEditNbMaxToursAttenteTram; }, []() { return (int)cv->NbMaxToursAttenteTram; }),
-    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamTram->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretTramDmd; }),
+    ChampSpin("personnes par tram", [] { return frmParamTram->CSpinEditNbMaxPersonnesTram; }, [] { return cv->NbMaxPersonnesTram; }),
+    ChampSpin("arrêt aux stations", [] { return frmParamTram->CSpinEditNbToursStopArretTram; }, [] { return cv->NbToursStopArretTram; }),
+    ChampSpin("cases vers un arrêt", [] { return frmParamTram->CSpinEditNbCasesMaxArretTram; }, [] { return cv->NbMaxCasesDetectArretTram; }),
+    ChampSpin("probabilité vers un arrêt", [] { return frmParamTram->CSpinEditProbaDirArretTram; }, [] { return cv->ProbaDirArretTram; }),
+    ChampSpin("attente maximale", [] { return frmParamTram->CSpinEditNbMaxToursAttenteTram; }, [] { return cv->NbMaxToursAttenteTram; }),
+    ChampSpin("probabilité d'arrêt à la demande", [] { return frmParamTram->CSpinEditProbaArretDmd; }, [] { return cv->ProbaArretTramDmd; }),
    });
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Taxi
-  VerifieChamps("Taxi", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTaxi; }, &TfrmParamSimul::BitBtnDefTaxis, Action); },
-                []() { return frmParamTaxi->ButtonOk; }, []() { return frmParamTaxi->ButtonAnnuler; },
+  VerifieChamps("Taxi", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamTaxi; }, &TfrmParamSimul::BitBtnDefTaxis, std::move(Action)); },
+                [] { return frmParamTaxi->ButtonOk; }, [] { return frmParamTaxi->ButtonAnnuler; },
    {
-    ChampSpin("personnes par taxi", []() { return frmParamTaxi->CSpinEditNbMaxPersonnesTaxi; }, []() { return (int)cv->NbMaxPersonnesTaxi; }),
-    ChampSpin("cases vers une place", []() { return frmParamTaxi->CSpinEditNbCasesMaxPlaceTaxi; }, []() { return (int)cv->NbMaxCasesDetectFileTaxi; }),
-    ChampSpin("probabilité vers une place", []() { return frmParamTaxi->CSpinEditProbaDirPlaceTaxi; }, []() { return (int)cv->ProbaDirFileTaxi; }),
-    ChampSpin("attente maximale", []() { return frmParamTaxi->CSpinEditNbMaxToursAttente; }, []() { return (int)cv->NbMaxToursAttenteTaxi; }),
-    ChampSpin("probabilité d'arrêt à la demande", []() { return frmParamTaxi->CSpinEditProbaArretDmd; }, []() { return (int)cv->ProbaArretTaxiDmd; }),
+    ChampSpin("personnes par taxi", [] { return frmParamTaxi->CSpinEditNbMaxPersonnesTaxi; }, [] { return cv->NbMaxPersonnesTaxi; }),
+    ChampSpin("cases vers une place", [] { return frmParamTaxi->CSpinEditNbCasesMaxPlaceTaxi; }, [] { return cv->NbMaxCasesDetectFileTaxi; }),
+    ChampSpin("probabilité vers une place", [] { return frmParamTaxi->CSpinEditProbaDirPlaceTaxi; }, [] { return cv->ProbaDirFileTaxi; }),
+    ChampSpin("attente maximale", [] { return frmParamTaxi->CSpinEditNbMaxToursAttente; }, [] { return cv->NbMaxToursAttenteTaxi; }),
+    ChampSpin("probabilité d'arrêt à la demande", [] { return frmParamTaxi->CSpinEditProbaArretDmd; }, [] { return cv->ProbaArretTaxiDmd; }),
    });
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   // Vehlib
-  VerifieChamps("Vehlib", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamVehlib; }, &TfrmParamSimul::BitBtnDefVehlibs, Action); },
-                []() { return frmParamVehlib->ButtonOk; }, []() { return frmParamVehlib->ButtonAnnuler; },
+  VerifieChamps("Vehlib", f, [&](std::function<void()> Action) { DansFille([]() -> QWidget * { return frmParamVehlib; }, &TfrmParamSimul::BitBtnDefVehlibs, std::move(Action)); },
+                [] { return frmParamVehlib->ButtonOk; }, [] { return frmParamVehlib->ButtonAnnuler; },
    {
-    ChampSpin("personnes par vehlib", []() { return frmParamVehlib->CSpinEditNbMaxPersonnesVehlib; }, []() { return (int)cv->NbMaxPersonnesVehlib; }),
-    ChampSpin("cases vers une place", []() { return frmParamVehlib->CSpinEditNbCasesMaxPlaceVehlib; }, []() { return (int)cv->NbMaxCasesDetectFileVehlib; }),
-    ChampSpin("probabilité vers une place", []() { return frmParamVehlib->CSpinEditProbaDirPlaceVehlib; }, []() { return (int)cv->ProbaDirFileVehlib; }),
-    ChampSpin("taux de remplissage", []() { return frmParamVehlib->CSpinEditTauxRemplissage; }, []() { return (int)cv->TauxRemplissageVehlib; }),
+    ChampSpin("personnes par vehlib", [] { return frmParamVehlib->CSpinEditNbMaxPersonnesVehlib; }, [] { return cv->NbMaxPersonnesVehlib; }),
+    ChampSpin("cases vers une place", [] { return frmParamVehlib->CSpinEditNbCasesMaxPlaceVehlib; }, [] { return cv->NbMaxCasesDetectFileVehlib; }),
+    ChampSpin("probabilité vers une place", [] { return frmParamVehlib->CSpinEditProbaDirPlaceVehlib; }, [] { return cv->ProbaDirFileVehlib; }),
+    ChampSpin("taux de remplissage", [] { return frmParamVehlib->CSpinEditTauxRemplissage; }, [] { return cv->TauxRemplissageVehlib; }),
    });
  }
 //---------------------------------------------------------------------------
 void TestInterface::feuxChampParChamp()
  { // Fiche Feux et fiche Feux de piétons, retrouvées par leur case après la réouverture
   ReseauAvecFeux();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   PoseFeuPietonsLie(4, 8);
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   const QString f=QFileInfo(Carte).absolutePath()+"/champs_feux.cvw";
   QFile::remove(f);
   Enregistre(f);
   OuvreFichier(f);
-  auto Feu=[]() { return &cv->Feu[cv->v[4][8].NumFeu[est-1]-1]; };
-  auto FeuP=[]() { return &cv->FeuP[cv->v[6][7].NumFeuP[sud-1]-1]; };
-  auto DansFeux=[this](std::function<void()> Action)
+  auto Feu=[] { return &cv->Feu[cv->v[4][8].NumFeu[est-1]-1]; };
+  auto FeuP=[] { return &cv->FeuP[cv->v[6][7].NumFeuP[sud-1]-1]; };
+  auto DansFeux=[this](const std::function<void()>& Action)
    {
     OuvreFicheFeu(4, 8, est);
-    if (!QTest::currentTestFailed()) Action();
+    if (!QTest::currentTestFailed()) { Action();
+}
     Clique(frmDefVoie->ButtonAnnuler);
    };
-  VerifieChamps("Feux", f, DansFeux, []() { return frmDefFeux->ButtonOk; }, []() { return frmDefFeux->ButtonAnnuler; },
+  VerifieChamps("Feux", f, DansFeux, [] { return frmDefFeux->ButtonOk; }, [] { return frmDefFeux->ButtonAnnuler; },
    {
-    ChampSpin("durée du vert", []() { return frmDefFeux->CSpinEditDureeVert; }, [Feu]() { return (int)Feu()->DureeVert; }),
-    ChampSpin("durée du rouge", []() { return frmDefFeux->CSpinEditDureeRouge; }, [Feu]() { return (int)Feu()->DureeRouge; }),
-    ChampRadio("état", []() { return frmDefFeux->RadioGroupEtat; }, [Feu]() { return (int)Feu()->Etat; }),
-    ChampRadio("demande du vert", []() { return frmDefFeux->RadioGroupTypeDmdVert; }, [Feu]() { return (int)Feu()->TypeDmdVert; }),
-    ChampRadio("passage au rouge", []() { return frmDefFeux->RadioGroupTypePsgRouge; }, [Feu]() { return (int)Feu()->TypePsgRouge; }),
+    ChampSpin("durée du vert", [] { return frmDefFeux->CSpinEditDureeVert; }, [Feu] { return Feu()->DureeVert; }),
+    ChampSpin("durée du rouge", [] { return frmDefFeux->CSpinEditDureeRouge; }, [Feu] { return Feu()->DureeRouge; }),
+    ChampRadio("état", [] { return frmDefFeux->RadioGroupEtat; }, [Feu] { return static_cast<int>(Feu()->Etat); }),
+    ChampRadio("demande du vert", [] { return frmDefFeux->RadioGroupTypeDmdVert; }, [Feu] { return static_cast<int>(Feu()->TypeDmdVert); }),
+    ChampRadio("passage au rouge", [] { return frmDefFeux->RadioGroupTypePsgRouge; }, [Feu] { return static_cast<int>(Feu()->TypePsgRouge); }),
    });
-  if (QTest::currentTestFailed()) return;
-  auto DansFeuxPietons=[this](std::function<void()> Action)
+  if (QTest::currentTestFailed()) { return;
+}
+  auto DansFeuxPietons=[this](const std::function<void()>& Action)
    { // Feu existant : bouton relâché puis enfoncé pour rouvrir sa fiche
     CliqueCase(6, 7);
     frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
@@ -5823,13 +6321,13 @@ void TestInterface::feuxChampParChamp()
     Action();
     Clique(frmDefVoiePietons->ButtonAnnuler);
    };
-  VerifieChamps("Feux de piétons", f, DansFeuxPietons, []() { return frmDefFeuxPietons->ButtonOk; }, []() { return frmDefFeuxPietons->ButtonAnnuler; },
+  VerifieChamps("Feux de piétons", f, DansFeuxPietons, [] { return frmDefFeuxPietons->ButtonOk; }, [] { return frmDefFeuxPietons->ButtonAnnuler; },
    {
-    ChampSpin("durée du vert", []() { return frmDefFeuxPietons->CSpinEditDureeVert; }, [FeuP]() { return (int)FeuP()->DureeVert; }),
-    ChampSpin("durée du rouge", []() { return frmDefFeuxPietons->CSpinEditDureeRouge; }, [FeuP]() { return (int)FeuP()->DureeRouge; }),
-    ChampRadio("état", []() { return frmDefFeuxPietons->RadioGroupEtat; }, [FeuP]() { return (int)FeuP()->Etat-(FeuP()->Etat==rouge); }),
-    ChampRadio("demande du vert", []() { return frmDefFeuxPietons->RadioGroupTypeDmdVert; }, [FeuP]() { return (int)FeuP()->TypeDmdVert; }),
-    ChampRadio("passage au rouge", []() { return frmDefFeuxPietons->RadioGroupTypePsgRouge; }, [FeuP]() { return (int)FeuP()->TypePsgRouge; }),
+    ChampSpin("durée du vert", [] { return frmDefFeuxPietons->CSpinEditDureeVert; }, [FeuP] { return FeuP()->DureeVert; }),
+    ChampSpin("durée du rouge", [] { return frmDefFeuxPietons->CSpinEditDureeRouge; }, [FeuP] { return FeuP()->DureeRouge; }),
+    ChampRadio("état", [] { return frmDefFeuxPietons->RadioGroupEtat; }, [FeuP] { return static_cast<int>(FeuP()->Etat)-(FeuP()->Etat==rouge); }),
+    ChampRadio("demande du vert", [] { return frmDefFeuxPietons->RadioGroupTypeDmdVert; }, [FeuP] { return static_cast<int>(FeuP()->TypeDmdVert); }),
+    ChampRadio("passage au rouge", [] { return frmDefFeuxPietons->RadioGroupTypePsgRouge; }, [FeuP] { return static_cast<int>(FeuP()->TypePsgRouge); }),
    });
  }
 //---------------------------------------------------------------------------
@@ -5850,8 +6348,10 @@ void TestInterface::ficheVehiculeNiveauxDePriorite()
     for(int i=0; i<cv->NbVehicules; i++)
      {
       vehicule *Veh=cv->Vehicule+i;
-      if (!Veh->Defini()||Vus[Veh->NivPriorite]) continue;
-      if ((cv->v[Veh->x][Veh->y].NumVehicule!=i+1)||cv->v[Veh->x][Veh->y].NumParking) continue;
+      if (!Veh->Defini()||Vus[Veh->NivPriorite]) { continue;
+}
+      if ((cv->v[Veh->x][Veh->y].NumVehicule!=i+1)||(cv->v[Veh->x][Veh->y].NumParking != 0)) { continue;
+}
       PlaceCurseur(Veh->x, Veh->y);
       frmInfosVehicule->RafraichitInfos();
       QCOMPARE(Q(frmInfosVehicule->LabelNivPriorite->Caption), QString(Libelles[Veh->NivPriorite]));
@@ -5867,13 +6367,14 @@ void TestInterface::parametresSansParking()
  { // v6.0.3 : moins de deux parkings et aucune place : division par zéro à l'ouverture
    // de la fiche dans l'original (arrêt de l'application sur x86, relevé par UBSan sur ARM)
   QVERIFY(!OuvreDemo("sans_parking.cvw").isEmpty());
-  const int NbX=cv->NbX, NbY=cv->NbY;
+  const int NbX=cv->NbX;
+  const int NbY=cv->NbY;
   delete cv;
   cv=new centre_ville(true, NbX, NbY);
   cv->DefinitNbParkings(0);
   QCOMPARE(cv->NbPlacesPark, 0);
   bool Vue=false;
-  QuandModale([]() { return frmParamSimul; }, [&]()
+  QuandModale([] { return frmParamSimul; }, [&]
    {
     Vue=frmParamSimul->isVisible();
     Clique(frmParamSimul->ButtonAnnuler);
@@ -5900,12 +6401,14 @@ namespace
   bool CouleurAutour(const QImage &Image, qreal Echelle, int x, int y, TColor Couleur, int Rayon)
    {
     QRgb c=CouleurQt(Couleur).rgb();
-    for(int i=-Rayon; i<=Rayon; i++)
+    for(int i=-Rayon; i<=Rayon; i++) {
      for(int j=-Rayon; j<=Rayon; j++)
       {
-       QPoint p((int)((x+i+0.5)*Echelle), (int)((y+j+0.5)*Echelle));
-       if (Image.rect().contains(p)&&(Image.pixel(p)==c)) return true;
+       QPoint p(static_cast<int>((x+i+0.5)*Echelle), static_cast<int>((y+j+0.5)*Echelle));
+       if (Image.rect().contains(p)&&(Image.pixel(p)==c)) { return true;
+}
       }
+}
     return false;
    }
   // Dessins d'un contrôle (QEvent::Paint), pour compter les rafraîchissements
@@ -5913,9 +6416,10 @@ namespace
    {
     public:
     int n=0;
-    bool eventFilter(QObject *, QEvent *e) override
+    bool eventFilter(QObject * /*watched*/, QEvent *e) override
      {
-      if (e->type()==QEvent::Paint) n++;
+      if (e->type()==QEvent::Paint) { n++;
+}
       return false;
      }
    };
@@ -5929,26 +6433,31 @@ namespace
   TotauxFluidite CalculeFluidite(int ed, int ea)
    {
     TotauxFluidite r;
-    for(int x=0; x<cv->NbX; x++)
+    for(int x=0; x<cv->NbX; x++) {
      for(int y=0; y<cv->NbY; y++)
       {
        voie *v=&cv->v[x][y];
-       if ((v->DirPoss<=aucune)||v->NumParking) continue;
+       if ((v->DirPoss<=aucune)||(v->NumParking != 0)) { continue;
+}
        r.n++;
-       if (!v->Attente||!v->Trafic) continue;
+       if (!v->Attente||!v->Trafic) { continue;
+}
        r.m[0]=qMax(r.m[0], v->Attente[ed][ea]);
        r.t[0]+=v->Attente[ed][ea];
        r.m[1]=qMax(r.m[1], v->Trafic[ed][ea]);
        r.t[1]+=v->Trafic[ed][ea];
       }
+}
     return r;
    }
   // Couleur d'une case : du vert (0) au rouge (maximum) en passant par le jaune
   TColor CouleurFluidite(const TotauxFluidite &r, int ts, int ed, int ea, voie *v)
    {
-    if (!r.m[ts]||!v->Trafic||!v->Attente) return 0;
-    int s=(127*(ts?v->Trafic[ed][ea]:v->Attente[ed][ea]))/r.m[ts],
-        Rouge=(s<64)?4*s:252, Vert=(s>=64)?252-4*(s-64):252;
+    if ((r.m[ts] == 0)||!v->Trafic||!v->Attente) { return 0;
+}
+    int s=(127*((ts != 0)?v->Trafic[ed][ea]:v->Attente[ed][ea]))/r.m[ts];
+    int Rouge=(s<64)?4*s:252;
+    int Vert=(s>=64)?252-4*(s-64):252;
     return Rouge|(Vert<<8);
    }
  }
@@ -5959,13 +6468,33 @@ void TestInterface::ficheComposition()
    // composition du réseau ; « Vu » et Échap la ferment
   QVERIFY(!OuvreCarte(QString::fromUtf8("Géant.cvw"), "lot3_composition.cvw").isEmpty());
   // Composition attendue, d'après le réseau
-  int Total=0, Routes=0, VoiesTram=0, Parkings=0, CasesArretsBus=0, CasesArretsTram=0,
-      Dir=0, Nord=0, Est=0, Sud=0, Ouest=0, ArretsBus=0, ArretsTram=0, PlacesTaxi=0, PlacesPark=0;
-  int Priorites[2]={0, 0}, Feux[2]={0, 0}, Clp[2]={0, 0}, Stops[2]={0, 0}; // sur route, sur voie de tram
-  for(int i=0; i<cv->NbArretsBus; i++) ArretsBus+=cv->ArretBus[i].Defini();
-  for(int i=0; i<cv->NbArretsTram; i++) ArretsTram+=cv->ArretTram[i].Defini();
-  for(int i=0; i<cv->NbPlacesTaxi; i++) PlacesTaxi+=cv->PlaceTaxi[i].Definie();
-  for(int i=0; i<cv->NbPlacesPark; i++) PlacesPark+=cv->PlacePark[i].Definie();
+  int Total=0;
+  int Routes=0;
+  int VoiesTram=0;
+  int Parkings=0;
+  int CasesArretsBus=0;
+  int CasesArretsTram=0;
+  int Dir=0;
+  int Nord=0;
+  int Est=0;
+  int Sud=0;
+  int Ouest=0;
+  int ArretsBus=0;
+  int ArretsTram=0;
+  int PlacesTaxi=0;
+  int PlacesPark=0;
+  int Priorites[2]={0, 0};
+  int Feux[2]={0, 0};
+  int Clp[2]={0, 0};
+  int Stops[2]={0, 0}; // sur route, sur voie de tram
+  for(int i=0; i<cv->NbArretsBus; i++) { ArretsBus+=static_cast<int>(cv->ArretBus[i].Defini());
+}
+  for(int i=0; i<cv->NbArretsTram; i++) { ArretsTram+=static_cast<int>(cv->ArretTram[i].Defini());
+}
+  for(int i=0; i<cv->NbPlacesTaxi; i++) { PlacesTaxi+=static_cast<int>(cv->PlaceTaxi[i].Definie());
+}
+  for(int i=0; i<cv->NbPlacesPark; i++) { PlacesPark+=static_cast<int>(cv->PlacePark[i].Definie());
+}
   auto Compte=[&](int Sur, int p)
    {
     Feux[Sur]+=(p==feux);
@@ -5973,39 +6502,45 @@ void TestInterface::ficheComposition()
     Stops[Sur]+=(p==stop);
     Priorites[Sur]+=(p==feux)||(p==cedez_le_passage)||(p==stop);
    };
-  for(int x=0; x<cv->NbX; x++)
+  for(int x=0; x<cv->NbX; x++) {
    for(int y=0; y<cv->NbY; y++)
     {
      voie *v=&cv->v[x][y];
      Total++;
-     Parkings+=(v->NumParking>0);
-     CasesArretsBus+=(v->NumArretBus>0);
-     if (v->DirPoss)
+     Parkings+=static_cast<int>(v->NumParking>0);
+     CasesArretsBus+=static_cast<int>(v->NumArretBus>0);
+     if (v->DirPoss != 0)
       {
        Routes++;
        Dir+=NbDir[v->DirPoss];
-       Nord+=!!(v->DirPoss&N); Est+=!!(v->DirPoss&E); Sud+=!!(v->DirPoss&S); Ouest+=!!(v->DirPoss&O);
-       for(int d=nord; d<=ouest; d++)
-        if (v->DirPoss&PossDir[d]) Compte(0, v->Priorite[d-1]);
+       Nord+=static_cast<int>(!((v->DirPoss&N) == 0)); Est+=static_cast<int>(!((v->DirPoss&E) == 0)); Sud+=static_cast<int>(!((v->DirPoss&S) == 0)); Ouest+=static_cast<int>(!((v->DirPoss&O) == 0));
+       for(int d=nord; d<=ouest; d++) {
+        if ((v->DirPoss&PossDir[d]) != 0) { Compte(0, v->Priorite[d-1]);
+}
+}
       }
-     if (v->SensVoieTram)
+     if (v->SensVoieTram != 0)
       {
        VoiesTram++;
-       CasesArretsTram+=(v->NumArretTram>0);
-       for(int d=nord; d<=ouest; d++)
-        if (v->EstDirPossSensVoieTram(indefinie, (direction)d)) Compte(1, v->Priorite[d-1]);
+       CasesArretsTram+=static_cast<int>(v->NumArretTram>0);
+       for(int d=nord; d<=ouest; d++) {
+        if (v->EstDirPossSensVoieTram(indefinie, static_cast<direction>(d))) { Compte(1, v->Priorite[d-1]);
+}
+}
       }
     }
+}
   QVERIFY(Routes&&Dir&&VoiesTram&&ArretsBus&&ArretsTram&&PlacesTaxi&&PlacesPark&&Priorites[0]);
   QStringList e;
   bool Modale=false;
   auto Entier=[&e](const char *Nom, TLabel *l, int Attendu) { Compare(e, Nom, l->Caption, QString::number(Attendu)); };
   auto PC=[&e](const char *Nom, TLabel *l, double Attendu)
    {
-    if (!PourcentageEgal(l->Caption, Attendu))
+    if (!PourcentageEgal(l->Caption, Attendu)) {
      e<<QString::fromUtf8("%1 : « %2 » au lieu de %3").arg(QString::fromUtf8(Nom), Q(l->Caption)).arg(Attendu);
+}
    };
-  auto Verifie=[&]()
+  auto Verifie=[&]
    {
     TfrmStatsComposition *c=frmStatsComposition;
     Modale=(QApplication::activeModalWidget()==c);
@@ -6064,7 +6599,7 @@ void TestInterface::ficheComposition()
      }
    };
   // Barre d'outils, « Vu »
-  QuandModale([]() { return frmStatsComposition; }, [&]()
+  QuandModale([] { return frmStatsComposition; }, [&]
    {
     Verifie();
     CaptureFiche(frmStatsComposition, "fiche_composition.png");
@@ -6078,7 +6613,7 @@ void TestInterface::ficheComposition()
   QVERIFY(!frmStatsComposition); // Release, comme l'original
   // Raccourci Ctrl+Maj+R, Échap (« Vu » est aussi le bouton Cancel)
   Modale=false;
-  QuandModale([]() { return frmStatsComposition; }, [&]()
+  QuandModale([] { return frmStatsComposition; }, [&]
    {
     Verifie();
     Touche(frmStatsComposition->ButtonAide, Qt::Key_Escape);
@@ -6103,7 +6638,7 @@ void TestInterface::fichesEvolutionEtVehicules()
   QVERIFY(JoueJusquAuTour(2));
   TfrmSimulation *s=frmSimulation;
   // Statistiques des véhicules avant toute arrivée : rien à afficher
-  if (!cv->NbVehiculesArrives)
+  if (cv->NbVehiculesArrives == 0)
    {
     Messages.clear();
     Clique(s->ToolButtonAffStatsEtapes);
@@ -6142,18 +6677,28 @@ void TestInterface::fichesEvolutionEtVehicules()
     QImage Image=p->grab().toImage();
     qreal Echelle=p->devicePixelRatioF();
     bool ParNombre=(cv->TypeStats==par_nombre);
-    int NbTours=cv->NbToursStats, DrnTour=cv->TourCrt-1, PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1),
-        NbVehicules=cv->NbVehicules, NbPietons=cv->NbPietons,
-        xMax=p->width(), yMax=p->height(), NbPoints=DrnTour-PrmTour;
+    int NbTours=cv->NbToursStats;
+    int DrnTour=cv->TourCrt-1;
+    int PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1);
+    int NbVehicules=cv->NbVehicules;
+    int NbPietons=cv->NbPietons;
+    int xMax=p->width();
+    int yMax=p->height();
+    int NbPoints=DrnTour-PrmTour;
     if (Q(p->Hint)!=QString::fromUtf8(Epidemique?"Guéris en vert ; Infectés en jaune et Morts en rouge":
-                                                 "Sortis en jaune ; Déplacés en vert et Arrivés en rouge"))
+                                                 "Sortis en jaune ; Déplacés en vert et Arrivés en rouge")) {
      e<<("légende : "+Q(p->Hint));
-    if (NbPoints<5) e<<QString("%1 points seulement").arg(NbPoints);
-    int Couleurs[3]={clRed, clYellow, clGreen}, Trouves[3]={0, 0, 0}, Visibles[3]={0, 0, 0};
+}
+    if (NbPoints<5) { e<<QString("%1 points seulement").arg(NbPoints);
+}
+    int Couleurs[3]={clRed, clYellow, clGreen};
+    int Trouves[3]={0, 0, 0};
+    int Visibles[3]={0, 0, 0};
     for(int i=0; i<NbPoints; i++)
      {
       stats &st=cv->Stats[(PrmTour+i)%NbTours];
-      int x=xMax*i/NbTours, y[3];
+      int x=xMax*i/NbTours;
+      int y[3];
       if (Epidemique)
        {
         y[0]=yMax-yMax*st.NbPietonsMorts/NbPietons;
@@ -6163,42 +6708,55 @@ void TestInterface::fichesEvolutionEtVehicules()
       else
        {
         int NbRestants=ParNombre?NbVehicules:(st.NbVehiculesSortis-st.NbVehiculesArrives);
-        if (!NbRestants) NbRestants=100;
+        if (!NbRestants) { NbRestants=100;
+}
         y[0]=yMax-yMax*st.NbVehiculesArrives/NbVehicules;
         y[1]=yMax-yMax*st.NbVehiculesSortis/NbVehicules;
         y[2]=yMax-yMax*st.NbVehiculesDeplaces/NbRestants;
        }
-      for(int c=0; c<3; c++)
+      for(int c=0; c<3; c++) {
        if ((y[c]>=0)&&(y[c]<yMax))
         {
          Visibles[c]++;
          Trouves[c]+=CouleurAutour(Image, Echelle, x, y[c], Couleurs[c], 1);
         }
+}
      }
     // Vert, tracé en dernier : tous ses points ; rouge et jaune : au moins la
     // moitié (une courbe tracée après peut passer dessus)
     const char *Noms[3]={"rouge", "jaune", "vert"};
-    for(int c=0; c<3; c++)
-     if (Visibles[c]&&(Trouves[c]<((c==2)?Visibles[c]:(Visibles[c]+1)/2)))
+    for(int c=0; c<3; c++) {
+     if (Visibles[c]&&(Trouves[c]<((c==2)?Visibles[c]:(Visibles[c]+1)/2))) {
       e<<QString("courbe %1 : %2 points sur %3").arg(Noms[c]).arg(Trouves[c]).arg(Visibles[c]);
+}
+}
     // Quadrillage : carrés de 2 x 2 pixels, gris sauf toutes les dix marques (blanc)
-    int dt=1+9*(NbTours>=100), NbMarques=ParNombre?(NbVehicules/10):10, NbCarres=0, CarresTrouves=0;
-    for(int i=0; i<NbTours/dt; i++)
+    int dt=1+9*(NbTours>=100);
+    int NbMarques=ParNombre?(NbVehicules/10):10;
+    int NbCarres=0;
+    int CarresTrouves=0;
+    for(int i=0; i<NbTours/dt; i++) {
      for(int j=0; j<NbMarques; j++)
       {
-       int x=dt*xMax*i/NbTours, y=ParNombre?(10*yMax*j/NbVehicules):(10*yMax*j/100);
-       if ((x<1)||(yMax-y-1<0)||(yMax-y-1>=yMax)) continue;
+       int x=dt*xMax*i/NbTours;
+       int y=ParNombre?(10*yMax*j/NbVehicules):(10*yMax*j/100);
+       if ((x<1)||(yMax-y-1<0)||(yMax-y-1>=yMax)) { continue;
+}
        NbCarres++;
        CarresTrouves+=CouleurAutour(Image, Echelle, x-1, yMax-y-1, ((i%10)&&(j%10))?clGray:clWhite, 0);
       }
-    if (cv->QuadrillageStats?(CarresTrouves<NbCarres*3/4):(CarresTrouves>0))
+}
+    if (cv->QuadrillageStats?(CarresTrouves<NbCarres*3/4):(CarresTrouves>0)) {
      e<<QString("quadrillage %1 : %2 carrés sur %3").arg(cv->QuadrillageStats?"affiché":"masqué").arg(CarresTrouves).arg(NbCarres);
+}
     return e.join('\n');
    };
-  if (!cv->QuadrillageStats) s->MenuItemQuadrillageStatistiques->ElementQt()->trigger();
+  if (!cv->QuadrillageStats) { s->MenuItemQuadrillageStatistiques->ElementQt()->trigger();
+}
   QVERIFY(cv->QuadrillageStats);
   QVERIFY(s->ActionStatsAffQuadrillage->Checked);
-  if (cv->TypeStats!=par_nombre) s->ActionStatsAffParVehicule->Execute();
+  if (cv->TypeStats!=par_nombre) { s->ActionStatsAffParVehicule->Execute();
+}
   QString e=VerifieCourbes(false);
   QVERIFY2(e.isEmpty(), qPrintable(e));
   CaptureFiche(f, "fiche_evolution.png");
@@ -6228,18 +6786,21 @@ void TestInterface::fichesEvolutionEtVehicules()
   //-------------------------------------------------------------------------
   // Statistiques des véhicules d'une étape à l'autre (menu Statistiques)
   // (attente d'arrivées : deux véhicules d'un même trajet, aux parcours et aux durées différents)
-  auto DeuxArrivees=[]()
+  auto DeuxArrivees=[]
    {
-    for(int i=0; i<cv->NbVehicules; i++)
+    for(int i=0; i<cv->NbVehicules; i++) {
      for(int j=i+1; j<cv->NbVehicules; j++)
       {
-       vehicule *a=&cv->Vehicule[i], *b=&cv->Vehicule[j];
+       vehicule *a=&cv->Vehicule[i];
+       vehicule *b=&cv->Vehicule[j];
        if (!a->Defini()&&!b->Defini()&&a->NbCasesParcourues&&b->NbCasesParcourues&&
            (a->NumParkingDepart==b->NumParkingDepart)&&(a->NumParkingArrivee==b->NumParkingArrivee)&&
            (a->NumParkingDepart!=a->NumParkingArrivee)&&
-           (a->NbCasesParcourues!=b->NbCasesParcourues)&&a->TourDrnDepl&&b->TourDrnDepl&&(a->TourDrnDepl!=b->TourDrnDepl))
+           (a->NbCasesParcourues!=b->NbCasesParcourues)&&a->TourDrnDepl&&b->TourDrnDepl&&(a->TourDrnDepl!=b->TourDrnDepl)) {
         return true;
+}
       }
+}
     return false;
    };
   QVERIFY(JoueTours(DeuxArrivees, 1500)); // graine 1 : sans blocage des vehlibs sur 1500 tours (Demarre)
@@ -6269,12 +6830,16 @@ void TestInterface::fichesEvolutionEtVehicules()
    {
     QStringList e;
     Compare(e, "titre", g->Caption, QString::fromUtf8("Statistique des véhicules d'une étape à l'autre [Tour %1]").arg(Tour));
-    int n=cv->NbParkings, Onglet=g->TabControl->TabIndex, NbNonNuls=0;
-    for(int ed=1; ed<=n; ed++)
-     for(int ea=1; ea<=n; ea++)
+    int n=cv->NbParkings;
+    int Onglet=g->TabControl->TabIndex;
+    int NbNonNuls=0;
+    for(int ed=1; ed<=n; ed++) {
+     for(int ea=1; ea<=n; ea++) {
       if (ed!=ea)
        {
-        int Max=0, Min=32768, Nb=0;
+        int Max=0;
+        int Min=32768;
+        int Nb=0;
         for(int i=0; i<cv->NbVehicules; i++)
          {
           vehicule *v=&cv->Vehicule[i];
@@ -6289,10 +6854,13 @@ void TestInterface::fichesEvolutionEtVehicules()
         NbNonNuls+=(Nb&&(Max>Min));
         Compare(e, qPrintable(QString("(%1, %2)").arg(ed).arg(ea)), g->StringGridStatsVehicules->Cells[ed][ea], QString::asprintf("%4d", Nb?Max-Min:0));
        }
-    if (!NbNonNuls) e<<QString::fromUtf8("aucun écart non nul");
+}
+}
+    if (!NbNonNuls) { e<<QString::fromUtf8("aucun écart non nul");
+}
     return e.join('\n');
    };
-  QTabBar *Onglets=g->TabControl->findChild<QTabBar *>();
+  auto *Onglets=g->TabControl->findChild<QTabBar *>();
   QVERIFY(Onglets);
   QCOMPARE(Onglets->count(), 2);
   QCOMPARE((int)g->TabControl->TabIndex, 0);
@@ -6347,12 +6915,16 @@ void TestInterface::evolutionEntreDeuxTours()
   TPaintBox *p=frmStatistiques->PaintBoxStats;
   QImage Image=p->grab().toImage();
   qreal Echelle=p->devicePixelRatioF();
-  int xMax=p->width(), yMax=p->height(), xPremier=xMax*(cv->TourCrt-1)/10+2;
+  int xMax=p->width();
+  int yMax=p->height();
+  int xPremier=xMax*(cv->TourCrt-1)/10+2;
   QRgb Fond=CouleurQt(clBlack).rgb();
-  for(int x=xPremier; x<xMax; x++)
-   for(int y=0; y<yMax; y++)
+  for(int x=xPremier; x<xMax; x++) {
+   for(int y=0; y<yMax; y++) {
     QVERIFY2(Image.pixel(QPoint((int)((x+0.5)*Echelle), (int)((y+0.5)*Echelle)))==Fond,
              qPrintable(QString("trait après le dernier tour joué, en (%1, %2)").arg(x).arg(y)));
+}
+}
   frmStatistiques->close();
   QVERIFY(Arrete());
  }
@@ -6388,7 +6960,8 @@ void TestInterface::ficheFluiditeTrafic()
       QString Texte=Q(l->Caption);
       bool Ok=false;
       double v=QString(Texte).replace(',', '.').toDouble(&Ok);
-      if (!Ok||!Texte.contains(',')||(qAbs(v-1.0*t/r.n)>0.0501)) e<<QString("%1 : %2 au lieu de %3").arg(Nom, Texte).arg(1.0*t/r.n);
+      if (!Ok||!Texte.contains(',')||(qAbs(v-1.0*t/r.n)>0.0501)) { e<<QString("%1 : %2 au lieu de %3").arg(Nom, Texte).arg(1.0*t/r.n);
+}
      };
     Compare(e, "maximum de la légende", f->LabelMax->Caption, QString::number(r.m[ts]));
     Compare(e, "attente cumulée", f->LabelAttenteCumulee->Caption, QString::number(r.t[0]));
@@ -6401,12 +6974,14 @@ void TestInterface::ficheFluiditeTrafic()
     // la case ; hors parkings, dépôts et case courante, dessinés par-dessus)
     QImage Image=g->viewport()->grab().toImage();
     qreal Echelle=g->viewport()->devicePixelRatioF();
-    int NbVues=0, NbColorees=0;
-    for(int x=0; x<cv->NbX; x++)
+    int NbVues=0;
+    int NbColorees=0;
+    for(int x=0; x<cv->NbX; x++) {
      for(int y=0; y<cv->NbY; y++)
       {
        voie *v=&cv->v[x][y];
-       if ((v->DirPoss<=aucune)||v->NumParking) continue;
+       if ((v->DirPoss<=aucune)||v->NumParking) { continue;
+}
        TColor c=CouleurFluidite(r, ts, ed, ea, v);
        if (f->CouleurCase(x, y)!=c)
         {
@@ -6415,14 +6990,19 @@ void TestInterface::ficheFluiditeTrafic()
         }
        NbColorees+=(c!=0);
        QRect Case=g->CellRect(x, y).Qt();
-       if (!g->viewport()->rect().contains(Case)||v->EstDepotBus()||((x==g->Col)&&(y==g->Row))) continue;
+       if (!g->viewport()->rect().contains(Case)||v->EstDepotBus()||((x==g->Col)&&(y==g->Row))) { continue;
+}
        NbVues++;
-       QRgb Obtenu=Image.pixel(QPoint((int)((Case.left()+8.5)*Echelle), (int)((Case.top()+8.5)*Echelle)));
-       if (Obtenu!=CouleurQt(c).rgb())
+       QRgb Obtenu=Image.pixel(QPoint(static_cast<int>((Case.left()+8.5)*Echelle), static_cast<int>((Case.top()+8.5)*Echelle)));
+       if (Obtenu!=CouleurQt(c).rgb()) {
         e<<QString("case (%1, %2) dessinée en %3 au lieu de %4").arg(x).arg(y).arg(Obtenu&0xFFFFFF, 6, 16, QChar('0')).arg(CouleurQt(c).rgb()&0xFFFFFF, 6, 16, QChar('0'));
+}
       }
-    if (NbVues<100) e<<QString("%1 cases vues seulement").arg(NbVues);
-    if (!ed&&!ea&&!NbColorees) e<<QString::fromUtf8("aucune case colorée");
+}
+    if (NbVues<100) { e<<QString("%1 cases vues seulement").arg(NbVues);
+}
+    if (!ed&&!ea&&!NbColorees) { e<<QString::fromUtf8("aucune case colorée");
+}
     // Détail de la case courante dans la barre d'état (asMsgDetailCase, au dessin de la case)
     g->Repaint();
     voie *v=&cv->v[g->Col][g->Row];
@@ -6442,24 +7022,29 @@ void TestInterface::ficheFluiditeTrafic()
   QPoint Depart;
   QString e;
   bool Modale=false;
-  QuandModale([]() { return frmStatsAttenteTrafic; }, [&]()
+  QuandModale([] { return frmStatsAttenteTrafic; }, [&]
    {
     TfrmStatsAttenteTrafic *f=frmStatsAttenteTrafic;
     Modale=(QApplication::activeModalWidget()==f);
     QStringList Ecarts;
-    auto Etape=[&Ecarts](const QString &Nom, const QString &Ecart) { if (!Ecart.isEmpty()) Ecarts<<(Nom+" :\n"+Ecart); };
+    auto Etape=[&Ecarts](const QString &Nom, const QString &Ecart) { if (!Ecart.isEmpty()) { Ecarts<<(Nom+" :\n"+Ecart); 
+}};
     Compare(Ecarts, "titre", f->Caption, QString::fromUtf8("Statistiques de fluidité et de trafic au tour n°%1").arg(cv->TourCrt));
-    if (f->AvecMenuContextuel::PopupMenu!=f->PopupMenu) Ecarts<<QString::fromUtf8("menu contextuel de la fiche non relié");
+    if (f->AvecMenuContextuel::PopupMenu!=f->PopupMenu) { Ecarts<<QString::fromUtf8("menu contextuel de la fiche non relié");
+}
     // Curseur sur une case de route où le trafic n'est pas nul, dans la vue
-    for(int y=2; (y<cv->NbY-2)&&Depart.isNull(); y++)
+    for(int y=2; (y<cv->NbY-2)&&Depart.isNull(); y++) {
      for(int x=2; (x<cv->NbX-2)&&Depart.isNull(); x++)
       {
        voie *v=&cv->v[x][y];
        if ((v->DirPoss>aucune)&&!v->NumParking&&v->Trafic&&v->Trafic[0][0]&&
-           g->viewport()->rect().contains(g->CellRect(x+1, y+1).Qt()))
+           g->viewport()->rect().contains(g->CellRect(x+1, y+1).Qt())) {
         Depart=QPoint(x, y);
+}
       }
-    if (Depart.isNull()) Ecarts<<QString::fromUtf8("aucune case de route avec du trafic");
+}
+    if (Depart.isNull()) { Ecarts<<QString::fromUtf8("aucune case de route avec du trafic");
+}
     g->Col=Depart.x();
     g->Row=Depart.y();
     Etape("attente", Verifie(0, 0, 0));
@@ -6472,7 +7057,8 @@ void TestInterface::ficheFluiditeTrafic()
     Capture("carte_trafic.png");
     // Trajets : parking de départ 1 puis 2, puis parking d'arrivée 1
     Clique(f->CheckBoxParkingDepart);
-    if (!f->CSpinEditParkingDepart->isEnabled()) Ecarts<<QString::fromUtf8("parking de départ non modifiable");
+    if (!f->CSpinEditParkingDepart->isEnabled()) { Ecarts<<QString::fromUtf8("parking de départ non modifiable");
+}
     Etape("départ 1", Verifie(1, 1, 0));
     f->CSpinEditParkingDepart->Value=2;
     Etape("départ 2", Verifie(1, 2, 0));
@@ -6480,16 +7066,19 @@ void TestInterface::ficheFluiditeTrafic()
     Etape("départ 2, arrivée 1", Verifie(1, 2, 1));
     Clique(f->CheckBoxParkingDepart);
     Clique(f->CheckBoxParkingArrivee);
-    if (f->CSpinEditParkingDepart->isEnabled()||f->CSpinEditParkingArrivee->isEnabled()) Ecarts<<QString::fromUtf8("parkings encore modifiables");
+    if (f->CSpinEditParkingDepart->isEnabled()||f->CSpinEditParkingArrivee->isEnabled()) { Ecarts<<QString::fromUtf8("parkings encore modifiables");
+}
     CliqueChoix(f->RadioGroupType, 0);
     Etape("attente (retour)", Verifie(0, 0, 0));
     // Boutons de direction : droite, bas, gauche-haut ; dans les coins : bas-droite, haut-gauche
     auto Curseur=[&Ecarts, g](const char *Nom, int x, int y)
      {
-      if ((g->Col!=x)||(g->Row!=y))
+      if ((g->Col!=x)||(g->Row!=y)) {
        Ecarts<<QString("%1 : curseur en (%2, %3) au lieu de (%4, %5)").arg(Nom).arg((int)g->Col).arg((int)g->Row).arg(x).arg(y);
+}
      };
-    int x=Depart.x(), y=Depart.y();
+    int x=Depart.x();
+    int y=Depart.y();
     Clique(f->BitBtn32);
     Curseur("BitBtn32", x+1, y);
     Clique(f->BitBtn23);
@@ -6518,7 +7107,8 @@ void TestInterface::ficheFluiditeTrafic()
     // v6.0.2 : depuis un champ numérique, les touches de déplacement restent au champ
     // (l'original déplaçait le curseur de la carte)
     Clique(f->CheckBoxParkingDepart);
-    if (!f->CSpinEditParkingDepart->hasFocus()) Ecarts<<QString::fromUtf8("parking de départ sans le focus");
+    if (!f->CSpinEditParkingDepart->hasFocus()) { Ecarts<<QString::fromUtf8("parking de départ sans le focus");
+}
     int NumAvant=f->CSpinEditParkingDepart->Value;
     Touche(f->CSpinEditParkingDepart, Qt::Key_Right);
     Curseur("flèche droite depuis le champ", x, y);
@@ -6526,7 +7116,8 @@ void TestInterface::ficheFluiditeTrafic()
     Curseur("Origine depuis le champ", x, y);
     Touche(f->CSpinEditParkingDepart, (NumAvant<cv->NbParkings)?Qt::Key_Up:Qt::Key_Down);
     Curseur("flèche haut ou bas depuis le champ", x, y);
-    if (f->CSpinEditParkingDepart->Value==NumAvant) Ecarts<<QString::fromUtf8("flèche sans effet sur le champ");
+    if (f->CSpinEditParkingDepart->Value==NumAvant) { Ecarts<<QString::fromUtf8("flèche sans effet sur le champ");
+}
     f->CSpinEditParkingDepart->Value=NumAvant;
     // N° d'étape tapé hors de 0..NbParkings (frappe non bornée, comme CSPIN.pas) :
     // « Le n° d'étape est incorrect ! » ; curseur déplacé pendant ce temps : case
@@ -6535,21 +7126,28 @@ void TestInterface::ficheFluiditeTrafic()
     int NbMessages=Messages.size();
     f->CSpinEditParkingDepart->selectAll();
     QTest::keyClicks(f->CSpinEditParkingDepart, QString::number(10*cv->NbParkings));
-    if ((Messages.size()!=NbMessages+1)||!Messages.last().contains(QString::fromUtf8("Le n° d'étape est incorrect !")))
+    if ((Messages.size()!=NbMessages+1)||!Messages.last().contains(QString::fromUtf8("Le n° d'étape est incorrect !"))) {
      Ecarts<<QString::fromUtf8("n° d'étape hors bornes : ")+Messages.mid(NbMessages).join(" / ");
-    while (Messages.size()>NbMessages) Messages.removeLast(); // vérifié ici
-    if (f->CSpinEditParkingDepart->Value!=10*cv->NbParkings) Ecarts<<QString::fromUtf8("frappe bornée");
+}
+    while (Messages.size()>NbMessages) { Messages.removeLast(); // vérifié ici
+}
+    if (f->CSpinEditParkingDepart->Value!=10*cv->NbParkings) { Ecarts<<QString::fromUtf8("frappe bornée");
+}
     f->activateWindow(); // de nouveau active après la boîte de message, le champ ayant le focus
-    if (!QTest::qWaitFor([f]() { return QApplication::activeWindow()==f; }, 3000)||!f->CSpinEditParkingDepart->hasFocus())
+    if (!QTest::qWaitFor([f] { return QApplication::activeWindow()==f; }, 3000)||!f->CSpinEditParkingDepart->hasFocus()) {
      Ecarts<<QString::fromUtf8("parking de départ sans le focus après le message");
+}
     g->Col=x+1;
     Curseur("curseur déplacé (n° hors bornes)", x+1, y);
-    if (f->CouleurCase(x+1, y)!=0) Ecarts<<QString::fromUtf8("case colorée pour un n° hors bornes");
+    if (f->CouleurCase(x+1, y)!=0) { Ecarts<<QString::fromUtf8("case colorée pour un n° hors bornes");
+}
     g->Repaint(); // détail de la case courante, au dessin de la case
     Compare(Ecarts, "barre d'état (n° hors bornes)", s->StatusBar->Panels->Items[0]->Text, QString());
     QTest::keyClick(f->CSpinEditParkingDepart, Qt::Key_Tab);
-    if (f->CSpinEditParkingDepart->hasFocus()) Ecarts<<QString::fromUtf8("parking de départ toujours actif après Tab");
-    if (f->CSpinEditParkingDepart->Value!=cv->NbParkings) Ecarts<<QString::fromUtf8("n° d'étape non ramené dans les bornes en quittant le champ");
+    if (f->CSpinEditParkingDepart->hasFocus()) { Ecarts<<QString::fromUtf8("parking de départ toujours actif après Tab");
+}
+    if (f->CSpinEditParkingDepart->Value!=cv->NbParkings) { Ecarts<<QString::fromUtf8("n° d'étape non ramené dans les bornes en quittant le champ");
+}
     Etape("départ hors bornes ramené au dernier", Verifie(0, cv->NbParkings, 0));
     Clique(f->CheckBoxParkingDepart);
     e=Ecarts.join('\n');
@@ -6576,7 +7174,7 @@ void TestInterface::ficheFluiditeTrafic()
   // En pause, par le raccourci (Ctrl+Maj+F)
   Modale=false;
   e.clear();
-  QuandModale([]() { return frmStatsAttenteTrafic; }, [&]()
+  QuandModale([] { return frmStatsAttenteTrafic; }, [&]
    {
     Modale=(QApplication::activeModalWidget()==frmStatsAttenteTrafic);
     e=Verifie(0, 0, 0);
@@ -6625,7 +7223,8 @@ void TestInterface::ficheRecherche()
   // Ouverture sur un parking : FormShow reprend la case et ses numéros
   int NumParking=TrouveCase([](voie *v) { return v->NumParking; });
   QVERIFY(NumParking>0);
-  int x0=g->Col, y0=g->Row;
+  int x0=g->Col;
+  int y0=g->Row;
   Clique(s->ToolButtonRechercher);
   QVERIFY(r->isVisible());
   QVERIFY(s->ActionRechercher->Checked);
@@ -6660,35 +7259,40 @@ void TestInterface::ficheRecherche()
     {"parking", r->RadioButtonParking, r->CSpinEditParking, cv->NbParkings, [Trouve](int k, int &x, int &y)
       {
        parking *p=cv->Parking+k-1;
-       if (!p->Defini()) return QString::fromUtf8("Parking n°%1 non utilisé").arg(k);
+       if (!p->Defini()) { return QString::fromUtf8("Parking n°%1 non utilisé").arg(k);
+}
        x=p->x; y=p->y;
        return Trouve("Parking n°%1 trouvé en (%2, %3)", k, x, y);
       }},
     {"feu", r->RadioButtonFeu, r->CSpinEditFeu, cv->NbFeux, [Trouve](int k, int &x, int &y)
       {
        feu *f=cv->Feu+k-1;
-       if (!f->Defini()) return QString::fromUtf8("Feu n°%1 non utilisé").arg(k);
+       if (!f->Defini()) { return QString::fromUtf8("Feu n°%1 non utilisé").arg(k);
+}
        x=f->x; y=f->y;
        return Trouve("Feu n°%1 trouvé en (%2, %3)", k, x, y);
       }},
     {"arrêt de bus", r->RadioButtonArretBus, r->CSpinEditArretBus, cv->NbArretsBus, [Trouve](int k, int &x, int &y)
       {
        arret_bus *a=cv->ArretBus+k-1;
-       if (!a->Defini()) return QString::fromUtf8("Arrêt de bus n°%1 non utilisé").arg(k);
+       if (!a->Defini()) { return QString::fromUtf8("Arrêt de bus n°%1 non utilisé").arg(k);
+}
        x=a->x; y=a->y;
        return Trouve("Arrêt de bus n°%1 trouvé en (%2, %3)", k, x, y);
       }},
     {"arrêt de tram", r->RadioButtonArretTram, r->CSpinEditArretTram, cv->NbArretsTram, [Trouve](int k, int &x, int &y)
       {
        arret_tram *a=cv->ArretTram+k-1;
-       if (!a->Defini()) return QString::fromUtf8("Arrêt de tram n°%1 non utilisé").arg(k);
+       if (!a->Defini()) { return QString::fromUtf8("Arrêt de tram n°%1 non utilisé").arg(k);
+}
        x=a->x; y=a->y;
        return Trouve("Arrêt de tram n°%1 trouvé en (%2, %3)", k, x, y);
       }},
     {"place de taxi", r->RadioButtonPlaceTaxi, r->CSpinEditPlaceTaxi, cv->NbPlacesTaxi, [Trouve](int k, int &x, int &y)
       {
        place_taxi *p=cv->PlaceTaxi+k-1;
-       if (!p->Definie()) return QString::fromUtf8("Place de taxi n°%1 non utilisée").arg(k); // v6.0.2 : l'original gardait le texte précédent
+       if (!p->Definie()) { return QString::fromUtf8("Place de taxi n°%1 non utilisée").arg(k); // v6.0.2 : l'original gardait le texte précédent
+}
        x=p->x; y=p->y;
        return Trouve("Place de taxi n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -6701,7 +7305,8 @@ void TestInterface::ficheRecherche()
     {"place de parking", r->RadioButtonPlacePark, r->CSpinEditPlacePark, cv->NbPlacesPark, [Trouve](int k, int &x, int &y)
       {
        place_park *p=cv->PlacePark+k-1;
-       if (!p->Definie()) return QString::fromUtf8("Place de parking n°%1 non utilisée").arg(k);
+       if (!p->Definie()) { return QString::fromUtf8("Place de parking n°%1 non utilisée").arg(k);
+}
        x=p->x; y=p->y;
        return Trouve("Place de parking n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -6714,7 +7319,8 @@ void TestInterface::ficheRecherche()
     {"place de vehlib", r->RadioButtonPlaceVehlib, r->CSpinEditPlaceVehlib, cv->NbPlacesVehlib, [Trouve](int k, int &x, int &y)
       {
        place_vehlib *p=cv->PlaceVehlib+k-1;
-       if (!p->Definie()) return QString::fromUtf8("Place de vehlib n°%1 non utilisée").arg(k);
+       if (!p->Definie()) { return QString::fromUtf8("Place de vehlib n°%1 non utilisée").arg(k);
+}
        x=p->x; y=p->y;
        return Trouve("Place de vehlib n°%1 trouvée en (%2, %3)", k, x, y);
       }},
@@ -6725,17 +7331,21 @@ void TestInterface::ficheRecherche()
     std::vector<int> Numeros={el.Nb, 1, (el.Nb+1)/2};
     for(std::size_t i=0; i<Numeros.size(); i++)
      {
-      int k=Numeros[i], x=-1, y=-1;
+      int k=Numeros[i];
+      int x=-1;
+      int y=-1;
       QString Avant=Q(r->StatusBar->SimpleText);
-      int ColAvant=g->Col, RowAvant=g->Row;
-      if (!i)
+      int ColAvant=g->Col;
+      int RowAvant=g->Row;
+      if (i == 0u)
        { // Le bouton radio active le numéro et recherche l'élément du numéro affiché
         el.Numero->Value=k;
         Clique(el.Radio);
         QVERIFY2(el.Radio->Checked&&el.Numero->isEnabled()&&!r->CSpinEditX->isEnabled(), el.Nom);
        }
-      else
+      else {
        el.Numero->Value=k;
+}
       QString Texte=el.Attendu(k, x, y);
       if (Texte.isEmpty()) { Texte=Avant; x=ColAvant; y=RowAvant; }
       QCOMPARE(Q(r->StatusBar->SimpleText), Texte);
@@ -6756,17 +7366,19 @@ void TestInterface::ficheRecherche()
   // Clignotement : sur un immeuble (rien n'y bouge), le curseur n'est dessiné
   // qu'une fois sur deux (Tag du minuteur)
   QPoint Vide;
-  for(int y=1; (y<20)&&Vide.isNull(); y++)
+  for(int y=1; (y<20)&&Vide.isNull(); y++) {
    for(int x=1; (x<30)&&Vide.isNull(); x++)
     {
      voie *v=&cv->v[x][y];
-     if (!v->DirPoss&&!v->SensVoieTram&&!v->NumParking&&!v->NbPietons&&(NATURE(v)==immeubles)) Vide=QPoint(x, y);
+     if ((v->DirPoss == 0)&&(v->SensVoieTram == 0)&&(v->NumParking == 0)&&(v->NbPietons == 0)&&(NATURE(v)==immeubles)) { Vide=QPoint(x, y);
+}
     }
+}
   QVERIFY(!Vide.isNull());
   r->CSpinEditX->Value=Vide.x();
   r->CSpinEditY->Value=Vide.y();
   QVERIFY(g->viewport()->rect().contains(g->CellRect(Vide.x(), Vide.y()).Qt()));
-  auto CaseCourante=[g]() { return g->viewport()->grab(g->CellRect(g->Col, g->Row).Qt()).toImage(); };
+  auto CaseCourante=[g] { return g->viewport()->grab(g->CellRect(g->Col, g->Row).Qt()).toImage(); };
   QVERIFY(QTest::qWaitFor([]() { return frmSimulation->TimerClignotementLocalisation->Tag==1; }, 2000));
   QImage Allume=CaseCourante();
   QVERIFY(QTest::qWaitFor([]() { return frmSimulation->TimerClignotementLocalisation->Tag==0; }, 2000));
@@ -6791,7 +7403,7 @@ void TestInterface::ficheRecherche()
     int NbTours;
     const char *Capture;
    };
-  auto Touches=[](Qt::Key Touche, Qt::KeyboardModifiers m) { return [Touche, m]() { QTest::keyClick(frmSimulation->DrawGridSimul, Touche, m); }; };
+  auto Touches=[](Qt::Key Touche, Qt::KeyboardModifiers m) { return [Touche, m] { QTest::keyClick(frmSimulation->DrawGridSimul, Touche, m); }; };
   auto Groupe=[](TGroupBox *b, int n, int x, int y) -> QString
    {
     QStringList e;
@@ -6826,10 +7438,14 @@ void TestInterface::ficheRecherche()
        if (!p->NumBus&&!p->NumTram&&!p->NumTaxi&&!p->NumVehlib) { t=QString::fromUtf8("Piéton n°%1 non utilisé").arg(n); return false; }
        auto Dans=[&t, &x, &y, n](const char *Quoi, int Num, int xb, int yb)
         { x=xb; y=yb; t=QString::fromUtf8("Piéton n°%1 trouvé dans le %2 n°%3 (%4, %5)").arg(n).arg(Quoi).arg(Num).arg(xb).arg(yb); };
-       if (p->NumBus) Dans("bus", p->NumBus, cv->Bus[p->NumBus-1].x, cv->Bus[p->NumBus-1].y);
-       if (p->NumTram) Dans("tram", p->NumTram, cv->Tram[p->NumTram-1].x, cv->Tram[p->NumTram-1].y);
-       if (p->NumTaxi) Dans("taxi", p->NumTaxi, cv->Taxi[p->NumTaxi-1].x, cv->Taxi[p->NumTaxi-1].y);
-       if (p->NumVehlib) Dans("vehlib", p->NumVehlib, cv->Vehlib[p->NumVehlib-1].x, cv->Vehlib[p->NumVehlib-1].y);
+       if (p->NumBus) { Dans("bus", p->NumBus, cv->Bus[p->NumBus-1].x, cv->Bus[p->NumBus-1].y);
+}
+       if (p->NumTram) { Dans("tram", p->NumTram, cv->Tram[p->NumTram-1].x, cv->Tram[p->NumTram-1].y);
+}
+       if (p->NumTaxi) { Dans("taxi", p->NumTaxi, cv->Taxi[p->NumTaxi-1].x, cv->Taxi[p->NumTaxi-1].y);
+}
+       if (p->NumVehlib) { Dans("vehlib", p->NumVehlib, cv->Vehlib[p->NumVehlib-1].x, cv->Vehlib[p->NumVehlib-1].y);
+}
        return true;
       },
      frmInfosPieton, Touches(Qt::Key_P, Qt::ControlModifier),
@@ -6856,7 +7472,7 @@ void TestInterface::ficheRecherche()
        t=QString::fromUtf8("Tram n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
        return cv->v[x][y].NumTram==n;
       },
-     frmInfosTram, [s]() { s->MenuItemDetailTram->ElementQt()->trigger(); },
+     frmInfosTram, [s] { s->MenuItemDetailTram->ElementQt()->trigger(); },
      [Groupe](int n, int x, int y) { return Groupe(frmInfosTram->GroupBoxTram, n, x, y); }, 6, nullptr},
     {"taxi", [](voie *v) { return v->NumTaxi; },
      Touches(Qt::Key_Y, Qt::ControlModifier), r->RadioButtonTaxi, r->CSpinEditTaxi,
@@ -6901,20 +7517,25 @@ void TestInterface::ficheRecherche()
     for(int i=0; i<m.NbTours; i++)
      {
       JoueTour();
-      int x=-1, y=-1;
+      int x=-1;
+      int y=-1;
       QString Texte;
       bool SurLaCarte=m.Attendu(n, x, y, Texte);
       QString Contexte=QString("%1 n°%2, tour %3").arg(QString::fromUtf8(m.Nom)).arg(n).arg(cv->TourCrt);
-      if (!Texte.isEmpty()) QVERIFY2(Q(r->StatusBar->SimpleText)==Texte, qPrintable(Contexte+" : « "+Q(r->StatusBar->SimpleText)+" » au lieu de « "+Texte+" »"));
-      if (x>=0)
+      if (!Texte.isEmpty()) { QVERIFY2(Q(r->StatusBar->SimpleText)==Texte, qPrintable(Contexte+" : « "+Q(r->StatusBar->SimpleText)+" » au lieu de « "+Texte+" »"));
+}
+      if (x>=0) {
        QVERIFY2((g->Col==x)&&(g->Row==y), qPrintable(Contexte+QString(" : curseur en (%1, %2) au lieu de (%3, %4)").arg((int)g->Col).arg((int)g->Row).arg(x).arg(y)));
-      if (!SurLaCarte) continue;
+}
+      if (!SurLaCarte) { continue;
+}
       QString e=m.EcartInfos(n, x, y);
       QVERIFY2(e.isEmpty(), qPrintable(Contexte+" (fiche d'informations) :\n"+e));
       NbVerifies++;
      }
     QVERIFY2(NbVerifies>0, m.Nom);
-    if (m.Capture) CaptureFiche(r, m.Capture);
+    if (m.Capture) { CaptureFiche(r, m.Capture);
+}
     Focalise();
     m.Infos->Close();
     QVERIFY(!m.Infos->isVisible());
@@ -6946,7 +7567,8 @@ void TestInterface::ficheRecherche()
   r->CSpinEditParking->MaxValue=NbParkings+10;
   r->CSpinEditParking->Value=NbParkings+5;
   QVERIFY(TrouveCase([](voie *v) { return (v->DirPoss>aucune)&&!v->NumParking?1:0; }));
-  int xc=g->Col, yc=g->Row;
+  int xc=g->Col;
+  int yc=g->Row;
   int NbChangeParking=0;
   TNotifyEvent ChangeParking=r->CSpinEditParking->OnChange;
   r->CSpinEditParking->OnChange=[&NbChangeParking, ChangeParking](TObject *Sender) { NbChangeParking++; ChangeParking(Sender); };
@@ -6999,30 +7621,34 @@ void TestInterface::rechercheElementsNonDefinis()
   TfrmRecherche *r=frmRecherche;
   s->ActionRechercher->Execute();
   QVERIFY(r->isVisible());
-  int xc=s->DrawGridSimul->Col, yc=s->DrawGridSimul->Row;
-  auto Verifie=[r, s, xc, yc](TCSpinEdit *Champ, int &x, int &y, std::function<void()> Change, const QString &Texte)
+  int xc=s->DrawGridSimul->Col;
+  int yc=s->DrawGridSimul->Row;
+  auto Verifie=[r, s, xc, yc](TCSpinEdit *Champ, int &x, int &y, const std::function<void()>& Change, const QString &Texte)
    {
-    int xa=x, ya=y;
+    int xa=x;
+    int ya=y;
     x=-1; y=-1;
     Champ->Value=1;
     r->StatusBar->SimpleText="";
     Change();
     QString Ecart;
-    if (Q(r->StatusBar->SimpleText)!=Texte) Ecart=Q(r->StatusBar->SimpleText);
-    if ((s->DrawGridSimul->Col!=xc)||(s->DrawGridSimul->Row!=yc)) Ecart+=" : curseur déplacé";
+    if (Q(r->StatusBar->SimpleText)!=Texte) { Ecart=Q(r->StatusBar->SimpleText);
+}
+    if ((s->DrawGridSimul->Col!=xc)||(s->DrawGridSimul->Row!=yc)) { Ecart+=" : curseur déplacé";
+}
     x=xa; y=ya;
     return Ecart;
    };
   QString e;
-  e=Verifie(r->CSpinEditTaxi, cv->Taxi[0].x, cv->Taxi[0].y, [r]() { r->CSpinEditTaxiChange(r->CSpinEditTaxi); }, QString::fromUtf8("Taxi n°1 non utilisé"));
+  e=Verifie(r->CSpinEditTaxi, cv->Taxi[0].x, cv->Taxi[0].y, [r] { r->CSpinEditTaxiChange(r->CSpinEditTaxi); }, QString::fromUtf8("Taxi n°1 non utilisé"));
   QVERIFY2(e.isEmpty(), qPrintable(e));
-  e=Verifie(r->CSpinEditVehlib, cv->Vehlib[0].x, cv->Vehlib[0].y, [r]() { r->CSpinEditVehlibChange(r->CSpinEditVehlib); }, QString::fromUtf8("Vehlib n°1 non utilisé"));
+  e=Verifie(r->CSpinEditVehlib, cv->Vehlib[0].x, cv->Vehlib[0].y, [r] { r->CSpinEditVehlibChange(r->CSpinEditVehlib); }, QString::fromUtf8("Vehlib n°1 non utilisé"));
   QVERIFY2(e.isEmpty(), qPrintable(e));
-  e=Verifie(r->CSpinEditPlaceTaxi, cv->PlaceTaxi[0].x, cv->PlaceTaxi[0].y, [r]() { r->CSpinEditPlaceTaxiChange(r->CSpinEditPlaceTaxi); }, QString::fromUtf8("Place de taxi n°1 non utilisée"));
+  e=Verifie(r->CSpinEditPlaceTaxi, cv->PlaceTaxi[0].x, cv->PlaceTaxi[0].y, [r] { r->CSpinEditPlaceTaxiChange(r->CSpinEditPlaceTaxi); }, QString::fromUtf8("Place de taxi n°1 non utilisée"));
   QVERIFY2(e.isEmpty(), qPrintable(e));
-  e=Verifie(r->CSpinEditPlacePark, cv->PlacePark[0].x, cv->PlacePark[0].y, [r]() { r->CSpinEditPlaceParkChange(r->CSpinEditPlacePark); }, QString::fromUtf8("Place de parking n°1 non utilisée"));
+  e=Verifie(r->CSpinEditPlacePark, cv->PlacePark[0].x, cv->PlacePark[0].y, [r] { r->CSpinEditPlaceParkChange(r->CSpinEditPlacePark); }, QString::fromUtf8("Place de parking n°1 non utilisée"));
   QVERIFY2(e.isEmpty(), qPrintable(e));
-  e=Verifie(r->CSpinEditPlaceVehlib, cv->PlaceVehlib[0].x, cv->PlaceVehlib[0].y, [r]() { r->CSpinEditPlaceVehlibChange(r->CSpinEditPlaceVehlib); }, QString::fromUtf8("Place de vehlib n°1 non utilisée"));
+  e=Verifie(r->CSpinEditPlaceVehlib, cv->PlaceVehlib[0].x, cv->PlaceVehlib[0].y, [r] { r->CSpinEditPlaceVehlibChange(r->CSpinEditPlaceVehlib); }, QString::fromUtf8("Place de vehlib n°1 non utilisée"));
   QVERIFY2(e.isEmpty(), qPrintable(e));
   Clique(r->ButtonAnnuler);
   QVERIFY(Arrete());
@@ -7055,23 +7681,29 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
   std::vector<Element> Elements=
    {
     {"bus", 0, r->RadioButtonBus, r->CSpinEditBus, cv->NbBus, "Bus n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
-      { if (v->NumBus) Position(cv->Bus+v->NumBus-1, p); return v->NumBus; }},
+      { if (v->NumBus) { Position(cv->Bus+v->NumBus-1, p); 
+}return v->NumBus; }},
     {"arrêt de bus", 1, r->RadioButtonArretBus, r->CSpinEditArretBus, cv->NbArretsBus, "Arrêt de bus n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
-      { if (v->NumArretBus) Position(cv->ArretBus+v->NumArretBus-1, p); return v->NumArretBus; }},
+      { if (v->NumArretBus) { Position(cv->ArretBus+v->NumArretBus-1, p); 
+}return v->NumArretBus; }},
     {"tram", 2, r->RadioButtonTram, r->CSpinEditTram, cv->NbTrams, "Tram n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
-      { if (v->NumTram) Position(cv->Tram+v->NumTram-1, p); return v->NumTram; }},
+      { if (v->NumTram) { Position(cv->Tram+v->NumTram-1, p); 
+}return v->NumTram; }},
     {"arrêt de tram", 3, r->RadioButtonArretTram, r->CSpinEditArretTram, cv->NbArretsTram, "Arrêt de tram n°%1 trouvé en (%2, %3)", [Position](voie *v, QPoint &p)
-      { if (v->NumArretTram) Position(cv->ArretTram+v->NumArretTram-1, p); return v->NumArretTram; }},
+      { if (v->NumArretTram) { Position(cv->ArretTram+v->NumArretTram-1, p); 
+}return v->NumArretTram; }},
     {"file de taxis", 5, r->RadioButtonFileTaxi, r->CSpinEditFileTaxi, cv->NbFilesTaxi, "file de taxis n°%1 trouvée en (%2, %3)", [Position](voie *v, QPoint &p)
       {
-       if (!v->NumPlaceTaxi) return 0;
+       if (!v->NumPlaceTaxi) { return 0;
+}
        int f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile;
        Position(cv->PlaceTaxi+cv->FileTaxi[f].NumPlaceQueue, p);
        return f+1;
       }},
     {"file de parkings", 6, r->RadioButtonFilePark, r->CSpinEditFilePark, cv->NbFilesPark, "file de parkings n°%1 trouvée en (%2, %3)", [Position](voie *v, QPoint &p)
       {
-       if (!v->NumPlacePark) return 0;
+       if (!v->NumPlacePark) { return 0;
+}
        int f=cv->PlacePark[v->NumPlacePark-1].NumFile;
        Position(cv->PlacePark+cv->FilePark[f].NumPlaceQueue, p);
        return f+1;
@@ -7083,13 +7715,15 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
    {
     int n[]={v->NumBus, v->NumArretBus, v->NumTram, v->NumArretTram, v->NumTaxi, v->NumPlaceTaxi, v->NumPlacePark, v->NumVehlib, v->NumPlaceVehlib};
     int k=0;
-    for(int i=Ordre+1; i<9; i++) k+=(n[i]!=0);
+    for(int i=Ordre+1; i<9; i++) { k+=(n[i]!=0);
+}
     return k;
    };
   // Fiche fermée, bouton coché et numéro autre que celui de la case
   auto Prepare=[this, r, s](TRadioButton *Radio, TCSpinEdit *Numero, int Autre)
    {
-    if (!r->isVisible()) s->ActionRechercher->Execute();
+    if (!r->isVisible()) { s->ActionRechercher->Execute();
+}
     Clique(Radio);
     Numero->Value=Autre;
     Clique(r->ButtonAnnuler);
@@ -7106,15 +7740,17 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
   for(const Element &el : Elements)
    {
     QVERIFY2(el.Nb>1, el.Nom);
-    QPoint Case(-1, -1), Ailleurs;
+    QPoint Case(-1, -1);
+    QPoint Ailleurs;
     int n=0;
-    for(int y=0; (y<cv->NbY)&&!n; y++)
-     for(int x=0; (x<cv->NbX)&&!n; x++)
+    for(int y=0; (y<cv->NbY)&&(n == 0); y++) {
+     for(int x=0; (x<cv->NbX)&&(n == 0); x++)
       {
        QPoint p(-1, -1);
        int k=el.DeLaCase(&cv->v[x][y], p);
-       if (k&&(p.x()>=0)&&(p!=QPoint(x, y))&&!Suivants(&cv->v[x][y], el.Ordre)) { n=k; Case=QPoint(x, y); Ailleurs=p; }
+       if ((k != 0)&&(p.x()>=0)&&(p!=QPoint(x, y))&&(Suivants(&cv->v[x][y], el.Ordre) == 0)) { n=k; Case=QPoint(x, y); Ailleurs=p; }
       }
+}
     QVERIFY2(n>0, el.Nom);
     QString Contexte=QString::fromUtf8("%1 n°%2 en (%3, %4), case (%5, %6)").arg(QString::fromUtf8(el.Nom)).arg(n).arg(Ailleurs.x()).arg(Ailleurs.y()).arg(Case.x()).arg(Case.y());
     // Bouton Coordonnées coché : le curseur reste sur la case
@@ -7130,10 +7766,11 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
     QVERIFY2((g->Col==Ailleurs.x())&&(g->Row==Ailleurs.y()), qPrintable(Contexte+QString(" (bouton coché) : curseur en (%1, %2)").arg((int)g->Col).arg((int)g->Row)));
     QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8(el.Trouve).arg(n).arg(Ailleurs.x()).arg(Ailleurs.y()));
     // Sur la case de l'élément, bouton Coordonnées : OnChange (texte), curseur sur la case
-    if (!Suivants(&cv->v[Ailleurs.x()][Ailleurs.y()], el.Ordre))
+    if (Suivants(&cv->v[Ailleurs.x()][Ailleurs.y()], el.Ordre) == 0)
      {
       QPoint p(-1, -1);
-      if (el.DeLaCase(&cv->v[Ailleurs.x()][Ailleurs.y()], p)!=n) continue;
+      if (el.DeLaCase(&cv->v[Ailleurs.x()][Ailleurs.y()], p)!=n) { continue;
+}
       Prepare(r->RadioButtonCoordonnees, el.Numero, n%el.Nb+1);
       Ouvre(Ailleurs);
       QVERIFY2((g->Col==Ailleurs.x())&&(g->Row==Ailleurs.y()), qPrintable(Contexte+" (case de l'élément)"));
@@ -7187,7 +7824,8 @@ void TestInterface::rechercheMessagesDeChaqueElement()
     {r->CSpinEditVehlib, cv->NbVehlibs, "Aucun vehlib défini ou n° incorrect", nullptr, nullptr, nullptr},
     {r->CSpinEditPlaceVehlib, cv->NbPlacesVehlib, "Aucune place de vehlib définie ou n° incorrect", nullptr, nullptr, nullptr},
    };
-  int xc=g->Col, yc=g->Row;
+  int xc=g->Col;
+  int yc=g->Row;
   for(const Element &el : Elements)
    {
     QVERIFY(el.Nb>0);
@@ -7199,12 +7837,15 @@ void TestInterface::rechercheMessagesDeChaqueElement()
     QCOMPARE(Q(r->StatusBar->SimpleText), QString::fromUtf8(el.Incorrect));
     QCOMPARE(g->Col, xc);
     QCOMPARE(g->Row, yc);
-    if (!el.x) continue;
+    if (!el.x) { continue;
+}
     // Élément n°1 sans position (un piéton, ni dans un véhicule) : rien ne se dessine entre
     // la position forcée et son rétablissement
-    int xa=*el.x, ya=*el.y;
+    int xa=*el.x;
+    int ya=*el.y;
     int Dans[]={p1->NumBus, p1->NumTram, p1->NumTaxi, p1->NumVehlib};
-    if (el.Numero==r->CSpinEditPieton) p1->NumBus=p1->NumTram=p1->NumTaxi=p1->NumVehlib=0;
+    if (el.Numero==r->CSpinEditPieton) { p1->NumBus=p1->NumTram=p1->NumTaxi=p1->NumVehlib=0;
+}
     *el.x=*el.y=-1;
     el.Numero->Value=1;
     QString Texte=Q(r->StatusBar->SimpleText);
@@ -7270,8 +7911,10 @@ void TestInterface::grilleAuClavierALaMoletteEtAuxBarres()
   GrilleSimulation *g=s->DrawGridSimul;
   FenetreReduite f;
   Focalise();
-  int Cv=g->viewport()->width()/16, Lv=g->viewport()->height()/16;
-  int MaxG=g->horizontalScrollBar()->maximum(), MaxH=g->verticalScrollBar()->maximum();
+  int Cv=g->viewport()->width()/16;
+  int Lv=g->viewport()->height()/16;
+  int MaxG=g->horizontalScrollBar()->maximum();
+  int MaxH=g->verticalScrollBar()->maximum();
   QCOMPARE(MaxG, cv->NbX-Cv);
   QCOMPARE(MaxH, cv->NbY-Lv);
   g->Col=0;
@@ -7360,13 +8003,14 @@ void TestInterface::grilleAuClavierALaMoletteEtAuxBarres()
   QCOMPARE(EtatGrille(g), EtatAttendu(5, 5, 0, 0));
   std::vector<Qt::KeyboardModifiers> Ctrl={Qt::ControlModifier};
 #if defined(Q_OS_MACOS)
-  Ctrl.push_back(Qt::MetaModifier); // touche Control
+  Ctrl.emplace_back(Qt::MetaModifier); // touche Control
 #endif
-  for(Qt::KeyboardModifiers m : Ctrl)
+  for(Qt::KeyboardModifiers m : Ctrl) {
    Frappe({{Qt::Key_Right, m, EtatAttendu(5+Cv, 5, Cv, 0), 1},
            {Qt::Key_Down, m, EtatAttendu(5+Cv, 5, Cv, 1), 0},
            {Qt::Key_Up, m, EtatAttendu(5+Cv, 5, Cv, 0), 0},
            {Qt::Key_Left, m, EtatAttendu(5, 5, 0, 0), 1}});
+}
   QVERIFY(Arrete());
  }
 //---------------------------------------------------------------------------
@@ -7384,7 +8028,8 @@ void TestInterface::selectionAuDelaDeLaVue()
   g->LeftCol=0;
   g->TopRow=0;
   QWidget *vp=g->viewport();
-  int Cv=vp->width()/16, Lv=vp->height()/16;
+  int Cv=vp->width()/16;
+  int Lv=vp->height()/16;
   QVERIFY((Cv<cv->NbX-5)&&(Lv<cv->NbY-5));
   auto Deplace=[vp](QPoint p)
    {
@@ -7416,7 +8061,8 @@ void TestInterface::selectionAuDelaDeLaVue()
   QCOMPARE(g->Selection.Top, 2);
   QCOMPARE(g->Selection.Bottom, 2);
   // À gauche des cases : rien au mouvement, la minuterie ramène l'ancre vers la gauche
-  int Ancre=g->Selection.Right, Gauche=g->LeftCol;
+  int Ancre=g->Selection.Right;
+  int Gauche=g->LeftCol;
   Deplace(QPoint(-20, y));
   QCOMPARE(g->Selection.Right, Ancre);
   QCOMPARE((int)g->LeftCol, Gauche);
@@ -7447,7 +8093,7 @@ void TestInterface::menuContextuelDeLaGrille()
   auto Menu=[vp](QContextMenuEvent::Reason Raison, QPoint p) -> QPoint
    { // Coin supérieur gauche du menu ouvert (exec), fermé dès qu'il s'affiche
     auto Position=std::make_shared<QPoint>(-1000, -1000);
-    QTimer::singleShot(50, [Position]()
+    QTimer::singleShot(50, [Position]
      {
       if (QWidget *m=QApplication::activePopupWidget()) { *Position=m->geometry().topLeft(); m->close(); }
      });
@@ -7485,11 +8131,11 @@ void TestInterface::controleCSpinEdit()
    // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
    // le champ (sauf au clic)
   QWidget Fiche;
-  TCSpinEdit *s=new TCSpinEdit(&Fiche);
-  TButton *b=new TButton(&Fiche);
+  auto *s=new TCSpinEdit(&Fiche);
+  auto *b=new TButton(&Fiche);
   s->setGeometry(8, 8, 60, 22);
   b->setGeometry(8, 40, 75, 25);
-  QLineEdit *Texte=s->findChild<QLineEdit *>();
+  auto *Texte=s->findChild<QLineEdit *>();
   QVERIFY(Texte);
   QVERIFY(b->focusPolicy()&Qt::ClickFocus); // le clic donne le focus (sous macOS aussi)
   int NbChange=0;
@@ -7619,13 +8265,13 @@ void TestInterface::controleCSpinEdit()
   QVERIFY(!Texte->hasSelectedText());
   // Chargement du .dfm : Value lu après MinValue et MaxValue (CheckValue), sans
   // OnChange ; sans Value, le texte reste « 0 », même hors des bornes
-  TCSpinEdit *d=new TCSpinEdit(&Fiche);
+  auto *d=new TCSpinEdit(&Fiche);
   d->setProperty("vclMinValue", 1);
   d->setProperty("vclMaxValue", 32);
   d->setProperty("vclValue", 50);
   d->PrepareVcl();
   QCOMPARE((int)d->Value, 32);
-  TCSpinEdit *z=new TCSpinEdit(&Fiche);
+  auto *z=new TCSpinEdit(&Fiche);
   z->setProperty("vclMinValue", 1);
   z->setProperty("vclMaxValue", 32);
   z->PrepareVcl();
@@ -7660,7 +8306,8 @@ void TestInterface::aideContextuelle()
   QCOMPARE(UrlsOuvertes, QList<QUrl>({Sommaire, Sommaire, QUrl::fromLocalFile(stDossier+"/tutocv/index.html")}));
   // Rechercher (non modale) : F1 dans un champ, puis le bouton Aide ; fermée
   // d'abord, si un test précédent en échec l'a laissée ouverte
-  if (frmRecherche->isVisible()) Clique(frmRecherche->ButtonAnnuler);
+  if (frmRecherche->isVisible()) { Clique(frmRecherche->ButtonAnnuler);
+}
   frmSimulation->ActionRechercher->Checked=false;
   frmSimulation->ActionRechercher->Execute();
   QVERIFY(frmRecherche->isVisible());
@@ -7674,7 +8321,7 @@ void TestInterface::aideContextuelle()
   QVERIFY(!frmRecherche->isVisible());
   // Paramètres (modale) : F1, puis Annuler
   UrlsOuvertes.clear();
-  QuandModale([]() { return frmParamSimul; }, [this]()
+  QuandModale([] { return frmParamSimul; }, [this]
    {
     Touche(frmParamSimul->CSpinEditDureeVert, Qt::Key_F1);
     Clique(frmParamSimul->ButtonAnnuler);
@@ -7700,7 +8347,8 @@ void TestInterface::textesResserres()
   double w=QFontMetricsF(f).horizontalAdvance(t);
   QFont Essai=f;
   Essai.setStretch(90);
-  if (QFontMetricsF(Essai).horizontalAdvance(t)>w-1) QSKIP("QFont::setStretch sans effet avec ce moteur de polices");
+  if (QFontMetricsF(Essai).horizontalAdvance(t)>w-1) { QSKIP("QFont::setStretch sans effet avec ce moteur de polices");
+}
   QCOMPARE(PoliceResserree(f, t, QRect(0, 0, qCeil(w)+2, 20), Dr), f);
   QRect Etroite(0, 0, qFloor(w*0.96), 20);
   QFont r=PoliceResserree(f, t, Etroite, Dr);
@@ -7729,21 +8377,25 @@ void TestInterface::textesResserres()
   QVERIFY(QFontMetricsF(Resserree).boundingRect(QRectF(Deux), DrLignes, Mots).height()<=Deux.height()+0.5);
   // Libellés des fiches créées au démarrage, avec Microsoft Sans Serif
   // (Windows, macOS) : chaque texte tient, une fois resserré
-  if (!QFontDatabase::hasFamily("Microsoft Sans Serif")) return;
+  if (!QFontDatabase::hasFamily("Microsoft Sans Serif")) { return;
+}
   QStringList Coupes;
   for(QWidget *Fiche : QApplication::topLevelWidgets())
    {
-    if (!Fiche->objectName().startsWith("frm")) continue;
+    if (!Fiche->objectName().startsWith("frm")) { continue;
+}
     for(QLabel *q : Fiche->findChildren<QLabel *>())
      {
-      TLabel *l=dynamic_cast<TLabel *>(q); // TLabel, sans Q_OBJECT : pas de qobject_cast
-      if (!l||(l->window()!=Fiche)||l->wordWrap()||l->text().isEmpty()) continue; // fiches filles : parcourues pour elles-mêmes
+      auto *l=dynamic_cast<TLabel *>(q); // TLabel, sans Q_OBJECT : pas de qobject_cast
+      if (!l||(l->window()!=Fiche)||l->wordWrap()||l->text().isEmpty()) { continue; // fiches filles : parcourues pour elles-mêmes
+}
       QRect Zone=l->contentsRect();
-      int Drapeaux=int(l->alignment())|(l->buddy()?int(Qt::TextShowMnemonic):0);
+      int Drapeaux=int(l->alignment())|(l->buddy()?static_cast<int>(Qt::TextShowMnemonic):0);
       QFont p=PoliceResserree(l->font(), l->text(), Zone, Drapeaux);
       double Largeur=QFontMetricsF(p).boundingRect(QRectF(Zone), Drapeaux, l->text()).width();
-      if (Largeur>Zone.width()+0.5)
+      if (Largeur>Zone.width()+0.5) {
        Coupes<<QString::fromUtf8("%1/%2 « %3 » : %4 pour %5").arg(Fiche->objectName(), l->objectName(), l->text()).arg(Largeur, 0, 'f', 1).arg(Zone.width());
+}
      }
    }
   QVERIFY2(Coupes.isEmpty(), qPrintable(Coupes.join(" | "))); // une ligne : la recette Windows ne garde que la ligne de FAIL!
@@ -7754,7 +8406,8 @@ void TestInterface::couleursLisibles()
    // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
    // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
    // clair de la VCL, vert et rouge sur fond sombre)
-  QColor Sombre(30, 30, 30), Clair(236, 236, 236);
+  QColor Sombre(30, 30, 30);
+  QColor Clair(236, 236, 236);
   for(TColor c : {clNavy, clMaroon, clPurple})
    {
     QColor Texte=CouleurQt(c);
@@ -7763,14 +8416,17 @@ void TestInterface::couleursLisibles()
     QVERIFY2(Contraste(l, Sombre)>=4.5, qPrintable(Texte.name()+" -> "+l.name()));
     QVERIFY2(qAbs(l.hslHue()-Texte.hslHue())<=2, qPrintable(Texte.name()+" -> "+l.name()));
    }
-  for(TColor c : {clNavy, clMaroon, clPurple, clGreen, clRed})
+  for(TColor c : {clNavy, clMaroon, clPurple, clGreen, clRed}) {
    QCOMPARE(CouleurLisible(CouleurQt(c), Clair), CouleurQt(c));
-  for(TColor c : {clGreen, clRed})
+}
+  for(TColor c : {clGreen, clRed}) {
    QCOMPARE(CouleurLisible(CouleurQt(c), Sombre), CouleurQt(c));
+}
   QVERIFY(Contraste(CouleurQt(clNavy), Sombre)<2); // bleu marine sur fond sombre : illisible sans correction
   QCOMPARE(CouleurLisible(QColor(Qt::black), QColor(Qt::white)), QColor(Qt::black));
   // Sur fond clair, une couleur trop claire est foncée
-  QColor Jaune=CouleurQt(clYellow), JauneLisible=CouleurLisible(Jaune, Clair);
+  QColor Jaune=CouleurQt(clYellow);
+  QColor JauneLisible=CouleurLisible(Jaune, Clair);
   QVERIFY(Contraste(JauneLisible, Clair)>=4.5);
   QVERIFY(JauneLisible.lightness()<Jaune.lightness());
  }
@@ -7780,7 +8436,7 @@ void TestInterface::ongletsEntiers()
    // leur donnait celle du système, plus grande : texte abrégé), resserrée
    // tant qu'un texte est abrégé
   TTabControl *t=frmStatsVehicules->TabControl;
-  QTabBar *Onglets=t->findChild<QTabBar *>();
+  auto *Onglets=t->findChild<QTabBar *>();
   QVERIFY(Onglets);
   QCOMPARE(Onglets->font().pixelSize(), t->font().pixelSize());
   QCOMPARE(QFontInfo(Onglets->font()).family(), QFontInfo(t->font()).family());
@@ -7788,8 +8444,9 @@ void TestInterface::ongletsEntiers()
   QVERIFY(Onglets->tabText(0).startsWith("Nb.cases"));
   QFont Essai=t->font();
   Essai.setStretch(90);
-  if (QFontMetricsF(Essai).horizontalAdvance(Onglets->tabText(0))>QFontMetricsF(t->font()).horizontalAdvance(Onglets->tabText(0))-1)
+  if (QFontMetricsF(Essai).horizontalAdvance(Onglets->tabText(0))>QFontMetricsF(t->font()).horizontalAdvance(Onglets->tabText(0))-1) {
    QSKIP("QFont::setStretch sans effet avec ce moteur de polices"); // Windows en « offscreen », sans polices
+}
   QVERIFY2(t->OngletsEntiers(), qPrintable(QString::number(Onglets->font().stretch())));
  }
 //---------------------------------------------------------------------------
@@ -7798,7 +8455,8 @@ void TestInterface::policesEtStyleWindows()
    // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
    // (libellés entiers), avec le style « windowsvista » (valeur des champs
    // numériques visible)
-  if (QGuiApplication::platformName()!=QLatin1String("windows")) QSKIP("affichage natif de Windows seulement");
+  if (QGuiApplication::platformName()!=QLatin1String("windows")) { QSKIP("affichage natif de Windows seulement");
+}
   QFont Police=frmRecherche->RadioButtonParking->font();
   QString Diagnostic=QString("police de Rechercher : %1 (%2) ; MS Sans Serif trouvée : %3 ; Microsoft Sans Serif trouvée : %4 ; style : %5")
                      .arg(QFontInfo(Police).family(), Police.families().join(", "))

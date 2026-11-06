@@ -10,7 +10,6 @@
 //#include <Controls.hpp> // portage
 //#include <ExtCtrls.hpp> // portage
 //#include <StdCtrls.hpp> // portage
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmParamSimul : public TForm
 {

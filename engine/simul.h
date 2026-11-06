@@ -166,44 +166,51 @@ class infection // v5.4.1
   infection *Svt;
   infection(const centre_ville *cv); // Patient zéro
   infection(int Tour, int NumPietonOrigine, int Rang);
-  ~infection() { if (Svt) delete Svt; };
+  ~infection() { delete Svt; };
   bool EstContagieux(int Tour)
    {
-	if ((Tour>TourDeb)&&(Tour<TourFin))
+	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return true;
-	else
-	  if (Svt)
+	} 
+	  if (Svt) {
 		return Svt->EstContagieux(Tour);
-	  else
+	  } else {
 		return false;
+}
    };
   bool Reinfecte(int Tour, int NumPieton, int Rang); // comme le constructeur mais pour une personne qui a déjà été infectée
   int DonneRang(int Tour)
    {
-	if ((Tour>TourDeb)&&(Tour<TourFin))
+	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return DrnRang; // v5.4.2 : Au lieu de PrmRang
-	else
-	  if (Svt)
+	} 
+	  if (Svt) {
 		return Svt->DonneRang(Tour);
-	  else
+	  } else {
 		return -1; // Non contagieux au moment du tour
+}
    };
   int DonneChargeVirale(int Tour)
    {
-	if ((Tour>TourDeb)&&(Tour<TourFin))
+	if ((Tour>TourDeb)&&(Tour<TourFin)) {
 	  return ChargeVirale;
-	else
-	  if (Svt)
+	} 
+	  if (Svt) {
 		return Svt->DonneChargeVirale(Tour);
-	  else
+	  } else {
         return 0;
+}
    };
   bool DoitSuccomber(int Tour);
-  int NbInfections() { if (Svt) return 1+Svt->NbInfections(); else return 1; };
+  int NbInfections() { if (Svt) { return 1+Svt->NbInfections(); } return 1; 
+};
   int DonnePrmRang() { return PrmRang; }; // v5.4.2 : au lieu de DonneDrnRang()
-  int DonneTourFin() { if (Svt) return Svt->DonneTourFin(); else return TourFin; };
-  int DonneTourDeb(bool Dernier) { if (Dernier&&Svt) return Svt->DonneTourDeb(true); else return TourDeb; };
-  bool EstCondamne() { if (Svt) return Svt->EstCondamne(); else return (TourFatal>0); };
+  int DonneTourFin() { if (Svt) { return Svt->DonneTourFin(); } return TourFin; 
+};
+  int DonneTourDeb(bool Dernier) { if (Dernier&&Svt) { return Svt->DonneTourDeb(true); } return TourDeb; 
+};
+  bool EstCondamne() { if (Svt) { return Svt->EstCondamne(); } return (TourFatal>0); 
+};
  };
 //---------------------------------------------------------------------------
 class pieton // v2.0
@@ -248,7 +255,7 @@ class pieton // v2.0
 	DemiCasesParcourues=TourDrnAff=TourDrnDepl=0L;
 	TourAttTaxi=TourAttTram=TourAttBus=0L; // v6.0.1 : indéterminés tant que le piéton n'a rien attendu
 	Mort=Ecrase=VeutDescendre=AttendFeuP=AttendVehlib=AttendTaxi=AttendTram=AttendBus=PlaceVehlibTrv=FileTaxiTrv=ArretTramTrv=ArretBusTrv=PsgPtTrv=false; // v4.3 (Ecrase), v5.2 (AttendFeuP), v5.3 (vehlib), v5.4.1 (Mort)
-    Infection=NULL;
+    Infection=nullptr;
    };
   pieton() { Numero=0; Initialise(); };
   void AffecteNumero(int Num) { Numero=Num; };
@@ -256,15 +263,20 @@ class pieton // v2.0
   void Definit(int x0, int y0, direction Dir0, int DemiCase0) { x=x0; y=y0; Dir=Dir0; DemiCase=DemiCase0; TourDrnAff=TourDrnDepl=0L; PsgPtTrv=false; };
   void AnnuleRechercheEnCours()
    {
-	if (PsgPtTrv) PsgPtTrv=false;
-	if (ArretBusTrv) ArretBusTrv=false;
-	if (ArretTramTrv) ArretTramTrv=false;
-	if (FileTaxiTrv) FileTaxiTrv=false; // v3.6
-	if (PlaceVehlibTrv) PlaceVehlibTrv=false; // v5.3
+	if (PsgPtTrv) { PsgPtTrv=false;
+}
+	if (ArretBusTrv) { ArretBusTrv=false;
+}
+	if (ArretTramTrv) { ArretTramTrv=false;
+}
+	if (FileTaxiTrv) { FileTaxiTrv=false; // v3.6
+}
+	if (PlaceVehlibTrv) { PlaceVehlibTrv=false; // v5.3
+}
    };
   ~pieton()
    {
-	if (Infection) delete Infection; // v5.4.1
+	delete Infection; // v5.4.1
    };
   void ChercheFileTaxi(); // v3.6
   bool Defini() { return (x>-1)&&(y>-1); };
@@ -282,12 +294,17 @@ class pieton // v2.0
   int DonneRang();
   int DonneChargeVirale();
   bool DoitSuccomber();
-  int NbInfections() { if (Infection) return Infection->NbInfections(); else return 0; };
-  int DonnePrmRang() { if (Infection) return Infection->DonnePrmRang(); else return -1; };
-  int DonneTourFin() { if (Infection) return Infection->DonneTourFin(); else return -1; };
-  int DonneTourDeb(bool Dernier) { if (Infection) return Infection->DonneTourDeb(Dernier); else return -1; };
-  bool EstCondamne() { if (Infection) return Infection->EstCondamne(); else return false; };
-  void SupprimeInfection() { if (Infection) { delete Infection; Infection=NULL; Mort=false; } }; // Utilisé par la résurrection !
+  int NbInfections() { if (Infection) { return Infection->NbInfections(); } return 0; 
+};
+  int DonnePrmRang() { if (Infection) { return Infection->DonnePrmRang(); } return -1; 
+};
+  int DonneTourFin() { if (Infection) { return Infection->DonneTourFin(); } return -1; 
+};
+  int DonneTourDeb(bool Dernier) { if (Infection) { return Infection->DonneTourDeb(Dernier); } return -1; 
+};
+  bool EstCondamne() { if (Infection) { return Infection->EstCondamne(); } return false; 
+};
+  void SupprimeInfection() { if (Infection) { delete Infection; Infection=nullptr; Mort=false; } }; // Utilisé par la résurrection !
   bool EstGueri() { return (!EstContagieux())&&(NbInfections()>0); }; // v5.4.2
  };
 //---------------------------------------------------------------------------
@@ -323,7 +340,7 @@ class feu
 	ProchainVert=RougeDemande=FeuxTousRouges=DemandeVert=false;
 	VerifEnCours=false;
    };
-  feu() { Numero=0; Initialise(); NumFeuxPtn=NumFeuxDmd=NumFeuxAtt=NULL; CopieEnCours=false; /*v5.1*/}; // v3.8.2 (NULL) v5.2 (NumFeuP)
+  feu() { Numero=0; Initialise(); NumFeuxPtn=NumFeuxDmd=NumFeuxAtt=nullptr; CopieEnCours=false; /*v5.1*/}; // v3.8.2 (NULL) v5.2 (NumFeuP)
   void Copie(feu *f) // v5.1
    {
 	f->CopieEnCours=true;
@@ -356,9 +373,9 @@ class feu
    {
 	if (!CopieEnCours) // v5.1
 	 {
-	  if (NbFeuxDmd) { delete[] NumFeuxDmd; NumFeuxDmd=NULL; }
-	  if (NbFeuxAtt) { delete[] NumFeuxAtt; NumFeuxAtt=NULL;}
-	  if (NbFeuxPtn) { delete[] NumFeuxPtn; NumFeuxPtn=NULL;} // v5.2
+	  if (NbFeuxDmd != 0) { delete[] NumFeuxDmd; NumFeuxDmd=nullptr; }
+	  if (NbFeuxAtt != 0) { delete[] NumFeuxAtt; NumFeuxAtt=nullptr;}
+	  if (NbFeuxPtn != 0) { delete[] NumFeuxPtn; NumFeuxPtn=nullptr;} // v5.2
 	 }
    };
   bool Defini() { return (x>-1)&&(y>-1)&&(Dir>aucune); };
@@ -372,7 +389,7 @@ class feu
   void Evolue();
   bool Charge(int hfile);
   bool Sauve(int hfile);
-  void Verifie(AnsiString &asMsgErr, AnsiString asSource);
+  void Verifie(AnsiString &asMsgErr, const AnsiString& asSource);
  };
 //---------------------------------------------------------------------------
 class feu_pieton // v5.2
@@ -399,15 +416,16 @@ class feu_pieton // v5.2
        ProchainVert, // Indique qu'il est autorisé à passer au vert
        VerifEnCours; // Drapeau pour Verifie()
   void Initialise();
-  feu_pieton() { Numero=0; Initialise(); NumFeux=NULL; CopieEnCours=false; };
+  feu_pieton() { Numero=0; Initialise(); NumFeux=nullptr; CopieEnCours=false; };
   void Copie(feu_pieton *f);
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0, int Dir0) { x[0]=x0; y[0]=y0; Dir[0]=Dir0; Etat=inactif; };
   void DefinitFeuOppose();
   ~feu_pieton()
    {
-    if (!CopieEnCours) // v5.1
-     if (NbFeux) { delete[] NumFeux; NumFeux=NULL; }
+    if (!CopieEnCours) { // v5.1
+     if (NbFeux != 0) { delete[] NumFeux; NumFeux=nullptr; }
+}
    };
   bool Defini()
    {
@@ -439,7 +457,7 @@ class parking
    };
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  ~parking() {};
+  ~parking() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void PlaceProchainVehicule();
   bool Charge(int hfile);
@@ -478,7 +496,7 @@ class vehicule // instances créées au lancement de la simulation
                int NumDepart, int NumArrivee,
                int NumFileDepart, int NumFileArrivee, // v5.0
                niveau_priorite NivPriorite0); // v2.2
-  ~vehicule() {};
+  ~vehicule() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   bool EstDestination(const voie *v); // v5.0 : indique si v est la case destination (parking ou place de parking)
   void CalculeProchaineDirection();
@@ -496,7 +514,7 @@ class depot_bus // v3.0 ATTENTION : il n'y en a qu'un !
   void Initialise() { x=-1; y=-1; NumDrnBusSorti=0; };
   depot_bus() { Initialise(); };
   void Definit(int x0, int y0) { x=x0; y=y0; NumDrnBusSorti=0; };
-  ~depot_bus() {};
+  ~depot_bus() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void PlaceProchainBus();
   bool Charge(int hfile);
@@ -531,7 +549,7 @@ class bus// v3.0 instances créées au lancement de la simulation
   void Place(int x0, int y0) { x=x0; y=y0; };
   void Definit(int NumLigne0, int NumArretSvt0)
    { NumLigne=NumLigne0; NumArretSvt=NumArretSvt0; };
-  ~bus() {};
+  ~bus() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void FaitMonterPieton(int NumPietonAFaireMonter);
   void FaitMonterEtDescendre(); // v3.0
@@ -555,7 +573,7 @@ class arret_bus // v3.0
   void Copie(arret_bus *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  ~arret_bus() {};
+  ~arret_bus() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesBus();
   void AjouteLigneBus(int n);
@@ -577,7 +595,7 @@ class ligne_bus // v3.0
   ligne_bus() { Numero=0; Initialise(); };
   void AffecteNumero(int Num) { Numero=Num; };
   void AjouteBus(int NumeroBus);
-  ~ligne_bus() {};
+  ~ligne_bus() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -611,7 +629,7 @@ class tram // v3.5 instances créées au lancement de la simulation
   void Place(int x0, int y0) { x=x0; y=y0; };
   void Definit(int NumLigne0, int NumArretSvt0)
    { NumLigne=NumLigne0; NumArretSvt=NumArretSvt0; };
-  ~tram() {};
+  ~tram() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void FaitMonterPieton(int NumPietonAFaireMonter);
   void FaitMonterEtDescendre();
@@ -635,7 +653,7 @@ class arret_tram // v3.5
   void Copie(arret_tram *a); // v5.1
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  ~arret_tram() {};
+  ~arret_tram() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   void InitialiseInfosLignesTram();
   void AjouteLigneTram(int n);
@@ -657,7 +675,7 @@ class ligne_tram // v3.5
   ligne_tram() { Numero=0; Initialise(); };
   void AffecteNumero(int Num) { Numero=Num; };
   void AjouteTram(int NumeroTram);
-  ~ligne_tram() {};
+  ~ligne_tram() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -683,7 +701,7 @@ class place_taxi // v3.6
   bool Definie() { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   void DefinitFile(int n) {NumFile=n; };
-  ~place_taxi() {};
+  ~place_taxi() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -702,7 +720,7 @@ class file_taxi // v3.6 instances créées au lancement de la simulation
   file_taxi() { Numero=0; NumPlaceQueue=-1; };
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int NumPlace) { NumPlaceQueue=NumPlace; };
-  ~file_taxi() {};
+  ~file_taxi() = default;
  };
 //---------------------------------------------------------------------------
 class taxi // v3.6 instances créées au lancement de la simulation
@@ -732,7 +750,7 @@ class taxi // v3.6 instances créées au lancement de la simulation
     NbCasesParcourues=NbCasesParcouruesDrnCourse=NbToursRepos=0;
    };
   taxi() { Numero=0; Initialise(); };
-  ~taxi() {};
+  ~taxi() = default;
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int f) { NumFile=f; }; // 0 <= f < NbFilesTaxi
   bool Defini() { return (x>-1)&&(y>-1); }; // v6.0.2 (Rechercher)
@@ -766,7 +784,7 @@ class place_park // v5.0
   bool Definie() { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
   void DefinitFile(int n) {NumFile=n; };
-  ~place_park() {};
+  ~place_park() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -784,7 +802,7 @@ class file_park // v5.0 instances créées au lancement de la simulation
   file_park() { Numero=0; NumPlaceQueue=-1; };
   void AffecteNumero(int Num) { Numero=Num; };
   void Definit(int NumPlace) { NumPlaceQueue=NumPlace; };
-  ~file_park() {};
+  ~file_park() = default;
  };
 //---------------------------------------------------------------------------
 class place_vehlib // v5.3
@@ -804,7 +822,7 @@ class place_vehlib // v5.3
   void AffecteNumero(int Num) { Numero=Num; };
   bool Definie() { return (x>-1)&&(y>-1); };
   void Definit(int x0, int y0) { x=x0; y=y0; };
-  ~place_vehlib() {};
+  ~place_vehlib() = default;
   bool Charge(int hfile);
   bool Sauve(int hfile);
   void Verifie(AnsiString &asMsgErr);
@@ -840,7 +858,7 @@ class vehlib // v5.3 instances créées au lancement de la simulation
   void Place(int p); // 0 <= p < NbPlacesVehlib
   void Definit(int p) { NumPlaceDepart=p+1; }; // ATTENTION: 0 <= p < NbPlacesVehlib
   void DefinitEtPlace(int p) { Definit(p); Place(p); }; // ATTENTION: 0 <= p < NbPlacesVehlib
-  ~vehlib() {};
+  ~vehlib() = default;
   bool Defini() { return (x>-1)&&(y>-1); };
   bool EstDestination(const voie *v);
   void CalculeProchaineDirection();
@@ -1222,11 +1240,11 @@ class centre_ville
   inline bool TourDeDeplacementBus(int NumeroBus);
   inline bool TourDeDeplacementTram(int NumeroTram); // v3.5
   inline bool TourDeDeplacementTaxi(int NumeroTaxi); // v3.6
-  inline void TopChrono() // v3.9.2
+  void TopChrono() // v3.9.2
    {
     dtTop=Time();
    };
-  inline void StopChrono() // v3.9.2
+  void StopChrono() // v3.9.2
    {
     dtTemps+=(Time()-dtTop);
    };
@@ -1235,8 +1253,9 @@ class centre_ville
    {
 	if ((CopieEnCours=EnCours))
      { Xc=x; Yc=y; NbXc=NbX; NbYc=NbY; }
-    else
+    else {
      Xc=Yc=NbXc=NbYc=0; // v6.0.1 : NbY (le paramètre) dans l'original
+}
    };
   template <class C> bool DansSelectionEnCours(C *c) // v4.0.1
    {
@@ -1244,10 +1263,11 @@ class centre_ville
    };
   template <class C> AnsiString asCoordonnees(C *c) // v4.2.1
    {
-    if ((c->x>-1)&&(c->y>-1))
+    if ((c->x>-1)&&(c->y>-1)) {
      return "("+IntToStr(c->x)+", "+IntToStr(c->y)+")";
-    else
+    } 
      return "(?, ?)";
+
    };
   void PrepareGenerationAleatoire( int LgrMinSgmtRoute, int LgrMaxSgmtRoute,
                                    int ProbaSortieIntersection, int ProbaEntreeIntersection,

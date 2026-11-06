@@ -12,19 +12,19 @@ namespace
   //-------------------------------------------------------------------------
   void Avance()
    {
-    GraineCrt=GraineCrt*alea::MULTIPLICATEUR+1u;
+    GraineCrt=GraineCrt*alea::MULTIPLICATEUR+1U;
    }
  }
 //---------------------------------------------------------------------------
 int alea::Rand()
  {
   Avance();
-  return (int)((GraineCrt>>16)&0x7FFFu);
+  return static_cast<int>((GraineCrt>>16)&0x7FFFU);
  }
 //---------------------------------------------------------------------------
 void alea::Srand(unsigned Graine)
  { // Comme la RTL : la graine est posée, puis le générateur avance d'un pas
-  GraineCrt=GraineForcee?ValeurForcee:(std::uint32_t)Graine;
+  GraineCrt=GraineForcee?ValeurForcee:static_cast<std::uint32_t>(Graine);
   Avance();
  }
 //---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ unsigned alea::Graine()
 void alea::FixeGraine(unsigned Graine)
  {
   GraineForcee=true;
-  ValeurForcee=(std::uint32_t)Graine;
+  ValeurForcee=static_cast<std::uint32_t>(Graine);
   Srand(Graine);
  }
 //---------------------------------------------------------------------------

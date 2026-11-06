@@ -42,10 +42,11 @@ bool OuvertureFichiers::eventFilter(QObject *o, QEvent *e)
   if (e->type()==QEvent::FileOpen)
    {
     QString f=static_cast<QFileOpenEvent *>(e)->file();
-    if (frmSimulation&&frmSimulation->isVisible())
+    if (frmSimulation&&frmSimulation->isVisible()) {
      frmSimulation->OuvreFichierDemande(A(QDir::toNativeSeparators(f)));
-    else
-     EnAttente=f;
+    } else {
+     EnAttente=std::move(f);
+}
     return true;
    }
   return QObject::eventFilter(o, e);
@@ -62,8 +63,9 @@ void InitialiseApplication(QApplication &App)
   static QTranslator Traduction;
   QString stTraductions=QLibraryInfo::path(QLibraryInfo::TranslationsPath);
   if (Traduction.load(QLocale(QLocale::French), "qtbase", "_", stTraductions)||
-      Traduction.load(QLocale(QLocale::French), "qt", "_", stTraductions))
-   App.installTranslator(&Traduction);
+      Traduction.load(QLocale(QLocale::French), "qt", "_", stTraductions)) {
+   QApplication::installTranslator(&Traduction);
+}
   // Polices de Windows absentes ailleurs. MS Sans Serif, police « raster »,
   // n'est pas utilisable par Qt même sous Windows : Microsoft Sans Serif, sa
   // version TrueType aux mêmes mesures (fournie par Windows et macOS), puis
@@ -86,7 +88,8 @@ void CreeFiches(const QString &asFichierFinder)
   // Application->MainFormOnTaskBar = true; // portage : les fiches secondaires ont la fiche principale pour parent
   Application->Title = "Centre-Ville";
   frmSimulation=new TfrmSimulation(Application); // Application->CreateForm(__classid(TfrmSimulation), &frmSimulation);
-  if (!asFichierFinder.isEmpty()) frmSimulation->OuvreFichierDemande(A(asFichierFinder)); // portage : Finder
+  if (!asFichierFinder.isEmpty()) { frmSimulation->OuvreFichierDemande(A(asFichierFinder)); // portage : Finder
+}
   frmSimulation->Show(); // portage : Visible = True dans le .dfm : affichée dès sa création
   frmDefVoie=new TfrmDefVoie(Application);
   frmDefVoiePietons=new TfrmDefVoiePietons(Application);
@@ -114,29 +117,29 @@ void CreeFiches(const QString &asFichierFinder)
 //---------------------------------------------------------------------------
 void DetruitFiches()
  { // Ordre inverse de la création (TComponent::DestroyComponents)
-  delete frmEpidemie; frmEpidemie=NULL;
-  delete frmDefNature; frmDefNature=NULL;
-  delete frmInfosVehlib; frmInfosVehlib=NULL;
-  delete frmInfosBus; frmInfosBus=NULL;
-  delete frmInfosTram; frmInfosTram=NULL;
-  delete frmInfosTaxi; frmInfosTaxi=NULL;
-  delete frmInfosPieton; frmInfosPieton=NULL;
-  delete frmInfosVehicule; frmInfosVehicule=NULL;
-  delete frmCarrefours; frmCarrefours=NULL;
-  delete frmRecherche; frmRecherche=NULL;
-  delete frmStatsVehicules; frmStatsVehicules=NULL;
-  delete frmStatistiques; frmStatistiques=NULL;
-  delete frmAffDistPlacesVehlib; frmAffDistPlacesVehlib=NULL;
-  delete frmAffDistFilesPark; frmAffDistFilesPark=NULL;
-  delete frmAffDistFilesTaxi; frmAffDistFilesTaxi=NULL;
-  delete frmAffDistArretsTram; frmAffDistArretsTram=NULL;
-  delete frmAffDistArretsBus; frmAffDistArretsBus=NULL;
-  delete frmAffDistParkings; frmAffDistParkings=NULL;
-  delete frmDefFeuxPietons; frmDefFeuxPietons=NULL;
-  delete frmDefFeux; frmDefFeux=NULL;
-  delete frmDefVoiePietons; frmDefVoiePietons=NULL;
-  delete frmDefVoie; frmDefVoie=NULL;
-  delete frmSimulation; frmSimulation=NULL;
-  delete Application; Application=NULL;
+  delete frmEpidemie; frmEpidemie=nullptr;
+  delete frmDefNature; frmDefNature=nullptr;
+  delete frmInfosVehlib; frmInfosVehlib=nullptr;
+  delete frmInfosBus; frmInfosBus=nullptr;
+  delete frmInfosTram; frmInfosTram=nullptr;
+  delete frmInfosTaxi; frmInfosTaxi=nullptr;
+  delete frmInfosPieton; frmInfosPieton=nullptr;
+  delete frmInfosVehicule; frmInfosVehicule=nullptr;
+  delete frmCarrefours; frmCarrefours=nullptr;
+  delete frmRecherche; frmRecherche=nullptr;
+  delete frmStatsVehicules; frmStatsVehicules=nullptr;
+  delete frmStatistiques; frmStatistiques=nullptr;
+  delete frmAffDistPlacesVehlib; frmAffDistPlacesVehlib=nullptr;
+  delete frmAffDistFilesPark; frmAffDistFilesPark=nullptr;
+  delete frmAffDistFilesTaxi; frmAffDistFilesTaxi=nullptr;
+  delete frmAffDistArretsTram; frmAffDistArretsTram=nullptr;
+  delete frmAffDistArretsBus; frmAffDistArretsBus=nullptr;
+  delete frmAffDistParkings; frmAffDistParkings=nullptr;
+  delete frmDefFeuxPietons; frmDefFeuxPietons=nullptr;
+  delete frmDefFeux; frmDefFeux=nullptr;
+  delete frmDefVoiePietons; frmDefVoiePietons=nullptr;
+  delete frmDefVoie; frmDefVoie=nullptr;
+  delete frmSimulation; frmSimulation=nullptr;
+  delete Application; Application=nullptr;
  }
 //---------------------------------------------------------------------------

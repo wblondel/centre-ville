@@ -30,7 +30,7 @@ class TVirtualImageList : public QObject
   public:
   int Width=16, Height=16;
   TVirtualImageList(const char *const *Ressources, int NbImages, QObject *Parent=nullptr);
-  int Count() const { return (int)Images.size(); }
+  int Count() const { return static_cast<int>(Images.size()); }
   void Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enabled=true);
   void GetBitmap(int Index, TBitmap *Bitmap) const;
   QPixmap Pixmap(int Index) const;

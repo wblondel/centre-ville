@@ -15,7 +15,7 @@
 //#pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_prmsim_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-TfrmParamSimul *frmParamSimul=NULL;
+TfrmParamSimul *frmParamSimul=nullptr;
 //---------------------------------------------------------------------------
 void Parametres()
  {
@@ -23,7 +23,7 @@ void Parametres()
    {
 	frmParamSimul->ShowModal();
 	delete frmParamSimul;
-	frmParamSimul=NULL;
+	frmParamSimul=nullptr;
    }
  }
 //---------------------------------------------------------------------------
@@ -50,8 +50,10 @@ TfrmParamSimul::TfrmParamSimul(TComponent* Owner) : TForm(Owner)
 bool TfrmParamSimul::AppliqueChoix()
  {
   frmSimulation->SimulationModifiee=true;
-  if (NbVehiculesChange) cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
-  if (NbPietonsChange) cv->DefinitNbPietons((CSpinEditNbPietons->Value*CSpinEditNbVehicules->Value)/100); // v2.0
+  if (NbVehiculesChange) { cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
+}
+  if (NbPietonsChange) { cv->DefinitNbPietons((CSpinEditNbPietons->Value*CSpinEditNbVehicules->Value)/100); // v2.0
+}
   BitBtnDefLignesBus->Enabled=(cv->NbArretsBus>0); // v3.0
   BitBtnDefLignesTram->Enabled=(cv->NbArretsTram>0); // v3.5
   BitBtnDefTaxis->Enabled=(cv->NbPlacesTaxi>0); // v3.6
@@ -92,10 +94,13 @@ void TfrmParamSimul::CSpinEditNbPietonsChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des possibilités de véhicules déporté en fonction car utilisé dans FormShow
  {
-  if ((cv->NbParkings*(cv->NbParkings-1)+2*cv->NbPlacesPark)<=0) return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
+  if ((cv->NbParkings*(cv->NbParkings-1)+2*cv->NbPlacesPark)<=0) { return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
+}
   int NbMinVehicules= cv->NbParkings*(cv->NbParkings-1)
-                     +2*cv->NbPlacesPark, // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
-	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules), // v5.0.3
+                     +2*cv->NbPlacesPark;
+  int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
+	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules);
+  int // v5.0.3
       NbVehicules=NbMinVehicules*(CSpinEditNbVehicules->Value/NbMinVehicules); // v5.0.3
     CSpinEditNbVehicules->Increment=NbMinVehicules;
     CSpinEditNbVehicules->MINVALUE=NbMinVehicules;
@@ -128,7 +133,7 @@ void TfrmParamSimul::FormShow(TObject *Sender)
    return;
   }
  Initialisation=true;
- if (!Caption.Pos("["))// v5.0
+ if (Caption.Pos("[") == 0)// v5.0
   {
    if (frmDimensionsZone) // v4.4.0
 	{
@@ -139,8 +144,9 @@ void TfrmParamSimul::FormShow(TObject *Sender)
 	 Caption=Caption+Format(" [%dx%d]", ARRAYOFCONST((cv->NbX, cv->NbY)));
 	}
   }
- if (cv->NbVehicules) CSpinEditNbVehicules->Value=cv->NbVehicules;
- else cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
+ if (cv->NbVehicules != 0) { CSpinEditNbVehicules->Value=cv->NbVehicules;
+ } else { cv->DefinitNbVehicules(CSpinEditNbVehicules->Value);
+}
 
  CSpinEditNbPietons->Value=(100*cv->NbPietons)/cv->NbVehicules;
  BitBtnDefLignesBus->Enabled=(cv->NbArretsBus>0); // v3.0
@@ -148,26 +154,30 @@ void TfrmParamSimul::FormShow(TObject *Sender)
  BitBtnDefTaxis->Enabled=(cv->NbPlacesTaxi>0); // v3.6
  BitBtnDefVehlibs->Enabled=(cv->NbPlacesVehlib>0); // v5.3
 
- if (cv->DureeVert) CSpinEditDureeVert->Value=cv->DureeVert;
- else cv->DureeVert=CSpinEditDureeVert->Value;
- if (cv->DureeOrange) CSpinEditDureeOrange->Value=cv->DureeOrange;
- else cv->DureeOrange=CSpinEditDureeOrange->Value;
- if (cv->DureeRouge) CSpinEditDureeRouge->Value=cv->DureeRouge;
- else cv->DureeRouge=CSpinEditDureeRouge->Value;
+ if (cv->DureeVert != 0) { CSpinEditDureeVert->Value=cv->DureeVert;
+ } else { cv->DureeVert=CSpinEditDureeVert->Value;
+}
+ if (cv->DureeOrange != 0) { CSpinEditDureeOrange->Value=cv->DureeOrange;
+ } else { cv->DureeOrange=CSpinEditDureeOrange->Value;
+}
+ if (cv->DureeRouge != 0) { CSpinEditDureeRouge->Value=cv->DureeRouge;
+ } else { cv->DureeRouge=CSpinEditDureeRouge->Value;
+}
 
  CSpinEditAttenteAvChx->Value=cv->AttenteMaxVeh;
 
- if (cv->NbToursParSeconde) CSpinEditNbToursParSeconde->Value=cv->NbToursParSeconde;
- else cv->NbToursParSeconde=CSpinEditNbToursParSeconde->Value;
+ if (cv->NbToursParSeconde != 0) { CSpinEditNbToursParSeconde->Value=cv->NbToursParSeconde;
+ } else { cv->NbToursParSeconde=CSpinEditNbToursParSeconde->Value;
+}
 
  RadioGroupVitesses->ItemIndex=cv->NbVitesses-1;
  CSpinEditNbCasesMaxPsgPtn->Value=cv->NbMaxCasesDetectPsgPt;
  CSpinEditProbaPsgPt->Value=cv->ProbaDirPsgPt;
 
- LabelNbVehicules->Enabled=!cv->TourCrt;
- CSpinEditNbVehicules->Enabled=!cv->TourCrt;
- LabelNbPietons->Enabled=!cv->TourCrt; // v2.0
- CSpinEditNbPietons->Enabled=!cv->TourCrt; // v2.0
+ LabelNbVehicules->Enabled=cv->TourCrt == 0;
+ CSpinEditNbVehicules->Enabled=cv->TourCrt == 0;
+ LabelNbPietons->Enabled=cv->TourCrt == 0; // v2.0
+ CSpinEditNbPietons->Enabled=cv->TourCrt == 0; // v2.0
  LabelDureeVert->Enabled=!frmSimulation->SimulationEnCours;
  LabelDureeOrange->Enabled=!frmSimulation->SimulationEnCours;
  LabelDureeRouge->Enabled=!frmSimulation->SimulationEnCours;
@@ -193,16 +203,20 @@ void TfrmParamSimul::BitBtnAppliqueDureeFeuVertClick(
       TObject *Sender)
 {
  int i;
- for(i=0; i<cv->NbFeux; i++)
-  if (cv->Feu[i].Defini()) cv->Feu[i].DureeVert=cv->DureeVert;
+ for(i=0; i<cv->NbFeux; i++) {
+  if (cv->Feu[i].Defini()) { cv->Feu[i].DureeVert=cv->DureeVert;
+}
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnAppliqueDureeFeuRougeClick(
       TObject *Sender)
 {
  int i;
- for(i=0; i<cv->NbFeux; i++)
-  if (cv->Feu[i].Defini()) cv->Feu[i].DureeRouge=cv->DureeRouge;
+ for(i=0; i<cv->NbFeux; i++) {
+  if (cv->Feu[i].Defini()) { cv->Feu[i].DureeRouge=cv->DureeRouge;
+}
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamSimul::CSpinEditDureeVertChange(TObject *Sender)
@@ -225,20 +239,21 @@ void TfrmParamSimul::CSpinEditDureeRougeChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::Change(TObject *Sender)
 {
- if (!Initialisation) ButtonAppliquer->Enabled=true;
+ if (!Initialisation) { ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnDefLignesBusClick(TObject *Sender)
 {
  if ((frmParamBus=new TfrmParamBus(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]()
+   Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamBus->Release();
-    frmParamBus=NULL;
+    frmParamBus=nullptr;
    });
     frmParamSimul->Hide();
     frmParamBus->ShowModal();
@@ -254,13 +269,13 @@ void TfrmParamSimul::BitBtnDefLignesTramClick(TObject *Sender)
 { // v3.5
  if ((frmParamTram=new TfrmParamTram(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]()
+   Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamTram->Release();
-    frmParamTram=NULL;
+    frmParamTram=nullptr;
    });
     frmParamSimul->Hide();
     frmParamTram->ShowModal();
@@ -271,13 +286,13 @@ void TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
 {
  if ((frmParamTaxi=new TfrmParamTaxi(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]()
+   Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamTaxi->Release();
-    frmParamTaxi=NULL;
+    frmParamTaxi=nullptr;
    });
     frmParamSimul->Hide();
     frmParamTaxi->ShowModal();
@@ -289,8 +304,9 @@ void TfrmParamSimul::BitBtnDefTaxisClick(TObject *Sender)
 void TfrmParamSimul::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 
@@ -298,13 +314,13 @@ void TfrmParamSimul::BitBtnDefVehlibsClick(TObject *Sender)
 { // v5.3
  if ((frmParamVehlib=new TfrmParamVehlib(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]()
+   Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
     frmParamSimul->Show();
     frmParamVehlib->Release();
-    frmParamVehlib=NULL;
+    frmParamVehlib=nullptr;
    });
     frmParamSimul->Hide();
     frmParamVehlib->ShowModal();
@@ -322,6 +338,7 @@ void TfrmParamSimul::ChargeFiche()
   COMPOSANTS_frmParamSimul(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmParamSimul(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

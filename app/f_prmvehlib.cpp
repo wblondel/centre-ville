@@ -56,14 +56,16 @@ void TfrmParamVehlib::AppliqueChoix()
 void TfrmParamVehlib::CSpinEditParametresChange(
       TObject *Sender)
 {
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+ if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamVehlib::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -77,6 +79,7 @@ void TfrmParamVehlib::ChargeFiche()
   COMPOSANTS_frmParamVehlib(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmParamVehlib(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

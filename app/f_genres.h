@@ -10,7 +10,6 @@
 //#include <Forms.hpp> // portage
 //#include <ComCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmGeneration : public TForm
 {

@@ -22,44 +22,56 @@ GrilleSimulation::GrilleSimulation(QWidget *Parent) : ControleVcl<QAbstractScrol
   Options<<goRangeSelect;
   Font->Name="Small Fonts";
   Font->Height=-7;
-  ColCount.Definit([this]() { return NbColonnes; },
+  ColCount.Definit([this] { return NbColonnes; },
                    [this](const int &n)
                     { // TCustomGrid::SetColCount : la case courante reste dans la grille
                      NbColonnes=qMax(1, n);
-                     if (Courante.X>=NbColonnes) MoveCurrent(NbColonnes-1, Courante.Y, true);
-                     if (Ancre.X>=NbColonnes) Ancre.X=NbColonnes-1;
+                     if (Courante.X>=NbColonnes) { MoveCurrent(NbColonnes-1, Courante.Y, true);
+}
+                     if (Ancre.X>=NbColonnes) { Ancre.X=NbColonnes-1;
+}
                      MetAJourSelection();
                      MetAJourDefilement();
                      viewport()->update();
                     });
-  RowCount.Definit([this]() { return NbLignes; },
+  RowCount.Definit([this] { return NbLignes; },
                    [this](const int &n)
                     {
                      NbLignes=qMax(1, n);
-                     if (Courante.Y>=NbLignes) MoveCurrent(Courante.X, NbLignes-1, true);
-                     if (Ancre.Y>=NbLignes) Ancre.Y=NbLignes-1;
+                     if (Courante.Y>=NbLignes) { MoveCurrent(Courante.X, NbLignes-1, true);
+}
+                     if (Ancre.Y>=NbLignes) { Ancre.Y=NbLignes-1;
+}
                      MetAJourSelection();
                      MetAJourDefilement();
                      viewport()->update();
                     });
-  Col.Definit([this]() { return Courante.X; }, [this](const int &c) { if (c!=Courante.X) FocusCell(c, Courante.Y, true); });
-  Row.Definit([this]() { return Courante.Y; }, [this](const int &r) { if (r!=Courante.Y) FocusCell(Courante.X, r, true); });
-  LeftCol.Definit([this]() { return HautGauche.X; }, [this](const int &c) { DefinitHautGauche(c, HautGauche.Y); });
-  TopRow.Definit([this]() { return HautGauche.Y; }, [this](const int &r) { DefinitHautGauche(HautGauche.X, r); });
+  Col.Definit([this] { return Courante.X; }, [this](const int &c) { if (c!=Courante.X) { FocusCell(c, Courante.Y, true); 
+}});
+  Row.Definit([this] { return Courante.Y; }, [this](const int &r) { if (r!=Courante.Y) { FocusCell(Courante.X, r, true); 
+}});
+  LeftCol.Definit([this] { return HautGauche.X; }, [this](const int &c) { DefinitHautGauche(c, HautGauche.Y); });
+  TopRow.Definit([this] { return HautGauche.Y; }, [this](const int &r) { DefinitHautGauche(HautGauche.X, r); });
   DefilementAuto.setInterval(60);
-  QObject::connect(&DefilementAuto, &QTimer::timeout, this, [this]()
+  QObject::connect(&DefilementAuto, &QTimer::timeout, this, [this]
    { // Sélection à la souris hors des cases entièrement visibles : l'ancre avance d'une case
      // par tic de la minuterie de 60 ms, et la vue la suit (TCustomGrid::WMTimer et
      // TimedScroll). v6.0.12 : la vue avançait d'une case, puis l'ancre allait sous la souris
      // (plusieurs cases par tic, selon la distance)
-    if (!SelectionEnCours) return;
+    if (!SelectionEnCours) { return;
+}
     QPoint p=DernierePosition;
     TGridCoord a=Ancre;
-    if (p.x()<0) { if (a.X>0) a.X--; }
-    else if ((p.x()>LimiteVisible(true))&&(a.X<NbColonnes-1)) a.X++;
-    if (p.y()<0) { if (a.Y>0) a.Y--; }
-    else if ((p.y()>LimiteVisible(false))&&(a.Y<NbLignes-1)) a.Y++;
-    if ((a.X!=Ancre.X)||(a.Y!=Ancre.Y)) MoveAnchor(a);
+    if (p.x()<0) { if (a.X>0) { a.X--; 
+}}
+    else if ((p.x()>LimiteVisible(true))&&(a.X<NbColonnes-1)) { a.X++;
+}
+    if (p.y()<0) { if (a.Y>0) { a.Y--; 
+}}
+    else if ((p.y()>LimiteVisible(false))&&(a.Y<NbLignes-1)) { a.Y++;
+}
+    if ((a.X!=Ancre.X)||(a.Y!=Ancre.Y)) { MoveAnchor(a);
+}
    });
   MetAJourSelection();
  }
@@ -67,18 +79,26 @@ GrilleSimulation::GrilleSimulation(QWidget *Parent) : ControleVcl<QAbstractScrol
 void GrilleSimulation::PrepareVcl()
  { // Propriétés du TDrawGrid dans le .dfm
   ControleVcl<QAbstractScrollArea>::PrepareVcl();
-  if (property("vclDefaultColWidth").isValid()) DefaultColWidth=property("vclDefaultColWidth").toInt();
-  if (property("vclDefaultRowHeight").isValid()) DefaultRowHeight=property("vclDefaultRowHeight").toInt();
-  if (property("vclColor").isValid()) Color=CouleurDepuisTexte(A(property("vclColor").toString()));
-  if (property("vclFontName").isValid()) Font->Name=A(property("vclFontName").toString());
-  if (property("vclFontHeight").isValid()) Font->Height=property("vclFontHeight").toInt();
+  if (property("vclDefaultColWidth").isValid()) { DefaultColWidth=property("vclDefaultColWidth").toInt();
+}
+  if (property("vclDefaultRowHeight").isValid()) { DefaultRowHeight=property("vclDefaultRowHeight").toInt();
+}
+  if (property("vclColor").isValid()) { Color=CouleurDepuisTexte(A(property("vclColor").toString()));
+}
+  if (property("vclFontName").isValid()) { Font->Name=A(property("vclFontName").toString());
+}
+  if (property("vclFontHeight").isValid()) { Font->Height=property("vclFontHeight").toInt();
+}
   if (property("vclOptions").isValid())
    {
     Options=TGridOptions();
-    if (property("vclOptions").toString().contains("goRangeSelect")) Options<<goRangeSelect;
+    if (property("vclOptions").toString().contains("goRangeSelect")) { Options<<goRangeSelect;
+}
    }
-  if (property("vclColCount").isValid()) ColCount=property("vclColCount").toInt();
-  if (property("vclRowCount").isValid()) RowCount=property("vclRowCount").toInt();
+  if (property("vclColCount").isValid()) { ColCount=property("vclColCount").toInt();
+}
+  if (property("vclRowCount").isValid()) { RowCount=property("vclRowCount").toInt();
+}
  }
 //---------------------------------------------------------------------------
 // Géométrie
@@ -105,14 +125,16 @@ int GrilleSimulation::LimiteVisible(bool Colonne) const
 //---------------------------------------------------------------------------
 TRect GrilleSimulation::CellRect(int ACol, int ARow) const
  { // TCustomGrid::CellRect : rectangle dans le contrôle (bords droit et bas exclus)
-  int x=(ACol-HautGauche.X)*DefaultColWidth, y=(ARow-HautGauche.Y)*DefaultRowHeight;
-  return TRect(x, y, x+DefaultColWidth, y+DefaultRowHeight);
+  int x=(ACol-HautGauche.X)*DefaultColWidth;
+  int y=(ARow-HautGauche.Y)*DefaultRowHeight;
+  return {x, y, x+DefaultColWidth, y+DefaultRowHeight};
  }
 //---------------------------------------------------------------------------
 QRect GrilleSimulation::RectGrille(const TGridRect &r) const
  {
-  TRect a=CellRect(r.Left, r.Top), b=CellRect(r.Right, r.Bottom);
-  return QRect(a.Left, a.Top, b.Right-a.Left, b.Bottom-a.Top);
+  TRect a=CellRect(r.Left, r.Top);
+  TRect b=CellRect(r.Right, r.Bottom);
+  return {a.Left, a.Top, b.Right-a.Left, b.Bottom-a.Top};
  }
 //---------------------------------------------------------------------------
 TGridCoord GrilleSimulation::CaseEn(const QPoint &p) const
@@ -121,20 +143,28 @@ TGridCoord GrilleSimulation::CaseEn(const QPoint &p) const
   TGridCoord c;
   c.X=HautGauche.X+(p.x()>=0?p.x()/DefaultColWidth:-1);
   c.Y=HautGauche.Y+(p.y()>=0?p.y()/DefaultRowHeight:-1);
-  if ((c.X<0)||(c.X>=NbColonnes)||(c.Y<0)||(c.Y>=NbLignes)) c.X=c.Y=-1;
+  if ((c.X<0)||(c.X>=NbColonnes)||(c.Y<0)||(c.Y>=NbLignes)) { c.X=c.Y=-1;
+}
   return c;
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::MetAJourDefilement()
  { // Défilement par cases entières ; barres seulement si la grille déborde
   QSize Max=maximumViewportSize();
-  int w=NbColonnes*DefaultColWidth, h=NbLignes*DefaultRowHeight;
-  bool BarreH=w>Max.width(), BarreV=h>Max.height();
-  int lh=horizontalScrollBar()->sizeHint().height(), lv=verticalScrollBar()->sizeHint().width();
-  if (style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, this)) lh=lv=0;
-  if (BarreH&&!BarreV) BarreV=h>Max.height()-lh;
-  if (BarreV&&!BarreH) BarreH=w>Max.width()-lv;
-  int Largeur=Max.width()-(BarreV?lv:0), Hauteur=Max.height()-(BarreH?lh:0);
+  int w=NbColonnes*DefaultColWidth;
+  int h=NbLignes*DefaultRowHeight;
+  bool BarreH=w>Max.width();
+  bool BarreV=h>Max.height();
+  int lh=horizontalScrollBar()->sizeHint().height();
+  int lv=verticalScrollBar()->sizeHint().width();
+  if (style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, this) != 0) { lh=lv=0;
+}
+  if (BarreH&&!BarreV) { BarreV=h>Max.height()-lh;
+}
+  if (BarreV&&!BarreH) { BarreH=w>Max.width()-lv;
+}
+  int Largeur=Max.width()-(BarreV?lv:0);
+  int Hauteur=Max.height()-(BarreH?lh:0);
   int MaxGauche=BarreH?qMax(0, NbColonnes-qMax(1, Largeur/DefaultColWidth)):0;
   int MaxHaut=BarreV?qMax(0, NbLignes-qMax(1, Hauteur/DefaultRowHeight)):0;
   horizontalScrollBar()->setRange(0, MaxGauche);
@@ -143,15 +173,17 @@ void GrilleSimulation::MetAJourDefilement()
   verticalScrollBar()->setRange(0, MaxHaut);
   verticalScrollBar()->setPageStep(qMax(1, Hauteur/DefaultRowHeight));
   verticalScrollBar()->setSingleStep(1);
-  if ((HautGauche.X>MaxGauche)||(HautGauche.Y>MaxHaut))
+  if ((HautGauche.X>MaxGauche)||(HautGauche.Y>MaxHaut)) {
    DefinitHautGauche(qMin(HautGauche.X, MaxGauche), qMin(HautGauche.Y, MaxHaut));
+}
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::DefinitHautGauche(int Gauche, int Haut)
  {
   Gauche=qBound(0, Gauche, horizontalScrollBar()->maximum());
   Haut=qBound(0, Haut, verticalScrollBar()->maximum());
-  if ((Gauche==HautGauche.X)&&(Haut==HautGauche.Y)) return;
+  if ((Gauche==HautGauche.X)&&(Haut==HautGauche.Y)) { return;
+}
   HautGauche.X=Gauche;
   HautGauche.Y=Haut;
   horizontalScrollBar()->setValue(Gauche);
@@ -159,9 +191,10 @@ void GrilleSimulation::DefinitHautGauche(int Gauche, int Haut)
   viewport()->update();
  }
 //---------------------------------------------------------------------------
-void GrilleSimulation::scrollContentsBy(int, int)
+void GrilleSimulation::scrollContentsBy(int /*dx*/, int /*dy*/)
  {
-  int g=horizontalScrollBar()->value(), h=verticalScrollBar()->value();
+  int g=horizontalScrollBar()->value();
+  int h=verticalScrollBar()->value();
   if ((g!=HautGauche.X)||(h!=HautGauche.Y))
    {
     HautGauche.X=g;
@@ -178,11 +211,14 @@ void GrilleSimulation::resizeEvent(QResizeEvent *e)
 //---------------------------------------------------------------------------
 void GrilleSimulation::ClampInView(TGridCoord c)
  { // Fait défiler pour que la case soit entièrement visible
-  int g=HautGauche.X, h=HautGauche.Y;
-  if (c.X<g) g=c.X;
-  else if (c.X>=g+ColonnesVisibles()) g=c.X-ColonnesVisibles()+1;
-  if (c.Y<h) h=c.Y;
-  else if (c.Y>=h+LignesVisibles()) h=c.Y-LignesVisibles()+1;
+  int g=HautGauche.X;
+  int h=HautGauche.Y;
+  if (c.X<g) { g=c.X;
+  } else if (c.X>=g+ColonnesVisibles()) { g=c.X-ColonnesVisibles()+1;
+}
+  if (c.Y<h) { h=c.Y;
+  } else if (c.Y>=h+LignesVisibles()) { h=c.Y-LignesVisibles()+1;
+}
   DefinitHautGauche(g, h);
  }
 //---------------------------------------------------------------------------
@@ -210,7 +246,8 @@ void GrilleSimulation::MoveCurrent(int ACol, int ARow, bool MoveAnchor)
   TGridCoord AncienneCourante=Courante;
   Courante.X=ACol;
   Courante.Y=ARow;
-  if (MoveAnchor||!Options.Contains(goRangeSelect)) Ancre=Courante;
+  if (MoveAnchor||!Options.Contains(goRangeSelect)) { Ancre=Courante;
+}
   MetAJourSelection();
   ClampInView(Courante);
   InvalidateCell(AncienneCourante.X, AncienneCourante.Y);
@@ -224,7 +261,8 @@ void GrilleSimulation::MoveAnchor(TGridCoord NouvelleAncre)
     MoveCurrent(NouvelleAncre.X, NouvelleAncre.Y, true);
     return;
    }
-  if ((NouvelleAncre.X==Ancre.X)&&(NouvelleAncre.Y==Ancre.Y)) return;
+  if ((NouvelleAncre.X==Ancre.X)&&(NouvelleAncre.Y==Ancre.Y)) { return;
+}
   TGridRect Ancienne=Selection;
   Ancre=NouvelleAncre;
   MetAJourSelection();
@@ -235,18 +273,21 @@ void GrilleSimulation::MoveAnchor(TGridCoord NouvelleAncre)
 void GrilleSimulation::FocusCell(int ACol, int ARow, bool MoveAnchor)
  { // TCustomGrid::FocusCell : déplacement puis Click
   MoveCurrent(ACol, ARow, MoveAnchor);
-  if (OnClick) OnClick(this);
+  if (OnClick) { OnClick(this);
+}
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::InvalidateCell(int ACol, int ARow)
  {
-  if ((ACol<HautGauche.X)||(ARow<HautGauche.Y)) return;
+  if ((ACol<HautGauche.X)||(ARow<HautGauche.Y)) { return;
+}
   viewport()->update(CellRect(ACol, ARow).Qt());
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::Repaint()
  { // Pendant un autre dessin, Qt n'autorise pas de dessin imbriqué : différé
-  if (TCanvas::NbDessinsEnCours) viewport()->update(); else viewport()->repaint();
+  if (TCanvas::NbDessinsEnCours != 0) { viewport()->update(); } else { viewport()->repaint();
+}
  }
 //---------------------------------------------------------------------------
 // Dessin
@@ -257,30 +298,40 @@ void GrilleSimulation::paintEvent(QPaintEvent *e)
   const QRegion &Zone=e->region();
   Canvas->Commence(&p);
   bool Focus=hasFocus();
-  int Largeur=viewport()->width(), Hauteur=viewport()->height();
-  int y=0, r=HautGauche.Y;
+  int Largeur=viewport()->width();
+  int Hauteur=viewport()->height();
+  int y=0;
+  int r=HautGauche.Y;
   for(; (y<Hauteur)&&(r<NbLignes); r++, y+=DefaultRowHeight)
    {
-    int x=0, c=HautGauche.X;
+    int x=0;
+    int c=HautGauche.X;
     for(; (x<Largeur)&&(c<NbColonnes); c++, x+=DefaultColWidth)
      {
       TRect Where(x, y, x+DefaultColWidth, y+DefaultRowHeight);
-      if (!Zone.intersects(Where.Qt())) continue; // RectVisible
+      if (!Zone.intersects(Where.Qt())) { continue; // RectVisible
+}
       TGridDrawState Etat;
       bool Selectionnee=(c>=Selection.Left)&&(c<=Selection.Right)&&(r>=Selection.Top)&&(r<=Selection.Bottom);
       bool Active=Focus&&(c==Courante.X)&&(r==Courante.Y);
-      if (Selectionnee) Etat<<gdSelected;
-      if (Active) Etat<<gdFocused;
+      if (Selectionnee) { Etat<<gdSelected;
+}
+      if (Active) { Etat<<gdFocused;
+}
       Canvas->Brush->Style=bsSolid;
       Canvas->Brush->Color=(Selectionnee&&!Active)?clHighlight:Color;
       Canvas->Font=Font.Ref();
       Canvas->FillRect(Where);
-      if (OnDrawCell) OnDrawCell(this, c, r, Where, Etat);
-      if (Active) Canvas->DrawFocusRect(Where);
+      if (OnDrawCell) { OnDrawCell(this, c, r, Where, Etat);
+}
+      if (Active) { Canvas->DrawFocusRect(Where);
+}
      }
-    if (x<Largeur) p.fillRect(QRect(x, y, Largeur-x, DefaultRowHeight), CouleurQt(Color));
+    if (x<Largeur) { p.fillRect(QRect(x, y, Largeur-x, DefaultRowHeight), CouleurQt(Color));
+}
    }
-  if (y<Hauteur) p.fillRect(QRect(0, y, Largeur, Hauteur-y), CouleurQt(Color));
+  if (y<Hauteur) { p.fillRect(QRect(0, y, Largeur, Hauteur-y), CouleurQt(Color));
+}
   Canvas->Termine();
  }
 //---------------------------------------------------------------------------
@@ -301,16 +352,19 @@ void GrilleSimulation::focusOutEvent(QFocusEvent *e)
 void GrilleSimulation::mousePressEvent(QMouseEvent *e)
  { // TCustomGrid::MouseDown
   setFocus(Qt::MouseFocusReason);
-  if (e->button()!=Qt::LeftButton) return; // clic droit : pas de changement de case
+  if (e->button()!=Qt::LeftButton) { return; // clic droit : pas de changement de case
+}
   TGridCoord c=CaseEn(e->position().toPoint());
-  if (c.X<0) return;
+  if (c.X<0) { return;
+}
   SelectionEnCours=true;
   DernierePosition=e->position().toPoint();
   DefilementAuto.start();
-  if (e->modifiers()&Qt::ShiftModifier)
+  if (e->modifiers().testFlag(Qt::ShiftModifier)) {
    MoveAnchor(c);
-  else
+  } else {
    MoveCurrent(c.X, c.Y, true);
+}
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::mouseMoveEvent(QMouseEvent *e)
@@ -319,28 +373,33 @@ void GrilleSimulation::mouseMoveEvent(QMouseEvent *e)
    // suit la dernière case entièrement visible, ni à gauche ou au-dessus des cases : au-delà,
    // la minuterie fait avancer l'ancre (l'ancre allait sous la souris, à plusieurs cases de la
    // vue, et un mouvement à gauche ou au-dessus faisait défiler d'une case)
-  if (!SelectionEnCours) return;
+  if (!SelectionEnCours) { return;
+}
   DernierePosition=e->position().toPoint();
   TGridCoord c=CaseEn(DernierePosition);
   if ((DernierePosition.x()>=0)&&(DernierePosition.y()>=0)&&(c.X>=0)&&
-      (c.X<=DerniereVisible(true)+1)&&(c.Y<=DerniereVisible(false)+1)) // v6.0.12
+      (c.X<=DerniereVisible(true)+1)&&(c.Y<=DerniereVisible(false)+1)) { // v6.0.12
    MoveAnchor(c);
+}
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::mouseReleaseEvent(QMouseEvent *e)
  { // TCustomGrid::MouseUp : fin de sélection puis Click
-  if ((e->button()!=Qt::LeftButton)||!SelectionEnCours) return;
+  if ((e->button()!=Qt::LeftButton)||!SelectionEnCours) { return;
+}
   mouseMoveEvent(e);
   SelectionEnCours=false;
   DefilementAuto.stop();
-  if (OnClick) OnClick(this);
+  if (OnClick) { OnClick(this);
+}
  }
 //---------------------------------------------------------------------------
 void GrilleSimulation::mouseDoubleClickEvent(QMouseEvent *e)
  { // ssDouble : DblClick, sans déplacement
   if (e->button()==Qt::LeftButton)
    {
-    if (OnDblClick) OnDblClick(this);
+    if (OnDblClick) { OnDblClick(this);
+}
    }
  }
 //---------------------------------------------------------------------------
@@ -350,12 +409,14 @@ void GrilleSimulation::wheelEvent(QWheelEvent *e)
   while(CumulMolette<=-120)
    {
     CumulMolette+=120;
-    if (Courante.Y<NbLignes-1) FocusCell(Courante.X, Courante.Y+1, true);
+    if (Courante.Y<NbLignes-1) { FocusCell(Courante.X, Courante.Y+1, true);
+}
    }
   while(CumulMolette>=120)
    {
     CumulMolette-=120;
-    if (Courante.Y>0) FocusCell(Courante.X, Courante.Y-1, true);
+    if (Courante.Y>0) { FocusCell(Courante.X, Courante.Y-1, true);
+}
    }
   e->accept();
  }
@@ -381,14 +442,15 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
 //---------------------------------------------------------------------------
 void GrilleSimulation::keyPressEvent(QKeyEvent *e)
  { // TCustomGrid::KeyDown
-  bool Ctrl=e->modifiers()&Qt::ControlModifier, Maj=e->modifiers()&Qt::ShiftModifier;
+  bool Ctrl=e->modifiers().testFlag(Qt::ControlModifier), Maj=e->modifiers().testFlag(Qt::ShiftModifier);
 #if defined(Q_OS_MACOS)
-  Ctrl=Ctrl||(e->modifiers()&Qt::MetaModifier);
+  Ctrl=Ctrl||((e->modifiers()&Qt::MetaModifier) != 0u);
 #endif
   TGridCoord n=Courante;
-  int g=HautGauche.X, h=HautGauche.Y;
+  int g=HautGauche.X;
+  int h=HautGauche.Y;
   bool Gere=true;
-  if (Ctrl)
+  if (Ctrl) {
    switch(e->key())
     {
      case Qt::Key_Up: h--; break;
@@ -401,7 +463,7 @@ void GrilleSimulation::keyPressEvent(QKeyEvent *e)
      case Qt::Key_End: n.X=NbColonnes-1; n.Y=NbLignes-1; break;
      default: Gere=false;
     }
-  else
+  } else {
    switch(e->key())
     {
      case Qt::Key_Up: n.Y--; break;
@@ -414,6 +476,7 @@ void GrilleSimulation::keyPressEvent(QKeyEvent *e)
      case Qt::Key_End: n.X=NbColonnes-1; break;
      default: Gere=false;
     }
+}
   if (!Gere)
    {
     QAbstractScrollArea::keyPressEvent(e);
@@ -421,8 +484,10 @@ void GrilleSimulation::keyPressEvent(QKeyEvent *e)
    }
   n.X=qBound(0, n.X, NbColonnes-1);
   n.Y=qBound(0, n.Y, NbLignes-1);
-  if ((g!=HautGauche.X)||(h!=HautGauche.Y)) DefinitHautGauche(g, h);
-  if ((n.X!=Courante.X)||(n.Y!=Courante.Y)) FocusCell(n.X, n.Y, !Maj);
+  if ((g!=HautGauche.X)||(h!=HautGauche.Y)) { DefinitHautGauche(g, h);
+}
+  if ((n.X!=Courante.X)||(n.Y!=Courante.Y)) { FocusCell(n.X, n.Y, !Maj);
+}
   e->accept();
  }
 //---------------------------------------------------------------------------

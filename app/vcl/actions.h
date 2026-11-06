@@ -43,7 +43,7 @@ class TPopupMenu;
 //---------------------------------------------------------------------------
 // TShortCut : code de touche virtuelle Windows + scShift/scCtrl/scAlt
 //---------------------------------------------------------------------------
-typedef int TShortCut;
+using TShortCut = int;
 const TShortCut scShift=0x2000, scCtrl=0x4000, scAlt=0x8000;
 TShortCut RaccourciVcl(const QKeyEvent *Evenement); // 0 si la touche n'a pas d'équivalent
 QKeySequence SequenceQt(TShortCut Raccourci);
@@ -53,7 +53,7 @@ QKeySequence SequenceQt(TShortCut Raccourci);
 class ClientAction
  {
   public:
-  virtual ~ClientAction() {}
+  virtual ~ClientAction() = default;
   // Recopie complète (affectation de Action à l'exécution : CheckDefaults=false)
   virtual void ActionChange(TAction *Action) = 0;
   // Propagation d'un changement d'état (seulement si le client suivait l'action)
@@ -95,7 +95,7 @@ class TActionList : public QObject
   Propriete<int> ActionCount;
   TActionList(QObject *Parent) : QObject(Parent)
    {
-    ActionCount.Definit([this]() { return (int)Actions.size(); }, [](const int &) {});
+    ActionCount.Definit([this] { return static_cast<int>(Actions.size()); }, [](const int &) {});
    }
   bool IsShortCut(TShortCut Raccourci, bool Executer);
  };
@@ -167,7 +167,7 @@ class TPopupMenu : public TMenu
 class AvecMenuContextuel
  {
   public:
-  virtual ~AvecMenuContextuel() {}
+  virtual ~AvecMenuContextuel() = default;
   TPopupMenu *PopupMenu=nullptr;
  };
 //---------------------------------------------------------------------------

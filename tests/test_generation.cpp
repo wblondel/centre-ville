@@ -28,9 +28,8 @@ namespace
 //---------------------------------------------------------------------------
 TEST_CASE("Génération aléatoire de réseau à graine fixe", "[golden][generation]")
  {
-  for(int k=0; k<NB_CONFIGS_GENERATION; k++)
+  for(const auto & Config : ConfigsGeneration)
    {
-    const config_generation &Config=ConfigsGeneration[k];
     DYNAMIC_SECTION(Config.Nom)
      {
       std::string asTexte=ProduitGoldenGeneration(Config, FichierSortie(std::string("generation_")+Config.Nom+".cvw"));

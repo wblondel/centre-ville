@@ -22,7 +22,7 @@ class QWidget;
 //---------------------------------------------------------------------------
 // TColor : 0x00BBGGRR, ou couleur système (bit 31 levé, comme la VCL)
 //---------------------------------------------------------------------------
-typedef int TColor;
+using TColor = int;
 const TColor clBlack=0x000000, clMaroon=0x000080, clGreen=0x008000, clOlive=0x008080,
              clNavy=0x800000, clPurple=0x800080, clTeal=0x808000, clGray=0x808080,
              clSilver=0xC0C0C0, clRed=0x0000FF, clLime=0x00FF00, clYellow=0x00FFFF,
@@ -30,13 +30,13 @@ const TColor clBlack=0x000000, clMaroon=0x000080, clGreen=0x008000, clOlive=0x00
              clMoneyGreen=0xC0DCC0, clSkyBlue=0xF0CAA6, clCream=0xF0FBFF, clMedGray=0xA4A0A0,
              clNone=0x1FFFFFFF, clDefault=0x20000000;
 // Couleurs système (COLOR_xxx | 0xFF000000)
-const TColor clScrollBar=(TColor)0xFF000000, clBackground=(TColor)0xFF000001,
-             clActiveCaption=(TColor)0xFF000002, clWindow=(TColor)0xFF000005,
-             clWindowText=(TColor)0xFF000008, clHighlight=(TColor)0xFF00000D,
-             clHighlightText=(TColor)0xFF00000E, clBtnFace=(TColor)0xFF00000F,
-             clBtnShadow=(TColor)0xFF000010, clGrayText=(TColor)0xFF000011,
-             clBtnText=(TColor)0xFF000012, clBtnHighlight=(TColor)0xFF000014,
-             clInfoBk=(TColor)0xFF000018;
+const TColor clScrollBar=static_cast<TColor>(0xFF000000), clBackground=static_cast<TColor>(0xFF000001),
+             clActiveCaption=static_cast<TColor>(0xFF000002), clWindow=static_cast<TColor>(0xFF000005),
+             clWindowText=static_cast<TColor>(0xFF000008), clHighlight=static_cast<TColor>(0xFF00000D),
+             clHighlightText=static_cast<TColor>(0xFF00000E), clBtnFace=static_cast<TColor>(0xFF00000F),
+             clBtnShadow=static_cast<TColor>(0xFF000010), clGrayText=static_cast<TColor>(0xFF000011),
+             clBtnText=static_cast<TColor>(0xFF000012), clBtnHighlight=static_cast<TColor>(0xFF000014),
+             clInfoBk=static_cast<TColor>(0xFF000018);
 QColor CouleurQt(TColor Couleur);
 TColor CouleurDepuisTexte(const AnsiString &asCouleur); // "clRed", "0x00FF0080"...
 // RGB de windows.h : 0x00BBGGRR (statistiques de fluidité et de trafic)
@@ -47,18 +47,18 @@ inline int RGB(int r, int g, int b) { return (r&0xFF)|((g&0xFF)<<8)|((b&0xFF)<<1
 struct TRect
  {
   int Left=0, Top=0, Right=0, Bottom=0;
-  TRect() {}
+  TRect() = default;
   TRect(int l, int t, int r, int b) : Left(l), Top(t), Right(r), Bottom(b) {}
   int Width() const { return Right-Left; }
   int Height() const { return Bottom-Top; }
-  QRect Qt() const { return QRect(Left, Top, Right-Left, Bottom-Top); }
+  QRect Qt() const { return {Left, Top, Right-Left, Bottom-Top}; }
  };
 //---------------------------------------------------------------------------
 enum TBrushStyle { bsSolid, bsClear };
 enum TPenStyle { psSolid, psDash, psDot, psDashDot, psDashDotDot, psClear };
 enum TPenMode { pmBlack, pmWhite, pmNop, pmNot, pmCopy }; // seul pmCopy (le défaut) est dessiné
 enum TFontStyle { fsBold, fsItalic, fsUnderline, fsStrikeOut };
-typedef TEnsemble<TFontStyle> TFontStyles;
+using TFontStyles = TEnsemble<TFontStyle>;
 //---------------------------------------------------------------------------
 struct TBrush
  {
@@ -93,7 +93,8 @@ struct TFont
 template <class T> class SousObjet
  {
   T Objet;
-  void Acces() { if (SurAcces) SurAcces(); }
+  void Acces() { if (SurAcces) { SurAcces(); 
+}}
   public:
   // Appelé à chaque accès qui peut modifier l'objet (->, affectation) : le
   // contrôle propriétaire s'y fait repeindre, comme sur TBrush::OnChange
@@ -123,8 +124,10 @@ class TCanvas
   // Dessins en cours (paintEvent des contrôles portés) : Qt interdit d'en
   // imbriquer un autre (Repaint pendant OnDrawCell devient alors update)
   static int NbDessinsEnCours;
-  void Commence(QPainter *p) { if (!Peintre&&p) NbDessinsEnCours++; Peintre=p; }
-  void Termine() { if (Peintre) NbDessinsEnCours--; Peintre=nullptr; }
+  void Commence(QPainter *p) { if (!Peintre&&p) { NbDessinsEnCours++; 
+}Peintre=p; }
+  void Termine() { if (Peintre) { NbDessinsEnCours--; 
+}Peintre=nullptr; }
   QPainter *Painter() const { return Peintre; }
   bool Actif() const { return Peintre!=nullptr; }
   void FillRect(const TRect &r);
@@ -148,10 +151,11 @@ class TBitmap
   public:
   QPixmap Image;
   std::function<void()> OnChange;
-  TBitmap() {}
+  TBitmap() = default;
   TBitmap(const TBitmap &b) : Image(b.Image) {}
   TBitmap &operator=(const TBitmap &b) { Image=b.Image; Changed(); return *this; }
-  void Changed() { if (OnChange) OnChange(); }
+  void Changed() { if (OnChange) { OnChange(); 
+}}
  };
 //---------------------------------------------------------------------------
 #endif

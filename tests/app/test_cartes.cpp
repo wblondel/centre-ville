@@ -50,7 +50,8 @@ class TestCartes : public QObject
     e.insert("XDG_DATA_HOME", stDonnees);
     p.setProcessEnvironment(e);
     p.start("sh", {"-e", "-c", ". \"$0\"", CV_SCRIPT_CARTES});
-    if (!p.waitForFinished(10000)||(p.exitStatus()!=QProcess::NormalExit)) return -1;
+    if (!p.waitForFinished(10000)||(p.exitStatus()!=QProcess::NormalExit)) { return -1;
+}
     return p.exitCode();
    }
   private slots:
@@ -74,8 +75,9 @@ void TestCartes::initTestCase()
   QVERIFY(QDir().mkpath(stCartes));
   Cartes=QDir(CV_DOSSIER_CARTES).entryList({"*.cvw"}, QDir::Files);
   QCOMPARE(Cartes.size(), 6);
-  for(const QString &c : Cartes)
+  for(const QString &c : Cartes) {
    QVERIFY(QFile::copy(QString(CV_DOSSIER_CARTES)+"/"+c, stCartes+"/"+c));
+}
  }
 //---------------------------------------------------------------------------
 void TestCartes::premierLancement()
@@ -87,9 +89,11 @@ void TestCartes::premierLancement()
   f.write("carte modifiée");
   f.close();
   QCOMPARE(Lance(), 0);
-  for(const QString &c : Cartes)
-   if (c!=Cartes.first())
+  for(const QString &c : Cartes) {
+   if (c!=Cartes.first()) {
     QVERIFY2(Contenu(stDossier+"/"+c)==Contenu(stCartes+"/"+c), qPrintable(c));
+}
+}
   QCOMPARE(Contenu(Modifiee), QByteArray("carte modifiée"));
   QCOMPARE(QDir(stDossier).entryList({"*.cvw"}, QDir::Files), Cartes);
  }
@@ -115,7 +119,8 @@ void TestCartes::copieAuPremierLancement()
  { // Source en lecture seule, comme les ressources Qt de l'exécutable
   QTemporaryDir Dossier;
   QVERIFY(Dossier.isValid());
-  QString stSource=Dossier.path()+"/cartes", stCible=Dossier.path()+"/Patquoi.fr/Centre-Ville";
+  QString stSource=Dossier.path()+"/cartes";
+  QString stCible=Dossier.path()+"/Patquoi.fr/Centre-Ville";
   QVERIFY(QDir().mkpath(stSource));
   for(const QString &c : Cartes)
    {
@@ -134,17 +139,19 @@ void TestCartes::copieAuPremierLancement()
   CopieCartesExemple(stSource, stCible);
   QCOMPARE(Contenu(f.fileName()), QByteArray("carte modifiée"));
   QCOMPARE(QDir(stCible).entryList({"*.cvw"}, QDir::Files), Cartes);
-  for(const QString &c : Cartes)
+  for(const QString &c : Cartes) {
    if (c!=Cartes.first())
     {
      QVERIFY2(Contenu(stCible+"/"+c)==Contenu(stSource+"/"+c), qPrintable(c));
      QVERIFY2(QFile::permissions(stCible+"/"+c)&QFile::WriteOwner, qPrintable(c));
     }
+}
   // Lancement suivant : une carte supprimée reste supprimée
   QVERIFY(QFile::remove(stCible+"/"+Cartes.last()));
   CopieCartesExemple(stSource, stCible);
   QVERIFY(!QFile::exists(stCible+"/"+Cartes.last()));
-  for(const QString &c : Cartes) QFile::setPermissions(stSource+"/"+c, QFile::ReadOwner|QFile::WriteOwner);
+  for(const QString &c : Cartes) { QFile::setPermissions(stSource+"/"+c, QFile::ReadOwner|QFile::WriteOwner);
+}
  }
 //---------------------------------------------------------------------------
 void TestCartes::paquetMacOS()
@@ -155,7 +162,7 @@ void TestCartes::paquetMacOS()
   QTemporaryDir Accueil;
   QVERIFY(Accueil.isValid());
   QString stCible=Accueil.path()+"/Library/Application Support/Patquoi.fr/Centre-Ville";
-  auto Lance=[&]()
+  auto Lance=[&]
    { // Qu'il tourne : la copie précède la création des fiches
     QProcess p;
     QProcessEnvironment e=QProcessEnvironment::systemEnvironment();
@@ -171,13 +178,16 @@ void TestCartes::paquetMacOS()
     p.waitForFinished(10000);
    };
   Lance();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QCOMPARE(QDir(stCible).entryList({"*.cvw"}, QDir::Files), Cartes);
-  for(const QString &c : Cartes)
+  for(const QString &c : Cartes) {
    QVERIFY2(Contenu(stCible+"/"+c)==Contenu(QString(CV_DOSSIER_CARTES)+"/"+c), qPrintable(c));
+}
   QVERIFY(QFile::remove(stCible+"/"+Cartes.last()));
   Lance();
-  if (QTest::currentTestFailed()) return;
+  if (QTest::currentTestFailed()) { return;
+}
   QVERIFY(!QFile::exists(stCible+"/"+Cartes.last()));
 #endif
  }

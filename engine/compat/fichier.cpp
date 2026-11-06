@@ -2,6 +2,7 @@
 // compat/fichier.cpp - Portage de Centre-Ville hors de C++Builder
 //---------------------------------------------------------------------------
 #include "fichier.h"
+#include <algorithm>
 #include <atomic>
 #include <cerrno>
 #include <cstring>
@@ -42,24 +43,27 @@ namespace
   //-------------------------------------------------------------------------
   int Enregistre(int fd)
    {
-    if (fd<0) return -1;
+    if (fd<0) { return -1;
+}
     std::lock_guard<std::mutex> g(Verrou);
-    for(std::size_t i=0; i<Fichiers.size(); i++)
+    for(std::size_t i=0; i<Fichiers.size(); i++) {
      if (Fichiers[i].fd<0)
       {
        Fichiers[i]=fichier();
        Fichiers[i].fd=fd;
-       return (int)i+1;
+       return static_cast<int>(i)+1;
       }
-    Fichiers.push_back(fichier());
+}
+    Fichiers.emplace_back();
     Fichiers.back().fd=fd;
-    return (int)Fichiers.size();
+    return static_cast<int>(Fichiers.size());
    }
   //-------------------------------------------------------------------------
   fichier *Trouve(int Handle)
    { // Appelé sous le verrou
-    if ((Handle<1)||((std::size_t)Handle>Fichiers.size())) return nullptr;
-    fichier *f=&Fichiers[(std::size_t)Handle-1];
+    if ((Handle<1)||(static_cast<std::size_t>(Handle)>Fichiers.size())) { return nullptr;
+}
+    fichier *f=&Fichiers[static_cast<std::size_t>(Handle)-1];
     return (f->fd<0)?nullptr:f;
    }
   //-------------------------------------------------------------------------
@@ -68,7 +72,7 @@ namespace
 #ifdef _WIN32
     return _read(fd, Tampon, (unsigned)n);
 #else
-    return (long long)read(fd, Tampon, n);
+    return static_cast<long long>(read(fd, Tampon, n));
 #endif
    }
   //-------------------------------------------------------------------------
@@ -82,8 +86,9 @@ namespace
 #else
       ssize_t k=write(fd, Tampon+Total, n-Total);
 #endif
-      if (k<=0) return false;
-      Total+=(std::size_t)k;
+      if (k<=0) { return false;
+}
+      Total+=static_cast<std::size_t>(k);
      }
     return true;
    }
@@ -93,7 +98,7 @@ namespace
 #ifdef _WIN32
     return _lseeki64(fd, Decalage, Origine);
 #else
-    return (long long)lseek(fd, (off_t)Decalage, Origine);
+    return static_cast<long long>(lseek(fd, static_cast<off_t>(Decalage), Origine));
 #endif
    }
   //-------------------------------------------------------------------------
@@ -104,12 +109,14 @@ namespace
     if (!f->Ecriture.empty())
      {
       Ok=EcritSysteme(f->fd, f->Ecriture.data(), f->Ecriture.size());
-      if (!Ok) f->Erreur=true;
+      if (!Ok) { f->Erreur=true;
+}
       f->Ecriture.clear();
      }
     std::size_t Restant=f->Lecture.size()-f->PosLecture;
-    if (Restant)
-     DeplaceSysteme(f->fd, -(long long)Restant, SEEK_CUR);
+    if (Restant != 0u) {
+     DeplaceSysteme(f->fd, -static_cast<long long>(Restant), SEEK_CUR);
+}
     f->Lecture.clear();
     f->PosLecture=0;
     return Ok;
@@ -118,7 +125,7 @@ namespace
   std::filesystem::path Chemin(const AnsiString &asNomFichier)
    { // Les noms de fichiers sont en UTF-8
     const std::string &s=asNomFichier.str();
-    return std::filesystem::path(std::u8string(s.begin(), s.end()));
+    return {std::u8string(s.begin(), s.end())};
    }
   //-------------------------------------------------------------------------
   int OuvreChemin(const std::filesystem::path &p, int Drapeaux)
@@ -162,7 +169,8 @@ namespace
      {
       Temporaire=Dossier/(".centre-ville-"+std::to_string(Processus)+"-"+std::to_string(Numero++)+".tmp");
       fd=OuvreChemin(Temporaire, Drapeaux);
-      if ((fd<0)&&(errno!=EEXIST)) break;
+      if ((fd<0)&&(errno!=EEXIST)) { break;
+}
      }
     return fd;
    }
@@ -199,9 +207,11 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
  { // Comme ReadFile : jusqu'à NbOctets, moins en fin de fichier
   std::lock_guard<std::mutex> g(Verrou);
   fichier *f=Trouve(Handle);
-  if (!f) return -1;
-  if (!f->Ecriture.empty()&&!Synchronise(f)) return -1;
-  char *Destination=(char*)Tampon;
+  if (!f) { return -1;
+}
+  if (!f->Ecriture.empty()&&!Synchronise(f)) { return -1;
+}
+  char *Destination=static_cast<char*>(Tampon);
   unsigned Total=0;
   while(Total<NbOctets)
    {
@@ -210,53 +220,62 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
       if (NbOctets-Total>=TAILLE_TAMPON)
        { // Gros bloc : lecture directe
         long long n=LitSysteme(f->fd, Destination+Total, NbOctets-Total);
-        if (n<0) return -1;
-        if (n==0) break;
-        Total+=(unsigned)n;
+        if (n<0) { return -1;
+}
+        if (n==0) { break;
+}
+        Total+=static_cast<unsigned>(n);
         continue;
        }
       f->Lecture.resize(TAILLE_TAMPON);
       long long n=LitSysteme(f->fd, f->Lecture.data(), TAILLE_TAMPON);
       if (n<0) { f->Lecture.clear(); f->PosLecture=0; return -1; }
-      f->Lecture.resize((std::size_t)n);
+      f->Lecture.resize(static_cast<std::size_t>(n));
       f->PosLecture=0;
-      if (n==0) break;
+      if (n==0) { break;
+}
      }
     std::size_t k=f->Lecture.size()-f->PosLecture;
-    if (k>NbOctets-Total) k=NbOctets-Total;
+    k = std::min<std::size_t>(k, NbOctets-Total);
     std::memcpy(Destination+Total, f->Lecture.data()+f->PosLecture, k);
     f->PosLecture+=k;
-    Total+=(unsigned)k;
+    Total+=static_cast<unsigned>(k);
    }
-  return (int)Total;
+  return static_cast<int>(Total);
  }
 //---------------------------------------------------------------------------
 int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
  {
   std::lock_guard<std::mutex> g(Verrou);
   fichier *f=Trouve(Handle);
-  if ((!f)||f->Erreur) return -1;
-  if ((f->PosLecture!=f->Lecture.size())||!f->Lecture.empty()) Synchronise(f);
-  f->Ecriture.insert(f->Ecriture.end(), (const char*)Tampon, (const char*)Tampon+NbOctets);
-  if ((f->Ecriture.size()>=TAILLE_TAMPON)&&!Synchronise(f)) return -1;
-  return (int)NbOctets;
+  if ((!f)||f->Erreur) { return -1;
+}
+  if ((f->PosLecture!=f->Lecture.size())||!f->Lecture.empty()) { Synchronise(f);
+}
+  f->Ecriture.insert(f->Ecriture.end(), static_cast<const char*>(Tampon), static_cast<const char*>(Tampon)+NbOctets);
+  if ((f->Ecriture.size()>=TAILLE_TAMPON)&&!Synchronise(f)) { return -1;
+}
+  return static_cast<int>(NbOctets);
  }
 //---------------------------------------------------------------------------
 int FileSeek(int Handle, int Decalage, int Origine)
  {
   std::lock_guard<std::mutex> g(Verrou);
   fichier *f=Trouve(Handle);
-  if (!f) return -1;
-  if (!Synchronise(f)) return -1;
+  if (!f) { return -1;
+}
+  if (!Synchronise(f)) { return -1;
+}
   long long p=DeplaceSysteme(f->fd, Decalage, Origine);
-  return (p<0)?-1:(int)p;
+  return (p<0)?-1:static_cast<int>(p);
  }
 //---------------------------------------------------------------------------
 bool FileFlush(int Handle)
  {
   std::lock_guard<std::mutex> g(Verrou);
   fichier *f=Trouve(Handle);
-  if (!f) return false;
+  if (!f) { return false;
+}
   Synchronise(f);
   return !f->Erreur;
  }
@@ -267,7 +286,8 @@ void FileClose(int Handle)
    {
     std::lock_guard<std::mutex> g(Verrou);
     fichier *f=Trouve(Handle);
-    if (!f) return;
+    if (!f) { return;
+}
     Synchronise(f);
     fd=f->fd;
     *f=fichier();
@@ -284,16 +304,18 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
   namespace fs=std::filesystem;
   std::error_code ec;
   fs::path Cible=Chemin(asNomFichier);
-  if (Direct) *Direct=false;
+  if (Direct) { *Direct=false;
+}
   if (fs::is_symlink(Cible, ec))
    { // Le lien reste : c'est sa cible qui est remplacée
     fs::path Resolu=fs::canonical(Cible, ec);
     if (ec)
      { // Lien vers rien : à traiter comme FileCreate
-      if (Direct) *Direct=true;
+      if (Direct) { *Direct=true;
+}
       return FileCreate(asNomFichier);
      }
-    Cible=Resolu;
+    Cible=std::move(Resolu);
    }
   const bool Existe=fs::exists(Cible, ec);
   if (Existe)
@@ -303,11 +325,13 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
 #else
     int fd=OuvreChemin(Cible, O_WRONLY);
 #endif
-    if (fd<0) return -1;
+    if (fd<0) { return -1;
+}
     FermeSysteme(fd);
    }
   fs::path Dossier=Cible.parent_path();
-  if (Dossier.empty()) Dossier=".";
+  if (Dossier.empty()) { Dossier=".";
+}
   fs::path Temporaire;
   int fd=CreeTemporaire(Dossier, Temporaire);
   if (fd<0)
@@ -318,8 +342,10 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
 #else
     const bool Interdit=(Erreur==EACCES)||(Erreur==EPERM)||(Erreur==EROFS);
 #endif
-    if (!(Existe&&Interdit)) return -1; // Dossier plein, notamment : réécrire le fichier le détruirait
-    if (Direct) *Direct=true;
+    if (!(Existe&&Interdit)) { return -1; // Dossier plein, notamment : réécrire le fichier le détruirait
+}
+    if (Direct) { *Direct=true;
+}
     return FileCreate(asNomFichier);
    }
 #ifndef _WIN32
@@ -327,7 +353,7 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
   if (Existe&&(stat(Cible.c_str(), &Etat)==0))
    {
     fchmod(fd, Etat.st_mode&07777);
-    (void)!fchown(fd, Etat.st_uid, Etat.st_gid); // Refusé si le fichier est à un autre : il reste à l'utilisateur
+    (void)(fchown(fd, Etat.st_uid, Etat.st_gid) == 0); // Refusé si le fichier est à un autre : il reste à l'utilisateur
    }
 #endif
   int Handle=Enregistre(fd);
@@ -335,8 +361,8 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
   fichier *f=Trouve(Handle);
   if (f)
    {
-    f->Temporaire=Temporaire;
-    f->Cible=Cible;
+    f->Temporaire=std::move(Temporaire);
+    f->Cible=std::move(Cible);
    }
   return Handle;
  }
@@ -346,11 +372,13 @@ bool FileCommitRemplacement(int Handle)
   namespace fs=std::filesystem;
   int fd=-1;
   bool Ok;
-  fs::path Temporaire, Cible;
+  fs::path Temporaire;
+  fs::path Cible;
    {
     std::lock_guard<std::mutex> g(Verrou);
     fichier *f=Trouve(Handle);
-    if (!f) return false;
+    if (!f) { return false;
+}
     Synchronise(f);
     Ok=!f->Erreur;
     fd=f->fd;
@@ -365,14 +393,16 @@ bool FileCommitRemplacement(int Handle)
   Ok=(fsync(fd)==0)&&Ok;
 #endif
   Ok=FermeSysteme(fd)&&Ok;
-  if (Temporaire.empty()) return Ok; // Écriture directe
+  if (Temporaire.empty()) { return Ok; // Écriture directe
+}
   std::error_code ec;
   if (Ok)
    {
     fs::rename(Temporaire, Cible, ec);
     Ok=!ec;
    }
-  if (!Ok) fs::remove(Temporaire, ec);
+  if (!Ok) { fs::remove(Temporaire, ec);
+}
   return Ok;
  }
 //---------------------------------------------------------------------------
@@ -382,12 +412,14 @@ void FileAbandonRemplacement(int Handle)
    {
     std::lock_guard<std::mutex> g(Verrou);
     fichier *f=Trouve(Handle);
-    if (!f) return;
+    if (!f) { return;
+}
     Temporaire=f->Temporaire;
     f->Ecriture.clear(); // Inutile de tenter d'écrire ce qui attend encore
    }
   FileClose(Handle);
   std::error_code ec;
-  if (!Temporaire.empty()) std::filesystem::remove(Temporaire, ec);
+  if (!Temporaire.empty()) { std::filesystem::remove(Temporaire, ec);
+}
  }
 //---------------------------------------------------------------------------

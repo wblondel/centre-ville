@@ -81,37 +81,38 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
   GroupBoxPieton->Caption=asDebutTitreCadrePieton;
   if (ARendreVisible)
    { // v5.4.1 : manquait tram, taxi et vehlib... v6.0.2 : coordonnées lues dans leur tableau (l'original lisait les bus)
-	if (p->NumBus)
+	if (p->NumBus != 0) {
 	  GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 							   Format( asFrmNumeroCoordonnees,
 									   ARRAYOFCONST(( NumPieton,
 													  cv->Bus[p->NumBus-1].x,
 													  cv->Bus[p->NumBus-1].y)));
-	else
-	  if (p->NumTram)
+	} else
+	  if (p->NumTram != 0) {
 		GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 								 Format( asFrmNumeroCoordonnees,
 										 ARRAYOFCONST(( NumPieton,
 														cv->Tram[p->NumTram-1].x,
 														cv->Tram[p->NumTram-1].y)));
-	  else
-		if (p->NumTaxi)
+	  } else
+		if (p->NumTaxi != 0) {
 		  GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 								   Format( asFrmNumeroCoordonnees,
 										   ARRAYOFCONST(( NumPieton,
 														  cv->Taxi[p->NumTaxi-1].x,
 														  cv->Taxi[p->NumTaxi-1].y)));
-		else
-		  if (p->NumVehlib)
+		} else
+		  if (p->NumVehlib != 0) {
 			GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 									 Format( asFrmNumeroCoordonnees,
 											 ARRAYOFCONST(( NumPieton,
 															cv->Vehlib[p->NumVehlib-1].x,
 															cv->Vehlib[p->NumVehlib-1].y)));
-		  else // à pied
+		  } else { // à pied
 			GroupBoxPieton->Caption= GroupBoxPieton->Caption+
 									 Format( asFrmNumeroCoordonnees,
 									         ARRAYOFCONST((NumPieton, p->x, p->y)));
+}
 	GroupBoxPieton->Caption= GroupBoxPieton->Caption+" ";
    }
   RadioButtonAucunPieton->Enabled=!ARendreVisible;
@@ -119,8 +120,9 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
   RadioButtonPietonNumero->Checked=ARendreVisible;
   RadioButtonPietonNumero->Enabled=ARendreVisible;
   // Libellés
-  for(i=1; i<7; i++)
-   ((TLabel*)FindComponent(asLabel+IntToStr(i)))->Enabled=ARendreVisible;
+  for(i=1; i<7; i++) {
+   (static_cast<TLabel*>(FindComponent(asLabel+IntToStr(i))))->Enabled=ARendreVisible;
+}
   // Données
   LabelDirection->Visible=ARendreVisible;
   LabelPosition->Visible=ARendreVisible;
@@ -130,8 +132,9 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
   LabelArretBusTramFileTaxiVehlib->Visible=ARendreVisible; // v5.3 ajout de Vehlib dans le nom
   // v5.4.1 Partie Epidémie (on active aussi si épidémie activée)
   CheckBoxEpidemie->Checked=ARendreVisible&&frmSimulation->EpidemieActivee;
-  for(i=7; i<14; i++) // v5.4.1 (+9)
-   ((TLabel*)FindComponent(asLabel+IntToStr(i)))->Enabled=CheckBoxEpidemie->Checked;
+  for(i=7; i<14; i++) { // v5.4.1 (+9)
+   (static_cast<TLabel*>(FindComponent(asLabel+IntToStr(i))))->Enabled=CheckBoxEpidemie->Checked;
+}
   LabelInfecte->Visible=CheckBoxEpidemie->Checked;
   LabelInfections->Visible=CheckBoxEpidemie->Checked;
   LabelRangs->Visible=CheckBoxEpidemie->Checked;
@@ -147,88 +150,109 @@ void TfrmInfosPieton::RafraichitInfos()
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
-  p=NULL;
+  p=nullptr;
   NumPieton=0;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if (frmRecherche&&
 	  frmRecherche->Visible&&
-	  frmRecherche->RadioButtonPieton->Checked)
+	  frmRecherche->RadioButtonPieton->Checked) {
    NumPieton=frmRecherche->CSpinEditPieton->Value;
-  if ((NumPieton<0)||(NumPieton>cv->NbPietons)) NumPieton=0; // portage : numéro tapé hors de 1..NbPietons dans Rechercher (lecture hors de Pieton dans l'original) : pas de piéton suivi
-  if (!cv->Pieton) NumPieton=0; // v6.0.2 : réseau rechargé à l'arrêt, sans piétons (accès à un pointeur nul dans l'original, au clic suivant sur la carte)
-  if (!NumPieton) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
+}
+  if ((NumPieton<0)||(NumPieton>cv->NbPietons)) { NumPieton=0; // portage : numéro tapé hors de 1..NbPietons dans Rechercher (lecture hors de Pieton dans l'original) : pas de piéton suivi
+}
+  if (!cv->Pieton) { NumPieton=0; // v6.0.2 : réseau rechargé à l'arrêt, sans piétons (accès à un pointeur nul dans l'original, au clic suivant sur la carte)
+}
+  if (NumPieton == 0) // Si pas de piéton suivi, on cherche parmi ceux de la case courante
    {
-	if (v->NumPieton[0])
+	if (v->NumPieton[0] != 0) {
 	 NumPieton=v->NumPieton[0];
-	else
-	 if (v->NumPieton[1])
+	} else
+	 if (v->NumPieton[1] != 0) {
 	  NumPieton=v->NumPieton[1];
+}
    }
   else
    {
     if ((v->NumPieton[0]!=NumPieton)&& // Si pas trouvé de piéton
 		(v->NumPieton[1]!=NumPieton)&& // sur la case courante ET
-		(!cv->Pieton[NumPieton-1].NumBus||(v->NumBus!=cv->Pieton[NumPieton-1].NumBus))&& // v6.0.3 : un piéton à pied (0) « était » dans le véhicule d'une case qui n'en a pas (0)
-		(!cv->Pieton[NumPieton-1].NumTram||(v->NumTram!=cv->Pieton[NumPieton-1].NumTram))&&
-		(!cv->Pieton[NumPieton-1].NumTaxi||(v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi))&&
-		(!cv->Pieton[NumPieton-1].NumVehlib||(v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib))) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
+		((cv->Pieton[NumPieton-1].NumBus == 0)||(v->NumBus!=cv->Pieton[NumPieton-1].NumBus))&& // v6.0.3 : un piéton à pied (0) « était » dans le véhicule d'une case qui n'en a pas (0)
+		((cv->Pieton[NumPieton-1].NumTram == 0)||(v->NumTram!=cv->Pieton[NumPieton-1].NumTram))&&
+		((cv->Pieton[NumPieton-1].NumTaxi == 0)||(v->NumTaxi!=cv->Pieton[NumPieton-1].NumTaxi))&&
+		((cv->Pieton[NumPieton-1].NumVehlib == 0)||(v->NumVehlib!=cv->Pieton[NumPieton-1].NumVehlib))) // qu'il n'y en a pas dans un bus/tram/taxi/vehlib qui se trouverait sur la case. v3.6. v5.3 (vehlib)
 	 { // On cherche un autre piéton
-	  if (v->NumPieton[0])
+	  if (v->NumPieton[0] != 0) {
 	   NumPieton=v->NumPieton[0];
-	  else
-	   if (v->NumPieton[1])
+	  } else
+	   if (v->NumPieton[1] != 0) {
 		NumPieton=v->NumPieton[1];
+}
 	 }
    }
-  if (NumPieton)
+  if (NumPieton != 0)
    {
 	p=&(cv->Pieton[NumPieton-1]);
     LabelDirection->Caption=asDir[p->Dir];
-	if (p->PsgPtTrv)
+	if (p->PsgPtTrv) {
      Situation=PSGPTTRV;
-    if (p->ArretBusTrv)
+}
+    if (p->ArretBusTrv) {
      Situation=ARRETBUSTRV;
-    if (p->ArretTramTrv)
+}
+    if (p->ArretTramTrv) {
      Situation=ARRETTRAMTRV;
-    if (p->FileTaxiTrv)
+}
+    if (p->FileTaxiTrv) {
      Situation=FILETAXITRV;
-    if (p->PlaceVehlibTrv) // v5.3. v6.0.2 : l'original testait FileTaxiTrv
+}
+    if (p->PlaceVehlibTrv) { // v5.3. v6.0.2 : l'original testait FileTaxiTrv
      Situation=PLACEVEHLIBTRV;
+}
 
-    if (p->AttendBus)
+    if (p->AttendBus) {
      Situation=ATTENDUNBUS;
-    if (p->NumBus)
+}
+    if (p->NumBus != 0) {
      Situation=ATTENDDSLEBUS;
+}
 
-    if (p->AttendTram)
+    if (p->AttendTram) {
      Situation=ATTENDUNTRAM;
-    if (p->NumTram)
+}
+    if (p->NumTram != 0) {
      Situation=ATTENDDSLETRAM;
+}
 
-    if (p->AttendTaxi)
+    if (p->AttendTaxi) {
      Situation=ATTENDUNTAXI;
-    if (p->NumTaxi)
+}
+    if (p->NumTaxi != 0) {
      Situation=ATTENDDSLETAXI;
+}
 
-    if (p->AttendVehlib) // v5.3
+    if (p->AttendVehlib) { // v5.3
      Situation=ATTENDUNVEHLIB;
-    if (p->NumVehlib) // v5.3
+}
+    if (p->NumVehlib != 0) { // v5.3
      Situation=ATTENDDSVEHLIB;
+}
 
-    if (p->VeutDescendre)
+    if (p->VeutDescendre) {
      Situation=VEUTDESCENDRE;
+}
 
-    if (p->Ecrase)
+    if (p->Ecrase) {
      Situation=ECRASE; // v4.3
+}
 
-	if (p->Mort)
+	if (p->Mort) {
 	 Situation=MORT; // v5.4.1
+}
 
 	LabelSituation->Caption=asSituation[Situation];
 	// v1.8.4 : FormatFloat au lieu de Format
 	LabelParcours->Caption=FormatFloat(asFrmDemiCase, p->DemiCasesParcourues/2.0);
 	// v5.3 ajout de Vehlib dans les noms de TLabel communs (LabelBusTramTaxiVehlib et LabelArretBusTramFileTaxiVehlib)
-	if (p->NumBus)
+	if (p->NumBus != 0)
 	 {
 	  LabelBusTramTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 								ARRAYOFCONST(( p->NumBus,
@@ -237,7 +261,7 @@ void TfrmInfosPieton::RafraichitInfos()
       LabelPosition->Caption=asPosition[DANSUNBUS];
      }
     else
-     if (p->NumTram)
+     if (p->NumTram != 0)
       {
 	   LabelBusTramTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
                                  ARRAYOFCONST(( p->NumTram,
@@ -246,7 +270,7 @@ void TfrmInfosPieton::RafraichitInfos()
 	   LabelPosition->Caption=asPosition[DANSUNTRAM];
 	  }
 	 else
-      if (p->NumTaxi) // v3.6
+      if (p->NumTaxi != 0) // v3.6
 	   {
 		LabelBusTramTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 								  ARRAYOFCONST(( p->NumTaxi,
@@ -255,7 +279,7 @@ void TfrmInfosPieton::RafraichitInfos()
 		LabelPosition->Caption=asPosition[DANSUNTAXI];
 	   }
 	  else
-	   if (p->NumVehlib) // v5.3
+	   if (p->NumVehlib != 0) // v5.3
 		{
 		 LabelBusTramTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 								   ARRAYOFCONST(( p->NumVehlib,
@@ -266,27 +290,28 @@ void TfrmInfosPieton::RafraichitInfos()
 	  else
 	   {
 		LabelBusTramTaxiVehlib->Caption="Aucun";
-		LabelPosition->Caption=asPosition[!!p->DemiCase];
+		LabelPosition->Caption=asPosition[!(p->DemiCase == 0)];
 	   }
-	if (p->NumArretBus)
+	if (p->NumArretBus != 0) {
 	 LabelArretBusTramFileTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 									ARRAYOFCONST(( p->NumArretBus,
 												   cv->ArretBus[p->NumArretBus-1].x,
 												   cv->ArretBus[p->NumArretBus-1].y)));
-	else
-	 if (p->NumArretTram)
+	} else
+	 if (p->NumArretTram != 0) {
 	  LabelArretBusTramFileTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 									 ARRAYOFCONST(( p->NumArretTram,
 													cv->ArretTram[p->NumArretTram-1].x,
 													cv->ArretTram[p->NumArretTram-1].y)));
-	 else
-	  if (p->NumFileTaxi)
+	 } else
+	  if (p->NumFileTaxi != 0) {
 	   LabelArretBusTramFileTaxiVehlib->Caption=Format( asFrmNumeroCoordonnees,
 									  ARRAYOFCONST(( p->NumFileTaxi, // v6.0.2 : PlaceTeteFile() commence à 1 (l'original lisait la place suivante, hors du tableau pour la dernière)
 													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()-1].x,
 													 cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi-1].NumPlaceQueue].PlaceTeteFile()-1].y)));
-	  else
+	  } else {
 	   LabelArretBusTramFileTaxiVehlib->Caption="Aucun";
+}
 
 	// v5.4.1 : partie Epidémie
 	if (frmSimulation->EpidemieActivee)
@@ -297,21 +322,25 @@ void TfrmInfosPieton::RafraichitInfos()
 	  LabelInfections->Caption=IntToStr(NbInfections); // portage : conversion implicite int -> AnsiString de C++Builder
 	  if (NbInfections>0)
 	   {
-		int Rang=p->DonnePrmRang(), // v5.4.2 : au lieu de DonneRang()
-			DrnRang=p->DonneRang(), // v5.4.2 : au lieu de DonneDrnRang()
-			PrmTourDeb=p->DonneTourDeb(PREMIER),
-			DrnTourDeb=p->DonneTourDeb(DERNIER),
-			DrnTourFin=p->DonneTourFin();
+		int Rang=p->DonnePrmRang();
+		int // v5.4.2 : au lieu de DonneRang()
+			DrnRang=p->DonneRang();
+		int // v5.4.2 : au lieu de DonneDrnRang()
+			PrmTourDeb=p->DonneTourDeb(PREMIER);
+		int DrnTourDeb=p->DonneTourDeb(DERNIER);
+		int DrnTourFin=p->DonneTourFin();
 		LabelRangs->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((Rang, DrnRang)));
 		LabelTours->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((PrmTourDeb, DrnTourDeb)));
-		if (Infection&&(DrnTourFin-DrnTourDeb>0))
+		if (Infection&&(DrnTourFin-DrnTourDeb>0)) {
 		  LabelPeriodeInfectiosite->Caption=FormatFloat(asFrmPourcents, 100.0*(cv->TourCrt-DrnTourDeb)/(DrnTourFin-DrnTourDeb));
-		else
+		} else {
 		  LabelPeriodeInfectiosite->Caption=asNA;
-		if (Infection)
+}
+		if (Infection) {
 		  LabelEtatFinal->Caption=asEtatFinal[!!p->EstCondamne()];
-		else
+		} else {
 		  LabelEtatFinal->Caption=asNA;
+}
 	   }
 	  else
 	   {
@@ -320,10 +349,11 @@ void TfrmInfosPieton::RafraichitInfos()
 		LabelPeriodeInfectiosite->Caption=asNA;
 		LabelEtatFinal->Caption=asNA;
 	   }
-	  if (cv->EpidemieChargeFatale)
+	  if (cv->EpidemieChargeFatale != 0) {
 		LabelChargeVirale->Caption=FormatFloat(asFrmPourcents, (100.0*p->DonneChargeVirale())/cv->EpidemieChargeFatale);
-	  else
+	  } else {
 	    LabelChargeVirale->Caption=asNA;
+}
 	 }
    }
   RendreVisibleInfos(NumPieton>0);
@@ -354,8 +384,9 @@ void TfrmInfosPieton::ButtonAideClick(TObject *Sender)
 void TfrmInfosPieton::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -369,6 +400,7 @@ void TfrmInfosPieton::ChargeFiche()
   COMPOSANTS_frmInfosPieton(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmInfosPieton(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

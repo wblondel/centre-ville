@@ -9,16 +9,16 @@
 #include "f_genres_composants.h" // portage : #pragma resource "*.dfm"
 #include "compat/alea.h" // portage : rand() de la RTL Borland (après les en-têtes système)
 //---------------------------------------------------------------------------
-TfrmGeneration *frmGeneration=NULL; // portage : =NULL explicite
+TfrmGeneration *frmGeneration=nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------
 void GenereReseau()
  {
   if ((frmGeneration=new TfrmGeneration(Application)))
    { // portage : try/__finally -> garde RAII (Finalement)
-    Finalement f([&]()
+    Finalement f([&]
     {
      delete frmGeneration;
-     frmGeneration=NULL;
+     frmGeneration=nullptr;
     });
      frmGeneration->ShowModal();
    }
@@ -38,7 +38,8 @@ void TfrmGeneration::ButtonOkClick(TObject *Sender)
                                  TrackBarProbaTraverseeRoute->Position);
  // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
  // d'origine les évalue de gauche à droite (engine/README.md) : x, puis y, puis la direction
- int x=rand()%cv->NbX, y=rand()%cv->NbY; direction d=(direction)(1+rand()%NBDIR); cv->Genere(x, y, d);
+ int x=rand()%cv->NbX;
+ int y=rand()%cv->NbY; auto d=static_cast<direction>(1+rand()%NBDIR); cv->Genere(x, y, d);
  frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -52,8 +53,9 @@ void TfrmGeneration::ButtonAideClick(TObject *Sender)
 void TfrmGeneration::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -67,6 +69,7 @@ void TfrmGeneration::ChargeFiche()
   COMPOSANTS_frmGeneration(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmGeneration(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

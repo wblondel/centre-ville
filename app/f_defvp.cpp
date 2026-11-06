@@ -11,7 +11,7 @@
 #include "ui_f_defvp.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_defvp_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-TfrmDefVoiePietons *frmDefVoiePietons=NULL;
+TfrmDefVoiePietons *frmDefVoiePietons=nullptr;
 //---------------------------------------------------------------------------
 TfrmDefVoiePietons::TfrmDefVoiePietons(TComponent* Owner) : TForm(Owner)
  { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
@@ -36,44 +36,52 @@ void TfrmDefVoiePietons::AppliqueChoix()
   frmSimulation->SimulationModifiee=true;
 
   // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
-  for(int d=nord; d<=ouest; d++)
-   if (v->NumFeuP[d-1]&&(!SpeedButton[d-1]->Down))
+  for(int d=nord; d<=ouest; d++) {
+   if ((v->NumFeuP[d-1] != 0)&&(!SpeedButton[d-1]->Down))
     {
      cv->SupprimeFeuPietons(v->NumFeuP[d-1]-1);
-     if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
+     if (frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();
+}
     }
+}
 
   // 2. On met à jour l'accessibilité des boutons et groupes
   ButtonAppliquer->Enabled=false;
-  for(int d=nord; d<=ouest; d++)
+  for(int d=nord; d<=ouest; d++) {
    SpeedButton[d-1]->Down=(v->NumFeuP[d-1]>0);
+}
 
   // 3. On rafraîchit la scène
   frmSimulation->RedessineCase(x, y, true);
-  for(int d=nord; d<=ouest; d++)
-   if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1))
+  for(int d=nord; d<=ouest; d++) {
+   if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1)) {
     frmSimulation->RedessineCase( xfo[d-1], yfo[d-1], true);
+}
+}
  }
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::RafraichitInfos()
  {
-  if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
+  if (frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();
+}
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
   v=&(cv->v[x][y]);
 
   // On sauvegarde les coordonnées de tous les feux de piétons opposés
-  for(int d=nord; d<=ouest; d++)
-   if (v->NumFeuP[d-1])
+  for(int d=nord; d<=ouest; d++) {
+   if (v->NumFeuP[d-1] != 0)
     {
      feu_pieton *f=cv->FeuP+(v->NumFeuP[d-1]-1);
      xfo[d-1]=f->x[f->IFEUOPPDIR(d)];
      yfo[d-1]=f->y[f->IFEUOPPDIR(d)];
     }
-   else
+   else {
     xfo[d-1]=yfo[d-1]=-1;
+}
+}
 
-  if (v->SensVoieTram||v->DirPoss) // On teste si présence de voies. Si pas le cas on affiche les priorités Piétons !
+  if ((v->SensVoieTram != 0)||(v->DirPoss != 0)) // On teste si présence de voies. Si pas le cas on affiche les priorités Piétons !
    {
     frmDefVoiePietons->Hide();
     frmDefVoie->Show();
@@ -91,10 +99,12 @@ void TfrmDefVoiePietons::RafraichitInfos()
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::FormShow(TObject *Sender)
 {
- if (frmDefVoie&&frmDefVoie->Visible) frmDefVoie->Hide(); // Fenêtres non modales exclusives
+ if (frmDefVoie&&frmDefVoie->Visible) { frmDefVoie->Hide(); // Fenêtres non modales exclusives
+}
  frmSimulation->ActionPrioritesPietons->Checked=true;
  RafraichitInfos();
- for(int i=0; i<NBDIR; i++) FeuExistant[i]=(v->NumFeuP[i]>0);
+ for(int i=0; i<NBDIR; i++) { FeuExistant[i]=(v->NumFeuP[i]>0);
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::ButtonOkClick(TObject *Sender)
@@ -111,23 +121,28 @@ void TfrmDefVoiePietons::ButtonAppliquerClick(TObject *Sender)
 void TfrmDefVoiePietons::ButtonAnnulerClick(TObject *Sender)
 {
  // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
- for(int d=nord; d<=ouest; d++)
-  if ((!FeuExistant[d-1])&&v->NumFeuP[d-1])
+ for(int d=nord; d<=ouest; d++) {
+  if ((!FeuExistant[d-1])&&(v->NumFeuP[d-1] != 0))
    {
     cv->SupprimeFeuPietons(v->NumFeuP[d-1]-1);
-    if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
+    if (frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();
+}
    }
+}
 
  // 2. On met à jour l'accessibilité des boutons et groupes
  ButtonAppliquer->Enabled=false;
- for(int d=nord; d<=ouest; d++)
+ for(int d=nord; d<=ouest; d++) {
   SpeedButton[d-1]->Down=(v->NumFeuP[d-1]>0);
+}
 
  // 3. On rafraîchit la scène
  frmSimulation->RedessineCase(x, y, true);
- for(int d=nord; d<=ouest; d++)
-  if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1))
+ for(int d=nord; d<=ouest; d++) {
+  if ((xfo[d-1]!=-1)&&(yfo[d-1]!=-1)) {
    frmSimulation->RedessineCase( xfo[d-1], yfo[d-1], true);
+}
+}
  ButtonAppliquer->Enabled=false;
  Hide();
 }
@@ -136,7 +151,8 @@ void TfrmDefVoiePietons::FormHide(TObject *Sender)
 {
  try // Voir pourquoi
   {
-   if (frmDefFeuxPietons&&frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();
+   if (frmDefFeuxPietons&&frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();
+}
    frmSimulation->ActionPrioritesPietons->Checked=false;
   }
  catch(...) {}; // portage : __except(true) (exceptions structurées de Windows) -> catch(...)
@@ -161,14 +177,14 @@ void TfrmDefVoiePietons::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::SpeedButtonClick(TObject *Sender)
 {
- TSpeedButton *SpeedButtonNESO=(TSpeedButton*)Sender;
- direction d=(direction)(TagDe((TComponent*)Sender)+1); // portage : TComponent::Tag -> TagDe
+ auto *SpeedButtonNESO=static_cast<TSpeedButton*>(Sender);
+ auto d=static_cast<direction>(TagDe(static_cast<TComponent*>(Sender))+1); // portage : TComponent::Tag -> TagDe
  ButtonAppliquer->Enabled=true;
  if (SpeedButtonNESO->Down)
   {
-   if (cv->FeuPietonsPossible(x, y, d))
+   if (cv->FeuPietonsPossible(x, y, d)) {
     DefinitFeu(d);
-   else
+   } else
     {
      AfficheMessage("\
 Impossible de définir un feu de piétons ici car le passage piétons est un cul de sac et le feu piétons opposé ne peut être placé.\n\n\
@@ -178,8 +194,9 @@ Placez un trottoir à l'extrémité du passage piétons puis réessayez.", asTit
   }
  else
   {
-   if (frmDefFeuxPietons&&frmDefFeuxPietons->Visible)
+   if (frmDefFeuxPietons&&frmDefFeuxPietons->Visible) {
     frmDefFeuxPietons->Hide();
+}
    SpeedButtonNESO->Down=false;
   }
 }
@@ -189,8 +206,9 @@ Placez un trottoir à l'extrémité du passage piétons puis réessayez.", asTit
 void TfrmDefVoiePietons::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -204,6 +222,7 @@ void TfrmDefVoiePietons::ChargeFiche()
   COMPOSANTS_frmDefVoiePietons(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmDefVoiePietons(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

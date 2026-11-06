@@ -27,8 +27,10 @@ TEST_CASE("AnsiString : sous-ensemble utilisé par le moteur", "[compat][chaine]
   CHECK("("+IntToStr(-1)+", "+IntToStr(2)+")"==AnsiString("(-1, 2)"));
   CHECK(AnsiString((char)('A'+2))==AnsiString("C"));
   AnsiString asListe="";
-  for(int i=1; i<=3; i++)
-   if (asListe.IsEmpty()) asListe=IntToStr(i); else asListe=asListe+","+IntToStr(i);
+  for(int i=1; i<=3; i++) {
+   if (asListe.IsEmpty()) { asListe=IntToStr(i); } else { asListe=asListe+","+IntToStr(i);
+}
+}
   CHECK(asListe==AnsiString("1,2,3"));
   // Indices à partir de 1
   AnsiString asTitre="Centre-Ville*";
@@ -80,14 +82,15 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
  { // Comportement vérifié par désassemblage de cvw 5.4.3.2 (engine/README.md)
   alea::LibereGraine();
   // État initial (_boot_srand) : graine 1 puis un pas
-  CHECK(alea::GRAINE_INITIALE==0x015A4E36u);
+  CHECK(alea::GRAINE_INITIALE==0x015A4E36U);
   // srand(g) pose la graine PUIS avance d'un pas : après srand(1), rand()
   // donne la suite Turbo C/Borland C++ (346, 130, 10982...) à partir du 2e tirage
   srand(1);
   CHECK(alea::Graine()==alea::GRAINE_INITIALE);
   const int Attendu[10]={130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
-  for(int i=0; i<10; i++)
-   CHECK(rand()==Attendu[i]);
+  for(int i : Attendu) {
+   CHECK(rand()==i);
+}
   // Bornes : RAND_MAX Borland = 32767
   srand(0xDEADBEEF);
   bool Max15Bits=true;
@@ -99,10 +102,10 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
   CHECK(Max15Bits);
   // Un pas = graine*0x15A4E35+1 sur 32 bits ; rand() = bits 30..16 après le pas
   srand(123);
-  const unsigned Apres=123u*22695477u+1u;
+  const unsigned Apres=123U*22695477U+1U;
   CHECK(alea::Graine()==Apres);
-  CHECK(rand()==(int)(((Apres*22695477u+1u)>>16)&0x7FFF));
-  CHECK(alea::Graine()==Apres*22695477u+1u);
+  CHECK(rand()==(int)(((Apres*22695477U+1U)>>16)&0x7FFF));
+  CHECK(alea::Graine()==Apres*22695477U+1U);
  }
 //---------------------------------------------------------------------------
 TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
@@ -114,7 +117,7 @@ TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
   CHECK(a==b);
   alea::LibereGraine();
   srand(987654);
-  CHECK(alea::Graine()==987654u*22695477u+1u);
+  CHECK(alea::Graine()==987654U*22695477U+1U);
  }
 //---------------------------------------------------------------------------
 TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]")
@@ -152,7 +155,8 @@ TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]
 //---------------------------------------------------------------------------
 TEST_CASE("TDateTime/Time() : chronométrage", "[compat][temps]")
  {
-  TDateTime dtTop, dtTemps;
+  TDateTime dtTop;
+  TDateTime dtTemps;
   dtTop=dtTemps=0;
   CHECK((double)dtTemps==0.0);
   dtTop=Time();
@@ -171,17 +175,18 @@ TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écrit
   bool EcrituresOk=true;
   for(int i=0; i<N; i++)
    {
-    unsigned char o=(unsigned char)(i*7+3);
+    auto o=static_cast<unsigned char>(i*7+3);
     EcrituresOk=EcrituresOk&&(FileWrite(h, &o, 1)==1);
    }
   CHECK(EcrituresOk);
   CHECK(FileSeek(h, 0, 2)==N); // fin de fichier : tout a été écrit
   CHECK(FileSeek(h, 0, 0)==0);
-  std::string Gros((std::size_t)N, '\0');
+  std::string Gros(static_cast<std::size_t>(N), '\0');
   CHECK(FileRead(h, &Gros[0], 100)==100);
   CHECK(FileRead(h, &Gros[100], (unsigned)N)==N-100); // lecture directe d'un gros bloc, tronquée en fin
   bool Identiques=true;
-  for(int i=0; i<N; i++) Identiques=Identiques&&((unsigned char)Gros[(std::size_t)i]==(unsigned char)(i*7+3));
+  for(int i=0; i<N; i++) { Identiques=Identiques&&(static_cast<unsigned char>(Gros[static_cast<std::size_t>(i)])==static_cast<unsigned char>(i*7+3));
+}
   CHECK(Identiques);
   FileClose(h);
   // Lecture puis écriture au milieu (fmOpenReadWrite) : la position est respectée
@@ -245,19 +250,19 @@ namespace
  {
   std::string LitTout(const AnsiString &asNom)
    {
-    std::ifstream f(std::filesystem::path(std::u8string((const char8_t*)asNom.str().data(), asNom.str().size())), std::ios::binary);
-    return std::string(std::istreambuf_iterator<char>(f), {});
+    std::ifstream f(std::filesystem::path(std::u8string(reinterpret_cast<const char8_t*>(asNom.str().data()), asNom.str().size())), std::ios::binary);
+    return {std::istreambuf_iterator<char>(f), {}};
    }
   void EcritTout(const AnsiString &asNom, const std::string &asOctets)
    {
     int h=FileCreate(asNom);
     REQUIRE(h>0);
-    FileWrite(h, asOctets.data(), (unsigned)asOctets.size());
+    FileWrite(h, asOctets.data(), static_cast<unsigned>(asOctets.size()));
     FileClose(h);
    }
   std::filesystem::path CheminDe(const AnsiString &asNom)
    {
-    return std::filesystem::path(std::u8string((const char8_t*)asNom.str().data(), asNom.str().size()));
+    return {std::u8string(reinterpret_cast<const char8_t*>(asNom.str().data()), asNom.str().size())};
    }
   // Fichiers du dossier de sortie : aucun fichier temporaire ne doit rester
   std::size_t NbFichiers(const std::filesystem::path &Dossier)

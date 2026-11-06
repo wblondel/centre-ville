@@ -13,8 +13,9 @@ namespace
     using namespace std::chrono;
     system_clock::time_point Maintenant=system_clock::now();
     std::time_t t=system_clock::to_time_t(Maintenant);
-    Millisecondes=(int)(duration_cast<milliseconds>(Maintenant.time_since_epoch()).count()%1000);
-    if (Millisecondes<0) Millisecondes+=1000;
+    Millisecondes=static_cast<int>(duration_cast<milliseconds>(Maintenant.time_since_epoch()).count()%1000);
+    if (Millisecondes<0) { Millisecondes+=1000;
+}
     std::tm Local{};
 #ifdef _WIN32
     localtime_s(&Local, &t);
@@ -34,6 +35,6 @@ TDateTime Time()
  {
   int ms;
   std::tm Local=HeureLocale(ms);
-  return TDateTime(FractionDeJour(Local, ms));
+  return {FractionDeJour(Local, ms)};
  }
 //---------------------------------------------------------------------------

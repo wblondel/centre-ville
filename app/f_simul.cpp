@@ -6,8 +6,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryFile>
-#include <time.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdlib>
 //---------------------------------------------------------------------------
 #include "base.h"
 #include "simul.h"
@@ -126,7 +126,7 @@
 #define NBTYPESDISTANCE 7 // v5.0 (ajout distances aux files de parkings. v6.0.8 : une entrée par type_distance, files de taxis et places de vehlib comprises
 static_assert(NBTYPESDISTANCE==files_vehlib+1, "asTypeDistance : une entrée par type_distance"); // v6.0.8
 //---------------------------------------------------------------------------
-TfrmSimulation *frmSimulation=NULL;
+TfrmSimulation *frmSimulation=nullptr;
 //---------------------------------------------------------------------------
 // v2.2 : Décalage gyrophares d{x|y}g[dorig][ddest]. v5.4 plus de zoom
 //            ddest =      n   e   s   o
@@ -147,7 +147,7 @@ const int dxg[5][5]={{ 0,  0,  0,  0,  0},
                                           {{11, 6},{12,12},{ 9, 2},{10, 4}}}; // Dir1 = O
 //---------------------------------------------------------------------------
 // v3.5 : Ajout de Tram aux constantes de Couleur
-TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM]={clBlue, clRed, clLime, clYellow, clFuchsia, clAqua, clPurple, (TColor)0x00FF0080, (TColor)0x000080FF};
+TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM]={clBlue, clRed, clLime, clYellow, clFuchsia, clAqua, clPurple, static_cast<TColor>(0x00FF0080), static_cast<TColor>(0x000080FF)};
 TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM]={clWhite, clBlack, clBlack, clBlack, clBlack, clBlack, clWhite, clWhite, clBlack};
 //---------------------------------------------------------------------------
 const AnsiString asVide,
@@ -239,15 +239,17 @@ void TfrmSimulation::RedessineCase(int x, int y, bool EffaceFond)
 //---------------------------------------------------------------------------
 void TfrmSimulation::RafraichitActionsEdition(mode_edition ModeEdition)
  {
-  bool EditionCase=(ModeEdition==meCase),
-       EditionSelection=(ModeEdition==meSelection);
+  bool EditionCase=(ModeEdition==meCase);
+  bool EditionSelection=(ModeEdition==meSelection);
   int i;
-  for(i=0; i<ActionList->ActionCount; i++) // v3.8.3
-   if (ActionList->Actions[i]->Category=="Edition (case)")
-    ((TAction*)ActionList->Actions[i])->Enabled=EditionCase;
-   else
-    if (ActionList->Actions[i]->Category=="Edition (sélection)")
-     ((TAction*)ActionList->Actions[i])->Enabled=EditionSelection;
+  for(i=0; i<ActionList->ActionCount; i++) { // v3.8.3
+   if (ActionList->Actions[i]->Category=="Edition (case)") {
+    (static_cast<TAction*>(ActionList->Actions[i]))->Enabled=EditionCase;
+   } else
+    if (ActionList->Actions[i]->Category=="Edition (sélection)") {
+     (static_cast<TAction*>(ActionList->Actions[i]))->Enabled=EditionSelection;
+}
+}
   ToolBarEditionCase->Repaint();
   ToolBarEditionSelection->Repaint();
   MenuNatureDecors->Enabled=EditionCase;  // Le ToolButton est lié au menu (pas d'action)
@@ -256,25 +258,32 @@ void TfrmSimulation::RafraichitActionsEdition(mode_edition ModeEdition)
   ToolButtonCoins->Enabled=EditionSelection; // Le ToolButton est lié au menu (pas d'action)
   MenuPeripherique->Enabled=EditionSelection; // Le ToolButton est lié au menu (pas d'action)
   ToolButtonPeripherique->Enabled=EditionSelection; // Le ToolButton est lié au menu (pas d'action)
-  if (EditionCase) // Permet de rafraîchir les boutons dépendant de la case courante
+  if (EditionCase) { // Permet de rafraîchir les boutons dépendant de la case courante
    RedessineCase(DrawGridSimul->Col, DrawGridSimul->Row, true);
+}
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
       int Col, int Row, TRect &Rect, TGridDrawState State)
  { // Dessin de chaque case (voie)
-  int Colonnes=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1,
-      Lignes=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1,
-      PassPoss=0,
-      BordTrottoir=0, BordToiture=0, CoinToiture=0, // v3.8
-      NumPieton, // v2.0
-      NivPriorite, // v2.2
+  int Colonnes=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
+  int Lignes=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
+  int PassPoss=0;
+  int BordTrottoir=0;
+  int BordToiture=0;
+  int CoinToiture=0;
+  int // v3.8
+      NumPieton;
+  int // v2.0
+      NivPriorite;
+  int // v2.2
       Vlr; // v5.3
   TColor CoulTxt; // v3.0.5
-  direction dorig, ddest,
-            DirArretBus; // v3.0
-  voie *v=&(cv->v[Col][Row]),
-       *vv;
+  direction dorig;
+  direction ddest;
+  direction DirArretBus; // v3.0
+  voie *v=&(cv->v[Col][Row]);
+  voie *vv;
   sens Sens=cv->SensPassagePietonsPossible(Col, Row); // v2.0
   pieton *p; // v2.0
   vehicule *Veh;
@@ -282,26 +291,30 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
   tram *Tram; // v3.5
   taxi *Taxi; // v3.6
   vehlib *Vlb; // v5.3
-  bool NordPoss, EstPoss, SudPoss, OuestPoss,
-       DefFeux= (frmDefFeux&&  // v3.8.1
+  bool NordPoss;
+  bool EstPoss;
+  bool SudPoss;
+  bool OuestPoss;
+  bool DefFeux= ((frmDefFeux != nullptr)&&  // v3.8.1
                  frmDefFeux->Visible)||
-                (frmDefFeuxPietons&&  // v5.2
-                 frmDefFeuxPietons->Visible),
-       EditionAutorisee= (!DefFeux)&&
-                         (!cv->TourCrt)&&
-                         (!SimulationEnCours),
-       ChgmtDirRoutesAutorise= (!v->PassagePietons)&& // v3.5
-                               (!v->NumArretBus)&&
-                               EditionAutorisee,
-       ChgmtDirVoiesAutorise= (!v->PassagePietons)&& // v3.5
-                              (!v->NumArretTram)&&
-                              (!v->Priorite[nord-1])&&
-                              (!v->Priorite[est-1])&&
-                              (!v->Priorite[sud-1])&&
-                              (!v->Priorite[ouest-1])&&
+                ((frmDefFeuxPietons != nullptr)&&  // v5.2
+                 frmDefFeuxPietons->Visible);
+  bool EditionAutorisee= (!DefFeux)&&
+                         (cv->TourCrt == 0)&&
+                         (!SimulationEnCours);
+  bool ChgmtDirRoutesAutorise= (!v->PassagePietons)&& // v3.5
+                               (v->NumArretBus == 0)&&
+                               EditionAutorisee;
+  bool ChgmtDirVoiesAutorise= (!v->PassagePietons)&& // v3.5
+                              (v->NumArretTram == 0)&&
+                              (v->Priorite[nord-1] == 0)&&
+                              (v->Priorite[est-1] == 0)&&
+                              (v->Priorite[sud-1] == 0)&&
+                              (v->Priorite[ouest-1] == 0)&&
                               EditionAutorisee;
   TCheckBox *CheckBox; // v3.0
-  AnsiString asListeLignes, asMsg="";
+  AnsiString asListeLignes;
+  AnsiString asMsg="";
 
   // v5.4 : ATTENTION : VirtualImageList remplace ImageList
 
@@ -309,26 +322,26 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
   if (StatsAttenteTrafic&&
       frmStatsAttenteTrafic&&
       (v->DirPoss>aucune)&&
-      (!v->NumParking)) // v2.2.7
+      (v->NumParking == 0)) // v2.2.7
    {
     DrawGridSimul->Canvas->Brush->Color=frmStatsAttenteTrafic->CouleurCase(Col, Row);
     DrawGridSimul->Canvas->FillRect(Rect);
    }
   else
    { // Calcul commun pour l'affichage du quadrillage, des routes, trottoirs et immeubles (v3.8)
-	if (Affichage&(aff_voie|aff_quadr|aff_env)) // v3.8.1 (aff_env)
+	if ((Affichage&(aff_voie|aff_quadr|aff_env)) != 0) // v3.8.1 (aff_env)
      { // 1. On pose le dur : Bitume des routes et trottoirs ainsi que le murs des immeubles (ou plutôt le toit !). v3.8 (trottoir et immeubles)
       for(int d=nord; d<=ouest; d++)
        { // On détermine ici les orientations pour les routes et trottoirs
-        PassPoss+=(int)PossDir[d]*(((v->DirPoss&PossDir[d])==PossDir[d])||
+        PassPoss+=static_cast<int>(PossDir[d])*static_cast<int>(((v->DirPoss&PossDir[d])==PossDir[d])||
                                    ((cv->V(Col,Row,d).DirPoss&InvPossDir[d])==InvPossDir[d]));
-        BordTrottoir+=(int)PossDir[d]*((v->v((direction)d)->DirPoss>aucune)||  // v3.8
-                                       (v->v((direction)d)->SensVoieTram>aucune_voie));
-        BordToiture+=(int)PossDir[d]*(NATURE(v->v((direction)d))!=immeubles);
-        CoinToiture+=(int)CoinDir[d]*(NATURE(v->v((direction)d)->v(ADroiteDe[(direction)d]))==immeubles); // Immeuble voisin présent en coin.. 1=NE;2=SE;4=SO;8=NO
+        BordTrottoir+=static_cast<int>(PossDir[d])*static_cast<int>((v->v(static_cast<direction>(d))->DirPoss>aucune)||  // v3.8
+                                       (v->v(static_cast<direction>(d))->SensVoieTram>aucune_voie));
+        BordToiture+=static_cast<int>(PossDir[d])*static_cast<int>(NATURE(v->v((direction)d))!=immeubles);
+        CoinToiture+=static_cast<int>(CoinDir[d])*static_cast<int>(NATURE(v->v((direction)d)->v(ADroiteDe[(direction)d]))==immeubles); // Immeuble voisin présent en coin.. 1=NE;2=SE;4=SO;8=NO
        }
-      if ((Affichage&aff_env)&& // v3.8.1 (aff_env)
-          (!PassPoss)&&(!v->SensVoieTram))
+      if (((Affichage&aff_env) != 0)&& // v3.8.1 (aff_env)
+          (PassPoss == 0)&&(v->SensVoieTram == 0))
        {
 		// 1a. Trottoirs
 		if (NATURE(v)==trottoirs) // v3.8
@@ -341,14 +354,16 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 		   {
 			// D'abord le trottoir
 			VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_TROTTOIR+BordTrottoir);
-			for(int d=nord; d<=ouest; d++)
-			 if ((!v->v((direction)d)->DirPoss)&&
-				 (!v->v((direction)d)->SensVoieTram)&&
-				 (!v->v(ADroiteDe[(direction)d])->DirPoss)&&
-				 (!v->v(ADroiteDe[(direction)d])->SensVoieTram)&&
-				 (v->v((direction)d)->v(ADroiteDe[(direction)d])->DirPoss||
-				  v->v((direction)d)->v(ADroiteDe[(direction)d])->SensVoieTram))
+			for(int d=nord; d<=ouest; d++) {
+			 if ((v->v(static_cast<direction>(d))->DirPoss == 0)&&
+				 (v->v(static_cast<direction>(d))->SensVoieTram == 0)&&
+				 (v->v(ADroiteDe[static_cast<direction>(d)])->DirPoss == 0)&&
+				 (v->v(ADroiteDe[static_cast<direction>(d)])->SensVoieTram == 0)&&
+				 ((v->v(static_cast<direction>(d))->v(ADroiteDe[static_cast<direction>(d)])->DirPoss != 0)||
+				  (v->v(static_cast<direction>(d))->v(ADroiteDe[static_cast<direction>(d)])->SensVoieTram != 0))) {
 			  VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_COINTROT+d-1);
+}
+}
 		   }
 		  // Ensuite les décors (sauf pelouse)
 		  switch(v->Nature) // v3.9
@@ -361,53 +376,61 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 		if (NATURE(v)==immeubles) // v3.8
 		 {
 		  bool UnSeulCoinVide=false;
-		  if (!BordToiture)
+		  if (BordToiture == 0)
 		   {
-			for(int d=nord; d<=ouest; d++)
-			 if (CoinToiture==(int)(quatre_coins-CoinDir[d]))
+			for(int d=nord; d<=ouest; d++) {
+			 if (CoinToiture==(quatre_coins-CoinDir[d]))
 			  {
                UnSeulCoinVide=true;
 			   VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_COINTOIT+d-1);
               }
-            if (!UnSeulCoinVide)
+}
+            if (!UnSeulCoinVide) {
 			 VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_TOITURE);
+}
 		   }
-		  else
+		  else {
 		   VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_TOITURE+BordToiture);
+}
 		 }
 		// Si NI de voies de circulation NI immeubles NI trottoirs, ALORS c'est le néant total : tout noir (couleur du fond)
 	   }
 	  // 1c. On met le bitume. À savoir, où passe la route... Si on peut aller ou venir du nord, on pose le bitume jusqu'en haut, et ainsi de suite...
-	  if (Affichage&(((!PassPoss)*aff_quadr)|
-					 ((!!PassPoss)*aff_voie)))
+	  if ((Affichage&((static_cast<int>(PassPoss == 0)*aff_quadr)|
+					 (static_cast<int>(!(PassPoss == 0))*aff_voie))) != 0) {
 	   VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_VOIE+PassPoss);
+}
 	 }
    }
   // 2. On peint la route : ligne de stop ou cédez-le-passage
-  if (Affichage&aff_sign)
+  if ((Affichage&aff_sign) != 0)
    {
 	// 2a. On peint le passage de bus (v3.5 : déplacé en tête)
-	if (v->PassageBus) // v3.1
+	if (v->PassageBus) { // v3.1
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_PSGBUS);
-    if (v->NumPlaceTaxi) // v3.6
+}
+    if (v->NumPlaceTaxi != 0) { // v3.6
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_PLCTAXI);
-    if ((v->NumPlacePark)||  // v5.0
-        (v->NumPlaceVehlib)) // v5.3
+}
+    if (((v->NumPlacePark) != 0)||  // v5.0
+        ((v->NumPlaceVehlib) != 0)) { // v5.3
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_PLCPRKG);
-    if (v->NumPlaceVehlib) // v5.3
+}
+    if (v->NumPlaceVehlib != 0) { // v5.3
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        ((cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve)?IDB_PLCVLBR:IDB_PLCVLB)+
+                        (((cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve) != 0)?IDB_PLCVLBR:IDB_PLCVLB)+
                         v->OrientationPlaceVehlib()); // orientation du dessin selon le sens de la file !
+}
 
     // 2b. On peint les c.l.p & stops
-    for(int i=0; i<NBDIR; i++)
+    for(int i=0; i<NBDIR; i++) {
      switch(v->Priorite[i])
       {
        case cedez_le_passage: VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
@@ -420,107 +443,120 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                               break;
        default: break;
       }
+}
     // 2c. On peint le passage piéton
-    if (v->PassagePietons&&Sens) // v2.0
+    if (v->PassagePietons&&(Sens != 0)) // v2.0
      {
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_PSGPT+Sens-1);
      }
     // 2d. On peint l'arrêt de bus
-    if (v->NumArretBus&&
-        (DirArretBus=cv->DirectionArretBus(Col, Row))) // v3.0
+    if ((v->NumArretBus != 0)&&
+        ((DirArretBus=cv->DirectionArretBus(Col, Row)) != 0)) // v3.0
      {
       if ((!frmParamBus)||
           (!frmParamBus->Visible)||
           (frmParamBus->NumArretBusAMontrer!=v->NumArretBus)||
-          frmParamBus->TimerClignotement->Tag)
+          (frmParamBus->TimerClignotement->Tag != 0)) {
        VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                           Rect.Left, Rect.Top,
                           IDB_ARRETBUS+
                           3*(DirArretBus-1)+
                           cv->PositionArretBus(Col, Row, DirArretBus));
+}
      }
     // 2e. Affichage des directions au carrefour (si pas d'affichage des directions possibles). v3.6.1
-    if (!(Affichage&aff_dir))
-     for(int d=nord; d<=ouest; d++)
-      if (v->Priorite[d-1]&&(v->DirPoss&PossDir[d]))
+    if ((Affichage&aff_dir) == 0) {
+     for(int d=nord; d<=ouest; d++) {
+      if ((v->Priorite[d-1] != 0)&&((v->DirPoss&PossDir[d]) != 0))
        {
-        vv=v->v((direction)d);
+        vv=v->v(static_cast<direction>(d));
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                            Rect.Left, Rect.Top,
                            IDB_DIRCARF-1+ // Bitmaps de flèche de direction au carrefour
                            7*(d-1)+ // Direction
-                           4*((!vv->ToutDroit)&&(vv->DirPoss&PossDir[AGaucheDe[d]]))+ // à gauche
-                           2*((vv->DirPoss&PossDir[d])>0)+ // Tout droit
-                             ((!vv->ToutDroit)&&(vv->DirPoss&PossDir[ADroiteDe[d]]))); // à droite
+                           4*static_cast<int>((!vv->ToutDroit)&&((vv->DirPoss&PossDir[AGaucheDe[d]]) != 0))+ // à gauche
+                           2*static_cast<int>((vv->DirPoss&PossDir[d])>0)+ // Tout droit
+                             static_cast<int>((!vv->ToutDroit)&&((vv->DirPoss&PossDir[ADroiteDe[d]]) != 0))); // à droite
        }
+}
+}
    }
   // 3. On met les voies de tram
-  if ((Affichage&aff_voie)&&
-      (!StatsAttenteTrafic))
-   for(int i=0,SensVT=nord_est; SensVT<=sud_ouest; i++,SensVT*=2)
-    if ((v->SensVoieTram&SensVT)&&
+  if (((Affichage&aff_voie) != 0)&&
+      (!StatsAttenteTrafic)) {
+   for(int i=0,SensVT=nord_est; SensVT<=sud_ouest; i++,SensVT*=2) {
+    if (((v->SensVoieTram&SensVT) != 0)&&
         ((!frmParamTram)||
          (!frmParamTram->Visible)||
-         (!frmParamTram->NumArretTramAMontrer)|| // v5.3 (oubli)
+         (frmParamTram->NumArretTramAMontrer == 0)|| // v5.3 (oubli)
          (frmParamTram->NumArretTramAMontrer!=v->NumArretTram)||
-         frmParamTram->TimerClignotement->Tag))
+         (frmParamTram->TimerClignotement->Tag != 0))) {
      VirtualImageList8x8->Draw( DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
-                         (v->NumArretTram&&(Affichage&aff_sign))?
+                         ((v->NumArretTram != 0)&&((Affichage&aff_sign) != 0))?
                          IDB_ARRETTRAM+i:IDB_VOIETRAM+i);
+}
+}
+}
 
   // 4. On met le(s) piéton(s) le(s) cas échéant(s). v2.0. (Avant les véhicules depuis v4.3 pour mode sanglant)
-  if ((Affichage&aff_ptn)&&v->NbPietons&&((NATURE(v)<=trottoirs))) // v3.8 (immeubles)
+  if (((Affichage&aff_ptn) != 0)&&(v->NbPietons != 0)&&((NATURE(v)<=trottoirs))) // v3.8 (immeubles)
    {
     // 4a. Vue de mort
-    for(int i=0; i<NBMAXPIETONSPARCASE; i++)
-     if (v->NumPieton[i])
+    for(int i : v->NumPieton) {
+     if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
-       p=&(cv->Pieton[NumPieton=v->NumPieton[i]-1]);
-       if (p->Ecrase) // v4.3
+       p=&(cv->Pieton[NumPieton=i-1]);
+       if (p->Ecrase) { // v4.3
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                            Rect.Left, Rect.Top,
                            IDB_SANG);
-	   if (p->Mort) // v5.4.1
+}
+	   if (p->Mort) { // v5.4.1
 		VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 						   Rect.Left, Rect.Top,
 						   IDB_MORT);
+}
 	  }
+}
     // 4b. Vue de vivant
-    for(int i=0; i<NBMAXPIETONSPARCASE; i++)
-     if (v->NumPieton[i])
+    for(int i : v->NumPieton) {
+     if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
-       p=&(cv->Pieton[NumPieton=v->NumPieton[i]-1]);
-       if (p->EstVivant()) // v4.3 (création) v5.4.1 : p->EstVivant() remplace !p->Ecrase pour prendre en compte p->Mort
+       p=&(cv->Pieton[NumPieton=i-1]);
+       if (p->EstVivant()) { // v4.3 (création) v5.4.1 : p->EstVivant() remplace !p->Ecrase pour prendre en compte p->Mort
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                            1+Rect.Left+(2*p->DemiCase-1)*dxr[p->Dir]*((1+Rect.Right-Rect.Left)/4),
                            1+Rect.Top+ (2*p->DemiCase-1)*dyr[p->Dir]*((1+Rect.Bottom-Rect.Top)/4),
-						   ((Affichage&aff_infct)? // V5.4.1 : affichage infections (mode épidémie)
+						   (((Affichage&aff_infct) != 0)? // V5.4.1 : affichage infections (mode épidémie)
 							(p->EstContagieux()?IDB_PTNCNTG:IDB_PTNSAIN): // v5.4.1 : piéton contagieux ou sain
 							(IDB_PIETON+8*(NumPieton%NBCOULDIFFP)))+ // Début image piéton + Couleur
 						   (p->TourDrnDepl<p->TourDrnAff?
 							p->Dir-1: // à l'arrêt
 							(4+p->DemiCase%2+2*(1-p->Dir%2)) // en mouvement
 						   ));
+}
 	   p->TourDrnAff=cv->TourCrt;
 	  }
+}
    }
 
 
 
-  if (Affichage&aff_veh&& // 5. Affichage des véhicules et bus et trams
-      (!v->NumParking)&&(!v->EstDepotBus())) // Si pas de parkings ou dépôt sur la case. v3.0
+  if (((Affichage&aff_veh) != 0)&& // 5. Affichage des véhicules et bus et trams
+      (v->NumParking == 0)&&(!v->EstDepotBus())) // Si pas de parkings ou dépôt sur la case. v3.0
    {
-    if (v->NumVehicule) // 5a. On met les véhicules le cas échéant
+    if (v->NumVehicule != 0) // 5a. On met les véhicules le cas échéant
      {
       Veh=&(cv->Vehicule[v->NumVehicule-1]);
-      dorig=(Veh->DirDrnDepl?
+      dorig=((Veh->DirDrnDepl != 0)?
              InvDir[Veh->DirDrnDepl]:
              InvDir[Veh->Dir]);
       ddest=Veh->Dir;
-      if (dorig==ddest) dorig=InvDir[ddest];
+      if (dorig==ddest) { dorig=InvDir[ddest];
+}
       switch(Veh->NivPriorite) // v2.2
        {
         case normal:  VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
@@ -528,13 +564,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                                          IDB_VEH+ // Numero de bitmap initiale des véhicules
                                        //(v->NumVehicule-1)%NBCOULDIFFV+ // v5.3 : on ne peint plus en gris (1ère couleur)...
                                          1+(v->NumVehicule-1)%(NBCOULDIFFV-1)+   // Le gris est réservé pour les VEHLIBS !
-                                         (3*(dorig-1)+ddest-1-(ddest>dorig))*NBCOULDIFFV);
+                                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV);
                       break;
         case urgence: VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                                          Rect.Left, Rect.Top,
                                          IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
                                          COULEURURGENCE+ // Numéro de couleur (rouge)
-                                         (3*(dorig-1)+ddest-1-(ddest>dorig))*NBCOULDIFFVPU);
+                                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU);
                        VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 										 Rect.Left+dxg[dorig][ddest], // v5.4 : plus de zoom (dxg)
 										 Rect.Top+dyg[dorig][ddest], // v5.4 : plus de zoom (dyg)
@@ -546,7 +582,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 										 Rect.Left, Rect.Top,
 										 IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
 										 // Couleur Police = 1ère couleur (blanche)
-										 (3*(dorig-1)+ddest-1-(ddest>dorig))*NBCOULDIFFVPU);
+										 (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU);
 					   VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 										 Rect.Left+dxg[dorig][ddest], // v5.4 : plus de zoom (dxg)
 										 Rect.Top+dyg[dorig][ddest], // v5.4 : plus de zoom (dyg)
@@ -556,22 +592,22 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                       break;
        }
      }
-    if (v->NumVehlib) // 5a bis. On met les vehlibs. v5.3
+    if (v->NumVehlib != 0) // 5a bis. On met les vehlibs. v5.3
      {
       Vlb=&(cv->Vehlib[v->NumVehlib-1]);
-      direction dpv=(direction)(1+v->OrientationPlaceVehlib()); // Si le vehlib est sur une place, on prend le sens de la file
-      dorig=(v->NumPlaceVehlib?
+      auto dpv=static_cast<direction>(1+v->OrientationPlaceVehlib()); // Si le vehlib est sur une place, on prend le sens de la file
+      dorig=((v->NumPlaceVehlib != 0)?
              InvDir[dpv]:
-             (Vlb->DirDrnDepl?
+             ((Vlb->DirDrnDepl != 0)?
               InvDir[Vlb->DirDrnDepl]:
               InvDir[Vlb->Dir]));
-      ddest=(v->NumPlaceVehlib?dpv:Vlb->Dir);
+      ddest=((v->NumPlaceVehlib != 0)?dpv:Vlb->Dir);
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_VEH+ // Numero de bitmap initiale des véhicules (gris, réservé aux vehlib
-                         (3*(dorig-1)+ddest-1-(ddest>dorig))*NBCOULDIFFV);
+                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV);
      }
-    if (v->NumBus)  // 5b. On met les bus le cas échéant. v3.0
+    if (v->NumBus != 0)  // 5b. On met les bus le cas échéant. v3.0
      {
       Bus=&(cv->Bus[v->NumBus-1]);
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
@@ -582,7 +618,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                           NumImgBusTram[Bus->Dir-1][Bus->DirDrnDepl-1][TETE]:
                           NumImgBusTram[Bus->DirDrnDepl-1][Bus->DirAvtDrnDepl-1][QUEUE]));
      }
-    if (v->NumTram)  // 5c. On met les trams le cas échéant. v3.5
+    if (v->NumTram != 0)  // 5c. On met les trams le cas échéant. v3.5
      {
       Tram=&(cv->Tram[v->NumTram-1]);
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
@@ -593,43 +629,49 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                           NumImgBusTram[Tram->Dir-1][Tram->DirDrnDepl-1][TETE]:
                           NumImgBusTram[Tram->DirDrnDepl-1][Tram->DirAvtDrnDepl-1][QUEUE]));
      }
-    if (v->NumTaxi)  // 5d. On met les taxis le cas échéant. v3.6
+    if (v->NumTaxi != 0)  // 5d. On met les taxis le cas échéant. v3.6
      {
       Taxi=&(cv->Taxi[v->NumTaxi-1]);
-      dorig=(Taxi->DirDrnDepl?
+      dorig=((Taxi->DirDrnDepl != 0)?
              InvDir[Taxi->DirDrnDepl]:
              InvDir[Taxi->Dir]);
       ddest=Taxi->Dir;
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_VEHTAXI+ // Numero de bitmap initiale des taxis
-                         3*(dorig-1)+ddest-1-(ddest>dorig));
+                         3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig));
      }
    }
   // 6a. On met le feu (ouais qu'ça pète !) de signalisation le cas échéant
-  if (Affichage&aff_sign)
-   for(int i=0,SensVT=nord_est; i<NBDIR; i++,SensVT*=2) // v5.2.4, ajout de SensVT pour afficher les feux de tram
-    if ((v->NumFeu[i])&&
+  if ((Affichage&aff_sign) != 0) {
+   for(int i=0,SensVT=nord_est; i<NBDIR; i++,SensVT*=2) { // v5.2.4, ajout de SensVT pour afficher les feux de tram
+    if (((v->NumFeu[i]) != 0)&&
         (cv->Feu[v->NumFeu[i]-1].x==Col)&&
         (cv->Feu[v->NumFeu[i]-1].y==Row)&&
-        (cv->Feu[v->NumFeu[i]-1].Dir==i+1))
+        (cv->Feu[v->NumFeu[i]-1].Dir==i+1)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        ((v->SensVoieTram&&v->EstDirPossSensVoieTram(indefinie, (direction)(i+1)))?IDB_FEUT:IDB_FEU)+4*i+cv->Feu[v->NumFeu[i]-1].Etat); // v5.2.4, affichage des feux de tram
+                        (((v->SensVoieTram != 0)&&v->EstDirPossSensVoieTram(indefinie, static_cast<direction>(i+1)))?IDB_FEUT:IDB_FEU)+4*i+cv->Feu[v->NumFeu[i]-1].Etat); // v5.2.4, affichage des feux de tram
+}
+}
+}
 
   // 6b. On met le feu (ouais qu'ça pète !) de piéton le cas échéant (v5.2)
-  if (Affichage&aff_sign)
-   for(int i=0; i<NBDIR; i++)
-    if ((v->NumFeuP[i])&&
+  if ((Affichage&aff_sign) != 0) {
+   for(int i=0; i<NBDIR; i++) {
+    if (((v->NumFeuP[i]) != 0)&&
         (cv->FeuP[v->NumFeuP[i]-1].x[IFEUDIR(v->NumFeuP[i],i)]==Col)&&
         (cv->FeuP[v->NumFeuP[i]-1].y[IFEUDIR(v->NumFeuP[i],i)]==Row)&&
-        (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1))
+        (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        IDB_FEUP+3*(InvDir[i+1]-1)+cv->FeuP[v->NumFeuP[i]-1].Etat-(cv->FeuP[v->NumFeuP[i]-1].Etat==rouge)); // On retire 1 si etat rouge car orange n'existe pas pour les feux de piétons
+                        IDB_FEUP+3*(InvDir[i+1]-1)+cv->FeuP[v->NumFeuP[i]-1].Etat-static_cast<int>(cv->FeuP[v->NumFeuP[i]-1].Etat==rouge)); // On retire 1 si etat rouge car orange n'existe pas pour les feux de piétons
+}
+}
+}
 
   // 7a. On met le parking le cas échéant et qqsoit l'affichage
-  if (v->NumParking)
+  if (v->NumParking != 0)
    {
     VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                        Rect.Left, Rect.Top,
@@ -639,24 +681,28 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                        IDB_NUMPRKNG+v->NumParking-1);
    }
   // 7b. On met le dépôt le cas échéant et qqsoit l'affichage. v3.0
-  if (v->EstDepotBus())
+  if (v->EstDepotBus()) {
    VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                       Rect.Left, Rect.Top,
                       IDB_DEPOTBUS);
+}
   // 8. Affichage des directions possibles
-  if (Affichage&aff_dir)
-   for(int i=0; i<NBDIR; i++)
-    if (v->DirPoss&PossDir[i+1])
+  if ((Affichage&aff_dir) != 0) {
+   for(int i=0; i<NBDIR; i++) {
+    if ((v->DirPoss&PossDir[i+1]) != 0) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        IDB_DIR+(IDB_DIRTD*v->ToutDroit)+i);
+                        IDB_DIR+(IDB_DIRTD*static_cast<int>(v->ToutDroit))+i);
+}
+}
+}
   // 9a. Trajet des lignes de bus. v3.0
   if (frmParamBus&&frmParamBus->Visible)
    {
     CoulTxt=clTeal;
     for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
      {
-      CheckBox=(TCheckBox*)frmParamBus->FindComponent("CheckBox"+IntToStr(i+1));
+      CheckBox=static_cast<TCheckBox*>(frmParamBus->FindComponent("CheckBox"+IntToStr(i+1)));
       if (CheckBox->Visible&&CheckBox->Checked&&v->LigneBus[i])
        {
         DrawGridSimul->Canvas->Brush->Color=CoulLigneBusTram[i];
@@ -679,7 +725,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     CoulTxt=clTeal;
     for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
      {
-      CheckBox=(TCheckBox*)frmParamTram->FindComponent("CheckBox"+IntToStr(i+1));
+      CheckBox=static_cast<TCheckBox*>(frmParamTram->FindComponent("CheckBox"+IntToStr(i+1)));
       if (CheckBox->Visible&&CheckBox->Checked&&v->LigneTram[i])
        {
         DrawGridSimul->Canvas->Brush->Color=CoulLigneBusTram[i];
@@ -701,52 +747,59 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
    {
     if ((xCrt!=Col)||(yCrt!=Row))
      { xPrc=xCrt; yPrc=yCrt; xCrt=Col; yCrt=Row; }
-    if (v->ToutDroit) asMsg=asMsg+"Tout droit. ";
+    if (v->ToutDroit) { asMsg=asMsg+"Tout droit. ";
+}
     for(int i=0; i<NBDIR; i++)
      {
-      if ((v->NumFeu[i])&&
+      if (((v->NumFeu[i]) != 0)&&
           (cv->Feu[v->NumFeu[i]-1].x==Col)&&
           (cv->Feu[v->NumFeu[i]-1].y==Row)&&
-          (cv->Feu[v->NumFeu[i]-1].Dir==i+1))
+          (cv->Feu[v->NumFeu[i]-1].Dir==i+1)) {
        asMsg=asMsg+Format("Feu %s %d. ", ARRAYOFCONST((asDir[i+1], v->NumFeu[i])));
-      if ((v->NumFeuP[i])&& // v5.2
+}
+      if (((v->NumFeuP[i]) != 0)&& // v5.2
           (cv->FeuP[v->NumFeuP[i]-1].x[IFEUDIR(v->NumFeuP[i],i)]==Col)&&
           (cv->FeuP[v->NumFeuP[i]-1].y[IFEUDIR(v->NumFeuP[i],i)]==Row)&&
-          (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1))
+          (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1)) {
        asMsg=asMsg+Format("Feu Piéton %s %d. ", ARRAYOFCONST((asDir[i+1], v->NumFeuP[i])));
+}
      }
-    if (v->NumParking)
+    if (v->NumParking != 0) {
      asMsg=asMsg+Format("Parking %d. ", ARRAYOFCONST((v->NumParking)));
-    if (v->EstDepotBus()) asMsg=asMsg+"Dépôt Bus. "; // v3.0
-    if (v->NumArretBus) // v3.0
+}
+    if (v->EstDepotBus()) { asMsg=asMsg+"Dépôt Bus. "; // v3.0
+}
+    if (v->NumArretBus != 0) // v3.0
      {
       asListeLignes=cv->ArretBus[v->NumArretBus-1].asListeLignesBus(); // v3.1.1
-      if (asListeLignes.IsEmpty())
+      if (asListeLignes.IsEmpty()) {
        asMsg=asMsg+Format( "Arrêt bus %d %s. ", // ajout de "bus" pour différencier avec "tram" (v3.5)
                            ARRAYOFCONST(( v->NumArretBus,
                                           asAsterisque[v->EstTeteArretBus()]))); // v3.1 !!!
-      else
+      } else {
        asMsg=asMsg+Format( "Arrêt bus %d %s (%s). ", // ajout de "bus" pour différencier avec "tram" (v3.5)
                            ARRAYOFCONST(( v->NumArretBus,
                                           asAsterisque[v->EstTeteArretBus()],
                                           asListeLignes))); // v3.1 !!!
+}
      }
-    if (v->NumArretTram) // v3.5
+    if (v->NumArretTram != 0) // v3.5
      {
       asListeLignes=cv->ArretTram[v->NumArretTram-1].asListeLignesTram();
-      if (asListeLignes.IsEmpty())
+      if (asListeLignes.IsEmpty()) {
        asMsg=asMsg+Format( "Arrêt tram %d %s. ",
                            ARRAYOFCONST(( v->NumArretTram,
                                           asAsterisque[v->EstTeteArretTram()])));
-      else
+      } else {
        asMsg=asMsg+Format( "Arrêt tram %d %s (%s). ",
                            ARRAYOFCONST(( v->NumArretTram,
                                           asAsterisque[v->EstTeteArretTram()],
                                           asListeLignes)));
+}
      }
-    if (v->NumVehicule)
+    if (v->NumVehicule != 0)
 	 {
-	  if ((NivPriorite=cv->Vehicule[v->NumVehicule-1].NivPriorite))
+	  if ((NivPriorite=cv->Vehicule[v->NumVehicule-1].NivPriorite) != 0)
 	   {
 		asMsg=asMsg+Format("Véhicule %s %d. ", ARRAYOFCONST((asTypeVehicule[NivPriorite], v->NumVehicule)));
 	   }
@@ -755,60 +808,74 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 		asMsg=asMsg+Format("Véhicule %d. ", ARRAYOFCONST((v->NumVehicule)));
 	   }
 	 }
-	if (v->NumPlaceVehlib) // v5.3
+	if (v->NumPlaceVehlib != 0) // v5.3
 	 {
-	  if ((Vlr=cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve))
+	  if ((Vlr=cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve) != 0) {
 	   asMsg=asMsg+Format("Place Vehlib %d (R=%d). ", ARRAYOFCONST((v->NumPlaceVehlib, Vlr)));
-      else
+      } else {
        asMsg=asMsg+Format("Place Vehlib %d. ", ARRAYOFCONST((v->NumPlaceVehlib)));
+}
      }
-    if (v->NumVehlib) // v5.3
+    if (v->NumVehlib != 0) { // v5.3
       asMsg=asMsg+Format("Vehlib %d. ", ARRAYOFCONST((v->NumVehlib)));
+}
 
-    if (v->PassageBus) asMsg=asMsg+"Passage bus. ";
-    if (v->NumBus) // v3.0
+    if (v->PassageBus) { asMsg=asMsg+"Passage bus. ";
+}
+    if (v->NumBus != 0) { // v3.0
      asMsg=asMsg+Format("Bus %d%s ligne %d. ", ARRAYOFCONST((v->NumBus, asAsterisque[v->EstTeteBus()], cv->Bus[v->NumBus-1].NumLigne)));
-    if (v->NumTram) // v3.5
+}
+    if (v->NumTram != 0) { // v3.5
      asMsg=asMsg+Format("Tram %d%s ligne %d. ", ARRAYOFCONST((v->NumTram, asAsterisque[v->EstTeteTram()], cv->Tram[v->NumTram-1].NumLigne)));
-    if (v->PassagePietons) asMsg=asMsg+"Passage piéton. ";
-    if (v->NbPietons) // v2.0
+}
+    if (v->PassagePietons) { asMsg=asMsg+"Passage piéton. ";
+}
+    if (v->NbPietons != 0) // v2.0
      {
       asMsg=asMsg+"Piéton";
-      if (v->NbPietons>1) asMsg=asMsg+"s";
-      for(int i=0; i<NBMAXPIETONSPARCASE; i++)
-       if (v->NumPieton[i])
-		asMsg=asMsg+Format(" %d%s", ARRAYOFCONST(( v->NumPieton[i],
-												   asSupInf[(!!cv->Pieton[v->NumPieton[i]-1].EstVivant())*(1+cv->Pieton[v->NumPieton[i]-1].DemiCase)]+ // v4.3 (asSupInf remplace as12) v5.4.1 EstVivant() remplace Ecrase
-												   asEtatPieton[1*(!!cv->Pieton[v->NumPieton[i]-1].Ecrase)+ // "*" v4.3 (création) v5.4.1 : asMort renommé en asEtatPieton ; affiche "*" au lieu de "†" réservé à l'épidémie
-																2*(!!cv->Pieton[v->NumPieton[i]-1].Mort)+ // v5.4.1 : affiche "†"
-																4*(!!(cv->Pieton[v->NumPieton[i]-1].EstContagieux()&&(!cv->Pieton[v->NumPieton[i]-1].Mort)))] // v5.4.1 : affiche "‡"
+      if (v->NbPietons>1) { asMsg=asMsg+"s";
+}
+      for(int i : v->NumPieton) {
+       if (i != 0) {
+		asMsg=asMsg+Format(" %d%s", ARRAYOFCONST(( i,
+												   asSupInf[(!!cv->Pieton[i-1].EstVivant())*(1+cv->Pieton[i-1].DemiCase)]+ // v4.3 (asSupInf remplace as12) v5.4.1 EstVivant() remplace Ecrase
+												   asEtatPieton[1*(!!cv->Pieton[i-1].Ecrase)+ // "*" v4.3 (création) v5.4.1 : asMort renommé en asEtatPieton ; affiche "*" au lieu de "†" réservé à l'épidémie
+																2*(!!cv->Pieton[i-1].Mort)+ // v5.4.1 : affiche "†"
+																4*(!!(cv->Pieton[i-1].EstContagieux()&&(!cv->Pieton[i-1].Mort)))] // v5.4.1 : affiche "‡"
 												)));
+}
+}
       asMsg=asMsg+". ";
      }
-    if (v->NumPlaceTaxi) // v3.6
+    if (v->NumPlaceTaxi != 0) { // v3.6
      asMsg=asMsg+Format("Place Taxi %d%s%s File %d. ", ARRAYOFCONST(( v->NumPlaceTaxi,
                                                                       asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
                                                                       asSupInf[2*v->EstQueueFileTaxis()], // v4.3 (asSupInf remplace as12)
                                                                       cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile+1))); // v5.3
-    if (v->NumTaxi) // v3.6
+}
+    if (v->NumTaxi != 0) { // v3.6
      asMsg=asMsg+Format("Véh.Taxi %d. ", ARRAYOFCONST((v->NumTaxi)));
+}
 
-    if (v->NumPlacePark) // v5.0
+    if (v->NumPlacePark != 0) { // v5.0
      asMsg=asMsg+Format("Place Prkg %d%s%s File %d. ", ARRAYOFCONST(( v->NumPlacePark,
                                                               asSupInf[v->EstTeteFilePark()], // v5.0
                                                               asSupInf[2*v->EstQueueFilePark()], // v5.0
                                                               cv->PlacePark[v->NumPlacePark-1].NumFile+1))); // v5.3
-    if (StatsAttenteTrafic&&frmStatsAttenteTrafic) // v3.0 : Affichage du détail des statistiques de fluidité det de trafic
+}
+    if (StatsAttenteTrafic&&frmStatsAttenteTrafic) { // v3.0 : Affichage du détail des statistiques de fluidité det de trafic
      StatusBar->Panels->Items[0]->Text=frmStatsAttenteTrafic->asMsgDetailCase(Col, Row);
+}
     StatusBar->Panels->Items[1]->Text=asMsg;
     StatusBar->Panels->Items[2]->Text=asDirPoss[v->DirPoss];
     StatusBar->Panels->Items[3]->Text=Format(asFormatCoord, ARRAYOFCONST((Col, Row)));
     if ((!SelectionFeuxDmd)&&(!SelectionFeuxAtt)&&(!SelectionFeuxPtn)&&  // Pas de curseur en sélection de feux. v5.2 : Ajout SelectionFeuxPtn
         ((!TimerClignotementLocalisation->Enabled)||
-         TimerClignotementLocalisation->Tag)) // v4.4.1 : Clignotement en suivi & recherche (localisation)
+         (TimerClignotementLocalisation->Tag != 0))) { // v4.4.1 : Clignotement en suivi & recherche (localisation)
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_CURSEUR);
+}
 
     bool FeuxPietonsPresents=FEUXPIETONS(v); //v5.2
 
@@ -820,39 +887,39 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 
     ActionDirectionHaut->Checked=NordPoss;
     ActionDirectionHaut->Enabled= ((!v->PassageBus)||(!NordPoss))&& // Interdit de retirer une direction si passage bus. v3.5
-                                  (!v->Priorite[nord-1])&&
-                                  (!(v->SensVoieTram&nord_sud))&& // Si une voie dans le même sens // v3.5
+                                  (v->Priorite[nord-1] == 0)&&
+                                  ((v->SensVoieTram&nord_sud) == 0)&& // Si une voie dans le même sens // v3.5
                                   ChgmtDirRoutesAutorise&&
                                   (!FeuxPietonsPresents); //v5.2
     ActionDirectionDroite->Checked=EstPoss;
     ActionDirectionDroite->Enabled= ((!v->PassageBus)||(!EstPoss))&& // Interdit de retirer une direction si passage bus. v3.5
-                                    (!v->Priorite[est-1])&&
-                                    (!(v->SensVoieTram&est_ouest))&&
+                                    (v->Priorite[est-1] == 0)&&
+                                    ((v->SensVoieTram&est_ouest) == 0)&&
                                     ChgmtDirRoutesAutorise&&
                                     (!FeuxPietonsPresents); //v5.2
     ActionDirectionBas->Checked=SudPoss;
     ActionDirectionBas->Enabled= ((!v->PassageBus)||(!SudPoss))&& // Interdit de retirer une direction si passage bus. v3.5
-                                 (!v->Priorite[sud-1])&&
-                                 (!(v->SensVoieTram&nord_sud))&&
+                                 (v->Priorite[sud-1] == 0)&&
+                                 ((v->SensVoieTram&nord_sud) == 0)&&
                                  ChgmtDirRoutesAutorise&&
                                  (!FeuxPietonsPresents); //v5.2
     ActionDirectionGauche->Checked=OuestPoss;
     ActionDirectionGauche->Enabled= ((!v->PassageBus)||(!OuestPoss))&& // Interdit de retirer une direction si passage bus. v3.5
-                                    (!v->Priorite[ouest-1])&&
-                                    (!(v->SensVoieTram&est_ouest))&&
+                                    (v->Priorite[ouest-1] == 0)&&
+                                    ((v->SensVoieTram&est_ouest) == 0)&&
                                     ChgmtDirRoutesAutorise&&
                                     (!FeuxPietonsPresents); //v5.2
 
     ActionEffacerRoute->Enabled=ChgmtDirRoutesAutorise;
 
     // Directions (Voies Tram)
-    ActionDirectionHautTram->Enabled=ChgmtDirVoiesAutorise&&(!(v->DirPoss&NS))&&
+    ActionDirectionHautTram->Enabled=ChgmtDirVoiesAutorise&&((v->DirPoss&NS) == 0)&&
                                      (!FeuxPietonsPresents); //v5.2
-    ActionDirectionDroiteTram->Enabled=ChgmtDirVoiesAutorise&&(!(v->DirPoss&EO))&&
+    ActionDirectionDroiteTram->Enabled=ChgmtDirVoiesAutorise&&((v->DirPoss&EO) == 0)&&
                                        (!FeuxPietonsPresents); //v5.2
-    ActionDirectionBasTram->Enabled=ChgmtDirVoiesAutorise&&(!(v->DirPoss&NS))&&
+    ActionDirectionBasTram->Enabled=ChgmtDirVoiesAutorise&&((v->DirPoss&NS) == 0)&&
                                     (!FeuxPietonsPresents); //v5.2
-    ActionDirectionGaucheTram->Enabled=ChgmtDirVoiesAutorise&&(!(v->DirPoss&EO))&&
+    ActionDirectionGaucheTram->Enabled=ChgmtDirVoiesAutorise&&((v->DirPoss&EO) == 0)&&
                                        (!FeuxPietonsPresents); //v5.2
     ActionEffacerVoieTram->Enabled=ChgmtDirVoiesAutorise;
 
@@ -861,20 +928,20 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 
     ActionParking->Checked=(v->NumParking>0);
     ActionParking->Enabled=(!v->EstDepotBus())&&
-                           (!(v->Priorite[0]+v->Priorite[1]+v->Priorite[2]+v->Priorite[3]))&&
+                           ((v->Priorite[0]+v->Priorite[1]+v->Priorite[2]+v->Priorite[3]) == 0)&&
                            (NbDir[v->DirPoss]<NBDIR)&&
                            EditionAutorisee;
 
     // v3.0
     ActionDepotBus->Checked=v->EstDepotBus();
-    ActionDepotBus->Enabled=(!v->NumParking)&&
-                            (!(v->Priorite[0]+v->Priorite[1]+v->Priorite[2]+v->Priorite[3]))&&
+    ActionDepotBus->Enabled=(v->NumParking == 0)&&
+                            ((v->Priorite[0]+v->Priorite[1]+v->Priorite[2]+v->Priorite[3]) == 0)&&
                             (NbDir[v->DirPoss]>0)&&
                             EditionAutorisee;
 
     // v2.0
     ActionPassagePietons->Checked=v->PassagePietons;
-    ActionPassagePietons->Enabled=(!!Sens)&&EditionAutorisee&&(!cv->ExisteFeuPietons(Col, Row));
+    ActionPassagePietons->Enabled=(!(Sens == 0))&&EditionAutorisee&&(!cv->ExisteFeuPietons(Col, Row));
 
     // v3.5: bouton commun entre bus et trams
     ActionArretBusTram->Checked=(v->NumArretBus>0)||(v->NumArretTram>0);
@@ -882,27 +949,27 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     
     // v3.6: Places de Taxi (exclusif avec Bus, tram, park (v5.0) et vehlib (v5.3)
     ActionPlaceTaxi->Checked=(v->NumPlaceTaxi>0);
-    ActionPlaceTaxi->Enabled=v->DirPoss&&(!v->NumArretBus)&&(!v->NumArretTram)&&(!v->NumPlacePark)&&(!v->NumPlaceVehlib)&&EditionAutorisee; // v5.0 (Park) v5.3 (vehlib)
+    ActionPlaceTaxi->Enabled=(v->DirPoss != 0)&&(v->NumArretBus == 0)&&(v->NumArretTram == 0)&&(v->NumPlacePark == 0)&&(v->NumPlaceVehlib == 0)&&EditionAutorisee; // v5.0 (Park) v5.3 (vehlib)
 
     // v5.0: Places de parkings (exclusif avec Bus, tram, taxi et vehlib (v5.3)
     ActionPlacePark->Checked=(v->NumPlacePark>0);
-    ActionPlacePark->Enabled=v->DirPoss&&(!v->NumArretBus)&&(!v->NumArretTram)&&(!v->NumPlaceTaxi)&&(!v->NumPlaceVehlib)&&EditionAutorisee; // v5.3 (vehlib)
+    ActionPlacePark->Enabled=(v->DirPoss != 0)&&(v->NumArretBus == 0)&&(v->NumArretTram == 0)&&(v->NumPlaceTaxi == 0)&&(v->NumPlaceVehlib == 0)&&EditionAutorisee; // v5.3 (vehlib)
 
     // v5.3: Places de vehlib (exclusif avec Bus, tram, taxi et park
     ActionPlaceVehlib->Checked=(v->NumPlaceVehlib>0);
-    ActionPlaceVehlib->Enabled=v->DirPoss&&(!v->NumArretBus)&&(!v->NumArretTram)&&(!v->NumPlaceTaxi)&&(!v->NumPlacePark)&&EditionAutorisee;
+    ActionPlaceVehlib->Enabled=(v->DirPoss != 0)&&(v->NumArretBus == 0)&&(v->NumArretTram == 0)&&(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&EditionAutorisee;
 
-    switch((v->NumArretBus>0)+2*(v->NumArretTram>0))
+    switch(static_cast<int>(v->NumArretBus>0)+2*static_cast<int>(v->NumArretTram>0))
      { // v5.0 : ajout de ..(!v->NumPlace)&&..
-      case BUS: ActionArretBusTram->Enabled=(!v->NumPlaceTaxi)&&(!v->NumPlacePark)&&cv->SuppressionArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
+      case BUS: ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->SuppressionArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
                 break;
-      case TRAM:ActionArretBusTram->Enabled=(!v->NumPlaceTaxi)&&(!v->NumPlacePark)&&cv->SuppressionArretTramPossible(Col, Row)&&EditionAutorisee; // v3.6
+      case TRAM:ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->SuppressionArretTramPossible(Col, Row)&&EditionAutorisee; // v3.6
                 break;
-      default:  switch((v->DirPoss>aucune)+2*(v->SensVoieTram>aucune_voie))
+      default:  switch(static_cast<int>(v->DirPoss>aucune)+2*static_cast<int>(v->SensVoieTram>aucune_voie))
                  {
-                  case BUS: ActionArretBusTram->Enabled=(!v->NumPlaceTaxi)&&(!v->NumPlacePark)&&cv->AjoutArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
+                  case BUS: ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->AjoutArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
                             break;
-                  case TRAM:ActionArretBusTram->Enabled=(!v->NumPlaceTaxi)&&(!v->NumPlacePark)&&cv->AjoutArretTramPossible(Col, Row)&&EditionAutorisee; // v3.6
+                  case TRAM:ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->AjoutArretTramPossible(Col, Row)&&EditionAutorisee; // v3.6
                             break;
                   default:  ActionArretBusTram->Enabled=false;
                  }
@@ -912,9 +979,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     ActionPassageBus->Enabled=(v->DirPoss>aucune)&&EditionAutorisee;
 	ActionMarche->Enabled=(!DefFeux)&&(!SimulationEnCours);
 
-	ActionPriorites->Enabled=(!v->NumParking)&&(v->DirPoss||v->SensVoieTram)&&EditionAutorisee; // v5.2 : On n'autorise si voies de circulation (voie de tram/route)
-    ActionPrioritesPietons->Enabled=(!v->DirPoss)&&(!v->SensVoieTram)&&EditionAutorisee; // v5.2 : Priorités Piétons si pas de vois de circulation (voie de tram/route)
-    ToolButtonPriorites->Action=(v->DirPoss||v->SensVoieTram)?ActionPriorites:ActionPrioritesPietons; // v5.2 : Le bouton de la barre d'outil sert pour les deux selon la présence de voies ou non.
+	ActionPriorites->Enabled=(v->NumParking == 0)&&((v->DirPoss != 0)||(v->SensVoieTram != 0))&&EditionAutorisee; // v5.2 : On n'autorise si voies de circulation (voie de tram/route)
+    ActionPrioritesPietons->Enabled=(v->DirPoss == 0)&&(v->SensVoieTram == 0)&&EditionAutorisee; // v5.2 : Priorités Piétons si pas de vois de circulation (voie de tram/route)
+    ToolButtonPriorites->Action=((v->DirPoss != 0)||(v->SensVoieTram != 0))?ActionPriorites:ActionPrioritesPietons; // v5.2 : Le bouton de la barre d'outil sert pour les deux selon la présence de voies ou non.
 
     ActionSuivreVehicule->Enabled=(v->NumVehicule>0);
     ActionSuivreBus->Enabled=(v->NumBus>0); // v3.0
@@ -922,7 +989,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     ActionSuivrePieton2->Enabled=(v->NumPieton[1]>0); // v3.0
     ActionSuivreTram->Enabled=(v->NumTram>0); // v3.6
     ActionSuivreTaxi->Enabled=(v->NumTaxi>0); // v3.6
-    ActionSuivreVehlib->Enabled=(v->NumVehlib); // v5.3
+    ActionSuivreVehlib->Enabled=(v->NumVehlib) != 0; // v5.3
 
     ActionDistancesParkings->Enabled=(v->DirPoss>aucune); // v3.5
     ActionDistancesArretsBus->Enabled=(v->DirPoss>aucune); // v3.5
@@ -947,42 +1014,52 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                                  (!FeuxPietonsPresents); // v5.2
     ActionDecorsPelouse->Checked=(v->Nature==pelouse);
     ActionNatureImmeuble->Checked=(NATURE(v)==immeubles);
-    ActionNatureImmeuble->Enabled= (!v->DirPoss)&& // v5.2
-                                   (!v->SensVoieTram)&&
+    ActionNatureImmeuble->Enabled= (v->DirPoss == 0)&& // v5.2
+                                   (v->SensVoieTram == 0)&&
                                    (!FeuxPietonsPresents);
    }
 
   // 8. Case illustrée par un message
   if ((!SelectionFeuxDmd)&&(!SelectionFeuxAtt)&&(!SelectionFeuxPtn)&& // v5.2 : Ajout SelectioneuxPtn
       (xErr==Col)&&(yErr==Row)&&
-      TimerClignotementErreur->Enabled&&TimerClignotementErreur->Tag) // v3.5
+      TimerClignotementErreur->Enabled&&(TimerClignotementErreur->Tag != 0)) { // v3.5
    VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                       Rect.Left, Rect.Top,
                       IDB_CURSERR);
+}
 
   // 9. feux sélectionnés depuis la fenêtre de définition d'un feu
-  if (SelectionFeuxDmd)
-   for(int i=0; i<frmDefFeux->NbFeuxDmd; i++)
+  if (SelectionFeuxDmd) {
+   for(int i=0; i<frmDefFeux->NbFeuxDmd; i++) {
     if ((cv->Feu[frmDefFeux->NumFeuxDmd[i]-1].x==Col)&&
-        (cv->Feu[frmDefFeux->NumFeuxDmd[i]-1].y==Row))
+        (cv->Feu[frmDefFeux->NumFeuxDmd[i]-1].y==Row)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_SELFEU+cv->Feu[frmDefFeux->NumFeuxDmd[i]-1].Dir-1);
-  if (SelectionFeuxAtt)
-   for(int i=0; i<frmDefFeux->NbFeuxAtt; i++)
+}
+}
+}
+  if (SelectionFeuxAtt) {
+   for(int i=0; i<frmDefFeux->NbFeuxAtt; i++) {
     if ((cv->Feu[frmDefFeux->NumFeuxAtt[i]-1].x==Col)&&
-        (cv->Feu[frmDefFeux->NumFeuxAtt[i]-1].y==Row))
+        (cv->Feu[frmDefFeux->NumFeuxAtt[i]-1].y==Row)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_SELFEU+cv->Feu[frmDefFeux->NumFeuxAtt[i]-1].Dir-1);
+}
+}
+}
   // 9bis. feux sélectionnés depuis la fenêtre de définition d'un feu de piéton (v5.2)
-  if (SelectionFeuxPtn)
-   for(int i=0; i<frmDefFeuxPietons->NbFeux; i++)
+  if (SelectionFeuxPtn) {
+   for(int i=0; i<frmDefFeuxPietons->NbFeux; i++) {
     if ((cv->Feu[frmDefFeuxPietons->NumFeux[i]-1].x==Col)&&
-        (cv->Feu[frmDefFeuxPietons->NumFeux[i]-1].y==Row))
+        (cv->Feu[frmDefFeuxPietons->NumFeux[i]-1].y==Row)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_SELFEU+cv->Feu[frmDefFeuxPietons->NumFeux[i]-1].Dir-1);
+}
+}
+}
   if ((Colonnes>1)||(Lignes>1))
    {
     StatusBar->Panels->Items[0]->Text=Format( "Sélection en cours : %d colonne(s) et %d ligne(s)",
@@ -995,8 +1072,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
    }
   else
    {
-    if (StatusBar->Panels->Items[0]->Text.Pos("Sélection en cours"))
+    if (StatusBar->Panels->Items[0]->Text.Pos("Sélection en cours") != 0) {
      StatusBar->Panels->Items[0]->Text="";
+}
     if (DrawGridSimul->PopupMenu==PopupMenuEditionSelection) // v3.5
      {
       DrawGridSimul->PopupMenu=PopupMenuEditionCase;
@@ -1020,7 +1098,8 @@ void TfrmSimulation::RafraichitFonctionDeplacementFeu() // v3.5
 //---------------------------------------------------------------------------
 void TfrmSimulation::RedimensionneZone()
  {
-  if (WindowState==wsMaximized) WindowState=wsNormal; // v4.4
+  if (WindowState==wsMaximized) { WindowState=wsNormal; // v4.4
+}
   DrawGridSimul->ColCount=cv->NbX;
   DrawGridSimul->RowCount=cv->NbY;
   Width=DrawGridSimul->DefaultColWidth*cv->NbX+(Width-DrawGridSimul->Width); // v5.4 (DrawGridSimul->DefaultColWidth)
@@ -1031,14 +1110,14 @@ void TfrmSimulation::RedimensionneZone()
 void TfrmSimulation::FormCreate(TObject *Sender)
 { // Initialise les indicateurs. v5.4 : la màj de la base de registres est faite par l'installateur
  // v5.4 : on applique la résolution courante sur la taille des cases par rapport à la définition prédéfinie
- Affichage=(affichage)(aff_sign|aff_voie|aff_env); // v3.8.1 (aff_env)
+ Affichage=static_cast<affichage>(aff_sign|aff_voie|aff_env); // v3.8.1 (aff_env)
  xErr=-1; yErr=-1;
  Pause=false; // v3.5
  SimulEnCours=false;
  SimulModifiee=false;
  EnregistrerAvant=false;
  RedimensionnementEnCours=false; // v3.5.1
- CopieReseau=NULL; // v6.0.1
+ CopieReseau=nullptr; // v6.0.1
  InitialiseDeplacementFeu();
  frmAPropos=new TfrmAPropos(this);
  cv=new centre_ville(NB_ELEMENTS_PAR_DEFAUT,NBXDEF,NBYDEF);
@@ -1047,9 +1126,9 @@ void TfrmSimulation::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::FormDestroy(TObject *Sender)
 {
- if (cv) { delete cv; cv=NULL; }
+ if (cv) { delete cv; cv=nullptr; }
  delete CopieReseau; // v6.0.1
- if (frmAPropos) delete frmAPropos;
+ delete frmAPropos;
  DebugFerme(); 
 }
 //---------------------------------------------------------------------------
@@ -1058,8 +1137,9 @@ bool TfrmSimulation::EnregistreModificationsAvant(operation_avant Operation)
   type_reponse mrRep;
   AnsiString asMessage;
   if ((!SimulationModifiee)||
-      Pause||SimulEnCours) // v5.1.1 : pas d'enregistrement si simulation en cours (enregistrement auotomatique déjà fait)
+      Pause||SimulEnCours) { // v5.1.1 : pas d'enregistrement si simulation en cours (enregistrement auotomatique déjà fait)
    return true; // Inutile car pas de modif.
+}
   switch(Operation)
    {
     case oaNouveau: asMessage=asQstEnregistrerFichier+
@@ -1078,9 +1158,11 @@ bool TfrmSimulation::EnregistreModificationsAvant(operation_avant Operation)
     case trOui: EnregistrerAvant=true;
                 ActionEnregistrer->Execute();
                 // Enregistrement annulé : on annule la création
-                if (!EnregistrerAvant) return false;
-    case trNon: if (EnregistrerAvant)
+                if (!EnregistrerAvant) { return false;
+}
+    case trNon: if (EnregistrerAvant) {
                  EnregistrerAvant=false;
+}
                 return true;
     default: return false;
    }
@@ -1095,19 +1177,28 @@ bool TfrmSimulation::ModifiePassagePietonsSiNecessaire(int x, int y) // v2.0
     RedessineCase(x%cv->NbX, y%cv->NbY, true);
     return true;
    }
-  else return false;
+  return false;
+
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 { // v5.4 : manque int (???)
  const int NumSvtOrdSel[2][4]={{0,0,1,0},{1,1,1,1}};
- int x=DrawGridSimul->Col,
-     y=DrawGridSimul->Row,
-     i, j, NbFeux, *NumFeu,// Variables de transition
-     NumFeuVoie[2]={0,0}, // Numéros de feux de la voie {Prm,Drn}
-     NbFeuxListe, // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
-     NbFeuxVoie=0, // Nombre de feux dans la voie v[Col][Row]
-     NbNonSel, // Compteur du nombre de feux non sélectionnés
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ int i;
+ int j;
+ int NbFeux;
+ int *NumFeu;
+ int // Variables de transition
+     NumFeuVoie[2]={0,0};
+ int // Numéros de feux de la voie {Prm,Drn}
+     NbFeuxListe;
+ int // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
+     NbFeuxVoie=0;
+ int // Nombre de feux dans la voie v[Col][Row]
+     NbNonSel;
+ int // Compteur du nombre de feux non sélectionnés
      Selection[2]={0,0}; // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
  // Traite le clic sur la case avec des feux lors d'une sélection de feux :
  // 2 feux = passage de aucun à feu1, de feu1 à feu2,
@@ -1115,7 +1206,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
  // 1 feu = passage de aucun à feu1, de feu1 à aucun
  voie *v=&(cv->v[x][y]);
 
- if (v->NumParking&&ActionParking->Enabled)
+ if ((v->NumParking != 0)&&ActionParking->Enabled)
   {
    ActionParking->Execute();
    return;
@@ -1124,27 +1215,31 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
  if (!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)) // v5.2 : Ajout SelectionFeuxPtn
   {
    // v5.2: Maintenant on choisit les priorités Voies ou piétons selon qui'il y ait des voies ou non
-   if (v->DirPoss||v->SensVoieTram) // Ici Voies de circulation -> Priorités des Voies
+   if ((v->DirPoss != 0)||(v->SensVoieTram != 0)) // Ici Voies de circulation -> Priorités des Voies
     {
      frmDefVoie->RafraichitInfos();
      if ((!ActionPriorites->Checked)&&
-         ActionPriorites->Enabled)
+         ActionPriorites->Enabled) {
       frmDefVoie->Show();
+}
      return;
     }
-   else // Pas de voies de circulation -> Priorités piétons
-    {
+   // Pas de voies de circulation -> Priorités piétons
+    
      frmDefVoiePietons->RafraichitInfos();
      if ((!ActionPrioritesPietons->Checked)&&
-         ActionPrioritesPietons->Enabled)
+         ActionPrioritesPietons->Enabled) {
       frmDefVoiePietons->Show();
+}
      return;
-    }
+    
   }
 
  // Calcul du nombre et des numéros de feux de la voie
- for(i=0; i<NBDIR; i++)
-  if ((v->NumFeu[i]>0)&&(NbFeuxVoie<2)) NumFeuVoie[NbFeuxVoie++]=v->NumFeu[i]; // v6.0.6 : jusqu'à 4 feux sur une case, écrits par l'original dans ce tableau de 2. Le choix porte sur les 2 premiers
+ for(i=0; i<NBDIR; i++) {
+  if ((v->NumFeu[i]>0)&&(NbFeuxVoie<2)) { NumFeuVoie[NbFeuxVoie++]=v->NumFeu[i]; // v6.0.6 : jusqu'à 4 feux sur une case, écrits par l'original dans ce tableau de 2. Le choix porte sur les 2 premiers
+}
+}
 
  // Attention : les listes sont exclusives à la sélection donc pas d'initialisation entre les 2
 
@@ -1153,14 +1248,18 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
   {
    NbFeuxListe=frmDefFeux->NbFeuxDmd;
    // Sélection courante
-   for(i=0; i<NbFeuxListe; i++)
-    for(j=0; j<NbFeuxVoie; j++)
-     if (frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j])
+   for(i=0; i<NbFeuxListe; i++) {
+    for(j=0; j<NbFeuxVoie; j++) {
+     if (frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j]) {
       Selection[0]+=(j+1);
+}
+}
+}
 
    // Sélection suivante selon la règle ci-dessus
-   if (NbFeuxVoie)
+   if (NbFeuxVoie != 0) {
     Selection[1]=(Selection[0]+1)%(2*NbFeuxVoie);
+}
 
    // Génération de la liste                                     Selection  Nombre
    NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
@@ -1176,19 +1275,22 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
      // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
      // NumFeu quand le feu retiré était le dernier de la liste
      int NbRetires=0;
-     for(j=0; j<NbFeuxVoie; j++)
-      NbRetires+=(frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
-     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxDmd[i];
+     for(j=0; j<NbFeuxVoie; j++) {
+      NbRetires+=static_cast<int>((frmDefFeux->NumFeuxDmd[i]==NumFeuVoie[j])&&((j&Selection[1]) == 0));
+}
+     if (NbRetires == 0) { NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxDmd[i];
+}
      NbNonSel+=NbRetires;
     }
-   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
+   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) { // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
+}
 
    // Changement de liste
    if (frmDefFeux->NumFeuxDmd)
     {
      delete[] frmDefFeux->NumFeuxDmd;
-     frmDefFeux->NumFeuxDmd=NULL;
+     frmDefFeux->NumFeuxDmd=nullptr;
     }
    frmDefFeux->NumFeuxDmd=NumFeu;
    frmDefFeux->NbFeuxDmd=NbFeux;
@@ -1201,14 +1303,18 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
   {
    NbFeuxListe=frmDefFeux->NbFeuxAtt;
    // Sélection courante
-   for(i=0; i<NbFeuxListe; i++)
-    for(j=0; j<NbFeuxVoie; j++)
-     if (frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j])
+   for(i=0; i<NbFeuxListe; i++) {
+    for(j=0; j<NbFeuxVoie; j++) {
+     if (frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j]) {
       Selection[0]+=(j+1);
+}
+}
+}
 
    // Sélection suivante selon la règle ci-dessus
-   if (NbFeuxVoie)
+   if (NbFeuxVoie != 0) {
     Selection[1]=(Selection[0]+1)%(2*NbFeuxVoie);
+}
 
    // Génération de la liste                                     Selection  Nombre
    NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
@@ -1224,19 +1330,22 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
      // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
      // NumFeu quand le feu retiré était le dernier de la liste
      int NbRetires=0;
-     for(j=0; j<NbFeuxVoie; j++)
-      NbRetires+=(frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
-     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxAtt[i];
+     for(j=0; j<NbFeuxVoie; j++) {
+      NbRetires+=static_cast<int>((frmDefFeux->NumFeuxAtt[i]==NumFeuVoie[j])&&((j&Selection[1]) == 0));
+}
+     if (NbRetires == 0) { NumFeu[i-NbNonSel]=frmDefFeux->NumFeuxAtt[i];
+}
      NbNonSel+=NbRetires;
     }
-   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
+   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) { // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
+}
 
    // Changement de liste
    if (frmDefFeux->NumFeuxAtt)
     {
      delete[] frmDefFeux->NumFeuxAtt;
-     frmDefFeux->NumFeuxAtt=NULL;
+     frmDefFeux->NumFeuxAtt=nullptr;
     }
    frmDefFeux->NumFeuxAtt=NumFeu;
    frmDefFeux->NbFeuxAtt=NbFeux;
@@ -1249,14 +1358,18 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
   {
    NbFeuxListe=frmDefFeuxPietons->NbFeux;
    // Sélection courante
-   for(i=0; i<NbFeuxListe; i++)
-    for(j=0; j<NbFeuxVoie; j++)
-     if (frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j])
+   for(i=0; i<NbFeuxListe; i++) {
+    for(j=0; j<NbFeuxVoie; j++) {
+     if (frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j]) {
       Selection[0]+=(j+1);
+}
+}
+}
 
    // Sélection suivante selon la règle ci-dessus
-   if (NbFeuxVoie)
+   if (NbFeuxVoie != 0) {
     Selection[1]=(Selection[0]+1)%(2*NbFeuxVoie);
+}
 
    // Génération de la liste                                     Selection  Nombre
    NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
@@ -1272,19 +1385,22 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
      // v6.0.5 : copié seulement s'il reste. L'original copiait d'abord : écriture hors de
      // NumFeu quand le feu retiré était le dernier de la liste
      int NbRetires=0;
-     for(j=0; j<NbFeuxVoie; j++)
-      NbRetires+=(frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j])&&(!(j&Selection[1]));
-     if (!NbRetires) NumFeu[i-NbNonSel]=frmDefFeuxPietons->NumFeux[i];
+     for(j=0; j<NbFeuxVoie; j++) {
+      NbRetires+=static_cast<int>((frmDefFeuxPietons->NumFeux[i]==NumFeuVoie[j])&&((j&Selection[1]) == 0));
+}
+     if (NbRetires == 0) { NumFeu[i-NbNonSel]=frmDefFeuxPietons->NumFeux[i];
+}
      NbNonSel+=NbRetires;
     }
-   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) // Cas de recopie d'une nouvelle sélection
+   for(i=NbFeuxListe-NbNonSel; i<NbFeux; i++) { // Cas de recopie d'une nouvelle sélection
     NumFeu[i]=NumFeuVoie[NumSvtOrdSel[i-NbFeuxListe+NbNonSel][Selection[1]]];
+}
 
    // Changement de liste
    if (frmDefFeuxPietons->NumFeux)
     {
      delete[] frmDefFeuxPietons->NumFeux;
-     frmDefFeuxPietons->NumFeux=NULL;
+     frmDefFeuxPietons->NumFeux=nullptr;
     }
    frmDefFeuxPietons->NumFeux=NumFeu;
    frmDefFeuxPietons->NbFeux=NbFeux;
@@ -1296,53 +1412,68 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 bool TfrmSimulation::VerifieReseau()
  {
   bool Ok=true;
-  int i, j, d,
-      NbDirPossSansPsgBus, // v3.5
+  int i;
+  int j;
+  int d;
+  int NbDirPossSansPsgBus;
+  int // v3.5
       NbCasesPietonPeutAller=0; // v3.8
   const AnsiString asMsgOk="Réseau correct.";
   AnsiString asMsgErr;
   dirposs dp;
-  voie *v, *vv;
+  voie *v;
+  voie *vv;
   cv->VerifOk=false;
   // On enleve le clignotement si actif. v3.5
-  if (TimerClignotementErreur->Enabled) TimerClignotementErreur->Enabled=false;
-  if ((xErr>-1)&&(yErr>-1)) RedessineCase(xErr, yErr, true);
+  if (TimerClignotementErreur->Enabled) { TimerClignotementErreur->Enabled=false;
+}
+  if ((xErr>-1)&&(yErr>-1)) { RedessineCase(xErr, yErr, true);
+}
   xErr=-1; yErr=-1;
-  for(i=0; Ok&&(i<cv->NbParkings); i++) // v3.0
-   if (!(Ok=cv->Parking[i].Defini()))
+  for(i=0; Ok&&(i<cv->NbParkings); i++) { // v3.0
+   if (!(Ok=cv->Parking[i].Defini())) {
     asMsgErr=Format( "Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                      ARRAYOFCONST((i+1, cv->NbParkings)));
+}
+}
 
-  for(i=0; Ok&&(i<cv->NbPlacesPark); i++) // v5.0
-   if (!(Ok=cv->PlacePark[i].Definie()))
+  for(i=0; Ok&&(i<cv->NbPlacesPark); i++) { // v5.0
+   if (!(Ok=cv->PlacePark[i].Definie())) {
     asMsgErr=Format( "Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                      ARRAYOFCONST((i+1, cv->NbPlacesPark)));
+}
+}
 
-  for(i=0; Ok&&(i<cv->NbPlacesVehlib); i++) // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
-   if (!(Ok=cv->PlaceVehlib[i].Definie()))
+  for(i=0; Ok&&(i<cv->NbPlacesVehlib); i++) { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
+   if (!(Ok=cv->PlaceVehlib[i].Definie())) {
     asMsgErr=Format( "Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                      ARRAYOFCONST((i+1)));
+}
+}
 
-  for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++)
+  for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) {
    for(j=0; Ok&&(j<NBMAXARRETSBUSTRAMPARLIGNE); j++)
     {
-     if (j<cv->LigneBus[i].NbArrets) // v3.5 : Oubli du test du nombre d'arrêts
+     if (j<cv->LigneBus[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
       if (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))
        {
         asMsgErr=Format( "La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((i+1, cv->LigneBus[i].NumArret[j])));
         break;
        }
-     if (j<cv->LigneTram[i].NbArrets) // v3.5 : Oubli du test du nombre d'arrêts
+}
+     if (j<cv->LigneTram[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
       if (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))
        {
         asMsgErr=Format( "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((AnsiString((char)('A'+i)), cv->LigneTram[i].NumArret[j])));
         break;
        }
+}
     }
-  for(i=0; Ok&&(i<cv->NbArretsBus); i++)
-   if (cv->ArretBus[i].Defini())
+}
+  for(i=0; Ok&&(i<cv->NbArretsBus); i++) {
+   if (cv->ArretBus[i].Defini()) {
     if (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))
      { // v3.0.3
       xErr=cv->ArretBus[i].x; yErr=cv->ArretBus[i].y;
@@ -1350,8 +1481,10 @@ bool TfrmSimulation::VerifieReseau()
                        ARRAYOFCONST((i+1)));
       break;
      }
-  for(i=0; Ok&&(i<cv->NbArretsTram); i++)
-   if (cv->ArretTram[i].Defini())
+}
+}
+  for(i=0; Ok&&(i<cv->NbArretsTram); i++) {
+   if (cv->ArretTram[i].Defini()) {
     if (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))
      { // v3.0.3
       xErr=cv->ArretTram[i].x; yErr=cv->ArretTram[i].y;
@@ -1359,6 +1492,8 @@ bool TfrmSimulation::VerifieReseau()
 					   ARRAYOFCONST((i+1)));
 	  break;
 	 }
+}
+}
   if (Ok&&(cv->NbArretsBus>0)&&(cv->NbLignesBus>0))  // v3.0
    {
 	if (!(Ok=cv->DepotBus.Defini()))
@@ -1374,7 +1509,7 @@ bool TfrmSimulation::VerifieReseau()
 	   }
 	  for(d=nord; Ok&&(d<=ouest); d++)
 	   {
-		if (!(Ok=!(cv->V(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss&InvPossDir[d])))
+		if (!(Ok=((cv->V(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss&InvPossDir[d]) == 0)))
 		 {
 		  xErr=(cv->DepotBus.x+dx[d])%cv->NbX; yErr=(cv->DepotBus.y+dy[d])%cv->NbY;
 		  asMsgErr="On ne peut diriger une case vers le dépôt de bus (il est en SORTIE SEULE).";
@@ -1382,7 +1517,7 @@ bool TfrmSimulation::VerifieReseau()
 	   }
 	 }
    }
-  for(i=0; Ok&&(i<cv->NbX); i++)
+  for(i=0; Ok&&(i<cv->NbX); i++) {
    for(j=0; Ok&&(j<cv->NbY); j++)
 	{
      v=&(cv->v[i][j]);
@@ -1392,17 +1527,17 @@ bool TfrmSimulation::VerifieReseau()
        if ((v->DirPoss&PossDir[d])==PossDir[d])
         {
          vv=&(cv->V(i,j,d));
-         NbDirPossSansPsgBus+=!vv->PassageBus;
+         NbDirPossSansPsgBus+=static_cast<int>(!vv->PassageBus);
          dp=vv->DirPoss;
          if ((dp==InvPossDir[d])&&
-             (!vv->NumPlaceVehlib)) // v5.3 sauf Places vehlib pour lesquelles il faut pouvoir entrer et sortir (pas de file de vehlib)
+             (vv->NumPlaceVehlib == 0)) // v5.3 sauf Places vehlib pour lesquelles il faut pouvoir entrer et sortir (pas de file de vehlib)
           {
            Ok=false; xErr=i; yErr=j;
            asMsgErr=Format("Demi-tour obligé entre les cases (%d, %d) et (%d, %d).",
                            ARRAYOFCONST((i, j, (i+dx[d])%cv->NbX, (j+dy[d])%cv->NbY)));
            break;
           }
-         if (!dp)
+         if (dp == 0)
           {
            Ok=false; xErr=i; yErr=j;
            asMsgErr=Format("La case (%d, %d) pointe sur (%d, %d) qui n'a aucune direction possible.",
@@ -1412,7 +1547,7 @@ bool TfrmSimulation::VerifieReseau()
          if ((!v->PassageBus)&& // Si ce n'est pas un passage réservé aux bus ET
              v->ToutDroit&& // il y a obligation d'aller tout droit ET
              vv->PassageBus&& // la case voisine est réservée aux bus ET
-             (cv->V(i,j,InvDir[d]).DirPoss&PossDir[d])&& // On peut venir de la case opposée
+             ((cv->V(i,j,InvDir[d]).DirPoss&PossDir[d]) != 0)&& // On peut venir de la case opposée
              (!cv->V(i,j,InvDir[d]).PassageBus)) // qui n'est pas réservé aux bus ALORS...
           { // ...Il y a possibilité de blocage. v3.5
            Ok=false; xErr=i; yErr=j;
@@ -1431,26 +1566,28 @@ bool TfrmSimulation::VerifieReseau()
          break;
         }
       } // v5.2.2
-     if (!Ok) break; // v3.5 (oubli !)
-     if (v->DirPoss&&
+     if (!Ok) { break; // v3.5 (oubli !)
+}
+     if ((v->DirPoss != 0)&&
          (!v->PassageBus)&&
-         (!NbDirPossSansPsgBus)) // v3.5
+         (NbDirPossSansPsgBus == 0)) // v3.5
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La case (%d, %d) n'a aucune direction possible en dehors des passages de bus.",
                        ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumParking)
+     if (v->NumParking != 0)
       {
-       if (!v->DirPoss)
+       if (v->DirPoss == 0)
         {
          Ok=false; xErr=i; yErr=j;
          asMsgErr=Format("La case (%d, %d) est un parking mais n'a aucune direction possible.",
                          ARRAYOFCONST((i, j)));
          break;
         }
-       for(d=nord; (d<=ouest)&&(!(cv->V(i,j,d).DirPoss&InvPossDir[d])); d++);
+       for(d=nord; (d<=ouest)&&((cv->V(i,j,d).DirPoss&InvPossDir[d]) == 0); d++) {;
+}
        if (d>ouest)
         {
          Ok=false; xErr=i; yErr=j;
@@ -1459,10 +1596,11 @@ bool TfrmSimulation::VerifieReseau()
          break;
        }
       }
-     if (v->NumArretBus) // v3.0
+     if (v->NumArretBus != 0) // v3.0
       {
-       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++)
+       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++) {
         Ok=(cv->V(i,j,d).NumArretBus==v->NumArretBus);
+}
        if (!Ok)
         {
          xErr=i; yErr=j;
@@ -1470,10 +1608,11 @@ bool TfrmSimulation::VerifieReseau()
          break;
         }
       }
-     if (v->NumArretTram) // v3.5
+     if (v->NumArretTram != 0) // v3.5
       {
-       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++)
+       for(Ok=false, d=nord; (!Ok)&&(d<=ouest); d++) {
         Ok=(cv->V(i,j,d).NumArretTram==v->NumArretTram);
+}
        if (!Ok)
         {
          xErr=i; yErr=j;
@@ -1481,7 +1620,7 @@ bool TfrmSimulation::VerifieReseau()
          break;
         }
       }
-     if ((v->PassagePietons)&&(!cv->SensPassagePietonsPossible(i, j)))
+     if ((v->PassagePietons)&&(cv->SensPassagePietonsPossible(i, j) == 0))
       {
        Ok=false; xErr=i; yErr=j;
 
@@ -1490,82 +1629,100 @@ bool TfrmSimulation::VerifieReseau()
        SimulationModifiee=true;
        break;
       }
-     if (v->NumPlaceTaxi&&v->ExistePlusieursQueuesFileTaxis()) // v3.6
+     if ((v->NumPlaceTaxi != 0)&&v->ExistePlusieursQueuesFileTaxis()) // v3.6
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("Plusieurs files de taxi sont dirigées sur la place de taxi de la case (%d, %d).", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlaceTaxi&&v->ExistePlusieursTetesFileTaxis()) // v3.6
+     if ((v->NumPlaceTaxi != 0)&&v->ExistePlusieursTetesFileTaxis()) // v3.6
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La place de taxi de la case (%d, %d) pointe sur plus d'une file de taxis.", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlacePark&&v->ExistePlusieursQueuesFilePark()) // v5.0
+     if ((v->NumPlacePark != 0)&&v->ExistePlusieursQueuesFilePark()) // v5.0
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("Plusieurs files de parkings sont dirigées sur la place de parking de la case (%d, %d).", ARRAYOFCONST((i, j)));
        break;
       }
-     if (v->NumPlacePark&&v->ExistePlusieursTetesFilePark()) // v5.0
+     if ((v->NumPlacePark != 0)&&v->ExistePlusieursTetesFilePark()) // v5.0
       {
        Ok=false; xErr=i; yErr=j;
        asMsgErr=Format("La place de parking de la case (%d, %d) pointe sur plus d'une file de parking.", ARRAYOFCONST((i, j)));
        break;
       }
      // Vérification du nombre de cases potentielles avec 1 piéton par case minimal. v3.8
-     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller((direction)d)); d++); // v6.0.2 : borne testée avant PietonPeutAller, qui lit InvDir[d] et dx[d] (feu de piétons rouge dans toutes les directions)
-     NbCasesPietonPeutAller+=(d<=ouest);
+     for(d=nord; (d<=ouest)&&(!v->PietonPeutAller(static_cast<direction>(d))); d++) {; // v6.0.2 : borne testée avant PietonPeutAller, qui lit InvDir[d] et dx[d] (feu de piétons rouge dans toutes les directions)
+}
+     NbCasesPietonPeutAller+=static_cast<int>(d<=ouest);
     }
+}
   if (Ok&&(NbCasesPietonPeutAller<cv->NbPietons)) // v4.2
    {
     Ok=false;
     asMsgErr=Format("Il n'y a pas assez de place pour %d piétons (%d possibles). Ajoutez des trottoirs.", ARRAYOFCONST((cv->NbPietons, NbCasesPietonPeutAller)));
    }
   StatusBar->Panels->Items[0]->Text=(cv->VerifOk=Ok)?asMsgOk:asMsgErr;
-  if ((xErr>-1)&&(yErr>-1))
+  if ((xErr>-1)&&(yErr>-1)) {
    TimerClignotementErreur->Enabled=true;
+}
   Cursor=crDefault;
   return Ok;
  }
 //---------------------------------------------------------------------------
-void TfrmSimulation::AfficheMsgInfoNonDisp(const AnsiString asTitre) // v3.7 (char* -> const AnsiString)
+void TfrmSimulation::AfficheMsgInfoNonDisp(const AnsiString& asTitre) // v3.7 (char* -> const AnsiString)
  {
   AfficheMessage("Aucune information n'est disponible.", asTitre, tmAvertissement, 0, 0);
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::AfficheBilan()
  {
-  int i, j, d, ndp, MinDist,
-      xe, ye,
-      ne=cv->NbParkings, // NbParkings
-      nv=cv->NbVehicules, // NbVehicules
-      nva=cv->NbVehiculesArrives, // NbVehiculesArrivés
-      nvpe=nv/ne, // NbVehiculesParParking
-      ParcoursMin=0L, AttenteDepart=0L,
-      ntp=cv->NbToursParcourus,
-      ncp=cv->NbCasesParcourues;
+  int i;
+  int j;
+  int d;
+  int ndp;
+  int MinDist;
+  int xe;
+  int ye;
+  int ne=cv->NbParkings;
+  int // NbParkings
+      nv=cv->NbVehicules;
+  int // NbVehicules
+      nva=cv->NbVehiculesArrives;
+  int // NbVehiculesArrivés
+      nvpe=nv/ne;
+  int // NbVehiculesParParking
+      ParcoursMin=0L;
+  int AttenteDepart=0L;
+  int ntp=cv->NbToursParcourus;
+  int ncp=cv->NbCasesParcourues;
   double m;
   AnsiString asMsgBilan;
   // 1. On calcule le parcours moyen
-  for(i=0; i<ne; i++)
-   for(j=0; j<ne; j++)
+  for(i=0; i<ne; i++) {
+   for(j=0; j<ne; j++) {
     if (i!=j)
      {
       xe=cv->Parking[i].x; ye=cv->Parking[i].y;
       MinDist=DIST_INDEFINIE; ndp=NbDir[cv->v[xe][ye].DirPoss];
-      for(d=0; d<ndp; d++)
+      for(d=0; d<ndp; d++) {
        MinDist=min(MinDist, cv->v[xe][ye].DistParking[j][d][SANSPSGBUS]); // v3.5 (SANSPSGBUS)
+}
       ParcoursMin+=MinDist;
      }
+}
+}
   m=(1.0*ParcoursMin)/ne/(ne-1);
   // 2. Calcul du temps d'attente de départ
-  for(i=0; i<nv; i++)
-   if (!cv->Vehicule[i].Defini())
+  for(i=0; i<nv; i++) {
+   if (!cv->Vehicule[i].Defini()) {
     AttenteDepart+=cv->Vehicule[i].TourDepart-1;
+}
+}
   // 3. Affichage du bilan
-  if (nva) // v1.8.4 : (long double) for win32 compiler
+  if (nva != 0) { // v1.8.4 : (long double) for win32 compiler
    asMsgBilan=Format( asFormatBilan,
 					  ARRAYOFCONST(( nv,
 									 (long double)m, (long double)m,
@@ -1581,7 +1738,7 @@ void TfrmSimulation::AfficheBilan()
 									 (long double)((1.0*ntp)/nva), (long double)((100.0*ntp)/nva/m),
 									 (long double)((1.0*ncp)/nva), (long double)((100.0*ncp)/ntp),
 									 (long double)((1.0*(ntp-ncp))/nva), (long double)((100.0*(ntp-ncp))/ntp))));
-  else
+  } else {
    asMsgBilan=Format( asFormatBilanSansArrives,
 					  ARRAYOFCONST(( nv,
 									 (long double)m, (long double)m,
@@ -1591,8 +1748,10 @@ void TfrmSimulation::AfficheBilan()
 											 ARRAYOFCONST(( FormatDateTime("hh:nn:ss.zzz", cv->dtTemps), // v3.9.2
 															(long double)(cv->TourCrt/(24*3600*(double)(cv->dtTemps))), // v3.9.2
 															(long double)((24L*3600000L*(double)(cv->dtTemps))/cv->TourCrt))))))); // v3.9.2
-  if (AfficheMessage(asMsgBilan, "Bilan", tmQuestionNecessaire, 0, 1)==trOui) // Défaut = Oui, Echap = Non
+}
+  if (AfficheMessage(asMsgBilan, "Bilan", tmQuestionNecessaire, 0, 1)==trOui) { // Défaut = Oui, Echap = Non
    AfficheStatsAttenteTrafic();
+}
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::FormShow(TObject *Sender)
@@ -1617,9 +1776,9 @@ void TfrmSimulation::FormShow(TObject *Sender)
  StatsAttenteTrafic=false; // v2.2.7
  if (ParamCount()>0)
   {
-   if (ParamStr(1).UpperCase()=="!") // v5.3
+   if (ParamStr(1).UpperCase()=="!") { // v5.3
 	 DebugOuvre(); // v5.4 : plus de paramètres, directement à la fermeture du fichier (DebugFerme)
-   else
+   } else
 	{
 	 asNomFichAuto=ParamStr(1);
      SimulEnCours=true;
@@ -1627,14 +1786,14 @@ void TfrmSimulation::FormShow(TObject *Sender)
      SimulEnCours=false;
     }
   }
- ActionAfficherDirections->Checked=!!(Affichage&aff_dir);
- ActionAfficherSignalisation->Checked=!!(Affichage&aff_sign);
- ActionAfficherVoies->Checked=!!(Affichage&aff_voie);
- ActionAfficherVehicules->Checked=!!(Affichage&aff_veh);
- ActionAfficherPietons->Checked=!!(Affichage&aff_ptn);
- ActionAfficherEnvironnement->Checked=!!(Affichage&aff_env);
- ActionAfficherQuadrillage->Checked=!!(Affichage&aff_quadr);
- ActionAfficherInfection->Checked=!!(Affichage&aff_infct); // v5.4.1
+ ActionAfficherDirections->Checked=!((Affichage&aff_dir) == 0);
+ ActionAfficherSignalisation->Checked=!((Affichage&aff_sign) == 0);
+ ActionAfficherVoies->Checked=!((Affichage&aff_voie) == 0);
+ ActionAfficherVehicules->Checked=!((Affichage&aff_veh) == 0);
+ ActionAfficherPietons->Checked=!((Affichage&aff_ptn) == 0);
+ ActionAfficherEnvironnement->Checked=!((Affichage&aff_env) == 0);
+ ActionAfficherQuadrillage->Checked=!((Affichage&aff_quadr) == 0);
+ ActionAfficherInfection->Checked=!((Affichage&aff_infct) == 0); // v5.4.1
 }
 //---------------------------------------------------------------------------
 // v6.0.2 : aussi quand le réseau change sans clic sur la carte (Arrêt, Ouvrir, Nouveau) :
@@ -1642,12 +1801,18 @@ void TfrmSimulation::FormShow(TObject *Sender)
 // Ouvrir peut venir de la ligne de commande, avant la création des autres fiches
 void TfrmSimulation::RafraichitFichesInfos()
  {
-  if (frmInfosPieton&&frmInfosPieton->Visible) frmInfosPieton->RafraichitInfos(); // v3.0
-  if (frmInfosVehicule&&frmInfosVehicule->Visible) frmInfosVehicule->RafraichitInfos();
-  if (frmInfosBus&&frmInfosBus->Visible) frmInfosBus->RafraichitInfos(); // v3.0
-  if (frmInfosTram&&frmInfosTram->Visible) frmInfosTram->RafraichitInfos(); // v3.5
-  if (frmInfosTaxi&&frmInfosTaxi->Visible) frmInfosTaxi->RafraichitInfos(); // v3.6
-  if (frmInfosVehlib&&frmInfosVehlib->Visible) frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+  if (frmInfosPieton&&frmInfosPieton->Visible) { frmInfosPieton->RafraichitInfos(); // v3.0
+}
+  if (frmInfosVehicule&&frmInfosVehicule->Visible) { frmInfosVehicule->RafraichitInfos();
+}
+  if (frmInfosBus&&frmInfosBus->Visible) { frmInfosBus->RafraichitInfos(); // v3.0
+}
+  if (frmInfosTram&&frmInfosTram->Visible) { frmInfosTram->RafraichitInfos(); // v3.5
+}
+  if (frmInfosTaxi&&frmInfosTaxi->Visible) { frmInfosTaxi->RafraichitInfos(); // v3.6
+}
+  if (frmInfosVehlib&&frmInfosVehlib->Visible) { frmInfosVehlib->RafraichitInfos(); // v5.4.1 (oubli)
+}
  }
 //---------------------------------------------------------------------------
 // v6.0.11 : les fiches Priorités (non modales) sont réaffichées après une commande sur la
@@ -1656,15 +1821,19 @@ void TfrmSimulation::RafraichitFichesInfos()
 // effacée ou redessinée, jusqu'à poser un feu sur une case sans route
 void TfrmSimulation::RafraichitFichesPriorites()
  {
-  if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
-  if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos();
+  if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+  if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos();
+}
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 {
  bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
- if ((frmDefVoie->Visible)&&PasDeSelectionFeux) frmDefVoie->RafraichitInfos();
- if ((frmDefVoiePietons->Visible)&&PasDeSelectionFeux) frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if ((frmDefVoie->Visible)&&PasDeSelectionFeux) { frmDefVoie->RafraichitInfos();
+}
+ if ((frmDefVoiePietons->Visible)&&PasDeSelectionFeux) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
  RafraichitFichesInfos(); // v6.0.2
  if ((frmAffDistParkings->Visible)&&PasDeSelectionFeux)
   {
@@ -1700,7 +1869,8 @@ void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::TimerSimulTimer(TObject *Sender)
 {
- if (cv->TourEnCours) return;
+ if (cv->TourEnCours) { return;
+}
 
  // On traite d'abord la demande
  switch(TypeDemande)
@@ -1710,15 +1880,24 @@ void TfrmSimulation::TimerSimulTimer(TObject *Sender)
                 Pause=false; // v3.5
                 SimulationEnCours=false;
                 // v3.9.2 (ActionXXX->Execute() ne fonctionne pas à tous les coups)
-                if (ActionDistancesParkings->Checked) ActionDistancesParkingsExecute(ActionDistancesParkings);
-                if (ActionDistancesArretsBus->Checked) ActionDistancesArretsBusExecute(ActionDistancesArretsBus);
-                if (ActionDistancesArretsTram->Checked) ActionDistancesArretsTramExecute(ActionDistancesArretsTram);
-                if (ActionDistancesFilesTaxi->Checked) ActionDistancesFilesTaxiExecute(ActionDistancesFilesTaxi);
-                if (ActionDistancesFilesPark->Checked) ActionDistancesFilesParkExecute(ActionDistancesFilesPark); // v5.0
-                if (ActionDistancesPlacesVehlib->Checked) ActionDistancesPlacesVehlibExecute(ActionDistancesPlacesVehlib); // v5.3
-                if (ActionEvolution->Checked) ActionEvolutionExecute(ActionEvolution);
-                if (ActionAfficherVehicules->Checked) ActionAfficherVehiculesExecute(ActionAfficherVehicules);
-				if (ActionStatsParkings->Checked) ActionStatsParkingsExecute(ActionStatsParkings); // v3.9.2
+                if (ActionDistancesParkings->Checked) { ActionDistancesParkingsExecute(ActionDistancesParkings);
+}
+                if (ActionDistancesArretsBus->Checked) { ActionDistancesArretsBusExecute(ActionDistancesArretsBus);
+}
+                if (ActionDistancesArretsTram->Checked) { ActionDistancesArretsTramExecute(ActionDistancesArretsTram);
+}
+                if (ActionDistancesFilesTaxi->Checked) { ActionDistancesFilesTaxiExecute(ActionDistancesFilesTaxi);
+}
+                if (ActionDistancesFilesPark->Checked) { ActionDistancesFilesParkExecute(ActionDistancesFilesPark); // v5.0
+}
+                if (ActionDistancesPlacesVehlib->Checked) { ActionDistancesPlacesVehlibExecute(ActionDistancesPlacesVehlib); // v5.3
+}
+                if (ActionEvolution->Checked) { ActionEvolutionExecute(ActionEvolution);
+}
+                if (ActionAfficherVehicules->Checked) { ActionAfficherVehiculesExecute(ActionAfficherVehicules);
+}
+				if (ActionStatsParkings->Checked) { ActionStatsParkingsExecute(ActionStatsParkings); // v3.9.2
+}
                 AfficheBilan();
                 StatusBar->Panels->Items[0]->Text="Arrêt de la simulation et réinitialisation du réseau en cours...";
                 ActionOuvrir->Execute();
@@ -1732,7 +1911,7 @@ void TfrmSimulation::TimerSimulTimer(TObject *Sender)
                    }
                  }
                 else
-                 { delete CopieReseau; CopieReseau=NULL; } // v6.0.1
+                 { delete CopieReseau; CopieReseau=nullptr; } // v6.0.1
                 DrawGridSimul->Options << goRangeSelect;
                 DrawGridSimul->PopupMenu=PopupMenuEditionCase;
                 return;
@@ -1757,42 +1936,50 @@ void TfrmSimulation::TimerSimulTimer(TObject *Sender)
  else
   {
    cv->EffectueTourSimulation();
-   if ((Affichage&aff_infct)&&cv->NbPietons) // v5.4.1 : si l'affichage épidémie est activé, on affiche les stats épidémiques des piétons. v6.0.8 : sans piéton, division entière par zéro (plantage sous Windows et Linux) : statistiques des véhicules
+   if (((Affichage&aff_infct) != 0)&&(cv->NbPietons != 0)) // v5.4.1 : si l'affichage épidémie est activé, on affiche les stats épidémiques des piétons. v6.0.8 : sans piéton, division entière par zéro (plantage sous Windows et Linux) : statistiques des véhicules
 	{
-	 if (cv->NbVehiculesSortis&&(cv->NbVehiculesSortis-cv->NbVehiculesArrives))
+	 if ((cv->NbVehiculesSortis != 0)&&((cv->NbVehiculesSortis-cv->NbVehiculesArrives) != 0)) {
 	   StatusBar->Panels->Items[0]->Text=Format("Sur %d piétons : %d guéri(s) [%d%%], %d infecté(s) [%d%%], %d mort(s) [%d%%].",
 												ARRAYOFCONST((cv->NbPietons,
 															  cv->NbPietonsGueris, 100*cv->NbPietonsGueris/cv->NbPietons,
 															  cv->NbPietonsInfectes, 100*cv->NbPietonsInfectes/cv->NbPietons,
 															  cv->NbPietonsMorts, 100*cv->NbPietonsMorts/cv->NbPietons)));
+}
 	}
    else
-	 if (cv->NbVehiculesSortis&&(cv->NbVehiculesSortis-cv->NbVehiculesArrives))
+	 if ((cv->NbVehiculesSortis != 0)&&((cv->NbVehiculesSortis-cv->NbVehiculesArrives) != 0)) {
 	   StatusBar->Panels->Items[0]->Text=Format("Sur %d sortis [%d%%] : %d arrivé(s) [%d%%]. Sur %d en course : %d déplacé(s) [%d%%].",
 												ARRAYOFCONST((cv->NbVehiculesSortis, 100*cv->NbVehiculesSortis/cv->NbVehicules,
 															  cv->NbVehiculesArrives, 100*cv->NbVehiculesArrives/cv->NbVehiculesSortis,
 															  cv->NbVehiculesSortis-cv->NbVehiculesArrives,
 															  cv->NbVehiculesDeplaces, 100*cv->NbVehiculesDeplaces/(cv->NbVehiculesSortis-cv->NbVehiculesArrives))));
+}
   }
 }
 //---------------------------------------------------------------------------
 bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) // v3.5 (TypeVoie)
  {
-  bool Abandon=false, ToutSupprimer=true;
-  int i, j, d, x, y, NumFeu,
-      xd=DrawGridSimul->Selection.Left,
-      yd=DrawGridSimul->Selection.Top,
-      xf=DrawGridSimul->Selection.Right,
-      yf=DrawGridSimul->Selection.Bottom;
-  for(x=xd; (!Abandon)&&(x<=xf); x++)
-   for(y=yd; (!Abandon)&&(y<=yf); y++)
-    for(d=0; (!Abandon)&&(d<NBDIR); d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
-         (NumFeu=cv->v[x][y].NumFeu[d]))
+  bool Abandon=false;
+  bool ToutSupprimer=true;
+  int i;
+  int j;
+  int d;
+  int x;
+  int y;
+  int NumFeu;
+  int xd=DrawGridSimul->Selection.Left;
+  int yd=DrawGridSimul->Selection.Top;
+  int xf=DrawGridSimul->Selection.Right;
+  int yf=DrawGridSimul->Selection.Bottom;
+  for(x=xd; (!Abandon)&&(x<=xf); x++) {
+   for(y=yd; (!Abandon)&&(y<=yf); y++) {
+    for(d=0; (!Abandon)&&(d<NBDIR); d++) {
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
+         ((NumFeu=cv->v[x][y].NumFeu[d]) != 0)) {
       for(i=0; (!Abandon)&&(i<cv->NbFeux); i++)
        {
-        for(j=0; (!Abandon)&&(j<cv->Feu[i].NbFeuxDmd); j++)
-         if (cv->Feu[i].NumFeuxDmd[j]==NumFeu)
+        for(j=0; (!Abandon)&&(j<cv->Feu[i].NbFeuxDmd); j++) {
+         if (cv->Feu[i].NumFeuxDmd[j]==NumFeu) {
           switch(MessageDlg( Format( "\
 Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
 Ce dernier demande que le premier soit rouge pour passer au vert.\n\n\
@@ -1809,8 +1996,10 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
                              Abandon=true;
             default:         break;
            }
-        for(j=0; (!Abandon)&&(j<cv->Feu[i].NbFeuxAtt); j++)
-         if (cv->Feu[i].NumFeuxAtt[j]==NumFeu)
+}
+}
+        for(j=0; (!Abandon)&&(j<cv->Feu[i].NbFeuxAtt); j++) {
+         if (cv->Feu[i].NumFeuxAtt[j]==NumFeu) {
           switch(MessageDlg( Format( "\
 Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
 Ce dernier doit être rouge pour que le premier passe au vert.\n\n\
@@ -1827,16 +2016,22 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
                              Abandon=true;
             default:         break;
            }
+}
+}
        }
+}
+}
+}
+}
   // v6.0.5 : les feux de piétons référencent aussi les feux (oubliés par l'original)
-  for(x=xd; (!Abandon)&&(x<=xf); x++)
-   for(y=yd; (!Abandon)&&(y<=yf); y++)
-    for(d=0; (!Abandon)&&(d<NBDIR); d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&&
-         (NumFeu=cv->v[x][y].NumFeu[d]))
-      for(i=0; (!Abandon)&&(i<cv->NbFeuxPieton); i++)
-       for(j=0; (!Abandon)&&(j<cv->FeuP[i].NbFeux); j++)
-        if (cv->FeuP[i].NumFeux[j]==NumFeu)
+  for(x=xd; (!Abandon)&&(x<=xf); x++) {
+   for(y=yd; (!Abandon)&&(y<=yf); y++) {
+    for(d=0; (!Abandon)&&(d<NBDIR); d++) {
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d+1))&&
+         ((NumFeu=cv->v[x][y].NumFeu[d]) != 0)) {
+      for(i=0; (!Abandon)&&(i<cv->NbFeuxPieton); i++) {
+       for(j=0; (!Abandon)&&(j<cv->FeuP[i].NbFeux); j++) {
+        if (cv->FeuP[i].NumFeux[j]==NumFeu) {
          switch(MessageDlg( Format( "\
 Le feu de piétons n°%d dépend du feu n°%d (à supprimer).\n\n\
 Si vous continuez, le feu n°%d sera supprimé.\n\
@@ -1852,65 +2047,98 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
                             Abandon=true;
            default:         break;
           }
+}
+}
+}
+}
+}
+}
+}
   return ToutSupprimer;
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
  {
-  int i, j, d, x, y, NumFeu,
-      xd=DrawGridSimul->Selection.Left,
-      yd=DrawGridSimul->Selection.Top,
-      xf=DrawGridSimul->Selection.Right,
-      yf=DrawGridSimul->Selection.Bottom;
-  for(x=xd; x<=xf; x++)
-   for(y=yd; y<=yf; y++)
-    for(d=0; d<NBDIR; d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
-         (NumFeu=cv->v[x][y].NumFeu[d]))
+  int i;
+  int j;
+  int d;
+  int x;
+  int y;
+  int NumFeu;
+  int xd=DrawGridSimul->Selection.Left;
+  int yd=DrawGridSimul->Selection.Top;
+  int xf=DrawGridSimul->Selection.Right;
+  int yf=DrawGridSimul->Selection.Bottom;
+  for(x=xd; x<=xf; x++) {
+   for(y=yd; y<=yf; y++) {
+    for(d=0; d<NBDIR; d++) {
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d+1))&& // v3.5. v6.0.5 : d+1, l'original regardait la direction précédente et oubliait des références
+         ((NumFeu=cv->v[x][y].NumFeu[d]) != 0)) {
       for(i=0; i<cv->NbFeux; i++)
        {
-        for(j=0; j<cv->Feu[i].NbFeuxDmd; j++)
-         if (cv->Feu[i].NumFeuxDmd[j]==NumFeu)
+        for(j=0; j<cv->Feu[i].NbFeuxDmd; j++) {
+         if (cv->Feu[i].NumFeuxDmd[j]==NumFeu) {
           cv->Feu[i].RetireFeuDmd(NumFeu);
-        for(j=0; j<cv->Feu[i].NbFeuxAtt; j++)
-         if (cv->Feu[i].NumFeuxAtt[j]==NumFeu)
+}
+}
+        for(j=0; j<cv->Feu[i].NbFeuxAtt; j++) {
+         if (cv->Feu[i].NumFeuxAtt[j]==NumFeu) {
           cv->Feu[i].RetireFeuAtt(NumFeu);
+}
+}
        }
+}
+}
+}
+}
   // v6.0.5 : de même dans les feux de piétons (oubliés par l'original)
-  for(x=xd; x<=xf; x++)
-   for(y=yd; y<=yf; y++)
-    for(d=0; d<NBDIR; d++)
-     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, (direction)(d+1))&&
-         (NumFeu=cv->v[x][y].NumFeu[d]))
-      for(i=0; i<cv->NbFeuxPieton; i++)
-       for(j=0; j<cv->FeuP[i].NbFeux; j++)
-        if (cv->FeuP[i].NumFeux[j]==NumFeu)
+  for(x=xd; x<=xf; x++) {
+   for(y=yd; y<=yf; y++) {
+    for(d=0; d<NBDIR; d++) {
+     if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d+1))&&
+         ((NumFeu=cv->v[x][y].NumFeu[d]) != 0)) {
+      for(i=0; i<cv->NbFeuxPieton; i++) {
+       for(j=0; j<cv->FeuP[i].NbFeux; j++) {
+        if (cv->FeuP[i].NumFeux[j]==NumFeu) {
          cv->FeuP[i].RetireFeu(NumFeu);
+}
+}
+}
+}
+}
+}
+}
  }
 //---------------------------------------------------------------------------
 bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) // v3.5
  {
-  bool Abandon=false, ToutSupprimer=true;
-  int i, x, y, NumArret,
-      xd=DrawGridSimul->Selection.Left,
-      yd=DrawGridSimul->Selection.Top,
-      xf=DrawGridSimul->Selection.Right,
-      yf=DrawGridSimul->Selection.Bottom;
-  bool *ArretBusDejaVu=new bool[cv->NbArretsBus],
-       *ArretTramDejaVu=new bool[cv->NbArretsTram];
+  bool Abandon=false;
+  bool ToutSupprimer=true;
+  int i;
+  int x;
+  int y;
+  int NumArret;
+  int xd=DrawGridSimul->Selection.Left;
+  int yd=DrawGridSimul->Selection.Top;
+  int xf=DrawGridSimul->Selection.Right;
+  int yf=DrawGridSimul->Selection.Bottom;
+  bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
+  bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
   voie *v;
   type_voie TypeVoieCrt;
-  for(i=0; i<cv->NbArretsBus; i++) ArretBusDejaVu[i]=false;
-  for(i=0; i<cv->NbArretsTram; i++) ArretTramDejaVu[i]=false;
-  for(x=xd; (!Abandon)&&(x<=xf); x++)
+  for(i=0; i<cv->NbArretsBus; i++) { ArretBusDejaVu[i]=false;
+}
+  for(i=0; i<cv->NbArretsTram; i++) { ArretTramDejaVu[i]=false;
+}
+  for(x=xd; (!Abandon)&&(x<=xf); x++) {
    for(y=yd; (!Abandon)&&(y<=yf); y++)
     {
 	 v=&(cv->v[x][y]); TypeVoieCrt=tvAucun;
 	 // v5.4 : conversion CBC6>BCBX (pas de += dans les énumérés)
-	 if (((TypeVoie&tvRoute)&&v->DirPoss&&(NumArret=v->NumArretBus)&&(TypeVoieCrt=(type_voie)(((int)TypeVoieCrt)+((int)tvRoute))))||
-		 ((TypeVoie&tvVoieTram)&&v->SensVoieTram&&(NumArret=v->NumArretTram)&&(TypeVoieCrt=(type_voie)(((int)TypeVoieCrt)+((int)tvVoieTram))))) // v3.5
-      if (((TypeVoieCrt&tvRoute)&&(!ArretBusDejaVu[NumArret-1]))||
-          ((TypeVoieCrt&tvVoieTram)&&(!ArretTramDejaVu[NumArret-1])))
+	 if ((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvRoute)))) != 0))||
+		 (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvVoieTram)))) != 0))) { // v3.5
+      if ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))||
+          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))
        {
         switch(MessageDlg( Format( "\
 L'arrêt %s n°%d est dans la sélection.\n\
@@ -1934,7 +2162,9 @@ Si vous continuez, il sera supprimé.\n\
           default: break;
          }
        }
+}
     }
+}
   delete[] ArretBusDejaVu;
   delete[] ArretTramDejaVu;
   return ToutSupprimer;
@@ -1942,26 +2172,31 @@ Si vous continuez, il sera supprimé.\n\
 //---------------------------------------------------------------------------
 void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
  {
-  int i, x, y, NumArret,
-      xd=DrawGridSimul->Selection.Left,
-      yd=DrawGridSimul->Selection.Top,
-      xf=DrawGridSimul->Selection.Right,
-      yf=DrawGridSimul->Selection.Bottom;
-  bool *ArretBusDejaVu=new bool[cv->NbArretsBus],
-       *ArretTramDejaVu=new bool[cv->NbArretsTram];
+  int i;
+  int x;
+  int y;
+  int NumArret;
+  int xd=DrawGridSimul->Selection.Left;
+  int yd=DrawGridSimul->Selection.Top;
+  int xf=DrawGridSimul->Selection.Right;
+  int yf=DrawGridSimul->Selection.Bottom;
+  bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
+  bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
   voie *v;
   type_voie TypeVoieCrt;
-  for(i=0; i<cv->NbArretsBus; i++) ArretBusDejaVu[i]=false;
-  for(i=0; i<cv->NbArretsTram; i++) ArretTramDejaVu[i]=false;
-  for(x=xd; (x<=xf); x++)
+  for(i=0; i<cv->NbArretsBus; i++) { ArretBusDejaVu[i]=false;
+}
+  for(i=0; i<cv->NbArretsTram; i++) { ArretTramDejaVu[i]=false;
+}
+  for(x=xd; (x<=xf); x++) {
    for(y=yd; (y<=yf); y++)
     {
 	 v=&(cv->v[x][y]); TypeVoieCrt=tvAucun;
      // v5.4 : conversion CBC6>BCBX (= au lieu de += dans les énumérés)
-	 if (((TypeVoie&tvRoute)&&v->DirPoss&&(NumArret=v->NumArretBus)&&(TypeVoieCrt=tvRoute))||
-         ((TypeVoie&tvVoieTram)&&v->SensVoieTram&&(NumArret=v->NumArretTram)&&(TypeVoieCrt=(TypeVoieCrt?tvTout:tvVoieTram)))) // v3.5
-      if (((TypeVoieCrt&tvRoute)&&(!ArretBusDejaVu[NumArret-1]))|| // v6.0.6 : NumArret-1, l'original lisait hors du tableau pour le dernier arrêt
-          ((TypeVoieCrt&tvVoieTram)&&(!ArretTramDejaVu[NumArret-1])))
+	 if ((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=tvRoute) != 0))||
+         (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=((TypeVoieCrt != 0)?tvTout:tvVoieTram)) != 0))) { // v3.5
+      if ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))|| // v6.0.6 : NumArret-1, l'original lisait hors du tableau pour le dernier arrêt
+          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))
        {
         switch(TypeVoieCrt)
          {
@@ -1970,39 +2205,52 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
           default: break;
          }
        }
+}
     }
+}
   delete[] ArretBusDejaVu;
   delete[] ArretTramDejaVu;
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ReinitialiseToutDansSelection(type_voie TypeVoie)
  {
-  int x, y,
-      xd=DrawGridSimul->Selection.Left,
-      yd=DrawGridSimul->Selection.Top,
-      xf=DrawGridSimul->Selection.Right,
-      yf=DrawGridSimul->Selection.Bottom;
-  for(x=xd; x<=xf; x++)
+  int x;
+  int y;
+  int xd=DrawGridSimul->Selection.Left;
+  int yd=DrawGridSimul->Selection.Top;
+  int xf=DrawGridSimul->Selection.Right;
+  int yf=DrawGridSimul->Selection.Bottom;
+  for(x=xd; x<=xf; x++) {
    for(y=yd; y<=yf; y++)
     {
-     if (TypeVoie&tvRoute) cv->SupprimeParkingVoie(x, y);
-     if (TypeVoie&tvRoute) cv->SupprimePlaceTaxiVoie(x, y);
-     if (TypeVoie&tvRoute) cv->SupprimePlaceParkVoie(x, y); // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
-     if (TypeVoie&tvRoute) cv->SupprimePlaceVehlibVoie(x, y); // v5.3
-     if (TypeVoie&tvRoute)
+     if ((TypeVoie&tvRoute) != 0) { cv->SupprimeParkingVoie(x, y);
+}
+     if ((TypeVoie&tvRoute) != 0) { cv->SupprimePlaceTaxiVoie(x, y);
+}
+     if ((TypeVoie&tvRoute) != 0) { cv->SupprimePlaceParkVoie(x, y); // v5.0. v5.3 : Renommée de SupprimePlaceVoie pour ne pas confondre avec SupprimePlaceVehlibVoie(x, y)
+}
+     if ((TypeVoie&tvRoute) != 0) { cv->SupprimePlaceVehlibVoie(x, y); // v5.3
+}
+     if ((TypeVoie&tvRoute) != 0)
       {
        cv->SupprimeDepotBusVoie(x, y);
        cv->SupprimeArretBusVoie(x, y);
       }
-     if (TypeVoie&tvVoieTram) cv->SupprimeArretTramVoie(x, y);
+     if ((TypeVoie&tvVoieTram) != 0) { cv->SupprimeArretTramVoie(x, y);
+}
      cv->SupprimeFeuxVoie(x, y, TypeVoie);
      cv->v[x][y].Initialise(TypeVoie);
      RedessineCase(x,y,true);
-     if (y==yd) RedessineCase((x+dx[nord])%cv->NbX, (y+dy[nord])%cv->NbY, true);
-     if (x==xf) RedessineCase((x+dx[est])%cv->NbX, (y+dy[est])%cv->NbY, true);
-     if (y==yf) RedessineCase((x+dx[sud])%cv->NbX, (y+dy[sud])%cv->NbY, true);
-     if (x==xd) RedessineCase((x+dx[ouest])%cv->NbX, (y+dy[ouest])%cv->NbY, true);
+     if (y==yd) { RedessineCase((x+dx[nord])%cv->NbX, (y+dy[nord])%cv->NbY, true);
+}
+     if (x==xf) { RedessineCase((x+dx[est])%cv->NbX, (y+dy[est])%cv->NbY, true);
+}
+     if (y==yf) { RedessineCase((x+dx[sud])%cv->NbX, (y+dy[sud])%cv->NbY, true);
+}
+     if (x==xd) { RedessineCase((x+dx[ouest])%cv->NbX, (y+dy[ouest])%cv->NbY, true);
+}
     }
+}
  }
 //---------------------------------------------------------------------------
 bool TfrmSimulation::SupprimeToutDansSelection(type_voie TypeVoie)
@@ -2020,7 +2268,8 @@ bool TfrmSimulation::SupprimeToutDansSelection(type_voie TypeVoie)
     ReinitialiseToutDansSelection(TypeVoie);
     return true;
    }
-  else return false;
+  return false;
+
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::FormCloseQuery(TObject *Sender,
@@ -2034,13 +2283,13 @@ void TfrmSimulation::AfficheStatsAttenteTrafic() // v2.2.7
  affichage AffSvg=Affichage;
  if ((frmStatsAttenteTrafic=new TfrmStatsAttenteTrafic(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement f([&]()
+   Finalement f([&]
    {
     StatsAttenteTrafic=false;
     Affichage=AffSvg;
     DrawGridSimul->Repaint();
     frmStatsAttenteTrafic->Release();
-    frmStatsAttenteTrafic=NULL;
+    frmStatsAttenteTrafic=nullptr;
    });
     StatsAttenteTrafic=true;
     Affichage=aff_aucun; // Pour une meilleure visibilité
@@ -2053,10 +2302,14 @@ direction TfrmSimulation::DirectionOrigineCurseur(int x, int y, direction DirDes
   direction DirOrig=((DirOrigVoieTram>indefinie)&&(DirOrigVoieTram!=DirDest))?DirOrigVoieTram:InvDir[DirDest];
   if ((x-xPrc)*(x-xPrc)+(y-yPrc)*(y-yPrc)==1) // N,E,S ou O ?
    {
-    if (xPrc-x==+1) DirOrig=est;
-    if (xPrc-x==-1) DirOrig=ouest;
-    if (yPrc-y==+1) DirOrig=sud;
-    if (yPrc-y==-1) DirOrig=nord;
+    if (xPrc-x==+1) { DirOrig=est;
+}
+    if (xPrc-x==-1) { DirOrig=ouest;
+}
+    if (yPrc-y==+1) { DirOrig=sud;
+}
+    if (yPrc-y==-1) { DirOrig=nord;
+}
    }
   DirOrigVoieTram=DirOrig;
   return DirOrig;
@@ -2064,8 +2317,8 @@ direction TfrmSimulation::DirectionOrigineCurseur(int x, int y, direction DirDes
 //---------------------------------------------------------------------------
 void TfrmSimulation::MenuItemBarreOutilsClick(TObject *Sender)
 {
- TToolBar *ToolBar=(TToolBar*)FindComponent(asDebutNom[TOOLBAR]+asNomElementBarreOutils[((TMenuItem*)Sender)->Tag]);
- TMenuItem *MenuItem=(TMenuItem*)Sender;
+ TToolBar *ToolBar=static_cast<TToolBar*>(FindComponent(asDebutNom[TOOLBAR]+asNomElementBarreOutils[(static_cast<TMenuItem*>(Sender))->Tag]));
+ auto *MenuItem=static_cast<TMenuItem*>(Sender);
  MenuItem->Checked^=true;
  ToolBar->Visible=MenuItem->Checked;
 }
@@ -2073,10 +2326,10 @@ void TfrmSimulation::MenuItemBarreOutilsClick(TObject *Sender)
 void TfrmSimulation::PopupMenuBarreOutilsPopup(TObject *Sender)
 {
  TToolBar *ToolBar; TMenuItem *MenuItem;
- for(int i=0; i<NBELEMENTSBARREOUTILS; i++)
+ for(const auto & asNomElementBarreOutil : asNomElementBarreOutils)
   {
-   MenuItem=(TMenuItem*)FindComponent(asDebutNom[MENUITEM]+asNomElementBarreOutils[i]);
-   ToolBar=(TToolBar*)FindComponent(asDebutNom[TOOLBAR]+asNomElementBarreOutils[i]);
+   MenuItem=static_cast<TMenuItem*>(FindComponent(asDebutNom[MENUITEM]+asNomElementBarreOutil));
+   ToolBar=static_cast<TToolBar*>(FindComponent(asDebutNom[TOOLBAR]+asNomElementBarreOutil));
    MenuItem->Checked=ToolBar->Visible;
   }
 }
@@ -2099,12 +2352,13 @@ void TfrmSimulation::TimerClignotementErreurTimer(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::DeplaceFeu() // v3.8.3
  {
-  int d,
-      xCrt=DrawGridSimul->Col,
-      yCrt=DrawGridSimul->Row;
-  voie *vSrc, *vDst;
+  int d;
+  int xCrt=DrawGridSimul->Col;
+  int yCrt=DrawGridSimul->Row;
+  voie *vSrc;
+  voie *vDst;
   feu *FeuADeplacer;
-  DeplacementFeuEnCours^=true;
+  DeplacementFeuEnCours^=1;
   RafraichitFonctionDeplacementFeu();
   if (DeplacementFeuEnCours)
    {
@@ -2131,12 +2385,12 @@ void TfrmSimulation::DeplaceFeu() // v3.8.3
       {
        if (vSrc->Priorite[d]==feux)
         {
-         if (vDst->Priorite[d]==feux)
+         if (vDst->Priorite[d]==feux) {
           AfficheMessage("Vous ne pouvez pas déplacer un feu sur une case où un feu de même orientation existe déjà.", "Déplacement de feu impossible", tmAvertissement, 0, 0);
-         else
-          if (!(vDst->DirPoss&PossDir[d+1]))
+         } else
+          if ((vDst->DirPoss&PossDir[d+1]) == 0) {
            AfficheMessage("Vous ne pouvez pas déplacer un feu sur une case qui n'a pas la même direction.", "Déplacement de feu impossible", tmAvertissement, 0, 0);
-          else
+          } else
            {
             FeuADeplacer=&(cv->Feu[vSrc->NumFeu[d]-1]);
             vDst->Priorite[d]=feux;
@@ -2148,7 +2402,8 @@ void TfrmSimulation::DeplaceFeu() // v3.8.3
             SimulationModifiee=true;
             RedessineCase(xDeplFeu, yDeplFeu, true);
             RedessineCase(xCrt, yCrt, true);
-            if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
+            if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
            }
         }
       }
@@ -2176,13 +2431,16 @@ void TfrmSimulation::ActionNouveauExecute(TObject *Sender)
  if (EnregistreModificationsAvant(oaNouveau))
   {
    bool GenereReseauAleatoirement=false; // v4.2
-   int NbX=NBXDEF, NbY=NBYDEF;
+   int NbX=NBXDEF;
+   int NbY=NBYDEF;
    if (cv) { NbX=cv->NbX; NbY=cv->NbY; }
-   if (!DefinitDimensionsZone(NbX, NbY, GenereReseauAleatoirement)) return; // v4.2 (GenereReseauAleatoirement)
-   if (cv) { delete cv; }
+   if (!DefinitDimensionsZone(NbX, NbY, GenereReseauAleatoirement)) { return; // v4.2 (GenereReseauAleatoirement)
+}
+   delete cv; 
    cv=new centre_ville(NB_ELEMENTS_PAR_DEFAUT, NbX, NbY);
    RedimensionneZone(); // v6.0.5 : avant la génération, qui redessine : l'original lisait hors du réseau pour une zone plus petite
-   if (GenereReseauAleatoirement) GenereReseau(); // v4.2
+   if (GenereReseauAleatoirement) { GenereReseau(); // v4.2
+}
    SimulationModifiee=false;
    asNomFichAuto="";
    SaveDialog->FileName="";
@@ -2201,15 +2459,17 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
  int hfile;
  AppelleAuChaos();
  if (asNomFichAuto.IsEmpty()&&
-	 (!EnregistreModificationsAvant(oaOuvrir))) return;
+	 (!EnregistreModificationsAvant(oaOuvrir))) { return;
+}
  if ((!asNomFichAuto.IsEmpty())||
 	 OpenDialog->Execute())
   {
    // v5.4 : pas d'affectation inline du nom de fichier
-   if (asNomFichAuto.IsEmpty())
+   if (asNomFichAuto.IsEmpty()) {
 	 asNomFichier=FILENAME(OpenDialog);
-   else
+   } else {
 	 asNomFichier=asNomFichAuto;
+}
    if ((hfile=FileOpen(asNomFichier, fmOpenRead))!=-1) // v6.0.1 : l'échec vaut -1 (l'original chargeait alors une carte vide)
     {
      StatusBar->Panels->Items[0]->Text="Chargement en cours...";
@@ -2230,14 +2490,15 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
       {
        cv->RetablitVoisinages();
        StatusBar->Panels->Items[0]->Text="Chargement NON effectué.";
-       if (VersionFichier>VERSION) // v3.5 : n'ouvre pas les fichier de simulation générés par une version ultérieure de la version actuelle (format de fichier)
+       if (VersionFichier>VERSION) { // v3.5 : n'ouvre pas les fichier de simulation générés par une version ultérieure de la version actuelle (format de fichier)
         AfficheMessage("\
 Le fichier sélectionné a été généré avec une version ultérieure à la version actuelle de Centre-Ville.\n\
 Veuillez utiliser la version de Centre-Ville avec laquelle vous avez généré ce fichier.\n\
 Le réseau affiché est conservé.",
                                 asChargementNonEffectue, tmErreur, 0, 0);
-       else
+       } else {
         AfficheMessage("Erreur de lecture ou de données dans le fichier.\nLe réseau affiché est conservé.", asChargementNonEffectue, tmErreur, 0, 0);
+}
        OpenDialog->FileName=SaveDialog->FileName; // Le réseau affiché reste le précédent
       }
      else
@@ -2254,8 +2515,9 @@ Le réseau affiché est conservé.",
         {
          StatusBar->Panels->Items[0]->Text="Contrôle d'intégrité du réseau en cours...";
          cv->Verifie(asMsgErr);
-         if (asMsgErr.Length()>0)
+         if (asMsgErr.Length()>0) {
           AfficheMessage(asMsgErr, "Erreurs d'intégrité trouvées dans le réseau", tmErreur, 0, 0);
+}
         }
        // Mise à jour du menu Statistiques | Affichage
        MenuItemQuadrillageStatistiques->Checked=cv->QuadrillageStats;
@@ -2305,17 +2567,20 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
    if ((hfile=FileCreateRemplacement(asNomFichier=(asNomFichAuto.IsEmpty()?FILENAME(SaveDialog):asNomFichAuto), &Direct))!=-1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
     {
      bool Ok=cv->Sauve(hfile);
-     if (Ok)
+     if (Ok) {
       Ok=FileCommitRemplacement(hfile);
-     else
+     } else {
       FileAbandonRemplacement(hfile);
+}
      if (!Ok)
       {
        AfficheMessage(Direct?"Erreur de données dans le fichier":"Erreur de données dans le fichier.\nAucun fichier existant n'a été modifié.", asSauvegardeNonEffectuee, tmErreur, 0, 0);
        StatusBar->Panels->Items[0]->Text="Enregistrement NON effectué.";
-       if (EnregistrerAvant) EnregistrerAvant=false;
+       if (EnregistrerAvant) { EnregistrerAvant=false;
+}
        SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
-       if (Direct) SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
+       if (Direct) { SimulationModifiee=true; // v6.0.1 : le fichier a été tronqué, il ne contient plus le réseau
+}
       }
      else
       {
@@ -2330,25 +2595,28 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
     {
      AfficheMessage("Impossible de créer le fichier", asSauvegardeNonEffectuee, tmErreur, 0, 0);
      StatusBar->Panels->Items[0]->Text="Enregistrement non effectué.";
-     if (EnregistrerAvant) EnregistrerAvant=false;
+     if (EnregistrerAvant) { EnregistrerAvant=false;
+}
      SaveDialog->FileName=OpenDialog->FileName; // v6.0.1 : nom du dernier fichier ouvert ou enregistré
     }
   }
  else
-  if (EnregistrerAvant) EnregistrerAvant=false;
+  if (EnregistrerAvant) { EnregistrerAvant=false;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEnregistrerSousExecute(
       TObject *Sender)
 {
- if (SaveDialog->Execute()) ActionEnregistrer->Execute();
+ if (SaveDialog->Execute()) { ActionEnregistrer->Execute();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionAfficherDirectionsExecute(
       TObject *Sender)
 {
  ActionAfficherDirections->Checked^=true;
- Affichage=(affichage)(Affichage^aff_dir);
+ Affichage=static_cast<affichage>(Affichage^aff_dir);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -2356,14 +2624,14 @@ void TfrmSimulation::ActionAfficherSignalisationExecute(
       TObject *Sender)
 {
  ActionAfficherSignalisation->Checked^=true;
- Affichage=(affichage)(Affichage^aff_sign);
+ Affichage=static_cast<affichage>(Affichage^aff_sign);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionAfficherVoiesExecute(TObject *Sender)
 {
  ActionAfficherVoies->Checked^=true;
- Affichage=(affichage)(Affichage^aff_voie);
+ Affichage=static_cast<affichage>(Affichage^aff_voie);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -2371,7 +2639,7 @@ void TfrmSimulation::ActionAfficherVehiculesExecute(
       TObject *Sender)
 {
  ActionAfficherVehicules->Checked^=true;
- Affichage=(affichage)(Affichage^aff_veh);
+ Affichage=static_cast<affichage>(Affichage^aff_veh);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -2379,14 +2647,14 @@ void TfrmSimulation::ActionAfficherPietonsExecute(
       TObject *Sender)
 {
  ActionAfficherPietons->Checked^=true;
- Affichage=(affichage)(Affichage^aff_ptn);
+ Affichage=static_cast<affichage>(Affichage^aff_ptn);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionAfficherQuadrillageExecute(TObject *Sender)
 {
  ActionAfficherQuadrillage->Checked^=true;
- Affichage=(affichage)(Affichage^aff_quadr);
+ Affichage=static_cast<affichage>(Affichage^aff_quadr);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -2394,7 +2662,7 @@ void TfrmSimulation::ActionAfficherEnvironnementExecute(
       TObject *Sender)
 {
  ActionAfficherEnvironnement->Checked^=true;
- Affichage=(affichage)(Affichage^aff_env);
+ Affichage=static_cast<affichage>(Affichage^aff_env);
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -2427,7 +2695,7 @@ bool TfrmSimulation::SauveCopieReseau()
       FileClose(hfile);
      }
    }
-  if (!Ok) { delete CopieReseau; CopieReseau=NULL; }
+  if (!Ok) { delete CopieReseau; CopieReseau=nullptr; }
   return Ok;
  }
 //---------------------------------------------------------------------------
@@ -2442,7 +2710,8 @@ bool TfrmSimulation::RestaureCopieReseau()
     cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0);
     Ok=cv->Charge(hfile);
     FileClose(hfile);
-    if (!Ok) SimulationModifiee=false; // Réseau incomplet : à ne pas proposer à l'enregistrement
+    if (!Ok) { SimulationModifiee=false; // Réseau incomplet : à ne pas proposer à l'enregistrement
+}
    }
   if (!Ok)
    {
@@ -2451,7 +2720,7 @@ bool TfrmSimulation::RestaureCopieReseau()
     return false;
    }
   delete CopieReseau;
-  CopieReseau=NULL;
+  CopieReseau=nullptr;
   RafraichitFichesInfos(); // v6.0.2
   DrawGridSimul->Repaint();
   return true;
@@ -2463,8 +2732,9 @@ void TfrmSimulation::InterromptDemarrage()
  {
   asNomFichAuto=asVide; // Sinon, Enregistrer et Ouvrir reprendraient ce nom sans demander
   asMsgErr="";
-  if (RestaureCopieReseau())
+  if (RestaureCopieReseau()) {
    StatusBar->Panels->Items[0]->Text="Simulation non démarrée : réseau remis dans son état initial.";
+}
  }
 //---------------------------------------------------------------------------
 // v6.0.1 : enregistrement automatique de Marche. Faux : ne pas démarrer.
@@ -2478,19 +2748,20 @@ bool TfrmSimulation::EnregistreAvantMarche()
    {
     if (!SimulationModifiee) // Le fichier est à jour : Arrêt le rechargera tel quel
      {
-      asNomFichAuto=asNomFichier;
+      asNomFichAuto=std::move(asNomFichier);
       AppelleAuChaos(); // Comme ActionEnregistrer : mêmes tirages que si le fichier était inscriptible
       return true;
      }
     if (AfficheMessage("Le fichier "+asNomFichier+" est en lecture seule : les modifications du réseau ne peuvent pas y être enregistrées.\n"
                        "La simulation enregistre le réseau avant de démarrer. Voulez-vous l'enregistrer sous un autre nom ?\n"
                        "Sinon, la simulation ne démarre pas.",
-                       "Enregistrement impossible", tmQuestionNecessaire, 0, 1)!=trOui) // Défaut = Oui, Echap = Non
+                       "Enregistrement impossible", tmQuestionNecessaire, 0, 1)!=trOui) { // Défaut = Oui, Echap = Non
      return false;
+}
     SaveDialog->FileName=A(QFileInfo(Q(asNomFichier)).fileName()); // Sans son dossier : la boîte démarre dans InitialDir, inscriptible
     if (!SaveDialog->Execute())
      {
-      SaveDialog->FileName=asNomFichier;
+      SaveDialog->FileName=std::move(asNomFichier);
       return false;
      }
    }
@@ -2499,7 +2770,8 @@ bool TfrmSimulation::EnregistreAvantMarche()
   ActionEnregistrer->Execute();
   bool Ok=EnregistrerAvant; // Enregistrement Annulé si faux
   EnregistrerAvant=false;
-  if (Ok) asNomFichAuto=FILENAME(SaveDialog); // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original redemandait à l'arrêt quoi ouvrir)
+  if (Ok) { asNomFichAuto=FILENAME(SaveDialog); // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original redemandait à l'arrêt quoi ouvrir)
+}
   return Ok;
  }
 //---------------------------------------------------------------------------
@@ -2507,10 +2779,14 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
 {
  type_distance TypeDistance=type_indefini; // v3.5
  int i;
- if (frmDefFeux->Visible) frmDefFeux->Hide();
- if (frmDefFeuxPietons->Visible) frmDefFeuxPietons->Hide();  // v5.2
- if (frmDefVoie->Visible) frmDefVoie->Hide();
- if (frmDefVoiePietons->Visible) frmDefVoiePietons->Hide(); // v5.2
+ if (frmDefFeux->Visible) { frmDefFeux->Hide();
+}
+ if (frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();  // v5.2
+}
+ if (frmDefVoie->Visible) { frmDefVoie->Hide();
+}
+ if (frmDefVoiePietons->Visible) { frmDefVoiePietons->Hide(); // v5.2
+}
  // v6.0.1 : ToolButtonArret et MenuItemArret suivent ActionArret, activée par
  // SimulationEnCours=true à la fin (l'original les activait ici, et ils le
  // restaient quand le démarrage s'interrompait)
@@ -2524,7 +2800,8 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
      return;
     }
 
-   for(i=0; (i<cv->NbParkings)&&cv->Parking[i].Defini(); i++);
+   for(i=0; (i<cv->NbParkings)&&cv->Parking[i].Defini(); i++) {;
+}
    if (i<cv->NbParkings)
     {
      AfficheMessage(asNbParkingsInsuff, asAvertissement, tmAvertissement, 0, 0);
@@ -2571,7 +2848,8 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
     {
      StatusBar->Panels->Items[0]->Text=Format("La case (%d, %d) a une distance "+asTypeDistance[TypeDistance]+" indéfinie.",
                                               ARRAYOFCONST((xErr=cv->xErr, yErr=cv->yErr)));
-     if ((xErr>-1)&&(yErr>-1)) RedessineCase(xErr, yErr, true);
+     if ((xErr>-1)&&(yErr>-1)) { RedessineCase(xErr, yErr, true);
+}
      AfficheMessage(Format(asFrmReseauNonConnexe[TypeDistance==parkings],
                                     ARRAYOFCONST((asTypeDistance[TypeDistance]))),
                              asAvertissement, tmAvertissement, 0, 0);
@@ -2621,8 +2899,9 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
    StatusBar->Repaint();
    if (!cv->PrepareTrams()) // On alloue la place et on prépare les trams que l'on place sur les arrêts. v3.5
     { // Si erreur alors problème de manque de mémoire
-     if (!cv->NbTrams) // v6.0.1 : sinon, PrepareTrams a déjà dit qu'elle ne peut pas les placer : ce n'est pas la mémoire
+     if (cv->NbTrams == 0) { // v6.0.1 : sinon, PrepareTrams a déjà dit qu'elle ne peut pas les placer : ce n'est pas la mémoire
       AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
+}
      InterromptDemarrage(); // v6.0.1
      return;
     }
@@ -2675,9 +2954,9 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
      InterromptDemarrage();
      return;
     }
-   if ((cv->Stats=new stats[cv->NbToursStats]))
+   if ((cv->Stats=new stats[cv->NbToursStats])) {
     cv->Stats[0].Definit();
-   else
+   } else
     {
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
      InterromptDemarrage(); // v6.0.1
@@ -2687,9 +2966,11 @@ void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
  if (!Pause) // v3.5 (Remplace !cv->TourCrt)
   {
    // On active l'affichage des véhicules
-   if (!ActionAfficherVehicules->Checked) ActionAfficherVehicules->Execute();
+   if (!ActionAfficherVehicules->Checked) { ActionAfficherVehicules->Execute();
+}
    // v2.0. On active l'affichage des piétons
-   if (!ActionAfficherPietons->Checked) ActionAfficherPietons->Execute();
+   if (!ActionAfficherPietons->Checked) { ActionAfficherPietons->Execute();
+}
   }
 
  // Mise en marche de la simulation : C'EST PARTI !
@@ -2705,7 +2986,8 @@ void TfrmSimulation::ActionInterruptionExecute(TObject *Sender)
 void TfrmSimulation::ActionArretExecute(TObject *Sender)
 {
  TypeDemande=tdArret;
- if (Pause) TimerSimul->Enabled=true; // v6.0.2 : la demande est traitée au tic suivant, et le minuteur est arrêté en pause
+ if (Pause) { TimerSimul->Enabled=true; // v6.0.2 : la demande est traitée au tic suivant, et le minuteur est arrêté en pause
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionVerifierAvantSimulationExecute(
@@ -2718,7 +3000,7 @@ void TfrmSimulation::ActionVerifierAvantSimulationExecute(
 void TfrmSimulation::ActionEvolutionExecute(TObject *Sender)
 {
  ActionEvolution->Checked^=true;
- frmStatistiques->AffichageEpidemique=!!(Affichage&aff_infct); // v5.4.1 : statistiques épidémiques si affichage épidémique
+ frmStatistiques->AffichageEpidemique=!((Affichage&aff_infct) == 0); // v5.4.1 : statistiques épidémiques si affichage épidémique
  frmStatistiques->Visible=ActionEvolution->Checked;
 }
 //---------------------------------------------------------------------------
@@ -2769,7 +3051,8 @@ void TfrmSimulation::ActionStatsAffParVehiculeExecute(
 {
  ActionStatsAffParVehicule->Checked=true;
  cv->TypeStats=par_nombre;
- if (frmStatistiques->Visible) frmStatistiques->PaintBoxStats->Repaint();
+ if (frmStatistiques->Visible) { frmStatistiques->PaintBoxStats->Repaint();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionStatsAffParPourcentExecute(
@@ -2777,7 +3060,8 @@ void TfrmSimulation::ActionStatsAffParPourcentExecute(
 {
  ActionStatsAffParPourcent->Checked=true;
  cv->TypeStats=par_pourcentage;
- if (frmStatistiques->Visible) frmStatistiques->PaintBoxStats->Repaint();
+ if (frmStatistiques->Visible) { frmStatistiques->PaintBoxStats->Repaint();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionStatsAffQuadrillageExecute(
@@ -2785,19 +3069,21 @@ void TfrmSimulation::ActionStatsAffQuadrillageExecute(
 {
  ActionStatsAffQuadrillage->Checked^=true;
  cv->QuadrillageStats=ActionStatsAffQuadrillage->Checked;
- if (frmStatistiques->Visible) frmStatistiques->PaintBoxStats->Repaint();
+ if (frmStatistiques->Visible) { frmStatistiques->PaintBoxStats->Repaint();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionFluiditeTraficExecute(
       TObject *Sender)
 {
- if (SimulEnCours)
+ if (SimulEnCours) {
   AfficheMessage("\
 Vous devez interrompre ou arrêter la simulation en cours pour visualiser ces statistiques.\n\
 À l'affichage du bilan, on vous demandera si vous souhaitez voir ces statistiques.",
 "Statistiques de fluidité et de trafic", tmInformation, 0, 0);
- else
+ } else {
   AfficheStatsAttenteTrafic();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCompositionExecute(TObject *Sender)
@@ -2808,13 +3094,14 @@ void TfrmSimulation::ActionCompositionExecute(TObject *Sender)
 void TfrmSimulation::ActionStatsParkingsExecute(TObject *Sender)
 { 
  ActionStatsParkings->Checked^=true;
- if (ActionStatsParkings->Checked&&(!cv->NbVehiculesArrives))
+ if (ActionStatsParkings->Checked&&(cv->NbVehiculesArrives == 0))
   {
    AfficheMsgInfoNonDisp("Statistiques sur les véhicules");
    ActionStatsParkings->Checked=false;
   }
- else
+ else {
   frmStatsVehicules->Visible=ActionStatsParkings->Checked;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionAProposExecute(TObject *Sender)
@@ -2829,76 +3116,95 @@ void TfrmSimulation::ActionSommaireExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionHautExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, N))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
    SimulationModifiee=true;
    RedessineCase((x+dx[nord])%cv->NbX, (y+dy[nord])%cv->NbY, true);
-   if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
-   if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+   if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+   if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
   }
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionDroiteExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, E))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
    SimulationModifiee=true;
    RedessineCase((x+dx[est])%cv->NbX, (y+dy[est])%cv->NbY, true);
-   if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
-   if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+   if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+   if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
   }
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionBasExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, S))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
    SimulationModifiee=true;
    RedessineCase((x+dx[sud])%cv->NbX, (y+dy[sud])%cv->NbY, true);
-   if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
-   if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+   if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+   if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
   }
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionGaucheExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, O))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
    SimulationModifiee=true;
    RedessineCase((x+dx[ouest])%cv->NbX, (y+dy[ouest])%cv->NbY, true);
-   if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
-   if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+   if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+   if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
   }
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerRouteExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
- for(int d=nord; d<=ouest; d++)
-  if (cv->v[x][y].DirPoss&PossDir[d])
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ for(int d=nord; d<=ouest; d++) {
+  if ((cv->v[x][y].DirPoss&PossDir[d]) != 0) {
    cv->ChangeDirectionSiPossible(x, y, PossDir[d]); // Tente de supprimer chaque direction possible
+}
+}
  ModifiePassagePietonsSiNecessaire(x, y);
  SimulationModifiee=true;
- for(int d=nord; d<=ouest; d++)
+ for(int d=nord; d<=ouest; d++) {
   RedessineCase((x+dx[d])%cv->NbX, (y+dy[d])%cv->NbY, true);
- if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
- if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
+ if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+ if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionHautTramExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, nord), nord);
  SimulationModifiee=true;
 }
@@ -2906,7 +3212,8 @@ void TfrmSimulation::ActionDirectionHautTramExecute(
 void TfrmSimulation::ActionDirectionDroiteTramExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, est), est);
  SimulationModifiee=true;
 }
@@ -2914,7 +3221,8 @@ void TfrmSimulation::ActionDirectionDroiteTramExecute(
 void TfrmSimulation::ActionDirectionBasTramExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, sud), sud);
  SimulationModifiee=true;
 }
@@ -2922,7 +3230,8 @@ void TfrmSimulation::ActionDirectionBasTramExecute(
 void TfrmSimulation::ActionDirectionGaucheTramExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, ouest), ouest);
  SimulationModifiee=true;
 }
@@ -2930,7 +3239,8 @@ void TfrmSimulation::ActionDirectionGaucheTramExecute(
 void TfrmSimulation::ActionEffacerVoieTramExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  cv->v[x][y].SensVoieTram=aucune_voie;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
@@ -2938,12 +3248,15 @@ void TfrmSimulation::ActionEffacerVoieTramExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionToutDroitExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
- cv->v[x][y].ToutDroit^=true;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ cv->v[x][y].ToutDroit^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
- if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
- if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+ if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPrioritesExecute(TObject *Sender)
@@ -2960,10 +3273,11 @@ void TfrmSimulation::ActionPrioritesPietonsExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionParkingExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumParking;
- if ((NumParking=cv->v[x][y].NumParking)) // Si parking on le supprime
+ if ((NumParking=cv->v[x][y].NumParking) != 0) // Si parking on le supprime
   {
    cv->SupprimeParking(NumParking-1);
    asMsgOp=Format("Le parking numéro %d a été supprimé.", ARRAYOFCONST((NumParking)));
@@ -2971,33 +3285,38 @@ void TfrmSimulation::ActionParkingExecute(TObject *Sender)
   }
  else // Sinon on la crée
   {
-   if ((NumParking=cv->AjouteParking(x, y)))
+   if ((NumParking=cv->AjouteParking(x, y)) != 0)
     {
      asMsgOp=Format("Le parking créé a le numéro %d.", ARRAYOFCONST((NumParking)));
      SimulationModifiee=true;
     }
    else
     {
-     if (cv->NbParkings) // v5.0
+     if (cv->NbParkings != 0) { // v5.0
       asMsgOp=Format("Impossible de créer un parking : il y en a déjà %d !", ARRAYOFCONST((cv->NbParkings)));
-     else
+     } else {
       asMsgOp="Impossible de créer un parking : vous devez d'abord en définir le nombre !";
+}
      ToolButtonParking->Down=false; // v5.0
     }
   }
  RedessineCase(x, y, true);
  StatusBar->Panels->Items[0]->Text=asMsgOp;
- if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
- if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+ if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDepotBusExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row,
-     xPrc=cv->DepotBus.x, yPrc=cv->DepotBus.y;
- if (cv->v[x][y].EstDepotBus()) // On supprime
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ int xPrc=cv->DepotBus.x;
+ int yPrc=cv->DepotBus.y;
+ if (cv->v[x][y].EstDepotBus()) { // On supprime
   cv->DepotBus.Initialise();
- else // On le pose sur la case courante
+ } else // On le pose sur la case courante
   {
    cv->DepotBus.Definit(x,y);
    RedessineCase(xPrc, yPrc, true);
@@ -3009,29 +3328,38 @@ void TfrmSimulation::ActionDepotBusExecute(TObject *Sender)
 void TfrmSimulation::ActionPassagePietonsExecute(
       TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
- cv->v[x][y].PassagePietons^=true;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ cv->v[x][y].PassagePietons^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
- if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
- if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+ if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
 {
- int d, x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int d;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumArretBus, NumArretTram;
+ int NumArretBus;
+ int NumArretTram;
  // OU BIEN Il y a une route OU BIEN une voie de tram
- if (!((cv->v[x][y].DirPoss>aucune)^(cv->v[x][y].SensVoieTram>aucune_voie))) return;
- if (cv->v[x][y].DirPoss)
+ if (((cv->v[x][y].DirPoss>aucune)^(cv->v[x][y].SensVoieTram>aucune_voie)) == 0) { return;
+}
+ if (cv->v[x][y].DirPoss != 0)
   { // Route (arrêt de bus)
-   if ((NumArretBus=cv->v[x][y].NumArretBus)) // Si arrêt on le supprime
+   if ((NumArretBus=cv->v[x][y].NumArretBus) != 0) // Si arrêt on le supprime
     {
      cv->SupprimeArretBus(x, y);
-     for(d=nord; d<=ouest; d++) // On rafraîchit les cases voisines du même arrêt
-      if (NumArretBus==cv->V(x,y,d).NumArretBus)
+     for(d=nord; d<=ouest; d++) { // On rafraîchit les cases voisines du même arrêt
+      if (NumArretBus==cv->V(x,y,d).NumArretBus) {
        RedessineCase((x+dx[d])%cv->NbX, (y+dy[d])%cv->NbY, true);
+}
+}
      asMsgOp=Format( "La case (%d,%d) a été retirée de l'arrêt de bus %d.",
                        ARRAYOFCONST(( DrawGridSimul->Col,
                                       DrawGridSimul->Row,
@@ -3040,11 +3368,13 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
     }
    else // Sinon on le crée
     {
-	 if ((NumArretBus=cv->AjouteArretBus(x, y)))
+	 if ((NumArretBus=cv->AjouteArretBus(x, y)) != 0)
       {
-       for(d=nord; d<=ouest; d++) // On rafraîchit les cases voisines du même arrêt
-        if (NumArretBus==cv->V(x,y,d).NumArretBus)
+       for(d=nord; d<=ouest; d++) { // On rafraîchit les cases voisines du même arrêt
+        if (NumArretBus==cv->V(x,y,d).NumArretBus) {
          RedessineCase((x+dx[d])%cv->NbX, (y+dy[d])%cv->NbY, true);
+}
+}
        asMsgOp=Format( "La case (%d,%d) a été ajoutée à l'arrêt de bus %d.",
                        ARRAYOFCONST(( DrawGridSimul->Col,
                                       DrawGridSimul->Row,
@@ -3053,22 +3383,25 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
       }
      else
       {
-       if (cv->NbArretsBus)
+       if (cv->NbArretsBus != 0) {
         asMsgOp=Format("Impossible de créer un arrêt de bus : il y en a déjà %d !", ARRAYOFCONST((cv->NbArretsBus)));
-       else
+       } else {
         asMsgOp="Impossible de créer un arrêt de bus : vous devez d'abord en définir le nombre !";
+}
        ToolButtonArretBusTram->Down=false; // v5.0
       }
     }
   }
  else
   { // Voie de tram (arrêt de tram)
-   if ((NumArretTram=cv->v[x][y].NumArretTram)) // Si arrêt on le supprime
+   if ((NumArretTram=cv->v[x][y].NumArretTram) != 0) // Si arrêt on le supprime
     {
      cv->SupprimeArretTram(x, y);
-     for(d=nord; d<=ouest; d++) // On rafraîchit les cases voisines du même arrêt
-      if (NumArretTram==cv->V(x,y,d).NumArretTram)
+     for(d=nord; d<=ouest; d++) { // On rafraîchit les cases voisines du même arrêt
+      if (NumArretTram==cv->V(x,y,d).NumArretTram) {
        RedessineCase((x+dx[d])%cv->NbX, (y+dy[d])%cv->NbY, true);
+}
+}
      asMsgOp=Format( "La case (%d,%d) a été retirée de l'arrêt de tram %d.",
                        ARRAYOFCONST(( DrawGridSimul->Col,
                                       DrawGridSimul->Row,
@@ -3077,11 +3410,13 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
     }
    else // Sinon on le crée
     {
-	 if ((NumArretTram=cv->AjouteArretTram(x, y)))
+	 if ((NumArretTram=cv->AjouteArretTram(x, y)) != 0)
       {
-       for(d=nord; d<=ouest; d++) // On rafraîchit les cases voisines du même arrêt
-        if (NumArretTram==cv->V(x,y,d).NumArretTram)
+       for(d=nord; d<=ouest; d++) { // On rafraîchit les cases voisines du même arrêt
+        if (NumArretTram==cv->V(x,y,d).NumArretTram) {
          RedessineCase((x+dx[d])%cv->NbX, (y+dy[d])%cv->NbY, true);
+}
+}
        asMsgOp=Format( "La case (%d,%d) a été ajoutée à l'arrêt de tram %d.",
                        ARRAYOFCONST(( DrawGridSimul->Col,
                                       DrawGridSimul->Row,
@@ -3090,34 +3425,39 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
       }
      else
       {
-       if (cv->NbArretsTram)
+       if (cv->NbArretsTram != 0) {
         asMsgOp=Format("Impossible de créer un arrêt de tram : il y en a déjà %d !", ARRAYOFCONST((cv->NbArretsTram)));
-       else
+       } else {
         asMsgOp="Impossible de créer un arrêt de tram : vous devez d'abord en définir le nombre !";
+}
        ToolButtonArretBusTram->Down=false; // v5.0
       }
     }
   }
  RedessineCase(x, y, true);
  StatusBar->Panels->Items[0]->Text=asMsgOp;
- if (ActionPriorites->Checked) frmDefVoie->RafraichitInfos();
- if (ActionPrioritesPietons->Checked) frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if (ActionPriorites->Checked) { frmDefVoie->RafraichitInfos();
+}
+ if (ActionPrioritesPietons->Checked) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPassageBusExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
- cv->v[x][y].PassageBus^=true;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
+ cv->v[x][y].PassageBus^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceTaxiExecute(TObject *Sender)
 {
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlaceTaxi;
- if ((NumPlaceTaxi=cv->v[x][y].NumPlaceTaxi)) // Si Place Taxi on la supprime
+ if ((NumPlaceTaxi=cv->v[x][y].NumPlaceTaxi) != 0) // Si Place Taxi on la supprime
   {
    cv->SupprimePlaceTaxi(NumPlaceTaxi-1);
    asMsgOp=Format("La place de taxi numéro %d a été supprimée.", ARRAYOFCONST((NumPlaceTaxi)));
@@ -3125,17 +3465,18 @@ void TfrmSimulation::ActionPlaceTaxiExecute(TObject *Sender)
   }
  else // Sinon on la crée
   {
-   if ((NumPlaceTaxi=cv->AjoutePlaceTaxi(x, y)))
+   if ((NumPlaceTaxi=cv->AjoutePlaceTaxi(x, y)) != 0)
     {
      asMsgOp=Format("La place de taxi créée a le numéro %d.", ARRAYOFCONST((NumPlaceTaxi)));
      SimulationModifiee=true;
     }
    else
     {
-     if (cv->NbPlacesTaxi)
+     if (cv->NbPlacesTaxi != 0) {
       asMsgOp=Format("Impossible de créer une place de taxi : il y en a déjà %d !", ARRAYOFCONST((cv->NbPlacesTaxi)));
-     else
+     } else {
       asMsgOp="Impossible de créer une place de taxi : vous devez d'abord en définir le nombre !";
+}
      ToolButtonPlaceTaxi->Down=false; // v5.0
     }
   }
@@ -3157,18 +3498,21 @@ void TfrmSimulation::ActionDeplacerFeuDestinationExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     x0, x1, y0, y1,
-     dx=abs(Droite-Gauche),
-     dy=abs(Bas-Haut),
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int x0;
+ int x1;
+ int y0;
+ int y1;
+ int dx=abs(Droite-Gauche);
+ int dy=abs(Bas-Haut);
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
  x0=x1=xd; y0=y1=yd; // v6.0.4 : x1 et y1 lus sans valeur pour un segment d'une seule voie
 
  if ((dx>1)&&(dy>1))
@@ -3189,8 +3533,9 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
    for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
     {
      cv->ChangeDirectionSiPossible(x0=yd<yf?Gauche:Droite, i, yd<yf?S:N);
-     if (dx==1)
+     if (dx==1) {
       cv->ChangeDirectionSiPossible(x1=yd<yf?Droite:Gauche, i==yd?yf:i, yd<yf?N:S);
+}
     }
    RedessineCase(x0, yf, true);
    RedessineCase(x1, yd, true);
@@ -3203,8 +3548,9 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
    for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
     {
      cv->ChangeDirectionSiPossible(i, y0=xd<xf?Bas:Haut, xd<xf?E:O);
-     if (dy==1)
+     if (dy==1) {
       cv->ChangeDirectionSiPossible(i==xd?xf:i, y1=xd<xf?Haut:Bas, xd<xf?O:E);
+}
     }
    RedessineCase(xf, y0, true);
    RedessineCase(xd, y1, true);
@@ -3215,17 +3561,17 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     dx=abs(Droite-Gauche),
-     dy=abs(Bas-Haut),
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int dx=abs(Droite-Gauche);
+ int dy=abs(Bas-Haut);
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
 
  if ((dx>1)&&(dy>1))
   {
@@ -3245,8 +3591,9 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
    for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
     {
      cv->v[yd<yf?Gauche:Droite][i].ModifieSensVoieTram(nord, sud);
-     if (dx==1)
+     if (dx==1) {
       cv->v[yd<yf?Droite:Gauche][i==yd?yf:i].ModifieSensVoieTram(nord, sud);
+}
     }
    RafraichitFichesPriorites(); // v6.0.11
    return;
@@ -3257,8 +3604,9 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
    for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
     {
      cv->v[i][xd<xf?Bas:Haut].ModifieSensVoieTram(est, ouest);
-     if (dy==1)
+     if (dy==1) {
       cv->v[i==xd?xf:i][xd<xf?Haut:Bas].ModifieSensVoieTram(est, ouest);
+}
     }
    RafraichitFichesPriorites(); // v6.0.11
    return;
@@ -3267,22 +3615,24 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
- for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
+ for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
   cv->ChangeDirectionSiPossible(Droite, i, yd<yf?S:N);
+}
  RedessineCase(Droite, yf, true);
- for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
+ for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd)) {
   cv->ChangeDirectionSiPossible(i, Haut, xd<xf?E:O);
+}
  RedessineCase(xf, Haut, true);
  RafraichitFichesPriorites(); // v6.0.11
 }
@@ -3290,22 +3640,24 @@ void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject *Sender)
 void TfrmSimulation::ActionCoinInferieurGaucheExecute(
       TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
- for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
+ for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
   cv->ChangeDirectionSiPossible(Gauche, i, yd<yf?S:N);
+}
  RedessineCase(Gauche, yf, true);
- for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
+ for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd)) {
   cv->ChangeDirectionSiPossible(i, Bas, xd<xf?E:O);
+}
  RedessineCase(xf, Bas, true);
  RafraichitFichesPriorites(); // v6.0.11
 }
@@ -3313,22 +3665,24 @@ void TfrmSimulation::ActionCoinInferieurGaucheExecute(
 void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
       TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
- for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
+ for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
   cv->ChangeDirectionSiPossible(Gauche, i, yd<yf?S:N);
+}
  RedessineCase(Gauche, yf, true);
- for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
+ for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd)) {
   cv->ChangeDirectionSiPossible(i, Haut, xd<xf?E:O);
+}
  RedessineCase(xf, Haut, true);
  RafraichitFichesPriorites(); // v6.0.11
 }
@@ -3336,22 +3690,24 @@ void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
 void TfrmSimulation::ActionCoinInferieurDroitExecute(
       TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom,
-     xd=DrawGridSimul->Col,
-     yd=DrawGridSimul->Row,
-     xf=(xd==Gauche?Droite:Gauche),
-     yf=(yd==Haut?Bas:Haut);
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
+ int xd=DrawGridSimul->Col;
+ int yd=DrawGridSimul->Row;
+ int xf=(xd==Gauche?Droite:Gauche);
+ int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
- for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd))
+ for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
   cv->ChangeDirectionSiPossible(Droite, i, yd<yf?S:N);
+}
  RedessineCase(Droite, yf, true);
- for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd))
+ for(i=xd; i!=xf; i+=(xf-xd)/abs(xf-xd)) {
   cv->ChangeDirectionSiPossible(i, Bas, xd<xf?E:O);
+}
  RedessineCase(xf, Bas, true);
  RafraichitFichesPriorites(); // v6.0.11
 }
@@ -3359,11 +3715,11 @@ void TfrmSimulation::ActionCoinInferieurDroitExecute(
 void TfrmSimulation::ActionPeripheriqueExterieurExecute(
       TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom;
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
 
  if ((Gauche==Droite)||(Bas==Haut))
   {
@@ -3372,21 +3728,25 @@ void TfrmSimulation::ActionPeripheriqueExterieurExecute(
   }
 
  SimulationModifiee=true;
- for(i=Gauche; i<Droite; i++) cv->ChangeDirectionSiPossible(i, Bas, E);
- for(i=Bas; i>Haut; i--) cv->ChangeDirectionSiPossible(Droite, i, N);
- for(i=Droite; i>Gauche; i--) cv->ChangeDirectionSiPossible(i, Haut, O);
- for(i=Haut; i<Bas; i++) cv->ChangeDirectionSiPossible(Gauche, i, S);
+ for(i=Gauche; i<Droite; i++) { cv->ChangeDirectionSiPossible(i, Bas, E);
+}
+ for(i=Bas; i>Haut; i--) { cv->ChangeDirectionSiPossible(Droite, i, N);
+}
+ for(i=Droite; i>Gauche; i--) { cv->ChangeDirectionSiPossible(i, Haut, O);
+}
+ for(i=Haut; i<Bas; i++) { cv->ChangeDirectionSiPossible(Gauche, i, S);
+}
  RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPeripheriqueInterieurExecute(
       TObject *Sender)
 {
- int i,
-     Gauche=DrawGridSimul->Selection.Left,
-     Droite=DrawGridSimul->Selection.Right,
-     Haut=DrawGridSimul->Selection.Top,
-     Bas=DrawGridSimul->Selection.Bottom;
+ int i;
+ int Gauche=DrawGridSimul->Selection.Left;
+ int Droite=DrawGridSimul->Selection.Right;
+ int Haut=DrawGridSimul->Selection.Top;
+ int Bas=DrawGridSimul->Selection.Bottom;
  if ((Gauche==Droite)||(Bas==Haut))
   {
    AfficheMessage(asTracerEffacerPeripherique, asSelectionIncorrecte, tmAvertissement, 0, 0);
@@ -3394,30 +3754,37 @@ void TfrmSimulation::ActionPeripheriqueInterieurExecute(
   }
 
  SimulationModifiee=true;
- for(i=Gauche; i<Droite; i++) cv->ChangeDirectionSiPossible(i, Haut, E);
- for(i=Haut; i<Bas; i++) cv->ChangeDirectionSiPossible(Droite, i, S);
- for(i=Droite; i>Gauche; i--) cv->ChangeDirectionSiPossible(i, Bas, O);
- for(i=Bas; i>Haut; i--) cv->ChangeDirectionSiPossible(Gauche, i, N);
+ for(i=Gauche; i<Droite; i++) { cv->ChangeDirectionSiPossible(i, Haut, E);
+}
+ for(i=Haut; i<Bas; i++) { cv->ChangeDirectionSiPossible(Droite, i, S);
+}
+ for(i=Droite; i>Gauche; i--) { cv->ChangeDirectionSiPossible(i, Bas, O);
+}
+ for(i=Bas; i>Haut; i--) { cv->ChangeDirectionSiPossible(Gauche, i, N);
+}
  RafraichitFichesPriorites(); // v6.0.11
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCarrefoursExecute(TObject *Sender)
 {
  if (Carrefours( DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1,
-                 DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1)!=mrCancel) // v6.0.11
+                 DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1)!=mrCancel) { // v6.0.11
   RafraichitFichesPriorites();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerRoutesExecute(
       TObject *Sender)
 {
- if (SupprimeToutDansSelection(tvRoute)) RafraichitFichesPriorites(); // v6.0.11
+ if (SupprimeToutDansSelection(tvRoute)) { RafraichitFichesPriorites(); // v6.0.11
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerVoiesTramExecute(
       TObject *Sender)
 {
- if (SupprimeToutDansSelection(tvVoieTram)) RafraichitFichesPriorites(); // v6.0.11
+ if (SupprimeToutDansSelection(tvVoieTram)) { RafraichitFichesPriorites(); // v6.0.11
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDefinirNatureExecute(TObject *Sender)
@@ -3496,9 +3863,11 @@ void TfrmSimulation::ActionSuivreVehiculeExecute(
       TObject *Sender)
 {
  int NumVehicule=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehicule;
- if (!NumVehicule) return;
- if (!ActionRechercher->Checked)
+ if (NumVehicule == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonVehicule->Checked=true;
  frmRecherche->CSpinEditVehicule->Value=NumVehicule;
 }
@@ -3506,9 +3875,11 @@ void TfrmSimulation::ActionSuivreVehiculeExecute(
 void TfrmSimulation::ActionSuivreBusExecute(TObject *Sender)
 {
  int NumBus=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumBus;
- if (!NumBus) return;
- if (!ActionRechercher->Checked)
+ if (NumBus == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonBus->Checked=true;
  frmRecherche->CSpinEditBus->Value=NumBus;
 }
@@ -3516,9 +3887,11 @@ void TfrmSimulation::ActionSuivreBusExecute(TObject *Sender)
 void TfrmSimulation::ActionSuivreTramExecute(TObject *Sender)
 {
  int NumTram=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTram;
- if (!NumTram) return;
- if (!ActionRechercher->Checked)
+ if (NumTram == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonTram->Checked=true;
  frmRecherche->CSpinEditTram->Value=NumTram;
 }
@@ -3526,9 +3899,11 @@ void TfrmSimulation::ActionSuivreTramExecute(TObject *Sender)
 void TfrmSimulation::ActionSuivreTaxiExecute(TObject *Sender)
 {
  int NumTaxi=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTaxi;
- if (!NumTaxi) return;
- if (!ActionRechercher->Checked)
+ if (NumTaxi == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonTaxi->Checked=true;
  frmRecherche->CSpinEditTaxi->Value=NumTaxi;
 }
@@ -3536,9 +3911,11 @@ void TfrmSimulation::ActionSuivreTaxiExecute(TObject *Sender)
 void TfrmSimulation::ActionSuivreVehlibExecute(TObject *Sender)
 { // v5.3
  int NumVehlib=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehlib;
- if (!NumVehlib) return;
- if (!ActionRechercher->Checked)
+ if (NumVehlib == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonVehlib->Checked=true;
  frmRecherche->CSpinEditVehlib->Value=NumVehlib;
 }
@@ -3546,9 +3923,11 @@ void TfrmSimulation::ActionSuivreVehlibExecute(TObject *Sender)
 void TfrmSimulation::ActionSuivrePieton1Execute(TObject *Sender)
 {
  int NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[0];
- if (!NumPieton) return;
- if (!ActionRechercher->Checked)
+ if (NumPieton == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonPieton->Checked=true;
  frmRecherche->CSpinEditPieton->Value=NumPieton;
 }
@@ -3556,27 +3935,33 @@ void TfrmSimulation::ActionSuivrePieton1Execute(TObject *Sender)
 void TfrmSimulation::ActionSuivrePieton2Execute(TObject *Sender)
 {
  int NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[1];
- if (!NumPieton) return;
- if (!ActionRechercher->Checked)
+ if (NumPieton == 0) { return;
+}
+ if (!ActionRechercher->Checked) {
   ActionRechercher->Execute();
+}
  frmRecherche->RadioButtonPieton->Checked=true;
  frmRecherche->CSpinEditPieton->Value=NumPieton;
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDecorsArbreExecute(TObject *Sender)
 {
- int x,y;
+ int x;
+ int y;
  voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
- if (v->Nature==arbre) v->Nature=trottoirs; else v->Nature=arbre;
+ if (v->Nature==arbre) { v->Nature=trottoirs; } else { v->Nature=arbre;
+}
  SimulationModifiee=true; // v5.0
  RedessineCase(x,y,true);
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDecorsPelouseExecute(TObject *Sender)
 {
- int x,y;
+ int x;
+ int y;
  voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
- if (v->Nature==pelouse) v->Nature=trottoirs; else v->Nature=pelouse;
+ if (v->Nature==pelouse) { v->Nature=trottoirs; } else { v->Nature=pelouse;
+}
  SimulationModifiee=true; // v5.0
  RedessineCase(x,y,true);
 }
@@ -3584,9 +3969,11 @@ void TfrmSimulation::ActionDecorsPelouseExecute(TObject *Sender)
 void TfrmSimulation::ActionNatureTrottoirExecute(
       TObject *Sender)
 {
- int x,y;
+ int x;
+ int y;
  voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
- if (NATURE(v)!=trottoirs) v->Nature=trottoirs; else v->Nature=voies;
+ if (NATURE(v)!=trottoirs) { v->Nature=trottoirs; } else { v->Nature=voies;
+}
  SimulationModifiee=true; // v5.0
  RedessineCase(x,y,true);
 }
@@ -3594,18 +3981,21 @@ void TfrmSimulation::ActionNatureTrottoirExecute(
 void TfrmSimulation::ActionNatureImmeubleExecute(
       TObject *Sender)
 {
- int x,y;
+ int x;
+ int y;
  voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
- if (NATURE(v)!=immeubles) v->Nature=immeubles; else v->Nature=voies;
+ if (NATURE(v)!=immeubles) { v->Nature=immeubles; } else { v->Nature=voies;
+}
  SimulationModifiee=true; // v5.0
  RedessineCase(x,y,true);
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCopierVersExecute(TObject *Sender)
 {
- int NbX=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1,
-     NbY=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
- if (!cv) return;
+ int NbX=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
+ int NbY=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
+ if (!cv) { return;
+}
  if ((NbX<8)||(NbY<8))
   {
    AfficheMessage("Les dimensions de la sélection doivent être d'au moins 8x8.", "Copie vers un fichier", tmAvertissement, 0, 0);
@@ -3633,10 +4023,12 @@ Ce message récapitulatif sera mis à jour en fonction des contrôles ajoutés d
  // v6.0.4 : la copie est un fichier à part. L'original lui donnait le nom et le titre
  // du réseau affiché, marqué non modifié : Enregistrer écrasait la copie par tout le
  // réseau, et ses modifications se perdaient sans question
- const AnsiString asNomEnregistrer=SaveDialog->FileName, asNomOuvrir=OpenDialog->FileName, asTitre=Caption;
+ const AnsiString asNomEnregistrer=SaveDialog->FileName;
+ const AnsiString asNomOuvrir=OpenDialog->FileName;
+ const AnsiString asTitre=Caption;
  const bool Modifiee=SimulationModifiee;
  { // portage : try/__finally -> garde RAII (Finalement)
-  Finalement f([&]()
+  Finalement f([&]
   {
    cv->PrepareCopie(FIN, 0, 0, 0, 0);
    SaveDialog->FileName=asNomEnregistrer;
@@ -3649,8 +4041,9 @@ Ce message récapitulatif sera mis à jour en fonction des contrôles ajoutés d
                      DrawGridSimul->Selection.Top,
                      NbX, NbY);
    if (cv->CopieValide()&& // v4.2.1
-       SaveDialog->Execute())
+       SaveDialog->Execute()) {
     ActionEnregistrer->Execute();
+}
  }
 }
 //---------------------------------------------------------------------------
@@ -3673,10 +4066,11 @@ void TfrmSimulation::TimerClignotementLocalisationTimer(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceParkExecute(TObject *Sender)
 { // v5.0
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlace;
- if ((NumPlace=cv->v[x][y].NumPlacePark)) // Si Place de parking on la supprime
+ if ((NumPlace=cv->v[x][y].NumPlacePark) != 0) // Si Place de parking on la supprime
   {
    cv->SupprimePlacePark(NumPlace-1); // v5.3 renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
    asMsgOp=Format("La place de parking numéro %d a été supprimée.", ARRAYOFCONST((NumPlace)));
@@ -3684,17 +4078,18 @@ void TfrmSimulation::ActionPlaceParkExecute(TObject *Sender)
   }
  else // Sinon on la crée
   {
-   if ((NumPlace=cv->AjoutePlacePark(x, y))) // v5.1 : ancien nom AjoutePlace
+   if ((NumPlace=cv->AjoutePlacePark(x, y)) != 0) // v5.1 : ancien nom AjoutePlace
     {
      asMsgOp=Format("La place de parking créée a le numéro %d.", ARRAYOFCONST((NumPlace)));
      SimulationModifiee=true;
     }
    else
     {
-     if (cv->NbPlacesPark)
+     if (cv->NbPlacesPark != 0) {
       asMsgOp=Format("Impossible de créer une place de parking : il y en a déjà %d !", ARRAYOFCONST((cv->NbPlacesPark)));
-     else
+     } else {
       asMsgOp="Impossible de créer une place de parking : vous devez d'abord en définir le nombre !";
+}
      ToolButtonPlacePark->Down=false;
     }
   }
@@ -3730,10 +4125,11 @@ void TfrmSimulation::StatusBarResize(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceVehlibExecute(TObject *Sender)
 { // v5.3
- int x=DrawGridSimul->Col, y=DrawGridSimul->Row;
+ int x=DrawGridSimul->Col;
+ int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlace;
- if ((NumPlace=cv->v[x][y].NumPlaceVehlib)) // Si Place de vehlib on la supprime
+ if ((NumPlace=cv->v[x][y].NumPlaceVehlib) != 0) // Si Place de vehlib on la supprime
   {
    cv->SupprimePlaceVehlib(NumPlace-1);
    asMsgOp=Format("La place de vehlib numéro %d a été supprimée.", ARRAYOFCONST((NumPlace)));
@@ -3741,17 +4137,18 @@ void TfrmSimulation::ActionPlaceVehlibExecute(TObject *Sender)
   }
  else // Sinon on la crée
   {
-   if ((NumPlace=cv->AjoutePlaceVehlib(x, y)))
+   if ((NumPlace=cv->AjoutePlaceVehlib(x, y)) != 0)
     {
      asMsgOp=Format("La place de vehlib créée a le numéro %d.", ARRAYOFCONST((NumPlace)));
      SimulationModifiee=true;
     }
    else
     {
-     if (cv->NbPlacesVehlib)
+     if (cv->NbPlacesVehlib != 0) {
       asMsgOp=Format("Impossible de créer une place de vehlib : il y en a déjà %d !", ARRAYOFCONST((cv->NbPlacesVehlib)));
-     else
+     } else {
       asMsgOp="Impossible de créer une place de vehlib : vous devez d'abord en définir le nombre !";
+}
      ToolButtonPlaceVehlib->Down=false;
     }
   }
@@ -3797,15 +4194,16 @@ void TfrmSimulation::FormKeyDown(TObject *Sender, WORD &Key,
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEpidemieExecute(TObject *Sender)
 { // v5.4.1
- if (ActionEpidemie->Checked) // v5.4.2 : l'action est en AutoCheck et la case dans les paramètres n'est plus modifiable
+ if (ActionEpidemie->Checked) { // v5.4.2 : l'action est en AutoCheck et la case dans les paramètres n'est plus modifiable
    frmEpidemie->ShowModal();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionAfficherInfectionExecute(TObject *Sender)
 {  // v5.4.1
  ActionAfficherInfection->Checked^=true;
- Affichage=(affichage)(Affichage^aff_infct);
- frmStatistiques->AffichageEpidemique=!!(Affichage&aff_infct); // statistiques épidémiques si affichage épidémique
+ Affichage=static_cast<affichage>(Affichage^aff_infct);
+ frmStatistiques->AffichageEpidemique=!((Affichage&aff_infct) == 0); // statistiques épidémiques si affichage épidémique
  DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
@@ -3860,7 +4258,7 @@ class VueSimulation : public IVueSimulation
       case fiInfosPieton:    frmInfosPieton->RafraichitInfos(); break;
      }
    }
-  bool RechercheVisible() const override { return frmRecherche&&frmRecherche->Visible; }
+  bool RechercheVisible() const override { return (frmRecherche != nullptr)&&frmRecherche->Visible; }
   bool RechercheCochee(objet_recherche Objet) const override
    {
     switch(Objet)
@@ -3905,28 +4303,33 @@ void TfrmSimulation::ChargeFiche()
   COMPOSANTS_frmSimulation(LIE_COMPOSANT)
   FinChargement(Lieur);
   // ClientHeight de la VCL : sans le menu (dans la fenêtre sous Windows et Linux)
-  if (!menuBar()->isNativeMenuBar()) resize(width(), height()+menuBar()->sizeHint().height());
-  SimulationEnCours.Definit([this]() { return SimulEstEnCours(); }, [this](const bool &b) { MarcheArretSimul(b); });
-  SimulationModifiee.Definit([this]() { return SimulEstModifiee(); }, [this](const bool &b) { ModifieSimul(b); });
-  SimulationSanglante.Definit([this]() { return SimulEstSanglante(); }, [this](const bool &b) { ModifieModeSanglant(b); });
-  ResurrectionDemandee.Definit([this]() { return ResurrectionEstDemandee(); }, [this](const bool &b) { ModifieDemandeResurrection(b); });
-  EpidemieActivee.Definit([this]() { return EpidemieEstActive(); }, [](const bool &) {});
+  if (!menuBar()->isNativeMenuBar()) { resize(width(), height()+menuBar()->sizeHint().height());
+}
+  SimulationEnCours.Definit([this] { return SimulEstEnCours(); }, [this](const bool &b) { MarcheArretSimul(b); });
+  SimulationModifiee.Definit([this] { return SimulEstModifiee(); }, [this](const bool &b) { ModifieSimul(b); });
+  SimulationSanglante.Definit([this] { return SimulEstSanglante(); }, [this](const bool &b) { ModifieModeSanglant(b); });
+  ResurrectionDemandee.Definit([this] { return ResurrectionEstDemandee(); }, [this](const bool &b) { ModifieDemandeResurrection(b); });
+  EpidemieActivee.Definit([this] { return EpidemieEstActive(); }, [](const bool &) {});
   EVENEMENTS_frmSimulation(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------
 TfrmSimulation::~TfrmSimulation()
  {
-  if (OnDestroy) OnDestroy(this);
-  vue=NULL;
+  if (OnDestroy) { OnDestroy(this);
+}
+  vue=nullptr;
   delete VueMoteur;
  }
 //---------------------------------------------------------------------------
 void TfrmSimulation::OuvreFichierDemande(const String &asNomFichier)
  { // Ouverture depuis le Finder (QFileOpenEvent) Centre-Ville déjà lancé :
    // comme Ouvrir, sans la boîte de dialogue (impossible pendant une simulation)
-  if (SimulEnCours||Pause) return;
-  if (!EnregistreModificationsAvant(oaOuvrir)) return;
+  if (SimulEnCours||Pause) { return;
+}
+  if (!EnregistreModificationsAvant(oaOuvrir)) { return;
+}
   asNomFichAuto=asNomFichier;
   ActionOuvrir->Execute();
  }

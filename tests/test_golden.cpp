@@ -26,24 +26,28 @@ namespace
   // Numéro (à partir de 1) et contenu de la première ligne différente
   std::string PremiereLigneDifferente(const std::string &a, const std::string &b)
    {
-    std::istringstream ia(a), ib(b);
-    std::string la, lb;
+    std::istringstream ia(a);
+    std::istringstream ib(b);
+    std::string la;
+    std::string lb;
     for(int n=1; ; n++)
      {
-      bool fa=(bool)std::getline(ia, la), fb=(bool)std::getline(ib, lb);
-      if (!fa&&!fb) return "aucune";
-      if ((fa!=fb)||(la!=lb))
+      bool fa=(bool)std::getline(ia, la);
+      bool fb=(bool)std::getline(ib, lb);
+      if (!fa&&!fb) { return "aucune";
+}
+      if ((fa!=fb)||(la!=lb)) {
        return "ligne "+std::to_string(n)+"\n  attendu : "+(fa?la:"<fin>")+"\n  obtenu  : "+(fb?lb:"<fin>");
+}
      }
    }
  }
 //---------------------------------------------------------------------------
 TEST_CASE("Golden master : simulation à graine fixe", "[golden][simulation]")
  {
-  for(int k=0; k<NB_CONFIGS_GOLDEN; k++)
+  for(auto Config : ConfigsGolden) {
    for(const carte &c : Cartes)
     {
-     const config_golden &Config=ConfigsGolden[k];
      DYNAMIC_SECTION(Config.Nom << "/" << c.Nom)
       {
        const std::string asRelatif=FichierGolden(c.Nom, Config);
@@ -59,9 +63,11 @@ TEST_CASE("Golden master : simulation à graine fixe", "[golden][simulation]")
          const bool Identique=false; // les textes diffèrent (voir ci-dessus)
          CHECK(Identique);
         }
-       else
+       else {
         SUCCEED();
+}
       }
     }
+}
  }
 //---------------------------------------------------------------------------

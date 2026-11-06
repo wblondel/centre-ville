@@ -106,14 +106,16 @@ String stRepLocalAppData()
    String stExePath = A(QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/"));
    QString stRepLocAppDataCvw = "/Patquoi.fr/Centre-Ville/";
    QString stBase = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-   if (stBase.isEmpty())
-     stResult = stExePath;
-   else
+   if (stBase.isEmpty()) {
+     stResult = std::move(stExePath);
+   } else
 	{
 	 QString stRep = stBase + stRepLocAppDataCvw;
-	 if (!QDir(stRep).exists())
-	   if (!QDir().mkpath(stRep))
+	 if (!QDir(stRep).exists()) {
+	   if (!QDir().mkpath(stRep)) {
 		 return stExePath;
+}
+}
 	 stResult = A(QDir::toNativeSeparators(stRep));
 	}
    return stResult;
@@ -131,17 +133,20 @@ void CopieCartesExemple(const QString &stSource, const QString &stDestination)
   QDir Destination(stDestination);
   QString stMarque=Destination.filePath(".cartes-copiees");
   QStringList Cartes=QDir(stSource).entryList({"*.cvw"}, QDir::Files);
-  if (Cartes.isEmpty()||QFile::exists(stMarque)||(!QDir().mkpath(stDestination))) return;
+  if (Cartes.isEmpty()||QFile::exists(stMarque)||(!QDir().mkpath(stDestination))) { return;
+}
   bool Ok=true;
   for(const QString &stCarte : Cartes)
    {
     QString stCopie=Destination.filePath(stCarte);
-    if (QFile::exists(stCopie)) continue;
-    if (QFile::copy(QDir(stSource).filePath(stCarte), stCopie))
+    if (QFile::exists(stCopie)) { continue;
+}
+    if (QFile::copy(QDir(stSource).filePath(stCarte), stCopie)) {
      // QFile::copy garde les droits de la source : une carte doit rester enregistrable
      QFile::setPermissions(stCopie, QFile::permissions(stCopie)|QFileDevice::ReadOwner|QFileDevice::WriteOwner);
-    else
+    } else {
      Ok=false;
+}
    }
   if (Ok)
    {
@@ -153,7 +158,7 @@ void CopieCartesExemple(const QString &stSource, const QString &stDestination)
 // v5.3. S'active automatiquement au lancement de cvw.exe avec le paramètre ! et génère un fichier cvw.log où se trouve cvw.exe à la fermeture de l'application
 // Usage : DebugEcrit("message");
 bool Debug = false;
-std::vector<AnsiString> *slDebug = NULL; // portage : TStringList -> vecteur de lignes
+std::vector<AnsiString> *slDebug = nullptr; // portage : TStringList -> vecteur de lignes
 //---------------------------------------------------------------------------
 void DebugOuvre()
  {
@@ -161,10 +166,11 @@ void DebugOuvre()
   slDebug = new std::vector<AnsiString>;
  }
 //---------------------------------------------------------------------------
-void DebugEcrit(const AnsiString asMessage)
+void DebugEcrit(const AnsiString& asMessage)
  {
-  if (Debug&&slDebug)
+  if (Debug&&slDebug) {
    slDebug->push_back(asMessage);
+}
  }
 //---------------------------------------------------------------------------
 void DebugFerme()
@@ -174,14 +180,15 @@ void DebugFerme()
   if (slDebug)
    {
 	QFile f(Q(stCheminEtFichierLog)); // portage : TStringList::SaveToFile
-	if (f.open(QIODevice::WriteOnly|QIODevice::Truncate))
+	if (f.open(QIODevice::WriteOnly|QIODevice::Truncate)) {
 	 for(const AnsiString &as : *slDebug)
 	  {
 	   f.write(as.c_str());
 	   f.write("\r\n");
 	  }
+}
 	delete slDebug;
-	slDebug = NULL;
+	slDebug = nullptr;
    }
   Debug = false;
  }
@@ -192,7 +199,7 @@ namespace
   class SansEchap : public QObject
    {
     public:
-    bool eventFilter(QObject *, QEvent *e) override
+    bool eventFilter(QObject * /*watched*/, QEvent *e) override
      {
       return ((e->type()==QEvent::KeyPress)||(e->type()==QEvent::ShortcutOverride))&&
              (static_cast<QKeyEvent *>(e)->key()==Qt::Key_Escape);
@@ -202,12 +209,13 @@ namespace
   QWidget *FenetreParente()
    { // Application->Handle : la fenêtre active de l'application
     QWidget *w=QApplication::activeModalWidget();
-    if (!w) w=QApplication::activeWindow();
+    if (!w) { w=QApplication::activeWindow();
+}
     return w;
    }
  }
 //---------------------------------------------------------------------------
-type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap)
+type_reponse AfficheMessage(const AnsiString& asMessage, const AnsiString& asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap)
  {// v5.4 : Conversion BCB6>BCBX (MessageBoxW + String)
   // portage : QMessageBox ; OrdreBoutonEchap était déjà ignoré par MessageBoxW
   (void)OrdreBoutonEchap;
@@ -229,8 +237,9 @@ type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre
             Boite.setEscapeButton(Boutons[2]);
             break;
    }
-  if (QAbstractButton *b=Boutons[BoutonDefaut[Type][OrdreBoutonDefaut]])
+  if (QAbstractButton *b=Boutons[BoutonDefaut[Type][OrdreBoutonDefaut]]) {
    Boite.setDefaultButton(static_cast<QPushButton *>(b));
+}
   Boite.exec();
   switch(Boite.standardButton(Boite.clickedButton()))
    {
@@ -242,7 +251,7 @@ type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre
    }
  }
 //---------------------------------------------------------------------------
-int MessageDlg(const AnsiString asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx)
+int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx)
  { // portage : Dialogs::MessageDlg (titres et libellés de la RTL en français)
   (void)HelpCtx;
   static const char *Titres[]={"Avertissement", "Erreur", "Information", "Confirmation", ""};
@@ -256,18 +265,24 @@ int MessageDlg(const AnsiString asMessage, TMsgDlgType Type, TMsgDlgButtons Bout
     {mbAll, QMessageBox::YesToAll, mrAll}, {mbNoToAll, QMessageBox::NoToAll, mrNoToAll},
     {mbYesToAll, QMessageBox::YesToAll, mrYesToAll}, {mbHelp, QMessageBox::Help, mrNone},
     {mbClose, QMessageBox::Close, mrClose}};
-  for(auto &c : Correspondances)
-   if (Boutons.Contains(c.b)) Boite.addButton(c.q);
+  for(auto &c : Correspondances) {
+   if (Boutons.Contains(c.b)) { Boite.addButton(c.q);
+}
+}
   // CreateMessageDialog : défaut = OK sinon Oui ; Échap = Annuler sinon Non sinon OK
-  if (Boutons.Contains(mbOK)) Boite.setDefaultButton(QMessageBox::Ok);
-  else if (Boutons.Contains(mbYes)) Boite.setDefaultButton(QMessageBox::Yes);
-  if (Boutons.Contains(mbCancel)) Boite.setEscapeButton(QMessageBox::Cancel);
-  else if (Boutons.Contains(mbNo)) Boite.setEscapeButton(QMessageBox::No);
-  else if (Boutons.Contains(mbOK)) Boite.setEscapeButton(QMessageBox::Ok);
+  if (Boutons.Contains(mbOK)) { Boite.setDefaultButton(QMessageBox::Ok);
+  } else if (Boutons.Contains(mbYes)) { Boite.setDefaultButton(QMessageBox::Yes);
+}
+  if (Boutons.Contains(mbCancel)) { Boite.setEscapeButton(QMessageBox::Cancel);
+  } else if (Boutons.Contains(mbNo)) { Boite.setEscapeButton(QMessageBox::No);
+  } else if (Boutons.Contains(mbOK)) { Boite.setEscapeButton(QMessageBox::Ok);
+}
   Boite.exec();
   QMessageBox::StandardButton r=Boite.standardButton(Boite.clickedButton());
-  for(auto &c : Correspondances)
-   if (Boutons.Contains(c.b)&&(c.q==r)) return c.mr;
+  for(auto &c : Correspondances) {
+   if (Boutons.Contains(c.b)&&(c.q==r)) { return c.mr;
+}
+}
   return mrCancel;
  }
 //---------------------------------------------------------------------------
@@ -280,8 +295,9 @@ String stRepAide()
  {
   QString stRep = QCoreApplication::applicationDirPath();
 #ifdef Q_OS_MACOS
-  if (stRep.endsWith("/Contents/MacOS"))
+  if (stRep.endsWith("/Contents/MacOS")) {
 	stRep = QDir::cleanPath(stRep+"/../Resources");
+}
 #endif
   return A(stRep+"/");
  }
@@ -294,7 +310,7 @@ String stRepAide()
 // l'adresse complète : le navigateur arrive ainsi à l'ancre, comme avec
 // l'original qui passait l'adresse au navigateur sur sa ligne de commande.
 //---------------------------------------------------------------------------
-void AffichePageHtml(const String stURL)
+void AffichePageHtml(const String& stURL)
  {
   QUrl Url(Q(stURL));
   if (Url.isLocalFile()&&Url.hasFragment())
@@ -321,15 +337,16 @@ void AffichePageHtml(const String stURL)
 void AfficheAideContextuelle(QWidget *Form)
  {// v5.3 : conversion HLP > HTML.
   int HelpContext=Form?Form->window()->property("vclHelpContext").toInt():0; // portage : TForm::HelpContext
-  for(int i=0; i<NBCONTEXTESAIDE; i++)
-	if (caCorresp[i].Numero==HelpContext) // On recherche la rubrique HelpContext dans le tableau caCorresp
+  for(auto i : caCorresp) {
+	if (i.Numero==HelpContext) // On recherche la rubrique HelpContext dans le tableau caCorresp
 	 { // v5.4 : conversion BCB6>BCBX (L"open" + String)
 	  String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString())+
 					 String("#")+
-					 String(caCorresp[i].szHREF);
+					 String(i.szHREF);
 	  AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
 	  break;
 	 }
+}
  }
 //---------------------------------------------------------------------------
 void AfficheIndexAide(QWidget *Form)

@@ -14,7 +14,7 @@ const char *NomPartieEtat[NB_PARTIES_ETAT]=
 std::string Hexa(std::uint64_t v)
  {
   char Tampon[20];
-  std::snprintf(Tampon, sizeof(Tampon), "%016llx", (unsigned long long)v);
+  std::snprintf(Tampon, sizeof(Tampon), "%016llx", static_cast<unsigned long long>(v));
   return Tampon;
  }
 //---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ std::string Hexa(std::uint64_t v)
 //---------------------------------------------------------------------------
 void PuitsTexte::Section(const char *Nom)
  {
-  Texte+="[";
+  Texte+='[';
   Texte+=Nom;
   Texte+="]\n";
  }
@@ -30,24 +30,28 @@ void PuitsTexte::Section(const char *Nom)
 void PuitsTexte::Objet(const char *Type, int Numero, bool Ignorable)
  {
   Ignore=Ignorable;
-  if (Ignore) return;
+  if (Ignore) { return;
+}
   Texte+=Type;
-  if (Numero>=0) Texte+=" "+std::to_string(Numero);
-  Texte+=":";
+  if (Numero>=0) { Texte+=" "+std::to_string(Numero);
+}
+  Texte+=':';
  }
 //---------------------------------------------------------------------------
 void PuitsTexte::Champ(const char *Nom, long long Valeur)
  {
-  if (Ignore) return;
-  Texte+=" ";
+  if (Ignore) { return;
+}
+  Texte+=' ';
   Texte+=Nom;
-  Texte+="=";
+  Texte+='=';
   Texte+=std::to_string(Valeur);
  }
 //---------------------------------------------------------------------------
 void PuitsTexte::FinObjet()
  {
-  if (!Ignore) Texte+="\n";
+  if (!Ignore) { Texte+='\n';
+}
   Ignore=false;
  }
 //---------------------------------------------------------------------------
@@ -67,7 +71,8 @@ template <class P> void ExportEtat::ExporteInfections(const pieton *p, P &s)
     for(int j=0; j<8; j++)
      {
       char n[48];
-      if constexpr (P::Noms) std::snprintf(n, sizeof(n), "inf%d.%s", k, Noms[j]); else n[0]=0;
+      if constexpr (P::Noms) { std::snprintf(n, sizeof(n), "inf%d.%s", k, Noms[j]); } else { n[0]=0;
+}
       s.Champ(n, Valeurs[j]);
      }
    }
@@ -121,7 +126,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
       C("QuadrillageStats", cv->QuadrillageStats); C("TypeStats", cv->TypeStats);
       C("graine", alea::Graine()); // état du générateur aléatoire
       s.FinObjet();
-      if (cv->Stats)
+      if (cv->Stats) {
        for(i=0; i<cv->NbToursStats; i++)
         {
          const stats *st=cv->Stats+i;
@@ -131,6 +136,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("infectes", st->NbPietonsInfectes); C("morts", st->NbPietonsMorts);
          s.FinObjet();
         }
+}
       break;
     case peFeux:
       for(i=0; i<cv->NbFeux; i++)
@@ -173,7 +179,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
        }
       break;
     case peVehicules:
-      if (cv->Vehicule)
+      if (cv->Vehicule) {
        for(i=0; i<cv->NbVehicules; i++)
         {
          const vehicule *v=cv->Vehicule+i;
@@ -185,12 +191,13 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("NbCasesParcourues", v->NbCasesParcourues); C("NbToursRepos", v->NbToursRepos);
          s.FinObjet();
         }
+}
       break;
     case peBus:
       s.Objet("depot_bus", -1);
       C("x", cv->DepotBus.x); C("y", cv->DepotBus.y); C("NumDrnBusSorti", cv->DepotBus.NumDrnBusSorti);
       s.FinObjet();
-      if (cv->Bus)
+      if (cv->Bus) {
        for(i=0; i<cv->NbBus; i++)
         {
          const bus *b=cv->Bus+i;
@@ -203,6 +210,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("NbToursRepos", b->NbToursRepos);
          s.FinObjet();
         }
+}
       for(i=0; i<cv->NbArretsBus; i++)
        {
         const arret_bus *a=cv->ArretBus+i;
@@ -221,7 +229,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
        }
       break;
     case peTrams:
-      if (cv->Tram)
+      if (cv->Tram) {
        for(i=0; i<cv->NbTrams; i++)
         {
          const tram *t=cv->Tram+i;
@@ -234,6 +242,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("NbToursRepos", t->NbToursRepos);
          s.FinObjet();
         }
+}
       for(i=0; i<cv->NbArretsTram; i++)
        {
         const arret_tram *a=cv->ArretTram+i;
@@ -258,14 +267,15 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         C("x", cv->PlaceTaxi[i].x); C("y", cv->PlaceTaxi[i].y); C("NumFile", cv->PlaceTaxi[i].NumFile);
         s.FinObjet();
        }
-      if (cv->FileTaxi)
+      if (cv->FileTaxi) {
        for(i=0; i<cv->NbFilesTaxi; i++)
         {
          s.Objet("file_taxi", i+1);
          C("NumPlaceQueue", cv->FileTaxi[i].NumPlaceQueue);
          s.FinObjet();
         }
-      if (cv->Taxi)
+}
+      if (cv->Taxi) {
        for(i=0; i<cv->NbTaxis; i++)
         {
          const taxi *t=cv->Taxi+i;
@@ -278,6 +288,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("Dir", t->Dir); C("DirDrnDepl", t->DirDrnDepl);
          s.FinObjet();
         }
+}
       break;
     case peParkingsPlaces:
       for(i=0; i<cv->NbPlacesPark; i++)
@@ -286,13 +297,14 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         C("x", cv->PlacePark[i].x); C("y", cv->PlacePark[i].y); C("NumFile", cv->PlacePark[i].NumFile);
         s.FinObjet();
        }
-      if (cv->FilePark)
+      if (cv->FilePark) {
        for(i=0; i<cv->NbFilesPark; i++)
         {
          s.Objet("file_park", i+1);
          C("NumPlaceQueue", cv->FilePark[i].NumPlaceQueue);
          s.FinObjet();
         }
+}
       break;
     case peVehlibs:
       for(i=0; i<cv->NbPlacesVehlib; i++)
@@ -302,7 +314,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         C("NumVehlibReserve", cv->PlaceVehlib[i].NumVehlibReserve);
         s.FinObjet();
        }
-      if (cv->Vehlib)
+      if (cv->Vehlib) {
        for(i=0; i<cv->NbVehlibs; i++)
         {
          const vehlib *v=cv->Vehlib+i;
@@ -313,9 +325,10 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          C("NbCasesParcourues", v->NbCasesParcourues); C("NbToursRepos", v->NbToursRepos);
          s.FinObjet();
         }
+}
       break;
     case pePietons:
-      if (cv->Pieton)
+      if (cv->Pieton) {
        for(i=0; i<cv->NbPietons; i++)
         {
          const pieton *p=cv->Pieton+i;
@@ -335,9 +348,10 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          ExporteInfections(p, s);
          s.FinObjet();
         }
+}
       break;
     case peCases:
-      for(int x=0; x<cv->NbX; x++)
+      for(int x=0; x<cv->NbX; x++) {
        for(int y=0; y<cv->NbY; y++)
         {
          const voie *v=&cv->v[x][y];
@@ -346,10 +360,13 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          if constexpr (P::Noms)
           { // Cases vides omises du texte (toujours dans l'empreinte)
          bool AttenteTraficNuls=true;
-         if (v->Attente&&v->Trafic)
-          for(int a=0; AttenteTraficNuls&&(a<=ne); a++)
-           for(int b=0; AttenteTraficNuls&&(b<=ne); b++)
+         if (v->Attente&&v->Trafic) {
+          for(int a=0; AttenteTraficNuls&&(a<=ne); a++) {
+           for(int b=0; AttenteTraficNuls&&(b<=ne); b++) {
             AttenteTraficNuls=(!v->Attente[a][b])&&(!v->Trafic[a][b]);
+}
+}
+}
          Vide=(!v->DirPoss)&&(!v->SensVoieTram)&&(v->Nature==voies)&&(!v->ToutDroit)&&
                    (!v->PassagePietons)&&(!v->PassageBus)&&
                    (!v->NumVehicule)&&(!v->NumVehlib)&&(!v->NumBus)&&(!v->NumTram)&&(!v->NumParking)&&
@@ -357,10 +374,12 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                    (!v->NbPietons)&&(!v->NumArretBus)&&(!v->NumArretTram)&&(!v->NumTaxi)&&(!v->NumPlaceTaxi)&&
                    (!v->NumPlacePark)&&(!v->NumPlaceVehlib)&&(!v->NumSpotVehlib)&&
                    (!v->NumPieton[0])&&(!v->NumPieton[1])&&AttenteTraficNuls;
-         for(int k=0; k<NBDIR; k++)
+         for(int k=0; k<NBDIR; k++) {
           Vide=Vide&&(!v->Priorite[k])&&(!v->NumFeu[k])&&(!v->NumFeuP[k]);
-         for(int k=0; k<NBMAXLIGNESBUSTRAM; k++)
+}
+         for(int k=0; k<NBMAXLIGNESBUSTRAM; k++) {
           Vide=Vide&&(!v->LigneBus[k])&&(!v->LigneTram[k]);
+}
           }
          s.Objet("case", x*1000+y, Vide);
          C("x", x); C("y", y);
@@ -381,17 +400,22 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
           {
            if (Detail)
             {
-             for(int a=0; a<=ne; a++)
-              for(int b=0; b<=ne; b++)
+             for(int a=0; a<=ne; a++) {
+              for(int b=0; b<=ne; b++) {
                if (v->Attente[a][b]||v->Trafic[a][b])
                 {
                  char n[48];
-                 if constexpr (P::Noms) std::snprintf(n, sizeof(n), "att%d.%d", a, b); else n[0]=0;
+                 if constexpr (P::Noms) { std::snprintf(n, sizeof(n), "att%d.%d", a, b); } else { n[0]=0;
+}
                  s.Champ(n, v->Attente[a][b]);
-                 if constexpr (P::Noms) std::snprintf(n, sizeof(n), "tra%d.%d", a, b);
+                 if constexpr (P::Noms) { std::snprintf(n, sizeof(n), "tra%d.%d", a, b);
+}
                  s.Champ(n, v->Trafic[a][b]);
-                 if constexpr (!P::Noms) s.Champ(n, a*1000+b); // position dans l'empreinte
+                 if constexpr (!P::Noms) { s.Champ(n, a*1000+b); // position dans l'empreinte
+}
                 }
+}
+}
             }
            else
             { // [0][0] = totaux tous véhicules, incrémentés à chaque mise à jour
@@ -401,37 +425,55 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
           }
          s.FinObjet();
         }
+}
       break;
     case peDistances:
-      for(int x=0; x<cv->NbX; x++)
+      for(int x=0; x<cv->NbX; x++) {
        for(int y=0; y<cv->NbY; y++)
         {
          const voie *v=&cv->v[x][y];
-         int nd=NbDir[v->DirPoss],
-             ndt=const_cast<voie*>(v)->NbDirPossSensVoieTram(indefinie);
+         int nd=NbDir[v->DirPoss];
+         int ndt=const_cast<voie*>(v)->NbDirPossSensVoieTram(indefinie);
          s.Objet("distances", x*1000+y);
-         if (v->DistParking)
-          for(int e=0; e<cv->NbParkings; e++)
+         if (v->DistParking) {
+          for(int e=0; e<cv->NbParkings; e++) {
            for(int d=0; d<nd; d++)
             { C("pk", v->DistParking[e][d][0]); C("pk", v->DistParking[e][d][1]); }
-         if (v->DistArretBus)
-          for(int e=0; e<cv->NbArretsBus; e++)
-           for(int d=0; d<nd; d++) C("ab", v->DistArretBus[e][d]);
-         if (v->DistArretTram)
-          for(int e=0; e<cv->NbArretsTram; e++)
-           for(int d=0; d<ndt; d++) C("at", v->DistArretTram[e][d]);
-         if (v->DistFileTaxi)
-          for(int e=0; e<cv->NbFilesTaxi; e++)
-           for(int d=0; d<nd; d++) C("ft", v->DistFileTaxi[e][d]);
-         if (v->DistFilePark)
-          for(int e=0; e<cv->NbFilesPark; e++)
+}
+}
+         if (v->DistArretBus) {
+          for(int e=0; e<cv->NbArretsBus; e++) {
+           for(int d=0; d<nd; d++) { C("ab", v->DistArretBus[e][d]);
+}
+}
+}
+         if (v->DistArretTram) {
+          for(int e=0; e<cv->NbArretsTram; e++) {
+           for(int d=0; d<ndt; d++) { C("at", v->DistArretTram[e][d]);
+}
+}
+}
+         if (v->DistFileTaxi) {
+          for(int e=0; e<cv->NbFilesTaxi; e++) {
+           for(int d=0; d<nd; d++) { C("ft", v->DistFileTaxi[e][d]);
+}
+}
+}
+         if (v->DistFilePark) {
+          for(int e=0; e<cv->NbFilesPark; e++) {
            for(int d=0; d<nd; d++)
             { C("fp", v->DistFilePark[e][d][0]); C("fp", v->DistFilePark[e][d][1]); }
-         if (v->DistPlaceVehlib)
-          for(int e=0; e<cv->NbPlacesVehlib; e++)
-           for(int d=0; d<nd; d++) C("pv", v->DistPlaceVehlib[e][d]);
+}
+}
+         if (v->DistPlaceVehlib) {
+          for(int e=0; e<cv->NbPlacesVehlib; e++) {
+           for(int d=0; d<nd; d++) { C("pv", v->DistPlaceVehlib[e][d]);
+}
+}
+}
          s.FinObjet();
         }
+}
       break;
     default:
       break;
@@ -441,8 +483,9 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
 std::string ExportEtat::Texte(const centre_ville *cv, bool Detail)
  {
   PuitsTexte p;
-  for(int i=0; i<peDistances; i++)
-   Exporte(cv, (partie_etat)i, p, Detail);
+  for(int i=0; i<peDistances; i++) {
+   Exporte(cv, static_cast<partie_etat>(i), p, Detail);
+}
   return p.Texte;
  }
 //---------------------------------------------------------------------------

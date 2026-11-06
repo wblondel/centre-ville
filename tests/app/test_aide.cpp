@@ -117,8 +117,9 @@ namespace
    {
     QStringList Resultat;
     QDir d(asDossier);
-    for(QDirIterator i(asDossier, QDir::Files|QDir::Hidden, QDirIterator::Subdirectories); i.hasNext(); )
+    for(QDirIterator i(asDossier, QDir::Files|QDir::Hidden, QDirIterator::Subdirectories); i.hasNext(); ) {
      Resultat<<d.relativeFilePath(i.next());
+}
     Resultat.sort();
     return Resultat;
    }
@@ -134,7 +135,8 @@ class TestAide : public QObject
     QString stPage=QString::fromUtf8(Contenu(Page.toLocalFile()));
     QRegularExpressionMatch Meta=QRegularExpression("<meta http-equiv=\"refresh\" content=\"0; url='([^']*)'\">").match(stPage);
     QRegularExpressionMatch Lien=QRegularExpression("<a href=\"([^\"]*)\">").match(stPage);
-    if (!Meta.hasMatch()||!Lien.hasMatch()||(Meta.captured(1)!=Lien.captured(1))) return QString();
+    if (!Meta.hasMatch()||!Lien.hasMatch()||(Meta.captured(1)!=Lien.captured(1))) { return {};
+}
     return Meta.captured(1).replace("&amp;", "&");
    }
   public slots:
@@ -235,13 +237,15 @@ void TestAide::aideCopieeACoteDeCvw()
   const struct { const char *Copie, *Source; } Dossiers[]={{"html", "guide"}, {"tutocv", "tutorial"}};
   for(const auto &d : Dossiers)
    {
-    QString stCopie=QString(CV_DOSSIER_AIDE_CVW)+"/"+d.Copie, stSource=QString(CV_DOSSIER_DOCS)+"/"+d.Source;
+    QString stCopie=QString(CV_DOSSIER_AIDE_CVW)+"/"+d.Copie;
+    QString stSource=QString(CV_DOSSIER_DOCS)+"/"+d.Source;
     QVERIFY2(QDir(stCopie).exists(), qPrintable("Dossier absent : "+stCopie));
     QStringList Copies=Fichiers(stCopie);
     QCOMPARE(Copies, Fichiers(stSource));
     QVERIFY(Copies.contains("index.html"));
-    for(const QString &f : Copies)
+    for(const QString &f : Copies) {
      QVERIFY2(Contenu(stCopie+"/"+f)==Contenu(stSource+"/"+f), qPrintable(stCopie+"/"+f));
+}
    }
  }
 //---------------------------------------------------------------------------

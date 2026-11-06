@@ -21,21 +21,21 @@ class AnsiString
  {
   std::string s;
   public:
-  AnsiString() {}
+  AnsiString() = default;
   AnsiString(const char *src) : s(src?src:"") {}
   AnsiString(const std::string &src) : s(src) {}
   AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
   const char *c_str() const { return s.c_str(); }
   const std::string &str() const { return s; }
-  int Length() const { return (int)s.size(); }
+  int Length() const { return static_cast<int>(s.size()); }
   bool IsEmpty() const { return s.empty(); }
   // Indices à partir de 1, comme la VCL
-  char &operator[](int i) { return s[(std::size_t)(i-1)]; }
-  char operator[](int i) const { return s[(std::size_t)(i-1)]; }
+  char &operator[](int i) { return s[static_cast<std::size_t>(i-1)]; }
+  char operator[](int i) const { return s[static_cast<std::size_t>(i-1)]; }
   AnsiString SubString(int Index, int Count) const;
   int Pos(const AnsiString &asSousChaine) const; // 0 si absente
   AnsiString &operator+=(const AnsiString &as) { s+=as.s; return *this; }
-  AnsiString operator+(const AnsiString &as) const { return AnsiString(s+as.s); }
+  AnsiString operator+(const AnsiString &as) const { return {s+as.s}; }
   bool operator==(const AnsiString &as) const { return s==as.s; }
   bool operator!=(const AnsiString &as) const { return s!=as.s; }
   bool operator<(const AnsiString &as) const { return s<as.s; }
@@ -66,15 +66,15 @@ class TVarRec
   std::string Chaine;
   const void *Pointeur=nullptr;
   template <class T,
-            typename std::enable_if<std::is_integral<T>::value&&
-                                    (!std::is_same<T, char>::value)&&
-                                    (!std::is_same<T, bool>::value), int>::type=0>
+            std::enable_if_t<std::is_integral_v<T>&&
+                                    (!std::is_same_v<T, char>)&&
+                                    (!std::is_same_v<T, bool>), int> =0>
   TVarRec(T v) : Genre(vtEntier), Entier((long long)v) {}
   TVarRec(char c) : Genre(vtCaractere), Chaine(1, c) {}
-  TVarRec(bool b) : Genre(vtBooleen), Entier(b) {}
+  TVarRec(bool b) : Genre(vtBooleen), Entier(static_cast<long long>(b)) {}
   TVarRec(double d) : Genre(vtReel), Reel(d) {}
   TVarRec(float f) : Genre(vtReel), Reel(f) {}
-  TVarRec(long double d) : Genre(vtReel), Reel((double)d) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
+  TVarRec(long double d) : Genre(vtReel), Reel(static_cast<double>(d)) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
   TVarRec(const char *c) : Genre(vtChaine), Chaine(c?c:"") {}
   TVarRec(const std::string &c) : Genre(vtChaine), Chaine(c) {}
   TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}

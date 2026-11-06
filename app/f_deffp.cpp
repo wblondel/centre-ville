@@ -10,12 +10,12 @@
 //#pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_deffp_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-TfrmDefFeuxPietons *frmDefFeuxPietons=NULL;
+TfrmDefFeuxPietons *frmDefFeuxPietons=nullptr;
 //---------------------------------------------------------------------------
 TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent* Owner) : TForm(Owner)
  { ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
   NbFeux=0;
-  NumFeux=NULL;
+  NumFeux=nullptr;
   // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
   frmSimulation->AffecteGlyphe(GLYPHE_SELF, SpeedButtonSelFeux->Glyph);
  }
@@ -25,14 +25,16 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
   int i;
   v=&(cv->v[x][y]);
   Numero=v->NumFeuP[Direction-1];
-  if (!Numero)
+  if (Numero == 0) {
    Numero=cv->AjouteFeuPietons(x, y, Direction);
+}
   v->NumFeuP[Direction-1]=Numero;
   f=&(cv->FeuP[Numero-1]);
   LabelCoordonnees->Caption=Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
   LabelDirection->Caption=asDir[Direction];
-  if (Numero) LabelNumero->Caption=IntToStr(Numero);
-  RadioGroupEtat->ItemIndex=f->Etat-(f->Etat==rouge);
+  if (Numero != 0) { LabelNumero->Caption=IntToStr(Numero);
+}
+  RadioGroupEtat->ItemIndex=f->Etat-static_cast<int>(f->Etat==rouge);
   RadioGroupTypeDmdVert->ItemIndex=f->TypeDmdVert;
   RadioGroupTypePsgRouge->ItemIndex=f->TypePsgRouge;
   CSpinEditDureeVert->Value=f->DureeVert;
@@ -40,13 +42,14 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
   LabelDureeTraversee->Caption=IntToStr(f->DureeTraversee); // portage : conversion implicite int -> AnsiString de C++Builder
   // Copie des listes de feux
   NbFeux=f->NbFeux;
-  if (NumFeux) { delete[] NumFeux; NumFeux=NULL; }
-  if ((NbFeux)&&(!(NumFeux=new int[NbFeux])))
+  if (NumFeux) { delete[] NumFeux; NumFeux=nullptr; }
+  if (((NbFeux) != 0)&&(!(NumFeux=new int[NbFeux])))
     {
      AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
      return false;
     }
-  for(i=0; i<NbFeux; i++) NumFeux[i]=f->NumFeux[i];
+  for(i=0; i<NbFeux; i++) { NumFeux[i]=f->NumFeux[i];
+}
   // Affichage du nombre de feux de la liste
   LabelNbFeux->Caption=IntToStr(NbFeux);
   LabelCoordonneesFeuPietonsOppose->Caption=Format("%2.2d, %2.2d",
@@ -66,27 +69,28 @@ void TfrmDefFeuxPietons::RafraichitFeuxPietons()
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
  {
-  etat_feu EtatFP=(etat_feu)(RadioGroupEtat->ItemIndex+(RadioGroupEtat->ItemIndex==2)),
-           EtatFC=inactif,
-           EtatCrt;
+  auto EtatFP=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
+  etat_feu EtatFC=inactif;
+  etat_feu EtatCrt;
   bool FeuxFCDifferents=false;
   // On relève l'état des feux de circulation liés
 
   for(int i=0; i<NbFeux; i++)
    {
-    if (!EtatFC)
+    if (EtatFC == 0) {
      EtatFC=cv->Feu[NumFeux[i]-1].Etat;
-    else
-     if ((EtatCrt=cv->Feu[NumFeux[i]-1].Etat))
+    } else
+     if ((EtatCrt=cv->Feu[NumFeux[i]-1].Etat) != 0) {
       FeuxFCDifferents=FeuxFCDifferents||(EtatFC!=EtatCrt);
+}
    }
-  if (!EtatFP) // Si pas d'état, on propose l'état opposé des feux liés
-   if (EtatFC&&(!FeuxFCDifferents))
+  if (EtatFP == 0) { // Si pas d'état, on propose l'état opposé des feux liés
+   if ((EtatFC != 0)&&(!FeuxFCDifferents)) {
     if (AfficheMessage("\
 Vous n'avez pas affecté d'état au feu de piétons.\n\
 Voulez-vous affecter le feu par rapport aux feux de circulation liés ?",
                        "Assistant feu de piétons",
-                       tmQuestionNecessaire, 0, 2)==trOui)
+                       tmQuestionNecessaire, 0, 2)==trOui) {
      switch(EtatFC)
       {
        case orange:
@@ -96,12 +100,14 @@ Voulez-vous affecter le feu par rapport aux feux de circulation liés ?",
                     break;
        default:     break; // v5.4 (évite avertissement)
 	  }
-    else
+    } else {
      return;
-   else
+}
+   } else {
     return;
-  else
-   if (FeuxFCDifferents||(EtatFC!=4-EtatFP))
+}
+  } else
+   if (FeuxFCDifferents||(EtatFC!=4-EtatFP)) {
     if (AfficheMessage("\
 Les feux de circulation liés n'ont pas tous l'état opposé à celui du feu de piéton.\n\
 Voulez-vous affecter l'état opposé à tous les feux de circulation liés ?",
@@ -122,10 +128,12 @@ Voulez-vous affecter l'état opposé à tous les feux de circulation liés ?",
        }
       return;
      }
-    else
+    
      return;
-   else
+
+   } else {
     return;
+}
  }
 //---------------------------------------------------------------------------
 bool TfrmDefFeuxPietons::AppliqueChoix()
@@ -133,7 +141,7 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
   int i;
   AnalyseEtatFeux(); // Assistant pour les états de feux (v5.2.1)
   frmSimulation->SimulationModifiee=true;
-  f->Etat=(etat_feu)(RadioGroupEtat->ItemIndex+(RadioGroupEtat->ItemIndex==2));
+  f->Etat=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
   f->TypeDmdVert=(dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
   f->TypePsgRouge=(psg_rouge)RadioGroupTypePsgRouge->ItemIndex;
   f->DureeVert=CSpinEditDureeVert->Value;
@@ -141,14 +149,15 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
 
   // Copie des listes de feux
   f->NbFeux=0;
-  if (f->NumFeux) { delete[] f->NumFeux; f->NumFeux=NULL; }
-  if ((NbFeux)&&(!(f->NumFeux=new int[NbFeux])))
+  if (f->NumFeux) { delete[] f->NumFeux; f->NumFeux=nullptr; }
+  if (((NbFeux) != 0)&&(!(f->NumFeux=new int[NbFeux])))
    {
     AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
     return false;
    }
   f->NbFeux=NbFeux;
-  for(i=0; i<NbFeux; i++) f->NumFeux[i]=NumFeux[i];
+  for(i=0; i<NbFeux; i++) { f->NumFeux[i]=NumFeux[i];
+}
   ButtonAppliquer->Enabled=false;
   RafraichitFeuxPietons();
   return true;
@@ -162,10 +171,11 @@ void TfrmDefFeuxPietons::RafraichitInfosFeux()
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::FormShow(TObject *Sender)
 {
- if (!RafraichitInfos())
+ if (!RafraichitInfos()) {
   Hide();
- else
+ } else {
   RafraichitFeuxPietons();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::FormHide(TObject *Sender)
@@ -173,13 +183,16 @@ void TfrmDefFeuxPietons::FormHide(TObject *Sender)
  int i;
  frmSimulation->ActionPrioritesPietons->Enabled=true;
  SpeedButtonSelFeux->Down=false;
- if (frmSimulation->SelectionFeuxPtn)
-  for(i=0; i<NbFeux; i++)
+ if (frmSimulation->SelectionFeuxPtn) {
+  for(i=0; i<NbFeux; i++) {
    frmSimulation->RedessineCase(cv->Feu[NumFeux[i]-1].x, cv->Feu[NumFeux[i]-1].y, true);
+}
+}
  frmSimulation->SelectionFeuxPtn=false;
  RafraichitFeuxPietons();
- if (frmDefVoiePietons&&frmDefVoiePietons->Visible)
+ if (frmDefVoiePietons&&frmDefVoiePietons->Visible) {
   frmDefVoiePietons->RafraichitInfos();
+}
  frmSimulation->DrawGridSimul->Col=x;
  frmSimulation->DrawGridSimul->Row=y;
  frmSimulation->DrawGridSimulClick(frmSimulation);
@@ -199,19 +212,22 @@ void TfrmDefFeuxPietons::ButtonAnnulerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::ButtonAppliquerClick(TObject *Sender)
 {
- if (!AppliqueChoix()) Hide();
+ if (!AppliqueChoix()) { Hide();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::RadioGroupEtatClick(TObject *Sender)
 {
- if ((etat_feu)(RadioGroupEtat->ItemIndex+(RadioGroupEtat->ItemIndex==2))!=f->Etat)
+ if (static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2))!=f->Etat) {
   ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::RadioGroupTypeDmdVertClick(TObject *Sender)
 {
- if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert)
+ if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert) {
   ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject *Sender)
@@ -223,15 +239,17 @@ void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject *Sender)
 {
  int i;
  frmSimulation->SelectionFeuxPtn=SpeedButtonSelFeux->Down;
- for(i=0; i<NbFeux; i++) frmSimulation->RedessineCase(cv->Feu[NumFeux[i]-1].x, cv->Feu[NumFeux[i]-1].y, true);
+ for(i=0; i<NbFeux; i++) { frmSimulation->RedessineCase(cv->Feu[NumFeux[i]-1].x, cv->Feu[NumFeux[i]-1].y, true);
+}
  frmSimulation->RedessineCase(frmSimulation->DrawGridSimul->Col, frmSimulation->DrawGridSimul->Row, true);
  frmSimulation->ActionPriorites->Enabled=!frmSimulation->SelectionFeuxPtn;
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::RadioGroupTypePsgRougeClick(TObject *Sender)
 {
- if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge)
+ if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge) {
   ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::ButtonAideClick(TObject *Sender)
@@ -242,8 +260,9 @@ void TfrmDefFeuxPietons::ButtonAideClick(TObject *Sender)
 void TfrmDefFeuxPietons::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -257,6 +276,7 @@ void TfrmDefFeuxPietons::ChargeFiche()
   COMPOSANTS_frmDefFeuxPietons(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmDefFeuxPietons(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

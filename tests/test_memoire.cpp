@@ -26,7 +26,7 @@ TEST_CASE("Mémoire non remise à zéro : NbVehlibs, FeuP, DureeVert et DureeRou
  {
   VueNulle Vue;
   vue=&Vue;
-  centre_ville *c=new centre_ville(false, 0, 0);
+  auto *c=new centre_ville(false, 0, 0);
   CHECK(c->NbVehlibs==0);
   CHECK(c->FeuP==nullptr);
   CHECK(c->DureeVert==0); // nouveau réseau (« Nouveau », génération) : enregistrées telles quelles
@@ -64,8 +64,9 @@ TEST_CASE("Mémoire non remise à zéro : piétons initialisés", "[memoire]")
   REQUIRE(harnais::Demarre(asMsgErr));
   REQUIRE(cv->NbPietons>0);
   int NbIndetermines=0;
-  for(int i=0; i<cv->NbPietons; i++)
-   NbIndetermines+=(cv->Pieton[i].TourAttBus!=0)+(cv->Pieton[i].TourAttTram!=0)+(cv->Pieton[i].TourAttTaxi!=0);
+  for(int i=0; i<cv->NbPietons; i++) {
+   NbIndetermines+=static_cast<int>(cv->Pieton[i].TourAttBus!=0)+static_cast<int>(cv->Pieton[i].TourAttTram!=0)+static_cast<int>(cv->Pieton[i].TourAttTaxi!=0);
+}
   CHECK(NbIndetermines==0);
   harnais::Ferme();
   alea::LibereGraine();

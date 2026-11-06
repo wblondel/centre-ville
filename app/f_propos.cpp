@@ -62,14 +62,17 @@ namespace
 //---------------------------------------------------------------------------
 QPixmap ImageDeVersion(int Majeure, int Mineure)
  {
-  QString stMajeure=QString::number(Majeure), stMineure=QString::number(Mineure);
+  QString stMajeure=QString::number(Majeure);
+  QString stMineure=QString::number(Mineure);
   QImage Image(13*(stMajeure.size()+stMineure.size())+2, 22, QImage::Format_ARGB32);
   Image.fill(qRgb(0x00, 0x00, 0x00));
   int x=0;
-  for(QChar c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); x+=13; }
+  for(QChar c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+}x+=13; }
   DessineTrait(Image, {6, 0, 1}, x, qRgb(0xFF, 0xFF, 0x00), qRgb(0x80, 0x80, 0x00)); // virgule
   x+=2;
-  for(QChar c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); x+=13; }
+  for(QChar c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+}x+=13; }
   return QPixmap::fromImage(Image);
  }
 //---------------------------------------------------------------------------
@@ -141,7 +144,8 @@ void TfrmAPropos::FormCreate(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmAPropos::FormKeyPress(TObject *Sender, char &Key)
 {
- if ((Key==13)||(Key==27)) SpeedButtonOk->Click();
+ if ((Key==13)||(Key==27)) { SpeedButtonOk->Click();
+}
 }
 //---------------------------------------------------------------------------
 void TfrmAPropos::LabelClick(TObject *Sender)
@@ -167,6 +171,7 @@ void TfrmAPropos::ChargeFiche()
   COMPOSANTS_frmAPropos(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmAPropos(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

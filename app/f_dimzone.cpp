@@ -10,7 +10,7 @@
 //#pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_dimzone_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-TfrmDimensionsZone *frmDimensionsZone=NULL; // portage : =NULL explicite
+TfrmDimensionsZone *frmDimensionsZone=nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------
 bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
  {
@@ -18,10 +18,10 @@ bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
   if ((frmDimensionsZone=new TfrmDimensionsZone(Application)))
    {
 	{ // portage : try/__finally -> garde RAII (Finalement)
-	 Finalement f([&]()
+	 Finalement f([&]
 	 {
 	  delete frmDimensionsZone;
-	  frmDimensionsZone=NULL;
+	  frmDimensionsZone=nullptr;
 	 });
 	  frmDimensionsZone->NbX=NbX;
 	  frmDimensionsZone->NbY=NbY;
@@ -29,15 +29,17 @@ bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
 	   {
 		NbX=frmDimensionsZone->NbX;
 		NbY=frmDimensionsZone->NbY;
-		if (frmDimensionsZone->CheckBoxAfficherParametres->Checked) // v4.1
+		if (frmDimensionsZone->CheckBoxAfficherParametres->Checked) { // v4.1
 		 frmSimulation->ActionParametres->Execute();
+}
 		GenereReseau=frmDimensionsZone->CheckBoxGenererReseau->Checked; // v4.2
 	   }
 	}
 	return (mrRep==mrOk);
    }
-  else
+  
    return false;
+
  }
 //---------------------------------------------------------------------------
 TfrmDimensionsZone::TfrmDimensionsZone(TComponent* Owner)
@@ -58,19 +60,20 @@ void TfrmDimensionsZone::ButtonCreerClick(TObject *Sender)
 {
  NbX=CSpinEditNbX->Value;
  NbY=CSpinEditNbY->Value;
- if ((NbX>NBXMAX)||(NbY>NBYMAX)) // v6.0.3 : aucune limite dans l'original (mémoire épuisée, plantage)
+ if ((NbX>NBXMAX)||(NbY>NBYMAX)) { // v6.0.3 : aucune limite dans l'original (mémoire épuisée, plantage)
   AfficheMessage( Format( "Vous devez spécifier une zone d'au plus %dx%d.",
                           ARRAYOFCONST((NBXMAX, NBYMAX))),
                   "Zone trop grande",
                   tmAvertissement, 0, 0);
- else
- if ((NbX>=NBXMIN)&&(NbY>=NBYMIN))
+ } else
+ if ((NbX>=NBXMIN)&&(NbY>=NBYMIN)) {
   ModalResult=mrOk;
- else
+ } else {
   AfficheMessage( Format( "Vous devez spécifier une zone d'au moins %dx%d.",
                           ARRAYOFCONST((NBXMIN, NBYMIN))),
                   "Zone insuffisante",
                   tmAvertissement, 0, 0);
+}
 }
 //---------------------------------------------------------------------------
 void TfrmDimensionsZone::ButtonAideClick(TObject *Sender)
@@ -83,7 +86,7 @@ void TfrmDimensionsZone::ButtonAideClick(TObject *Sender)
 void TfrmDimensionsZone::FormKeyPress(TObject *Sender,
       char &Key)
 {
- if (CSpinEditNbX->Focused()||CSpinEditNbY->Focused())
+ if (CSpinEditNbX->Focused()||CSpinEditNbY->Focused()) {
   switch(Key)
    {
     case '\r': ButtonCreer->Click(); break;
@@ -91,14 +94,16 @@ void TfrmDimensionsZone::FormKeyPress(TObject *Sender,
     default: return;
    }
 }
+}
 //---------------------------------------------------------------------------
 
 
 void TfrmDimensionsZone::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -112,6 +117,7 @@ void TfrmDimensionsZone::ChargeFiche()
   COMPOSANTS_frmDimensionsZone(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmDimensionsZone(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

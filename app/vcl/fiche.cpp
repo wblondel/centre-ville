@@ -34,17 +34,20 @@ namespace
    {
     QRect r=Parent->contentsRect();
     const char *Ordre[]={"alTop", "alBottom", "alLeft", "alRight", "alClient"};
-    for(const char *a : Ordre)
+    for(const char *a : Ordre) {
      for(QObject *o : Parent->children())
       {
        QWidget *w=qobject_cast<QWidget *>(o);
-       if (!w||w->isWindow()||w->isHidden()||(w->property("vclAlign").toString()!=QLatin1String(a))) continue;
-       if (!std::strcmp(a, "alTop")) { w->setGeometry(r.left(), r.top(), r.width(), w->height()); r.setTop(r.top()+w->height()); }
-       else if (!std::strcmp(a, "alBottom")) { w->setGeometry(r.left(), r.bottom()+1-w->height(), r.width(), w->height()); r.setBottom(r.bottom()-w->height()); }
-       else if (!std::strcmp(a, "alLeft")) { w->setGeometry(r.left(), r.top(), w->width(), r.height()); r.setLeft(r.left()+w->width()); }
-       else if (!std::strcmp(a, "alRight")) { w->setGeometry(r.right()+1-w->width(), r.top(), w->width(), r.height()); r.setRight(r.right()-w->width()); }
-       else w->setGeometry(r);
+       if (!w||w->isWindow()||w->isHidden()||(w->property("vclAlign").toString()!=QLatin1String(a))) { continue;
+}
+       if (std::strcmp(a, "alTop") == 0) { w->setGeometry(r.left(), r.top(), r.width(), w->height()); r.setTop(r.top()+w->height()); }
+       else if (std::strcmp(a, "alBottom") == 0) { w->setGeometry(r.left(), r.bottom()+1-w->height(), r.width(), w->height()); r.setBottom(r.bottom()-w->height()); }
+       else if (std::strcmp(a, "alLeft") == 0) { w->setGeometry(r.left(), r.top(), w->width(), r.height()); r.setLeft(r.left()+w->width()); }
+       else if (std::strcmp(a, "alRight") == 0) { w->setGeometry(r.right()+1-w->width(), r.top(), w->width(), r.height()); r.setRight(r.right()-w->width()); }
+       else { w->setGeometry(r);
+}
       }
+}
    }
   class Aligneur : public QObject
    {
@@ -52,7 +55,8 @@ namespace
     using QObject::QObject;
     bool eventFilter(QObject *o, QEvent *e) override
      {
-      if ((e->type()==QEvent::Resize)||(e->type()==QEvent::LayoutRequest)) Aligne(static_cast<QWidget *>(o));
+      if ((e->type()==QEvent::Resize)||(e->type()==QEvent::LayoutRequest)) { Aligne(static_cast<QWidget *>(o));
+}
       return false;
      }
    };
@@ -62,65 +66,78 @@ QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
  {
   QString n=QString::fromUtf8(Nom);
   QObject *o=nullptr;
-  if (!std::strcmp(Classe, "TActionList"))
+  if (std::strcmp(Classe, "TActionList") == 0)
    {
     DerniereListe=new TActionList(Fiche);
     Raccourcis.ListesActions.push_back(DerniereListe);
     o=DerniereListe;
    }
-  else if (!std::strcmp(Classe, "TAction"))
+  else if (std::strcmp(Classe, "TAction") == 0)
    {
-    QAction *q=Fiche->findChild<QAction *>(n);
-    if (q&&DerniereListe) o=new TAction(q, DerniereListe);
+    auto *q=Fiche->findChild<QAction *>(n);
+    if (q&&DerniereListe) { o=new TAction(q, DerniereListe);
+}
    }
-  else if (!std::strcmp(Classe, "TMenuItem"))
+  else if (std::strcmp(Classe, "TMenuItem") == 0)
    {
     TMenuItem *m=nullptr;
-    if (QMenu *Menu=Fiche->findChild<QMenu *>(n)) m=new TMenuItem(Menu, Fiche);
-    else if (QAction *q=Fiche->findChild<QAction *>(n)) m=new TMenuItem(q, Fiche);
+    if (auto *Menu=Fiche->findChild<QMenu *>(n)) { m=new TMenuItem(Menu, Fiche);
+    } else if (auto *q=Fiche->findChild<QAction *>(n)) { m=new TMenuItem(q, Fiche);
+}
     if (m)
      {
       ElementsMenus[m->ElementQt()]=m;
       QString Action=m->ElementQt()->property("vclAction").toString();
-      if (m->MenuQt()) Action=m->MenuQt()->property("vclAction").toString();
-      if (!Action.isEmpty())
-       if (TAction *a=dynamic_cast<TAction *>(Composants[Action])) m->LieAction(a);
+      if (m->MenuQt()) { Action=m->MenuQt()->property("vclAction").toString();
+}
+      if (!Action.isEmpty()) {
+       if (auto *a=dynamic_cast<TAction *>(Composants[Action])) { m->LieAction(a);
+}
+}
      }
     o=m;
    }
-  else if (!std::strcmp(Classe, "TPopupMenu"))
+  else if (std::strcmp(Classe, "TPopupMenu") == 0)
    {
-    if (QMenu *Menu=Fiche->findChild<QMenu *>(n)) o=new TPopupMenu(Menu);
+    if (auto *Menu=Fiche->findChild<QMenu *>(n)) { o=new TPopupMenu(Menu);
+}
    }
-  else if (!std::strcmp(Classe, "TMainMenu"))
+  else if (std::strcmp(Classe, "TMainMenu") == 0)
    {
-    if (QMenuBar *b=Fiche->findChild<QMenuBar *>(n)) Raccourcis.Menu=static_cast<TMainMenu *>(o=new TMainMenu(b));
+    if (auto *b=Fiche->findChild<QMenuBar *>(n)) { Raccourcis.Menu=static_cast<TMainMenu *>(o=new TMainMenu(b));
+}
    }
-  else if (!std::strcmp(Classe, "TTimer")||!std::strcmp(Classe, "TOpenDialog")||!std::strcmp(Classe, "TSaveDialog"))
+  else if ((std::strcmp(Classe, "TTimer") == 0)||(std::strcmp(Classe, "TOpenDialog") == 0)||(std::strcmp(Classe, "TSaveDialog") == 0))
    {
-    if (!std::strcmp(Classe, "TTimer")) o=new TTimer(Fiche);
-    else if (!std::strcmp(Classe, "TSaveDialog")) o=new TSaveDialog(Fiche);
-    else o=new TOpenDialog(Fiche);
+    if (std::strcmp(Classe, "TTimer") == 0) { o=new TTimer(Fiche);
+    } else if (std::strcmp(Classe, "TSaveDialog") == 0) { o=new TSaveDialog(Fiche);
+    } else { o=new TOpenDialog(Fiche);
+}
     ConfigureNonVisuel(o, Fiche->property(("vcl_"+n).toUtf8().constData()).toStringList());
    }
-  else if (!std::strcmp(Classe, "TVirtualImageList"))
+  else if (std::strcmp(Classe, "TVirtualImageList") == 0)
    {
-    for(const ListeIndexee &l : ListesIndexees)
-     if (!std::strcmp(l.Fiche, Fichier)&&!std::strcmp(l.Nom, Nom))
+    for(const ListeIndexee &l : ListesIndexees) {
+     if ((std::strcmp(l.Fiche, Fichier) == 0)&&(std::strcmp(l.Nom, Nom) == 0)) {
       o=new TVirtualImageList(l.Ressources, l.Nombre, Fiche);
+}
+}
    }
-  else if (!std::strcmp(Classe, "TImageCollection"))
+  else if (std::strcmp(Classe, "TImageCollection") == 0) {
    o=new TImageCollection;
-  else
+  } else {
    o=Fiche->findChild<QWidget *>(n);
+}
   if (o)
    {
-    if (o->objectName().isEmpty()) o->setObjectName(n);
+    if (o->objectName().isEmpty()) { o->setObjectName(n);
+}
     Composants[n]=o;
     Ordre.push_back(o);
    }
-  else
+  else {
    qWarning("Portage : composant %s (%s) introuvable dans la fiche %s", Nom, Classe, Fichier);
+}
   return o;
  }
 //---------------------------------------------------------------------------
@@ -133,15 +150,17 @@ void LieurComposants::Termine()
      for(QAction *a : Menu->actions())
       {
        auto i=ElementsMenus.find(a);
-       if (i==ElementsMenus.end()) continue;
+       if (i==ElementsMenus.end()) { continue;
+}
        TMenuItem *m=i->second;
        m->Parent=Parent;
        Items.push_back(m);
-       if (m->MenuQt()) Arbre(m->MenuQt(), m, m->Items);
+       if (m->MenuQt()) { Arbre(m->MenuQt(), m, m->Items);
+}
       }
      // Éléments radio : un groupe exclusif par GroupIndex
      std::map<int, QActionGroup *> Groupes;
-     for(TMenuItem *m : Items)
+     for(TMenuItem *m : Items) {
       if (m->RadioItem&&!m->MenuQt())
        {
         QActionGroup *&g=Groupes[m->GroupIndex];
@@ -152,52 +171,65 @@ void LieurComposants::Termine()
          }
         m->DefinitGroupe(g);
        }
+}
     };
   for(auto &c : Composants)
    {
-    if (TPopupMenu *p=dynamic_cast<TPopupMenu *>(c.second))
+    if (auto *p=dynamic_cast<TPopupMenu *>(c.second)) {
      Arbre(p->Menu, nullptr, p->Items);
-    else if (TMainMenu *mm=dynamic_cast<TMainMenu *>(c.second))
+    } else if (auto *mm=dynamic_cast<TMainMenu *>(c.second)) {
      for(QAction *a : mm->Barre->actions())
       {
        auto i=ElementsMenus.find(a);
-       if (i==ElementsMenus.end()) continue;
+       if (i==ElementsMenus.end()) { continue;
+}
        TMenuItem *m=i->second;
        mm->Items.push_back(m);
-       if (m->MenuQt()) Arbre(m->MenuQt(), m, m->Items);
+       if (m->MenuQt()) { Arbre(m->MenuQt(), m, m->Items);
+}
       }
+}
    }
   // Boutons de barres d'outils : action ou menu associé
-  for(auto &c : Composants)
-   if (TToolButton *b=dynamic_cast<TToolButton *>(c.second))
+  for(auto &c : Composants) {
+   if (auto *b=dynamic_cast<TToolButton *>(c.second))
     {
-     QString Action=b->property("vclAction").toString(), Menu=b->property("vclMenuItem").toString();
+     QString Action=b->property("vclAction").toString();
+     QString Menu=b->property("vclMenuItem").toString();
      b->LieAction(Action.isEmpty()?nullptr:dynamic_cast<TAction *>(Composants[Action]));
-     if (!Menu.isEmpty()) b->MenuItem=dynamic_cast<TMenuItem *>(Composants[Menu]);
+     if (!Menu.isEmpty()) { b->MenuItem=dynamic_cast<TMenuItem *>(Composants[Menu]);
+}
     }
+}
   // Propriétés PopupMenu des contrôles, et de la fiche elle-même (f_statsat)
   QList<QWidget *> AvecMenus=Fiche->findChildren<QWidget *>();
   AvecMenus.prepend(Fiche);
-  for(QWidget *w : AvecMenus)
-   if (AvecMenuContextuel *m=dynamic_cast<AvecMenuContextuel *>(w))
+  for(QWidget *w : AvecMenus) {
+   if (auto *m=dynamic_cast<AvecMenuContextuel *>(w))
     {
      QString p=w->property("vclPopupMenu").toString();
-     if (!p.isEmpty()) m->PopupMenu=dynamic_cast<TPopupMenu *>(Composants[p]);
+     if (!p.isEmpty()) { m->PopupMenu=dynamic_cast<TPopupMenu *>(Composants[p]);
+}
     }
+}
   // Propriétés de la VCL appliquées après setupUi
   // (liste d'abord : PrepareVcl peut détruire des widgets internes, comme la poignée du TStatusBar)
   std::vector<ControleVclBase *> Controles;
-  for(QWidget *w : Fiche->findChildren<QWidget *>())
-   if (ControleVclBase *c=dynamic_cast<ControleVclBase *>(w))
+  for(QWidget *w : Fiche->findChildren<QWidget *>()) {
+   if (auto *c=dynamic_cast<ControleVclBase *>(w)) {
     Controles.push_back(c);
-  for(ControleVclBase *c : Controles)
+}
+}
+  for(ControleVclBase *c : Controles) {
    c->PrepareVcl();
+}
   // Align des contrôles
   for(QWidget *w : Fiche->findChildren<QWidget *>())
    {
     QString a=w->property("vclAlign").toString();
     QWidget *p=w->parentWidget();
-    if (a.isEmpty()||(a=="alNone")||!p||p->property("vclAligneur").toBool()) continue;
+    if (a.isEmpty()||(a=="alNone")||!p||p->property("vclAligneur").toBool()) { continue;
+}
     p->setProperty("vclAligneur", true);
     p->installEventFilter(new Aligneur(p));
     Aligne(p);
@@ -213,7 +245,7 @@ void LieurComposants::Termine()
   // Polices « raster » de la fiche et de ses contrôles : équivalents TrueType (FamillesQt)
   QList<QWidget *> AvecPolice=Fiche->findChildren<QWidget *>();
   AvecPolice.prepend(Fiche);
-  for(QWidget *w : AvecPolice)
+  for(QWidget *w : AvecPolice) {
    if (w->testAttribute(Qt::WA_SetFont))
     {
      QStringList Familles=FamillesQt(w->font().families().value(0));
@@ -224,6 +256,7 @@ void LieurComposants::Termine()
        w->setFont(f);
       }
     }
+}
  }
 //---------------------------------------------------------------------------
 QWidget *FichePrincipaleQt=nullptr;
@@ -243,12 +276,16 @@ TShiftState EtatTouches(const QKeyEvent *e)
  {
   TShiftState s;
   Qt::KeyboardModifiers m=e->modifiers();
-  if (m&Qt::ShiftModifier) s<<ssShift;
-  if (m&Qt::ControlModifier) s<<ssCtrl;
+  if (m.testFlag(Qt::ShiftModifier)) { s<<ssShift;
+}
+  if (m.testFlag(Qt::ControlModifier)) { s<<ssCtrl;
+}
 #if defined(Q_OS_MACOS)
-  if (m&Qt::MetaModifier) s<<ssCtrl;
+  if (m.testFlag(Qt::MetaModifier)) { s<<ssCtrl;
+}
 #endif
-  if (m&Qt::AltModifier) s<<ssAlt;
+  if (m.testFlag(Qt::AltModifier)) { s<<ssAlt;
+}
   return s;
  }
 //---------------------------------------------------------------------------

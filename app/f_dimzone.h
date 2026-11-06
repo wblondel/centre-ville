@@ -10,7 +10,6 @@
 //#include <Forms.hpp> // portage
 //#include "CSPIN.h" // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmDimensionsZone : public TForm
 {

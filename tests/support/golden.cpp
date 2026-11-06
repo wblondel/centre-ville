@@ -14,7 +14,7 @@ namespace
   std::string Hexa8(std::uint64_t v)
    { // Empreinte 64 bits repliée sur 32 bits pour la ligne de chaque tour
     char Tampon[12];
-    std::snprintf(Tampon, sizeof(Tampon), "%08x", (unsigned)((v>>32)^(v&0xFFFFFFFFu)));
+    std::snprintf(Tampon, sizeof(Tampon), "%08x", static_cast<unsigned>((v>>32)^(v&0xFFFFFFFFU)));
     return Tampon;
    }
   //-------------------------------------------------------------------------
@@ -28,8 +28,9 @@ namespace
     std::string Ligne(Tampon);
     // Clés courtes, dans l'ordre de partie_etat (voir l'en-tête des fichiers)
     static const char *Cles[peDistances]={"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};
-    for(int i=0; i<peDistances; i++)
-     Ligne+=std::string(" ")+Cles[i]+"="+Hexa8(ExportEtat::Empreinte(cv, (partie_etat)i, false));
+    for(int i=0; i<peDistances; i++) {
+     Ligne+=std::string(" ")+Cles[i]+"="+Hexa8(ExportEtat::Empreinte(cv, static_cast<partie_etat>(i), false));
+}
     return Ligne+"\n";
    }
  }
@@ -52,7 +53,7 @@ std::string ProduitGolden(const std::string &asCheminCarte, const std::string &a
   Texte+="# Golden master du moteur Centre-Ville (tests/support/golden.cpp)\n";
   Texte+="# carte="+asNomCarte+" config="+Config.Nom+
          " graine="+std::to_string(GRAINE_GOLDEN)+" tours="+std::to_string(NB_TOURS_GOLDEN)+
-         " sanglante="+std::to_string(Config.Sanglante)+" epidemie="+std::to_string(Config.Epidemie)+
+         " sanglante="+std::to_string(static_cast<int>(Config.Sanglante))+" epidemie="+std::to_string(static_cast<int>(Config.Epidemie))+
          " resurrection="+std::to_string(Config.TourResurrection)+"\n";
   Texte+="# Une ligne par tour : état du générateur aléatoire, compteurs, puis empreinte (64 bits repliée\n"
          "# sur 32 bits) de chaque partie de l'état : c=centre_ville et statistiques, f=feux, fp=feux piétons,\n"
@@ -60,23 +61,24 @@ std::string ProduitGolden(const std::string &asCheminCarte, const std::string &a
          "# pl=places et files de parking, vl=vehlibs/places, p=piétons et infections, k=cases.\n"
          "# Diagnostic d'un écart : cvsim <carte> --graine "+std::to_string(GRAINE_GOLDEN)+" --tours <N> --etat"+
          std::string(Config.Sanglante?" --sanglante":"")+std::string(Config.Epidemie?" --epidemie":"")+
-         (Config.TourResurrection?" --resurrection "+std::to_string(Config.TourResurrection):std::string())+"\n";
+         ((Config.TourResurrection != 0)?" --resurrection "+std::to_string(Config.TourResurrection):std::string())+"\n";
   Texte+="# Régénération (après validation d'un changement VOULU) : cvsim --golden maps tests/golden\n";
   AnsiString asMsgErr;
-  if (!harnais::Ouvre(asCheminCarte))
+  if (!harnais::Ouvre(asCheminCarte)) {
    Texte+="ERREUR chargement\n";
-  else
-   if (!harnais::Demarre(asMsgErr))
+  } else
+   if (!harnais::Demarre(asMsgErr)) {
     Texte+="ERREUR demarrage : "+asMsgErr.str()+"\n";
-   else
+   } else
     {
      Texte+="distances="+Hexa(ExportEtat::Empreinte(cv, peDistances, true))+"\n";
      Texte+=LigneTour(cv);
      int t;
      for(t=1; t<=NB_TOURS_GOLDEN; t++)
       {
-       if (Config.TourResurrection&&(t==Config.TourResurrection))
+       if ((Config.TourResurrection != 0)&&(t==Config.TourResurrection)) {
         Vue.Resurrection=true; // ActionResurrection (fiche principale)
+}
        if (!harnais::Tick())
         {
          Texte+="simulation terminee\n";
@@ -85,8 +87,9 @@ std::string ProduitGolden(const std::string &asCheminCarte, const std::string &a
        Texte+=LigneTour(cv);
       }
      Texte+="messages="+std::to_string(Vue.Messages.size())+"\n";
-     for(const VueNulle::message &m : Vue.Messages)
+     for(const VueNulle::message &m : Vue.Messages) {
       Texte+="message: "+m.asTitre.str()+" | "+m.asMessage.str()+"\n";
+}
      Texte+="etat final (attente/trafic detailles)="+Hexa(ExportEtat::Empreinte(cv, peCases, true))+"\n";
     }
   harnais::Ferme();
@@ -132,8 +135,8 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
   // la direction (engine/README.md, « Vérifications sur le binaire d'origine »).
   int x=rand()%cv->NbX;
   int y=rand()%cv->NbY;
-  direction d=(direction)(1+rand()%NBDIR);
-  Texte+="depart x="+std::to_string(x)+" y="+std::to_string(y)+" d="+std::to_string((int)d)+"\n";
+  auto d=static_cast<direction>(1+rand()%NBDIR);
+  Texte+="depart x="+std::to_string(x)+" y="+std::to_string(y)+" d="+std::to_string(static_cast<int>(d))+"\n";
   cv->Genere(x, y, d);
   char Tampon[16];
   std::snprintf(Tampon, sizeof(Tampon), "%08x", alea::Graine());
@@ -143,16 +146,17 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
    {
     for(int i=0; i<cv->NbX; i++)
      {
-      std::snprintf(Tampon, sizeof(Tampon), "%x", (int)cv->v[i][j].DirPoss);
+      std::snprintf(Tampon, sizeof(Tampon), "%x", static_cast<int>(cv->v[i][j].DirPoss));
       Texte+=Tampon;
      }
-    Texte+="\n";
+    Texte+='\n';
    }
   Texte+="etat="+Hexa(ExportEtat::Empreinte(cv, peCases, true))+"\n";
-  if (harnais::SauveSansChaos(asFichierCvw))
+  if (harnais::SauveSansChaos(asFichierCvw)) {
    Texte+="fichier "+DescriptionFichier(asFichierCvw)+"\n";
-  else
+  } else {
    Texte+="ERREUR enregistrement\n";
+}
   Texte+="messages="+std::to_string(Vue.Messages.size())+"\n";
   harnais::Ferme();
   alea::LibereGraine();
@@ -170,9 +174,9 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
   alea::FixeGraine(GRAINE_GOLDEN);
   Texte+="# Golden master de « Copier vers... » (tests/support/golden.cpp)\n";
   Texte+="# carte="+asNomCarte+"\n";
-  if (!harnais::Ouvre(asCheminCarte))
+  if (!harnais::Ouvre(asCheminCarte)) {
    Texte+="ERREUR chargement\n";
-  else
+  } else
    {
     const std::string asNormal=asDossierSortie+"/copie_"+asNomCarte+"_normal.cvw";
     for(const char *Suffixe : {"_complete.cvw", "_reduite.cvw"})
@@ -194,19 +198,20 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
       cv->PrepareCopie(DEBUT, s.x, s.y, s.nx, s.ny);
       bool Valide=cv->CopieValide();
       Texte+=std::string("selection ")+s.Nom+" ("+std::to_string(s.x)+","+std::to_string(s.y)+","+
-             std::to_string(s.nx)+","+std::to_string(s.ny)+") valide="+std::to_string(Valide)+"\n";
+             std::to_string(s.nx)+","+std::to_string(s.ny)+") valide="+std::to_string(static_cast<int>(Valide))+"\n";
       const std::string asCopie=asDossierSortie+"/copie_"+asNomCarte+"_"+s.Nom+".cvw";
       if (Valide)
        {
         harnais::Sauve(asCopie); // ActionEnregistrer->Execute()
         Texte+="  copie "+DescriptionFichier(asCopie)+"\n";
-        Texte+="  identique a Sauve="+std::to_string(harnais::LitFichier(asCopie)==harnais::LitFichier(asNormal))+"\n";
+        Texte+="  identique a Sauve="+std::to_string(static_cast<int>(harnais::LitFichier(asCopie)==harnais::LitFichier(asNormal)))+"\n";
        }
       cv->PrepareCopie(FIN, 0, 0, 0, 0);
-      Texte+="  apres FIN : CopieEnCours="+std::to_string(cv->CopieEnCours)+" Xc="+std::to_string(cv->Xc)+
+      Texte+="  apres FIN : CopieEnCours="+std::to_string(static_cast<int>(cv->CopieEnCours))+" Xc="+std::to_string(cv->Xc)+
              " Yc="+std::to_string(cv->Yc)+" NbXc="+std::to_string(cv->NbXc)+" NbYc="+std::to_string(cv->NbYc)+"\n";
-      for(std::size_t m=NbMessages; m<Vue.Messages.size(); m++)
+      for(std::size_t m=NbMessages; m<Vue.Messages.size(); m++) {
        Texte+="  message: "+Vue.Messages[m].asTitre.str()+" | "+Vue.Messages[m].asMessage.str()+"\n";
+}
      }
     // La copie réduite se recharge-t-elle sans erreur d'intégrité ?
     const std::string asReduite=asDossierSortie+"/copie_"+asNomCarte+"_reduite.cvw";
@@ -215,7 +220,7 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
      {
       harnais::Ferme();
       bool Ok=harnais::Ouvre(asReduite);
-      Texte+="rechargement copie reduite="+std::to_string(Ok);
+      Texte+="rechargement copie reduite="+std::to_string(static_cast<int>(Ok));
       if (Ok)
        {
         AnsiString asMsgErr;
@@ -223,7 +228,7 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
         Texte+=" NbX="+std::to_string(cv->NbX)+" NbY="+std::to_string(cv->NbY)+
                " verifie="+(asMsgErr.IsEmpty()?std::string("ok"):asMsgErr.str());
        }
-      Texte+="\n";
+      Texte+='\n';
      }
    }
   harnais::Ferme();

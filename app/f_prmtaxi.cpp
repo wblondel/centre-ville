@@ -58,14 +58,16 @@ void TfrmParamTaxi::AppliqueChoix()
 void TfrmParamTaxi::CSpinEditParametresChange(
       TObject *Sender)
 {
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+ if (!InitialisationEnCours) { ButtonAppliquer->Enabled=true;
+}
 }
 //---------------------------------------------------------------------------
 void TfrmParamTaxi::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -79,6 +81,7 @@ void TfrmParamTaxi::ChargeFiche()
   COMPOSANTS_frmParamTaxi(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmParamTaxi(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

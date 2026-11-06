@@ -32,14 +32,14 @@ template <class X, class Y> inline std::common_type_t<X, Y> max(X x, Y y) { retu
 // v5.3: DEBOGAGE dans cvw.log
 extern bool Debug;
 extern void DebugOuvre();
-extern void DebugEcrit(const AnsiString asMessage);
+extern void DebugEcrit(const AnsiString& asMessage);
 extern void DebugFerme();
 //---------------------------------------------------------------------------
 extern const AnsiString asDebutNomSpinEdit; // v5.4
 //---------------------------------------------------------------------------
 extern String stRepLocalAppData(); // v5.4
 extern void CopieCartesExemple(const QString &stSource, const QString &stDestination); // v6.0.1
-extern type_reponse AfficheMessage(const AnsiString asMessage, const AnsiString asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap);
+extern type_reponse AfficheMessage(const AnsiString& asMessage, const AnsiString& asTitre, type_message Type, int OrdreBoutonDefaut, int OrdreBoutonEchap);
 extern void AfficheAideContextuelle(QWidget *Form); // portage : TForm* -> QWidget* (HelpContext lu sur la fiche)
 extern void AfficheIndexAide(QWidget *Form);
 extern void AfficheTutoriel(); // v5.4 (appelée par TfrmSimulation::ActionTutorielExecute
@@ -48,7 +48,7 @@ extern void AfficheTutoriel(); // v5.4 (appelée par TfrmSimulation::ActionTutor
 //---------------------------------------------------------------------------
 enum TMsgDlgType { mtWarning, mtError, mtInformation, mtConfirmation, mtCustom };
 enum TMsgDlgBtn { mbYes, mbNo, mbOK, mbCancel, mbAbort, mbRetry, mbIgnore, mbAll, mbNoToAll, mbYesToAll, mbHelp, mbClose };
-typedef TEnsemble<TMsgDlgBtn> TMsgDlgButtons;
-extern int MessageDlg(const AnsiString asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx);
+using TMsgDlgButtons = TEnsemble<TMsgDlgBtn>;
+extern int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx);
 //---------------------------------------------------------------------------
 #endif

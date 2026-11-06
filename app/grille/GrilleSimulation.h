@@ -37,10 +37,10 @@ struct TGridRect
 enum TGridOption { goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect,
                    goDrawFocusSelected, goRowSizing, goColSizing, goRowMoving, goColMoving,
                    goEditing, goTabs, goRowSelect, goAlwaysShowEditor, goThumbTracking };
-typedef TEnsemble<TGridOption> TGridOptions;
+using TGridOptions = TEnsemble<TGridOption>;
 enum TGridDrawStateElement { gdSelected, gdFocused, gdFixed };
-typedef TEnsemble<TGridDrawStateElement> TGridDrawState;
-typedef std::function<void(TObject *Sender, int ACol, int ARow, TRect &Rect, TGridDrawState State)> TDrawCellEvent;
+using TGridDrawState = TEnsemble<TGridDrawStateElement>;
+using TDrawCellEvent = std::function<void(TObject *Sender, int ACol, int ARow, TRect &Rect, TGridDrawState State)>;
 //---------------------------------------------------------------------------
 class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMenuContextuel
  {
@@ -96,6 +96,6 @@ class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMen
   void focusOutEvent(QFocusEvent *e) override;
  };
 //---------------------------------------------------------------------------
-typedef GrilleSimulation TDrawGrid;
+using TDrawGrid = GrilleSimulation;
 //---------------------------------------------------------------------------
 #endif

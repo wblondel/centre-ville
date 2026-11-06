@@ -27,8 +27,10 @@ namespace
  {
   const champ_cvw &Champ(const conversion_cvw &c, const std::string &Nom)
    {
-    for(const champ_cvw &ch : c.Champs)
-     if (ch.Nom==Nom) return ch;
+    for(const champ_cvw &ch : c.Champs) {
+     if (ch.Nom==Nom) { return ch;
+}
+}
     FAIL("champ introuvable : " << Nom);
     return c.Champs.front();
    }
@@ -36,23 +38,27 @@ namespace
   int LitEntier(const std::string &o, const champ_cvw &ch)
    {
     unsigned u=0;
-    for(int i=3; i>=0; i--) u=(u<<8)|(unsigned char)o[ch.Debut+(std::size_t)i];
-    return (int)u;
+    for(int i=3; i>=0; i--) { u=(u<<8)|static_cast<unsigned char>(o[ch.Debut+static_cast<std::size_t>(i)]);
+}
+    return static_cast<int>(u);
    }
   //-------------------------------------------------------------------------
   // Champ de coordonnée d'un élément (feu1.x, feup2.y[1], depot.x...), hors cases
   bool EstCoordonnee(const std::string &Nom)
    {
-    if (Nom.rfind("case(", 0)==0) return false;
+    if (Nom.starts_with("case(")) { return false;
+}
     std::size_t p=Nom.rfind('.');
-    if (p==std::string::npos) return false;
+    if (p==std::string::npos) { return false;
+}
     std::string Fin=Nom.substr(p+1);
-    return (Fin=="x")||(Fin=="y")||(Fin.rfind("x[", 0)==0)||(Fin.rfind("y[", 0)==0);
+    return (Fin=="x")||(Fin=="y")||(Fin.starts_with("x["))||(Fin.starts_with("y["));
    }
   //-------------------------------------------------------------------------
   void EcritEntier(std::string &o, const champ_cvw &ch, int v)
    {
-    for(int i=0; i<4; i++) o[ch.Debut+(std::size_t)i]=(char)(((unsigned)v>>(8*i))&0xFF);
+    for(int i=0; i<4; i++) { o[ch.Debut+static_cast<std::size_t>(i)]=static_cast<char>((static_cast<unsigned>(v)>>(8*i))&0xFF);
+}
    }
   //-------------------------------------------------------------------------
   void EcritFichier(const std::string &asChemin, const std::string &asContenu)
@@ -67,9 +73,11 @@ namespace
   // Une place que le vehlib n°NumVehlib pourrait réserver (libre, autre que sa place de départ)
   bool ExistePlaceReservable(int NumVehlib)
    {
-    for(int p=0; p<cv->NbPlacesVehlib; p++)
-     if ((p+1!=cv->Vehlib[NumVehlib-1].NumPlaceDepart)&&cv->PlaceVehlib[p].EstLibre())
+    for(int p=0; p<cv->NbPlacesVehlib; p++) {
+     if ((p+1!=cv->Vehlib[NumVehlib-1].NumPlaceDepart)&&cv->PlaceVehlib[p].EstLibre()) {
       return true;
+}
+}
     return false;
    }
   //-------------------------------------------------------------------------
@@ -77,8 +85,9 @@ namespace
   int NbPietonsQuiAttendent(int NumVehlib)
    {
     int n=0;
-    for(int i=0; i<cv->NbPietons; i++)
-     n+=cv->Pieton[i].AttendVehlib&&(cv->Pieton[i].NumPlaceVehlib==cv->Vehlib[NumVehlib-1].NumPlaceDepart);
+    for(int i=0; i<cv->NbPietons; i++) {
+     n+=static_cast<int>(cv->Pieton[i].AttendVehlib&&(cv->Pieton[i].NumPlaceVehlib==cv->Vehlib[NumVehlib-1].NumPlaceDepart));
+}
     return n;
    }
  }
@@ -104,20 +113,24 @@ TEST_CASE("Vehlibs : sans place libre, le vehlib attend au lieu de figer la simu
       INFO("Tour " << t << ", vehlib n°" << i+1);
       REQUIRE(vl.NumPlaceDepart>0);
       // Un vehlib ne part que vers une place réservée pour lui
-      if (vl.Situation==svDepart) REQUIRE(vl.NumPlaceArrivee>0);
-      if (vl.NumPlaceArrivee) REQUIRE(cv->PlaceVehlib[vl.NumPlaceArrivee-1].NumVehlibReserve==i+1);
+      if (vl.Situation==svDepart) { REQUIRE(vl.NumPlaceArrivee>0);
+}
+      if (vl.NumPlaceArrivee != 0) { REQUIRE(cv->PlaceVehlib[vl.NumPlaceArrivee-1].NumVehlibReserve==i+1);
+}
       // Situation qui figeait l'original : des piétons attendent ce vehlib,
       // qui n'a pas de destination, et aucune place n'est libre. Il attend :
       // les piétons restent dehors, il réessaiera au tour suivant
-      if ((vl.Situation==svAttente)&&(!vl.NumPlaceArrivee)&&NbPietonsQuiAttendent(i+1)&&!ExistePlaceReservable(i+1))
+      if ((vl.Situation==svAttente)&&(vl.NumPlaceArrivee == 0)&&(NbPietonsQuiAttendent(i+1) != 0)&&!ExistePlaceReservable(i+1)) {
        NbAttentesSansPlace++;
+}
      }
-    for(int p=0; p<cv->NbPlacesVehlib; p++)
+    for(int p=0; p<cv->NbPlacesVehlib; p++) {
      if (int n=cv->PlaceVehlib[p].NumVehlibReserve)
       {
        INFO("Tour " << t << ", place de vehlib n°" << p+1);
        REQUIRE(cv->Vehlib[n-1].NumPlaceArrivee==p+1);
       }
+}
    }
   CHECK(cv->TourCrt==300);
   CHECK(NbAttentesSansPlace>0); // le cas est bien exercé
@@ -140,9 +153,15 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
   REQUIRE(harnais::Demarre(asMsgErr));
   REQUIRE(cv->NbVehlibs==29);
   auto Ecart=[](int a, int b, int n) { int e=std::abs(a-b); return std::min(e, n-e); }; // la carte est un tore
-  std::vector<int> VehlibAvant(cv->NbPietons), xAvant(cv->NbPietons), yAvant(cv->NbPietons), ArriveeAvant(cv->NbVehlibs);
+  std::vector<int> VehlibAvant(cv->NbPietons);
+  std::vector<int> xAvant(cv->NbPietons);
+  std::vector<int> yAvant(cv->NbPietons);
+  std::vector<int> ArriveeAvant(cv->NbVehlibs);
   std::vector<long> DemiCasesALaDescente(cv->NbPietons, -1); // -1 : pas descendu, ou déjà reparti à pied
-  int NbArrivees=0, NbDescentes=0, NbRestesABord=0, NbRepartis=0;
+  int NbArrivees=0;
+  int NbDescentes=0;
+  int NbRestesABord=0;
+  int NbRepartis=0;
   for(int t=1; t<=600; t++)
    {
     for(int p=0; p<cv->NbPietons; p++)
@@ -151,7 +170,8 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
       xAvant[p]=cv->Pieton[p].x;
       yAvant[p]=cv->Pieton[p].y;
      }
-    for(int i=0; i<cv->NbVehlibs; i++) ArriveeAvant[i]=cv->Vehlib[i].NumPlaceArrivee;
+    for(int i=0; i<cv->NbVehlibs; i++) { ArriveeAvant[i]=cv->Vehlib[i].NumPlaceArrivee;
+}
     REQUIRE(harnais::Tick());
     for(int i=0; i<cv->NbVehlibs; i++)
      {
@@ -162,7 +182,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
       // (il y arrive, puis monte, pendant le même tour)
       const place_vehlib &pd=cv->PlaceVehlib[vl.NumPlaceDepart-1];
       int NbPassagers=0;
-      for(int p=0; p<cv->NbPietons; p++)
+      for(int p=0; p<cv->NbPietons; p++) {
        if (cv->Pieton[p].NumVehlib==i+1)
         {
          NbPassagers++;
@@ -173,6 +193,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
            REQUIRE(Ecart(xAvant[p], pd.x, cv->NbX)+Ecart(yAvant[p], pd.y, cv->NbY)<=2);
           }
         }
+}
       REQUIRE(vl.NbPersonnes==NbPassagers);
       REQUIRE(vl.NbPersonnes<=cv->NbMaxPersonnesVehlib);
       if (vl.Situation==svDepart)
@@ -187,17 +208,17 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
         REQUIRE(pd.x==vl.x);
         REQUIRE(pd.y==vl.y);
        }
-      if (ArriveeAvant[i]&&(vl.NumPlaceDepart==ArriveeAvant[i]))
+      if ((ArriveeAvant[i] != 0)&&(vl.NumPlaceDepart==ArriveeAvant[i]))
        { // Arrivé pendant ce tour : sa place d'arrivée est devenue sa place de départ
         NbArrivees++;
         const place_vehlib &pv=cv->PlaceVehlib[ArriveeAvant[i]-1];
         REQUIRE(pv.NumVehlibReserve==0);
-        for(int p=0; p<cv->NbPietons; p++)
+        for(int p=0; p<cv->NbPietons; p++) {
          if (VehlibAvant[p]==i+1)
           {
            pieton &pt=cv->Pieton[p];
            INFO("piéton n°" << p+1);
-           if (pt.NumVehlib)
+           if (pt.NumVehlib != 0)
             { // Aucun trottoir voisin ne pouvait l'accueillir : il reste à bord et
               // descendra à la place suivante (le vehlib repart, ou attend une place libre)
              NbRestesABord++;
@@ -215,12 +236,13 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
              DemiCasesALaDescente[p]=pt.DemiCasesParcourues;
             }
           }
+}
        }
      }
     for(int p=0; p<cv->NbPietons; p++)
      {
       pieton &pt=cv->Pieton[p];
-      if (pt.NumVehlib)
+      if (pt.NumVehlib != 0)
        {
         INFO("Tour " << t << ", piéton n°" << p+1);
         REQUIRE_FALSE(pt.Defini());
@@ -232,12 +254,13 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
          DemiCasesALaDescente[p]=-1;
         }
      }
-    for(int p=0; p<cv->NbPlacesVehlib; p++)
+    for(int p=0; p<cv->NbPlacesVehlib; p++) {
      if (int n=cv->PlaceVehlib[p].NumVehlibReserve)
       {
        INFO("Tour " << t << ", place de vehlib n°" << p+1);
        REQUIRE(cv->Vehlib[n-1].NumPlaceArrivee==p+1);
       }
+}
    }
   INFO(NbArrivees << " arrivées, " << NbDescentes << " descentes, " << NbRestesABord << " restés à bord, " << NbRepartis << " repartis à pied");
   CHECK(NbDescentes>NbArrivees/2); // l'original : aucune
@@ -275,17 +298,17 @@ TEST_CASE("Ouverture : une erreur de lecture fait échouer Charge", "[correction
   const std::string asOctets=harnais::LitFichier(asCarte);
   {
    std::ofstream f(asCopie, std::ios::binary);
-   f.write(asOctets.data(), (std::streamsize)asOctets.size());
+   f.write(asOctets.data(), static_cast<std::streamsize>(asOctets.size()));
   }
   REQUIRE((h=FileOpen(asCopie.c_str(), fmOpenWrite))>0);
   CHECK_FALSE(Charge(h));
   FileClose(h);
   // Fichier coupé au milieu du dernier champ, et plus tôt
-  for(std::size_t Coupe : {(std::size_t)1, (std::size_t)2, asOctets.size()/2, asOctets.size()-4})
+  for(std::size_t Coupe : {static_cast<std::size_t>(1), static_cast<std::size_t>(2), asOctets.size()/2, asOctets.size()-4})
    {
     {
      std::ofstream f(asCopie, std::ios::binary|std::ios::trunc);
-     f.write(asOctets.data(), (std::streamsize)(asOctets.size()-Coupe));
+     f.write(asOctets.data(), static_cast<std::streamsize>(asOctets.size()-Coupe));
     }
     REQUIRE((h=FileOpen(asCopie.c_str(), fmOpenRead))>0);
     INFO("Coupé de " << Coupe << " octets");
@@ -309,7 +332,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
    {
     {
      std::ofstream f(asCopie, std::ios::binary|std::ios::trunc);
-     f.write(asDonnees.data(), (std::streamsize)asDonnees.size());
+     f.write(asDonnees.data(), static_cast<std::streamsize>(asDonnees.size()));
     }
     int h=FileOpen(asCopie.c_str(), fmOpenRead);
     REQUIRE(h>0);
@@ -324,7 +347,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
   struct { const char *Nom; std::size_t Position; } Champs[]=
    {{"NbFeux", 4}, {"NbX", 8}, {"NbY", 12}, {"NbFeuxPieton", 16}, {"NbParkings", 20}, {"NbArretsBus", 32},
     {"NbArretsTram", 40}, {"NbPlacesTaxi", 48}, {"NbPlacesPark", 56}, {"NbPlacesVehlib", 60}};
-  for(const auto &c : Champs)
+  for(const auto &c : Champs) {
    for(int Valeur : {-5, 0x7FFFFFF0})
     {
      INFO(c.Nom << " = " << Valeur);
@@ -332,8 +355,9 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
      std::memcpy(asDonnees.data()+c.Position, &Valeur, sizeof(Valeur));
      CHECK_FALSE(Charge(asDonnees));
     }
+}
   // Zone sans case : v resterait nul
-  for(std::size_t Position : {(std::size_t)8, (std::size_t)12})
+  for(std::size_t Position : {static_cast<std::size_t>(8), static_cast<std::size_t>(12)})
    {
     std::string asDonnees=asOctets;
     int Zero=0;
@@ -371,7 +395,8 @@ TEST_CASE("~centre_ville libère toute la mémoire du réseau", "[corrections][m
       REQUIRE(harnais::Demarre(asMsgErr));
       REQUIRE(cv->NbBus>0);
       REQUIRE(cv->NbTrams>0);
-      for(int i=0; i<20; i++) harnais::Tick();
+      for(int i=0; i<20; i++) { harnais::Tick();
+}
       harnais::Ferme();
      }
     CHECK(NombreAllocationsVives()==Avant);
@@ -406,7 +431,8 @@ TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corre
       // Taille de fichier limitée à 1000 octets, comme un disque plein :
       // l'écriture échoue en cours de route
       const std::string asLimite=FichierSortie(std::string("limite_")+Cartes[c].Nom+".cvw");
-      struct rlimit Ancienne, Limite;
+      struct rlimit Ancienne;
+      struct rlimit Limite;
       REQUIRE(getrlimit(RLIMIT_FSIZE, &Ancienne)==0);
       Limite=Ancienne;
       Limite.rlim_cur=1000;
@@ -458,29 +484,33 @@ TEST_CASE("Copier vers... : un élément non défini reste non défini (-1) dans
     DYNAMIC_SECTION(c.Nom)
      {
       REQUIRE(harnais::Ouvre(CheminCarte(c)));
-      const std::string asOrigine=FichierSortie(std::string("copie_indefinis_")+c.Nom+"_origine.cvw"),
-                        asCopie=FichierSortie(std::string("copie_indefinis_")+c.Nom+".cvw");
+      const std::string asOrigine=FichierSortie(std::string("copie_indefinis_")+c.Nom+"_origine.cvw");
+      const std::string asCopie=FichierSortie(std::string("copie_indefinis_")+c.Nom+".cvw");
       REQUIRE(harnais::SauveSansChaos(asOrigine));
       cv->PrepareCopie(DEBUT, 1, 1, cv->NbX-2, cv->NbY-2);
       REQUIRE(cv->CopieValide());
       REQUIRE(harnais::SauveSansChaos(asCopie));
       cv->PrepareCopie(FIN, 0, 0, 0, 0);
       harnais::Ferme();
-      const std::string asOctetsOrigine=harnais::LitFichier(asOrigine), asOctetsCopie=harnais::LitFichier(asCopie);
-      const conversion_cvw Origine=ConvertitEn530(asOctetsOrigine), Copie=ConvertitEn530(asOctetsCopie);
+      const std::string asOctetsOrigine=harnais::LitFichier(asOrigine);
+      const std::string asOctetsCopie=harnais::LitFichier(asCopie);
+      const conversion_cvw Origine=ConvertitEn530(asOctetsOrigine);
+      const conversion_cvw Copie=ConvertitEn530(asOctetsCopie);
       REQUIRE(Origine.Ok);
       REQUIRE(Copie.Ok);
       int NbIndefinis=0;
-      for(const champ_cvw &ch : Origine.Champs)
+      for(const champ_cvw &ch : Origine.Champs) {
        if (EstCoordonnee(ch.Nom)&&(LitEntier(asOctetsOrigine, ch)<0))
         {
          NbIndefinis++;
          const champ_cvw *chc=nullptr;
-         for(const champ_cvw &k : Copie.Champs) if (k.Nom==ch.Nom) { chc=&k; break; }
+         for(const champ_cvw &k : Copie.Champs) { if (k.Nom==ch.Nom) { chc=&k; break; }
+}
          REQUIRE(chc);
          INFO(ch.Nom);
          CHECK(LitEntier(asOctetsCopie, *chc)==-1);
         }
+}
       CHECK(NbIndefinis>0); // chaque carte a des éléments non définis
      }
    }
@@ -500,7 +530,8 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
   REQUIRE(Ref.Version==VERSION);
   const int NbY=LitEntier(asCarte, Champ(Ref, "NbY"));
   int f=1; // premier feu défini (les places libres, x=-1, ne sont pas vérifiées)
-  while(LitEntier(asCarte, Champ(Ref, "feu"+std::to_string(f)+".x"))<0) f++;
+  while(LitEntier(asCarte, Champ(Ref, "feu"+std::to_string(f)+".x"))<0) { f++;
+}
   const std::string asFeu="feu"+std::to_string(f)+".";
   asCarte[Champ(Ref, asFeu+"Etat").Debut]=7;
   asCarte[Champ(Ref, asFeu+"TypeDmdVert").Debut]=9;
@@ -524,9 +555,10 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
                                     asSource+": direction incorrecte (9)\n",
                                     asSource+": ordonnée incorrecte ("+std::to_string(NbY)+")\n",
                                     std::string("Case (0,0): directions possibles incorrectes (20)\n"),
-                                    std::string("Case (0,0) (Nord): priorité incorrecte (9)\n")})
+                                    std::string("Case (0,0) (Nord): priorité incorrecte (9)\n")}) {
    CHECK(asMessages.find(Attendu)!=std::string::npos);
-  cv->v[0][0].DirPoss=(dirposs)DirPoss00; // ~voie() lit NbDir[DirPoss] : hors du tableau pour 20
+}
+  cv->v[0][0].DirPoss=static_cast<dirposs>(DirPoss00); // ~voie() lit NbDir[DirPoss] : hors du tableau pour 20
   harnais::Ferme();
   CHECK(Vue.Messages.empty());
   vue=nullptr;
@@ -540,7 +572,8 @@ TEST_CASE("Vérification d'intégrité : le message du dépôt de bus donne ses 
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw : dépôt de bus défini
   conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
-  const int NbX=LitEntier(asCarte, Champ(Ref, "NbX")), y=LitEntier(asCarte, Champ(Ref, "depot.y"));
+  const int NbX=LitEntier(asCarte, Champ(Ref, "NbX"));
+  const int y=LitEntier(asCarte, Champ(Ref, "depot.y"));
   REQUIRE(LitEntier(asCarte, Champ(Ref, "depot.x"))>=0);
   EcritEntier(asCarte, Champ(Ref, "depot.x"), NbX);
   const std::string asFichier=FichierSortie("verifie_depot.cvw");
@@ -600,7 +633,8 @@ TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[correctio
   CHECK(f.NbFeuxAtt==0);
   CHECK(f.NumFeuxAtt==nullptr);
   feu_pieton &p=cv->FeuP[0];
-  for(int n : {4, 5, 6}) p.AjouteFeu(n);
+  for(int n : {4, 5, 6}) { p.AjouteFeu(n);
+}
   p.RetireFeu(5);
   CHECK(Liste(p.NumFeux, p.NbFeux)==std::vector<int>{4, 6});
   p.RetireFeu(6);
@@ -692,9 +726,10 @@ TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans 
   AnsiString asMsgErr;
   REQUIRE(harnais::Demarre(asMsgErr));
   std::vector<std::vector<int>> Listes;
-  Listes.reserve((std::size_t)cv->NbFeux);
-  for(int i=0; i<cv->NbFeux; i++)
-   Listes.push_back(std::vector<int>(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn));
+  Listes.reserve(static_cast<std::size_t>(cv->NbFeux));
+  for(int i=0; i<cv->NbFeux; i++) {
+   Listes.emplace_back(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn);
+}
   REQUIRE(std::any_of(Listes.begin(), Listes.end(), [](const std::vector<int> &l) { return !l.empty(); }));
   cv->PrepareFeuxPietons();
   for(int i=0; i<cv->NbFeux; i++)
@@ -702,7 +737,8 @@ TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans 
     INFO("Feu n°" << i+1);
     CHECK(std::vector<int>(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn)==Listes[(std::size_t)i]);
    }
-  for(int t=0; t<20; t++) REQUIRE(harnais::Tick());
+  for(int t=0; t<20; t++) { REQUIRE(harnais::Tick());
+}
   harnais::Ferme();
   alea::LibereGraine();
   vue=nullptr;
@@ -725,14 +761,21 @@ TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refus�
     cv->DefinitNbPietons(0);
     for(int x0 : {2, 12})
      {
-      const int x1=x0+6, y0=2, y1=6;
-      for(int x=x0; x<x1; x++) cv->v[x][y0].DirPoss=E;
-      for(int y=y0; y<y1; y++) cv->v[x1][y].DirPoss=S;
-      for(int x=x1; x>x0; x--) cv->v[x][y1].DirPoss=O;
-      for(int y=y1; y>y0; y--) cv->v[x0][y].DirPoss=N;
+      const int x1=x0+6;
+      const int y0=2;
+      const int y1=6;
+      for(int x=x0; x<x1; x++) { cv->v[x][y0].DirPoss=E;
+}
+      for(int y=y0; y<y1; y++) { cv->v[x1][y].DirPoss=S;
+}
+      for(int x=x1; x>x0; x--) { cv->v[x][y1].DirPoss=O;
+}
+      for(int y=y1; y>y0; y--) { cv->v[x0][y].DirPoss=N;
+}
      }
-    cv->v[12][4].DirPoss=(dirposs)(N|O);
-    for(int x=9; x<12; x++) cv->v[x][4].DirPoss=O;
+    cv->v[12][4].DirPoss=static_cast<dirposs>(N|O);
+    for(int x=9; x<12; x++) { cv->v[x][4].DirPoss=O;
+}
     cv->AjouteParking(4, 2);
     cv->AjouteParking(4, 6);
     const std::string asPlace=Place;
@@ -749,13 +792,14 @@ TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refus�
     REQUIRE(harnais::VerifieReseau(asMsgErr));
     const bool Demarre=harnais::Demarre(asMsgErr);
     INFO(asMsgErr.str());
-    if (asPlace=="parking") CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 5)")==0)));
-    else if (asPlace=="vehlib") CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 6)")==0)));
-    else
+    if (asPlace=="parking") { CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 5)")==0)));
+    } else if (asPlace=="vehlib") { CHECK((!Demarre&&(asMsgErr.str().find("Distance indéfinie (type 6)")==0)));
+    } else
      { // Témoins : tous les véhicules arrivent
       REQUIRE(Demarre);
       int t=0;
-      while ((t<2000)&&harnais::Tick()) t++;
+      while ((t<2000)&&harnais::Tick()) { t++;
+}
       CHECK(cv->NbVehiculesArrives==cv->NbVehicules);
      }
     harnais::Ferme();

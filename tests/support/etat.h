@@ -47,9 +47,10 @@ class PuitsEmpreinte
     Empreinte*=1099511628211ULL;
     Empreinte^=Empreinte>>29; // brassage : chaque mot influe sur tous les bits
    }
-  void Section(const char *Nom) { for(const char *c=Nom; *c; c++) Ajoute((unsigned char)*c); }
-  void Objet(const char *, int Numero, bool=false) { Ajoute(0xFFFFFFFF00000000ULL^(std::uint64_t)(std::uint32_t)Numero); }
-  void Champ(const char *, long long Valeur) { Ajoute((std::uint64_t)Valeur); }
+  void Section(const char *Nom) { for(const char *c=Nom; (*c) != 0; c++) { Ajoute(static_cast<unsigned char>(*c)); 
+}}
+  void Objet(const char * /*unused*/, int Numero, bool /*unused*/=false) { Ajoute(0xFFFFFFFF00000000ULL^static_cast<std::uint64_t>(static_cast<std::uint32_t>(Numero))); }
+  void Champ(const char * /*unused*/, long long Valeur) { Ajoute(static_cast<std::uint64_t>(Valeur)); }
   void FinObjet() {}
  };
 //---------------------------------------------------------------------------

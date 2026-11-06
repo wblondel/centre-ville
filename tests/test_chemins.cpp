@@ -21,16 +21,19 @@ long NombreAllocationsVives(); // support/allocation.cpp
 //---------------------------------------------------------------------------
 namespace
  {
-  typedef std::pair<int, int> coord;
+  using coord = std::pair<int, int>;
   //-------------------------------------------------------------------------
   // Cases de l'arrêt de bus (Bus) ou de tram n°Numero
   std::vector<coord> CasesArret(bool Bus, int Numero)
    {
     std::vector<coord> Cases;
-    for(int x=0; x<cv->NbX; x++)
-     for(int y=0; y<cv->NbY; y++)
-      if ((Bus?cv->v[x][y].NumArretBus:cv->v[x][y].NumArretTram)==Numero)
-       Cases.push_back(coord(x, y));
+    for(int x=0; x<cv->NbX; x++) {
+     for(int y=0; y<cv->NbY; y++) {
+      if ((Bus?cv->v[x][y].NumArretBus:cv->v[x][y].NumArretTram)==Numero) {
+       Cases.emplace_back(x, y);
+}
+}
+}
     return Cases;
    }
   //-------------------------------------------------------------------------
@@ -39,7 +42,8 @@ namespace
    {
     AnsiString asMsgErr;
     REQUIRE(harnais::Demarre(asMsgErr));
-    for(int t=0; t<NbTours; t++) REQUIRE(harnais::Tick());
+    for(int t=0; t<NbTours; t++) { REQUIRE(harnais::Tick());
+}
    }
  }
 //---------------------------------------------------------------------------
@@ -52,12 +56,18 @@ TEST_CASE("Places de parking et de vehlib supprimées : retirées et renumérot�
   vue=&Vue;
   alea::FixeGraine(1);
   REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : 28 places de parking, 32 places de vehlib
-  const int NbPark=cv->NbPlacesPark, NbVehlib=cv->NbPlacesVehlib;
+  const int NbPark=cv->NbPlacesPark;
+  const int NbVehlib=cv->NbPlacesVehlib;
   REQUIRE(NbPark==28);
   REQUIRE(NbVehlib==32);
-  std::vector<coord> Park, Vehlib;
-  for(int p=0; p<NbPark; p++) Park.push_back(coord(cv->PlacePark[p].x, cv->PlacePark[p].y));
-  for(int p=0; p<NbVehlib; p++) Vehlib.push_back(coord(cv->PlaceVehlib[p].x, cv->PlaceVehlib[p].y));
+  std::vector<coord> Park;
+  std::vector<coord> Vehlib;
+  Park.reserve(NbPark);
+for(int p=0; p<NbPark; p++) { Park.emplace_back(cv->PlacePark[p].x, cv->PlacePark[p].y);
+}
+  Vehlib.reserve(NbVehlib);
+for(int p=0; p<NbVehlib; p++) { Vehlib.emplace_back(cv->PlaceVehlib[p].x, cv->PlaceVehlib[p].y);
+}
   // Places n°2 et dernière
   cv->SupprimePlacePark(1);
   cv->SupprimePlacePark(NbPark-1);
@@ -76,7 +86,7 @@ TEST_CASE("Places de parking et de vehlib supprimées : retirées et renumérot�
   REQUIRE(cv->NbPlacesVehlib==NbVehlib-2);
   for(int p=0; p<cv->NbPlacesPark; p++) // nouveau n° p+1 : ancien n° p+1 (p=0) ou p+2
    {
-    const coord c=Park[p?p+1:p];
+    const coord c=Park[(p != 0)?p+1:p];
     INFO("Place de parking n°" << p+1);
     CHECK(cv->PlacePark[p].x==c.first);
     CHECK(cv->PlacePark[p].y==c.second);
@@ -84,17 +94,19 @@ TEST_CASE("Places de parking et de vehlib supprimées : retirées et renumérot�
    }
   for(int p=0; p<cv->NbPlacesVehlib; p++)
    {
-    const coord c=Vehlib[p?p+1:p];
+    const coord c=Vehlib[(p != 0)?p+1:p];
     INFO("Place de vehlib n°" << p+1);
     CHECK(cv->PlaceVehlib[p].x==c.first);
     CHECK(cv->PlaceVehlib[p].y==c.second);
     CHECK(cv->v[c.first][c.second].NumPlaceVehlib==p+1);
    }
-  for(const coord &c : {Park[1], Park[NbPark-1]}) CHECK(cv->v[c.first][c.second].NumPlacePark==0);
-  for(const coord &c : {Vehlib[1], Vehlib[NbVehlib-1]}) CHECK(cv->v[c.first][c.second].NumPlaceVehlib==0);
+  for(const coord &c : {Park[1], Park[NbPark-1]}) { CHECK(cv->v[c.first][c.second].NumPlacePark==0);
+}
+  for(const coord &c : {Vehlib[1], Vehlib[NbVehlib-1]}) { CHECK(cv->v[c.first][c.second].NumPlaceVehlib==0);
+}
   AnsiString asMsgErr;
   CHECK(harnais::VerifieReseau(asMsgErr));
-  CHECK(asMsgErr.str()=="");
+  CHECK(asMsgErr.str().empty());
   Simule(200);
   CHECK(Vue.Messages.empty());
   harnais::Ferme();
@@ -119,8 +131,9 @@ TEST_CASE("Arrêts de bus et de tram : case de tête retirée, rajoutée, puis a
       INFO((Bus?"Arrêt de bus n°1":"Arrêt de tram n°1"));
       const coord Tete=Bus?coord(cv->ArretBus[0].x, cv->ArretBus[0].y):coord(cv->ArretTram[0].x, cv->ArretTram[0].y);
       REQUIRE(CasesArret(Bus, 1).size()==3);
-      if (Bus) cv->SupprimeArretBus(Tete.first, Tete.second);
-      else cv->SupprimeArretTram(Tete.first, Tete.second);
+      if (Bus) { cv->SupprimeArretBus(Tete.first, Tete.second);
+      } else { cv->SupprimeArretTram(Tete.first, Tete.second);
+}
       const std::vector<coord> Reste=CasesArret(Bus, 1);
       REQUIRE(Reste.size()==2);
       const coord NvTete=Bus?coord(cv->ArretBus[0].x, cv->ArretBus[0].y):coord(cv->ArretTram[0].x, cv->ArretTram[0].y);
@@ -180,32 +193,38 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
   auto Arrets=[](auto *a, int n)
    {
     std::vector<arret> l;
-    l.reserve((std::size_t)n);
-    for(int i=0; i<n; i++) l.push_back(arret{a[i].x, a[i].y, a[i].NbLignes, std::vector<int>(a[i].NumLigne, a[i].NumLigne+a[i].NbLignes)});
+    l.reserve(static_cast<std::size_t>(n));
+    for(int i=0; i<n; i++) { l.push_back(arret{a[i].x, a[i].y, a[i].NbLignes, std::vector<int>(a[i].NumLigne, a[i].NumLigne+a[i].NbLignes)});
+}
     return l;
    };
   // Case de route (Bus) ou de voie de tram seule, sans arrêt ni arrêt voisin
   auto CaseLibre=[](bool Bus)
    {
-    for(int x=1; x<cv->NbX-1; x++)
+    for(int x=1; x<cv->NbX-1; x++) {
      for(int y=1; y<cv->NbY-1; y++)
       {
        const voie &v=cv->v[x][y];
        bool Libre=Bus?(v.DirPoss&&!v.SensVoieTram&&!v.NumParking&&!v.NumPlaceTaxi&&!v.NumPlacePark&&!v.NumPlaceVehlib)
                      :(v.SensVoieTram&&!v.DirPoss);
-       for(int d=nord; Libre&&(d<=ouest); d++)
+       for(int d=nord; Libre&&(d<=ouest); d++) {
         Libre=!(Bus?cv->V(x,y,d).NumArretBus:cv->V(x,y,d).NumArretTram);
-       if (Libre&&!(Bus?v.NumArretBus:v.NumArretTram)) return coord(x, y);
+}
+       if (Libre&&!(Bus?v.NumArretBus:v.NumArretTram)) { return coord(x, y);
+}
       }
+}
     return coord(-1, -1);
    };
 
   SECTION("arrêts de bus et de tram, puis simulation")
    {
-    const std::vector<arret> Bus=Arrets(cv->ArretBus, cv->NbArretsBus), Tram=Arrets(cv->ArretTram, cv->NbArretsTram);
+    const std::vector<arret> Bus=Arrets(cv->ArretBus, cv->NbArretsBus);
+    const std::vector<arret> Tram=Arrets(cv->ArretTram, cv->NbArretsTram);
     REQUIRE(Bus.size()==25);
     REQUIRE(Tram.size()==16);
-    const coord b=CaseLibre(true), t=CaseLibre(false);
+    const coord b=CaseLibre(true);
+    const coord t=CaseLibre(false);
     REQUIRE(b.first>=0);
     REQUIRE(t.first>=0);
     CHECK(cv->AjouteArretBus(b.first, b.second)==26);
@@ -236,22 +255,28 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
     auto FeuxP=[](int n)
      {
       std::vector<feu_p> l;
-      l.reserve((std::size_t)n);
-      for(int i=0; i<n; i++)
+      l.reserve(static_cast<std::size_t>(n));
+      for(int i=0; i<n; i++) {
        l.push_back(feu_p{cv->FeuP[i].x[0], cv->FeuP[i].y[0], cv->FeuP[i].Dir[0],
                          std::vector<int>(cv->FeuP[i].NumFeux, cv->FeuP[i].NumFeux+cv->FeuP[i].NbFeux)});
+}
       return l;
      };
     const std::vector<feu_p> Avant=FeuxP(cv->NbFeuxPieton);
     REQUIRE(Avant.size()==6);
     REQUIRE(std::any_of(Avant.begin(), Avant.end(), [](const feu_p &f) { return !f.NumFeux.empty(); }));
     // Comme la fiche Priorités piétons : passage piétons sans feu dans cette direction
-    int x=-1, y=-1, d=0;
-    for(int i=0; (x<0)&&(i<cv->NbX); i++)
-     for(int j=0; (x<0)&&(j<cv->NbY); j++)
-      for(int k=nord; (x<0)&&(k<=ouest); k++)
-       if (cv->v[i][j].PassagePietons&&!cv->v[i][j].NumFeuP[k-1]&&cv->FeuPietonsPossible(i, j, (direction)k))
+    int x=-1;
+    int y=-1;
+    int d=0;
+    for(int i=0; (x<0)&&(i<cv->NbX); i++) {
+     for(int j=0; (x<0)&&(j<cv->NbY); j++) {
+      for(int k=nord; (x<0)&&(k<=ouest); k++) {
+       if (cv->v[i][j].PassagePietons&&(cv->v[i][j].NumFeuP[k-1] == 0)&&cv->FeuPietonsPossible(i, j, static_cast<direction>(k)))
         { x=i; y=j; d=k; }
+}
+}
+}
     REQUIRE(x>=0);
     CHECK(cv->AjouteFeuPietons(x, y, (direction)d)==7);
     CHECK(FeuxP(6)==Avant);
@@ -277,21 +302,23 @@ TEST_CASE("Épidémie avec réinfections : un piéton guéri retombe malade", "[
    {
     Avant=NombreAllocationsVives();
     REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : 327 piétons
-    cv->EpidemieReinfections=true;
+    cv->EpidemieReinfections=1;
     Simule(500);
     NbReinfectes=0;
     for(int i=0; i<cv->NbPietons; i++)
      {
       pieton &p=cv->Pieton[i];
       INFO("Piéton n°" << i+1);
-      if (p.NbInfections()>1) NbReinfectes++;
+      if (p.NbInfections()>1) { NbReinfectes++;
+}
       if (p.EstContagieux()) // l'infection en cours, même chaînée
        {
         CHECK(p.DonneChargeVirale()>0);
         CHECK(p.DonneRang()>=0);
        }
       else
-       if (p.EstVivant()) CHECK(p.DonneChargeVirale()==0); // un mort garde sa charge
+       if (p.EstVivant()) { CHECK(p.DonneChargeVirale()==0); // un mort garde sa charge
+}
      }
     harnais::Ferme();
    }

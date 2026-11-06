@@ -22,9 +22,9 @@
 #include "compat/temps.h"
 #include "proprietes.h"
 //---------------------------------------------------------------------------
-typedef QObject TObject;
-typedef QObject TComponent;
-typedef unsigned short WORD;
+using TObject = QObject;
+using TComponent = QObject;
+using WORD = unsigned short;
 //---------------------------------------------------------------------------
 // String (UnicodeString de C++Builder X) : AnsiString en UTF-8, plus les
 // quelques méthodes utilisées par les fiches
@@ -32,22 +32,22 @@ typedef unsigned short WORD;
 class String : public AnsiString
  {
   public:
-  String() {}
+  String() = default;
   String(const char *s) : AnsiString(s) {}
   String(const AnsiString &as) : AnsiString(as) {}
   String(const std::string &s) : AnsiString(s) {}
   String UpperCase() const;
  };
-typedef String UnicodeString;
+using UnicodeString = String;
 //---------------------------------------------------------------------------
 // Conversions avec Qt
 //---------------------------------------------------------------------------
 inline QString Q(const AnsiString &as) { return QString::fromUtf8(as.c_str()); }
-inline AnsiString A(const QString &qs) { return AnsiString(qs.toUtf8().toStdString()); }
+inline AnsiString A(const QString &qs) { return {qs.toUtf8().toStdString()}; }
 //---------------------------------------------------------------------------
 // Événements (TNotifyEvent et compagnie) : fonctions appelées avec Sender
 //---------------------------------------------------------------------------
-typedef std::function<void(TObject *Sender)> TNotifyEvent;
+using TNotifyEvent = std::function<void(TObject *Sender)>;
 //---------------------------------------------------------------------------
 // Connecte(Evenement, objet, &Classe::Gestionnaire) : affecte un gestionnaire
 // (méthode de fiche) à un événement, comme l'inspecteur d'objets de l'EDI
@@ -76,9 +76,9 @@ class TShiftState
  {
   unsigned Bits=0;
   public:
-  TShiftState() {}
-  TShiftState &operator<<(TShiftStateElement e) { Bits|=1u<<e; return *this; }
-  bool Contains(TShiftStateElement e) const { return (Bits>>e)&1u; }
+  TShiftState() = default;
+  TShiftState &operator<<(TShiftStateElement e) { Bits|=1U<<e; return *this; }
+  bool Contains(TShiftStateElement e) const { return ((Bits>>e)&1U) != 0u; }
  };
 //---------------------------------------------------------------------------
 // Ensembles de la VCL (TGridOptions, TMsgDlgButtons...) : Options << x, >> x
@@ -87,10 +87,10 @@ template <class E> class TEnsemble
  {
   unsigned long long Bits=0;
   public:
-  TEnsemble() {}
-  TEnsemble &operator<<(E e) { Bits|=1ull<<(int)e; return *this; }
-  TEnsemble &operator>>(E e) { Bits&=~(1ull<<(int)e); return *this; }
-  bool Contains(E e) const { return (Bits>>(int)e)&1ull; }
+  TEnsemble() = default;
+  TEnsemble &operator<<(E e) { Bits|=1ULL<<(int)e; return *this; }
+  TEnsemble &operator>>(E e) { Bits&=~(1ULL<<(int)e); return *this; }
+  bool Contains(E e) const { return ((Bits>>(int)e)&1ULL) != 0u; }
   bool operator==(const TEnsemble &t) const { return Bits==t.Bits; }
  };
 //---------------------------------------------------------------------------

@@ -15,38 +15,41 @@ namespace
  {
   void *Alloue(std::size_t n)
    {
-    void *p=std::malloc(n?n:1);
-    if (p) std::memset(p, 0xA5, n?n:1);
+    void *p=std::malloc((n != 0u)?n:1);
+    if (p) { std::memset(p, 0xA5, (n != 0u)?n:1);
+}
     return p;
    }
  }
 //---------------------------------------------------------------------------
 void *operator new(std::size_t n)
  {
-  if (void *p=Alloue(n)) return p;
+  if (void *p=Alloue(n)) { return p;
+}
   throw std::bad_alloc();
  }
 //---------------------------------------------------------------------------
 void *operator new[](std::size_t n)
  {
-  if (void *p=Alloue(n)) return p;
+  if (void *p=Alloue(n)) { return p;
+}
   throw std::bad_alloc();
  }
 //---------------------------------------------------------------------------
-void *operator new(std::size_t n, const std::nothrow_t &) noexcept
+void *operator new(std::size_t n, const std::nothrow_t & /*unused*/) noexcept
  {
   return Alloue(n);
  }
 //---------------------------------------------------------------------------
-void *operator new[](std::size_t n, const std::nothrow_t &) noexcept
+void *operator new[](std::size_t n, const std::nothrow_t & /*unused*/) noexcept
  {
   return Alloue(n);
  }
 //---------------------------------------------------------------------------
 void operator delete(void *p) noexcept { std::free(p); }
 void operator delete[](void *p) noexcept { std::free(p); }
-void operator delete(void *p, std::size_t) noexcept { std::free(p); }
-void operator delete[](void *p, std::size_t) noexcept { std::free(p); }
-void operator delete(void *p, const std::nothrow_t &) noexcept { std::free(p); }
-void operator delete[](void *p, const std::nothrow_t &) noexcept { std::free(p); }
+void operator delete(void *p, std::size_t /*unused*/) noexcept { std::free(p); }
+void operator delete[](void *p, std::size_t /*unused*/) noexcept { std::free(p); }
+void operator delete(void *p, const std::nothrow_t & /*unused*/) noexcept { std::free(p); }
+void operator delete[](void *p, const std::nothrow_t & /*unused*/) noexcept { std::free(p); }
 //---------------------------------------------------------------------------

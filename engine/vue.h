@@ -41,7 +41,7 @@ enum objet_recherche : signed char {orVehicule, orPieton, orBus, orTram, orTaxi,
 class IVueSimulation
  {
   public:
-  virtual ~IVueSimulation() {}
+  virtual ~IVueSimulation() = default;
   // --- frmSimulation ---
   // frmSimulation->RedessineCase(x, y, EffaceFond)
   virtual void RedessineCase(int x, int y, bool EffaceFond) = 0;
@@ -103,7 +103,7 @@ class VueNulle : public IVueSimulation
   long long NbRedessins=0;
   std::vector<message> Messages;
   AnsiString asStatut[4];
-  void RedessineCase(int, int, bool) override { NbRedessins++; }
+  void RedessineCase(int /*x*/, int /*y*/, bool /*EffaceFond*/) override { NbRedessins++; }
   bool SimulationSanglante() const override { return Sanglante; }
   bool EpidemieActivee() const override { return Epidemie; }
   bool ActionEpidemieCochee() const override { return Epidemie; }
@@ -112,16 +112,17 @@ class VueNulle : public IVueSimulation
   void DefinitSimulationModifiee(bool Modif) override { Modifiee=Modif; }
   void AfficheStatut(int NumPanneau, const AnsiString &asTexte) override
    {
-    if ((NumPanneau>=0)&&(NumPanneau<4)) asStatut[NumPanneau]=asTexte;
+    if ((NumPanneau>=0)&&(NumPanneau<4)) { asStatut[NumPanneau]=asTexte;
+}
    }
   void RepeintStatut() override {}
-  bool FicheVisible(fiche_info) const override { return false; }
-  void RafraichitFiche(fiche_info) override {}
+  bool FicheVisible(fiche_info /*Fiche*/) const override { return false; }
+  void RafraichitFiche(fiche_info /*Fiche*/) override {}
   bool RechercheVisible() const override { return false; }
-  bool RechercheCochee(objet_recherche) const override { return false; }
-  void RechercheActualise(objet_recherche) override {}
+  bool RechercheCochee(objet_recherche /*Objet*/) const override { return false; }
+  void RechercheActualise(objet_recherche /*Objet*/) override {}
   type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTitre,
-                              type_message Type, int, int) override
+                              type_message Type, int /*OrdreBoutonDefaut*/, int /*OrdreBoutonEchap*/) override
    {
     Messages.push_back(message{asMessage, asTitre, Type});
     return Reponse;

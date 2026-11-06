@@ -11,7 +11,6 @@
 //#include <ExtCtrls.hpp> // portage
 //#include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 #include "simul.h"
 //---------------------------------------------------------------------------
 class TfrmDefFeuxPietons : public TForm

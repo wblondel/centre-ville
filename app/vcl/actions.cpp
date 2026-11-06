@@ -48,10 +48,13 @@ namespace
   //-------------------------------------------------------------------------
   int ToucheVirtuelle(int Touche, bool PaveNumerique)
    {
-    if ((Touche>=Qt::Key_A)&&(Touche<=Qt::Key_Z)) return Touche; // 'A'..'Z'
-    if ((Touche>=Qt::Key_0)&&(Touche<=Qt::Key_9))
+    if ((Touche>=Qt::Key_A)&&(Touche<=Qt::Key_Z)) { return Touche; // 'A'..'Z'
+}
+    if ((Touche>=Qt::Key_0)&&(Touche<=Qt::Key_9)) {
      return PaveNumerique?0x60+(Touche-Qt::Key_0):Touche;
-    if ((Touche>=Qt::Key_F1)&&(Touche<=Qt::Key_F24)) return 0x70+(Touche-Qt::Key_F1);
+}
+    if ((Touche>=Qt::Key_F1)&&(Touche<=Qt::Key_F24)) { return 0x70+(Touche-Qt::Key_F1);
+}
     switch(Touche)
      {
       case Qt::Key_Backspace: return 0x08;
@@ -107,41 +110,53 @@ TShortCut RaccourciVcl(const QKeyEvent *e)
  {
   int Touche=e->key();
   if ((Touche==Qt::Key_Shift)||(Touche==Qt::Key_Control)||(Touche==Qt::Key_Alt)||
-      (Touche==Qt::Key_Meta)||(Touche==Qt::Key_AltGr)||(Touche==Qt::Key_unknown)) return 0;
-  bool PaveNumerique=e->modifiers()&Qt::KeypadModifier;
+      (Touche==Qt::Key_Meta)||(Touche==Qt::Key_AltGr)||(Touche==Qt::Key_unknown)) { return 0;
+}
+  bool PaveNumerique=e->modifiers().testFlag(Qt::KeypadModifier);
   int vk=PaveNumerique?0:ToucheVirtuellePhysique(e);
-  if (!vk) vk=ToucheVirtuelle(Touche, PaveNumerique);
-  if (!vk) return 0;
+  if (vk == 0) { vk=ToucheVirtuelle(Touche, PaveNumerique);
+}
+  if (vk == 0) { return 0;
+}
   Qt::KeyboardModifiers m=e->modifiers();
   TShortCut sc=vk;
-  if (m&Qt::ShiftModifier) sc|=scShift;
+  if (m.testFlag(Qt::ShiftModifier)) { sc|=scShift;
+}
   // Ctrl de la VCL = Qt::ControlModifier (⌘ sous macOS, comme les menus de Qt)
   // ou, sous macOS, la touche Control physique (Qt::MetaModifier) : les
   // raccourcis Ctrl+flèches et Ctrl+Espace, pris par le système avec Control,
   // restent accessibles avec ⌘, et ⌘Q/⌘H, pris par le système, avec Control.
-  if (m&Qt::ControlModifier) sc|=scCtrl;
+  if (m.testFlag(Qt::ControlModifier)) { sc|=scCtrl;
+}
 #if defined(Q_OS_MACOS)
-  if (m&Qt::MetaModifier) sc|=scCtrl;
+  if (m.testFlag(Qt::MetaModifier)) { sc|=scCtrl;
+}
 #endif
-  if (m&Qt::AltModifier) sc|=scAlt;
+  if (m.testFlag(Qt::AltModifier)) { sc|=scAlt;
+}
   return sc;
  }
 //---------------------------------------------------------------------------
 QKeySequence SequenceQt(TShortCut Raccourci)
  {
-  if (!Raccourci) return QKeySequence();
+  if (Raccourci == 0) { return {};
+}
   int vk=Raccourci&0xFF;
   QString Nom;
-  if (const char *n=NomTouche(vk)) Nom=QString::fromLatin1(n);
-  else if (((vk>='0')&&(vk<='9'))||((vk>='A')&&(vk<='Z'))) Nom=QChar(vk);
-  else if ((vk>=0x70)&&(vk<=0x87)) Nom=QString("F%1").arg(vk-0x6F);
-  else if ((vk>=0x60)&&(vk<=0x69)) Nom=QString("Num+%1").arg(vk-0x60);
-  else return QKeySequence();
+  if (const char *n=NomTouche(vk)) { Nom=QString::fromLatin1(n);
+  } else if (((vk>='0')&&(vk<='9'))||((vk>='A')&&(vk<='Z'))) { Nom=QChar(vk);
+  } else if ((vk>=0x70)&&(vk<=0x87)) { Nom=QString("F%1").arg(vk-0x6F);
+  } else if ((vk>=0x60)&&(vk<=0x69)) { Nom=QString("Num+%1").arg(vk-0x60);
+  } else { return {};
+}
   QString Texte;
-  if (Raccourci&scCtrl) Texte+="Ctrl+";
-  if (Raccourci&scAlt) Texte+="Alt+";
-  if (Raccourci&scShift) Texte+="Shift+";
-  return QKeySequence(Texte+Nom, QKeySequence::PortableText);
+  if ((Raccourci&scCtrl) != 0) { Texte+="Ctrl+";
+}
+  if ((Raccourci&scAlt) != 0) { Texte+="Alt+";
+}
+  if ((Raccourci&scShift) != 0) { Texte+="Shift+";
+}
+  return {Texte+Nom, QKeySequence::PortableText};
  }
 //---------------------------------------------------------------------------
 // TAction
@@ -162,53 +177,65 @@ TAction::TAction(QAction *Modele, TActionList *Liste) : QObject(Liste), ActionLi
   Tag=Modele->property("vclTag").toInt();
   HelpContext=Modele->property("vclHelpContext").toInt();
   Icone=Modele->icon();
-  Caption.Definit([this]() { return asCaption; }, [this](const AnsiString &as) { asCaption=as; });
-  Hint.Definit([this]() { return asHint; }, [this](const AnsiString &as) { asHint=as; });
-  Checked.Definit([this]() { return bChecked; }, [this](const bool &b) { DefinitChecked(b); });
-  Enabled.Definit([this]() { return bEnabled; }, [this](const bool &b) { DefinitEnabled(b); });
-  Visible.Definit([this]() { return bVisible; }, [this](const bool &b) { DefinitVisible(b); });
+  Caption.Definit([this] { return asCaption; }, [this](const AnsiString &as) { asCaption=as; });
+  Hint.Definit([this] { return asHint; }, [this](const AnsiString &as) { asHint=as; });
+  Checked.Definit([this] { return bChecked; }, [this](const bool &b) { DefinitChecked(b); });
+  Enabled.Definit([this] { return bEnabled; }, [this](const bool &b) { DefinitEnabled(b); });
+  Visible.Definit([this] { return bVisible; }, [this](const bool &b) { DefinitVisible(b); });
   Liste->Actions.push_back(this);
  }
 //---------------------------------------------------------------------------
 void TAction::DefinitChecked(bool Valeur)
  { // TCustomAction::SetChecked : clients d'abord, puis groupe (GroupIndex)
-  if (Verification) return;
+  if (Verification) { return;
+}
   Verification=true;
   if (Valeur!=bChecked)
    {
     std::vector<ClientAction *> c=Clients;
-    for(ClientAction *Client : c) Client->LienChecked(bChecked, Valeur);
+    for(ClientAction *Client : c) { Client->LienChecked(bChecked, Valeur);
+}
     bChecked=Valeur;
-    if ((GroupIndex>0)&&bChecked&&ActionList)
-     for(TAction *a : ActionList->Actions)
-      if ((a!=this)&&(a->GroupIndex==GroupIndex))
+    if ((GroupIndex>0)&&bChecked&&ActionList) {
+     for(TAction *a : ActionList->Actions) {
+      if ((a!=this)&&(a->GroupIndex==GroupIndex)) {
        a->Checked=false;
+}
+}
+}
    }
   Verification=false;
  }
 //---------------------------------------------------------------------------
 void TAction::DefinitEnabled(bool Valeur)
  {
-  if (Valeur==bEnabled) return;
+  if (Valeur==bEnabled) { return;
+}
   std::vector<ClientAction *> c=Clients;
-  for(ClientAction *Client : c) Client->LienEnabled(bEnabled, Valeur);
+  for(ClientAction *Client : c) { Client->LienEnabled(bEnabled, Valeur);
+}
   bEnabled=Valeur;
  }
 //---------------------------------------------------------------------------
 void TAction::DefinitVisible(bool Valeur)
  {
-  if (Valeur==bVisible) return;
+  if (Valeur==bVisible) { return;
+}
   std::vector<ClientAction *> c=Clients;
-  for(ClientAction *Client : c) Client->LienVisible(bVisible, Valeur);
+  for(ClientAction *Client : c) { Client->LienVisible(bVisible, Valeur);
+}
   bVisible=Valeur;
  }
 //---------------------------------------------------------------------------
 bool TAction::Execute()
  { // TCustomAction::Execute
-  if (bEnabled&&AutoCheck)
-   if ((!bChecked)||(bChecked&&(GroupIndex==0)))
+  if (bEnabled&&AutoCheck) {
+   if ((!bChecked)||(bChecked&&(GroupIndex==0))) {
     Checked=!bChecked;
-  if (!bEnabled) return false;
+}
+}
+  if (!bEnabled) { return false;
+}
   if (OnExecute)
    {
     OnExecute(this);
@@ -219,7 +246,8 @@ bool TAction::Execute()
 //---------------------------------------------------------------------------
 void TAction::AjouteClient(ClientAction *c)
  {
-  if (std::find(Clients.begin(), Clients.end(), c)==Clients.end()) Clients.push_back(c);
+  if (std::find(Clients.begin(), Clients.end(), c)==Clients.end()) { Clients.push_back(c);
+}
  }
 //---------------------------------------------------------------------------
 void TAction::RetireClient(ClientAction *c)
@@ -229,9 +257,11 @@ void TAction::RetireClient(ClientAction *c)
 //---------------------------------------------------------------------------
 bool TActionList::IsShortCut(TShortCut Raccourci, bool Executer)
  { // TCustomActionList::IsShortCut : la première action portant le raccourci
-  for(TAction *a : Actions)
-   if (a->ShortCut==Raccourci)
+  for(TAction *a : Actions) {
+   if (a->ShortCut==Raccourci) {
     return Executer?a->Execute():(bool)a->Enabled;
+}
+}
   return false;
  }
 //---------------------------------------------------------------------------
@@ -240,7 +270,8 @@ bool TActionList::IsShortCut(TShortCut Raccourci, bool Executer)
 TMenuItem::TMenuItem(QAction *Feuille, QObject *Parent) : QObject(Parent), Element(Feuille), SousMenu(nullptr)
  {
   setObjectName(Feuille->objectName());
-  if (Feuille->property("vclSeparateur").toBool()) Feuille->setSeparator(true);
+  if (Feuille->property("vclSeparateur").toBool()) { Feuille->setSeparator(true);
+}
   asCaption=A(Feuille->text());
   asHint=A(Feuille->statusTip());
   bChecked=Feuille->isChecked();
@@ -253,27 +284,30 @@ TMenuItem::TMenuItem(QAction *Feuille, QObject *Parent) : QObject(Parent), Eleme
   HelpContext=Feuille->property("vclHelpContext").toInt();
   ImageIndex=Feuille->property("vclImageIndex").isValid()?Feuille->property("vclImageIndex").toInt():-1;
   ShortCut=Feuille->property("vclShortCut").toInt();
-  QObject::connect(Feuille, &QAction::triggered, this, [this]() { ElementDeclenche(); });
-  Caption.Definit([this]() { return asCaption; },
+  QObject::connect(Feuille, &QAction::triggered, this, [this] { ElementDeclenche(); });
+  Caption.Definit([this] { return asCaption; },
                   [this](const AnsiString &as) { asCaption=as; Element->setText(Q(as)); });
-  Hint.Definit([this]() { return asHint; },
+  Hint.Definit([this] { return asHint; },
                [this](const AnsiString &as) { asHint=as; Element->setStatusTip(Q(as)); });
-  Checked.Definit([this]() { return bChecked; },
+  Checked.Definit([this] { return bChecked; },
                   [this](const bool &b)
                    {
-                    if (b==bChecked) return;
+                    if (b==bChecked) { return;
+}
                     bChecked=b;
-                    if (b&&RadioItem) TurnSiblingsOff();
+                    if (b&&RadioItem) { TurnSiblingsOff();
+}
                     AfficheCoche();
                    });
-  Enabled.Definit([this]() { return bEnabled; },
+  Enabled.Definit([this] { return bEnabled; },
                   [this](const bool &b) { bEnabled=b; Element->setEnabled(b); });
-  Visible.Definit([this]() { return bVisible; },
+  Visible.Definit([this] { return bVisible; },
                   [this](const bool &b) { bVisible=b; Element->setVisible(b); });
-  Action.Definit([this]() { return ActionLiee; },
+  Action.Definit([this] { return ActionLiee; },
                  [this](TAction *const &a)
                   {
-                   if (ActionLiee) ActionLiee->RetireClient(this);
+                   if (ActionLiee) { ActionLiee->RetireClient(this);
+}
                    ActionLiee=a;
                    if (a) { a->AjouteClient(this); ActionChange(a); }
                   });
@@ -289,37 +323,42 @@ TMenuItem::TMenuItem(QMenu *Menu, QObject *Parent) : QObject(Parent), Element(Me
   Tag=Menu->property("vclTag").toInt();
   HelpContext=Menu->property("vclHelpContext").toInt();
   ImageIndex=Menu->property("vclImageIndex").isValid()?Menu->property("vclImageIndex").toInt():-1;
-  Caption.Definit([this]() { return asCaption; },
+  Caption.Definit([this] { return asCaption; },
                   [this](const AnsiString &as) { asCaption=as; SousMenu->setTitle(Q(as)); });
-  Hint.Definit([this]() { return asHint; }, [this](const AnsiString &as) { asHint=as; });
-  Checked.Definit([this]() { return bChecked; }, [this](const bool &b) { bChecked=b; });
-  Enabled.Definit([this]() { return bEnabled; },
+  Hint.Definit([this] { return asHint; }, [this](const AnsiString &as) { asHint=as; });
+  Checked.Definit([this] { return bChecked; }, [this](const bool &b) { bChecked=b; });
+  Enabled.Definit([this] { return bEnabled; },
                   [this](const bool &b) { bEnabled=b; SousMenu->setEnabled(b); });
-  Visible.Definit([this]() { return bVisible; },
+  Visible.Definit([this] { return bVisible; },
                   [this](const bool &b) { bVisible=b; SousMenu->menuAction()->setVisible(b); });
-  Action.Definit([this]() { return ActionLiee; }, [this](TAction *const &a) { ActionLiee=a; });
+  Action.Definit([this] { return ActionLiee; }, [this](TAction *const &a) { ActionLiee=a; });
  }
 //---------------------------------------------------------------------------
 void TMenuItem::DefinitGroupe(QActionGroup *g)
  {
   Groupe=g;
-  if (!SousMenu) Element->setActionGroup(g);
+  if (!SousMenu) { Element->setActionGroup(g);
+}
   AfficheCoche();
  }
 //---------------------------------------------------------------------------
 void TMenuItem::AfficheCoche()
  { // La VCL n'affiche rien pour un élément non coché : checkable seulement si coché
-  if (SousMenu) return;
+  if (SousMenu) { return;
+}
   Element->setCheckable(bChecked);
   Element->setChecked(bChecked);
  }
 //---------------------------------------------------------------------------
 void TMenuItem::TurnSiblingsOff()
  {
-  if (!Parent) return;
-  for(TMenuItem *m : Parent->Items)
-   if ((m!=this)&&m->RadioItem&&(m->GroupIndex==GroupIndex))
+  if (!Parent) { return;
+}
+  for(TMenuItem *m : Parent->Items) {
+   if ((m!=this)&&m->RadioItem&&(m->GroupIndex==GroupIndex)) {
     m->Checked=false;
+}
+}
  }
 //---------------------------------------------------------------------------
 void TMenuItem::ElementDeclenche()
@@ -330,34 +369,44 @@ void TMenuItem::ElementDeclenche()
 //---------------------------------------------------------------------------
 void TMenuItem::Click()
  { // TMenuItem::Click
-  if (!bEnabled) return;
-  bool AutoCheckLie=ActionLiee&&(ActionLiee->AutoCheck==AutoCheck);
-  if (AutoCheck&&((!ActionLiee)||(!AutoCheckLie)))
+  if (!bEnabled) { return;
+}
+  bool AutoCheckLie=(ActionLiee != nullptr)&&(ActionLiee->AutoCheck==AutoCheck);
+  if (AutoCheck&&((!ActionLiee)||(!AutoCheckLie))) {
    Checked=!bChecked;
-  if (OnClick&&ActionLiee&&(ActionLiee->OnExecute))
+}
+  if (OnClick&&ActionLiee&&(ActionLiee->OnExecute)) {
    OnClick(this);
-  else if (ActionLiee)
+  } else if (ActionLiee) {
    ActionLiee->Execute();
-  else if (OnClick)
+  } else if (OnClick) {
    OnClick(this);
+}
  }
 //---------------------------------------------------------------------------
 TMenuItem *TMenuItem::Find(TShortCut Raccourci)
  { // Parcours en profondeur, préfixe (TMenu::FindItem)
-  if (Raccourci&&(ShortCut==Raccourci)) return this;
-  for(TMenuItem *m : Items)
-   if (TMenuItem *t=m->Find(Raccourci)) return t;
+  if ((Raccourci != 0)&&(ShortCut==Raccourci)) { return this;
+}
+  for(TMenuItem *m : Items) {
+   if (TMenuItem *t=m->Find(Raccourci)) { return t;
+}
+}
   return nullptr;
  }
 //---------------------------------------------------------------------------
 void TMenuItem::LieAction(TAction *a)
  { // Lien établi au chargement de la fiche : les propriétés sont déjà dans le .ui
   ActionLiee=a;
-  if (!a) return;
+  if (!a) { return;
+}
   a->AjouteClient(this);
-  if (!Element->property("vclShortCut").isValid()) ShortCut=a->ShortCut;
-  if (!Element->property("vclImageIndex").isValid()) ImageIndex=a->ImageIndex;
-  if (!Element->property("vclHelpContext").isValid()) HelpContext=a->HelpContext;
+  if (!Element->property("vclShortCut").isValid()) { ShortCut=a->ShortCut;
+}
+  if (!Element->property("vclImageIndex").isValid()) { ImageIndex=a->ImageIndex;
+}
+  if (!Element->property("vclHelpContext").isValid()) { HelpContext=a->HelpContext;
+}
  }
 //---------------------------------------------------------------------------
 void TMenuItem::ActionChange(TAction *a)
@@ -374,28 +423,37 @@ void TMenuItem::ActionChange(TAction *a)
   Visible=(bool)a->Visible;
  }
 //---------------------------------------------------------------------------
-void TMenuItem::LienChecked(bool Ancien, bool Nouveau) { if (bChecked==Ancien) Checked=Nouveau; }
-void TMenuItem::LienEnabled(bool Ancien, bool Nouveau) { if (bEnabled==Ancien) Enabled=Nouveau; }
-void TMenuItem::LienVisible(bool Ancien, bool Nouveau) { if (bVisible==Ancien) Visible=Nouveau; }
+void TMenuItem::LienChecked(bool Ancien, bool Nouveau) { if (bChecked==Ancien) { Checked=Nouveau; 
+}}
+void TMenuItem::LienEnabled(bool Ancien, bool Nouveau) { if (bEnabled==Ancien) { Enabled=Nouveau; 
+}}
+void TMenuItem::LienVisible(bool Ancien, bool Nouveau) { if (bVisible==Ancien) { Visible=Nouveau; 
+}}
 //---------------------------------------------------------------------------
 // Menus
 //---------------------------------------------------------------------------
 bool TMenu::IsShortCut(TShortCut Raccourci, bool Executer)
  { // TMenu::IsShortCut : la touche est consommée même si l'élément est désactivé
   TMenuItem *Element=nullptr;
-  for(TMenuItem *m : Items)
-   if ((Element=m->Find(Raccourci))) break;
-  if (!Element) return false;
+  for(TMenuItem *m : Items) {
+   if ((Element=m->Find(Raccourci))) { break;
+}
+}
+  if (!Element) { return false;
+}
   if (Executer)
    {
     std::vector<TMenuItem *> Chaine;
-    for(TMenuItem *m=Element; m; m=m->Parent) Chaine.insert(Chaine.begin(), m);
+    for(TMenuItem *m=Element; m; m=m->Parent) { Chaine.insert(Chaine.begin(), m);
+}
     QPointer<TMenu> Moi(this);
     for(TMenuItem *m : Chaine) // DoClick : les parents d'abord, tous activés
      {
-      if (!m->Enabled) break;
+      if (!m->Enabled) { break;
+}
       m->Click();
-      if (!Moi) break;
+      if (!Moi) { break;
+}
      }
    }
   return true;
@@ -413,7 +471,8 @@ TPopupMenu::TPopupMenu(QMenu *m) : TMenu(m), Menu(m)
 //---------------------------------------------------------------------------
 void TPopupMenu::Popup(int X, int Y)
  {
-  if (OnPopup) OnPopup(this);
+  if (OnPopup) { OnPopup(this);
+}
   Menu->exec(QPoint(X, Y));
  }
 //---------------------------------------------------------------------------
@@ -426,32 +485,42 @@ namespace
   FicheRaccourcis *FicheDe(QWidget *w)
    {
     QWidget *f=w?w->window():nullptr;
-    for(FicheRaccourcis &r : Fiches)
-     if (r.Fenetre==f) return &r;
+    for(FicheRaccourcis &r : Fiches) {
+     if (r.Fenetre==f) { return &r;
+}
+}
     return nullptr;
    }
   //-------------------------------------------------------------------------
   FicheRaccourcis *FichePrincipale()
    {
-    for(FicheRaccourcis &r : Fiches)
-     if (r.Principale) return &r;
+    for(FicheRaccourcis &r : Fiches) {
+     if (r.Principale) { return &r;
+}
+}
     return nullptr;
    }
   //-------------------------------------------------------------------------
   bool TraiteRaccourci(QWidget *Cible, TShortCut Raccourci, bool Executer)
    { // TWinControl::IsMenuKey puis TApplication::IsShortCut
     FicheRaccourcis *f=FicheDe(Cible);
-    if (!f) return false;
+    if (!f) { return false;
+}
     for(QWidget *c=Cible; c; c=c->parentWidget())
      {
-      if (AvecMenuContextuel *m=dynamic_cast<AvecMenuContextuel *>(c))
-       if (m->PopupMenu&&m->PopupMenu->IsShortCut(Raccourci, Executer)) return true;
-      if (c==f->Fenetre) break;
+      if (auto *m=dynamic_cast<AvecMenuContextuel *>(c)) {
+       if (m->PopupMenu&&m->PopupMenu->IsShortCut(Raccourci, Executer)) { return true;
+}
+}
+      if (c==f->Fenetre) { break;
+}
      }
-    if (f->IsShortCut(Raccourci, Executer)) return true;
+    if (f->IsShortCut(Raccourci, Executer)) { return true;
+}
     FicheRaccourcis *p=FichePrincipale();
-    if (p&&(p!=f)&&p->Fenetre->isEnabled()&&!QApplication::activeModalWidget())
+    if (p&&(p!=f)&&p->Fenetre->isEnabled()&&!QApplication::activeModalWidget()) {
      return p->IsShortCut(Raccourci, Executer);
+}
     return false;
    }
   //-------------------------------------------------------------------------
@@ -461,20 +530,22 @@ namespace
     bool eventFilter(QObject *o, QEvent *e) override
      {
       if ((e->type()!=QEvent::ShortcutOverride)&&(e->type()!=QEvent::KeyPress)&&
-          (e->type()!=QEvent::KeyRelease)) return false;
+          (e->type()!=QEvent::KeyRelease)) { return false;
+}
       QWidget *w=qobject_cast<QWidget *>(o);
       // Seulement au premier destinataire (le contrôle actif, ou la fenêtre
       // si aucun de ses contrôles n'a le focus), pas lors de la remontée aux parents
       QWidget *Focus=QApplication::focusWidget();
-      if (!w||((w!=Focus)&&!(w->isWindow()&&(!Focus||(Focus->window()!=w))))) return false;
-      QKeyEvent *k=static_cast<QKeyEvent *>(e);
+      if (!w||((w!=Focus)&&(!w->isWindow()||(Focus&&(Focus->window()==w))))) { return false;
+}
+      auto *k=static_cast<QKeyEvent *>(e);
       if (e->type()==QEvent::KeyRelease)
        { // KeyPreview : OnKeyUp de la fiche
         FicheRaccourcis *f=FicheDe(w);
-        return f&&f->Apercu&&f->Apercu(k, true);
+        return (f != nullptr)&&f->Apercu&&f->Apercu(k, true);
        }
-      if (TCSpinEdit *Champ=dynamic_cast<TCSpinEdit *>(w))
-       if (Champ->GardeTouchesDeplacement&&!(k->modifiers()&~Qt::KeypadModifier))
+      if (auto *Champ=dynamic_cast<TCSpinEdit *>(w)) {
+       if (Champ->GardeTouchesDeplacement&&!(k->modifiers()&~Qt::KeypadModifier)) {
         switch(k->key())
          { // v6.0.2
           case Qt::Key_Left: case Qt::Key_Right: case Qt::Key_Up: case Qt::Key_Down:
@@ -482,13 +553,17 @@ namespace
            return false;
           default: break;
          }
+}
+}
       TShortCut sc=RaccourciVcl(k);
-      if (!sc)
+      if (sc == 0)
        {
-        if (e->type()!=QEvent::KeyPress) return false;
+        if (e->type()!=QEvent::KeyPress) { return false;
+}
         FicheRaccourcis *f=FicheDe(w);
-        if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) return true;
-        return f&&f->Apercu&&f->Apercu(k, false);
+        if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) { return true;
+}
+        return (f != nullptr)&&f->Apercu&&f->Apercu(k, false);
        }
       if (e->type()==QEvent::ShortcutOverride)
        {
@@ -500,10 +575,12 @@ namespace
         return false;
        }
       // Raccourci (IsMenuKey), touche de dialogue (CM_DIALOGKEY), puis KeyPreview
-      if (TraiteRaccourci(w, sc, true)) return true;
+      if (TraiteRaccourci(w, sc, true)) { return true;
+}
       FicheRaccourcis *f=FicheDe(w);
-      if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) return true;
-      return f&&f->Apercu&&f->Apercu(k, false);
+      if (f&&f->ToucheDialogue&&f->ToucheDialogue(k)) { return true;
+}
+      return (f != nullptr)&&f->Apercu&&f->Apercu(k, false);
      }
    };
   RepartiteurRaccourcis *Repartiteur=nullptr;
@@ -511,9 +588,12 @@ namespace
 //---------------------------------------------------------------------------
 bool FicheRaccourcis::IsShortCut(TShortCut Raccourci, bool Executer)
  { // TCustomForm::IsShortCut : menu principal puis listes d'actions de la fiche
-  if (Menu&&Menu->IsShortCut(Raccourci, Executer)) return true;
-  for(TActionList *l : ListesActions)
-   if (l->IsShortCut(Raccourci, Executer)) return true;
+  if (Menu&&Menu->IsShortCut(Raccourci, Executer)) { return true;
+}
+  for(TActionList *l : ListesActions) {
+   if (l->IsShortCut(Raccourci, Executer)) { return true;
+}
+}
   return false;
  }
 //---------------------------------------------------------------------------

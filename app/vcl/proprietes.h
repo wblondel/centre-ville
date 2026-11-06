@@ -20,7 +20,7 @@ template <class T> class Propriete
   std::function<T()> Lit;
   std::function<void(const T &)> Ecrit;
   public:
-  Propriete() {}
+  Propriete() = default;
   Propriete(const Propriete &)=delete;
   void Definit(std::function<T()> Lecture, std::function<void(const T &)> Ecriture)
    {
@@ -30,7 +30,7 @@ template <class T> class Propriete
   T Valeur() const { return Lit(); }
   operator T() const { return Lit(); }
   // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
-  template <class E, typename std::enable_if<std::is_enum<E>::value, int>::type=0>
+  template <class E, std::enable_if_t<std::is_enum_v<E>, int> =0>
   explicit operator E() const { return (E)Lit(); }
   Propriete &operator=(const T &v) { Ecrit(v); return *this; }
   // Affectation d'une propriété à une autre : copie de la valeur, pas des accesseurs
@@ -48,7 +48,7 @@ template <> class Propriete<AnsiString>
   std::function<AnsiString()> Lit;
   std::function<void(const AnsiString &)> Ecrit;
   public:
-  Propriete() {}
+  Propriete() = default;
   Propriete(const Propriete &)=delete;
   void Definit(std::function<AnsiString()> Lecture, std::function<void(const AnsiString &)> Ecriture)
    {

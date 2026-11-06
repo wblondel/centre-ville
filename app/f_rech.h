@@ -10,7 +10,6 @@
 //#include <Controls.hpp> // portage
 //#include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmRecherche : public TForm
 {

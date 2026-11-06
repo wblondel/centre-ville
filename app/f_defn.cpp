@@ -10,7 +10,7 @@
 #include "ui_f_defn.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_defn_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-TfrmDefNature *frmDefNature=NULL;
+TfrmDefNature *frmDefNature=nullptr;
 //---------------------------------------------------------------------------
 TfrmDefNature::TfrmDefNature(TComponent* Owner)
   : TForm(Owner)
@@ -24,9 +24,9 @@ TfrmDefNature::TfrmDefNature(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmDefNature::RadioGroupNatureClick(TObject *Sender)
 {
- if (RadioGroupNature->ItemIndex==1)
+ if (RadioGroupNature->ItemIndex==1) {
   CheckBoxPelouse->Enabled=true;
- else
+ } else
   {
    CheckBoxPelouse->Checked=false;
    CheckBoxPelouse->Enabled=false;
@@ -36,26 +36,38 @@ void TfrmDefNature::RadioGroupNatureClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefNature::ButtonAppliquerClick(TObject *Sender)
 {
- bool BordGauche, BordDroit, BordHaut, BordBas;
- for(int x=frmSimulation->DrawGridSimul->Selection.Left; x<=frmSimulation->DrawGridSimul->Selection.Right; x++)
+ bool BordGauche;
+ bool BordDroit;
+ bool BordHaut;
+ bool BordBas;
+ for(int x=frmSimulation->DrawGridSimul->Selection.Left; x<=frmSimulation->DrawGridSimul->Selection.Right; x++) {
   for(int y=frmSimulation->DrawGridSimul->Selection.Top; y<=frmSimulation->DrawGridSimul->Selection.Bottom; y++)
    {
-    cv->v[x][y].DefinitNature( (nature)( trottoirs*RadioGroupNature->ItemIndex+
-                                         CheckBoxPelouse->Checked*(pelouse-trottoirs)),
+    cv->v[x][y].DefinitNature( static_cast<nature>( trottoirs*RadioGroupNature->ItemIndex+
+                                         static_cast<int>(CheckBoxPelouse->Checked)*(pelouse-trottoirs)),
                                CheckBoxEcraser->Checked);
     BordGauche=(x==frmSimulation->DrawGridSimul->Selection.Left);
     BordDroit=(x==frmSimulation->DrawGridSimul->Selection.Right);
     BordHaut=(y==frmSimulation->DrawGridSimul->Selection.Top);
     BordBas=(y==frmSimulation->DrawGridSimul->Selection.Bottom);
-    if (BordDroit||BordHaut) cv->v[(x+BordDroit)%cv->NbX][(y+BordHaut*(cv->NbY-1))%cv->NbY].RedessineCase(true);
-    if (BordDroit||BordBas) cv->v[(x+BordDroit)%cv->NbX][(y+BordBas)%cv->NbY].RedessineCase(true);
-    if (BordGauche||BordBas) cv->v[(x+BordGauche*(cv->NbX-1))%cv->NbX][(y+BordBas)%cv->NbY].RedessineCase(true);
-    if (BordGauche||BordHaut) cv->v[(x+BordGauche*(cv->NbX-1))%cv->NbX][(y+BordHaut*(cv->NbY-1))%cv->NbY].RedessineCase(true);
-    if (BordDroit||BordBas) cv->v[(x+BordDroit)%cv->NbX][(y+BordBas)%cv->NbY].RedessineCase(true);
-    if (BordDroit||BordHaut) cv->v[(x+BordDroit)%cv->NbX][(y+BordHaut*(cv->NbY-1))%cv->NbY].RedessineCase(true);
-    if (BordGauche||BordBas) cv->v[(x+BordGauche*(cv->NbX-1))%cv->NbX][(y+BordBas)%cv->NbY].RedessineCase(true);
-    if (BordGauche||BordHaut) cv->v[(x+BordGauche*(cv->NbX-1))%cv->NbX][(y+BordHaut*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+}
+    if (BordDroit||BordBas) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+}
+    if (BordGauche||BordBas) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+}
+    if (BordGauche||BordHaut) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+}
+    if (BordDroit||BordBas) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+}
+    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+}
+    if (BordGauche||BordBas) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+}
+    if (BordGauche||BordHaut) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+}
    }
+}
  }
 //---------------------------------------------------------------------------
 void TfrmDefNature::ButtonAideClick(TObject *Sender)
@@ -85,8 +97,9 @@ void TfrmDefNature::ButtonFermerClick(TObject *Sender)
 void TfrmDefNature::FormKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
+ if (Key==112) {
    AfficheAideContextuelle(this);
+}
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -100,6 +113,7 @@ void TfrmDefNature::ChargeFiche()
   COMPOSANTS_frmDefNature(LIE_COMPOSANT)
   FinChargement(Lieur);
   EVENEMENTS_frmDefNature(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
+  if (OnCreate) { OnCreate(this);
+}
  }
 //---------------------------------------------------------------------------

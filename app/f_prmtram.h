@@ -12,7 +12,6 @@
 //#include <Menus.hpp> // portage
 //#include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
-#include "base.h"
 //---------------------------------------------------------------------------
 class TfrmParamTram : public TForm
 {

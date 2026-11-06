@@ -49,9 +49,11 @@ namespace
   QString TexteSymbol(const QString &s)
    {
     QString r=s;
-    for(QChar &c : r)
-     if ((c.unicode()>=0x20)&&(c.unicode()<0xFF)&&CodageSymbol[c.unicode()-0x20])
+    for(QChar &c : r) {
+     if ((c.unicode()>=0x20)&&(c.unicode()<0xFF)&&(CodageSymbol[c.unicode()-0x20] != 0u)) {
       c=QChar(CodageSymbol[c.unicode()-0x20]);
+}
+}
     return r;
    }
  }
@@ -65,9 +67,9 @@ TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QAbstractScrollArea>(Par
   setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-  ColCount.Definit([this]() { return NbColonnes; }, [this](const int &n) { DefinitColonnes(n); });
-  RowCount.Definit([this]() { return NbLignes; }, [this](const int &n) { DefinitLignes(n); });
-  FixedCols.Definit([this]() { return NbFixesC; },
+  ColCount.Definit([this] { return NbColonnes; }, [this](const int &n) { DefinitColonnes(n); });
+  RowCount.Definit([this] { return NbLignes; }, [this](const int &n) { DefinitLignes(n); });
+  FixedCols.Definit([this] { return NbFixesC; },
                     [this](const int &n)
                      {
                       NbFixesC=qBound(0, n, NbColonnes-1);
@@ -75,7 +77,7 @@ TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QAbstractScrollArea>(Par
                       Deplace(qMax(ColCour, NbFixesC), LigCour, true, false);
                       MetAJourDefilement();
                      });
-  FixedRows.Definit([this]() { return NbFixesL; },
+  FixedRows.Definit([this] { return NbFixesL; },
                     [this](const int &n)
                      {
                       NbFixesL=qBound(0, n, NbLignes-1);
@@ -83,31 +85,31 @@ TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QAbstractScrollArea>(Par
                       Deplace(ColCour, qMax(LigCour, NbFixesL), true, false);
                       MetAJourDefilement();
                      });
-  DefaultColWidth.Definit([this]() { return LargeurDefaut; },
+  DefaultColWidth.Definit([this] { return LargeurDefaut; },
                           [this](const int &v)
                            { // TCustomGrid::SetDefaultColWidth : toutes les colonnes reprennent la largeur par défaut
                             LargeurDefaut=v;
-                            Largeurs.assign((std::size_t)NbColonnes, v);
+                            Largeurs.assign(static_cast<std::size_t>(NbColonnes), v);
                             MetAJourDefilement();
                             viewport()->update();
                            });
-  DefaultRowHeight.Definit([this]() { return HauteurDefaut; },
+  DefaultRowHeight.Definit([this] { return HauteurDefaut; },
                            [this](const int &v)
                             {
                              HauteurDefaut=v;
-                             Hauteurs.assign((std::size_t)NbLignes, v);
+                             Hauteurs.assign(static_cast<std::size_t>(NbLignes), v);
                              MetAJourDefilement();
                              viewport()->update();
                             });
-  GridLineWidth.Definit([this]() { return Trait; },
+  GridLineWidth.Definit([this] { return Trait; },
                         [this](const int &v) { Trait=qMax(0, v); MetAJourDefilement(); viewport()->update(); });
   // TCustomGrid::SetCol/SetRow : FocusCell (déplacement puis Click)
-  Col.Definit([this]() { return ColCour; }, [this](const int &c) { Deplace(c, LigCour, true, true); });
-  Row.Definit([this]() { return LigCour; }, [this](const int &r) { Deplace(ColCour, r, true, true); });
-  LeftCol.Definit([this]() { return PremCol; }, [this](const int &c) { DefinitHautGauche(c, PremLig); });
-  TopRow.Definit([this]() { return PremLig; }, [this](const int &r) { DefinitHautGauche(PremCol, r); });
-  Largeurs.assign((std::size_t)NbColonnes, LargeurDefaut);
-  Hauteurs.assign((std::size_t)NbLignes, HauteurDefaut);
+  Col.Definit([this] { return ColCour; }, [this](const int &c) { Deplace(c, LigCour, true, true); });
+  Row.Definit([this] { return LigCour; }, [this](const int &r) { Deplace(ColCour, r, true, true); });
+  LeftCol.Definit([this] { return PremCol; }, [this](const int &c) { DefinitHautGauche(c, PremLig); });
+  TopRow.Definit([this] { return PremLig; }, [this](const int &r) { DefinitHautGauche(PremCol, r); });
+  Largeurs.assign(static_cast<std::size_t>(NbColonnes), LargeurDefaut);
+  Hauteurs.assign(static_cast<std::size_t>(NbLignes), HauteurDefaut);
  }
 //---------------------------------------------------------------------------
 void TStringGrid::PrepareVcl()
@@ -123,16 +125,24 @@ void TStringGrid::PrepareVcl()
   QString Barres=property("vclScrollBars").isValid()?property("vclScrollBars").toString():QString("ssBoth");
   setHorizontalScrollBarPolicy(((Barres=="ssBoth")||(Barres=="ssHorizontal"))?Qt::ScrollBarAsNeeded:Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(((Barres=="ssBoth")||(Barres=="ssVertical"))?Qt::ScrollBarAsNeeded:Qt::ScrollBarAlwaysOff);
-  if (property("vclBorderStyle").toString()=="bsNone") setFrameStyle(QFrame::NoFrame);
-  if (property("vclGridLineWidth").isValid()) GridLineWidth=property("vclGridLineWidth").toInt();
-  if (property("vclDefaultColWidth").isValid()) DefaultColWidth=property("vclDefaultColWidth").toInt();
-  if (property("vclDefaultRowHeight").isValid()) DefaultRowHeight=property("vclDefaultRowHeight").toInt();
-  if (property("vclFixedCols").isValid()) FixedCols=property("vclFixedCols").toInt();
-  if (property("vclFixedRows").isValid()) FixedRows=property("vclFixedRows").toInt();
+  if (property("vclBorderStyle").toString()=="bsNone") { setFrameStyle(QFrame::NoFrame);
+}
+  if (property("vclGridLineWidth").isValid()) { GridLineWidth=property("vclGridLineWidth").toInt();
+}
+  if (property("vclDefaultColWidth").isValid()) { DefaultColWidth=property("vclDefaultColWidth").toInt();
+}
+  if (property("vclDefaultRowHeight").isValid()) { DefaultRowHeight=property("vclDefaultRowHeight").toInt();
+}
+  if (property("vclFixedCols").isValid()) { FixedCols=property("vclFixedCols").toInt();
+}
+  if (property("vclFixedRows").isValid()) { FixedRows=property("vclFixedRows").toInt();
+}
   QStringList l=property("vclColWidths").toStringList();
-  for(int i=0; i<(int)l.size(); i++) ColWidths[i]=l[i].toInt();
+  for(int i=0; i<static_cast<int>(l.size()); i++) { ColWidths[i]=l[i].toInt();
+}
   l=property("vclRowHeights").toStringList();
-  for(int i=0; i<(int)l.size(); i++) RowHeights[i]=l[i].toInt();
+  for(int i=0; i<static_cast<int>(l.size()); i++) { RowHeights[i]=l[i].toInt();
+}
   // Police Symbol : absente hors de Windows, le texte est traduit (TexteSymbol)
   // et affiché dans la police du système, à la même taille
   if (font().family()==QLatin1String("Symbol"))
@@ -155,16 +165,19 @@ AnsiString TStringGrid::LitCellule(int c, int r) const
 //---------------------------------------------------------------------------
 void TStringGrid::EcritCellule(int c, int r, const AnsiString &as)
  { // TStringGrid::SetCells : mémorisée même hors de la grille, puis case redessinée
-  if (as.IsEmpty()) Donnees.erase({c, r}); else Donnees[{c, r}]=as;
+  if (as.IsEmpty()) { Donnees.erase({c, r}); } else { Donnees[{c, r}]=as;
+}
   TRect Rect=CellRect(c, r);
-  if (Rect.Width()>0) viewport()->update(Rect.Qt());
+  if (Rect.Width()>0) { viewport()->update(Rect.Qt());
+}
  }
 //---------------------------------------------------------------------------
 void TStringGrid::EcritTaille(bool Colonne, int i, int Taille)
  {
   std::vector<int> &t=Colonne?Largeurs:Hauteurs;
-  if ((i<0)||(i>=(int)t.size())) return;
-  t[(std::size_t)i]=Taille;
+  if ((i<0)||(i>=static_cast<int>(t.size()))) { return;
+}
+  t[static_cast<std::size_t>(i)]=Taille;
   MetAJourDefilement();
   viewport()->update();
  }
@@ -172,14 +185,20 @@ void TStringGrid::EcritTaille(bool Colonne, int i, int Taille)
 void TStringGrid::DefinitColonnes(int n)
  { // TCustomGrid::SetColCount puis TStringGrid::SizeChanged
   n=qMax(1, n);
-  if (n==NbColonnes) return;
+  if (n==NbColonnes) { return;
+}
   NbColonnes=n;
-  Largeurs.resize((std::size_t)n, LargeurDefaut);
-  for(auto i=Donnees.begin(); i!=Donnees.end(); )
-   if (i->first.first>=n) i=Donnees.erase(i); else ++i;
-  if (NbFixesC>=n) NbFixesC=n-1;
-  if (ColCour>=n) ColCour=n-1;
-  if (ColAncre>=n) ColAncre=n-1;
+  Largeurs.resize(static_cast<std::size_t>(n), LargeurDefaut);
+  for(auto i=Donnees.begin(); i!=Donnees.end(); ) {
+   if (i->first.first>=n) { i=Donnees.erase(i); } else { ++i;
+}
+}
+  if (NbFixesC>=n) { NbFixesC=n-1;
+}
+  if (ColCour>=n) { ColCour=n-1;
+}
+  if (ColAncre>=n) { ColAncre=n-1;
+}
   PremCol=qBound(NbFixesC, PremCol, n-1);
   MetAJourDefilement();
   viewport()->update();
@@ -188,14 +207,20 @@ void TStringGrid::DefinitColonnes(int n)
 void TStringGrid::DefinitLignes(int n)
  {
   n=qMax(1, n);
-  if (n==NbLignes) return;
+  if (n==NbLignes) { return;
+}
   NbLignes=n;
-  Hauteurs.resize((std::size_t)n, HauteurDefaut);
-  for(auto i=Donnees.begin(); i!=Donnees.end(); )
-   if (i->first.second>=n) i=Donnees.erase(i); else ++i;
-  if (NbFixesL>=n) NbFixesL=n-1;
-  if (LigCour>=n) LigCour=n-1;
-  if (LigAncre>=n) LigAncre=n-1;
+  Hauteurs.resize(static_cast<std::size_t>(n), HauteurDefaut);
+  for(auto i=Donnees.begin(); i!=Donnees.end(); ) {
+   if (i->first.second>=n) { i=Donnees.erase(i); } else { ++i;
+}
+}
+  if (NbFixesL>=n) { NbFixesL=n-1;
+}
+  if (LigCour>=n) { LigCour=n-1;
+}
+  if (LigAncre>=n) { LigAncre=n-1;
+}
   PremLig=qBound(NbFixesL, PremLig, n-1);
   MetAJourDefilement();
   viewport()->update();
@@ -207,26 +232,34 @@ void TStringGrid::DefinitLignes(int n)
 int TStringGrid::DebutColonne(int c) const
  {
   int x=0;
-  for(int i=0; (i<c)&&(i<NbFixesC); i++) x+=Largeur(i)+Trait;
-  for(int i=PremCol; i<c; i++) x+=Largeur(i)+Trait;
+  for(int i=0; (i<c)&&(i<NbFixesC); i++) { x+=Largeur(i)+Trait;
+}
+  for(int i=PremCol; i<c; i++) { x+=Largeur(i)+Trait;
+}
   return x;
  }
 //---------------------------------------------------------------------------
 int TStringGrid::DebutLigne(int r) const
  {
   int y=0;
-  for(int i=0; (i<r)&&(i<NbFixesL); i++) y+=Hauteur(i)+Trait;
-  for(int i=PremLig; i<r; i++) y+=Hauteur(i)+Trait;
+  for(int i=0; (i<r)&&(i<NbFixesL); i++) { y+=Hauteur(i)+Trait;
+}
+  for(int i=PremLig; i<r; i++) { y+=Hauteur(i)+Trait;
+}
   return y;
  }
 //---------------------------------------------------------------------------
 TRect TStringGrid::CellRect(int ACol, int ARow) const
  { // TCustomGrid::CellRect : rectangle vide si la case est hors de la vue
-  if ((ACol<0)||(ACol>=NbColonnes)||(ARow<0)||(ARow>=NbLignes)) return TRect();
-  if (((ACol>=NbFixesC)&&(ACol<PremCol))||((ARow>=NbFixesL)&&(ARow<PremLig))) return TRect();
-  int x=DebutColonne(ACol), y=DebutLigne(ARow);
-  if ((x>=viewport()->width())||(y>=viewport()->height())) return TRect();
-  return TRect(x, y, x+Largeur(ACol), y+Hauteur(ARow));
+  if ((ACol<0)||(ACol>=NbColonnes)||(ARow<0)||(ARow>=NbLignes)) { return {};
+}
+  if (((ACol>=NbFixesC)&&(ACol<PremCol))||((ARow>=NbFixesL)&&(ARow<PremLig))) { return {};
+}
+  int x=DebutColonne(ACol);
+  int y=DebutLigne(ARow);
+  if ((x>=viewport()->width())||(y>=viewport()->height())) { return {};
+}
+  return {x, y, x+Largeur(ACol), y+Hauteur(ARow)};
  }
 //---------------------------------------------------------------------------
 namespace
@@ -234,13 +267,16 @@ namespace
    // que les suivantes tiennent dans Zone (le dernier trait peut être coupé)
   int CaseMax(int Nombre, int Fixes, int Zone, int Trait, int Fixe, const std::function<int(int)> &Taille)
    {
-    int Resultat=Nombre-1, Ligne=Zone+Trait;
+    int Resultat=Nombre-1;
+    int Ligne=Zone+Trait;
     for(int i=Nombre-1; i>=Fixes; i--)
      {
       int e=Taille(i);
-      if (e<=0) continue;
+      if (e<=0) { continue;
+}
       Ligne-=e+Trait;
-      if (Ligne<Fixe) break;
+      if (Ligne<Fixe) { break;
+}
       Resultat=i;
      }
     return qMax(Fixes, Resultat);
@@ -251,27 +287,38 @@ void TStringGrid::MetAJourDefilement()
  { // TCustomGrid::UpdateScrollRange : barres seulement si des cases débordent
    // (la largeur d'une barre réduit la zone de l'autre, sauf barres superposées)
   QSize Max=maximumViewportSize();
-  int FixeC=0, FixeL=0;
-  for(int i=0; i<NbFixesC; i++) FixeC+=Largeur(i)+Trait;
-  for(int i=0; i<NbFixesL; i++) FixeL+=Hauteur(i)+Trait;
+  int FixeC=0;
+  int FixeL=0;
+  for(int i=0; i<NbFixesC; i++) { FixeC+=Largeur(i)+Trait;
+}
+  for(int i=0; i<NbFixesL; i++) { FixeL+=Hauteur(i)+Trait;
+}
   auto MaxGauche=[&](int Zone) { return CaseMax(NbColonnes, NbFixesC, Zone, Trait, FixeC, [this](int i) { return Largeur(i); }); };
   auto MaxHaut=[&](int Zone) { return CaseMax(NbLignes, NbFixesL, Zone, Trait, FixeL, [this](int i) { return Hauteur(i); }); };
-  int lh=horizontalScrollBar()->sizeHint().height(), lv=verticalScrollBar()->sizeHint().width();
-  if (style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, this)) lh=lv=0;
-  bool AutoriseH=horizontalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff,
-       AutoriseV=verticalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
-  bool BarreH=AutoriseH&&(MaxGauche(Max.width())>NbFixesC), BarreV=AutoriseV&&(MaxHaut(Max.height())>NbFixesL);
-  if (BarreH&&!BarreV) BarreV=AutoriseV&&(MaxHaut(Max.height()-lh)>NbFixesL);
-  if (BarreV&&!BarreH) BarreH=AutoriseH&&(MaxGauche(Max.width()-lv)>NbFixesC);
-  int Largeur=Max.width()-(BarreV?lv:0), Hauteur=Max.height()-(BarreH?lh:0);
-  int MaxG=MaxGauche(Largeur), MaxH=MaxHaut(Hauteur);
+  int lh=horizontalScrollBar()->sizeHint().height();
+  int lv=verticalScrollBar()->sizeHint().width();
+  if (style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, this) != 0) { lh=lv=0;
+}
+  bool AutoriseH=horizontalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
+  bool AutoriseV=verticalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
+  bool BarreH=AutoriseH&&(MaxGauche(Max.width())>NbFixesC);
+  bool BarreV=AutoriseV&&(MaxHaut(Max.height())>NbFixesL);
+  if (BarreH&&!BarreV) { BarreV=AutoriseV&&(MaxHaut(Max.height()-lh)>NbFixesL);
+}
+  if (BarreV&&!BarreH) { BarreH=AutoriseH&&(MaxGauche(Max.width()-lv)>NbFixesC);
+}
+  int Largeur=Max.width()-(BarreV?lv:0);
+  int Hauteur=Max.height()-(BarreH?lh:0);
+  int MaxG=MaxGauche(Largeur);
+  int MaxH=MaxHaut(Hauteur);
   horizontalScrollBar()->setRange(0, MaxG-NbFixesC);
   horizontalScrollBar()->setPageStep(qMax(1, NbColonnes-MaxG));
   horizontalScrollBar()->setSingleStep(1);
   verticalScrollBar()->setRange(0, MaxH-NbFixesL);
   verticalScrollBar()->setPageStep(qMax(1, NbLignes-MaxH));
   verticalScrollBar()->setSingleStep(1);
-  if ((PremCol>MaxG)||(PremLig>MaxH)) DefinitHautGauche(qMin(PremCol, MaxG), qMin(PremLig, MaxH));
+  if ((PremCol>MaxG)||(PremLig>MaxH)) { DefinitHautGauche(qMin(PremCol, MaxG), qMin(PremLig, MaxH));
+}
   horizontalScrollBar()->setValue(PremCol-NbFixesC);
   verticalScrollBar()->setValue(PremLig-NbFixesL);
  }
@@ -280,7 +327,8 @@ void TStringGrid::DefinitHautGauche(int Gauche, int Haut)
  {
   Gauche=qBound(NbFixesC, Gauche, qMax(NbFixesC, NbFixesC+horizontalScrollBar()->maximum()));
   Haut=qBound(NbFixesL, Haut, qMax(NbFixesL, NbFixesL+verticalScrollBar()->maximum()));
-  if ((Gauche==PremCol)&&(Haut==PremLig)) return;
+  if ((Gauche==PremCol)&&(Haut==PremLig)) { return;
+}
   PremCol=Gauche;
   PremLig=Haut;
   horizontalScrollBar()->setValue(Gauche-NbFixesC);
@@ -288,9 +336,10 @@ void TStringGrid::DefinitHautGauche(int Gauche, int Haut)
   viewport()->update();
  }
 //---------------------------------------------------------------------------
-void TStringGrid::scrollContentsBy(int, int)
+void TStringGrid::scrollContentsBy(int /*dx*/, int /*dy*/)
  {
-  int g=NbFixesC+horizontalScrollBar()->value(), h=NbFixesL+verticalScrollBar()->value();
+  int g=NbFixesC+horizontalScrollBar()->value();
+  int h=NbFixesL+verticalScrollBar()->value();
   if ((g!=PremCol)||(h!=PremLig))
    {
     PremCol=g;
@@ -307,11 +356,12 @@ void TStringGrid::resizeEvent(QResizeEvent *e)
 //---------------------------------------------------------------------------
 void TStringGrid::Montre(int c, int r)
  { // TCustomGrid::ClampInView : défile pour que la case soit entièrement visible
-  int g=PremCol, h=PremLig;
+  int g=PremCol;
+  int h=PremLig;
   if (c>=NbFixesC)
    {
-    if (c<g) g=c;
-    else
+    if (c<g) { g=c;
+    } else
      {
       int x=DebutColonne(c);
       while((g<c)&&(x+Largeur(c)>viewport()->width())) { x-=Largeur(g)+Trait; g++; }
@@ -319,8 +369,8 @@ void TStringGrid::Montre(int c, int r)
    }
   if (r>=NbFixesL)
    {
-    if (r<h) h=r;
-    else
+    if (r<h) { h=r;
+    } else
      {
       int y=DebutLigne(r);
       while((h<r)&&(y+Hauteur(r)>viewport()->height())) { y-=Hauteur(h)+Trait; h++; }
@@ -341,7 +391,8 @@ void TStringGrid::Deplace(int c, int r, bool DeplaceAncre, bool Clic)
   if (DeplaceAncre||!PlageSelection) { ColAncre=c; LigAncre=r; }
   Montre(c, r);
   viewport()->update();
-  if (Clic&&OnClick) OnClick(this);
+  if (Clic&&OnClick) { OnClick(this);
+}
  }
 //---------------------------------------------------------------------------
 bool TStringGrid::CaseEn(const QPoint &p, int &c, int &r) const
@@ -349,13 +400,15 @@ bool TStringGrid::CaseEn(const QPoint &p, int &c, int &r) const
   c=r=-1;
   for(int i=0; i<NbColonnes; i++)
    {
-    if ((i>=NbFixesC)&&(i<PremCol)) continue;
+    if ((i>=NbFixesC)&&(i<PremCol)) { continue;
+}
     int x=DebutColonne(i);
     if ((p.x()>=x)&&(p.x()<x+Largeur(i)+Trait)) { c=i; break; }
    }
   for(int i=0; i<NbLignes; i++)
    {
-    if ((i>=NbFixesL)&&(i<PremLig)) continue;
+    if ((i>=NbFixesL)&&(i<PremLig)) { continue;
+}
     int y=DebutLigne(i);
     if ((p.y()>=y)&&(p.y()<y+Hauteur(i)+Trait)) { r=i; break; }
    }
@@ -368,25 +421,31 @@ void TStringGrid::paintEvent(QPaintEvent *e)
  { // TCustomGrid::Paint et TStringGrid::DrawCell (DefaultDrawing)
   QPainter p(viewport());
   const QRegion &Zone=e->region();
-  int Largeur=viewport()->width(), Hauteur=viewport()->height();
-  QColor Fond=CouleurQt(property("vclColor").isValid()?CouleurDepuisTexte(A(property("vclColor").toString())):clWindow),
-         Trace=CouleurQt(clSilver);
+  int Largeur=viewport()->width();
+  int Hauteur=viewport()->height();
+  QColor Fond=CouleurQt(property("vclColor").isValid()?CouleurDepuisTexte(A(property("vclColor").toString())):clWindow);
+  QColor Trace=CouleurQt(clSilver);
   p.fillRect(viewport()->rect(), Fond); // au-delà de la dernière case : Color
   // Case active de la fiche (TCustomGrid::IsActiveControl) : pas de surlignage ;
   // cadre de focus seulement si la grille a le focus
-  bool Active=(window()->focusWidget()==this), Focus=hasFocus();
-  int SelG=qMin(ColCour, ColAncre), SelD=qMax(ColCour, ColAncre),
-      SelH=qMin(LigCour, LigAncre), SelB=qMax(LigCour, LigAncre);
+  bool Active=(window()->focusWidget()==this);
+  bool Focus=hasFocus();
+  int SelG=qMin(ColCour, ColAncre);
+  int SelD=qMax(ColCour, ColAncre);
+  int SelH=qMin(LigCour, LigAncre);
+  int SelB=qMax(LigCour, LigAncre);
   QFont Police=font();
   QFontMetrics fm(Police);
   p.setFont(Police);
   for(int r=0, y=0; (r<NbLignes)&&(y<Hauteur); r++)
    {
-    if ((r>=NbFixesL)&&(r<PremLig)) continue;
+    if ((r>=NbFixesL)&&(r<PremLig)) { continue;
+}
     int h=this->Hauteur(r);
     for(int c=0, x=0; (c<NbColonnes)&&(x<Largeur); c++)
      {
-      if ((c>=NbFixesC)&&(c<PremCol)) continue;
+      if ((c>=NbFixesC)&&(c<PremCol)) { continue;
+}
       int w=this->Largeur(c);
       QRect Case(x, y, w, h);
       bool Fixe=(c<NbFixesC)||(r<NbFixesL);
@@ -407,22 +466,24 @@ void TStringGrid::paintEvent(QPaintEvent *e)
          }
         else
          {
-          bool Selectionnee=(c>=SelG)&&(c<=SelD)&&(r>=SelH)&&(r<=SelB),
-               Courante=Active&&(c==ColCour)&&(r==LigCour);
+          bool Selectionnee=(c>=SelG)&&(c<=SelD)&&(r>=SelH)&&(r<=SelB);
+          bool Courante=Active&&(c==ColCour)&&(r==LigCour);
           if (Selectionnee&&!Courante)
            {
             p.fillRect(Case, palette().color(QPalette::Active, QPalette::Highlight));
             Texte=palette().color(QPalette::Active, QPalette::HighlightedText);
            }
-          else
+          else {
            p.fillRect(Case, Fond);
+}
          }
         // Canvas->TextRect(Rect, Rect.Left+2, Rect.Top+2, Cells[ACol][ARow])
         auto i=Donnees.find({c, r});
         if (i!=Donnees.end())
          {
           QString s=Q(i->second);
-          if (PoliceSymbole) s=TexteSymbol(s);
+          if (PoliceSymbole) { s=TexteSymbol(s);
+}
           p.save();
           p.setClipRect(Case);
           p.setPen(Texte);
@@ -440,8 +501,10 @@ void TStringGrid::paintEvent(QPaintEvent *e)
         // Traits (goFixedVertLine/goVertLine, goFixedHorzLine/goHorzLine)
         if (Trait>0)
          {
-          if (Fixe?TraitsFixesV:TraitsV) p.fillRect(QRect(x+w, y, Trait, h+Trait), Trace);
-          if (Fixe?TraitsFixesH:TraitsH) p.fillRect(QRect(x, y+h, w+Trait, Trait), Trace);
+          if (Fixe?TraitsFixesV:TraitsV) { p.fillRect(QRect(x+w, y, Trait, h+Trait), Trace);
+}
+          if (Fixe?TraitsFixesH:TraitsH) { p.fillRect(QRect(x, y+h, w+Trait, Trait), Trace);
+}
          }
        }
       x+=w+Trait;
@@ -467,27 +530,35 @@ void TStringGrid::focusOutEvent(QFocusEvent *e)
 void TStringGrid::mousePressEvent(QMouseEvent *e)
  { // TCustomGrid::MouseDown : case courante (Maj : l'ancre seulement)
   setFocus(Qt::MouseFocusReason);
-  if (e->button()!=Qt::LeftButton) return;
-  int c, r;
-  if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) return;
+  if (e->button()!=Qt::LeftButton) { return;
+}
+  int c;
+  int r;
+  if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) { return;
+}
   SelectionEnCours=true;
-  if ((e->modifiers()&Qt::ShiftModifier)&&PlageSelection)
+  if (((e->modifiers()&Qt::ShiftModifier) != 0u)&&PlageSelection)
    {
     ColAncre=c;
     LigAncre=r;
     viewport()->update();
    }
-  else
+  else {
    Deplace(c, r, true, false);
+}
  }
 //---------------------------------------------------------------------------
 void TStringGrid::mouseMoveEvent(QMouseEvent *e)
  { // Glisser (goRangeSelect) : l'ancre suit la souris
-  if (!SelectionEnCours) return;
-  int c, r;
-  if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) return;
+  if (!SelectionEnCours) { return;
+}
+  int c;
+  int r;
+  if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) { return;
+}
   if (!PlageSelection) { Deplace(c, r, true, false); return; }
-  if ((c==ColAncre)&&(r==LigAncre)) return;
+  if ((c==ColAncre)&&(r==LigAncre)) { return;
+}
   ColAncre=c;
   LigAncre=r;
   viewport()->update();
@@ -495,10 +566,12 @@ void TStringGrid::mouseMoveEvent(QMouseEvent *e)
 //---------------------------------------------------------------------------
 void TStringGrid::mouseReleaseEvent(QMouseEvent *e)
  { // TCustomGrid::MouseUp : fin de sélection puis Click
-  if ((e->button()!=Qt::LeftButton)||!SelectionEnCours) return;
+  if ((e->button()!=Qt::LeftButton)||!SelectionEnCours) { return;
+}
   mouseMoveEvent(e);
   SelectionEnCours=false;
-  if (OnClick) OnClick(this);
+  if (OnClick) { OnClick(this);
+}
  }
 //---------------------------------------------------------------------------
 void TStringGrid::wheelEvent(QWheelEvent *e)
@@ -507,23 +580,27 @@ void TStringGrid::wheelEvent(QWheelEvent *e)
   while(CumulMolette<=-120)
    {
     CumulMolette+=120;
-    if (LigCour<NbLignes-1) Deplace(ColCour, LigCour+1, true, true);
+    if (LigCour<NbLignes-1) { Deplace(ColCour, LigCour+1, true, true);
+}
    }
   while(CumulMolette>=120)
    {
     CumulMolette-=120;
-    if (LigCour>NbFixesL) Deplace(ColCour, LigCour-1, true, true);
+    if (LigCour>NbFixesL) { Deplace(ColCour, LigCour-1, true, true);
+}
    }
   e->accept();
  }
 //---------------------------------------------------------------------------
 void TStringGrid::keyPressEvent(QKeyEvent *e)
  { // TCustomGrid::KeyDown (sans goTabs ni goEditing)
-  bool Ctrl=e->modifiers()&Qt::ControlModifier, Maj=e->modifiers()&Qt::ShiftModifier;
+  bool Ctrl=e->modifiers().testFlag(Qt::ControlModifier), Maj=e->modifiers().testFlag(Qt::ShiftModifier);
 #if defined(Q_OS_MACOS)
-  Ctrl=Ctrl||(e->modifiers()&Qt::MetaModifier);
+  Ctrl=Ctrl||((e->modifiers()&Qt::MetaModifier) != 0u);
 #endif
-  int c=ColCour, r=LigCour, Page=qMax(1, verticalScrollBar()->pageStep());
+  int c=ColCour;
+  int r=LigCour;
+  int Page=qMax(1, verticalScrollBar()->pageStep());
   switch(e->key())
    {
     case Qt::Key_Up: if (Ctrl) { DefinitHautGauche(PremCol, PremLig-1); e->accept(); return; } r--; break;
@@ -532,13 +609,16 @@ void TStringGrid::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Right: c++; break;
     case Qt::Key_PageUp: r-=Page; break;
     case Qt::Key_PageDown: r+=Page; break;
-    case Qt::Key_Home: if (Ctrl) r=NbFixesL; c=NbFixesC; break;
-    case Qt::Key_End: if (Ctrl) r=NbLignes-1; c=NbColonnes-1; break;
+    case Qt::Key_Home: if (Ctrl) { r=NbFixesL; 
+}c=NbFixesC; break;
+    case Qt::Key_End: if (Ctrl) { r=NbLignes-1; 
+}c=NbColonnes-1; break;
     default: QAbstractScrollArea::keyPressEvent(e); return;
    }
   c=qBound(qMin(NbFixesC, NbColonnes-1), c, NbColonnes-1);
   r=qBound(qMin(NbFixesL, NbLignes-1), r, NbLignes-1);
-  if ((c!=ColCour)||(r!=LigCour)) Deplace(c, r, !Maj, true);
+  if ((c!=ColCour)||(r!=LigCour)) { Deplace(c, r, !Maj, true);
+}
   e->accept();
  }
 //---------------------------------------------------------------------------
