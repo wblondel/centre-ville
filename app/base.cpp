@@ -13,6 +13,7 @@
 #include <QTextStream>
 #include <QUrl>
 #include <QWidget>
+#include <array>
 #include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
@@ -26,21 +27,26 @@ constexpr int NBMAXBOUTONS = 3;
 constexpr int NBCONTEXTESAIDE = 57;
 //---------------------------------------------------------------------------
 // portage : MessageBoxW -> QMessageBox (mêmes icônes, boutons et bouton par défaut)
-const QMessageBox::Icon Style[NBTYPESMESSAGE] = {QMessageBox::Information, QMessageBox::Warning, QMessageBox::Critical,
-                                                 QMessageBox::Question, QMessageBox::Question};
-const int NbBoutons[NBTYPESMESSAGE] = {1, 1, 1, 2, 3}; // MB_OK, MB_OK, MB_OK, MB_YESNO, MB_YESNOCANCEL
-const int BoutonDefaut[NBTYPESMESSAGE][NBMAXBOUTONS] = {
-    {0, 0, 0}, // MB_DEFBUTTONn - 1
-    {0, 0, 0}, {0, 0, 0}, {0, 1, 0}, {0, 1, 2},
-};
+const std::array<QMessageBox::Icon, NBTYPESMESSAGE> Style = {QMessageBox::Information, QMessageBox::Warning,
+                                                             QMessageBox::Critical, QMessageBox::Question,
+                                                             QMessageBox::Question};
+const std::array<int, NBTYPESMESSAGE> NbBoutons = {1, 1, 1, 2, 3}; // MB_OK, MB_OK, MB_OK, MB_YESNO, MB_YESNOCANCEL
+const std::array<std::array<int, NBMAXBOUTONS>, NBTYPESMESSAGE> BoutonDefaut = {{
+    {0, 0, 0},
+    {0, 0, 0},
+    {0, 0, 0},
+    {0, 1, 0},
+    {0, 1, 2},
+}}; // MB_DEFBUTTONn - 1
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-const struct
+// v5.3 : aide type HLP converti en type HTML : correspondances TForm::HelpContext en URL "html\index.html#"
+struct ContexteAide
 {
     int Numero;
     const char *szHREF;
-} // v5.3 : aide type HLP converti en type HTML : correspondances TForm::HelpContext en URL "html\index.html#"
-caCorresp[NBCONTEXTESAIDE] = {
+};
+const std::array<ContexteAide, NBCONTEXTESAIDE> caCorresp = {{
     {.Numero = 0, .szHREF = "ASCV"},        {.Numero = 10, .szHREF = "BR"},
     {.Numero = 20, .szHREF = "EDLS"},       {.Numero = 30, .szHREF = "PDLI"},
     {.Numero = 31, .szHREF = "LMP"},        {.Numero = 3101, .szHREF = "LMF"},
@@ -70,7 +76,7 @@ caCorresp[NBCONTEXTESAIDE] = {
     {.Numero = 673, .szHREF = "ISUVDT"},    {.Numero = 674, .szHREF = "ISUVL"},
     {.Numero = 68, .szHREF = "ISUP"},       {.Numero = 69, .szHREF = "RC"},
     {.Numero = 70, .szHREF = "MDE"},
-};
+}};
 //---------------------------------------------------------------------------
 // v5.4 : Pour les fichiers créés par Centre-Ville
 //        on utilise le chemin donné par %LocalAppData% pour Windows 7 ou plus
@@ -217,7 +223,7 @@ type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTit
     // portage : QMessageBox ; OrdreBoutonEchap était déjà ignoré par MessageBoxW
     (void)OrdreBoutonEchap;
     QMessageBox Boite(Style[Type], Q(asTitre), Q(asMessage), QMessageBox::NoButton, FenetreParente());
-    QAbstractButton *Boutons[NBMAXBOUTONS] = {nullptr, nullptr, nullptr};
+    std::array<QAbstractButton *, NBMAXBOUTONS> Boutons = {nullptr, nullptr, nullptr};
     SansEchap Filtre;
     switch (NbBoutons[Type])
     {
@@ -260,19 +266,24 @@ type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTit
 int MessageDlg(const AnsiString &asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx)
 { // portage : Dialogs::MessageDlg (titres et libellés de la RTL en français)
     (void)HelpCtx;
-    const static char *Titres[] = {"Avertissement", "Erreur", "Information", "Confirmation", ""};
-    const static QMessageBox::Icon Icones[] = {
-        QMessageBox::Warning,  QMessageBox::Critical, QMessageBox::Information,
-        QMessageBox::Question, QMessageBox::NoIcon,
-    };
+    static const auto Titres =
+        std::to_array<const char *>({"Avertissement", "Erreur", "Information", "Confirmation", ""});
+    static const auto Icones = std::to_array<QMessageBox::Icon>({
+        QMessageBox::Warning,
+        QMessageBox::Critical,
+        QMessageBox::Information,
+        QMessageBox::Question,
+        QMessageBox::NoIcon,
+    });
     QMessageBox Boite(Icones[Type], QString::fromUtf8(Titres[Type]), Q(asMessage), QMessageBox::NoButton,
                       FenetreParente());
-    const struct
+    struct ElementCorrespondances
     {
         TMsgDlgBtn b;
         QMessageBox::StandardButton q;
         int mr;
-    } Correspondances[] = {
+    };
+    const auto Correspondances = std::to_array<ElementCorrespondances>({
         {.b = mbYes, .q = QMessageBox::Yes, .mr = mrYes},
         {.b = mbNo, .q = QMessageBox::No, .mr = mrNo},
         {.b = mbOK, .q = QMessageBox::Ok, .mr = mrOk},
@@ -285,7 +296,7 @@ int MessageDlg(const AnsiString &asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
         {.b = mbYesToAll, .q = QMessageBox::YesToAll, .mr = mrYesToAll},
         {.b = mbHelp, .q = QMessageBox::Help, .mr = mrNone},
         {.b = mbClose, .q = QMessageBox::Close, .mr = mrClose},
-    };
+    });
     for (const auto &c : Correspondances)
     {
         if (Boutons.Contains(c.b))

@@ -1269,11 +1269,11 @@ public:
     std::array<bool, NBMAXLIGNESBUSTRAM> LigneTram{}; // v3.5. Si Ligne[i] alors la ligne n°i+1 passe par cette case
                                                       // (visualisation par la fiche paramètres du réseau de tram
                                                       // UNIQUEMENT)
-    int NumVehicule{};                        // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
-    int NumVehlib{};                          // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
-    int NumBus{};                             // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
-    int NumTram{};                            // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
-    int NumParking{};                         // >0 si c'est un parking (=index+1 de cv->parking)
+    int NumVehicule{};                                // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
+    int NumVehlib{};                                  // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
+    int NumBus{};                                     // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
+    int NumTram{};                                    // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
+    int NumParking{};                                 // >0 si c'est un parking (=index+1 de cv->parking)
     int NumProchVeh{};                        // >0 si un véhicule doit passer sur la case lors du prochain mouvement
     int NumProchVL{};                         // >0 si un vehlib doit passer sur la case lors du prochain mouvement
     int NumProchBus{};                        // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement

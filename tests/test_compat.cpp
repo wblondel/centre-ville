@@ -2,6 +2,7 @@
 // test_compat.cpp - Tests de la couche engine/compat
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <array>
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
@@ -99,7 +100,7 @@ TEST_CASE("alea::Rand()/alea::Srand() : LCG de la RTL Borland", "[compat][alea]"
     // donne la suite Turbo C/Borland C++ (346, 130, 10982...) à partir du 2e tirage
     alea::Srand(1);
     CHECK(alea::Graine() == alea::GRAINE_INITIALE);
-    const int Attendu[10] = {130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
+    const std::array<int, 10> Attendu = {130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
     for (const int i : Attendu)
     {
         CHECK(alea::Rand() == i);
@@ -138,20 +139,20 @@ TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]
     const AnsiString asNom = FichierSortie("compat_fichier_é.bin");
     int h = FileCreate(asNom);
     REQUIRE(h > 0);
-    int Valeurs[3] = {1, -2, 0x530};
+    std::array<int, 3> Valeurs = {1, -2, 0x530};
     bool Booleen = true;
     signed char Octet = -3;
-    CHECK(FileWrite(h, Valeurs, sizeof(Valeurs)) == (int)sizeof(Valeurs));
+    CHECK(FileWrite(h, Valeurs.data(), sizeof(Valeurs)) == (int)sizeof(Valeurs));
     CHECK(FileWrite(h, &Booleen, sizeof(Booleen)) == 1);
     CHECK(FileWrite(h, &Octet, sizeof(Octet)) == 1);
     FileClose(h);
     h = FileOpen(asNom, fmOpenRead);
     REQUIRE(h > 0);
     CHECK(FileSeek(h, 0, 0) == 0);
-    int Lus[3] = {0, 0, 0};
+    std::array<int, 3> Lus = {0, 0, 0};
     bool BooleenLu = false;
     signed char OctetLu = 0;
-    CHECK(FileRead(h, Lus, sizeof(Lus)) == (int)sizeof(Lus));
+    CHECK(FileRead(h, Lus.data(), sizeof(Lus)) == (int)sizeof(Lus));
     CHECK(FileRead(h, &BooleenLu, sizeof(BooleenLu)) == 1);
     CHECK(FileRead(h, &OctetLu, sizeof(OctetLu)) == 1);
     CHECK(FileRead(h, &OctetLu, sizeof(OctetLu)) == 0); // fin de fichier : 0 (faux)
@@ -163,7 +164,7 @@ TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]
     CHECK(OctetLu == -3);
     // Fichier absent : -1, comme INVALID_HANDLE_VALUE
     CHECK(FileOpen(AnsiString(CV_DOSSIER_SORTIE) + "/absent/absent.cvw", fmOpenRead) == -1);
-    CHECK(FileRead(9999, Lus, 4) == -1);
+    CHECK(FileRead(9999, Lus.data(), 4) == -1);
 }
 //---------------------------------------------------------------------------
 TEST_CASE("TDateTime/Time() : chronométrage", "[compat][temps]")
@@ -218,8 +219,8 @@ TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écrit
     FileClose(h);
     h = FileOpen(asNom, fmOpenRead);
     REQUIRE(h > 0);
-    int Valeurs[2] = {0, 0};
-    CHECK(FileRead(h, Valeurs, 8) == 8);
+    std::array<int, 2> Valeurs = {0, 0};
+    CHECK(FileRead(h, Valeurs.data(), 8) == 8);
     CHECK(Valeurs[0] == Lu);
     CHECK(Valeurs[1] == -1);
     CHECK(FileSeek(h, 0, 2) == N);

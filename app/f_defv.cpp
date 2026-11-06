@@ -49,18 +49,18 @@ void TfrmDefVoie::DefinitFeu(direction Dir)
 void TfrmDefVoie::AppliqueChoix()
 {
     const AnsiString asMsg;
-    TRadioGroup *RadioGroupPriorite[NBDIR] = {
+    std::array<TRadioGroup *, NBDIR> RadioGroupPriorite = {
         RadioGroupPrioriteNord,
         RadioGroupPrioriteEst,
         RadioGroupPrioriteSud,
         RadioGroupPrioriteOuest,
     };
-    TBitBtn *BitBtnDefFeu[NBDIR] = {
-        BitBtnDefFeuN, // v3.8.3
+    std::array<TBitBtn *, NBDIR> BitBtnDefFeu = {
+        BitBtnDefFeuN,
         BitBtnDefFeuE,
         BitBtnDefFeuS,
         BitBtnDefFeuO,
-    };
+    }; // v3.8.3
     frmSimulation->SimulationModifiee = true;
     // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeux)
     for (int d = nord; d <= ouest; d++) // v3.8.3
@@ -208,7 +208,7 @@ void TfrmDefVoie::RafraichitInfos()
         return;
     }
     const bool VoiesTramEtRoutes = (v->SensVoieTram != 0) && (v->DirPoss != 0);
-    const bool VoieTram[NBDIR] = {
+    const std::array<bool, NBDIR> VoieTram = {
         v->EstDirPossSensVoieTram(indefinie, nord),
         v->EstDirPossSensVoieTram(indefinie, est),
         v->EstDirPossSensVoieTram(indefinie, sud),

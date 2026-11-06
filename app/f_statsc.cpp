@@ -1,4 +1,5 @@
 //---------------------------------------------------------------------------
+#include <array>
 #include "compat/chaine.h"
 #include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
@@ -44,18 +45,18 @@ void TfrmStatsComposition::FormShow(TObject * /*Sender*/)
     int Total = 0;
     int Routes = 0;
     int VoiesTram = 0;
-    int Priorites[2] = {0, 0}; // v3.5
+    std::array<int, 2> Priorites = {0, 0}; // v3.5
     int Parkings = 0;
     int CasesArretsBus = 0;
-    int ArretsBus = 0;       // v3.0
-    int CasesArretsTram = 0; // v3.0
-    int ArretsTram = 0;      // v3.5
-    int PlacesTaxi = 0;      // v3.5
-    int PlacesPark = 0;      // v3.6
-    int Feux[2] = {0, 0};    // v5.0
-    int Clp[2] = {0, 0};     // v3.5
-    int Stops[2] = {0, 0};   // v3.5
-    int Dir = 0;             // v3.5
+    int ArretsBus = 0;                 // v3.0
+    int CasesArretsTram = 0;           // v3.0
+    int ArretsTram = 0;                // v3.5
+    int PlacesTaxi = 0;                // v3.5
+    int PlacesPark = 0;                // v3.6
+    std::array<int, 2> Feux = {0, 0};  // v5.0
+    std::array<int, 2> Clp = {0, 0};   // v3.5
+    std::array<int, 2> Stops = {0, 0}; // v3.5
+    int Dir = 0;                       // v3.5
     int Nord = 0;
     int Est = 0;
     int Sud = 0;

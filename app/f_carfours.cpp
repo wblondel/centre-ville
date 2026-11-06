@@ -1,4 +1,5 @@
 //---------------------------------------------------------------------------
+#include <array>
 #include "compat/chaine.h"
 #include "controles.h"
 #include "vcl.h"
@@ -15,48 +16,45 @@
 //---------------------------------------------------------------------------
 TfrmCarrefours *frmCarrefours;
 //---------------------------------------------------------------------------
-const dirposs DirPossC4x4[4][4] =
-    {
-        {aucune, O, E, aucune},
-        {S, SO, SE, S},
-        {N, NO, NE, N},
-        {aucune, O, E, aucune},
-    },
-              DirPossC6x6[2][6][6] =
-                  {
-                      {
-                          {aucune, aucune, O, E, aucune, aucune},
-                          {aucune, S, SO, S, E, aucune},
-                          {S, O, aucune, aucune, SE, S},
-                          {N, NO, aucune, aucune, E, N},
-                          {aucune, O, N, NE, N, aucune},
-                          {aucune, aucune, O, E, aucune, aucune},
-                      },
-                      {
-                          {aucune, aucune, O, E, aucune, aucune},
-                          {aucune, S, SO, SE, E, aucune},
-                          {S, SO, SO, SE, SE, S},
-                          {N, NO, NO, NE, NE, N},
-                          {aucune, O, NO, NE, N, aucune},
-                          {aucune, aucune, O, E, aucune, aucune},
-                      },
-                  },
-              DirPossC8x8[8][8] =
-                  {
-                      {aucune, aucune, aucune, O, E, aucune, aucune, aucune},
-                      {aucune, S, S, SO, SE, SE, E, aucune},
-                      {aucune, SO, SO, SO, S, SE, E, aucune},
-                      {S, SO, O, aucune, aucune, SE, SE, S},
-                      {N, NO, NO, aucune, aucune, E, NE, N},
-                      {aucune, O, NO, N, NE, NE, NE, aucune},
-                      {aucune, O, NO, NO, NE, N, N, aucune},
-                      {aucune, aucune, aucune, O, E, aucune, aucune, aucune},
-                  },
-              DirPossC3x4[3][4] = {
-                  {O, SO, O, O},
-                  {E, SE, NE, E},
-                  {aucune, S, N, aucune},
-              };
+const std::array<std::array<dirposs, 4>, 4> DirPossC4x4 = {{
+    {aucune, O, E, aucune},
+    {S, SO, SE, S},
+    {N, NO, NE, N},
+    {aucune, O, E, aucune},
+}};
+const std::array<std::array<std::array<dirposs, 6>, 6>, 2> DirPossC6x6 = {{
+    {{
+        {aucune, aucune, O, E, aucune, aucune},
+        {aucune, S, SO, S, E, aucune},
+        {S, O, aucune, aucune, SE, S},
+        {N, NO, aucune, aucune, E, N},
+        {aucune, O, N, NE, N, aucune},
+        {aucune, aucune, O, E, aucune, aucune},
+    }},
+    {{
+        {aucune, aucune, O, E, aucune, aucune},
+        {aucune, S, SO, SE, E, aucune},
+        {S, SO, SO, SE, SE, S},
+        {N, NO, NO, NE, NE, N},
+        {aucune, O, NO, NE, N, aucune},
+        {aucune, aucune, O, E, aucune, aucune},
+    }},
+}};
+const std::array<std::array<dirposs, 8>, 8> DirPossC8x8 = {{
+    {aucune, aucune, aucune, O, E, aucune, aucune, aucune},
+    {aucune, S, S, SO, SE, SE, E, aucune},
+    {aucune, SO, SO, SO, S, SE, E, aucune},
+    {S, SO, O, aucune, aucune, SE, SE, S},
+    {N, NO, NO, aucune, aucune, E, NE, N},
+    {aucune, O, NO, N, NE, NE, NE, aucune},
+    {aucune, O, NO, NO, NE, N, N, aucune},
+    {aucune, aucune, aucune, O, E, aucune, aucune, aucune},
+}};
+const std::array<std::array<dirposs, 4>, 3> DirPossC3x4 = {{
+    {O, SO, O, O},
+    {E, SE, NE, E},
+    {aucune, S, N, aucune},
+}};
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 int Carrefours(int Colonnes, int Lignes)
@@ -135,7 +133,7 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
     const int Dimensions = mrRep / 100;
     const int Orientation = (mrRep % 100) / 10;
     const int Type = mrRep % 10;
-    int NumFeux[4];
+    std::array<int, 4> NumFeux{};
     if ((Dimensions < 44) && (Type > 1))
     {
         while (cv->NbFeuxLibres() < 3)

@@ -145,8 +145,8 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
         }
         e.Entier("NbPlacesVehlib", NbPlacesVehlib);
         e.Entier("NbVehlibs", NbVehlibs);
-        const char *Parametres[] = {"DureeVert",     "DureeOrange",       "DureeRouge",
-                                    "AttenteMaxVeh", "NbToursParSeconde", "NbToursStats"};
+        const auto Parametres = std::to_array<const char *>(
+            {"DureeVert", "DureeOrange", "DureeRouge", "AttenteMaxVeh", "NbToursParSeconde", "NbToursStats"});
         for (const char *p : Parametres)
         {
             e.Entier(p, l.Entier());
@@ -156,40 +156,51 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
         e.Entier("NbVitesses", l.Entier());
         e.Entier("NbMaxCasesDetectPsgPt", l.Entier());
         e.Entier("ProbaDirPsgPt", l.Entier());
-        const char *ParamBus[] = {
-            "NbMaxCasesDetectArretBus", "ProbaDirArretBus",    "ProbaArretBusDmd",
-            "NbMaxPersonnesBus",        "NbToursStopArretBus", "NbMaxToursAttenteBus",
-        };
+        const auto ParamBus = std::to_array<const char *>({
+            "NbMaxCasesDetectArretBus",
+            "ProbaDirArretBus",
+            "ProbaArretBusDmd",
+            "NbMaxPersonnesBus",
+            "NbToursStopArretBus",
+            "NbMaxToursAttenteBus",
+        });
         for (const char *p : ParamBus)
         {
             e.Entier(p, l.Entier());
         }
         // Valeurs par défaut du constructeur de centre_ville pour les champs absents
-        const char *ParamTram[] = {
-            "NbMaxCasesDetectArretTram", "ProbaDirArretTram",    "ProbaArretTramDmd",
-            "NbMaxPersonnesTram",        "NbToursStopArretTram", "NbMaxToursAttenteTram",
-        };
-        const int DefautTram[] = {3, 50, 10, 100, 3, 25};
+        const auto ParamTram = std::to_array<const char *>({
+            "NbMaxCasesDetectArretTram",
+            "ProbaDirArretTram",
+            "ProbaArretTramDmd",
+            "NbMaxPersonnesTram",
+            "NbToursStopArretTram",
+            "NbMaxToursAttenteTram",
+        });
+        const auto DefautTram = std::to_array<int>({3, 50, 10, 100, 3, 25});
         for (int i = 0; i < 6; i++)
         {
             e.Entier(ParamTram[i], (v >= 0x350) ? l.Entier() : DefautTram[i]);
         }
-        const char *ParamTaxi[] = {
-            "NbMaxCasesDetectFileTaxi", "ProbaDirFileTaxi",      "ProbaArretTaxiDmd",
-            "NbMaxPersonnesTaxi",       "NbMaxToursAttenteTaxi",
-        };
-        const int DefautTaxi[] = {3, 50, 10, 3, 25};
+        const auto ParamTaxi = std::to_array<const char *>({
+            "NbMaxCasesDetectFileTaxi",
+            "ProbaDirFileTaxi",
+            "ProbaArretTaxiDmd",
+            "NbMaxPersonnesTaxi",
+            "NbMaxToursAttenteTaxi",
+        });
+        const auto DefautTaxi = std::to_array<int>({3, 50, 10, 3, 25});
         for (int i = 0; i < 5; i++)
         {
             e.Entier(ParamTaxi[i], (v >= 0x360) ? l.Entier() : DefautTaxi[i]);
         }
-        const char *ParamVehlib[] = {
+        const auto ParamVehlib = std::to_array<const char *>({
             "NbMaxPersonnesVehlib",
             "NbMaxCasesDetectFileVehlib",
             "ProbaDirFileVehlib",
             "TauxRemplissageVehlib",
-        };
-        const int DefautVehlib[] = {3, 3, 50, 80};
+        });
+        const auto DefautVehlib = std::to_array<int>({3, 3, 50, 80});
         for (int i = 0; i < 4; i++)
         {
             e.Entier(ParamVehlib[i], (v >= 0x530) ? l.Entier() : DefautVehlib[i]);
@@ -334,8 +345,8 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
             }
         }
         // --- Places de taxi (v3.6), de parking (v5.0), de vehlib (v5.3)
-        const char *Places[] = {"place_taxi", "place_park", "place_vehlib"};
-        const int NbPlaces[] = {NbPlacesTaxi, NbPlacesPark, NbPlacesVehlib};
+        const auto Places = std::to_array<const char *>({"place_taxi", "place_park", "place_vehlib"});
+        const auto NbPlaces = std::to_array<int>({NbPlacesTaxi, NbPlacesPark, NbPlacesVehlib});
         for (int t = 0; t < 3; t++)
         {
             for (int p = 1; p <= NbPlaces[t]; p++)

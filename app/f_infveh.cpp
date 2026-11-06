@@ -25,7 +25,7 @@ constexpr std::array<const char *, NBNIVEAUXPRIORITE> asNiveauPriorite = {"Norma
 constexpr std::array<const char *, 2> asDepartArrivee = {"de départ", "d'arrivée"};           // v5.0
 constexpr std::array<const char *, 2> asFrmFileParking = {"Parking %s :", "File Parking %s"}; // v5.0
 //---------------------------------------------------------------------------
-const TColor CouleurNiveauPriorite[NBNIVEAUXPRIORITE] = {clBlack, clRed, clBlue};
+const std::array<TColor, NBNIVEAUXPRIORITE> CouleurNiveauPriorite = {clBlack, clRed, clBlue};
 //---------------------------------------------------------------------------
 TfrmInfosVehicule::TfrmInfosVehicule(TComponent *Owner) : TForm(Owner)
 {

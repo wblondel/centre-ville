@@ -9,6 +9,7 @@
 #include "simul.h"
 #include "f_statsat.h"
 
+#include <array>
 #include <algorithm>
 #include "f_simul.h"
 //---------------------------------------------------------------------------
@@ -128,7 +129,7 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
     int x = 0;
     int y = 0;
     int n = 0;
-    int t[2] = {0, 0};
+    std::array<int, 2> t = {0, 0};
     const int ed = CheckBoxParkingDepart->Checked ? CSpinEditParkingDepart->Value : 0;
     const int ea = CheckBoxParkingArrivee->Checked ? CSpinEditParkingArrivee->Value : 0;
     if ((ed < 0) || (ed > cv->NbParkings) || (ea < 0) || (ea > cv->NbParkings))

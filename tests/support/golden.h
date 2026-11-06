@@ -26,11 +26,11 @@ struct config_golden
 //---------------------------------------------------------------------------
 const unsigned GRAINE_GOLDEN = 12345;
 const int NB_TOURS_GOLDEN = 500;
-const config_golden ConfigsGolden[] = {
+const auto ConfigsGolden = std::to_array<config_golden>({
     {.Nom = "standard", .Sanglante = false, .Epidemie = false, .TourResurrection = 0},
-    {.Nom = "epidemie", .Sanglante = true, .Epidemie = true, .TourResurrection = 250}, // épidémie + mode sanglant +
-                                                                                       // résurrection
-};
+    {.Nom = "epidemie", .Sanglante = true, .Epidemie = true, .TourResurrection = 250},
+
+}); // épidémie + mode sanglant + résurrection
 const int NB_CONFIGS_GOLDEN = sizeof(ConfigsGolden) / sizeof(ConfigsGolden[0]);
 //---------------------------------------------------------------------------
 std::string ProduitGolden(const std::string &asCheminCarte, const std::string &asNomCarte, const config_golden &Config);
@@ -47,11 +47,11 @@ struct config_generation
     unsigned Graine;
     int NbX, NbY;
 };
-const config_generation ConfigsGeneration[] = {
+const auto ConfigsGeneration = std::to_array<config_generation>({
     {.Nom = "defaut_1", .Graine = 1, .NbX = NBXDEF, .NbY = NBYDEF},
     {.Nom = "defaut_12345", .Graine = 12345, .NbX = NBXDEF, .NbY = NBYDEF},
     {.Nom = "petit_777", .Graine = 777, .NbX = 40, .NbY = 30},
-};
+});
 const int NB_CONFIGS_GENERATION = sizeof(ConfigsGeneration) / sizeof(ConfigsGeneration[0]);
 std::string ProduitGoldenGeneration(const config_generation &Config, const std::string &asFichierCvw);
 //---------------------------------------------------------------------------

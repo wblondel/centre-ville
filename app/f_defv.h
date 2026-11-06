@@ -2,6 +2,7 @@
 #ifndef f_defvH
 #define f_defvH
 //---------------------------------------------------------------------------
+#include <array>
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
 #include "base.h"      // portage
 // #include <Buttons.hpp> // portage
@@ -43,7 +44,7 @@ public:
 private:
     voie *v{}; // Déclarations de l'utilisateur
     int x{}, y{};
-    TBitBtn *BitBtn[NBDIR]{}; // v5.2
+    std::array<TBitBtn *, NBDIR> BitBtn{}; // v5.2
     void DefinitFeu(direction Dir);
 
 public: // Déclarations de l'utilisateur

@@ -2,6 +2,7 @@
 // harnais.cpp - Tests du moteur : pilotage de la simulation sans interface
 //---------------------------------------------------------------------------
 #include "harnais.h"
+#include <array>
 #include <cstdio>
 #include "compat/chaine.h"
 #include <string>
@@ -485,11 +486,11 @@ std::string harnais::LitFichier(const std::string &asNomFichier)
     {
         return Contenu;
     }
-    char Tampon[65536];
+    std::array<char, 65536> Tampon{};
     int n = 0;
-    while ((n = FileRead(hfile, Tampon, sizeof(Tampon))) > 0)
+    while ((n = FileRead(hfile, Tampon.data(), sizeof(Tampon))) > 0)
     {
-        Contenu.append(Tampon, static_cast<std::size_t>(n));
+        Contenu.append(Tampon.data(), static_cast<std::size_t>(n));
     }
     FileClose(hfile);
     return Contenu;

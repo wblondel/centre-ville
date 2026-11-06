@@ -12,7 +12,7 @@ struct carte
     const char *Nom;     // nom ASCII (fichiers de référence)
 };
 //---------------------------------------------------------------------------
-const carte Cartes[] = {
+const auto Cartes = std::to_array<carte>({
     {.Fichier = "8x8.cvw", .Nom = "8x8"},
     {.Fichier = "Carfours.cvw", .Nom = "Carfours"},
     {.Fichier = "Colimasson.cvw", .Nom = "Colimasson"},
@@ -21,16 +21,16 @@ const carte Cartes[] = {
                 "ant.cvw",
      .Nom = "Geant"},
     {.Fichier = "Spaghettis.cvw", .Nom = "Spaghettis"},
-};
+});
 const int NB_CARTES = sizeof(Cartes) / sizeof(Cartes[0]);
 //---------------------------------------------------------------------------
 // Cartes du tutoriel (docs/tutorial, identiques à celles de l'installeur) :
 // vérifiées par le round-trip seulement
-const carte CartesTutoriel[] = {
+const auto CartesTutoriel = std::to_array<carte>({
     {.Fichier = "tutocv.cvw", .Nom = "tutocv"},
     {.Fichier = "tutocvdeco.cvw", .Nom = "tutocvdeco"},
     {.Fichier = "tutocvptn.cvw", .Nom = "tutocvptn"},
-};
+});
 //---------------------------------------------------------------------------
 #ifdef CV_DOSSIER_CARTES
 inline std::string CheminCarte(const carte &c)

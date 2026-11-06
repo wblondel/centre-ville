@@ -19,12 +19,12 @@ QPixmap AgranditSansLissage(const QPixmap &Image, qreal Echelle)
     return p;
 }
 //---------------------------------------------------------------------------
-TVirtualImageList::TVirtualImageList(const char *const *Ressources, int NbImages, QObject *Parent) : QObject(Parent)
+TVirtualImageList::TVirtualImageList(std::span<const char *const> Ressources, QObject *Parent) : QObject(Parent)
 {
-    Images.reserve(static_cast<std::size_t>(NbImages));
-    for (int i = 0; i < NbImages; i++)
+    Images.reserve(Ressources.size());
+    for (const char *r : Ressources)
     {
-        Images.emplace_back(QString::fromUtf8(Ressources[i]));
+        Images.emplace_back(QString::fromUtf8(r));
     }
     if (!Images.empty())
     {

@@ -2,6 +2,7 @@
 // test_cvw.cpp - Format .cvw : round-trip Charge -> Sauve et Verifie()
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <array>
 #include <cstddef>
 #include <ios>
 #include <stdexcept>
@@ -289,8 +290,8 @@ TEST_CASE("Chargement : parkings indéfinis retirés et renumérotés (v5.1)", "
     const conversion_cvw Ref = ConvertitEn530(asCarte);
     REQUIRE(Ref.Ok);
     REQUIRE(LitEntier(asCarte, Champ(Ref, "NbParkings")) == 4);
-    int x[5];
-    int y[5];
+    std::array<int, 5> x{};
+    std::array<int, 5> y{};
     for (int p = 1; p <= 4; p++)
     {
         x[p] = LitEntier(asCarte, Champ(Ref, "parking" + std::to_string(p) + ".x"));
@@ -303,7 +304,7 @@ TEST_CASE("Chargement : parkings indéfinis retirés et renumérotés (v5.1)", "
     EcritFichier(asIndefini, asCarte);
     REQUIRE(harnais::Ouvre(asIndefini));
     REQUIRE(cv->NbParkings == 3);
-    const int Ancien[4] = {0, 1, 3, 4}; // nouveau n° -> ancien n°
+    const std::array<int, 4> Ancien = {0, 1, 3, 4}; // nouveau n° -> ancien n°
     for (int p = 1; p <= 3; p++)
     {
         CHECK(cv->Parking[p - 1].x == x[Ancien[p]]);

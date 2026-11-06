@@ -3,6 +3,7 @@
 #define f_simulH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL (ActnList, ComCtrls, Menus...)
+#include <array>
 #include <cmath>
 #include "grille/GrilleSimulation.h" // portage : TDrawGrid
 #include "vue.h"                     // portage : IVueSimulation
@@ -723,8 +724,8 @@ public:
 //---------------------------------------------------------------------------
 extern TfrmSimulation *frmSimulation; // portage : PACKAGE
 // v3.5 : Ajout de Tram aux constantes de Couleur
-extern TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM];
-extern TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM];
+extern std::array<TColor, NBMAXLIGNESBUSTRAM> CoulLigneBusTram;
+extern std::array<TColor, NBMAXLIGNESBUSTRAM> CoulTLigneBusTram;
 inline constexpr const char *asMemInsuff = "Mémoire insuffisante !";
 inline constexpr const char *asErrInattendue = "Erreur inattendue";
 inline constexpr const char *asFormatCoord = "(%d, %d)";

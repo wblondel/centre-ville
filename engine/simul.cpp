@@ -1283,7 +1283,7 @@ void vehicule::CalculeProchaineDirection()
     voie *Voie = nullptr;
     const direction AncDir = Dir;                    // v2.2.4
     const bool Prioritaire = (NivPriorite > normal); // v3.5 (pour DistParking)
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -1399,7 +1399,7 @@ direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOI
 {
     voie *v = &cv->Voisine(x, y, Dir);               // Ici v est la prochaine case
     const bool Prioritaire = (NivPriorite > normal); // v3.5 (pour DistParking)
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -1588,7 +1588,7 @@ void vehlib::CalculeProchaineDirection()
     voie *v = &cv->v[x][y];
     voie *Voie = nullptr;
     const direction AncDir = Dir; // v2.2.4
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -1673,7 +1673,7 @@ void vehlib::CalculeProchaineDirection()
 direction vehlib::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
 {
     voie *v = &cv->Voisine(x, y, Dir); // Ici v est la prochaine case
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -1923,7 +1923,7 @@ void bus::CalculeProchaineDirection() // v3.0
     voie *v = &cv->v[x][y];
     voie *Voie = nullptr;
     const direction AncDir = Dir;
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -1995,7 +1995,7 @@ void bus::CalculeProchaineDirection() // v3.0
 direction bus::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
 {
     voie *v = &cv->Voisine(x, y, Dir); // Ici v est la prochaine case
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -2278,7 +2278,7 @@ void tram::CalculeProchaineDirection() // v3.5
     voie *v = &cv->v[x][y];
     voie *Voie = nullptr;
     const direction AncDir = DirDrnDepl;
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int d = 0;
     int i = 0;
     int j = 0;
@@ -2353,7 +2353,7 @@ void tram::CalculeProchaineDirection() // v3.5
 direction tram::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE. v3.0
 {
     voie *v = &cv->Voisine(x, y, Dir); // Ici v est la prochaine case
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int d = 0;
     int i = 0;
     int j = 0;
@@ -2705,7 +2705,7 @@ void taxi::CalculeProchaineDirection()
     voie *v = &cv->v[x][y];
     voie *Voie = nullptr;
     const direction AncDir = Dir; // v2.2.4
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -2796,7 +2796,7 @@ void taxi::CalculeProchaineDirection()
 direction taxi::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
 {
     voie *v = &cv->Voisine(x, y, Dir); // Ici v est la prochaine case
-    int OrdreDir[NBDIR] = {0, 0, 0, 0};
+    std::array<int, NBDIR> OrdreDir = {0, 0, 0, 0};
     int i = 0;
     int j = 0;
     const int ndp = NbDir[v->DirPoss];
@@ -3146,11 +3146,11 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
     int d = 0;
     int MaxNivP = 0;
     int NumVV = 0;
-    int NumLV = 0;                        // NUMéro du Véhicule Voisin. v3.0
-    int NumBV = 0;                        // NUMéro du vehLib Voisin. v5.3
-    int NumTV = 0;                        // NUMéro du Bus Voisin. v3.0
-    int NumXV = 0;                        // NUMéro du Tram Voisin. v3.5
-    int NivPriorite[5] = {0, 0, 0, 0, 0}; // NUMéro du taXi Voisin. v3.6
+    int NumLV = 0;                                    // NUMéro du Véhicule Voisin. v3.0
+    int NumBV = 0;                                    // NUMéro du vehLib Voisin. v5.3
+    int NumTV = 0;                                    // NUMéro du Bus Voisin. v3.0
+    int NumXV = 0;                                    // NUMéro du Tram Voisin. v3.5
+    std::array<int, 5> NivPriorite = {0, 0, 0, 0, 0}; // NUMéro du taXi Voisin. v3.6
     direction DirCrt{};
     direction DirAuCarrefour{};
     voie *v = nullptr;
@@ -3618,7 +3618,8 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
     int dd = 0;
     int n = 0;
     int NbPietonsDehors = 0;
-    int NumPietonDehors[NBMAXPIETONSPARCASE] = {0, 0}; // v5.4.1 : pour savoir si l'on peut effectuer la contamination
+    std::array<int, NBMAXPIETONSPARCASE> NumPietonDehors = {0, 0}; // v5.4.1 : pour savoir si l'on peut effectuer la
+                                                                   // contamination
     pieton *p = nullptr;
     pieton *pv = nullptr;
     direction NvDir{};
@@ -5850,8 +5851,9 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
     bool Trv = false;
     int i = 0;
     int d = 0;
-    int Dist[2] = {0, 0};
-    const direction Dir[2] = {static_cast<direction>(3 - SensRecherche), static_cast<direction>(5 - SensRecherche)};
+    std::array<int, 2> Dist = {0, 0};
+    const std::array<direction, 2> Dir = {static_cast<direction>(3 - SensRecherche),
+                                          static_cast<direction>(5 - SensRecherche)};
     if ((NbMaxCasesDetectPsgPt == 0) || // NbMaxCasesDetectPsgPt et
         (SensRecherche == 0))
     {                     // SensRecherche
@@ -5895,8 +5897,9 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
     bool Trv = false;
     int i = 0;
     int d = 0;
-    int Dist[2] = {0, 0};
-    const direction Dir[2] = {static_cast<direction>(3 - SensRecherche), static_cast<direction>(5 - SensRecherche)};
+    std::array<int, 2> Dist = {0, 0};
+    const std::array<direction, 2> Dir = {static_cast<direction>(3 - SensRecherche),
+                                          static_cast<direction>(5 - SensRecherche)};
     if ((NbMaxCasesDetectArretBus == 0) || // NbMaxCasesDetectArretBus et
         (SensRecherche == 0))
     {                     // SensRecherche
@@ -5944,8 +5947,9 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
     bool Trv = false;
     int i = 0;
     int d = 0;
-    int Dist[2] = {0, 0};
-    const direction Dir[2] = {static_cast<direction>(3 - SensRecherche), static_cast<direction>(5 - SensRecherche)};
+    std::array<int, 2> Dist = {0, 0};
+    const std::array<direction, 2> Dir = {static_cast<direction>(3 - SensRecherche),
+                                          static_cast<direction>(5 - SensRecherche)};
     if ((NbMaxCasesDetectArretTram == 0) || // NbMaxCasesDetectArretTram et
         (SensRecherche == 0))
     {                     // SensRecherche
@@ -5993,8 +5997,9 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
     bool Trv = false;
     int i = 0;
     int d = 0;
-    int Dist[2] = {0, 0};
-    const direction Dir[2] = {static_cast<direction>(3 - SensRecherche), static_cast<direction>(5 - SensRecherche)};
+    std::array<int, 2> Dist = {0, 0};
+    const std::array<direction, 2> Dir = {static_cast<direction>(3 - SensRecherche),
+                                          static_cast<direction>(5 - SensRecherche)};
     if ((NbMaxCasesDetectFileTaxi == 0) || // NbMaxCasesDetectFileTaxi et
         (SensRecherche == 0))
     {                     // SensRecherche
@@ -6042,8 +6047,9 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) // 
     bool Trv = false;
     int i = 0;
     int d = 0;
-    int Dist[2] = {0, 0};
-    const direction Dir[2] = {static_cast<direction>(3 - SensRecherche), static_cast<direction>(5 - SensRecherche)};
+    std::array<int, 2> Dist = {0, 0};
+    const std::array<direction, 2> Dir = {static_cast<direction>(3 - SensRecherche),
+                                          static_cast<direction>(5 - SensRecherche)};
     if ((NbMaxCasesDetectFileVehlib == 0) || // NbMaxCasesDetectFileVehlib et
         (SensRecherche == 0))
     {                     // SensRecherche
@@ -8270,7 +8276,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
 {                                              // ATTENTION : d peut changer à l'intérieur de Genere(...)
     int k = 0;
     bool Ok = true;
-    bool DejaFait[NBDIR + 1] = {false, false, false, false, false};
+    std::array<bool, NBDIR + 1> DejaFait = {false, false, false, false, false};
     bool AutreDirection = false;
     do
     { /* LE CODE EN COMMENTAIRE sert pour le débogage

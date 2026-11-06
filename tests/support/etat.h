@@ -15,6 +15,7 @@
 #ifndef etatH
 #define etatH
 //---------------------------------------------------------------------------
+#include <array>
 #include <cstdint>
 #include <string>
 #include "simul.h"
@@ -80,7 +81,7 @@ enum partie_etat {
     peDistances, // statique après CalculeDistances : hors état « complet »
     NB_PARTIES_ETAT,
 };
-const extern char *NomPartieEtat[NB_PARTIES_ETAT];
+extern const std::array<const char *, NB_PARTIES_ETAT> NomPartieEtat;
 //---------------------------------------------------------------------------
 class ExportEtat // ami de la classe infection (champs privés)
 {

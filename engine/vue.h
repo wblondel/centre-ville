@@ -14,6 +14,7 @@
 #ifndef vueH
 #define vueH
 //---------------------------------------------------------------------------
+#include <array>
 #include <vector>
 #include "compat/chaine.h"
 //---------------------------------------------------------------------------
@@ -107,7 +108,7 @@ public:
     type_reponse Reponse = trOk; // Réponse renvoyée par AfficheMessage
     long long NbRedessins = 0;
     std::vector<message> Messages;
-    AnsiString asStatut[4];
+    std::array<AnsiString, 4> asStatut{};
     void RedessineCase(int /*x*/, int /*y*/, bool /*EffaceFond*/) override { NbRedessins++; }
     [[nodiscard]] bool SimulationSanglante() const override { return Sanglante; }
     [[nodiscard]] bool EpidemieActivee() const override { return Epidemie; }

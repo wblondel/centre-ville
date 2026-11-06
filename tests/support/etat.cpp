@@ -2,13 +2,14 @@
 // etat.cpp - Tests du moteur : export de l'état complet de la simulation
 //---------------------------------------------------------------------------
 #include "etat.h"
+#include <array>
 #include <format>
 #include <cstdint>
 #include <string>
 #include "compat/alea.h"
 #include "simul.h"
 //---------------------------------------------------------------------------
-const char *NomPartieEtat[NB_PARTIES_ETAT] = {
+const std::array<const char *, NB_PARTIES_ETAT> NomPartieEtat = {
     "centre", "feux",   "feuxp",   "parkings", "vehicules", "bus",       "trams",
     "taxis",  "places", "vehlibs", "pietons",  "cases",     "distances",
 };

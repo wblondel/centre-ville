@@ -9,8 +9,10 @@
 #include <cstring>
 #include "actions.h"
 #include "controles.h"
+#include <array>
 #include <functional>
 #include <map>
+#include <span>
 #include <vector>
 #include "index_images.h"
 #include "listeimages.h"
@@ -22,39 +24,17 @@ namespace
 struct ListeIndexee
 {
     const char *Fiche, *Nom;
-    const char *const *Ressources;
-    int Nombre;
+    std::span<const char *const> Ressources;
 };
-const ListeIndexee ListesIndexees[] = {
-    {.Fiche = "f_carfours",
-     .Nom = "VirtualImageList64",
-     .Ressources = f_carfours_VirtualImageList64,
-     .Nombre = NB_F_CARFOURS_VirtualImageList64},
-    {.Fiche = "f_carfours",
-     .Nom = "VirtualImageList96",
-     .Ressources = f_carfours_VirtualImageList96,
-     .Nombre = NB_F_CARFOURS_VirtualImageList96},
-    {.Fiche = "f_carfours",
-     .Nom = "VirtualImageList128",
-     .Ressources = f_carfours_VirtualImageList128,
-     .Nombre = NB_F_CARFOURS_VirtualImageList128},
-    {.Fiche = "f_propos",
-     .Nom = "VirtualImageList",
-     .Ressources = f_propos_VirtualImageList,
-     .Nombre = NB_F_PROPOS_VirtualImageList},
-    {.Fiche = "f_simul",
-     .Nom = "VirtualImageList16x16",
-     .Ressources = f_simul_VirtualImageList16x16,
-     .Nombre = NB_F_SIMUL_VirtualImageList16x16},
-    {.Fiche = "f_simul",
-     .Nom = "VirtualImageList8x8",
-     .Ressources = f_simul_VirtualImageList8x8,
-     .Nombre = NB_F_SIMUL_VirtualImageList8x8},
-    {.Fiche = "f_simul",
-     .Nom = "VirtualImageListGlyphes",
-     .Ressources = f_simul_VirtualImageListGlyphes,
-     .Nombre = NB_F_SIMUL_VirtualImageListGlyphes},
-};
+const auto ListesIndexees = std::to_array<ListeIndexee>({
+    {.Fiche = "f_carfours", .Nom = "VirtualImageList64", .Ressources = f_carfours_VirtualImageList64},
+    {.Fiche = "f_carfours", .Nom = "VirtualImageList96", .Ressources = f_carfours_VirtualImageList96},
+    {.Fiche = "f_carfours", .Nom = "VirtualImageList128", .Ressources = f_carfours_VirtualImageList128},
+    {.Fiche = "f_propos", .Nom = "VirtualImageList", .Ressources = f_propos_VirtualImageList},
+    {.Fiche = "f_simul", .Nom = "VirtualImageList16x16", .Ressources = f_simul_VirtualImageList16x16},
+    {.Fiche = "f_simul", .Nom = "VirtualImageList8x8", .Ressources = f_simul_VirtualImageList8x8},
+    {.Fiche = "f_simul", .Nom = "VirtualImageListGlyphes", .Ressources = f_simul_VirtualImageListGlyphes},
+});
 } // namespace
 //---------------------------------------------------------------------------
 // Align (alTop, alBottom, alLeft, alRight, alClient) : placement des contrôles
@@ -65,7 +45,7 @@ namespace
 void Aligne(QWidget *Parent)
 {
     QRect r = Parent->contentsRect();
-    const char *Ordre[] = {"alTop", "alBottom", "alLeft", "alRight", "alClient"};
+    const auto Ordre = std::to_array<const char *>({"alTop", "alBottom", "alLeft", "alRight", "alClient"});
     for (const char *a : Ordre)
     {
         for (QObject *o : Parent->children())
@@ -201,7 +181,7 @@ QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
         {
             if ((std::strcmp(l.Fiche, Fichier) == 0) && (std::strcmp(l.Nom, Nom) == 0))
             {
-                o = new TVirtualImageList(l.Ressources, l.Nombre, Fiche);
+                o = new TVirtualImageList(l.Ressources, Fiche);
             }
         }
     }

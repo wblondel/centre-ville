@@ -2,6 +2,7 @@
 #ifndef f_statsatH
 #define f_statsatH
 //---------------------------------------------------------------------------
+#include <array>
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
 #include "base.h"      // portage
 // #include "CSPIN.h" // portage
@@ -72,7 +73,7 @@ public:
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private:
-    int m[2]{}; // Déclarations de l'utilisateur
+    std::array<int, 2> m{}; // Déclarations de l'utilisateur
     void RecalculeEtVisualise();
 
 public: // Déclarations de l'utilisateur

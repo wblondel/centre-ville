@@ -14,6 +14,7 @@
 //   - l'aide copiée par la compilation à côté de cvw (dans le paquet sous
 //     macOS) est identique à docs/guide et docs/tutorial.
 //---------------------------------------------------------------------------
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <QApplication>
@@ -32,11 +33,12 @@ namespace
 {
 // Table caCorresp de src/base.cpp (5.4.3.2), recopiée pour que le test ne
 // dépende plus de src/ : HelpContext -> ancre de html/index.html
-const struct
+struct ElementCorrespOriginal
 {
     int Numero;
     const char *szHREF;
-} CorrespOriginal[] = {
+};
+const auto CorrespOriginal = std::to_array<ElementCorrespOriginal>({
     {.Numero = 0, .szHREF = "ASCV"},        {.Numero = 10, .szHREF = "BR"},
     {.Numero = 20, .szHREF = "EDLS"},       {.Numero = 30, .szHREF = "PDLI"},
     {.Numero = 31, .szHREF = "LMP"},        {.Numero = 3101, .szHREF = "LMF"},
@@ -66,7 +68,7 @@ const struct
     {.Numero = 673, .szHREF = "ISUVDT"},    {.Numero = 674, .szHREF = "ISUVL"},
     {.Numero = 68, .szHREF = "ISUP"},       {.Numero = 69, .szHREF = "RC"},
     {.Numero = 70, .szHREF = "MDE"},
-};
+});
 //-------------------------------------------------------------------------
 QByteArray Contenu(const QString &asFichier)
 {
@@ -221,10 +223,12 @@ void TestAide::sommaireEtTutoriel()
 void TestAide::aideCopieeACoteDeCvw() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
                                       // de Qt Test)
 { // html/ et tutocv/ à côté de cvw (Contents/Resources sous macOS), identiques à docs/
-    const struct
+    struct ElementDossiers
     {
         const char *Copie, *Source;
-    } Dossiers[] = {{.Copie = "html", .Source = "guide"}, {.Copie = "tutocv", .Source = "tutorial"}};
+    };
+    const auto Dossiers = std::to_array<ElementDossiers>(
+        {{.Copie = "html", .Source = "guide"}, {.Copie = "tutocv", .Source = "tutorial"}});
     for (const auto &d : Dossiers)
     {
         const QString stCopie = QString(CV_DOSSIER_AIDE_CVW) + "/" + d.Copie;

@@ -9,6 +9,7 @@
 #include "compat/chaine.h"
 #include "simul.h"
 #include <catch2/catch_test_macros.hpp>
+#include <array>
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
@@ -378,17 +379,23 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
         return Ok;
     };
     CHECK(Charge(asOctets));
-    const struct
+    struct ElementChamps
     {
         const char *Nom;
         std::size_t Position;
-    } Champs[] = {
-        {.Nom = "NbFeux", .Position = 4},        {.Nom = "NbX", .Position = 8},
-        {.Nom = "NbY", .Position = 12},          {.Nom = "NbFeuxPieton", .Position = 16},
-        {.Nom = "NbParkings", .Position = 20},   {.Nom = "NbArretsBus", .Position = 32},
-        {.Nom = "NbArretsTram", .Position = 40}, {.Nom = "NbPlacesTaxi", .Position = 48},
-        {.Nom = "NbPlacesPark", .Position = 56}, {.Nom = "NbPlacesVehlib", .Position = 60},
     };
+    const auto Champs = std::to_array<ElementChamps>({
+        {.Nom = "NbFeux", .Position = 4},
+        {.Nom = "NbX", .Position = 8},
+        {.Nom = "NbY", .Position = 12},
+        {.Nom = "NbFeuxPieton", .Position = 16},
+        {.Nom = "NbParkings", .Position = 20},
+        {.Nom = "NbArretsBus", .Position = 32},
+        {.Nom = "NbArretsTram", .Position = 40},
+        {.Nom = "NbPlacesTaxi", .Position = 48},
+        {.Nom = "NbPlacesPark", .Position = 56},
+        {.Nom = "NbPlacesVehlib", .Position = 60},
+    });
     for (const auto &c : Champs)
     {
         for (int Valeur : {-5, 0x7FFFFFF0})
@@ -822,7 +829,7 @@ TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refus�
   // avec les deux parkings ; boucle secondaire dont on peut sortir, pas entrer
     VueNulle Vue;
     vue = &Vue;
-    const char *Places[] = {"aucune", "parking", "vehlib", "parking accessible"};
+    const auto Places = std::to_array<const char *>({"aucune", "parking", "vehlib", "parking accessible"});
     for (const char *Place : Places)
     {
         INFO(Place);

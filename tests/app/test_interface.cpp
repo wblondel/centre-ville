@@ -135,6 +135,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <QWheelEvent>
+#include <array>
 #include <exception>
 #include <format>
 #include <iostream>
@@ -209,12 +210,12 @@ QByteArray Contenu(const QString &asFichier)
 }
 //-------------------------------------------------------------------------
 // f_carfours.cpp : DirPossC4x4[x-xd][y-yd]
-const dirposs DirPossC4x4[4][4] = {
+const std::array<std::array<dirposs, 4>, 4> DirPossC4x4 = {{
     {aucune, O, E, aucune},
     {S, SO, SE, S},
     {N, NO, NE, N},
     {aucune, O, E, aucune},
-};
+}};
 //-------------------------------------------------------------------------
 // Case libre : sans voie, nature, parking, arrêt, place ni feu
 bool CaseLibre(int x, int y)
@@ -288,65 +289,33 @@ struct BoutonCarrefour
     bool Feux;
     dirposs Entrees, Vertes;
 };
-const BoutonCarrefour BoutonsCarrefours[] = {
-    {.Nom = "SpeedButton34a1",
-     .Colonnes = 3,
-     .Lignes = 4,
-     .Feux = false,
-     .Entrees = NSO,
-     .Vertes = aucune}, // route
-                        // nord-sud,
-                        // branche
-                        // à l'est
+const auto BoutonsCarrefours = std::to_array<BoutonCarrefour>({
+    {.Nom = "SpeedButton34a1", .Colonnes = 3, .Lignes = 4, .Feux = false, .Entrees = NSO, .Vertes = aucune},
+
     {.Nom = "SpeedButton34a2", .Colonnes = 3, .Lignes = 4, .Feux = true, .Entrees = NSO, .Vertes = NS},
     {.Nom = "SpeedButton34a3", .Colonnes = 3, .Lignes = 4, .Feux = true, .Entrees = NSO, .Vertes = O},
-    {.Nom = "SpeedButton34b1",
-     .Colonnes = 3,
-     .Lignes = 4,
-     .Feux = false,
-     .Entrees = NES,
-     .Vertes = aucune}, // route
-                        // nord-sud,
-                        // branche
-                        // à
-                        // l'ouest
+    {.Nom = "SpeedButton34b1", .Colonnes = 3, .Lignes = 4, .Feux = false, .Entrees = NES, .Vertes = aucune},
+
     {.Nom = "SpeedButton34b2", .Colonnes = 3, .Lignes = 4, .Feux = true, .Entrees = NES, .Vertes = NS},
     {.Nom = "SpeedButton34b3", .Colonnes = 3, .Lignes = 4, .Feux = true, .Entrees = NES, .Vertes = E},
-    {.Nom = "SpeedButton43a1",
-     .Colonnes = 4,
-     .Lignes = 3,
-     .Feux = false,
-     .Entrees = ESO,
-     .Vertes = aucune}, // route
-                        // est-ouest,
-                        // branche
-                        // au nord
+    {.Nom = "SpeedButton43a1", .Colonnes = 4, .Lignes = 3, .Feux = false, .Entrees = ESO, .Vertes = aucune},
+
     {.Nom = "SpeedButton43a2", .Colonnes = 4, .Lignes = 3, .Feux = true, .Entrees = ESO, .Vertes = EO},
     {.Nom = "SpeedButton43a3", .Colonnes = 4, .Lignes = 3, .Feux = true, .Entrees = ESO, .Vertes = S},
-    {.Nom = "SpeedButton43b1",
-     .Colonnes = 4,
-     .Lignes = 3,
-     .Feux = false,
-     .Entrees = NEO,
-     .Vertes = aucune}, // route
-                        // est-ouest,
-                        // branche
-                        // au sud
+    {.Nom = "SpeedButton43b1", .Colonnes = 4, .Lignes = 3, .Feux = false, .Entrees = NEO, .Vertes = aucune},
+
     {.Nom = "SpeedButton43b2", .Colonnes = 4, .Lignes = 3, .Feux = true, .Entrees = NEO, .Vertes = EO},
     {.Nom = "SpeedButton43b3", .Colonnes = 4, .Lignes = 3, .Feux = true, .Entrees = NEO, .Vertes = N},
     {.Nom = "SpeedButton44a", .Colonnes = 4, .Lignes = 4, .Feux = false, .Entrees = NESO, .Vertes = aucune},
     {.Nom = "SpeedButton44b", .Colonnes = 4, .Lignes = 4, .Feux = true, .Entrees = NESO, .Vertes = EO},
     {.Nom = "SpeedButton44c", .Colonnes = 4, .Lignes = 4, .Feux = true, .Entrees = NESO, .Vertes = NS},
-    {.Nom = "SpeedButton66a",
-     .Colonnes = 6,
-     .Lignes = 6,
-     .Feux = false,
-     .Entrees = NESO,
-     .Vertes = aucune}, // giratoires
+    {.Nom = "SpeedButton66a", .Colonnes = 6, .Lignes = 6, .Feux = false, .Entrees = NESO, .Vertes = aucune},
     {.Nom = "SpeedButton66b", .Colonnes = 6, .Lignes = 6, .Feux = false, .Entrees = NESO, .Vertes = aucune},
     {.Nom = "SpeedButton88", .Colonnes = 8, .Lignes = 8, .Feux = false, .Entrees = NESO, .Vertes = aucune},
-};
-const char *const GroupesCarrefours[] = {"GroupBox34", "GroupBox43", "GroupBox44", "GroupBox66", "GroupBox88"};
+}); // route nord-sud, branche à l'est route nord-sud, branche à l'ouest route est-ouest, branche au nord route
+    // est-ouest, branche au sud giratoires
+const auto GroupesCarrefours =
+    std::to_array<const char *>({"GroupBox34", "GroupBox43", "GroupBox44", "GroupBox66", "GroupBox88"});
 //-------------------------------------------------------------------------
 // Carrefour du bouton b dessiné en (xd, yd) : écarts avec ce qui est attendu. Les
 // directions sont vérifiées par leur structure, sans recopier les tables de la fiche :
@@ -356,8 +325,8 @@ const char *const GroupesCarrefours[] = {"GroupBox34", "GroupBox43", "GroupBox44
 QStringList EcartsCarrefour(const BoutonCarrefour &b, int xd, int yd, int NbFeuxAvant)
 {
     QStringList Ecarts;
-    const int dxc[NBDIR + 1] = {0, 0, 1, 0, -1};
-    const int dyc[NBDIR + 1] = {0, -1, 0, 1, 0};
+    const std::array<int, NBDIR + 1> dxc = {0, 0, 1, 0, -1};
+    const std::array<int, NBDIR + 1> dyc = {0, -1, 0, 1, 0};
     const QString Nom = QString::fromUtf8(b.Nom) + " : ";
     const auto Dedans = [&](int x, int y) {
         return (x >= xd) && (x < xd + b.Colonnes) && (y >= yd) && (y < yd + b.Lignes);
@@ -1301,7 +1270,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
     }
     static void OuvreFicheFeu(int x, int y, direction d)
     { // Fiche Priorités de la case, puis bouton du feu : les deux fiches restent ouvertes
-        TBitBtn *Boutons[NBDIR] = {
+        std::array<TBitBtn *, NBDIR> Boutons = {
             frmDefVoie->BitBtnDefFeuN,
             frmDefVoie->BitBtnDefFeuE,
             frmDefVoie->BitBtnDefFeuS,
@@ -2819,13 +2788,13 @@ void TestInterface::fichesPrioritesEtFeux()
             d = k;
         }
     }
-    TRadioGroup *Groupes[NBDIR] = {
+    std::array<TRadioGroup *, NBDIR> Groupes = {
         frmDefVoie->RadioGroupPrioriteNord,
         frmDefVoie->RadioGroupPrioriteEst,
         frmDefVoie->RadioGroupPrioriteSud,
         frmDefVoie->RadioGroupPrioriteOuest,
     };
-    TBitBtn *BoutonsFeu[NBDIR] = {
+    std::array<TBitBtn *, NBDIR> BoutonsFeu = {
         frmDefVoie->BitBtnDefFeuN,
         frmDefVoie->BitBtnDefFeuE,
         frmDefVoie->BitBtnDefFeuS,
@@ -3365,12 +3334,14 @@ void TestInterface::lignesAppliqueesEtArretRepete()
     QStringList Ecarts;
     // Bus : ligne 4 de neuf passages à l'arrêt 25 (ligne 3) ; trams : ligne 5 de trois passages
     // à l'arrêt 16 (lignes A et D), un seul tram (deux ne trouveraient pas de place au départ)
-    const struct
+    struct ElementCas
     {
         int Ligne, NumArret, NbPassages, NbVehicules;
         const char *Liste;
-    } Cas[] = {{.Ligne = 4, .NumArret = 25, .NbPassages = 9, .NbVehicules = 12, .Liste = "3,4"},
-               {.Ligne = 5, .NumArret = 16, .NbPassages = 3, .NbVehicules = 11, .Liste = "A,D,E"}};
+    };
+    const auto Cas =
+        std::to_array<ElementCas>({{.Ligne = 4, .NumArret = 25, .NbPassages = 9, .NbVehicules = 12, .Liste = "3,4"},
+                                   {.Ligne = 5, .NumArret = 16, .NbPassages = 3, .NbVehicules = 11, .Liste = "A,D,E"}});
     std::vector<FicheLignes> Fiches = FichesLignes();
     for (int i = 0; i < 2; i++)
     {
@@ -3519,12 +3490,13 @@ void TestInterface::lignesDeplacementsEtClignotement()
     const int xMax = g->ColCount - 1;
     const int yMax = g->RowCount - 1;
     // Bouton (BitBtn<colonne><ligne>, 2 = sans déplacement), avec « Coins », case de départ, case attendue
-    const struct
+    struct ElementDeplacements
     {
         int Bouton;
         bool Coins;
         int x0, y0, x, y;
-    } Deplacements[] = {
+    };
+    const auto Deplacements = std::to_array<ElementDeplacements>({
         {.Bouton = 32, .Coins = false, .x0 = 10, .y0 = 10, .x = 11, .y = 10},
         {.Bouton = 23, .Coins = false, .x0 = 11, .y0 = 10, .x = 11, .y = 11},
         {.Bouton = 11, .Coins = false, .x0 = 11, .y0 = 11, .x = 10, .y = 10},
@@ -3545,7 +3517,7 @@ void TestInterface::lignesDeplacementsEtClignotement()
         {.Bouton = 13, .Coins = true, .x0 = xMax, .y0 = 0, .x = 0, .y = yMax},
         {.Bouton = 32, .Coins = true, .x0 = 0, .y0 = yMax, .x = xMax, .y = yMax},
         {.Bouton = 11, .Coins = true, .x0 = 40, .y0 = 30, .x = 0, .y = 0},
-    };
+    });
     QStringList Ecarts;
     const QString stDossier = QCoreApplication::applicationDirPath();
     for (const FicheLignes &l : FichesLignes())
@@ -3710,10 +3682,10 @@ void TestInterface::ficheCarrefours()
                 QCOMPARE((int)cv->v[xd + i][yd + j].DirPoss, (int)DirPossC4x4[i][j]);
             }
         }
-        const int xf[NBDIR] = {xd + 1, xd + 3, xd + 2, xd};
-        const int yf[NBDIR] = {yd, yd + 1, yd + 3, yd + 2};
-        const direction df[NBDIR] = {sud, ouest, nord, est};
-        int NumFeux[NBDIR];
+        const std::array<int, NBDIR> xf = {xd + 1, xd + 3, xd + 2, xd};
+        const std::array<int, NBDIR> yf = {yd, yd + 1, yd + 3, yd + 2};
+        const std::array<direction, NBDIR> df = {sud, ouest, nord, est};
+        std::array<int, NBDIR> NumFeux{};
         for (int i = 0; i < NBDIR; i++)
         {
             QCOMPARE((int)cv->v[xf[i]][yf[i]].Priorite[df[i] - 1], (int)feux);
@@ -3809,7 +3781,7 @@ QStringList EcartsFichesPriorites(const QString &Quoi)
     }
     if (frmDefVoie->isVisible())
     {
-        TRadioGroup *Groupes[NBDIR] = {
+        std::array<TRadioGroup *, NBDIR> Groupes = {
             frmDefVoie->RadioGroupPrioriteNord,
             frmDefVoie->RadioGroupPrioriteEst,
             frmDefVoie->RadioGroupPrioriteSud,
@@ -3982,12 +3954,19 @@ void TestInterface::carrefoursSelectionDUneAutreTaille()
     }
     QDesktopServices::setUrlHandler("file", this, "UrlOuverte");
     UrlsOuvertes.clear();
-    const struct
+    struct ElementTailles
     {
         int Colonnes, Lignes;
-    } Tailles[] = {{.Colonnes = 2, .Lignes = 14}, {.Colonnes = 3, .Lignes = 13}, {.Colonnes = 3, .Lignes = 14},
-                   {.Colonnes = 5, .Lignes = 16}, {.Colonnes = 7, .Lignes = 18}, {.Colonnes = 2, .Lignes = 2},
-                   {.Colonnes = 4, .Lignes = 5},  {.Colonnes = 8, .Lignes = 6},  {.Colonnes = 3, .Lignes = 3}};
+    };
+    const auto Tailles = std::to_array<ElementTailles>({{.Colonnes = 2, .Lignes = 14},
+                                                        {.Colonnes = 3, .Lignes = 13},
+                                                        {.Colonnes = 3, .Lignes = 14},
+                                                        {.Colonnes = 5, .Lignes = 16},
+                                                        {.Colonnes = 7, .Lignes = 18},
+                                                        {.Colonnes = 2, .Lignes = 2},
+                                                        {.Colonnes = 4, .Lignes = 5},
+                                                        {.Colonnes = 8, .Lignes = 6},
+                                                        {.Colonnes = 3, .Lignes = 3}});
     QStringList Ecarts;
     bool Aide = true;
     for (const auto &t : Tailles)
@@ -4149,13 +4128,14 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
     QVERIFY(!OuvreDemo("carrefours_autre.cvw").isEmpty());
     OuvreFichier(f);
     QCOMPARE(cv->NbFeux, 10);
-    const struct
+    struct ElementDessines
     {
         int Bouton, xd, yd;
-    } Dessines[] = {{.Bouton = 12, .xd = 2, .yd = 2},
-                    {.Bouton = 5, .xd = 8, .yd = 2},
-                    {.Bouton = 8, .xd = 14, .yd = 2},
-                    {.Bouton = 14, .xd = 20, .yd = 2}}; // 44a, 34b3, 43a3, 44c
+    };
+    const auto Dessines = std::to_array<ElementDessines>({{.Bouton = 12, .xd = 2, .yd = 2},
+                                                          {.Bouton = 5, .xd = 8, .yd = 2},
+                                                          {.Bouton = 8, .xd = 14, .yd = 2},
+                                                          {.Bouton = 14, .xd = 20, .yd = 2}}); // 44a, 34b3, 43a3, 44c
     for (const auto &c : Dessines)
     {
         const BoutonCarrefour &b = BoutonsCarrefours[c.Bouton];
@@ -4418,7 +4398,7 @@ namespace
 // Symbol (0xAD haut, 0xAE droite, 0xAF bas, 0xAC gauche)
 QString Fleche(direction d)
 {
-    const char16_t Symboles[NBDIR + 1] = {0, 0xAD, 0xAE, 0xAF, 0xAC};
+    const std::array<char16_t, NBDIR + 1> Symboles = {0, 0xAD, 0xAE, 0xAF, 0xAC};
     return (d != 0) ? QString("   ") + QChar(Symboles[d]) : QString();
 }
 //-------------------------------------------------------------------------
@@ -4880,7 +4860,7 @@ void TestInterface::fichesInfos()
             if (v->NumVehicule > 0)
             {
                 vehicule *Veh = &cv->Vehicule[v->NumVehicule - 1];
-                const char *Priorites[] = {"Normal", "Urgences", "Police"};
+                const auto Priorites = std::to_array<const char *>({"Normal", "Urgences", "Police"});
                 if (!f->RadioButtonVehiculeNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << QString::fromUtf8("véhicule non affiché");
@@ -5111,8 +5091,8 @@ void TestInterface::fichesInfos()
     }
     //-------------------------------------------------------------------------
     // Taxi (Ctrl+I) et vehlib (Ctrl+E)
-    const char *Situations[NBSITUATIONSTAXI] = {"En attente", "Départ d'une course", "Dépôt de client(s)",
-                                                "Retour d'une course"};
+    const std::array<const char *, NBSITUATIONSTAXI> Situations = {"En attente", "Départ d'une course",
+                                                                   "Dépôt de client(s)", "Retour d'une course"};
     {
         const int n = Trouve([](voie *v) { return v->NumTaxi; });
         QVERIFY(n > 0);
@@ -5240,7 +5220,7 @@ void TestInterface::fichesInfos()
             if (Num > 0)
             {
                 pieton *p = &cv->Pieton[Num - 1];
-                const char *Positions[2] = {"Entrée de la case", "Sortie de la case"};
+                const std::array<const char *, 2> Positions = {"Entrée de la case", "Sortie de la case"};
                 if (!f->RadioButtonPietonNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << QString::fromUtf8("piéton non affiché");
@@ -6866,19 +6846,20 @@ void TestInterface::commandesDAffichage()
     s->MenuItemFichier->ElementQt()->trigger();
     QVERIFY(s->ToolBarFichier->isVisible());
     // Nombre de tours des statistiques
-    const struct
+    struct ElementTours
     {
         TAction *Action;
         TMenuItem *Menu;
         int NbTours;
-    } Tours[] = {
+    };
+    const auto Tours = std::to_array<ElementTours>({
         {.Action = s->ActionStatsAff10Tours, .Menu = s->MenuItem10DrnTours, .NbTours = 10},
         {.Action = s->ActionStatsAff20Tours, .Menu = s->MenuItem20DrnTours, .NbTours = 20},
         {.Action = s->ActionStatsAff50Tours, .Menu = s->MenuItem50DrnTours, .NbTours = 50},
         {.Action = s->ActionStatsAff100Tours, .Menu = s->MenuItem100DrnTours, .NbTours = 100},
         {.Action = s->ActionStatsAff200Tours, .Menu = s->MenuItem200DrnTours, .NbTours = 200},
         {.Action = s->ActionStatsAff500Tours, .Menu = s->MenuItem500DrnTours, .NbTours = 500},
-    };
+    });
     for (const auto &t : Tours)
     {
         t.Action->Execute();
@@ -7028,11 +7009,12 @@ void TestInterface::dessinsPendantLaSimulation()
     QCOMPARE(NbBus, 3);
     QCOMPARE(NbTrams, 4);
     // Suivre... depuis une case : Rechercher s'ouvre sur l'objet
-    const struct
+    struct ElementSuivis
     {
         TAction *Action;
         std::function<int(voie *)> Numero;
-    } Suivis[] = {
+    };
+    const auto Suivis = std::to_array<ElementSuivis>({
         {.Action = s->ActionSuivreVehicule, .Numero = [](voie *v) { return v->NumVehicule; }},
         {.Action = s->ActionSuivreBus, .Numero = [](voie *v) { return v->NumBus; }},
         {.Action = s->ActionSuivreTram, .Numero = [](voie *v) { return v->NumTram; }},
@@ -7040,7 +7022,7 @@ void TestInterface::dessinsPendantLaSimulation()
         {.Action = s->ActionSuivreVehlib, .Numero = [](voie *v) { return v->NumVehlib; }},
         {.Action = s->ActionSuivrePieton1, .Numero = [](voie *v) { return v->NumPieton[0]; }},
         {.Action = s->ActionSuivrePieton2, .Numero = [](voie *v) { return v->NumPieton[1]; }},
-    };
+    });
     QStringList Absents;
     for (const auto &u : Suivis)
     {
@@ -7210,12 +7192,13 @@ void TestInterface::reseauNonConnexeSansParking()
   // distances de ce type (les parkings ont la leur, interruptionReseauNonConnexe)
     // v6.0.8 : la v5.0 nommait « file de parkings » les files de taxis, et lisait hors de
     // asTypeDistance pour les files de parkings et les places de vehlib
-    const struct
+    struct ElementCas
     {
         const char *Type;
         std::function<void()> Ajoute;
         TForm *Fiche;
-    } Cas[] = {
+    };
+    const auto Cas = std::to_array<ElementCas>({
         {.Type = "à un arrêt de bus",
          .Ajoute =
              [] {
@@ -7252,7 +7235,7 @@ void TestInterface::reseauNonConnexeSansParking()
                  cv->AjouteArretTram(4, 8);
              },
          .Fiche = frmAffDistArretsTram},
-    };
+    });
     QStringList Ecarts;
     for (const auto &c : Cas)
     {
@@ -7933,8 +7916,8 @@ void TestInterface::ficheVehiculeNiveauxDePriorite()
     TfrmSimulation *s = frmSimulation;
     s->ActionDetailVehicule->Execute();
     QVERIFY(frmInfosVehicule->isVisible());
-    bool Vus[3] = {false, false, false};
-    const char *Libelles[3] = {"Normal", "Urgences", "Police"};
+    std::array<bool, 3> Vus = {false, false, false};
+    const std::array<const char *, 3> Libelles = {"Normal", "Urgences", "Police"};
     for (int Tour = 0; (Tour < 400) && !(Vus[normal] && Vus[urgence] && Vus[police]) && !QTest::currentTestFailed();
          Tour++)
     {
@@ -8031,7 +8014,9 @@ public:
 // (cases de route hors parkings, comme RecalculeEtVisualise)
 struct TotauxFluidite
 {
-    int m[2] = {0, 0}, t[2] = {0, 0}, n = 0;
+    std::array<int, 2> m = {0, 0};
+    std::array<int, 2> t = {0, 0};
+    int n = 0;
 };
 TotauxFluidite CalculeFluidite(int ed, int ea)
 {
@@ -8093,10 +8078,10 @@ void TestInterface::ficheComposition()
     int ArretsTram = 0;
     int PlacesTaxi = 0;
     int PlacesPark = 0;
-    int Priorites[2] = {0, 0};
-    int Feux[2] = {0, 0};
-    int Clp[2] = {0, 0};
-    int Stops[2] = {0, 0}; // sur route, sur voie de tram
+    std::array<int, 2> Priorites = {0, 0};
+    std::array<int, 2> Feux = {0, 0};
+    std::array<int, 2> Clp = {0, 0};
+    std::array<int, 2> Stops = {0, 0}; // sur route, sur voie de tram
     for (int i = 0; i < cv->NbArretsBus; i++)
     {
         ArretsBus += static_cast<int>(cv->ArretBus[i].Defini());
@@ -8325,14 +8310,14 @@ void TestInterface::fichesEvolutionEtVehicules()
         {
             e << QString("%1 points seulement").arg(NbPoints);
         }
-        const int Couleurs[3] = {clRed, clYellow, clGreen};
-        int Trouves[3] = {0, 0, 0};
-        int Visibles[3] = {0, 0, 0};
+        const std::array<int, 3> Couleurs = {clRed, clYellow, clGreen};
+        std::array<int, 3> Trouves = {0, 0, 0};
+        std::array<int, 3> Visibles = {0, 0, 0};
         for (int i = 0; i < NbPoints; i++)
         {
             const stats &st = cv->Stats[(PrmTour + i) % NbTours];
             const int x = xMax * i / NbTours;
-            int y[3];
+            std::array<int, 3> y{};
             if (Epidemique)
             {
                 y[0] = yMax - (yMax * st.NbPietonsMorts / NbPietons);
@@ -8361,7 +8346,7 @@ void TestInterface::fichesEvolutionEtVehicules()
         }
         // Vert, tracé en dernier : tous ses points ; rouge et jaune : au moins la
         // moitié (une courbe tracée après peut passer dessus)
-        const char *Noms[3] = {"rouge", "jaune", "vert"};
+        const std::array<const char *, 3> Noms = {"rouge", "jaune", "vert"};
         for (int c = 0; c < 3; c++)
         {
             if (Visibles[c] && (Trouves[c] < ((c == 2) ? Visibles[c] : (Visibles[c] + 1) / 2)))
@@ -9738,8 +9723,8 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
     // Numéros que FormShow pose après celui de rang Ordre (leur OnChange déciderait du texte
     // de la barre d'état, ou ramènerait le curseur sur la case)
     const auto Suivants = [](voie *v, int Ordre) {
-        const int n[] = {v->NumBus,       v->NumArretBus,  v->NumTram,   v->NumArretTram,  v->NumTaxi,
-                         v->NumPlaceTaxi, v->NumPlacePark, v->NumVehlib, v->NumPlaceVehlib};
+        const auto n = std::to_array<int>({v->NumBus, v->NumArretBus, v->NumTram, v->NumArretTram, v->NumTaxi,
+                                           v->NumPlaceTaxi, v->NumPlacePark, v->NumVehlib, v->NumPlaceVehlib});
         int k = 0;
         for (int i = Ordre + 1; i < 9; i++)
         {
@@ -9966,7 +9951,7 @@ void TestInterface::rechercheMessagesDeChaqueElement()
         // la position forcée et son rétablissement
         const int xa = *el.x;
         const int ya = *el.y;
-        const int Dans[] = {p1->NumBus, p1->NumTram, p1->NumTaxi, p1->NumVehlib};
+        const auto Dans = std::to_array<int>({p1->NumBus, p1->NumTram, p1->NumTaxi, p1->NumVehlib});
         if (el.Numero == r->CSpinEditPieton)
         {
             p1->NumBus = p1->NumTram = p1->NumTaxi = p1->NumVehlib = 0;

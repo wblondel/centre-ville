@@ -138,40 +138,33 @@ TfrmSimulation *frmSimulation = nullptr;
 //---------------------------------------------------------------------------
 // v2.2 : Décalage gyrophares d{x|y}g[dorig][ddest]. v5.4 plus de zoom
 //            ddest =      n   e   s   o
-const int dxg[5][5] =
-    {
-        {0, 0, 0, 0, 0},   {0, 0, 1, 0, -1}, // dorig = nord
-        {0, 1, 0, 1, 0},                     // dorig = est
-        {0, 0, 1, 0, -1},                    // dorig = sud
-        {0, -1, 0, -1, 0},
-    }, // dorig = ouest
-    dyg[5][5] =
-        {
-            {0, 0, 0, 0, 0},  {0, 0, -1, 0, -1}, // dorig = nord
-            {0, -1, 0, 1, 0},                    // dorig = est
-            {0, 0, 1, 0, 1},                     // dorig = sud
-            {0, -1, 0, 1, 0},
-        }, // dorig = ouest
-           // [Dir1][Dir2][AVT|ARR] Dir2=N   ,   E   ,   S   ,   O
-    NumImgBusTram[NBDIR][NBDIR][2] = {
-        {{1, 7}, {2, 9}, {12, 12}, {0, 5}},  // Dir1 = N // v3.5 : ajout de Tram dans le nom (nitmaps communes aux bus)
-        {{3, 8}, {4, 10}, {5, 0}, {12, 12}}, // Dir1 = E
-        {{12, 12}, {6, 11}, {7, 1}, {8, 3}}, // Dir1 = S
-        {{11, 6}, {12, 12}, {9, 2}, {10, 4}},
-    }; // Dir1 = O
+const std::array<std::array<int, 5>, 5> dxg = {{
+    {0, 0, 0, 0, 0},
+    {0, 0, 1, 0, -1},
+    {0, 1, 0, 1, 0},
+    {0, 0, 1, 0, -1},
+    {0, -1, 0, -1, 0},
+}}; // dorig = nord dorig = est dorig = sud
+const std::array<std::array<int, 5>, 5> dyg = {{
+    {0, 0, 0, 0, 0},
+    {0, 0, -1, 0, -1},
+    {0, -1, 0, 1, 0},
+    {0, 0, 1, 0, 1},
+    {0, -1, 0, 1, 0},
+}}; // dorig = nord dorig = est dorig = sud
+const std::array<std::array<std::array<int, 2>, NBDIR>, NBDIR> NumImgBusTram = {{
+    {{{1, 7}, {2, 9}, {12, 12}, {0, 5}}},
+    {{{3, 8}, {4, 10}, {5, 0}, {12, 12}}},
+    {{{12, 12}, {6, 11}, {7, 1}, {8, 3}}},
+    {{{11, 6}, {12, 12}, {9, 2}, {10, 4}}},
+}}; // Dir1 = N // v3.5 : ajout de Tram dans le nom (nitmaps communes aux bus) Dir1 = E Dir1 = S Dir1 = O
 //---------------------------------------------------------------------------
 // v3.5 : Ajout de Tram aux constantes de Couleur
-TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM] = {clBlue,
-                                               clRed,
-                                               clLime,
-                                               clYellow,
-                                               clFuchsia,
-                                               clAqua,
-                                               clPurple,
-                                               static_cast<TColor>(0x00FF0080),
-                                               static_cast<TColor>(0x000080FF)};
-TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM] = {clWhite, clBlack, clBlack, clBlack, clBlack,
-                                                clBlack, clWhite, clWhite, clBlack};
+std::array<TColor, NBMAXLIGNESBUSTRAM> CoulLigneBusTram = {{clBlue, clRed, clLime, clYellow, clFuchsia, clAqua,
+                                                            clPurple, static_cast<TColor>(0x00FF0080),
+                                                            static_cast<TColor>(0x000080FF)}};
+std::array<TColor, NBMAXLIGNESBUSTRAM> CoulTLigneBusTram = {clWhite, clBlack, clBlack, clBlack, clBlack,
+                                                            clBlack, clWhite, clWhite, clBlack};
 //---------------------------------------------------------------------------
 constexpr const char *asVide = "";
 constexpr const char *asFrmTitleCV = "Centre-Ville [%d]";
@@ -1339,18 +1332,19 @@ bool TfrmSimulation::ModifiePassagePietonsSiNecessaire(int x, int y) // v2.0
 //---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
 { // v5.4 : manque int (???)
-    const int NumSvtOrdSel[2][4] = {{0, 0, 1, 0}, {1, 1, 1, 1}};
+    const std::array<std::array<int, 4>, 2> NumSvtOrdSel = {{{0, 0, 1, 0}, {1, 1, 1, 1}}};
     const int x = DrawGridSimul->Col;
     const int y = DrawGridSimul->Row;
     int i = 0;
     int j = 0;
     int NbFeux = 0;
     std::vector<int> NumFeu;
-    int NumFeuVoie[2] = {0, 0}; // Variables de transition
-    int NbFeuxListe = 0;        // Numéros de feux de la voie {Prm,Drn}
-    int NbFeuxVoie = 0;         // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
-    int NbNonSel = 0;           // Nombre de feux dans la voie v[Col][Row]
-    int Selection[2] = {0, 0};  // Compteur du nombre de feux non sélectionnés // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
+    std::array<int, 2> NumFeuVoie = {0, 0}; // Variables de transition
+    int NbFeuxListe = 0;                    // Numéros de feux de la voie {Prm,Drn}
+    int NbFeuxVoie = 0;                     // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
+    int NbNonSel = 0;                       // Nombre de feux dans la voie v[Col][Row]
+    std::array<int, 2> Selection = {0, 0};  // Compteur du nombre de feux non sélectionnés //
+                                            // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
     // Traite le clic sur la case avec des feux lors d'une sélection de feux :
     // 2 feux = passage de aucun à feu1, de feu1 à feu2,
     //                  de feu2 à feu1+feu2 et de feu1+feu2 à aucun.

@@ -2,6 +2,7 @@
 #ifndef f_defvpH
 #define f_defvpH
 //---------------------------------------------------------------------------
+#include <array>
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
 #include "base.h"      // portage
 // #include <Buttons.hpp> // portage
@@ -52,12 +53,15 @@ public:
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private:
-    bool FeuExistant[NBDIR]{}; // Déclarations de l'utilisateur // Indique lors de l'affichage de la fenêtre,
-                               // l'existence des feux. Sert à l'annulation (suppression)
+    std::array<bool, NBDIR> FeuExistant{}; // Déclarations de l'utilisateur // Indique lors de l'affichage de la
+                                           // fenêtre, l'existence des feux. Sert à l'annulation (suppression)
     voie *v{};
-    int x{}, y{}, xfo[NBDIR]{}, yfo[NBDIR]{};
-    TSpeedButton *SpeedButton[NBDIR]{};
-    TImage *Image[NBDIR]{};
+    int x{};
+    int y{};
+    std::array<int, NBDIR> xfo{};
+    std::array<int, NBDIR> yfo{};
+    std::array<TSpeedButton *, NBDIR> SpeedButton{};
+    std::array<TImage *, NBDIR> Image{};
     void DefinitFeu(direction Dir);
 
 public: // Déclarations de l'utilisateur

@@ -2,6 +2,7 @@
 // golden.cpp - Tests du moteur : golden master de la simulation
 //---------------------------------------------------------------------------
 #include "golden.h"
+#include <array>
 #include <format>
 #include <cstdint>
 #include <cstdio>
@@ -29,7 +30,8 @@ std::string LigneTour(const centre_ville *cv)
                     cv->TourCrt, alea::Graine(), cv->NbVehiculesSortis, cv->NbVehiculesArrives, cv->NbVehiculesDeplaces,
                     cv->NbPietonsGueris, cv->NbPietonsInfectes, cv->NbPietonsMorts);
     // Clés courtes, dans l'ordre de partie_etat (voir l'en-tête des fichiers)
-    const static char *Cles[peDistances] = {"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};
+    const static std::array<const char *, peDistances> Cles = {"c", "f", "fp", "pk", "v", "b",
+                                                               "t", "x", "pl", "vl", "p", "k"};
     for (int i = 0; i < peDistances; i++)
     {
         Ligne +=
@@ -210,10 +212,10 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
             const char *Nom;
             int x, y, nx, ny;
         };
-        const selection Selections[2] = {
+        const std::array<selection, 2> Selections = {{
             {.Nom = "complete", .x = 0, .y = 0, .nx = cv->NbX, .ny = cv->NbY},
             {.Nom = "reduite", .x = 1, .y = 1, .nx = cv->NbX - 2, .ny = cv->NbY - 2},
-        };
+        }};
         for (const selection &s : Selections)
         {
             const std::size_t NbMessages = Vue.Messages.size();
