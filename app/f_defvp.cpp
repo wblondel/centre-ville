@@ -66,7 +66,7 @@ void TfrmDefVoiePietons::RafraichitInfos()
 }
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
 
   // On sauvegarde les coordonnées de tous les feux de piétons opposés
   for(int d=nord; d<=ouest; d++) {

@@ -27,13 +27,13 @@ namespace
   //-------------------------------------------------------------------------
   double FractionDeJour(const std::tm &Local, int Millisecondes)
    {
-    return ((Local.tm_hour*60.0+Local.tm_min)*60.0+Local.tm_sec+Millisecondes/1000.0)/86400.0;
+    return ((((Local.tm_hour*60.0)+Local.tm_min)*60.0)+Local.tm_sec+(Millisecondes/1000.0))/86400.0;
    }
  }
 //---------------------------------------------------------------------------
 TDateTime Time()
  {
-  int ms;
+  int ms = 0;
   std::tm Local=HeureLocale(ms);
   return {FractionDeJour(Local, ms)};
  }

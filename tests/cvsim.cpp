@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     std::cerr<<"Démarrage impossible : "<<asMsgErr<<"\n";
     return 1;
    }
-  int t;
+  int t = 0;
   for(t=0; t<NbTours; t++)
    {
     if ((TourResurrection != 0)&&(t+1==TourResurrection)) { Vue.Resurrection=true; // comme le golden master

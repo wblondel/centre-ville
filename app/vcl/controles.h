@@ -37,6 +37,7 @@
 #include <QToolButton>
 #include <QWidget>
 #include <map>
+#include <utility>
 #include <vector>
 #include "actions.h"
 #include "graphiques.h"
@@ -414,8 +415,8 @@ class TStringGrid : public ControleVcl<QAbstractScrollArea>
   int CumulMolette=0;
   void DefinitColonnes(int n);
   void DefinitLignes(int n);
-  int Largeur(int c) const { return ((c>=0)&&(c<static_cast<int>(Largeurs.size())))?Largeurs[static_cast<std::size_t>(c)]:LargeurDefaut; }
-  int Hauteur(int r) const { return ((r>=0)&&(r<static_cast<int>(Hauteurs.size())))?Hauteurs[static_cast<std::size_t>(r)]:HauteurDefaut; }
+  int Largeur(int c) const { return ((c>=0)&&std::cmp_less(c,Largeurs.size()))?Largeurs[static_cast<std::size_t>(c)]:LargeurDefaut; }
+  int Hauteur(int r) const { return ((r>=0)&&std::cmp_less(r,Hauteurs.size()))?Hauteurs[static_cast<std::size_t>(r)]:HauteurDefaut; }
   int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
   int DebutLigne(int r) const;
   void MetAJourDefilement();
@@ -489,7 +490,7 @@ class TStatusPanel
   enum TAlignment { taLeftJustify, taRightJustify, taCenter } Alignment=taLeftJustify;
   Propriete<AnsiString> Text;
   Propriete<int> Width;
-  TStatusPanel(TStatusBar *b, int Largeur, TAlignment Alignement, const AnsiString &asTexteInitial);
+  TStatusPanel(TStatusBar *b, int Largeur, TAlignment Alignement, AnsiString asTexteInitial);
  };
 class TStatusPanels
  {

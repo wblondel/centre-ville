@@ -102,7 +102,7 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
   CHECK(Max15Bits);
   // Un pas = graine*0x15A4E35+1 sur 32 bits ; rand() = bits 30..16 après le pas
   srand(123);
-  const unsigned Apres=123U*22695477U+1U;
+  const unsigned Apres=(123U*22695477U)+1U;
   CHECK(alea::Graine()==Apres);
   CHECK(rand()==(int)(((Apres*22695477U+1U)>>16)&0x7FFF));
   CHECK(alea::Graine()==Apres*22695477U+1U);
@@ -175,17 +175,17 @@ TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écrit
   bool EcrituresOk=true;
   for(int i=0; i<N; i++)
    {
-    auto o=static_cast<unsigned char>(i*7+3);
+    auto o=static_cast<unsigned char>((i*7)+3);
     EcrituresOk=EcrituresOk&&(FileWrite(h, &o, 1)==1);
    }
   CHECK(EcrituresOk);
   CHECK(FileSeek(h, 0, 2)==N); // fin de fichier : tout a été écrit
   CHECK(FileSeek(h, 0, 0)==0);
   std::string Gros(static_cast<std::size_t>(N), '\0');
-  CHECK(FileRead(h, &Gros[0], 100)==100);
+  CHECK(FileRead(h, Gros.data(), 100)==100);
   CHECK(FileRead(h, &Gros[100], (unsigned)N)==N-100); // lecture directe d'un gros bloc, tronquée en fin
   bool Identiques=true;
-  for(int i=0; i<N; i++) { Identiques=Identiques&&(static_cast<unsigned char>(Gros[static_cast<std::size_t>(i)])==static_cast<unsigned char>(i*7+3));
+  for(int i=0; i<N; i++) { Identiques=Identiques&&(static_cast<unsigned char>(Gros[static_cast<std::size_t>(i)])==static_cast<unsigned char>((i*7)+3));
 }
   CHECK(Identiques);
   FileClose(h);

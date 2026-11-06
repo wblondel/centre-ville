@@ -14,12 +14,12 @@ struct carte
 //---------------------------------------------------------------------------
 const carte Cartes[]=
  {
-  {"8x8.cvw", "8x8"},
-  {"Carfours.cvw", "Carfours"},
-  {"Colimasson.cvw", "Colimasson"},
-  {"D\xC3\xA9mo.cvw", "Demo"},
-  {"G\xC3\xA9" "ant.cvw", "Geant"},
-  {"Spaghettis.cvw", "Spaghettis"},
+  {.Fichier="8x8.cvw", .Nom="8x8"},
+  {.Fichier="Carfours.cvw", .Nom="Carfours"},
+  {.Fichier="Colimasson.cvw", .Nom="Colimasson"},
+  {.Fichier="D\xC3\xA9mo.cvw", .Nom="Demo"},
+  {.Fichier="G\xC3\xA9" "ant.cvw", .Nom="Geant"},
+  {.Fichier="Spaghettis.cvw", .Nom="Spaghettis"},
  };
 const int NB_CARTES=sizeof(Cartes)/sizeof(Cartes[0]);
 //---------------------------------------------------------------------------
@@ -27,9 +27,9 @@ const int NB_CARTES=sizeof(Cartes)/sizeof(Cartes[0]);
 // vérifiées par le round-trip seulement
 const carte CartesTutoriel[]=
  {
-  {"tutocv.cvw", "tutocv"},
-  {"tutocvdeco.cvw", "tutocvdeco"},
-  {"tutocvptn.cvw", "tutocvptn"},
+  {.Fichier="tutocv.cvw", .Nom="tutocv"},
+  {.Fichier="tutocvdeco.cvw", .Nom="tutocvdeco"},
+  {.Fichier="tutocvptn.cvw", .Nom="tutocvptn"},
  };
 //---------------------------------------------------------------------------
 #ifdef CV_DOSSIER_CARTES

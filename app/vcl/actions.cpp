@@ -22,7 +22,7 @@ namespace
   // comme les codes de touches virtuelles de Windows
   int ToucheVirtuellePhysique(const QKeyEvent *e)
    {
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
     switch(e->nativeVirtualKey()) // kVK_ANSI_xxx (Carbon)
      {
       case 0x12: return '1'; case 0x13: return '2'; case 0x14: return '3';
@@ -128,7 +128,7 @@ TShortCut RaccourciVcl(const QKeyEvent *e)
   // restent accessibles avec ⌘, et ⌘Q/⌘H, pris par le système, avec Control.
   if (m.testFlag(Qt::ControlModifier)) { sc|=scCtrl;
 }
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
   if (m.testFlag(Qt::MetaModifier)) { sc|=scCtrl;
 }
 #endif
@@ -229,11 +229,11 @@ void TAction::DefinitVisible(bool Valeur)
 //---------------------------------------------------------------------------
 bool TAction::Execute()
  { // TCustomAction::Execute
-  if (bEnabled&&AutoCheck) {
-   if ((!bChecked)||(bChecked&&(GroupIndex==0))) {
+  if ((bEnabled&&AutoCheck) && ((!bChecked)||(bChecked&&(GroupIndex==0)))) 
+   {
     Checked=!bChecked;
 }
-}
+
   if (!bEnabled) { return false;
 }
   if (OnExecute)
@@ -246,13 +246,13 @@ bool TAction::Execute()
 //---------------------------------------------------------------------------
 void TAction::AjouteClient(ClientAction *c)
  {
-  if (std::find(Clients.begin(), Clients.end(), c)==Clients.end()) { Clients.push_back(c);
+  if (std::ranges::find(Clients, c)==Clients.end()) { Clients.push_back(c);
 }
  }
 //---------------------------------------------------------------------------
 void TAction::RetireClient(ClientAction *c)
  {
-  Clients.erase(std::remove(Clients.begin(), Clients.end(), c), Clients.end());
+  Clients.erase(std::ranges::remove(Clients, c).begin(), Clients.end());
  }
 //---------------------------------------------------------------------------
 bool TActionList::IsShortCut(TShortCut Raccourci, bool Executer)
@@ -375,7 +375,7 @@ void TMenuItem::Click()
   if (AutoCheck&&((!ActionLiee)||(!AutoCheckLie))) {
    Checked=!bChecked;
 }
-  if (OnClick&&ActionLiee&&(ActionLiee->OnExecute)) {
+  if (OnClick&&ActionLiee&&ActionLiee->OnExecute) {
    OnClick(this);
   } else if (ActionLiee) {
    ActionLiee->Execute();
@@ -508,10 +508,10 @@ namespace
 }
     for(QWidget *c=Cible; c; c=c->parentWidget())
      {
-      if (auto *m=dynamic_cast<AvecMenuContextuel *>(c)) {
-       if (m->PopupMenu&&m->PopupMenu->IsShortCut(Raccourci, Executer)) { return true;
+      if (auto *m=dynamic_cast<AvecMenuContextuel *>(c); m && (m->PopupMenu&&m->PopupMenu->IsShortCut(Raccourci, Executer))) 
+       { return true;
 }
-}
+
       if (c==f->Fenetre) { break;
 }
      }
@@ -544,8 +544,8 @@ namespace
         FicheRaccourcis *f=FicheDe(w);
         return (f != nullptr)&&f->Apercu&&f->Apercu(k, true);
        }
-      if (auto *Champ=dynamic_cast<TCSpinEdit *>(w)) {
-       if (Champ->GardeTouchesDeplacement&&!(k->modifiers()&~Qt::KeypadModifier)) {
+      if (auto *Champ=dynamic_cast<TCSpinEdit *>(w); Champ && (Champ->GardeTouchesDeplacement&&!(k->modifiers()&~Qt::KeypadModifier))) 
+       {
         switch(k->key())
          { // v6.0.2
           case Qt::Key_Left: case Qt::Key_Right: case Qt::Key_Up: case Qt::Key_Down:
@@ -554,7 +554,7 @@ namespace
           default: break;
          }
 }
-}
+
       TShortCut sc=RaccourciVcl(k);
       if (sc == 0)
        {
@@ -610,8 +610,8 @@ void InscritFicheRaccourcis(const FicheRaccourcis &Fiche)
 //---------------------------------------------------------------------------
 void DesinscritFicheRaccourcis(QWidget *Fenetre)
  {
-  Fiches.erase(std::remove_if(Fiches.begin(), Fiches.end(),
-                              [Fenetre](const FicheRaccourcis &f) { return f.Fenetre==Fenetre; }),
+  Fiches.erase(std::ranges::remove_if(Fiches,
+                              [Fenetre](const FicheRaccourcis &f) { return f.Fenetre==Fenetre; }).begin(),
                Fiches.end());
  }
 //---------------------------------------------------------------------------

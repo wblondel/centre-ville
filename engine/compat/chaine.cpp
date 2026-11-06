@@ -2,12 +2,15 @@
 // compat/chaine.cpp - Portage de Centre-Ville hors de C++Builder
 //---------------------------------------------------------------------------
 #include "chaine.h"
+
+#include <math.h>
 #include <algorithm>
 #include <cctype>
 #include <clocale>
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+#include <utility>
 //---------------------------------------------------------------------------
 TFormatSettings FormatSettings; // portage
 //---------------------------------------------------------------------------
@@ -110,7 +113,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
     if ((i<n)&&std::isdigit(static_cast<unsigned char>(f[i])))
      {
       Valeur=0;
-      while((i<n)&&std::isdigit(static_cast<unsigned char>(f[i]))) { Valeur=10*Valeur+(f[i++]-'0');
+      while((i<n)&&std::isdigit(static_cast<unsigned char>(f[i]))) { Valeur=(10*Valeur)+(f[i++]-'0');
 }
       return true;
      }
@@ -167,7 +170,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
 }
         long long v=a.Entier;
         bool Negatif=false;
-        unsigned long long Absolu;
+        unsigned long long Absolu = 0;
         if (Type=='U') {
          Absolu=(v<0)?static_cast<unsigned long long>(static_cast<unsigned int>(v)):static_cast<unsigned long long>(v);
         } else
@@ -176,7 +179,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
           Absolu=Negatif?static_cast<unsigned long long>(-(v+1))+1ULL:static_cast<unsigned long long>(v);
          }
         std::string Chiffres=std::to_string(Absolu);
-        if (PrecisionDefinie&&(static_cast<int>(Chiffres.size())<Precision)) {
+        if (PrecisionDefinie&&std::cmp_less(Chiffres.size(),Precision)) {
          Chiffres=std::string(static_cast<std::size_t>(Precision)-Chiffres.size(), '0')+Chiffres;
 }
         Texte=(Negatif?"-":"")+Chiffres;
@@ -192,7 +195,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
         char Tampon[32];
         std::snprintf(Tampon, sizeof(Tampon), "%llX", v);
         Texte=Tampon;
-        if (PrecisionDefinie&&(static_cast<int>(Texte.size())<Precision)) {
+        if (PrecisionDefinie&&std::cmp_less(Texte.size(),Precision)) {
          Texte=std::string(static_cast<std::size_t>(Precision)-Texte.size(), '0')+Texte;
 }
         break;
@@ -202,7 +205,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
       case 'G':
       case 'N':
        {
-        double v;
+        double v = NAN;
         if (a.Genre==TVarRec::vtReel) { v=a.Reel;
         } else { ErreurFormat(f, "%e/%f/%g/%n attend un réel");
 }
@@ -231,7 +234,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
          ErreurFormat(f, "%s attend une chaîne");
 }
         Texte=a.Chaine;
-        if (PrecisionDefinie&&(static_cast<int>(Texte.size())>Precision)) {
+        if (PrecisionDefinie&&std::cmp_greater(Texte.size(),Precision)) {
          Texte=Texte.substr(0, static_cast<std::size_t>(Precision));
 }
         break;
@@ -249,7 +252,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
       default:
        ErreurFormat(f, "type de spécificateur non géré");
      }
-    if (LargeurDefinie&&(static_cast<int>(Texte.size())<Largeur))
+    if (LargeurDefinie&&std::cmp_less(Texte.size(),Largeur))
      {
       std::string Bourrage(static_cast<std::size_t>(Largeur)-Texte.size(), ' ');
       Texte=AGauche?Texte+Bourrage:Bourrage+Texte;

@@ -73,7 +73,7 @@ std::string ProduitGolden(const std::string &asCheminCarte, const std::string &a
     {
      Texte+="distances="+Hexa(ExportEtat::Empreinte(cv, peDistances, true))+"\n";
      Texte+=LigneTour(cv);
-     int t;
+     int t = 0;
      for(t=1; t<=NB_TOURS_GOLDEN; t++)
       {
        if ((Config.TourResurrection != 0)&&(t==Config.TourResurrection)) {
@@ -135,7 +135,7 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
   // la direction (engine/README.md, « Vérifications sur le binaire d'origine »).
   int x=rand()%cv->NbX;
   int y=rand()%cv->NbY;
-  auto d=static_cast<direction>(1+rand()%NBDIR);
+  auto d=static_cast<direction>(1+(rand()%NBDIR));
   Texte+="depart x="+std::to_string(x)+" y="+std::to_string(y)+" d="+std::to_string(static_cast<int>(d))+"\n";
   cv->Genere(x, y, d);
   char Tampon[16];
@@ -189,8 +189,8 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
     struct selection { const char *Nom; int x, y, nx, ny; };
     const selection Selections[2]=
      {
-      {"complete", 0, 0, cv->NbX, cv->NbY},
-      {"reduite", 1, 1, cv->NbX-2, cv->NbY-2},
+      {.Nom="complete", .x=0, .y=0, .nx=cv->NbX, .ny=cv->NbY},
+      {.Nom="reduite", .x=1, .y=1, .nx=cv->NbX-2, .ny=cv->NbY-2},
      };
     for(const selection &s : Selections)
      {

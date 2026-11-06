@@ -257,14 +257,14 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
       std::vector<feu_p> l;
       l.reserve(static_cast<std::size_t>(n));
       for(int i=0; i<n; i++) {
-       l.push_back(feu_p{cv->FeuP[i].x[0], cv->FeuP[i].y[0], cv->FeuP[i].Dir[0],
-                         std::vector<int>(cv->FeuP[i].NumFeux, cv->FeuP[i].NumFeux+cv->FeuP[i].NbFeux)});
+       l.push_back(feu_p{.x=cv->FeuP[i].x[0], .y=cv->FeuP[i].y[0], .Dir=cv->FeuP[i].Dir[0],
+                         .NumFeux=std::vector<int>(cv->FeuP[i].NumFeux, cv->FeuP[i].NumFeux+cv->FeuP[i].NbFeux),});
 }
       return l;
      };
     const std::vector<feu_p> Avant=FeuxP(cv->NbFeuxPieton);
     REQUIRE(Avant.size()==6);
-    REQUIRE(std::any_of(Avant.begin(), Avant.end(), [](const feu_p &f) { return !f.NumFeux.empty(); }));
+    REQUIRE(std::ranges::any_of(Avant, [](const feu_p &f) { return !f.NumFeux.empty(); }));
     // Comme la fiche Priorités piétons : passage piétons sans feu dans cette direction
     int x=-1;
     int y=-1;

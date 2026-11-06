@@ -29,7 +29,7 @@ TfrmInfosVehicule::TfrmInfosVehicule(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmInfosVehicule::RendreVisibleInfos(bool ARendreVisible)
  {
-  int i;
+  int i = 0;
   GroupBoxVehicule->Caption=asDebutTitreCadreVehicule;
   if (ARendreVisible)
    {
@@ -66,23 +66,23 @@ void TfrmInfosVehicule::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosVehicule::RafraichitInfos()
  {
-  int i;
-  int NbTours;
-  int NumParkingDepart;
-  int NumParkingArrivee;
-  int NumFileParkDepart;
-  int NumFileParkArrivee;
+  int i = 0;
+  int NbTours = 0;
+  int NumParkingDepart = 0;
+  int NumParkingArrivee = 0;
+  int NumFileParkDepart = 0;
+  int NumFileParkArrivee = 0;
   int // v5.0
-      NbDirPoss;
-  bool Prioritaire;
-  int DejaParcouru;
-  int ResteAParcourir;
-  int DistMin;
-  voie *CaseDepart; // v5.0 : ATTENTION, le type de parking peut être souterrain ou extérieur !
-  bool Afficher;
+      NbDirPoss = 0;
+  bool Prioritaire = false;
+  int DejaParcouru = 0;
+  int ResteAParcourir = 0;
+  int DistMin = 0;
+  voie *CaseDepart = nullptr; // v5.0 : ATTENTION, le type de parking peut être souterrain ou extérieur !
+  bool Afficher = false;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   Veh=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumVehicule>0)))
@@ -139,14 +139,14 @@ void TfrmInfosVehicule::RafraichitInfos()
      LabelDistance->Caption=IntToStr(ResteAParcourir=v->DistParking[NumParkingArrivee-1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire]); // v3.5
 }
     if (NumParkingDepart != 0) { // v5.0
-      CaseDepart=&(cv->v[cv->Parking[NumParkingDepart-1].x][cv->Parking[NumParkingDepart-1].y]);
+      CaseDepart=&cv->v[cv->Parking[NumParkingDepart-1].x][cv->Parking[NumParkingDepart-1].y];
 }
     if (NumFileParkArrivee != 0) { // v5.0
       LabelDistance->Caption=IntToStr(ResteAParcourir=v->DistFilePark[NumFileParkArrivee-1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire]); // v3.5
 }
     if (NumFileParkDepart != 0) { // v5.0
-      CaseDepart=&(cv->v[cv->PlacePark[cv->FilePark[NumFileParkDepart-1].NumPlaceQueue].x]
-                           [cv->PlacePark[cv->FilePark[NumFileParkDepart-1].NumPlaceQueue].y]);
+      CaseDepart=&cv->v[cv->PlacePark[cv->FilePark[NumFileParkDepart-1].NumPlaceQueue].x]
+                           [cv->PlacePark[cv->FilePark[NumFileParkDepart-1].NumPlaceQueue].y];
 }
     NbDirPoss=NbDir[CaseDepart->DirPoss];
     if (NumFileParkArrivee != 0) { // v5.0
@@ -162,7 +162,7 @@ void TfrmInfosVehicule::RafraichitInfos()
 	LabelDistanceMin->Caption=IntToStr(DistMin);
 	// v1.8.4 : FormatFloat au lieu de Format
 	LabelParcoursEffectue->Caption=FormatFloat(asFrmPourcentage, (100.0*DejaParcouru)/(DejaParcouru+ResteAParcourir));
-	LabelDetour->Caption=FormatFloat(asFrmPourcentage, (100.0*(DejaParcouru+ResteAParcourir))/DistMin-100.0);
+	LabelDetour->Caption=FormatFloat(asFrmPourcentage, ((100.0*(DejaParcouru+ResteAParcourir))/DistMin)-100.0);
 	if (NbTours != 0) {
 	 LabelAttente->Caption=FormatFloat(asFrmPourcentage, (100.0*(NbTours-DejaParcouru))/NbTours);
     } else {

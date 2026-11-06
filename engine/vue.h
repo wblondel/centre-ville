@@ -32,7 +32,7 @@ enum fiche_info : signed char
   fiInfosTram,      // frmInfosTram      (idem)
   fiInfosTaxi,      // frmInfosTaxi      (idem)
   fiInfosVehlib,    // frmInfosVehlib    (idem)
-  fiInfosPieton     // frmInfosPieton    (idem)
+  fiInfosPieton,     // frmInfosPieton    (idem)
  };
 //---------------------------------------------------------------------------
 // Objets recherchés par frmRecherche (RadioButtonXxx / CSpinEditXxx)
@@ -124,7 +124,7 @@ class VueNulle : public IVueSimulation
   type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTitre,
                               type_message Type, int /*OrdreBoutonDefaut*/, int /*OrdreBoutonEchap*/) override
    {
-    Messages.push_back(message{asMessage, asTitre, Type});
+    Messages.push_back(message{.asMessage=asMessage, .asTitre=asTitre, .Type=Type});
     return Reponse;
    }
  };

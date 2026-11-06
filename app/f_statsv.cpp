@@ -23,7 +23,7 @@ TfrmStatsVehicules::TfrmStatsVehicules(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmStatsVehicules::FormShow(TObject *Sender)
 {
- int i;
+ int i = 0;
  int ne=cv->NbParkings;
  frmSimulation->ActionStatsParkings->Checked=true;
  frmStatsVehicules->Caption=Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
@@ -57,14 +57,14 @@ void TfrmStatsVehicules::ButtonFermerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmStatsVehicules::RafraichitInfos()
 {
- int i;
- int ed;
- int ea;
+ int i = 0;
+ int ed = 0;
+ int ea = 0;
  int n=StringGridStatsVehicules->ColCount-1;
- int Record;
- int Minimum;
- int Maximum;
- vehicule *v;
+ int Record = 0;
+ int Minimum = 0;
+ int Maximum = 0;
+ vehicule *v = nullptr;
  frmStatsVehicules->Caption=Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
  for(i=0; i<n*n; i++) {
   if ((i%n)!=(i/n)) {
@@ -80,7 +80,7 @@ void TfrmStatsVehicules::RafraichitInfos()
                Maximum=0; Minimum=32768;
                for(i=0; i<cv->NbVehicules; i++)
                 {
-                 v=&(cv->Vehicule[i]);
+                 v=&cv->Vehicule[i];
                  if ((v->NumParkingDepart==ed)&&
                      (v->NumParkingArrivee==ea)&&
                      (!v->Defini())&&
@@ -105,7 +105,7 @@ void TfrmStatsVehicules::RafraichitInfos()
                Maximum=0; Minimum=32768;
                for(i=0; i<cv->NbVehicules; i++)
                 {
-                 v=&(cv->Vehicule[i]);
+                 v=&cv->Vehicule[i];
                  if ((v->NumParkingDepart==ed)&&
                      (v->NumParkingArrivee==ea)&&
                      (!v->Defini())&&

@@ -45,7 +45,7 @@ namespace
     explicit ecrivain(conversion_cvw &Conversion) : c(Conversion) {}
     void Brut(const std::string &Nom, const std::string &o)
      {
-      c.Champs.push_back(champ_cvw{c.Octets.size(), o.size(), Nom});
+      c.Champs.push_back(champ_cvw{.Debut=c.Octets.size(), .Taille=o.size(), .Nom=Nom});
       c.Octets+=o;
      }
     void Entier(const std::string &Nom, std::int32_t v)
@@ -122,22 +122,22 @@ conversion_cvw ConvertitEn530(const std::string &asOrigine)
     e.Entier("NbMaxCasesDetectPsgPt", l.Entier());
     e.Entier("ProbaDirPsgPt", l.Entier());
     const char *ParamBus[]={"NbMaxCasesDetectArretBus", "ProbaDirArretBus", "ProbaArretBusDmd",
-                            "NbMaxPersonnesBus", "NbToursStopArretBus", "NbMaxToursAttenteBus"};
+                            "NbMaxPersonnesBus", "NbToursStopArretBus", "NbMaxToursAttenteBus",};
     for(const char *p : ParamBus) { e.Entier(p, l.Entier());
 }
     // Valeurs par défaut du constructeur de centre_ville pour les champs absents
     const char *ParamTram[]={"NbMaxCasesDetectArretTram", "ProbaDirArretTram", "ProbaArretTramDmd",
-                             "NbMaxPersonnesTram", "NbToursStopArretTram", "NbMaxToursAttenteTram"};
+                             "NbMaxPersonnesTram", "NbToursStopArretTram", "NbMaxToursAttenteTram",};
     const int DefautTram[]={3, 50, 10, 100, 3, 25};
     for(int i=0; i<6; i++) { e.Entier(ParamTram[i], (v>=0x350)?l.Entier():DefautTram[i]);
 }
     const char *ParamTaxi[]={"NbMaxCasesDetectFileTaxi", "ProbaDirFileTaxi", "ProbaArretTaxiDmd",
-                             "NbMaxPersonnesTaxi", "NbMaxToursAttenteTaxi"};
+                             "NbMaxPersonnesTaxi", "NbMaxToursAttenteTaxi",};
     const int DefautTaxi[]={3, 50, 10, 3, 25};
     for(int i=0; i<5; i++) { e.Entier(ParamTaxi[i], (v>=0x360)?l.Entier():DefautTaxi[i]);
 }
     const char *ParamVehlib[]={"NbMaxPersonnesVehlib", "NbMaxCasesDetectFileVehlib", "ProbaDirFileVehlib",
-                               "TauxRemplissageVehlib"};
+                               "TauxRemplissageVehlib",};
     const int DefautVehlib[]={3, 3, 50, 80};
     for(int i=0; i<4; i++) { e.Entier(ParamVehlib[i], (v>=0x530)?l.Entier():DefautVehlib[i]);
 }

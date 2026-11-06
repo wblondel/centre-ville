@@ -52,7 +52,7 @@ namespace
     if (p==std::string::npos) { return false;
 }
     std::string Fin=Nom.substr(p+1);
-    return (Fin=="x")||(Fin=="y")||(Fin.starts_with("x["))||(Fin.starts_with("y["));
+    return (Fin=="x")||(Fin=="y")||Fin.starts_with("x[")||Fin.starts_with("y[");
    }
   //-------------------------------------------------------------------------
   void EcritEntier(std::string &o, const champ_cvw &ch, int v)
@@ -345,8 +345,8 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
    };
   CHECK(Charge(asOctets));
   struct { const char *Nom; std::size_t Position; } Champs[]=
-   {{"NbFeux", 4}, {"NbX", 8}, {"NbY", 12}, {"NbFeuxPieton", 16}, {"NbParkings", 20}, {"NbArretsBus", 32},
-    {"NbArretsTram", 40}, {"NbPlacesTaxi", 48}, {"NbPlacesPark", 56}, {"NbPlacesVehlib", 60}};
+   {{.Nom="NbFeux", .Position=4}, {.Nom="NbX", .Position=8}, {.Nom="NbY", .Position=12}, {.Nom="NbFeuxPieton", .Position=16}, {.Nom="NbParkings", .Position=20}, {.Nom="NbArretsBus", .Position=32},
+    {.Nom="NbArretsTram", .Position=40}, {.Nom="NbPlacesTaxi", .Position=48}, {.Nom="NbPlacesPark", .Position=56}, {.Nom="NbPlacesVehlib", .Position=60},};
   for(const auto &c : Champs) {
    for(int Valeur : {-5, 0x7FFFFFF0})
     {
@@ -555,7 +555,7 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
                                     asSource+": direction incorrecte (9)\n",
                                     asSource+": ordonnée incorrecte ("+std::to_string(NbY)+")\n",
                                     std::string("Case (0,0): directions possibles incorrectes (20)\n"),
-                                    std::string("Case (0,0) (Nord): priorité incorrecte (9)\n")}) {
+                                    std::string("Case (0,0) (Nord): priorité incorrecte (9)\n"),}) {
    CHECK(asMessages.find(Attendu)!=std::string::npos);
 }
   cv->v[0][0].DirPoss=static_cast<dirposs>(DirPoss00); // ~voie() lit NbDir[DirPoss] : hors du tableau pour 20
@@ -730,7 +730,7 @@ TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans 
   for(int i=0; i<cv->NbFeux; i++) {
    Listes.emplace_back(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn+cv->Feu[i].NbFeuxPtn);
 }
-  REQUIRE(std::any_of(Listes.begin(), Listes.end(), [](const std::vector<int> &l) { return !l.empty(); }));
+  REQUIRE(std::ranges::any_of(Listes, [](const std::vector<int> &l) { return !l.empty(); }));
   cv->PrepareFeuxPietons();
   for(int i=0; i<cv->NbFeux; i++)
    {

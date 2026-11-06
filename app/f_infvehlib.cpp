@@ -28,7 +28,7 @@ TfrmInfosVehlib::TfrmInfosVehlib(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
  {
-  int i;
+  int i = 0;
   GroupBoxVehlib->Caption=asDebutTitreCadreVehlib;
   if (ARendreVisible)
    {
@@ -60,12 +60,12 @@ void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosVehlib::RafraichitInfos()
  {
-  int i;
+  int i = 0;
   int MinDistPlace=0x7FFFFFFF;
-  bool Afficher;
+  bool Afficher = false;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   Vehlib=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumVehlib>0)))

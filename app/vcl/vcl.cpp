@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <utility>
 //---------------------------------------------------------------------------
 String String::UpperCase() const { return A(Q(*this).toUpper()); }
 //---------------------------------------------------------------------------
@@ -32,7 +33,7 @@ String ParamStr(int Index)
 String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
  { // Sous-ensemble utilisé par les fiches : hh, nn, ss, zzz et caractères littéraux
   auto Jours=(double)dt;
-  auto ms=static_cast<long long>(std::floor((Jours-std::floor(Jours))*86400000.0+0.5));
+  auto ms=static_cast<long long>(std::floor(((Jours-std::floor(Jours))*86400000.0)+0.5));
   int h=static_cast<int>((ms/3600000)%24);
   int n=static_cast<int>((ms/60000)%60);
   int s=static_cast<int>((ms/1000)%60);
@@ -101,7 +102,7 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
   int Exposant=std::atoi(std::strchr(Tampon, 'e')+1);
   int Garde=Exposant+1+Decimales;
   if (Garde<0) { Chiffres.clear();
-  } else if (Garde<static_cast<int>(Chiffres.size()))
+  } else if (std::cmp_less(Garde,Chiffres.size()))
    {
     bool Haut=Chiffres[static_cast<std::size_t>(Garde)]>='5';
     Chiffres.resize(static_cast<std::size_t>(Garde));
@@ -118,17 +119,17 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
   bool Zero=Chiffres.find_first_not_of('0')==std::string::npos;
   std::string Entier;
   std::string Fraction;
-  for(int i=0; i<Exposant+1; i++) { Entier+=(i<static_cast<int>(Chiffres.size()))?Chiffres[static_cast<std::size_t>(i)]:'0';
+  for(int i=0; i<Exposant+1; i++) { Entier+=std::cmp_less(i,Chiffres.size())?Chiffres[static_cast<std::size_t>(i)]:'0';
 }
   for(int i=0; i<Decimales; i++)
    {
     int j=Exposant+1+i;
-    Fraction+=((j>=0)&&(j<static_cast<int>(Chiffres.size())))?Chiffres[static_cast<std::size_t>(j)]:'0';
+    Fraction+=((j>=0)&&std::cmp_less(j,Chiffres.size()))?Chiffres[static_cast<std::size_t>(j)]:'0';
    }
   Entier.erase(0, qMin(Entier.find_first_not_of('0'), Entier.size()));
-  if (static_cast<int>(Entier.size())<EntiersMin) { Entier.insert(0, static_cast<std::size_t>(EntiersMin-static_cast<int>(Entier.size())), '0');
+  if (std::cmp_less(Entier.size(),EntiersMin)) { Entier.insert(0, static_cast<std::size_t>(EntiersMin-static_cast<int>(Entier.size())), '0');
 }
-  while((static_cast<int>(Fraction.size())>DecimalesMin)&&(Fraction.back()=='0')) { Fraction.pop_back();
+  while(std::cmp_greater(Fraction.size(),DecimalesMin)&&(Fraction.back()=='0')) { Fraction.pop_back();
 }
   // Résultat
   std::string r=((Valeur<0)&&!Zero)?"-":"";

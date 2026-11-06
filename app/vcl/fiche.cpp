@@ -15,13 +15,13 @@ namespace
   struct ListeIndexee { const char *Fiche, *Nom; const char *const *Ressources; int Nombre; };
   const ListeIndexee ListesIndexees[]=
    {
-    {"f_carfours", "VirtualImageList64", f_carfours_VirtualImageList64, NB_F_CARFOURS_VirtualImageList64},
-    {"f_carfours", "VirtualImageList96", f_carfours_VirtualImageList96, NB_F_CARFOURS_VirtualImageList96},
-    {"f_carfours", "VirtualImageList128", f_carfours_VirtualImageList128, NB_F_CARFOURS_VirtualImageList128},
-    {"f_propos", "VirtualImageList", f_propos_VirtualImageList, NB_F_PROPOS_VirtualImageList},
-    {"f_simul", "VirtualImageList16x16", f_simul_VirtualImageList16x16, NB_F_SIMUL_VirtualImageList16x16},
-    {"f_simul", "VirtualImageList8x8", f_simul_VirtualImageList8x8, NB_F_SIMUL_VirtualImageList8x8},
-    {"f_simul", "VirtualImageListGlyphes", f_simul_VirtualImageListGlyphes, NB_F_SIMUL_VirtualImageListGlyphes},
+    {.Fiche="f_carfours", .Nom="VirtualImageList64", .Ressources=f_carfours_VirtualImageList64, .Nombre=NB_F_CARFOURS_VirtualImageList64},
+    {.Fiche="f_carfours", .Nom="VirtualImageList96", .Ressources=f_carfours_VirtualImageList96, .Nombre=NB_F_CARFOURS_VirtualImageList96},
+    {.Fiche="f_carfours", .Nom="VirtualImageList128", .Ressources=f_carfours_VirtualImageList128, .Nombre=NB_F_CARFOURS_VirtualImageList128},
+    {.Fiche="f_propos", .Nom="VirtualImageList", .Ressources=f_propos_VirtualImageList, .Nombre=NB_F_PROPOS_VirtualImageList},
+    {.Fiche="f_simul", .Nom="VirtualImageList16x16", .Ressources=f_simul_VirtualImageList16x16, .Nombre=NB_F_SIMUL_VirtualImageList16x16},
+    {.Fiche="f_simul", .Nom="VirtualImageList8x8", .Ressources=f_simul_VirtualImageList8x8, .Nombre=NB_F_SIMUL_VirtualImageList8x8},
+    {.Fiche="f_simul", .Nom="VirtualImageListGlyphes", .Ressources=f_simul_VirtualImageListGlyphes, .Nombre=NB_F_SIMUL_VirtualImageListGlyphes},
    };
  }
 //---------------------------------------------------------------------------
@@ -280,7 +280,7 @@ TShiftState EtatTouches(const QKeyEvent *e)
 }
   if (m.testFlag(Qt::ControlModifier)) { s<<ssCtrl;
 }
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
   if (m.testFlag(Qt::MetaModifier)) { s<<ssCtrl;
 }
 #endif

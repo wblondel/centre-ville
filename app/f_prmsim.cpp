@@ -94,10 +94,10 @@ void TfrmParamSimul::CSpinEditNbPietonsChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des possibilités de véhicules déporté en fonction car utilisé dans FormShow
  {
-  if ((cv->NbParkings*(cv->NbParkings-1)+2*cv->NbPlacesPark)<=0) { return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
+  if (((cv->NbParkings*(cv->NbParkings-1))+(2*cv->NbPlacesPark))<=0) { return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
 }
-  int NbMinVehicules= cv->NbParkings*(cv->NbParkings-1)
-                     +2*cv->NbPlacesPark;
+  int NbMinVehicules= (cv->NbParkings*(cv->NbParkings-1))
+                     +(2*cv->NbPlacesPark);
   int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
 	  NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules);
   int // v5.0.3
@@ -202,7 +202,7 @@ void TfrmParamSimul::FormShow(TObject *Sender)
 void TfrmParamSimul::BitBtnAppliqueDureeFeuVertClick(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  for(i=0; i<cv->NbFeux; i++) {
   if (cv->Feu[i].Defini()) { cv->Feu[i].DureeVert=cv->DureeVert;
 }
@@ -212,7 +212,7 @@ void TfrmParamSimul::BitBtnAppliqueDureeFeuVertClick(
 void TfrmParamSimul::BitBtnAppliqueDureeFeuRougeClick(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  for(i=0; i<cv->NbFeux; i++) {
   if (cv->Feu[i].Defini()) { cv->Feu[i].DureeRouge=cv->DureeRouge;
 }

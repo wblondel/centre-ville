@@ -24,15 +24,15 @@ TfrmDefFeux::TfrmDefFeux(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 bool TfrmDefFeux::RafraichitInfos()
  {
-  int i;
-  int NbFeuxP;
-  v=&(cv->v[x][y]);
+  int i = 0;
+  int NbFeuxP = 0;
+  v=&cv->v[x][y];
   Numero=v->NumFeu[Direction-1];
   if (Numero == 0) {
    Numero=cv->AjouteFeu(x, y, Direction); // v5.2 : plus de message de limite.
 }
   v->NumFeu[Direction-1]=Numero;
-  f=&(cv->Feu[Numero-1]);
+  f=&cv->Feu[Numero-1];
   LabelCoordonnees->Caption=Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
   LabelDirection->Caption=asDir[Direction];
   if (Numero != 0) { LabelNumero->Caption=IntToStr(Numero);
@@ -48,8 +48,8 @@ bool TfrmDefFeux::RafraichitInfos()
   NbFeuxAtt=f->NbFeuxAtt;
   if (NumFeuxDmd) { delete[] NumFeuxDmd; NumFeuxDmd=nullptr; }
   if (NumFeuxAtt) { delete[] NumFeuxAtt; NumFeuxAtt=nullptr; }
-  if ((((NbFeuxDmd) != 0)&&(!(NumFeuxDmd=new int[NbFeuxDmd])))||
-      (((NbFeuxAtt) != 0)&&(!(NumFeuxAtt=new int[NbFeuxAtt]))))
+  if (((NbFeuxDmd != 0)&&(!(NumFeuxDmd=new int[NbFeuxDmd])))||
+      ((NbFeuxAtt != 0)&&(!(NumFeuxAtt=new int[NbFeuxAtt]))))
     {
      AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
      return false;
@@ -89,13 +89,13 @@ bool TfrmDefFeux::RafraichitInfos()
 //---------------------------------------------------------------------------
 bool TfrmDefFeux::AppliqueChoix()
  {
-  int i;
+  int i = 0;
   // v6.0.10 : la fiche n'est pas modale. Depuis RafraichitInfos, Carrefours ou la fiche
   // Priorités ont pu agrandir la table des feux, donc la déplacer ; Carrefours a pu effacer ce
   // feu et reprendre son numéro ailleurs : rien n'est alors écrit (et la fiche se ferme)
   if (cv->v[x][y].NumFeu[Direction-1]!=Numero) { return false;
 }
-  f=&(cv->Feu[Numero-1]);
+  f=&cv->Feu[Numero-1];
   frmSimulation->SimulationModifiee=true;
   f->Etat=(etat_feu)RadioGroupEtat->ItemIndex;
   f->TypeDmdVert=(dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
@@ -108,8 +108,8 @@ bool TfrmDefFeux::AppliqueChoix()
   f->NbFeuxAtt=0;
   if (f->NumFeuxDmd) { delete[] f->NumFeuxDmd; f->NumFeuxDmd=nullptr; }
   if (f->NumFeuxAtt) { delete[] f->NumFeuxAtt; f->NumFeuxAtt=nullptr; }
-  if ((((NbFeuxDmd) != 0)&&(!(f->NumFeuxDmd=new int[NbFeuxDmd])))||
-      (((NbFeuxAtt) != 0)&&(!(f->NumFeuxAtt=new int[NbFeuxAtt]))))
+  if (((NbFeuxDmd != 0)&&(!(f->NumFeuxDmd=new int[NbFeuxDmd])))||
+      ((NbFeuxAtt != 0)&&(!(f->NumFeuxAtt=new int[NbFeuxAtt]))))
    {
     AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
     return false;
@@ -145,7 +145,7 @@ void TfrmDefFeux::FormShow(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::FormHide(TObject *Sender)
 {
- int i;
+ int i = 0;
  frmSimulation->ActionPriorites->Enabled=true;
  SpeedButtonSelFeuxDmd->Down=false;
  SpeedButtonSelFeuxAtt->Down=false;
@@ -188,7 +188,7 @@ void TfrmDefFeux::ButtonAppliquerClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupEtatClick(TObject *Sender)
 {
- f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
+ f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupEtat->ItemIndex!=f->Etat) {
   ButtonAppliquer->Enabled=true;
 }
@@ -196,7 +196,7 @@ void TfrmDefFeux::RadioGroupEtatClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject *Sender)
 {
- f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
+ f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypeDmdVert->ItemIndex!=f->TypeDmdVert) {
  ButtonAppliquer->Enabled=true;
 }
@@ -209,7 +209,7 @@ void TfrmDefFeux::CSpinEditDureeVertChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject *Sender)
 {
- int i;
+ int i = 0;
  if (SpeedButtonSelFeuxDmd->Down&&(!SpeedButtonSelFeuxAtt->Down)) {
   SpeedButtonSelFeuxAtt->Click();
 }
@@ -217,12 +217,12 @@ void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject *Sender)
  for(i=0; i<NbFeuxDmd; i++) { frmSimulation->RedessineCase(cv->Feu[NumFeuxDmd[i]-1].x, cv->Feu[NumFeuxDmd[i]-1].y, true);
 }
  frmSimulation->RedessineCase(frmSimulation->DrawGridSimul->Col, frmSimulation->DrawGridSimul->Row, true);
- frmSimulation->ActionPriorites->Enabled=!((frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt));
+ frmSimulation->ActionPriorites->Enabled=!(frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt);
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject *Sender)
 {
- int i;
+ int i = 0;
  if (SpeedButtonSelFeuxAtt->Down&&(!SpeedButtonSelFeuxDmd->Down)) {
   SpeedButtonSelFeuxDmd->Click();
 }
@@ -230,12 +230,12 @@ void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject *Sender)
  for(i=0; i<NbFeuxAtt; i++) { frmSimulation->RedessineCase(cv->Feu[NumFeuxAtt[i]-1].x, cv->Feu[NumFeuxAtt[i]-1].y, true);
 }
  frmSimulation->RedessineCase(frmSimulation->DrawGridSimul->Col, frmSimulation->DrawGridSimul->Row, true);
- frmSimulation->ActionPriorites->Enabled=!((frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt));
+ frmSimulation->ActionPriorites->Enabled=!(frmSimulation->SelectionFeuxDmd||frmSimulation->SelectionFeuxAtt);
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeux::RadioGroupTypePsgRougeClick(TObject *Sender)
 {
- f=&(cv->Feu[Numero-1]); // v6.0.10 : voir AppliqueChoix
+ f=&cv->Feu[Numero-1]; // v6.0.10 : voir AppliqueChoix
  if (RadioGroupTypePsgRouge->ItemIndex!=f->TypePsgRouge) {
   ButtonAppliquer->Enabled=true;
 }

@@ -27,7 +27,7 @@ TfrmInfosTaxi::TfrmInfosTaxi(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
  {
-  int i;
+  int i = 0;
   GroupBoxTaxi->Caption=asDebutTitreCadreTaxi;
   if (ARendreVisible)
    {
@@ -61,13 +61,13 @@ void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::RafraichitInfos()
  {
-  int i;
-  int NumPlaceTeteFile;
+  int i = 0;
+  int NumPlaceTeteFile = 0;
   int MinDistFile=0x7FFFFFFF;
-  bool Afficher;
+  bool Afficher = false;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   Taxi=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumTaxi>0)))

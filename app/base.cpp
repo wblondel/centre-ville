@@ -29,69 +29,69 @@ const int BoutonDefaut[NBTYPESMESSAGE][NBMAXBOUTONS]={ {0,0,0}, // MB_DEFBUTTONn
                                                        {0,0,0},
                                                        {0,0,0},
                                                        {0,1,0},
-                                                       {0,1,2}};
+                                                       {0,1,2},};
 //---------------------------------------------------------------------------
 const AnsiString asDebutNomSpinEdit = "CSpinEdit";
 //---------------------------------------------------------------------------
 const struct { int Numero; const char *szHREF; } // v5.3 : aide type HLP converti en type HTML : correspondances TForm::HelpContext en URL "html\index.html#"
       caCorresp[NBCONTEXTESAIDE] =
-                      {{ 0, "ASCV"},
-                       {10, "BR"},
-                       {20, "EDLS"},
-                       {30, "PDLI"},
-                       {31, "LMP"},
-                       {3101, "LMF"},
-                       {3102, "LMA"},
-                       {3103, "LMSI"},
-                       {3104, "LMST"},
-                       {3105, "LMI"},
-                       {311, "PDLS"},
-                       {3111, "DDDDLZDS"},
-                       {3112, "GADUR"},
-                       {3121, "PDRDB"},
-                       {3122, "PDRDT"},
-                       {3123, "PDT"},
-                       {3124, "PDV"},
-                       {313, "CDLS"},
-                       {314, "SDLS"},
-                       {315, "SSLCDR"},
-					   {316, "PDLADSDE"},
-                       {317, "PDLE"}, // v5.4.1
-                       {32, "LBDO"},
-                       {33, "LZDS"},
-                       {3301, "LDEDLZDS"},
-                       {3302, "LMD"},
-                       {34, "LBDE"},
-                       {40, "CDR"},
-                       {41, "DDP"},
-                       {415, "DDPP"},
-                       {42, "DDF"},
-                       {425, "DDFDP"},
-                       {431, "ODC"},
-                       {4311, "OCUCS"},
-                       {4312, "OCPCS"},
-                       {432, "C"},
-                       {44, "BDN"},
-                       {45, "DDLNDUZ"},
-                       {50, "LDLS"},
-                       {611, "EGDLS"},
-                       {612, "SDFEDT"},
-                       {62, "SDVDUEAUA"},
-                       {63, "ADDJAE"},
-                       {641, "ADDJAADB"},
-                       {642, "ADDJAADT"},
-                       {643, "ADDJAFDT"},
-					   {644, "ADDJAFDP"},
-                       {645, "ADDJAPDV"},
-					   {65, "RDUEDLS"},
-                       {66, "ISUV"},
-                       {671, "ISUB"},
-                       {672, "ISUT"},
-                       {673, "ISUVDT"},
-                       {674, "ISUVL"},
-                       {68, "ISUP"},
-                       {69, "RC"},
-                       {70, "MDE"}};
+                      {{ .Numero=0, .szHREF="ASCV"},
+                       {.Numero=10, .szHREF="BR"},
+                       {.Numero=20, .szHREF="EDLS"},
+                       {.Numero=30, .szHREF="PDLI"},
+                       {.Numero=31, .szHREF="LMP"},
+                       {.Numero=3101, .szHREF="LMF"},
+                       {.Numero=3102, .szHREF="LMA"},
+                       {.Numero=3103, .szHREF="LMSI"},
+                       {.Numero=3104, .szHREF="LMST"},
+                       {.Numero=3105, .szHREF="LMI"},
+                       {.Numero=311, .szHREF="PDLS"},
+                       {.Numero=3111, .szHREF="DDDDLZDS"},
+                       {.Numero=3112, .szHREF="GADUR"},
+                       {.Numero=3121, .szHREF="PDRDB"},
+                       {.Numero=3122, .szHREF="PDRDT"},
+                       {.Numero=3123, .szHREF="PDT"},
+                       {.Numero=3124, .szHREF="PDV"},
+                       {.Numero=313, .szHREF="CDLS"},
+                       {.Numero=314, .szHREF="SDLS"},
+                       {.Numero=315, .szHREF="SSLCDR"},
+					   {.Numero=316, .szHREF="PDLADSDE"},
+                       {.Numero=317, .szHREF="PDLE"}, // v5.4.1
+                       {.Numero=32, .szHREF="LBDO"},
+                       {.Numero=33, .szHREF="LZDS"},
+                       {.Numero=3301, .szHREF="LDEDLZDS"},
+                       {.Numero=3302, .szHREF="LMD"},
+                       {.Numero=34, .szHREF="LBDE"},
+                       {.Numero=40, .szHREF="CDR"},
+                       {.Numero=41, .szHREF="DDP"},
+                       {.Numero=415, .szHREF="DDPP"},
+                       {.Numero=42, .szHREF="DDF"},
+                       {.Numero=425, .szHREF="DDFDP"},
+                       {.Numero=431, .szHREF="ODC"},
+                       {.Numero=4311, .szHREF="OCUCS"},
+                       {.Numero=4312, .szHREF="OCPCS"},
+                       {.Numero=432, .szHREF="C"},
+                       {.Numero=44, .szHREF="BDN"},
+                       {.Numero=45, .szHREF="DDLNDUZ"},
+                       {.Numero=50, .szHREF="LDLS"},
+                       {.Numero=611, .szHREF="EGDLS"},
+                       {.Numero=612, .szHREF="SDFEDT"},
+                       {.Numero=62, .szHREF="SDVDUEAUA"},
+                       {.Numero=63, .szHREF="ADDJAE"},
+                       {.Numero=641, .szHREF="ADDJAADB"},
+                       {.Numero=642, .szHREF="ADDJAADT"},
+                       {.Numero=643, .szHREF="ADDJAFDT"},
+					   {.Numero=644, .szHREF="ADDJAFDP"},
+                       {.Numero=645, .szHREF="ADDJAPDV"},
+					   {.Numero=65, .szHREF="RDUEDLS"},
+                       {.Numero=66, .szHREF="ISUV"},
+                       {.Numero=671, .szHREF="ISUB"},
+                       {.Numero=672, .szHREF="ISUT"},
+                       {.Numero=673, .szHREF="ISUVDT"},
+                       {.Numero=674, .szHREF="ISUVL"},
+                       {.Numero=68, .szHREF="ISUP"},
+                       {.Numero=69, .szHREF="RC"},
+                       {.Numero=70, .szHREF="MDE"},};
 //---------------------------------------------------------------------------
 // v5.4 : Pour les fichiers créés par Centre-Ville
 //        on utilise le chemin donné par %LocalAppData% pour Windows 7 ou plus
@@ -111,11 +111,11 @@ String stRepLocalAppData()
    } else
 	{
 	 QString stRep = stBase + stRepLocAppDataCvw;
-	 if (!QDir(stRep).exists()) {
-	   if (!QDir().mkpath(stRep)) {
+	 if ((!QDir(stRep).exists()) && (!QDir().mkpath(stRep))) 
+	   {
 		 return stExePath;
 }
-}
+
 	 stResult = A(QDir::toNativeSeparators(stRep));
 	}
    return stResult;
@@ -256,15 +256,15 @@ int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
   (void)HelpCtx;
   static const char *Titres[]={"Avertissement", "Erreur", "Information", "Confirmation", ""};
   static const QMessageBox::Icon Icones[]={QMessageBox::Warning, QMessageBox::Critical, QMessageBox::Information,
-                                           QMessageBox::Question, QMessageBox::NoIcon};
+                                           QMessageBox::Question, QMessageBox::NoIcon,};
   QMessageBox Boite(Icones[Type], QString::fromUtf8(Titres[Type]), Q(asMessage), QMessageBox::NoButton, FenetreParente());
   struct { TMsgDlgBtn b; QMessageBox::StandardButton q; int mr; } Correspondances[]=
-   {{mbYes, QMessageBox::Yes, mrYes}, {mbNo, QMessageBox::No, mrNo}, {mbOK, QMessageBox::Ok, mrOk},
-    {mbCancel, QMessageBox::Cancel, mrCancel}, {mbAbort, QMessageBox::Abort, mrAbort},
-    {mbRetry, QMessageBox::Retry, mrRetry}, {mbIgnore, QMessageBox::Ignore, mrIgnore},
-    {mbAll, QMessageBox::YesToAll, mrAll}, {mbNoToAll, QMessageBox::NoToAll, mrNoToAll},
-    {mbYesToAll, QMessageBox::YesToAll, mrYesToAll}, {mbHelp, QMessageBox::Help, mrNone},
-    {mbClose, QMessageBox::Close, mrClose}};
+   {{.b=mbYes, .q=QMessageBox::Yes, .mr=mrYes}, {.b=mbNo, .q=QMessageBox::No, .mr=mrNo}, {.b=mbOK, .q=QMessageBox::Ok, .mr=mrOk},
+    {.b=mbCancel, .q=QMessageBox::Cancel, .mr=mrCancel}, {.b=mbAbort, .q=QMessageBox::Abort, .mr=mrAbort},
+    {.b=mbRetry, .q=QMessageBox::Retry, .mr=mrRetry}, {.b=mbIgnore, .q=QMessageBox::Ignore, .mr=mrIgnore},
+    {.b=mbAll, .q=QMessageBox::YesToAll, .mr=mrAll}, {.b=mbNoToAll, .q=QMessageBox::NoToAll, .mr=mrNoToAll},
+    {.b=mbYesToAll, .q=QMessageBox::YesToAll, .mr=mrYesToAll}, {.b=mbHelp, .q=QMessageBox::Help, .mr=mrNone},
+    {.b=mbClose, .q=QMessageBox::Close, .mr=mrClose},};
   for(auto &c : Correspondances) {
    if (Boutons.Contains(c.b)) { Boite.addButton(c.q);
 }

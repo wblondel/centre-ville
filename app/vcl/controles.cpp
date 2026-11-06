@@ -2,6 +2,8 @@
 // vcl/controles.cpp - Portage de Centre-Ville : contrôles de la VCL sur Qt
 //---------------------------------------------------------------------------
 #include "controles.h"
+
+#include <math.h>
 #include <QAbstractButton>
 #include <QAction>
 #include <QButtonGroup>
@@ -22,6 +24,7 @@
 #include <QTabBar>
 #include <cmath>
 #include <cstring>
+#include <utility>
 //---------------------------------------------------------------------------
 // Commun
 //---------------------------------------------------------------------------
@@ -33,7 +36,7 @@ template <class B> void ControleVcl<B>::PrepareVcl()
    { // Font.Height < 0 : hauteur des caractères en pixels (indépendant des ppp de l'écran)
     QFont f=w->font();
     int h=v.toInt();
-    f.setPixelSize(h<0?-h:qMax(1, static_cast<int>(0.85*h+0.5)));
+    f.setPixelSize(h<0?-h:qMax(1, static_cast<int>((0.85*h)+0.5)));
     w->setFont(f);
    }
   v=w->property("vclFontColor");
@@ -352,7 +355,7 @@ namespace
   double Luminance(const QColor &c)
    {
     auto Lineaire=[](double v) { return v<=0.03928?v/12.92:std::pow((v+0.055)/1.055, 2.4); };
-    return 0.2126*Lineaire(c.redF())+0.7152*Lineaire(c.greenF())+0.0722*Lineaire(c.blueF());
+    return (0.2126*Lineaire(c.redF()))+(0.7152*Lineaire(c.greenF()))+(0.0722*Lineaire(c.blueF()));
    }
  }
 //---------------------------------------------------------------------------
@@ -368,10 +371,10 @@ QColor CouleurLisible(const QColor &Texte, const QColor &Fond)
   if (Contraste(Texte, Fond)>=3) { return Texte;
 }
   bool Sombre=Luminance(Fond)<0.18;
-  float h;
-  float s;
-  float l;
-  float a;
+  float h = NAN;
+  float s = NAN;
+  float l = NAN;
+  float a = NAN;
   Texte.getHslF(&h, &s, &l, &a);
   QColor c=Texte;
   for(int i=0; (i<50)&&(Contraste(c, Fond)<4.5); i++)
@@ -494,7 +497,7 @@ int TCSpinEdit::CheckValue(int v)
 //---------------------------------------------------------------------------
 void TCSpinEdit::stepBy(int steps)
  { // Value:=Value+FIncrement (ou -), puis, comme QAbstractSpinBox, texte sélectionné
-  Value=Value+steps*Increment;
+  Value=Value+(steps*Increment);
   if (style()->styleHint(QStyle::SH_SpinBox_SelectOnStep, nullptr, this) != 0) { selectAll();
 }
  }
@@ -672,7 +675,7 @@ TRadioGroup::TRadioGroup(QWidget *Parent) : ControleVcl<QGroupBox>(Parent)
   ItemIndex.Definit([this] { return Groupe?Groupe->checkedId():-1; },
                     [this](const int &i)
                      {
-                      if ((i>=0)&&(i<static_cast<int>(Boutons.size()))) { Boutons[static_cast<std::size_t>(i)]->setChecked(true);
+                      if ((i>=0)&&std::cmp_less(i,Boutons.size())) { Boutons[static_cast<std::size_t>(i)]->setChecked(true);
                       } else if (Groupe&&Groupe->checkedButton())
                        {
                         Groupe->setExclusive(false);
@@ -809,11 +812,11 @@ void TSpeedButton::DefinitDown(bool Valeur)
   setChecked(Valeur);
   if (Valeur&&parentWidget()) {
    for(QObject *o : parentWidget()->children()) {
-    if (auto *b=dynamic_cast<TSpeedButton *>(o)) {
-     if ((b!=this)&&(b->GroupIndex==GroupIndex)&&b->isChecked()) {
+    if (auto *b=dynamic_cast<TSpeedButton *>(o); b && ((b!=this)&&(b->GroupIndex==GroupIndex)&&b->isChecked())) 
+     {
       b->setChecked(false);
 }
-}
+
 }
 }
  }
@@ -1010,8 +1013,8 @@ void TTabControl::paintEvent(QPaintEvent * /*event*/)
 //---------------------------------------------------------------------------
 // TStatusBar
 //---------------------------------------------------------------------------
-TStatusPanel::TStatusPanel(TStatusBar *b, int Largeur, TAlignment Alignement, const AnsiString &asTexteInitial) :
-  Barre(b), asTexte(asTexteInitial), iLargeur(Largeur), Alignment(Alignement)
+TStatusPanel::TStatusPanel(TStatusBar *b, int Largeur, TAlignment Alignement, AnsiString asTexteInitial) :
+  Barre(b), asTexte(std::move(asTexteInitial)), iLargeur(Largeur), Alignment(Alignement)
  {
   Text.Definit([this] { return asTexte; },
                [this](const AnsiString &as) { if (as!=asTexte) { asTexte=as; Barre->update(); } });
@@ -1289,9 +1292,9 @@ void ConfigureNonVisuel(QObject *Composant, const QStringList &Proprietes)
      }
    }
   // TTimer : Enabled vaut True par défaut dans la VCL
-  if (auto *t=dynamic_cast<TTimer *>(Composant)) {
-   if (!Proprietes.join(';').contains("Enabled=")) { t->Enabled=true;
+  if (auto *t=dynamic_cast<TTimer *>(Composant); t && (!Proprietes.join(';').contains("Enabled="))) 
+   { t->Enabled=true;
 }
-}
+
  }
 //---------------------------------------------------------------------------

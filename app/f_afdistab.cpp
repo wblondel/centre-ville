@@ -18,7 +18,7 @@ TfrmAffDistArretsBus::TfrmAffDistArretsBus(TComponent* Owner) : TForm(Owner) { C
 //---------------------------------------------------------------------------
 void TfrmAffDistArretsBus::EffaceInfos()
  {
-  int i;
+  int i = 0;
   int NbCol=StringGridDistances->ColCount;
   int NbLig=StringGridDistances->RowCount;
   int NbCases=NbCol*NbLig;
@@ -28,13 +28,13 @@ void TfrmAffDistArretsBus::EffaceInfos()
 //---------------------------------------------------------------------------
 void TfrmAffDistArretsBus::RafraichitInfos()
  {
-  int i;
-  int NbCases;
-  int NbX;
-  int de;
+  int i = 0;
+  int NbCases = 0;
+  int NbX = 0;
+  int de = 0;
   int x=frmSimulation->DrawGridSimul->Col;
   int y=frmSimulation->DrawGridSimul->Row;
-  voie *v=&(cv->v[x][y]);
+  voie *v=&cv->v[x][y];
   EffaceInfos();
   if (!v->DistArretBus) { return;
 }
@@ -46,10 +46,10 @@ void TfrmAffDistArretsBus::RafraichitInfos()
      {
       if ((i%NbX) == 0) { StringGridDistances->Cells[i%NbX][i/NbX]=Format("%5d", ARRAYOFCONST((i/NbX)));
 }
-      if ((i != 0)&&(i<NbX)) { StringGridDistances->Cells[i%NbX][i/NbX]=asDir1[Dirdp[i%NbX-1][v->DirPoss]];
+      if ((i != 0)&&(i<NbX)) { StringGridDistances->Cells[i%NbX][i/NbX]=asDir1[Dirdp[(i%NbX)-1][v->DirPoss]];
 }
       if (((i%NbX) != 0)&&(i>=NbX)) { // v5.4 : conversion BCB6>BCBX (AnsiString>String)
-	   StringGridDistances->Cells[i%NbX][i/NbX]=((de=v->DistArretBus[i/NbX-1][i%NbX-1])==DIST_INDEFINIE)?String("     "):Format("%5d", ARRAYOFCONST((de)));
+	   StringGridDistances->Cells[i%NbX][i/NbX]=((de=v->DistArretBus[(i/NbX)-1][(i%NbX)-1])==DIST_INDEFINIE)?String("     "):Format("%5d", ARRAYOFCONST((de)));
 }
      }
    }
@@ -60,7 +60,7 @@ void TfrmAffDistArretsBus::FormShow(TObject *Sender)
  frmSimulation->ActionDistancesArretsBus->Checked=true;
  StringGridDistances->RowCount=1+cv->NbArretsBus;
  StringGridDistances->FixedRows=1; // v6.0.2 : RowCount=1 (tableau vide) l'avait ramené à 0, pour toutes les cartes suivantes (borné à RowCount-1)
- Height=(cv->NbArretsBus>10)?283:(26+21*StringGridDistances->RowCount);
+ Height=(cv->NbArretsBus>10)?283:(26+(21*StringGridDistances->RowCount));
  RafraichitInfos();
 }
 //---------------------------------------------------------------------------

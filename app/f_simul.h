@@ -37,7 +37,7 @@ class QTemporaryFile;
 // Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets)
 //----------------------------------------------------------------------------------------------------------------------
 // pour RafraichitBoutonsEdition(...) v3.5
-enum affichage : unsigned char {aff_aucun, aff_dir, aff_sign, aff_veh=4, aff_ptn=8, aff_voie=16, aff_quadr=32, aff_env=64, aff_infct=128}; // v3.8.1 (aff_env). v5.4.1 (unsigned + aff_infct)
+enum affichage : unsigned char {aff_aucun = 0, aff_dir = 1, aff_sign = 2, aff_veh=4, aff_ptn=8, aff_voie=16, aff_quadr=32, aff_env=64, aff_infct=128}; // v3.8.1 (aff_env). v5.4.1 (unsigned + aff_infct)
 enum type_demande : char {tdRien, tdPause, tdArret};
 enum operation_avant : char {oaNouveau, oaOuvrir, oaQuitter};
 enum mode_edition : char {meAucun, meCase, meSelection}; // pour RafraichitBoutonEdition. v3.5
@@ -628,7 +628,7 @@ private:
     if (SimulEnCours)
      {
       TypeDemande=tdRien;
-      TimerSimul->Interval=static_cast<unsigned>(0.5+1000.0/(cv->NbToursParSeconde));
+      TimerSimul->Interval=static_cast<unsigned>(0.5+(1000.0/cv->NbToursParSeconde));
       TimerSimul->Enabled=true;
      }
     InitialiseDeplacementFeu(); // v3.5

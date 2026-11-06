@@ -443,7 +443,7 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
 void GrilleSimulation::keyPressEvent(QKeyEvent *e)
  { // TCustomGrid::KeyDown
   bool Ctrl=e->modifiers().testFlag(Qt::ControlModifier), Maj=e->modifiers().testFlag(Qt::ShiftModifier);
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
   Ctrl=Ctrl||((e->modifiers()&Qt::MetaModifier) != 0u);
 #endif
   TGridCoord n=Courante;

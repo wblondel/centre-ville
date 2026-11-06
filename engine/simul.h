@@ -148,10 +148,10 @@ enum type_distance : signed char {type_indefini, parkings, arrets_bus, arrets_tr
 enum type_voie : signed char {tvAucun, tvRoute, tvVoieTram, tvTout}; // pour la suppression des routes et voies de tram. v3.5 // portage : signed char
 enum situation_taxi : signed char {stAttente, stDepart, stDepot, stRetour}; // v3.6 // portage : signed char
 enum situation_vehlib : signed char {svAttente, svDepart}; // v5.3 // portage : signed char
-enum nature { voies,
+enum nature { voies = 0,
               trottoirs=0x10000, arbre=0x10010, pelouse=0x10020,  // Décors zone piétonne (v3.9)
-              immeubles=0x20000};
-enum coin : signed char {aucun_coin, haut_droite, bas_droite, bas_gauche=4, haut_gauche=8, quatre_coins=15}; // v3.8 // portage : signed char
+              immeubles=0x20000,};
+enum coin : signed char {aucun_coin = 0, haut_droite = 1, bas_droite = 2, bas_gauche=4, haut_gauche=8, quatre_coins=15}; // v3.8 // portage : signed char
 //---------------------------------------------------------------------------
 class centre_ville;
 //---------------------------------------------------------------------------
@@ -423,9 +423,9 @@ class feu_pieton // v5.2
   void DefinitFeuOppose();
   ~feu_pieton()
    {
-    if (!CopieEnCours) { // v5.1
-     if (NbFeux != 0) { delete[] NumFeux; NumFeux=nullptr; }
-}
+    if ((!CopieEnCours) && (NbFeux != 0)) // v5.1
+     { delete[] NumFeux; NumFeux=nullptr; }
+
    };
   bool Defini()
    {

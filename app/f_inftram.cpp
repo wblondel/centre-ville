@@ -19,7 +19,7 @@ TfrmInfosTram *frmInfosTram;
 const AnsiString asDebutTitreCadreTram="                           ",
                  asFrmNumeroCoordonnees[3]={ "%d (%2.2d, %2.2d)",
                                              "%d (%2.2d, %2.2d)  jusqu'au tour %d",
-                                             "%d (%2.2d, %2.2d) depuis le tour %d"},
+                                             "%d (%2.2d, %2.2d) depuis le tour %d",},
                  asFrmCoordonnees="%2.2d, %2.2d",
                  asFrmPourcentage="0.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais "#.000%"
                  asFrmVitesse="%d/%d";
@@ -31,7 +31,7 @@ TfrmInfosTram::TfrmInfosTram(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
  {
-  int i;
+  int i = 0;
   GroupBoxTram->Caption=asDebutTitreCadreTram;
   if (ARendreVisible)
    {
@@ -68,19 +68,19 @@ void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
 //---------------------------------------------------------------------------
 void TfrmInfosTram::RafraichitInfos()
  {
-  int i;
-  int NbTours;
-  int NumDrnArret;
-  int NumArretSvt;
-  int NbDirPoss;
-  int DejaParcouru;
-  int ResteAParcourir;
-  int DistMin;
-  voie *DrnArret;
-  bool Afficher;
+  int i = 0;
+  int NbTours = 0;
+  int NumDrnArret = 0;
+  int NumArretSvt = 0;
+  int NbDirPoss = 0;
+  int DejaParcouru = 0;
+  int ResteAParcourir = 0;
+  int DistMin = 0;
+  voie *DrnArret = nullptr;
+  bool Afficher = false;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   Tram=nullptr;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
   if ((Afficher=(v->NumTram>0)))
@@ -95,7 +95,7 @@ void TfrmInfosTram::RafraichitInfos()
                                                         cv->ArretTram[NumDrnArret-1].x,
                                                         cv->ArretTram[NumDrnArret-1].y,
                                                         (int)Tram->TourArriveDrnArret)));
-      DrnArret=&(cv->v[cv->ArretTram[NumDrnArret-1].x][cv->ArretTram[NumDrnArret-1].y]);
+      DrnArret=&cv->v[cv->ArretTram[NumDrnArret-1].x][cv->ArretTram[NumDrnArret-1].y];
      }
     else
      { // Si pas encore d'arrêt... On prend le premier arrêt de la ligne comme dernier arrêt
@@ -104,7 +104,7 @@ void TfrmInfosTram::RafraichitInfos()
                                                         cv->ArretTram[0].x,
                                                         cv->ArretTram[0].y,
                                                         0)));
-      DrnArret=&(cv->v[cv->ArretTram[0].x][cv->ArretTram[0].y]);
+      DrnArret=&cv->v[cv->ArretTram[0].x][cv->ArretTram[0].y];
      }
     // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
     // d'origine les évalue de gauche à droite (engine/README.md) : NumArretSvt d'abord
@@ -127,7 +127,7 @@ void TfrmInfosTram::RafraichitInfos()
 	LabelDistanceMin->Caption=IntToStr(DistMin);
 	// v1.8.4 : FormatFloat au lieu de Format
 	LabelParcoursEffectue->Caption=FormatFloat(asFrmPourcentage, (100.0*DejaParcouru)/(DejaParcouru+ResteAParcourir));
-	LabelDetour->Caption=FormatFloat(asFrmPourcentage, (100.0*(DejaParcouru+ResteAParcourir))/DistMin-100.0);
+	LabelDetour->Caption=FormatFloat(asFrmPourcentage, ((100.0*(DejaParcouru+ResteAParcourir))/DistMin)-100.0);
 	if (NbTours != 0) {
 	 LabelAttente->Caption=FormatFloat(asFrmPourcentage, (100.0*(NbTours-DejaParcouru))/NbTours);
     } else {

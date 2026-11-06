@@ -12,6 +12,8 @@
 #include "base.h"
 #include "simul.h"
 #include "f_simul.h"
+
+#include <math.h>
 #include "f_defv.h"
 #include "f_defvp.h"
 #include "f_prmsim.h"
@@ -134,17 +136,17 @@ const int dxg[5][5]={{ 0,  0,  0,  0,  0},
 					 { 0,  0,  1,  0, -1}, // dorig = nord
 					 { 0,  1,  0,  1,  0}, // dorig = est
 					 { 0,  0,  1,  0, -1}, // dorig = sud
-					 { 0, -1,  0, -1,  0}},// dorig = ouest
+					 { 0, -1,  0, -1,  0},},// dorig = ouest
 		  dyg[5][5]={{ 0,  0,  0,  0,  0},
 					 { 0,  0, -1,  0, -1}, // dorig = nord
 					 { 0, -1,  0,  1,  0}, // dorig = est
 					 { 0,  0,  1,  0,  1}, // dorig = sud
-					 { 0, -1,  0,  1,  0}},// dorig = ouest
+					 { 0, -1,  0,  1,  0},},// dorig = ouest
             // [Dir1][Dir2][AVT|ARR] Dir2=N   ,   E   ,   S   ,   O
           NumImgBusTram[NBDIR][NBDIR][2]={{{ 1, 7},{ 2, 9},{12,12},{ 0, 5}},  // Dir1 = N // v3.5 : ajout de Tram dans le nom (nitmaps communes aux bus)
                                           {{ 3, 8},{ 4,10},{ 5, 0},{12,12}},  // Dir1 = E
                                           {{12,12},{ 6,11},{ 7, 1},{ 8, 3}},  // Dir1 = S
-                                          {{11, 6},{12,12},{ 9, 2},{10, 4}}}; // Dir1 = O
+                                          {{11, 6},{12,12},{ 9, 2},{10, 4}},}; // Dir1 = O
 //---------------------------------------------------------------------------
 // v3.5 : Ajout de Tram aux constantes de Couleur
 TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM]={clBlue, clRed, clLime, clYellow, clFuchsia, clAqua, clPurple, static_cast<TColor>(0x00FF0080), static_cast<TColor>(0x000080FF)};
@@ -173,7 +175,7 @@ Un tableau des distances va apparaître pour vous aider à résoudre le problèm
 Le réseau n'est pas connexe : une distance %s n'a pas pu être définie !\n\
 Un tableau des distances va apparaître pour vous aider à résoudre le problème.\n\n\
 ATTENTION ! S'il y a des zones où seuls les bus et les véhicules prioritaires peuvent passer, TOUTES CES ZONES DOIVENT ÊTRE DÉFINIES COMME PASSAGE RÉSERVÉ AUX BUS.\n\
-En d'autres termes, il ne doit pas y avoir de zones non réservées aux bus isolées par des zones réservées aux bus."},
+En d'autres termes, il ne doit pas y avoir de zones non réservées aux bus isolées par des zones réservées aux bus.",},
                  asSelectionIncorrecte="Sélection incorrecte",
                  asTracerEffacerPeripherique="\
 Pour tracer ou effacer un périphérique,\n\
@@ -241,7 +243,7 @@ void TfrmSimulation::RafraichitActionsEdition(mode_edition ModeEdition)
  {
   bool EditionCase=(ModeEdition==meCase);
   bool EditionSelection=(ModeEdition==meSelection);
-  int i;
+  int i = 0;
   for(i=0; i<ActionList->ActionCount; i++) { // v3.8.3
    if (ActionList->Actions[i]->Category=="Edition (case)") {
     (static_cast<TAction*>(ActionList->Actions[i]))->Enabled=EditionCase;
@@ -273,28 +275,28 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
   int BordToiture=0;
   int CoinToiture=0;
   int // v3.8
-      NumPieton;
+      NumPieton = 0;
   int // v2.0
-      NivPriorite;
+      NivPriorite = 0;
   int // v2.2
-      Vlr; // v5.3
-  TColor CoulTxt; // v3.0.5
+      Vlr = 0; // v5.3
+  TColor CoulTxt = 0; // v3.0.5
   direction dorig;
   direction ddest;
   direction DirArretBus; // v3.0
-  voie *v=&(cv->v[Col][Row]);
-  voie *vv;
+  voie *v=&cv->v[Col][Row];
+  voie *vv = nullptr;
   sens Sens=cv->SensPassagePietonsPossible(Col, Row); // v2.0
-  pieton *p; // v2.0
-  vehicule *Veh;
-  bus *Bus; // v3.0
-  tram *Tram; // v3.5
-  taxi *Taxi; // v3.6
-  vehlib *Vlb; // v5.3
-  bool NordPoss;
-  bool EstPoss;
-  bool SudPoss;
-  bool OuestPoss;
+  pieton *p = nullptr; // v2.0
+  vehicule *Veh = nullptr;
+  bus *Bus = nullptr; // v3.0
+  tram *Tram = nullptr; // v3.5
+  taxi *Taxi = nullptr; // v3.6
+  vehlib *Vlb = nullptr; // v5.3
+  bool NordPoss = false;
+  bool EstPoss = false;
+  bool SudPoss = false;
+  bool OuestPoss = false;
   bool DefFeux= ((frmDefFeux != nullptr)&&  // v3.8.1
                  frmDefFeux->Visible)||
                 ((frmDefFeuxPietons != nullptr)&&  // v5.2
@@ -312,7 +314,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                               (v->Priorite[sud-1] == 0)&&
                               (v->Priorite[ouest-1] == 0)&&
                               EditionAutorisee;
-  TCheckBox *CheckBox; // v3.0
+  TCheckBox *CheckBox = nullptr; // v3.0
   AnsiString asListeLignes;
   AnsiString asMsg="";
 
@@ -368,7 +370,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 		  // Ensuite les décors (sauf pelouse)
 		  switch(v->Nature) // v3.9
 		   {
-			case arbre:  VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_ARBRE+(Col+Row)%4); break;
+			case arbre:  VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_ARBRE+((Col+Row)%4)); break;
 			default :    break;
 		   }
 		 }
@@ -416,8 +418,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                         Rect.Left, Rect.Top,
                         IDB_PLCTAXI);
 }
-    if (((v->NumPlacePark) != 0)||  // v5.0
-        ((v->NumPlaceVehlib) != 0)) { // v5.3
+    if ((v->NumPlacePark != 0)||  // v5.0
+        (v->NumPlaceVehlib != 0)) { // v5.3
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
                         IDB_PLCPRKG);
@@ -425,7 +427,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     if (v->NumPlaceVehlib != 0) { // v5.3
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        (((cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve) != 0)?IDB_PLCVLBR:IDB_PLCVLB)+
+                        ((cv->PlaceVehlib[v->NumPlaceVehlib-1].NumVehlibReserve != 0)?IDB_PLCVLBR:IDB_PLCVLB)+
                         v->OrientationPlaceVehlib()); // orientation du dessin selon le sens de la file !
 }
 
@@ -462,7 +464,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
        VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                           Rect.Left, Rect.Top,
                           IDB_ARRETBUS+
-                          3*(DirArretBus-1)+
+                          (3*(DirArretBus-1))+
                           cv->PositionArretBus(Col, Row, DirArretBus));
 }
      }
@@ -475,9 +477,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                            Rect.Left, Rect.Top,
                            IDB_DIRCARF-1+ // Bitmaps de flèche de direction au carrefour
-                           7*(d-1)+ // Direction
-                           4*static_cast<int>((!vv->ToutDroit)&&((vv->DirPoss&PossDir[AGaucheDe[d]]) != 0))+ // à gauche
-                           2*static_cast<int>((vv->DirPoss&PossDir[d])>0)+ // Tout droit
+                           (7*(d-1))+ // Direction
+                           (4*static_cast<int>((!vv->ToutDroit)&&((vv->DirPoss&PossDir[AGaucheDe[d]]) != 0)))+ // à gauche
+                           (2*static_cast<int>((vv->DirPoss&PossDir[d])>0))+ // Tout droit
                              static_cast<int>((!vv->ToutDroit)&&((vv->DirPoss&PossDir[ADroiteDe[d]]) != 0))); // à droite
        }
 }
@@ -502,13 +504,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 }
 
   // 4. On met le(s) piéton(s) le(s) cas échéant(s). v2.0. (Avant les véhicules depuis v4.3 pour mode sanglant)
-  if (((Affichage&aff_ptn) != 0)&&(v->NbPietons != 0)&&((NATURE(v)<=trottoirs))) // v3.8 (immeubles)
+  if (((Affichage&aff_ptn) != 0)&&(v->NbPietons != 0)&&(NATURE(v)<=trottoirs)) // v3.8 (immeubles)
    {
     // 4a. Vue de mort
     for(int i : v->NumPieton) {
      if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
-       p=&(cv->Pieton[NumPieton=i-1]);
+       p=&cv->Pieton[NumPieton=i-1];
        if (p->Ecrase) { // v4.3
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                            Rect.Left, Rect.Top,
@@ -525,17 +527,17 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     for(int i : v->NumPieton) {
      if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
-       p=&(cv->Pieton[NumPieton=i-1]);
+       p=&cv->Pieton[NumPieton=i-1];
        if (p->EstVivant()) { // v4.3 (création) v5.4.1 : p->EstVivant() remplace !p->Ecrase pour prendre en compte p->Mort
         VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
-                           1+Rect.Left+(2*p->DemiCase-1)*dxr[p->Dir]*((1+Rect.Right-Rect.Left)/4),
-                           1+Rect.Top+ (2*p->DemiCase-1)*dyr[p->Dir]*((1+Rect.Bottom-Rect.Top)/4),
+                           1+Rect.Left+(((2*p->DemiCase)-1)*dxr[p->Dir]*((1+Rect.Right-Rect.Left)/4)),
+                           1+Rect.Top+ (((2*p->DemiCase)-1)*dyr[p->Dir]*((1+Rect.Bottom-Rect.Top)/4)),
 						   (((Affichage&aff_infct) != 0)? // V5.4.1 : affichage infections (mode épidémie)
 							(p->EstContagieux()?IDB_PTNCNTG:IDB_PTNSAIN): // v5.4.1 : piéton contagieux ou sain
-							(IDB_PIETON+8*(NumPieton%NBCOULDIFFP)))+ // Début image piéton + Couleur
+							(IDB_PIETON+(8*(NumPieton%NBCOULDIFFP))))+ // Début image piéton + Couleur
 						   (p->TourDrnDepl<p->TourDrnAff?
 							p->Dir-1: // à l'arrêt
-							(4+p->DemiCase%2+2*(1-p->Dir%2)) // en mouvement
+							(4+(p->DemiCase%2)+(2*(1-(p->Dir%2)))) // en mouvement
 						   ));
 }
 	   p->TourDrnAff=cv->TourCrt;
@@ -550,7 +552,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
    {
     if (v->NumVehicule != 0) // 5a. On met les véhicules le cas échéant
      {
-      Veh=&(cv->Vehicule[v->NumVehicule-1]);
+      Veh=&cv->Vehicule[v->NumVehicule-1];
       dorig=((Veh->DirDrnDepl != 0)?
              InvDir[Veh->DirDrnDepl]:
              InvDir[Veh->Dir]);
@@ -563,38 +565,38 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
                                          Rect.Left, Rect.Top,
                                          IDB_VEH+ // Numero de bitmap initiale des véhicules
                                        //(v->NumVehicule-1)%NBCOULDIFFV+ // v5.3 : on ne peint plus en gris (1ère couleur)...
-                                         1+(v->NumVehicule-1)%(NBCOULDIFFV-1)+   // Le gris est réservé pour les VEHLIBS !
-                                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV);
+                                         1+((v->NumVehicule-1)%(NBCOULDIFFV-1))+   // Le gris est réservé pour les VEHLIBS !
+                                         (((3*(dorig-1))+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV));
                       break;
         case urgence: VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                                          Rect.Left, Rect.Top,
                                          IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
                                          COULEURURGENCE+ // Numéro de couleur (rouge)
-                                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU);
+                                         (((3*(dorig-1))+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU));
                        VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 										 Rect.Left+dxg[dorig][ddest], // v5.4 : plus de zoom (dxg)
 										 Rect.Top+dyg[dorig][ddest], // v5.4 : plus de zoom (dyg)
 										 IDB_URGENCE+ // Numero de bitmap initiale des gyrophares
-										 2*((dorig+ddest)%2)+ // Horizontal/vertical ou en diagonale
-										 cv->TourCrt%2); // Clignotement
+										 (2*((dorig+ddest)%2))+ // Horizontal/vertical ou en diagonale
+										 (cv->TourCrt%2)); // Clignotement
 					  break;
 		case police:  VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 										 Rect.Left, Rect.Top,
 										 IDB_VEHPU+ // Numero de bitmap initiale des véhicules de police/urgence
 										 // Couleur Police = 1ère couleur (blanche)
-										 (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU);
+										 (((3*(dorig-1))+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFVPU));
 					   VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
 										 Rect.Left+dxg[dorig][ddest], // v5.4 : plus de zoom (dxg)
 										 Rect.Top+dyg[dorig][ddest], // v5.4 : plus de zoom (dyg)
                                          IDB_POLICE+ // Numero de bitmap initiale des gyrophares
-                                         2*((dorig+ddest)%NBDIR)+ // Direction
-                                         cv->TourCrt%2); // Clignotement
+                                         (2*((dorig+ddest)%NBDIR))+ // Direction
+                                         (cv->TourCrt%2)); // Clignotement
                       break;
        }
      }
     if (v->NumVehlib != 0) // 5a bis. On met les vehlibs. v5.3
      {
-      Vlb=&(cv->Vehlib[v->NumVehlib-1]);
+      Vlb=&cv->Vehlib[v->NumVehlib-1];
       auto dpv=static_cast<direction>(1+v->OrientationPlaceVehlib()); // Si le vehlib est sur une place, on prend le sens de la file
       dorig=((v->NumPlaceVehlib != 0)?
              InvDir[dpv]:
@@ -605,33 +607,33 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_VEH+ // Numero de bitmap initiale des véhicules (gris, réservé aux vehlib
-                         (3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV);
+                         (((3*(dorig-1))+ddest-1-static_cast<int>(ddest>dorig))*NBCOULDIFFV));
      }
     if (v->NumBus != 0)  // 5b. On met les bus le cas échéant. v3.0
      {
-      Bus=&(cv->Bus[v->NumBus-1]);
+      Bus=&cv->Bus[v->NumBus-1];
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_BUSTRAM+ // Numero de bitmap initiale des bus
-                         12*(Bus->NumLigne-1)+ // Couleur de la ligne
+                         (12*(Bus->NumLigne-1))+ // Couleur de la ligne
                          (v->EstTeteBus()?
                           NumImgBusTram[Bus->Dir-1][Bus->DirDrnDepl-1][TETE]:
                           NumImgBusTram[Bus->DirDrnDepl-1][Bus->DirAvtDrnDepl-1][QUEUE]));
      }
     if (v->NumTram != 0)  // 5c. On met les trams le cas échéant. v3.5
      {
-      Tram=&(cv->Tram[v->NumTram-1]);
+      Tram=&cv->Tram[v->NumTram-1];
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_BUSTRAM+ // Numero de bitmap initiale des trams
-                         12*(Tram->NumLigne-1)+ // Couleur de la ligne
+                         (12*(Tram->NumLigne-1))+ // Couleur de la ligne
                          (v->EstTeteTram()?
                           NumImgBusTram[Tram->Dir-1][Tram->DirDrnDepl-1][TETE]:
                           NumImgBusTram[Tram->DirDrnDepl-1][Tram->DirAvtDrnDepl-1][QUEUE]));
      }
     if (v->NumTaxi != 0)  // 5d. On met les taxis le cas échéant. v3.6
      {
-      Taxi=&(cv->Taxi[v->NumTaxi-1]);
+      Taxi=&cv->Taxi[v->NumTaxi-1];
       dorig=((Taxi->DirDrnDepl != 0)?
              InvDir[Taxi->DirDrnDepl]:
              InvDir[Taxi->Dir]);
@@ -639,19 +641,19 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
       VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                          Rect.Left, Rect.Top,
                          IDB_VEHTAXI+ // Numero de bitmap initiale des taxis
-                         3*(dorig-1)+ddest-1-static_cast<int>(ddest>dorig));
+                         (3*(dorig-1))+ddest-1-static_cast<int>(ddest>dorig));
      }
    }
   // 6a. On met le feu (ouais qu'ça pète !) de signalisation le cas échéant
   if ((Affichage&aff_sign) != 0) {
    for(int i=0,SensVT=nord_est; i<NBDIR; i++,SensVT*=2) { // v5.2.4, ajout de SensVT pour afficher les feux de tram
-    if (((v->NumFeu[i]) != 0)&&
+    if ((v->NumFeu[i] != 0)&&
         (cv->Feu[v->NumFeu[i]-1].x==Col)&&
         (cv->Feu[v->NumFeu[i]-1].y==Row)&&
         (cv->Feu[v->NumFeu[i]-1].Dir==i+1)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        (((v->SensVoieTram != 0)&&v->EstDirPossSensVoieTram(indefinie, static_cast<direction>(i+1)))?IDB_FEUT:IDB_FEU)+4*i+cv->Feu[v->NumFeu[i]-1].Etat); // v5.2.4, affichage des feux de tram
+                        (((v->SensVoieTram != 0)&&v->EstDirPossSensVoieTram(indefinie, static_cast<direction>(i+1)))?IDB_FEUT:IDB_FEU)+(4*i)+cv->Feu[v->NumFeu[i]-1].Etat); // v5.2.4, affichage des feux de tram
 }
 }
 }
@@ -659,13 +661,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
   // 6b. On met le feu (ouais qu'ça pète !) de piéton le cas échéant (v5.2)
   if ((Affichage&aff_sign) != 0) {
    for(int i=0; i<NBDIR; i++) {
-    if (((v->NumFeuP[i]) != 0)&&
+    if ((v->NumFeuP[i] != 0)&&
         (cv->FeuP[v->NumFeuP[i]-1].x[IFEUDIR(v->NumFeuP[i],i)]==Col)&&
         (cv->FeuP[v->NumFeuP[i]-1].y[IFEUDIR(v->NumFeuP[i],i)]==Row)&&
         (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1)) {
      VirtualImageList8x8->Draw(DrawGridSimul->Canvas,
                         Rect.Left, Rect.Top,
-                        IDB_FEUP+3*(InvDir[i+1]-1)+cv->FeuP[v->NumFeuP[i]-1].Etat-static_cast<int>(cv->FeuP[v->NumFeuP[i]-1].Etat==rouge)); // On retire 1 si etat rouge car orange n'existe pas pour les feux de piétons
+                        IDB_FEUP+(3*(InvDir[i+1]-1))+cv->FeuP[v->NumFeuP[i]-1].Etat-static_cast<int>(cv->FeuP[v->NumFeuP[i]-1].Etat==rouge)); // On retire 1 si etat rouge car orange n'existe pas pour les feux de piétons
 }
 }
 }
@@ -714,8 +716,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
      {
       DrawGridSimul->Canvas->Font=DrawGridSimul->Font;
       DrawGridSimul->Canvas->Font->Color=CoulTxt;
-      DrawGridSimul->Canvas->TextOut( Rect.Left+(Rect.Right-Rect.Left+1-DrawGridSimul->Canvas->TextWidth(IntToStr(v->NumArretBus)))/2,
-                                      Rect.Top+(Rect.Bottom-Rect.Top+1-DrawGridSimul->Canvas->TextHeight(IntToStr(v->NumArretBus)))/2,
+      DrawGridSimul->Canvas->TextOut( Rect.Left+((Rect.Right-Rect.Left+1-DrawGridSimul->Canvas->TextWidth(IntToStr(v->NumArretBus)))/2),
+                                      Rect.Top+((Rect.Bottom-Rect.Top+1-DrawGridSimul->Canvas->TextHeight(IntToStr(v->NumArretBus)))/2),
                                       IntToStr(v->NumArretBus));
      }
    }
@@ -737,8 +739,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
      {
       DrawGridSimul->Canvas->Font=DrawGridSimul->Font;
       DrawGridSimul->Canvas->Font->Color=CoulTxt;
-      DrawGridSimul->Canvas->TextOut( Rect.Left+(Rect.Right-Rect.Left+1-DrawGridSimul->Canvas->TextWidth(IntToStr(v->NumArretTram)))/2,
-                                      Rect.Top+(Rect.Bottom-Rect.Top+1-DrawGridSimul->Canvas->TextHeight(IntToStr(v->NumArretTram)))/2,
+      DrawGridSimul->Canvas->TextOut( Rect.Left+((Rect.Right-Rect.Left+1-DrawGridSimul->Canvas->TextWidth(IntToStr(v->NumArretTram)))/2),
+                                      Rect.Top+((Rect.Bottom-Rect.Top+1-DrawGridSimul->Canvas->TextHeight(IntToStr(v->NumArretTram)))/2),
                                       IntToStr(v->NumArretTram));
      }
    }
@@ -751,13 +753,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
 }
     for(int i=0; i<NBDIR; i++)
      {
-      if (((v->NumFeu[i]) != 0)&&
+      if ((v->NumFeu[i] != 0)&&
           (cv->Feu[v->NumFeu[i]-1].x==Col)&&
           (cv->Feu[v->NumFeu[i]-1].y==Row)&&
           (cv->Feu[v->NumFeu[i]-1].Dir==i+1)) {
        asMsg=asMsg+Format("Feu %s %d. ", ARRAYOFCONST((asDir[i+1], v->NumFeu[i])));
 }
-      if (((v->NumFeuP[i]) != 0)&& // v5.2
+      if ((v->NumFeuP[i] != 0)&& // v5.2
           (cv->FeuP[v->NumFeuP[i]-1].x[IFEUDIR(v->NumFeuP[i],i)]==Col)&&
           (cv->FeuP[v->NumFeuP[i]-1].y[IFEUDIR(v->NumFeuP[i],i)]==Row)&&
           (cv->FeuP[v->NumFeuP[i]-1].Dir[IFEUDIR(v->NumFeuP[i],i)]==i+1)) {
@@ -959,13 +961,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     ActionPlaceVehlib->Checked=(v->NumPlaceVehlib>0);
     ActionPlaceVehlib->Enabled=(v->DirPoss != 0)&&(v->NumArretBus == 0)&&(v->NumArretTram == 0)&&(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&EditionAutorisee;
 
-    switch(static_cast<int>(v->NumArretBus>0)+2*static_cast<int>(v->NumArretTram>0))
+    switch(static_cast<int>(v->NumArretBus>0)+(2*static_cast<int>(v->NumArretTram>0)))
      { // v5.0 : ajout de ..(!v->NumPlace)&&..
       case BUS: ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->SuppressionArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
                 break;
       case TRAM:ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->SuppressionArretTramPossible(Col, Row)&&EditionAutorisee; // v3.6
                 break;
-      default:  switch(static_cast<int>(v->DirPoss>aucune)+2*static_cast<int>(v->SensVoieTram>aucune_voie))
+      default:  switch(static_cast<int>(v->DirPoss>aucune)+(2*static_cast<int>(v->SensVoieTram>aucune_voie)))
                  {
                   case BUS: ActionArretBusTram->Enabled=(v->NumPlaceTaxi == 0)&&(v->NumPlacePark == 0)&&cv->AjoutArretBusPossible(Col, Row)&&EditionAutorisee; // v3.6
                             break;
@@ -989,7 +991,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject *Sender,
     ActionSuivrePieton2->Enabled=(v->NumPieton[1]>0); // v3.0
     ActionSuivreTram->Enabled=(v->NumTram>0); // v3.6
     ActionSuivreTaxi->Enabled=(v->NumTaxi>0); // v3.6
-    ActionSuivreVehlib->Enabled=(v->NumVehlib) != 0; // v5.3
+    ActionSuivreVehlib->Enabled=v->NumVehlib != 0; // v5.3
 
     ActionDistancesParkings->Enabled=(v->DirPoss>aucune); // v3.5
     ActionDistancesArretsBus->Enabled=(v->DirPoss>aucune); // v3.5
@@ -1102,8 +1104,8 @@ void TfrmSimulation::RedimensionneZone()
 }
   DrawGridSimul->ColCount=cv->NbX;
   DrawGridSimul->RowCount=cv->NbY;
-  Width=DrawGridSimul->DefaultColWidth*cv->NbX+(Width-DrawGridSimul->Width); // v5.4 (DrawGridSimul->DefaultColWidth)
-  Height=DrawGridSimul->DefaultRowHeight*cv->NbY+(Height-DrawGridSimul->Height); // v5.4 (DrawGridSimul->DefaultRowHeight)
+  Width=(DrawGridSimul->DefaultColWidth*cv->NbX)+(Width-DrawGridSimul->Width); // v5.4 (DrawGridSimul->DefaultColWidth)
+  Height=(DrawGridSimul->DefaultRowHeight*cv->NbY)+(Height-DrawGridSimul->Height); // v5.4 (DrawGridSimul->DefaultRowHeight)
   DrawGridSimul->Repaint(); // v4.0.1
  }
 //---------------------------------------------------------------------------
@@ -1186,25 +1188,25 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
  const int NumSvtOrdSel[2][4]={{0,0,1,0},{1,1,1,1}};
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
- int i;
- int j;
- int NbFeux;
- int *NumFeu;
+ int i = 0;
+ int j = 0;
+ int NbFeux = 0;
+ int *NumFeu = nullptr;
  int // Variables de transition
      NumFeuVoie[2]={0,0};
  int // Numéros de feux de la voie {Prm,Drn}
-     NbFeuxListe;
+     NbFeuxListe = 0;
  int // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
      NbFeuxVoie=0;
  int // Nombre de feux dans la voie v[Col][Row]
-     NbNonSel;
+     NbNonSel = 0;
  int // Compteur du nombre de feux non sélectionnés
      Selection[2]={0,0}; // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
  // Traite le clic sur la case avec des feux lors d'une sélection de feux :
  // 2 feux = passage de aucun à feu1, de feu1 à feu2,
  //                  de feu2 à feu1+feu2 et de feu1+feu2 à aucun.
  // 1 feu = passage de aucun à feu1, de feu1 à aucun
- voie *v=&(cv->v[x][y]);
+ voie *v=&cv->v[x][y];
 
  if ((v->NumParking != 0)&&ActionParking->Enabled)
   {
@@ -1262,7 +1264,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 }
 
    // Génération de la liste                                     Selection  Nombre
-   NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
+   NbFeux=NbFeuxListe+((Selection[1]+1)/2)-((Selection[0]+1)/2); // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
    if (!(NumFeu=new int[NbFeux]))
     {
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
@@ -1317,7 +1319,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 }
 
    // Génération de la liste                                     Selection  Nombre
-   NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
+   NbFeux=NbFeuxListe+((Selection[1]+1)/2)-((Selection[0]+1)/2); // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
    if (!(NumFeu=new int[NbFeux]))
     {
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
@@ -1372,7 +1374,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 }
 
    // Génération de la liste                                     Selection  Nombre
-   NbFeux=NbFeuxListe+(Selection[1]+1)/2-(Selection[0]+1)/2; // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
+   NbFeux=NbFeuxListe+((Selection[1]+1)/2)-((Selection[0]+1)/2); // (0,1,2,3)->(0,1,1,2) : f(s)=(s+1)/2
    if (!(NumFeu=new int[NbFeux]))
     {
      AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
@@ -1412,17 +1414,17 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject *Sender)
 bool TfrmSimulation::VerifieReseau()
  {
   bool Ok=true;
-  int i;
-  int j;
-  int d;
-  int NbDirPossSansPsgBus;
+  int i = 0;
+  int j = 0;
+  int d = 0;
+  int NbDirPossSansPsgBus = 0;
   int // v3.5
       NbCasesPietonPeutAller=0; // v3.8
   const AnsiString asMsgOk="Réseau correct.";
   AnsiString asMsgErr;
   dirposs dp;
-  voie *v;
-  voie *vv;
+  voie *v = nullptr;
+  voie *vv = nullptr;
   cv->VerifOk=false;
   // On enleve le clignotement si actif. v3.5
   if (TimerClignotementErreur->Enabled) { TimerClignotementErreur->Enabled=false;
@@ -1454,45 +1456,41 @@ bool TfrmSimulation::VerifieReseau()
   for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) {
    for(j=0; Ok&&(j<NBMAXARRETSBUSTRAMPARLIGNE); j++)
     {
-     if (j<cv->LigneBus[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
-      if (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))
-       {
+     if ((j<cv->LigneBus[i].NbArrets) && (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))) // v3.5 : Oubli du test du nombre d'arrêts
+      {
         asMsgErr=Format( "La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((i+1, cv->LigneBus[i].NumArret[j])));
         break;
        }
-}
-     if (j<cv->LigneTram[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
-      if (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))
-       {
+
+     if ((j<cv->LigneTram[i].NbArrets) && (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))) // v3.5 : Oubli du test du nombre d'arrêts
+      {
         asMsgErr=Format( "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((AnsiString((char)('A'+i)), cv->LigneTram[i].NumArret[j])));
         break;
        }
-}
+
     }
 }
   for(i=0; Ok&&(i<cv->NbArretsBus); i++) {
-   if (cv->ArretBus[i].Defini()) {
-    if (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))
-     { // v3.0.3
+   if ((cv->ArretBus[i].Defini()) && (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))) 
+    { // v3.0.3
       xErr=cv->ArretBus[i].x; yErr=cv->ArretBus[i].y;
       asMsgErr=Format( "La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
                        ARRAYOFCONST((i+1)));
       break;
      }
-}
+
 }
   for(i=0; Ok&&(i<cv->NbArretsTram); i++) {
-   if (cv->ArretTram[i].Defini()) {
-    if (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))
-     { // v3.0.3
+   if ((cv->ArretTram[i].Defini()) && (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))) 
+    { // v3.0.3
       xErr=cv->ArretTram[i].x; yErr=cv->ArretTram[i].y;
       asMsgErr=Format( "La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
 					   ARRAYOFCONST((i+1)));
 	  break;
 	 }
-}
+
 }
   if (Ok&&(cv->NbArretsBus>0)&&(cv->NbLignesBus>0))  // v3.0
    {
@@ -1520,7 +1518,7 @@ bool TfrmSimulation::VerifieReseau()
   for(i=0; Ok&&(i<cv->NbX); i++) {
    for(j=0; Ok&&(j<cv->NbY); j++)
 	{
-     v=&(cv->v[i][j]);
+     v=&cv->v[i][j];
      NbDirPossSansPsgBus=0; // v3.5
      for(d=nord; Ok&&(d<=ouest); d++)
       { // v5.2.2
@@ -1620,7 +1618,7 @@ bool TfrmSimulation::VerifieReseau()
          break;
         }
       }
-     if ((v->PassagePietons)&&(cv->SensPassagePietonsPossible(i, j) == 0))
+     if (v->PassagePietons&&(cv->SensPassagePietonsPossible(i, j) == 0))
       {
        Ok=false; xErr=i; yErr=j;
 
@@ -1679,13 +1677,13 @@ void TfrmSimulation::AfficheMsgInfoNonDisp(const AnsiString& asTitre) // v3.7 (c
 //---------------------------------------------------------------------------
 void TfrmSimulation::AfficheBilan()
  {
-  int i;
-  int j;
-  int d;
-  int ndp;
-  int MinDist;
-  int xe;
-  int ye;
+  int i = 0;
+  int j = 0;
+  int d = 0;
+  int ndp = 0;
+  int MinDist = 0;
+  int xe = 0;
+  int ye = 0;
   int ne=cv->NbParkings;
   int // NbParkings
       nv=cv->NbVehicules;
@@ -1698,7 +1696,7 @@ void TfrmSimulation::AfficheBilan()
   int AttenteDepart=0L;
   int ntp=cv->NbToursParcourus;
   int ncp=cv->NbCasesParcourues;
-  double m;
+  double m = NAN;
   AnsiString asMsgBilan;
   // 1. On calcule le parcours moyen
   for(i=0; i<ne; i++) {
@@ -1830,37 +1828,37 @@ void TfrmSimulation::RafraichitFichesPriorites()
 void TfrmSimulation::DrawGridSimulClick(TObject *Sender)
 {
  bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
- if ((frmDefVoie->Visible)&&PasDeSelectionFeux) { frmDefVoie->RafraichitInfos();
+ if (frmDefVoie->Visible&&PasDeSelectionFeux) { frmDefVoie->RafraichitInfos();
 }
- if ((frmDefVoiePietons->Visible)&&PasDeSelectionFeux) { frmDefVoiePietons->RafraichitInfos(); //v5.2
+ if (frmDefVoiePietons->Visible&&PasDeSelectionFeux) { frmDefVoiePietons->RafraichitInfos(); //v5.2
 }
  RafraichitFichesInfos(); // v6.0.2
- if ((frmAffDistParkings->Visible)&&PasDeSelectionFeux)
+ if (frmAffDistParkings->Visible&&PasDeSelectionFeux)
   {
    frmAffDistParkings->EffaceInfos();
    frmAffDistParkings->RafraichitInfos();
   }
- if ((frmAffDistArretsBus->Visible)&&PasDeSelectionFeux) // v3.0
+ if (frmAffDistArretsBus->Visible&&PasDeSelectionFeux) // v3.0
   {
    frmAffDistArretsBus->EffaceInfos();
    frmAffDistArretsBus->RafraichitInfos();
   }
- if ((frmAffDistArretsTram->Visible)&&PasDeSelectionFeux) // v3.5
+ if (frmAffDistArretsTram->Visible&&PasDeSelectionFeux) // v3.5
   {
    frmAffDistArretsTram->EffaceInfos();
    frmAffDistArretsTram->RafraichitInfos();
   }
- if ((frmAffDistFilesTaxi->Visible)&&PasDeSelectionFeux) // v3.6
+ if (frmAffDistFilesTaxi->Visible&&PasDeSelectionFeux) // v3.6
   {
    frmAffDistFilesTaxi->EffaceInfos();
    frmAffDistFilesTaxi->RafraichitInfos();
   }
- if ((frmAffDistFilesPark->Visible)&&PasDeSelectionFeux) // v5.0
+ if (frmAffDistFilesPark->Visible&&PasDeSelectionFeux) // v5.0
   {
    frmAffDistFilesPark->EffaceInfos();
    frmAffDistFilesPark->RafraichitInfos();
   }
- if ((frmAffDistPlacesVehlib->Visible)&&PasDeSelectionFeux) // v5.3
+ if (frmAffDistPlacesVehlib->Visible&&PasDeSelectionFeux) // v5.3
   {
    frmAffDistPlacesVehlib->EffaceInfos();
    frmAffDistPlacesVehlib->RafraichitInfos();
@@ -1961,12 +1959,12 @@ bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie Type
  {
   bool Abandon=false;
   bool ToutSupprimer=true;
-  int i;
-  int j;
-  int d;
-  int x;
-  int y;
-  int NumFeu;
+  int i = 0;
+  int j = 0;
+  int d = 0;
+  int x = 0;
+  int y = 0;
+  int NumFeu = 0;
   int xd=DrawGridSimul->Selection.Left;
   int yd=DrawGridSimul->Selection.Top;
   int xf=DrawGridSimul->Selection.Right;
@@ -2059,12 +2057,12 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
 //---------------------------------------------------------------------------
 void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
  {
-  int i;
-  int j;
-  int d;
-  int x;
-  int y;
-  int NumFeu;
+  int i = 0;
+  int j = 0;
+  int d = 0;
+  int x = 0;
+  int y = 0;
+  int NumFeu = 0;
   int xd=DrawGridSimul->Selection.Left;
   int yd=DrawGridSimul->Selection.Top;
   int xf=DrawGridSimul->Selection.Right;
@@ -2114,17 +2112,17 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
  {
   bool Abandon=false;
   bool ToutSupprimer=true;
-  int i;
-  int x;
-  int y;
-  int NumArret;
+  int i = 0;
+  int x = 0;
+  int y = 0;
+  int NumArret = 0;
   int xd=DrawGridSimul->Selection.Left;
   int yd=DrawGridSimul->Selection.Top;
   int xf=DrawGridSimul->Selection.Right;
   int yf=DrawGridSimul->Selection.Bottom;
   bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
   bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
-  voie *v;
+  voie *v = nullptr;
   type_voie TypeVoieCrt;
   for(i=0; i<cv->NbArretsBus; i++) { ArretBusDejaVu[i]=false;
 }
@@ -2133,13 +2131,12 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
   for(x=xd; (!Abandon)&&(x<=xf); x++) {
    for(y=yd; (!Abandon)&&(y<=yf); y++)
     {
-	 v=&(cv->v[x][y]); TypeVoieCrt=tvAucun;
+	 v=&cv->v[x][y]; TypeVoieCrt=tvAucun;
 	 // v5.4 : conversion CBC6>BCBX (pas de += dans les énumérés)
-	 if ((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvRoute)))) != 0))||
-		 (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvVoieTram)))) != 0))) { // v3.5
-      if ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))||
-          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))
-       {
+	 if (((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvRoute)))) != 0))||
+		 (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=static_cast<type_voie>((static_cast<int>(TypeVoieCrt))+(static_cast<int>(tvVoieTram)))) != 0))) && ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))||
+          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))) // v3.5
+      {
         switch(MessageDlg( Format( "\
 L'arrêt %s n°%d est dans la sélection.\n\
 Si vous continuez, il sera supprimé.\n\
@@ -2162,7 +2159,7 @@ Si vous continuez, il sera supprimé.\n\
           default: break;
          }
        }
-}
+
     }
 }
   delete[] ArretBusDejaVu;
@@ -2172,17 +2169,17 @@ Si vous continuez, il sera supprimé.\n\
 //---------------------------------------------------------------------------
 void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
  {
-  int i;
-  int x;
-  int y;
-  int NumArret;
+  int i = 0;
+  int x = 0;
+  int y = 0;
+  int NumArret = 0;
   int xd=DrawGridSimul->Selection.Left;
   int yd=DrawGridSimul->Selection.Top;
   int xf=DrawGridSimul->Selection.Right;
   int yf=DrawGridSimul->Selection.Bottom;
   bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
   bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
-  voie *v;
+  voie *v = nullptr;
   type_voie TypeVoieCrt;
   for(i=0; i<cv->NbArretsBus; i++) { ArretBusDejaVu[i]=false;
 }
@@ -2191,13 +2188,12 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
   for(x=xd; (x<=xf); x++) {
    for(y=yd; (y<=yf); y++)
     {
-	 v=&(cv->v[x][y]); TypeVoieCrt=tvAucun;
+	 v=&cv->v[x][y]; TypeVoieCrt=tvAucun;
      // v5.4 : conversion CBC6>BCBX (= au lieu de += dans les énumérés)
-	 if ((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=tvRoute) != 0))||
-         (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=((TypeVoieCrt != 0)?tvTout:tvVoieTram)) != 0))) { // v3.5
-      if ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))|| // v6.0.6 : NumArret-1, l'original lisait hors du tableau pour le dernier arrêt
-          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))
-       {
+	 if (((((TypeVoie&tvRoute) != 0)&&(v->DirPoss != 0)&&((NumArret=v->NumArretBus) != 0)&&((TypeVoieCrt=tvRoute) != 0))||
+         (((TypeVoie&tvVoieTram) != 0)&&(v->SensVoieTram != 0)&&((NumArret=v->NumArretTram) != 0)&&((TypeVoieCrt=((TypeVoieCrt != 0)?tvTout:tvVoieTram)) != 0))) && ((((TypeVoieCrt&tvRoute) != 0)&&(!ArretBusDejaVu[NumArret-1]))|| // v6.0.6 : NumArret-1, l'original lisait hors du tableau pour le dernier arrêt
+          (((TypeVoieCrt&tvVoieTram) != 0)&&(!ArretTramDejaVu[NumArret-1])))) // v3.5
+      {
         switch(TypeVoieCrt)
          {
           case tvRoute:    cv->SupprimeArretBus(NumArret-1); ArretBusDejaVu[NumArret-1]=true; break;
@@ -2205,7 +2201,7 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
           default: break;
          }
        }
-}
+
     }
 }
   delete[] ArretBusDejaVu;
@@ -2214,8 +2210,8 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ReinitialiseToutDansSelection(type_voie TypeVoie)
  {
-  int x;
-  int y;
+  int x = 0;
+  int y = 0;
   int xd=DrawGridSimul->Selection.Left;
   int yd=DrawGridSimul->Selection.Top;
   int xf=DrawGridSimul->Selection.Right;
@@ -2300,7 +2296,7 @@ void TfrmSimulation::AfficheStatsAttenteTrafic() // v2.2.7
 direction TfrmSimulation::DirectionOrigineCurseur(int x, int y, direction DirDest) // v3.5
  {
   direction DirOrig=((DirOrigVoieTram>indefinie)&&(DirOrigVoieTram!=DirDest))?DirOrigVoieTram:InvDir[DirDest];
-  if ((x-xPrc)*(x-xPrc)+(y-yPrc)*(y-yPrc)==1) // N,E,S ou O ?
+  if (((x-xPrc)*(x-xPrc))+((y-yPrc)*(y-yPrc))==1) // N,E,S ou O ?
    {
     if (xPrc-x==+1) { DirOrig=est;
 }
@@ -2325,7 +2321,7 @@ void TfrmSimulation::MenuItemBarreOutilsClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::PopupMenuBarreOutilsPopup(TObject *Sender)
 {
- TToolBar *ToolBar; TMenuItem *MenuItem;
+ TToolBar *ToolBar = nullptr; TMenuItem *MenuItem = nullptr;
  for(const auto & asNomElementBarreOutil : asNomElementBarreOutils)
   {
    MenuItem=static_cast<TMenuItem*>(FindComponent(asDebutNom[MENUITEM]+asNomElementBarreOutil));
@@ -2352,19 +2348,19 @@ void TfrmSimulation::TimerClignotementErreurTimer(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::DeplaceFeu() // v3.8.3
  {
-  int d;
+  int d = 0;
   int xCrt=DrawGridSimul->Col;
   int yCrt=DrawGridSimul->Row;
-  voie *vSrc;
-  voie *vDst;
-  feu *FeuADeplacer;
+  voie *vSrc = nullptr;
+  voie *vDst = nullptr;
+  feu *FeuADeplacer = nullptr;
   DeplacementFeuEnCours^=1;
   RafraichitFonctionDeplacementFeu();
   if (DeplacementFeuEnCours)
    {
     xDeplFeu=DrawGridSimul->Col;
     yDeplFeu=DrawGridSimul->Row;
-    vSrc=&(cv->v[xDeplFeu][yDeplFeu]);
+    vSrc=&cv->v[xDeplFeu][yDeplFeu];
     if ((vSrc->Priorite[0]!=feux)&&
         (vSrc->Priorite[1]!=feux)&&
         (vSrc->Priorite[2]!=feux)&&
@@ -2379,8 +2375,8 @@ void TfrmSimulation::DeplaceFeu() // v3.8.3
    if ((xCrt!=xDeplFeu)||
        (yCrt!=yDeplFeu))
     {
-     vSrc=&(cv->v[xDeplFeu][yDeplFeu]);
-     vDst=&(cv->v[xCrt][yCrt]);
+     vSrc=&cv->v[xDeplFeu][yDeplFeu];
+     vDst=&cv->v[xCrt][yCrt];
      for(d=0; d<NBDIR; d++)
       {
        if (vSrc->Priorite[d]==feux)
@@ -2392,7 +2388,7 @@ void TfrmSimulation::DeplaceFeu() // v3.8.3
            AfficheMessage("Vous ne pouvez pas déplacer un feu sur une case qui n'a pas la même direction.", "Déplacement de feu impossible", tmAvertissement, 0, 0);
           } else
            {
-            FeuADeplacer=&(cv->Feu[vSrc->NumFeu[d]-1]);
+            FeuADeplacer=&cv->Feu[vSrc->NumFeu[d]-1];
             vDst->Priorite[d]=feux;
             vDst->NumFeu[d]=vSrc->NumFeu[d];
             vSrc->Priorite[d]=a_droite;
@@ -2456,7 +2452,7 @@ void TfrmSimulation::ActionOuvrirExecute(TObject *Sender)
 {
  // v5.4 : conversion BCB6>BCBX (AnsiString>String)
  String asNomFichier;
- int hfile;
+ int hfile = 0;
  AppelleAuChaos();
  if (asNomFichAuto.IsEmpty()&&
 	 (!EnregistreModificationsAvant(oaOuvrir))) { return;
@@ -2554,7 +2550,7 @@ Le réseau affiché est conservé.",
 void TfrmSimulation::ActionEnregistrerExecute(TObject *Sender)
 {
  AnsiString asNomFichier="";
- int hfile;
+ int hfile = 0;
  AppelleAuChaos();
  if ((!FILENAME(SaveDialog).IsEmpty())||
      (!asNomFichAuto.IsEmpty())||
@@ -2778,7 +2774,7 @@ bool TfrmSimulation::EnregistreAvantMarche()
 void TfrmSimulation::ActionMarcheExecute(TObject *Sender)
 {
  type_distance TypeDistance=type_indefini; // v3.5
- int i;
+ int i = 0;
  if (frmDefFeux->Visible) { frmDefFeux->Hide();
 }
  if (frmDefFeuxPietons->Visible) { frmDefFeuxPietons->Hide();  // v5.2
@@ -3276,7 +3272,7 @@ void TfrmSimulation::ActionParkingExecute(TObject *Sender)
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumParking;
+ int NumParking = 0;
  if ((NumParking=cv->v[x][y].NumParking) != 0) // Si parking on le supprime
   {
    cv->SupprimeParking(NumParking-1);
@@ -3341,12 +3337,12 @@ void TfrmSimulation::ActionPassagePietonsExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionArretBusTramExecute(TObject *Sender)
 {
- int d;
+ int d = 0;
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumArretBus;
- int NumArretTram;
+ int NumArretBus = 0;
+ int NumArretTram = 0;
  // OU BIEN Il y a une route OU BIEN une voie de tram
  if (((cv->v[x][y].DirPoss>aucune)^(cv->v[x][y].SensVoieTram>aucune_voie)) == 0) { return;
 }
@@ -3456,7 +3452,7 @@ void TfrmSimulation::ActionPlaceTaxiExecute(TObject *Sender)
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumPlaceTaxi;
+ int NumPlaceTaxi = 0;
  if ((NumPlaceTaxi=cv->v[x][y].NumPlaceTaxi) != 0) // Si Place Taxi on la supprime
   {
    cv->SupprimePlaceTaxi(NumPlaceTaxi-1);
@@ -3498,15 +3494,15 @@ void TfrmSimulation::ActionDeplacerFeuDestinationExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
  int Bas=DrawGridSimul->Selection.Bottom;
- int x0;
- int x1;
- int y0;
- int y1;
+ int x0 = 0;
+ int x1 = 0;
+ int y0 = 0;
+ int y1 = 0;
  int dx=abs(Droite-Gauche);
  int dy=abs(Bas-Haut);
  int xd=DrawGridSimul->Col;
@@ -3561,7 +3557,7 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3615,7 +3611,7 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3640,7 +3636,7 @@ void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject *Sender)
 void TfrmSimulation::ActionCoinInferieurGaucheExecute(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3665,7 +3661,7 @@ void TfrmSimulation::ActionCoinInferieurGaucheExecute(
 void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3690,7 +3686,7 @@ void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
 void TfrmSimulation::ActionCoinInferieurDroitExecute(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3715,7 +3711,7 @@ void TfrmSimulation::ActionCoinInferieurDroitExecute(
 void TfrmSimulation::ActionPeripheriqueExterieurExecute(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3742,7 +3738,7 @@ void TfrmSimulation::ActionPeripheriqueExterieurExecute(
 void TfrmSimulation::ActionPeripheriqueInterieurExecute(
       TObject *Sender)
 {
- int i;
+ int i = 0;
  int Gauche=DrawGridSimul->Selection.Left;
  int Droite=DrawGridSimul->Selection.Right;
  int Haut=DrawGridSimul->Selection.Top;
@@ -3946,9 +3942,9 @@ void TfrmSimulation::ActionSuivrePieton2Execute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDecorsArbreExecute(TObject *Sender)
 {
- int x;
- int y;
- voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
+ int x = 0;
+ int y = 0;
+ voie *v=&cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row];
  if (v->Nature==arbre) { v->Nature=trottoirs; } else { v->Nature=arbre;
 }
  SimulationModifiee=true; // v5.0
@@ -3957,9 +3953,9 @@ void TfrmSimulation::ActionDecorsArbreExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDecorsPelouseExecute(TObject *Sender)
 {
- int x;
- int y;
- voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
+ int x = 0;
+ int y = 0;
+ voie *v=&cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row];
  if (v->Nature==pelouse) { v->Nature=trottoirs; } else { v->Nature=pelouse;
 }
  SimulationModifiee=true; // v5.0
@@ -3969,9 +3965,9 @@ void TfrmSimulation::ActionDecorsPelouseExecute(TObject *Sender)
 void TfrmSimulation::ActionNatureTrottoirExecute(
       TObject *Sender)
 {
- int x;
- int y;
- voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
+ int x = 0;
+ int y = 0;
+ voie *v=&cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row];
  if (NATURE(v)!=trottoirs) { v->Nature=trottoirs; } else { v->Nature=voies;
 }
  SimulationModifiee=true; // v5.0
@@ -3981,9 +3977,9 @@ void TfrmSimulation::ActionNatureTrottoirExecute(
 void TfrmSimulation::ActionNatureImmeubleExecute(
       TObject *Sender)
 {
- int x;
- int y;
- voie *v=&(cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row]);
+ int x = 0;
+ int y = 0;
+ voie *v=&cv->v[x=DrawGridSimul->Col][y=DrawGridSimul->Row];
  if (NATURE(v)!=immeubles) { v->Nature=immeubles; } else { v->Nature=voies;
 }
  SimulationModifiee=true; // v5.0
@@ -4069,7 +4065,7 @@ void TfrmSimulation::ActionPlaceParkExecute(TObject *Sender)
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumPlace;
+ int NumPlace = 0;
  if ((NumPlace=cv->v[x][y].NumPlacePark) != 0) // Si Place de parking on la supprime
   {
    cv->SupprimePlacePark(NumPlace-1); // v5.3 renommée de SupprimePlace(n) pour distinguer avec SupprimePlaceVehlib(n)
@@ -4128,7 +4124,7 @@ void TfrmSimulation::ActionPlaceVehlibExecute(TObject *Sender)
  int x=DrawGridSimul->Col;
  int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
- int NumPlace;
+ int NumPlace = 0;
  if ((NumPlace=cv->v[x][y].NumPlaceVehlib) != 0) // Si Place de vehlib on la supprime
   {
    cv->SupprimePlaceVehlib(NumPlace-1);

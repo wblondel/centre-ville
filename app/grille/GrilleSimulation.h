@@ -36,7 +36,7 @@ struct TGridRect
  };
 enum TGridOption { goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect,
                    goDrawFocusSelected, goRowSizing, goColSizing, goRowMoving, goColMoving,
-                   goEditing, goTabs, goRowSelect, goAlwaysShowEditor, goThumbTracking };
+                   goEditing, goTabs, goRowSelect, goAlwaysShowEditor, goThumbTracking, };
 using TGridOptions = TEnsemble<TGridOption>;
 enum TGridDrawStateElement { gdSelected, gdFocused, gdFixed };
 using TGridDrawState = TEnsemble<TGridDrawStateElement>;

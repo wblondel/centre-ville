@@ -21,23 +21,23 @@ TfrmParamBus::TfrmParamBus(TComponent* Owner)
  // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
  for(int i=0; i<9; i++) {
   if (i!=4) { // v5.4 : plus de zoom !
-   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, (static_cast<TBitBtn*>(FindComponent(UnicodeString("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
+   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, (static_cast<TBitBtn*>(FindComponent(UnicodeString("BitBtn"+IntToStr(1+(i%3))+IntToStr(1+(i/3))))))->Glyph);
 }
 }
  for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) { // v6.0.2 : champs des n° d'arrêts
   for(int j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++) {
-   Connecte((static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->OnExit, this, &TfrmParamBus::CSpinEditExit);
+   Connecte((static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j))))->OnExit, this, &TfrmParamBus::CSpinEditExit);
 }
 }
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::RafraichitNbBus()
  {
-  int i;
+  int i = 0;
   int NbBus=0;
   for(i=0; i<NBMAXLIGNESBUSTRAM; i++) {
    if (cv->LigneBus[i].NbArrets != 0) {
-    NbBus+=1+(cv->LigneBus[i].NbArrets-1)/3; // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts
+    NbBus+=1+((cv->LigneBus[i].NbArrets-1)/3); // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts
 }
 }
   LabelNbBus->Caption=IntToStr(NbBus);
@@ -45,10 +45,10 @@ void TfrmParamBus::RafraichitNbBus()
 //---------------------------------------------------------------------------
 void TfrmParamBus::FormShow(TObject *Sender)
 {
- int i;
- int j;
+ int i = 0;
+ int j = 0;
  AnsiString asNumLigne;
- TShape* Shape;
+ TShape* Shape = nullptr;
  NumArretBusAMontrer=0;
  InitialisationEnCours=true;
  for(NbArretsBus=i=0; i<cv->NbArretsBus; i++) { NbArretsBus+=static_cast<int>(cv->ArretBus[i].Defini());
@@ -77,9 +77,9 @@ void TfrmParamBus::FormShow(TObject *Sender)
      (static_cast<TCheckBox*>(FindComponent("CheckBox"+IntToStr(i))))->Visible=(cv->TourCrt>0)&&(cv->LigneBus[i-1].NbArrets>0);
      for(j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
       {
-       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->MAXVALUE=cv->NbArretsBus;
-       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->Value=cv->LigneBus[i-1].NumArret[j-1];
-       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j))))->Enabled=cv->TourCrt == 0;
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j))))->MAXVALUE=cv->NbArretsBus;
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j))))->Value=cv->LigneBus[i-1].NumArret[j-1];
+       (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j))))->Enabled=cv->TourCrt == 0;
       }
      asNumLigne=IntToStr(i);
      Shape=static_cast<TShape*>(FindComponent("Shape"+asNumLigne));
@@ -108,15 +108,15 @@ void TfrmParamBus::FormShow(TObject *Sender)
 void TfrmParamBus::CSpinEditChange(TObject *Sender)
 {
  auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
- int i;
+ int i = 0;
  int k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
  int n=CSpinEdit->Value;
- int AncNumArretBusAMontrer;
+ int AncNumArretBusAMontrer = 0;
  switch(k/10)
   {
    case 0: // Nombre d'arrêts
            for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++) {
-            (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i))))->Visible=(i<=n);
+            (static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*k)+i))))->Visible=(i<=n);
 }
            break;
    default:// N°d'arrêt de bus
@@ -126,7 +126,7 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 }}
            else
             if (!cv->ArretBus[n-1].Defini())
-             { if (!CSpinEdit->Frappe()) { CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsBus; 
+             { if (!CSpinEdit->Frappe()) { CSpinEdit->Value=1+(CSpinEdit->Value%cv->NbArretsBus); 
 }}
             else
              if (!InitialisationEnCours)
@@ -156,7 +156,7 @@ void TfrmParamBus::CSpinEditExit(TObject *Sender)
   CSpinEdit->Value=0;
  } else
   if (!cv->ArretBus[n-1].Defini()) {
-   CSpinEdit->Value=1+n%cv->NbArretsBus;
+   CSpinEdit->Value=1+(n%cv->NbArretsBus);
 }
 }
 //---------------------------------------------------------------------------
@@ -176,8 +176,8 @@ void TfrmParamBus::BitBtnDirClick(TObject *Sender)
 {
  int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
  int // portage : TComponent::Name -> NomDe
-     dx=n/10-2;
- int dy=n%10-2;
+     dx=(n/10)-2;
+ int dy=(n%10)-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)
@@ -217,10 +217,10 @@ void TfrmParamBus::TimerClignotementTimer(TObject *Sender)
 bool TfrmParamBus::AppliqueChoix()
  {
   AnsiString asMsg;
-  int i;
-  int j;
-  TCSpinEdit *CSpinEditNb;
-  TCSpinEdit *CSpinEditNum;
+  int i = 0;
+  int j = 0;
+  TCSpinEdit *CSpinEditNb = nullptr;
+  TCSpinEdit *CSpinEditNum = nullptr;
   // 1. On vérifie que tous les arrêts sont définis
   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
    {
@@ -229,7 +229,7 @@ bool TfrmParamBus::AppliqueChoix()
      {
       for(j=1; j<=CSpinEditNb->Value; j++)
        {
-        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)));
+        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j)));
         if (CSpinEditNum->Value == 0) {
          asMsg= asMsg+
                 Format( " - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
@@ -255,7 +255,7 @@ bool TfrmParamBus::AppliqueChoix()
       cv->NbLignesBus++;
       for(j=1; j<=CSpinEditNb->Value; j++)
        {
-        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)));
+        CSpinEditNum=static_cast<TCSpinEdit*>(FindComponent(asDebutNomSpinEdit+IntToStr((10*i)+j)));
         cv->LigneBus[i-1].NumArret[j-1]=CSpinEditNum->Value;
         cv->ArretBus[CSpinEditNum->Value-1].AjouteLigneBus(i); // v3.0.5
        }

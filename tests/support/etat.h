@@ -60,7 +60,7 @@ enum partie_etat
   peCentreVille, peFeux, peFeuxPietons, peParkings, peVehicules, peBus,
   peTrams, peTaxis, peParkingsPlaces, peVehlibs, pePietons, peCases,
   peDistances, // statique après CalculeDistances : hors état « complet »
-  NB_PARTIES_ETAT
+  NB_PARTIES_ETAT,
  };
 extern const char *NomPartieEtat[NB_PARTIES_ETAT];
 //---------------------------------------------------------------------------

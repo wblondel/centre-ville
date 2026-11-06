@@ -45,7 +45,7 @@ TColor CouleurDepuisTexte(const AnsiString &asCouleur)
     {"clWindow", clWindow}, {"clWindowText", clWindowText}, {"clHighlight", clHighlight},
     {"clHighlightText", clHighlightText}, {"clBtnFace", clBtnFace}, {"clBtnShadow", clBtnShadow},
     {"clGrayText", clGrayText}, {"clBtnText", clBtnText}, {"clBtnHighlight", clBtnHighlight},
-    {"clInfoBk", clInfoBk}};
+    {"clInfoBk", clInfoBk},};
   auto i=Noms.find(asCouleur.str());
   if (i!=Noms.end()) { return i->second;
 }
@@ -78,7 +78,7 @@ QFont TFont::Qt() const
    f.setPixelSize(-Height); // Font.Height négatif = hauteur des caractères en pixels
   } else
    if (Height>0) {
-    f.setPixelSize(qMax(1, static_cast<int>(0.85*Height+0.5))); // hauteur de cellule
+    f.setPixelSize(qMax(1, static_cast<int>((0.85*Height)+0.5))); // hauteur de cellule
 }
   f.setBold(Style.Contains(fsBold));
   f.setItalic(Style.Contains(fsItalic));

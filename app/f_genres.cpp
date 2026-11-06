@@ -39,7 +39,7 @@ void TfrmGeneration::ButtonOkClick(TObject *Sender)
  // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
  // d'origine les évalue de gauche à droite (engine/README.md) : x, puis y, puis la direction
  int x=rand()%cv->NbX;
- int y=rand()%cv->NbY; auto d=static_cast<direction>(1+rand()%NBDIR); cv->Genere(x, y, d);
+ int y=rand()%cv->NbY; auto d=static_cast<direction>(1+(rand()%NBDIR)); cv->Genere(x, y, d);
  frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------

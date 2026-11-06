@@ -357,13 +357,12 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
 }
 }
     for(QPushButton *p : this->template findChildren<QPushButton *>()) {
-     if (auto *b=dynamic_cast<TButton *>(p)) {
-      if ((Entree?b->Default:b->Cancel)&&b->isVisible()&&b->isEnabled())
-       {
+     if (auto *b=dynamic_cast<TButton *>(p); b && ((Entree?b->Default:b->Cancel)&&b->isVisible()&&b->isEnabled())) 
+      {
         b->Click();
         return true;
        }
-}
+
 }
     return false;
    }

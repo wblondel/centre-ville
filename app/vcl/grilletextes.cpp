@@ -11,6 +11,7 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QWheelEvent>
+#include <utility>
 //---------------------------------------------------------------------------
 namespace
  {
@@ -44,7 +45,7 @@ namespace
     0x25CA, 0x2329, 0x00AE, 0x00A9, 0x2122, 0x2211, 0x239B, 0x239C, // E0
     0x239D, 0x23A1, 0x23A2, 0x23A3, 0x23A7, 0x23A8, 0x23A9, 0x23AA, // E8
     0,      0x232A, 0x222B, 0x2320, 0x23AE, 0x2321, 0x239E, 0x239F, // F0
-    0x23A0, 0x23A4, 0x23A5, 0x23A6, 0x23AB, 0x23AC, 0x23AD          // F8
+    0x23A0, 0x23A4, 0x23A5, 0x23A6, 0x23AB, 0x23AC, 0x23AD,          // F8
    };
   QString TexteSymbol(const QString &s)
    {
@@ -175,7 +176,7 @@ void TStringGrid::EcritCellule(int c, int r, const AnsiString &as)
 void TStringGrid::EcritTaille(bool Colonne, int i, int Taille)
  {
   std::vector<int> &t=Colonne?Largeurs:Hauteurs;
-  if ((i<0)||(i>=static_cast<int>(t.size()))) { return;
+  if ((i<0)||std::cmp_greater_equal(i,t.size())) { return;
 }
   t[static_cast<std::size_t>(i)]=Taille;
   MetAJourDefilement();
@@ -532,8 +533,8 @@ void TStringGrid::mousePressEvent(QMouseEvent *e)
   setFocus(Qt::MouseFocusReason);
   if (e->button()!=Qt::LeftButton) { return;
 }
-  int c;
-  int r;
+  int c = 0;
+  int r = 0;
   if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) { return;
 }
   SelectionEnCours=true;
@@ -552,8 +553,8 @@ void TStringGrid::mouseMoveEvent(QMouseEvent *e)
  { // Glisser (goRangeSelect) : l'ancre suit la souris
   if (!SelectionEnCours) { return;
 }
-  int c;
-  int r;
+  int c = 0;
+  int r = 0;
   if (!CaseEn(e->position().toPoint(), c, r)||(c<NbFixesC)||(r<NbFixesL)) { return;
 }
   if (!PlageSelection) { Deplace(c, r, true, false); return; }
@@ -595,7 +596,7 @@ void TStringGrid::wheelEvent(QWheelEvent *e)
 void TStringGrid::keyPressEvent(QKeyEvent *e)
  { // TCustomGrid::KeyDown (sans goTabs ni goEditing)
   bool Ctrl=e->modifiers().testFlag(Qt::ControlModifier), Maj=e->modifiers().testFlag(Qt::ShiftModifier);
-#if defined(Q_OS_MACOS)
+#ifdef Q_OS_MACOS
   Ctrl=Ctrl||((e->modifiers()&Qt::MetaModifier) != 0u);
 #endif
   int c=ColCour;

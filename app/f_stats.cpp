@@ -17,10 +17,10 @@ TfrmStatistiques::TfrmStatistiques(TComponent* Owner) : TForm(Owner) { Affichage
 void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 {
  bool ParNbVehicules=(cv->TypeStats==par_nombre);
- int i;
- int j;
- int x;
- int y;
+ int i = 0;
+ int j = 0;
+ int x = 0;
+ int y = 0;
  int NbTours=cv->NbToursStats;
  int // v6.0.2 : dernier tour dont les statistiques sont calculées. Le moteur dessine pendant
 	 // le tour, puis passe au suivant : entre deux tours (fenêtre découverte, pause), TourCrt
@@ -31,11 +31,11 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
  int NbVehicules=cv->NbVehicules;
  int NbPietons=cv->NbPietons;
  int // v5.4.1
-	 NbMarques=(ParNbVehicules)?(NbVehicules/10):10;
- int dt=1+9*static_cast<int>(NbTours>=100L);
+	 NbMarques=ParNbVehicules?(NbVehicules/10):10;
+ int dt=1+(9*static_cast<int>(NbTours>=100L));
  int xMax=PaintBoxStats->Width;
  int yMax=PaintBoxStats->Height;
- int NbRestants;
+ int NbRestants = 0;
 
  // 0. légende selon le mode
  if (AffichageEpidemique) {
@@ -49,7 +49,7 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
   for(i=0; i<NbTours/dt; i++) {
    for(j=0; j<NbMarques; j++)
 	{
-	 x=dt*xMax*i/NbTours; y=(ParNbVehicules)?(10*yMax*j/NbVehicules):(10*yMax*j/100);
+	 x=dt*xMax*i/NbTours; y=ParNbVehicules?(10*yMax*j/NbVehicules):(10*yMax*j/100);
 	 PaintBoxStats->Canvas->Pen->Color=(((i%10) != 0)&&((j%10) != 0))?clGray:clWhite;
 	 PaintBoxStats->Canvas->Rectangle(x-1, yMax-y-1, x+1, yMax-y+1);
 	}
@@ -67,48 +67,48 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject *Sender)
 	 if (NbPietons == 0) { return; // portage : division entière par zéro (sans piéton) : exception EDivByZero dans l'original
 }
 	 PaintBoxStats->Canvas->Pen->Color=clRed; // Morts = Rouges
-	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsMorts/NbPietons);
+	 PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbPietonsMorts/NbPietons));
 	 for(i=0; i<DrnTour-PrmTour+1; i++) {
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsMorts/NbPietons);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsMorts/NbPietons));
 }
 
 	 PaintBoxStats->Canvas->Pen->Color=clYellow; // Infectés = Jaunes
-	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsInfectes/NbPietons);
+	 PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbPietonsInfectes/NbPietons));
 	 for(i=0; i<DrnTour-PrmTour+1; i++) {
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsInfectes/NbPietons);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsInfectes/NbPietons));
 }
 
 	 PaintBoxStats->Canvas->Pen->Color=clGreen; // Guéris = Verts
-	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbPietonsGueris/NbPietons);
+	 PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbPietonsGueris/NbPietons));
 	 for(i=0; i<DrnTour-PrmTour+1; i++) {
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsGueris/NbPietons);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbPietonsGueris/NbPietons));
 }
 	}
    else // SINON statistiques de véhicules
 	{
 	 PaintBoxStats->Canvas->Pen->Color=clRed; // Arrivés = Rouges
-	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesArrives/NbVehicules);
+	 PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbVehiculesArrives/NbVehicules));
 	 for(i=0; i<DrnTour-PrmTour+1; i++) {
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives/NbVehicules);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives/NbVehicules));
 }
 
 	 PaintBoxStats->Canvas->Pen->Color=clYellow; // Sortis = Jaunes
-	 PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesSortis/NbVehicules);
+	 PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbVehiculesSortis/NbVehicules));
 	 for(i=0; i<DrnTour-PrmTour+1; i++) {
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesSortis/NbVehicules);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesSortis/NbVehicules));
 }
 
 	 PaintBoxStats->Canvas->Pen->Color=clGreen; // Deplaces = Verts
 	 NbRestants=ParNbVehicules?NbVehicules:(cv->Stats[PrmTour%NbTours].NbVehiculesSortis-cv->Stats[PrmTour%NbTours].NbVehiculesArrives);
 	 if (NbRestants == 0) { NbRestants=100;
 }
-	   PaintBoxStats->Canvas->MoveTo(0, yMax-yMax*cv->Stats[PrmTour%NbTours].NbVehiculesDeplaces/NbRestants);
+	   PaintBoxStats->Canvas->MoveTo(0, yMax-(yMax*cv->Stats[PrmTour%NbTours].NbVehiculesDeplaces/NbRestants));
 	 for(i=0; i<DrnTour-PrmTour+1; i++)
 	  {
 	   NbRestants=ParNbVehicules?NbVehicules:(cv->Stats[(PrmTour+i)%NbTours].NbVehiculesSortis-cv->Stats[(PrmTour+i)%NbTours].NbVehiculesArrives);
 	   if (NbRestants == 0) { NbRestants=100;
 }
-	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesDeplaces/NbRestants);
+	   PaintBoxStats->Canvas->LineTo(xMax*i/NbTours, yMax-(yMax*cv->Stats[(PrmTour+i)%NbTours].NbVehiculesDeplaces/NbRestants));
 	  }
 	}
   }

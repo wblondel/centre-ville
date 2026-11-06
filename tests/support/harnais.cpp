@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------
 bool harnais::Ouvre(const std::string &asNomFichier)
  { // f_simul.cpp, TfrmSimulation::ActionOuvrirExecute (partie moteur)
-  int hfile;
+  int hfile = 0;
   AppelleAuChaos();
   if ((hfile=FileOpen(asNomFichier.c_str(), fmOpenRead))<0) { return false; // harnais : -1 si échec
 }
@@ -25,7 +25,7 @@ bool harnais::Ouvre(const std::string &asNomFichier)
 //---------------------------------------------------------------------------
 bool harnais::SauveSansChaos(const std::string &asNomFichier)
  {
-  int hfile;
+  int hfile = 0;
   if ((hfile=FileCreate(asNomFichier.c_str()))<0) { return false;
 }
   bool Ok=cv->Sauve(hfile);
@@ -42,17 +42,17 @@ bool harnais::Sauve(const std::string &asNomFichier)
 bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, TfrmSimulation::VerifieReseau()
  {
   bool Ok=true;
-  int i;
-  int j;
-  int d;
-  int NbDirPossSansPsgBus;
+  int i = 0;
+  int j = 0;
+  int d = 0;
+  int NbDirPossSansPsgBus = 0;
   int // v3.5
       NbCasesPietonPeutAller=0; // v3.8
   const AnsiString asMsgOk="Réseau correct.";
   asMsgErr=""; // harnais : variable locale devenue paramètre
   dirposs dp;
-  voie *v;
-  voie *vv;
+  voie *v = nullptr;
+  voie *vv = nullptr;
   cv->VerifOk=false;
   // On enleve le clignotement si actif. v3.5
   // harnais : if (TimerClignotementErreur->Enabled) TimerClignotementErreur->Enabled=false;
@@ -83,45 +83,41 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
   for(i=0; Ok&&(i<NBMAXLIGNESBUSTRAM); i++) {
    for(j=0; Ok&&(j<NBMAXARRETSBUSTRAMPARLIGNE); j++)
     {
-     if (j<cv->LigneBus[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
-      if (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))
-       {
+     if ((j<cv->LigneBus[i].NbArrets) && (!(Ok=cv->ArretBus[cv->LigneBus[i].NumArret[j]-1].Defini()))) // v3.5 : Oubli du test du nombre d'arrêts
+      {
         asMsgErr=Format( "La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((i+1, cv->LigneBus[i].NumArret[j])));
         break;
        }
-}
-     if (j<cv->LigneTram[i].NbArrets) { // v3.5 : Oubli du test du nombre d'arrêts
-      if (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))
-       {
+
+     if ((j<cv->LigneTram[i].NbArrets) && (!(Ok=cv->ArretTram[cv->LigneTram[i].NumArret[j]-1].Defini()))) // v3.5 : Oubli du test du nombre d'arrêts
+      {
         asMsgErr=Format( "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
                          ARRAYOFCONST((AnsiString((char)('A'+i)), cv->LigneTram[i].NumArret[j])));
         break;
        }
-}
+
     }
 }
   for(i=0; Ok&&(i<cv->NbArretsBus); i++) {
-   if (cv->ArretBus[i].Defini()) {
-    if (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))
-     { // v3.0.3
+   if ((cv->ArretBus[i].Defini()) && (!(Ok=(cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus==i+1)))) 
+    { // v3.0.3
       xErr=cv->ArretBus[i].x; yErr=cv->ArretBus[i].y;
       asMsgErr=Format( "La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
                        ARRAYOFCONST((i+1)));
       break;
      }
-}
+
 }
   for(i=0; Ok&&(i<cv->NbArretsTram); i++) {
-   if (cv->ArretTram[i].Defini()) {
-    if (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))
-     { // v3.0.3
+   if ((cv->ArretTram[i].Defini()) && (!(Ok=(cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram==i+1)))) 
+    { // v3.0.3
       xErr=cv->ArretTram[i].x; yErr=cv->ArretTram[i].y;
       asMsgErr=Format( "La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
 					   ARRAYOFCONST((i+1)));
 	  break;
 	 }
-}
+
 }
   if (Ok&&(cv->NbArretsBus>0)&&(cv->NbLignesBus>0))  // v3.0
    {
@@ -149,7 +145,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
   for(i=0; Ok&&(i<cv->NbX); i++) {
    for(j=0; Ok&&(j<cv->NbY); j++)
 	{
-     v=&(cv->v[i][j]);
+     v=&cv->v[i][j];
      NbDirPossSansPsgBus=0; // v3.5
      for(d=nord; Ok&&(d<=ouest); d++)
       { // v5.2.2
@@ -249,7 +245,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
          break;
         }
       }
-     if ((v->PassagePietons)&&(cv->SensPassagePietonsPossible(i, j) == 0))
+     if (v->PassagePietons&&(cv->SensPassagePietonsPossible(i, j) == 0))
       {
        Ok=false; xErr=i; yErr=j;
 
@@ -303,7 +299,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 bool harnais::Demarre(AnsiString &asMsgErr)
  { // f_simul.cpp, TfrmSimulation::ActionMarcheExecute (cas !Pause)
   type_distance TypeDistance=type_indefini;
-  int i;
+  int i = 0;
   asMsgErr="";
   if (!VerifieReseau(asMsgErr)) { return false;
 }
@@ -367,7 +363,7 @@ std::string harnais::LitFichier(const std::string &asNomFichier)
   if (hfile<0) { return Contenu;
 }
   char Tampon[65536];
-  int n;
+  int n = 0;
   while((n=FileRead(hfile, Tampon, sizeof(Tampon)))>0) {
    Contenu.append(Tampon, static_cast<std::size_t>(n));
 }

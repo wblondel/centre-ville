@@ -36,20 +36,20 @@ namespace
   struct Trait { int Bande, x0, x1; };
   const std::vector<Trait> Chiffres[10]=
    {
-    {{0,1,11}, {1,1,4}, {1,8,11}, {2,1,4}, {2,8,11}, {3,1,4}, {3,8,11}, {4,1,4}, {4,8,11}, {5,1,4}, {5,8,11}, {6,4,8}}, // 0
-    {{0,8,11}, {1,8,11}, {2,8,11}, {3,8,11}, {4,8,11}, {5,8,11}, {6,8,11}},                                       // 1
-    {{0,1,11}, {1,8,11}, {2,8,11}, {3,1,11}, {4,1,4}, {5,1,4}, {6,1,11}},                                         // 2
-    {{0,1,11}, {1,8,11}, {2,8,11}, {3,4,11}, {4,8,11}, {5,8,11}, {6,4,8}},                                        // 3
-    {{0,4,8}, {1,3,6}, {2,2,5}, {2,8,11}, {3,1,4}, {3,8,11}, {4,1,11}, {5,8,11}, {6,8,11}},                      // 4 (d'origine)
-    {{0,1,11}, {1,1,4}, {2,1,8}, {3,8,11}, {4,1,4}, {4,8,11}, {5,1,4}, {5,8,11}, {6,4,8}},                      // 5 (d'origine)
-    {{0,1,11}, {1,1,4}, {2,1,8}, {3,1,4}, {3,8,11}, {4,1,4}, {4,8,11}, {5,1,4}, {5,8,11}, {6,4,8}},            // 6
-    {{0,1,11}, {1,8,11}, {2,8,11}, {3,8,11}, {4,8,11}, {5,8,11}, {6,8,11}},                                       // 7
-    {{0,1,11}, {1,1,4}, {1,8,11}, {2,1,4}, {2,8,11}, {3,1,11}, {4,1,4}, {4,8,11}, {5,1,4}, {5,8,11}, {6,4,8}}, // 8
-    {{0,1,11}, {1,1,4}, {1,8,11}, {2,1,4}, {2,8,11}, {3,1,11}, {4,8,11}, {5,8,11}, {6,4,8}}                     // 9
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=1,.x1=4}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=1,.x1=4}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=1,.x1=4}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=1,.x1=4}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=1,.x1=4}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}}, // 0
+    {{.Bande=0,.x0=8,.x1=11}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=8,.x1=11}},                                       // 1
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=1,.x1=11}, {.Bande=4,.x0=1,.x1=4}, {.Bande=5,.x0=1,.x1=4}, {.Bande=6,.x0=1,.x1=11}},                                         // 2
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=4,.x1=11}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}},                                        // 3
+    {{.Bande=0,.x0=4,.x1=8}, {.Bande=1,.x0=3,.x1=6}, {.Bande=2,.x0=2,.x1=5}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=1,.x1=4}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=1,.x1=11}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=8,.x1=11}},                      // 4 (d'origine)
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=1,.x1=4}, {.Bande=2,.x0=1,.x1=8}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=1,.x1=4}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=1,.x1=4}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}},                      // 5 (d'origine)
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=1,.x1=4}, {.Bande=2,.x0=1,.x1=8}, {.Bande=3,.x0=1,.x1=4}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=1,.x1=4}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=1,.x1=4}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}},            // 6
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=8,.x1=11}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=8,.x1=11}},                                       // 7
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=1,.x1=4}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=1,.x1=4}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=1,.x1=11}, {.Bande=4,.x0=1,.x1=4}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=1,.x1=4}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}}, // 8
+    {{.Bande=0,.x0=1,.x1=11}, {.Bande=1,.x0=1,.x1=4}, {.Bande=1,.x0=8,.x1=11}, {.Bande=2,.x0=1,.x1=4}, {.Bande=2,.x0=8,.x1=11}, {.Bande=3,.x0=1,.x1=11}, {.Bande=4,.x0=8,.x1=11}, {.Bande=5,.x0=8,.x1=11}, {.Bande=6,.x0=4,.x1=8}},                     // 9
    };
   void DessineTrait(QImage &Image, const Trait &t, int x, QRgb Clair, QRgb Ombre)
    {
-    int y=1+3*t.Bande;
+    int y=1+(3*t.Bande);
     for(int i=t.x0; i<=t.x1; i++)
      {
       Image.setPixel(x+i, y, Clair);
@@ -64,12 +64,12 @@ QPixmap ImageDeVersion(int Majeure, int Mineure)
  {
   QString stMajeure=QString::number(Majeure);
   QString stMineure=QString::number(Mineure);
-  QImage Image(13*(stMajeure.size()+stMineure.size())+2, 22, QImage::Format_ARGB32);
+  QImage Image((13*(stMajeure.size()+stMineure.size()))+2, 22, QImage::Format_ARGB32);
   Image.fill(qRgb(0x00, 0x00, 0x00));
   int x=0;
   for(QChar c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }
-  DessineTrait(Image, {6, 0, 1}, x, qRgb(0xFF, 0xFF, 0x00), qRgb(0x80, 0x80, 0x00)); // virgule
+  DessineTrait(Image, {.Bande=6, .x0=0, .x1=1}, x, qRgb(0xFF, 0xFF, 0x00), qRgb(0x80, 0x80, 0x00)); // virgule
   x+=2;
   for(QChar c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }

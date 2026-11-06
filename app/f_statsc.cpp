@@ -36,10 +36,10 @@ TfrmStatsComposition::TfrmStatsComposition(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmStatsComposition::FormShow(TObject *Sender)
 {
- voie *vv;
- int i;
- int x;
- int y;
+ voie *vv = nullptr;
+ int i = 0;
+ int x = 0;
+ int y = 0;
  int Total=0;
  int Routes=0;
  int VoiesTram=0;
@@ -84,7 +84,7 @@ void TfrmStatsComposition::FormShow(TObject *Sender)
  for(x=0; x<cv->NbX; x++) {
   for(y=0; y<cv->NbY; y++)
    {
-    vv=&(cv->v[x][y]);
+    vv=&cv->v[x][y];
     Total++;
     Parkings+=static_cast<int>(vv->NumParking>0);
     CasesArretsBus+=static_cast<int>(vv->NumArretBus>0); // v3.0

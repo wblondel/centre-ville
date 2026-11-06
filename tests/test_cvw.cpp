@@ -85,9 +85,9 @@ TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes et les 3 
   vue=&Vue;
   struct carte_roundtrip { carte c; std::string asChemin; };
   std::vector<carte_roundtrip> Liste;
-  for(const carte &c : Cartes) { Liste.push_back({c, CheminCarte(c)});
+  for(const carte &c : Cartes) { Liste.push_back({.c=c, .asChemin=CheminCarte(c)});
 }
-  for(const carte &c : CartesTutoriel) { Liste.push_back({c, CheminCarteTutoriel(c)});
+  for(const carte &c : CartesTutoriel) { Liste.push_back({.c=c, .asChemin=CheminCarteTutoriel(c)});
 }
   for(const carte_roundtrip &r : Liste)
    {

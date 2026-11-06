@@ -8,7 +8,7 @@
 const char *NomPartieEtat[NB_PARTIES_ETAT]=
  {
   "centre", "feux", "feuxp", "parkings", "vehicules", "bus",
-  "trams", "taxis", "places", "vehlibs", "pietons", "cases", "distances"
+  "trams", "taxis", "places", "vehlibs", "pietons", "cases", "distances",
  };
 //---------------------------------------------------------------------------
 std::string Hexa(std::uint64_t v)
@@ -66,7 +66,7 @@ template <class P> void ExportEtat::ExporteInfections(const pieton *p, P &s)
   for(const infection *i=p->Infection; i; i=i->Svt, k++)
    {
     const int Valeurs[8]={i->TourDeb, i->TourFin, i->TourFatal, i->NumPrmPieton,
-                          i->NumDrnPieton, i->PrmRang, i->DrnRang, i->ChargeVirale};
+                          i->NumDrnPieton, i->PrmRang, i->DrnRang, i->ChargeVirale,};
     const char *Noms[8]={"deb", "fin", "fatal", "prm", "drn", "prmrang", "drnrang", "charge"};
     for(int j=0; j<8; j++)
      {
@@ -81,7 +81,7 @@ template <class P> void ExportEtat::ExporteInfections(const pieton *p, P &s)
 //---------------------------------------------------------------------------
 template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat Partie, P &s, bool Detail)
  {
-  int i;
+  int i = 0;
   s.Section(NomPartieEtat[Partie]);
   switch(Partie)
    {
@@ -381,7 +381,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
           Vide=Vide&&(!v->LigneBus[k])&&(!v->LigneTram[k]);
 }
           }
-         s.Objet("case", x*1000+y, Vide);
+         s.Objet("case", (x*1000)+y, Vide);
          C("x", x); C("y", y);
          C("DirPoss", v->DirPoss); C("SensVoieTram", v->SensVoieTram); CT("Priorite", v->Priorite, NBDIR);
          C("Nature", v->Nature); C("ToutDroit", v->ToutDroit); C("PassagePietons", v->PassagePietons);
@@ -411,7 +411,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                  if constexpr (P::Noms) { std::snprintf(n, sizeof(n), "tra%d.%d", a, b);
 }
                  s.Champ(n, v->Trafic[a][b]);
-                 if constexpr (!P::Noms) { s.Champ(n, a*1000+b); // position dans l'empreinte
+                 if constexpr (!P::Noms) { s.Champ(n, (a*1000)+b); // position dans l'empreinte
 }
                 }
 }
@@ -434,7 +434,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
          const voie *v=&cv->v[x][y];
          int nd=NbDir[v->DirPoss];
          int ndt=const_cast<voie*>(v)->NbDirPossSensVoieTram(indefinie);
-         s.Objet("distances", x*1000+y);
+         s.Objet("distances", (x*1000)+y);
          if (v->DistParking) {
           for(int e=0; e<cv->NbParkings; e++) {
            for(int d=0; d<nd; d++)

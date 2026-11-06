@@ -15,6 +15,7 @@
 #include <ostream>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
 class AnsiString
@@ -23,7 +24,7 @@ class AnsiString
   public:
   AnsiString() = default;
   AnsiString(const char *src) : s(src?src:"") {}
-  AnsiString(const std::string &src) : s(src) {}
+  AnsiString(std::string src) : s(std::move(src)) {}
   AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
   const char *c_str() const { return s.c_str(); }
   const std::string &str() const { return s; }
@@ -76,7 +77,7 @@ class TVarRec
   TVarRec(float f) : Genre(vtReel), Reel(f) {}
   TVarRec(long double d) : Genre(vtReel), Reel(static_cast<double>(d)) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
   TVarRec(const char *c) : Genre(vtChaine), Chaine(c?c:"") {}
-  TVarRec(const std::string &c) : Genre(vtChaine), Chaine(c) {}
+  TVarRec(std::string c) : Genre(vtChaine), Chaine(std::move(c)) {}
   TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}
   TVarRec(const void *p) : Genre(vtPointeur), Pointeur(p) {}
  };

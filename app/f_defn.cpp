@@ -36,35 +36,35 @@ void TfrmDefNature::RadioGroupNatureClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefNature::ButtonAppliquerClick(TObject *Sender)
 {
- bool BordGauche;
- bool BordDroit;
- bool BordHaut;
- bool BordBas;
+ bool BordGauche = false;
+ bool BordDroit = false;
+ bool BordHaut = false;
+ bool BordBas = false;
  for(int x=frmSimulation->DrawGridSimul->Selection.Left; x<=frmSimulation->DrawGridSimul->Selection.Right; x++) {
   for(int y=frmSimulation->DrawGridSimul->Selection.Top; y<=frmSimulation->DrawGridSimul->Selection.Bottom; y++)
    {
-    cv->v[x][y].DefinitNature( static_cast<nature>( trottoirs*RadioGroupNature->ItemIndex+
-                                         static_cast<int>(CheckBoxPelouse->Checked)*(pelouse-trottoirs)),
+    cv->v[x][y].DefinitNature( static_cast<nature>( (trottoirs*RadioGroupNature->ItemIndex)+
+                                         (static_cast<int>(CheckBoxPelouse->Checked)*(pelouse-trottoirs))),
                                CheckBoxEcraser->Checked);
     BordGauche=(x==frmSimulation->DrawGridSimul->Selection.Left);
     BordDroit=(x==frmSimulation->DrawGridSimul->Selection.Right);
     BordHaut=(y==frmSimulation->DrawGridSimul->Selection.Top);
     BordBas=(y==frmSimulation->DrawGridSimul->Selection.Bottom);
-    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+(static_cast<int>(BordHaut)*(cv->NbY-1)))%cv->NbY].RedessineCase(true);
 }
     if (BordDroit||BordBas) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
 }
-    if (BordGauche||BordBas) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+    if (BordGauche||BordBas) { cv->v[(x+(static_cast<int>(BordGauche)*(cv->NbX-1)))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
 }
-    if (BordGauche||BordHaut) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+    if (BordGauche||BordHaut) { cv->v[(x+(static_cast<int>(BordGauche)*(cv->NbX-1)))%cv->NbX][(y+(static_cast<int>(BordHaut)*(cv->NbY-1)))%cv->NbY].RedessineCase(true);
 }
     if (BordDroit||BordBas) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
 }
-    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+    if (BordDroit||BordHaut) { cv->v[(x+static_cast<int>(BordDroit))%cv->NbX][(y+(static_cast<int>(BordHaut)*(cv->NbY-1)))%cv->NbY].RedessineCase(true);
 }
-    if (BordGauche||BordBas) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
+    if (BordGauche||BordBas) { cv->v[(x+(static_cast<int>(BordGauche)*(cv->NbX-1)))%cv->NbX][(y+static_cast<int>(BordBas))%cv->NbY].RedessineCase(true);
 }
-    if (BordGauche||BordHaut) { cv->v[(x+static_cast<int>(BordGauche)*(cv->NbX-1))%cv->NbX][(y+static_cast<int>(BordHaut)*(cv->NbY-1))%cv->NbY].RedessineCase(true);
+    if (BordGauche||BordHaut) { cv->v[(x+(static_cast<int>(BordGauche)*(cv->NbX-1)))%cv->NbX][(y+(static_cast<int>(BordHaut)*(cv->NbY-1)))%cv->NbY].RedessineCase(true);
 }
    }
 }

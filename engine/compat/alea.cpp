@@ -12,7 +12,7 @@ namespace
   //-------------------------------------------------------------------------
   void Avance()
    {
-    GraineCrt=GraineCrt*alea::MULTIPLICATEUR+1U;
+    GraineCrt=(GraineCrt*alea::MULTIPLICATEUR)+1U;
    }
  }
 //---------------------------------------------------------------------------

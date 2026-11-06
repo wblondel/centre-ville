@@ -38,21 +38,21 @@ void TfrmRecherche::RafraichitAffichage()
   CSpinEditPlaceVehlib->Enabled=RadioButtonPlaceVehlib->Checked; // v5.3
 
   switch(   static_cast<int>(RadioButtonCoordonnees->Checked)+
-          2*static_cast<int>(RadioButtonParking->Checked)+
-          3*static_cast<int>(RadioButtonFeu->Checked)+
-          4*static_cast<int>(RadioButtonVehicule->Checked)+
-          5*static_cast<int>(RadioButtonPieton->Checked)+
-          6*static_cast<int>(RadioButtonBus->Checked)+ // v3.0
-          7*static_cast<int>(RadioButtonArretBus->Checked)+ // v3.0
-          8*static_cast<int>(RadioButtonTram->Checked)+ // v3.5
-          9*static_cast<int>(RadioButtonArretTram->Checked)+ // v3.5
-         10*static_cast<int>(RadioButtonTaxi->Checked)+ // v3.6
-         11*static_cast<int>(RadioButtonPlaceTaxi->Checked)+ // v3.6
-         12*static_cast<int>(RadioButtonFileTaxi->Checked)+ // v3.6
-         13*static_cast<int>(RadioButtonPlacePark->Checked)+ // v5.0
-         14*static_cast<int>(RadioButtonFilePark->Checked)+ // v5.0
-         15*static_cast<int>(RadioButtonVehlib->Checked)+ // v5.3
-         16*static_cast<int>(RadioButtonPlaceVehlib->Checked)) // v5.3
+          (2*static_cast<int>(RadioButtonParking->Checked))+
+          (3*static_cast<int>(RadioButtonFeu->Checked))+
+          (4*static_cast<int>(RadioButtonVehicule->Checked))+
+          (5*static_cast<int>(RadioButtonPieton->Checked))+
+          (6*static_cast<int>(RadioButtonBus->Checked))+ // v3.0
+          (7*static_cast<int>(RadioButtonArretBus->Checked))+ // v3.0
+          (8*static_cast<int>(RadioButtonTram->Checked))+ // v3.5
+          (9*static_cast<int>(RadioButtonArretTram->Checked))+ // v3.5
+         (10*static_cast<int>(RadioButtonTaxi->Checked))+ // v3.6
+         (11*static_cast<int>(RadioButtonPlaceTaxi->Checked))+ // v3.6
+         (12*static_cast<int>(RadioButtonFileTaxi->Checked))+ // v3.6
+         (13*static_cast<int>(RadioButtonPlacePark->Checked))+ // v5.0
+         (14*static_cast<int>(RadioButtonFilePark->Checked))+ // v5.0
+         (15*static_cast<int>(RadioButtonVehlib->Checked))+ // v5.3
+         (16*static_cast<int>(RadioButtonPlaceVehlib->Checked))) // v5.3
    {
     case 1: CSpinEditX->SetFocus();
             CSpinEditXChange(CSpinEditX);
@@ -147,10 +147,10 @@ static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int
 //---------------------------------------------------------------------------
 void TfrmRecherche::FormShow(TObject *Sender)
 {
- int i;
+ int i = 0;
  int x=frmSimulation->DrawGridSimul->Col;
  int y=frmSimulation->DrawGridSimul->Row;
- voie *v=&(cv->v[x][y]);
+ voie *v=&cv->v[x][y];
  frmSimulation->ActionRechercher->Checked=true;
  FixeNumeroMax(CSpinEditParking, cv->NbParkings);
  FixeNumeroMax(CSpinEditFeu, cv->NbFeux);

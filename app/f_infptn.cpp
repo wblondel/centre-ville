@@ -63,7 +63,7 @@ const AnsiString asLabel="Label",
 											 "Attend dans le vehlib", // v5.3
 											 "Descend au prochain arrêt",
 											 "Ecrasé (mode sanglant)",
-											 "Mort (épidémie)"},
+											 "Mort (épidémie)",},
 				 asOuiNon[2]={"Non","Oui"}, // v5.4.1
 				 asFrmPrmDrn="%d, %d", // v5.4.1
 				 asEtatFinal[2]={"Guéri","Mort"},
@@ -77,7 +77,7 @@ TfrmInfosPieton::TfrmInfosPieton(TComponent* Owner)
 //---------------------------------------------------------------------------
 void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
  {
-  int i;
+  int i = 0;
   GroupBoxPieton->Caption=asDebutTitreCadrePieton;
   if (ARendreVisible)
    { // v5.4.1 : manquait tram, taxi et vehlib... v6.0.2 : coordonnées lues dans leur tableau (l'original lisait les bus)
@@ -149,7 +149,7 @@ void TfrmInfosPieton::RafraichitInfos()
   int Situation=0;
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   p=nullptr;
   NumPieton=0;
   LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
@@ -190,7 +190,7 @@ void TfrmInfosPieton::RafraichitInfos()
    }
   if (NumPieton != 0)
    {
-	p=&(cv->Pieton[NumPieton-1]);
+	p=&cv->Pieton[NumPieton-1];
     LabelDirection->Caption=asDir[p->Dir];
 	if (p->PsgPtTrv) {
      Situation=PSGPTTRV;

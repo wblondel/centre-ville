@@ -99,7 +99,7 @@ template <class E> class TEnsemble
 enum TWindowState { wsNormal, wsMinimized, wsMaximized };
 enum TCursor { crDefault=0, crHourGlass=-11, crHandPoint=-21 };
 enum TModalResult { mrNone=0, mrOk=1, mrCancel=2, mrAbort=3, mrRetry=4, mrIgnore=5, mrYes=6, mrNo=7,
-                    mrAll=8, mrNoToAll=9, mrYesToAll=10, mrClose=11 };
+                    mrAll=8, mrNoToAll=9, mrYesToAll=10, mrClose=11, };
 //---------------------------------------------------------------------------
 // SysUtils / System
 //---------------------------------------------------------------------------

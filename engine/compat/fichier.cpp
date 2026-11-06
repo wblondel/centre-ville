@@ -45,7 +45,7 @@ namespace
    {
     if (fd<0) { return -1;
 }
-    std::lock_guard<std::mutex> g(Verrou);
+    std::scoped_lock g(Verrou);
     for(std::size_t i=0; i<Fichiers.size(); i++) {
      if (Fichiers[i].fd<0)
       {
@@ -178,7 +178,7 @@ namespace
 //---------------------------------------------------------------------------
 int FileOpen(const AnsiString &asNomFichier, unsigned Mode)
  { // Les modes de partage (fmShare*) n'ont pas d'équivalent portable : ignorés
-  int Drapeaux;
+  int Drapeaux = 0;
   switch(Mode&3)
    {
 #ifdef _WIN32
@@ -205,7 +205,7 @@ int FileCreate(const AnsiString &asNomFichier)
 //---------------------------------------------------------------------------
 int FileRead(int Handle, void *Tampon, unsigned NbOctets)
  { // Comme ReadFile : jusqu'à NbOctets, moins en fin de fichier
-  std::lock_guard<std::mutex> g(Verrou);
+  std::scoped_lock g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return -1;
 }
@@ -246,7 +246,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
 //---------------------------------------------------------------------------
 int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
  {
-  std::lock_guard<std::mutex> g(Verrou);
+  std::scoped_lock g(Verrou);
   fichier *f=Trouve(Handle);
   if ((!f)||f->Erreur) { return -1;
 }
@@ -260,7 +260,7 @@ int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
 //---------------------------------------------------------------------------
 int FileSeek(int Handle, int Decalage, int Origine)
  {
-  std::lock_guard<std::mutex> g(Verrou);
+  std::scoped_lock g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return -1;
 }
@@ -272,7 +272,7 @@ int FileSeek(int Handle, int Decalage, int Origine)
 //---------------------------------------------------------------------------
 bool FileFlush(int Handle)
  {
-  std::lock_guard<std::mutex> g(Verrou);
+  std::scoped_lock g(Verrou);
   fichier *f=Trouve(Handle);
   if (!f) { return false;
 }
@@ -284,7 +284,7 @@ void FileClose(int Handle)
  {
   int fd=-1;
    {
-    std::lock_guard<std::mutex> g(Verrou);
+    std::scoped_lock g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return;
 }
@@ -357,7 +357,7 @@ int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct)
    }
 #endif
   int Handle=Enregistre(fd);
-  std::lock_guard<std::mutex> g(Verrou);
+  std::scoped_lock g(Verrou);
   fichier *f=Trouve(Handle);
   if (f)
    {
@@ -371,11 +371,11 @@ bool FileCommitRemplacement(int Handle)
  {
   namespace fs=std::filesystem;
   int fd=-1;
-  bool Ok;
+  bool Ok = false;
   fs::path Temporaire;
   fs::path Cible;
    {
-    std::lock_guard<std::mutex> g(Verrou);
+    std::scoped_lock g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return false;
 }
@@ -410,7 +410,7 @@ void FileAbandonRemplacement(int Handle)
  {
   std::filesystem::path Temporaire;
    {
-    std::lock_guard<std::mutex> g(Verrou);
+    std::scoped_lock g(Verrou);
     fichier *f=Trouve(Handle);
     if (!f) { return;
 }

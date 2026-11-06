@@ -23,7 +23,7 @@ TfrmStatsAttenteTrafic::TfrmStatsAttenteTrafic(TComponent* Owner)
  // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
  for(int i=0; i<9; i++) {
   if (i!=4) { // v5.4 : plus de zoom !
-   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, (static_cast<TBitBtn*>(FindComponent(UnicodeString("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
+   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, (static_cast<TBitBtn*>(FindComponent(UnicodeString("BitBtn"+IntToStr(1+(i%3))+IntToStr(1+(i/3))))))->Glyph);
 }
 }
  // v6.0.2 : dans ces deux champs, les touches de déplacement servent au champ. Les
@@ -38,7 +38,7 @@ void TfrmStatsAttenteTrafic::PaintBoxPaint(
 {
  for(int i=0; i<128; i++)
   {
-   PaintBox->Canvas->Pen->Color=static_cast<TColor>(RGB((i<64)?4*i:252,(i>=64)?252-4*(i-64):252,0));
+   PaintBox->Canvas->Pen->Color=static_cast<TColor>(RGB((i<64)?4*i:252,(i>=64)?252-(4*(i-64)):252,0));
    PaintBox->Canvas->MoveTo(i, 0);
    PaintBox->Canvas->LineTo(i, PaintBox->Height-1);
   }
@@ -56,7 +56,7 @@ void TfrmStatsAttenteTrafic::FormShow(TObject *Sender)
 //---------------------------------------------------------------------------
 TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
  {
-  int s;
+  int s = 0;
   int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
   int ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
   int ts=RadioGroupType->ItemIndex;
@@ -69,7 +69,7 @@ TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
     } else {
      s=(127*cv->v[x][y].Attente[ed][ea])/m[ts];
 }
-    return static_cast<TColor>(RGB((s<64)?4*s:252,(s>=64)?252-4*(s-64):252,0));
+    return static_cast<TColor>(RGB((s<64)?4*s:252,(s>=64)?252-(4*(s-64)):252,0));
    }
   
    return static_cast<TColor>(0);
@@ -106,8 +106,8 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
 //---------------------------------------------------------------------------
 void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
 {
- int x;
- int y;
+ int x = 0;
+ int y = 0;
  int n=0;
  int t[2]={0,0};
  int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
@@ -179,8 +179,8 @@ void TfrmStatsAttenteTrafic::BitBtnDirClick(
 {
  int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
  int // portage : TComponent::Name -> NomDe
-     dx=n/10-2;
- int dy=n%10-2;
+     dx=(n/10)-2;
+ int dy=(n%10)-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)

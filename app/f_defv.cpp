@@ -44,18 +44,18 @@ void TfrmDefVoie::AppliqueChoix()
   TRadioGroup *RadioGroupPriorite[NBDIR]={ RadioGroupPrioriteNord,
                                            RadioGroupPrioriteEst,
                                            RadioGroupPrioriteSud,
-                                           RadioGroupPrioriteOuest};
+                                           RadioGroupPrioriteOuest,};
   TBitBtn *BitBtnDefFeu[NBDIR]={ BitBtnDefFeuN, // v3.8.3
                                  BitBtnDefFeuE,
                                  BitBtnDefFeuS,
-                                 BitBtnDefFeuO};
+                                 BitBtnDefFeuO,};
   frmSimulation->SimulationModifiee=true;
   // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeux)
   for(int d=nord; d<=ouest; d++) // v3.8.3
    {
-    int RefTrv;
-    int NumRef;
-    int NumRefP; // v5.2
+    int RefTrv = 0;
+    int NumRef = 0;
+    int NumRefP = 0; // v5.2
     if ((v->Priorite[d-1]==feux)&&
         (RadioGroupPriorite[d-1]->ItemIndex!=feux))
      {
@@ -163,7 +163,7 @@ void TfrmDefVoie::RafraichitInfos()
 }
   x=frmSimulation->DrawGridSimul->Col;
   y=frmSimulation->DrawGridSimul->Row;
-  v=&(cv->v[x][y]);
+  v=&cv->v[x][y];
   if ((v->SensVoieTram == 0)&&(v->DirPoss == 0)) // v5.2: On teste si présence de voies. Si pas le cas on affiche les priorités Piétons !
    {
     frmDefVoie->Hide();
@@ -174,7 +174,7 @@ void TfrmDefVoie::RafraichitInfos()
   bool VoieTram[NBDIR]={ v->EstDirPossSensVoieTram(indefinie, nord),
                          v->EstDirPossSensVoieTram(indefinie, est),
                          v->EstDirPossSensVoieTram(indefinie, sud),
-                         v->EstDirPossSensVoieTram(indefinie, ouest)};
+                         v->EstDirPossSensVoieTram(indefinie, ouest),};
   int NbDirVoiesTram= static_cast<int>(VoieTram[nord-1])+
                       static_cast<int>(VoieTram[est-1])+
                       static_cast<int>(VoieTram[sud-1])+

@@ -22,14 +22,14 @@ TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 bool TfrmDefFeuxPietons::RafraichitInfos()
  {
-  int i;
-  v=&(cv->v[x][y]);
+  int i = 0;
+  v=&cv->v[x][y];
   Numero=v->NumFeuP[Direction-1];
   if (Numero == 0) {
    Numero=cv->AjouteFeuPietons(x, y, Direction);
 }
   v->NumFeuP[Direction-1]=Numero;
-  f=&(cv->FeuP[Numero-1]);
+  f=&cv->FeuP[Numero-1];
   LabelCoordonnees->Caption=Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
   LabelDirection->Caption=asDir[Direction];
   if (Numero != 0) { LabelNumero->Caption=IntToStr(Numero);
@@ -43,7 +43,7 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
   // Copie des listes de feux
   NbFeux=f->NbFeux;
   if (NumFeux) { delete[] NumFeux; NumFeux=nullptr; }
-  if (((NbFeux) != 0)&&(!(NumFeux=new int[NbFeux])))
+  if ((NbFeux != 0)&&(!(NumFeux=new int[NbFeux])))
     {
      AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
      return false;
@@ -138,7 +138,7 @@ Voulez-vous affecter l'état opposé à tous les feux de circulation liés ?",
 //---------------------------------------------------------------------------
 bool TfrmDefFeuxPietons::AppliqueChoix()
  {
-  int i;
+  int i = 0;
   AnalyseEtatFeux(); // Assistant pour les états de feux (v5.2.1)
   frmSimulation->SimulationModifiee=true;
   f->Etat=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
@@ -150,7 +150,7 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
   // Copie des listes de feux
   f->NbFeux=0;
   if (f->NumFeux) { delete[] f->NumFeux; f->NumFeux=nullptr; }
-  if (((NbFeux) != 0)&&(!(f->NumFeux=new int[NbFeux])))
+  if ((NbFeux != 0)&&(!(f->NumFeux=new int[NbFeux])))
    {
     AfficheMessage(asMemInsuff,asErrInattendue, tmErreur, 0, 0);
     return false;
@@ -180,7 +180,7 @@ void TfrmDefFeuxPietons::FormShow(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::FormHide(TObject *Sender)
 {
- int i;
+ int i = 0;
  frmSimulation->ActionPrioritesPietons->Enabled=true;
  SpeedButtonSelFeux->Down=false;
  if (frmSimulation->SelectionFeuxPtn) {
@@ -237,7 +237,7 @@ void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject *Sender)
 {
- int i;
+ int i = 0;
  frmSimulation->SelectionFeuxPtn=SpeedButtonSelFeux->Down;
  for(i=0; i<NbFeux; i++) { frmSimulation->RedessineCase(cv->Feu[NumFeux[i]-1].x, cv->Feu[NumFeux[i]-1].y, true);
 }
