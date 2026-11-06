@@ -39,7 +39,13 @@ def main():
     if not liste:
         sys.exit("Aucun fichier C++ suivi par git")
     options = ["--dry-run", "--Werror"] if args.verifie else ["-i"]
-    resultat = subprocess.run([args.clang_format, *options, *liste], cwd=RACINE, check=False)  # noqa: S603
+    try:
+        resultat = subprocess.run([args.clang_format, *options, *liste], cwd=RACINE, check=False)  # noqa: S603
+    except FileNotFoundError:
+        sys.exit(
+            f"clang-format introuvable ({args.clang_format}) : pip install -r tools/lint/requirements.txt, "
+            "ou --clang-format CHEMIN"
+        )
     if args.verifie:
         if resultat.returncode:
             print("\nMise en forme à refaire : python3 tools/format_cpp.py", file=sys.stderr)
