@@ -37,7 +37,7 @@ Non retenu : l'option `sha_pinning_required` du dépôt. `jurplel/install-qt-act
 - [x] **`timeout-minutes` sur tous les jobs**, au lieu du défaut de 6 h.
 - [x] **Images et Qt figés** : `ubuntu-24.04`, `macos-26`, `windows-2025-vs2026`, Qt 6.8.3. Checks requis nommés par système, pour qu'un changement d'image ne les touche pas.
 - [x] **Run hebdomadaire** de la suite complète, le lundi.
-- [ ] **Remplacer `ubuntu-22.04`** pour l'AppImage, gardée pour sa glibc 2.35 : son support standard finit en avril 2027.
+- [x] **Remplacer `ubuntu-22.04`** pour l'AppImage, gardée pour sa glibc 2.35 : son support standard finit en avril 2027. Depuis la 6.0.14, l'AppImage est construite dans le conteneur `ubuntu:22.04`, épinglé par son empreinte, sur l'image `ubuntu-24.04`. La même glibc est demandée, et le contenu est celui de la 6.0.13, au dossier de compilation et à une mise à jour de glib d'Ubuntu près.
 
 ## 3. Optimisation (fait)
 
