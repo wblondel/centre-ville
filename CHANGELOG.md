@@ -4,6 +4,18 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.15] — compilation et tests vérifiés sans le code d'origine
+
+Cette version ne change pas le programme. `src/` garde le code VCL d'origine, en lecture
+seule. Seuls deux outils le lisent encore : `tools/dfm2ui.py` (fiches `.ui`) et
+`tools/extrait_images.py` (images des fiches), avec les deux contrôles obligatoires de la CI
+qui vérifient leur sortie. La compilation, les tests et les installeurs s'en passent, et les
+règles d'installation n'en citent aucun fichier ; seule l'archive des sources le contient,
+comme le reste du dépôt. Le job hebdomadaire « Couverture des tests » le vérifie maintenant
+pour la compilation et les tests : il met `src/` de côté avant de tout compiler et de lancer
+tous les tests. `src/` et les contrôles obligatoires ne changent pas. Le format des fichiers `.cvw` ne change pas (0x530),
+ni la simulation des cartes livrées (golden master identique).
+
 ## [6.0.14] — AppImage construite dans un conteneur Ubuntu 22.04
 
 Cette version ne change pas le programme. L'AppImage Linux était construite sur l'image

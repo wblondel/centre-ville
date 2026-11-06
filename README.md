@@ -134,6 +134,8 @@ cmake --preset dev && cmake --build --preset dev
 * `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
 * deux contrôles de la CI (`ci.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
 
+Rien d'autre ne le lit : la compilation, les tests et les installeurs s'en passent (l'archive des sources le contient, comme le reste du dépôt). Depuis la 6.0.15, le job hebdomadaire « Couverture des tests » met `src/` de côté avant de tout compiler et de lancer tous les tests. Pour retirer `src/`, il faudrait faire des fiches `.ui` et des images extraites les sources du port, ne garder les deux outils que pour comparer avec l'original, retirer les deux contrôles du ruleset `main : CI obligatoire`, et poser un tag sur la dernière version qui contient `src/`.
+
 Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` montre le portage ligne à ligne.
 
 ---
