@@ -1054,7 +1054,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
     { // Nouveau : zone vide, sans génération ni paramètres, sans enregistrer la précédente
         ReponseQuestions = QMessageBox::No;
         QuandModale([] { return frmDimensionsZone; },
-                    [this, NbX, NbY] {
+                    [NbX, NbY] {
                         frmDimensionsZone->CSpinEditNbX->Value = NbX;
                         frmDimensionsZone->CSpinEditNbY->Value = NbY;
                         frmDimensionsZone->CheckBoxAfficherParametres->Checked = false;
@@ -1127,7 +1127,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
             return n;
         };
         c.Ecran = [Groupe] { return static_cast<int>(Groupe()->ItemIndex); };
-        c.Saisit = [this, Groupe](int v) { CliqueChoix(Groupe(), v); };
+        c.Saisit = [Groupe](int v) { CliqueChoix(Groupe(), v); };
         c.Lu = std::move(Lu);
         return c;
     }
@@ -1378,9 +1378,9 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
     }
     void DansFicheLignes(const FicheLignes &l, const std::function<void(TForm *)> &Action)
     { // Paramètres, la fiche des lignes (Action), puis Annuler dans Paramètres
-        QuandModale([] { return frmParamSimul; }, [this, &l] { Clique(frmParamSimul->*l.Bouton); });
+        QuandModale([] { return frmParamSimul; }, [&l] { Clique(frmParamSimul->*l.Bouton); });
         QuandModale(l.Fiche, [&l, &Action] { Action(l.Fiche()); }); // étapes jouées pendant Clique
-        QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
+        QuandModale([] { return frmParamSimul; }, [] { Clique(frmParamSimul->ButtonAnnuler); });
         Clique(frmSimulation->ToolButtonParametres);
     }
     QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
@@ -4057,7 +4057,7 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
         ReponseQuestions = Reponse;
         Messages.clear();
         QuandModale([] { return frmCarrefours; },
-                    [Nom, this] { Clique(dynamic_cast<TSpeedButton *>(frmCarrefours->FindComponent(Nom))); });
+                    [Nom] { Clique(dynamic_cast<TSpeedButton *>(frmCarrefours->FindComponent(Nom))); });
         Clique(frmSimulation->ToolButtonCarrefours);
         ReponseQuestions = QMessageBox::No;
         if (!Etapes.empty())
@@ -4187,7 +4187,7 @@ void TestInterface::carrefoursPendantLaDefinitionDUnFeu()
     const int NbFeuxAvant = NbFeuxDefinis();
     ReponseQuestions = QMessageBox::Yes;
     Messages.clear();
-    QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton44b); });
+    QuandModale([] { return frmCarrefours; }, [] { Clique(frmCarrefours->SpeedButton44b); });
     Clique(frmSimulation->ToolButtonCarrefours);
     ReponseQuestions = QMessageBox::No;
     QVERIFY(Etapes.empty());
@@ -4247,7 +4247,7 @@ void TestInterface::carrefoursSurLeFeuDeLaFicheFeu()
     const int NbFeuxAvant = NbFeuxDefinis();
     ReponseQuestions = QMessageBox::Yes;
     Messages.clear();
-    QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton44b); });
+    QuandModale([] { return frmCarrefours; }, [] { Clique(frmCarrefours->SpeedButton44b); });
     Clique(frmSimulation->ToolButtonCarrefours);
     ReponseQuestions = QMessageBox::No;
     QVERIFY(Etapes.empty());
@@ -4379,7 +4379,7 @@ void TestInterface::prioritesApresUneCommandeSurLaSelection()
     };
     Verifie(QString::fromUtf8("Effacer les routes"), 4, 2, 6, 3, [s] { s->ActionEffacerRoutes->Execute(); });
     Verifie(QString::fromUtf8("Carrefours"), 4, 6, 6, 9, [this, s] {
-        QuandModale([] { return frmCarrefours; }, [this] { Clique(frmCarrefours->SpeedButton34a2); });
+        QuandModale([] { return frmCarrefours; }, [] { Clique(frmCarrefours->SpeedButton34a2); });
         s->ActionCarrefours->Execute();
     });
     Verifie(QString::fromUtf8("Segment de route"), 4, 10, 6, 10, [s] { s->ActionSegmentRoute->Execute(); });
@@ -4841,7 +4841,7 @@ void TestInterface::fichesInfos()
                                                   static_cast<int>(frmSimulation->DrawGridSimul->Row)));
     };
     // Premier objet trouvé sur la carte (Numero(v) > 0), case courante
-    const auto Trouve = [this](const std::function<int(voie *)> &Numero) -> int {
+    const auto Trouve = [](const std::function<int(voie *)> &Numero) -> int {
         for (int y = 0; y < cv->NbY; y++)
         {
             for (int x = 0; x < cv->NbX; x++)
@@ -5343,7 +5343,7 @@ void TestInterface::fichePietonDansUnVehicule()
     s->ActionRechercher->Execute();
     QVERIFY(f->isVisible() && r->isVisible());
     r->RadioButtonPieton->Checked = true;
-    const auto Montre = [f, r, this](int n, int x, int y) {
+    const auto Montre = [f, r](int n, int x, int y) {
         r->CSpinEditPieton->Value = n;
         PlaceCurseur(x, y);
         f->RafraichitInfos();
@@ -5539,7 +5539,7 @@ void TestInterface::fichePietonSuiviAilleurs()
         }
     }
     QVERIFY(Autre);
-    const auto Fiche = [f, this](int x, int y) {
+    const auto Fiche = [f](int x, int y) {
         PlaceCurseur(x, y);
         f->RafraichitInfos();
         return Q(f->GroupBoxPieton->Caption);
@@ -5720,7 +5720,7 @@ void TestInterface::parcoursEdition()
     // Enregistrer sous : nom, titre, plus de modification
     const QString f = QFileInfo(Carte).absolutePath() + "/edition.cvw";
     QFile::remove(f);
-    QuandModale([this] { return BoiteFichier(); }, [this, f] { ChoisitFichier(f); });
+    QuandModale([] { return BoiteFichier(); }, [f] { ChoisitFichier(f); });
     s->ActionEnregistrerSous->Execute();
     QVERIFY(Etapes.empty());
     QVERIFY(QFile::exists(f));
@@ -5907,7 +5907,7 @@ void TestInterface::quitterAvecModifications()
         return;
     }
     ReponseQuestions = QMessageBox::Yes;
-    QuandModale([this] { return BoiteFichier(); }, [this] { AnnuleBoiteFichier(); });
+    QuandModale([] { return BoiteFichier(); }, [] { AnnuleBoiteFichier(); });
     Peut = true;
     s->FormCloseQuery(s, Peut);
     QVERIFY(Etapes.empty());
@@ -5954,7 +5954,7 @@ void TestInterface::copierVersUnFichier()
     Messages.clear();
     Selectionne(2, 2, 11, 11);
     QVERIFY(s->ActionCopierVers->Enabled);
-    QuandModale([this] { return BoiteFichier(); }, [this, Copie] { ChoisitFichier(Copie); });
+    QuandModale([] { return BoiteFichier(); }, [Copie] { ChoisitFichier(Copie); });
     s->ActionCopierVers->Execute();
     QVERIFY(Etapes.empty());
     QVERIFY2(QFile::exists(Copie), qPrintable(Messages.join('\n')));
@@ -6666,7 +6666,7 @@ void TestInterface::voiesEtArretsDeTram()
         return;
     }
     // Case par case : la voie relie la case précédente du curseur à la direction choisie
-    const auto Voie = [this](int xPrc, int yPrc, int x, int y, TAction *Action) {
+    const auto Voie = [](int xPrc, int yPrc, int x, int y, TAction *Action) {
         CliqueCase(xPrc, yPrc);
         CliqueCase(x, y);
         QVERIFY(Action->Enabled);
@@ -6940,7 +6940,7 @@ void TestInterface::dessinsPendantLaSimulation()
         }
     } r{FermeRecherche};
     QVERIFY(!OuvreCarte("Géant.cvw", "dessins.cvw").isEmpty());
-    QuandModale([] { return frmEpidemie; }, [this] { Clique(frmEpidemie->ButtonOk); });
+    QuandModale([] { return frmEpidemie; }, [] { Clique(frmEpidemie->ButtonOk); });
     s->Epidemie1->ElementQt()->trigger();
     QVERIFY(Etapes.empty());
     QVERIFY(s->ActionEpidemie->Checked);
@@ -7005,19 +7005,19 @@ void TestInterface::dessinsPendantLaSimulation()
         g->TopRow = 0;
         g->Repaint();
     };
-    QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->BitBtnDefLignesBus); });
+    QuandModale([] { return frmParamSimul; }, [] { Clique(frmParamSimul->BitBtnDefLignesBus); });
     QuandModale([] { return frmParamBus; },
                 [&] {
                     CocheLignes(frmParamBus, NbBus);
                     Clique(frmParamBus->ButtonAnnuler);
                 });
-    QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->BitBtnDefLignesTram); });
+    QuandModale([] { return frmParamSimul; }, [] { Clique(frmParamSimul->BitBtnDefLignesTram); });
     QuandModale([] { return frmParamTram; },
                 [&] {
                     CocheLignes(frmParamTram, NbTrams);
                     Clique(frmParamTram->ButtonAnnuler);
                 });
-    QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
+    QuandModale([] { return frmParamSimul; }, [] { Clique(frmParamSimul->ButtonAnnuler); });
     QVERIFY(s->ActionParametres->Enabled);
     s->ActionParametres->Execute();
     QVERIFY(Etapes.empty());
@@ -7656,7 +7656,7 @@ void TestInterface::nouvelleZoneGenereePlusPetite()
     QVERIFY(!OuvreDemo("avant_petite_zone.cvw").isEmpty());
     QVERIFY((cv->NbX > NBXMIN + 2) && (cv->NbY > NBYMIN + 2));
     QuandModale([] { return frmDimensionsZone; },
-                [this] {
+                [] {
                     frmDimensionsZone->CSpinEditNbX->Value = NBXMIN + 2;
                     frmDimensionsZone->CSpinEditNbY->Value = NBYMIN + 2;
                     frmDimensionsZone->CheckBoxAfficherParametres->Checked = false;
@@ -7691,9 +7691,9 @@ void TestInterface::parametresChampParChamp()
     };
     auto DansFille = [this](std::function<QWidget *()> Fiche, TBitBtn *TfrmParamSimul::*Bouton,
                             std::function<void()> Action) {
-        QuandModale([] { return frmParamSimul; }, [this, Bouton] { Clique(frmParamSimul->*Bouton); });
+        QuandModale([] { return frmParamSimul; }, [Bouton] { Clique(frmParamSimul->*Bouton); });
         QuandModale(std::move(Fiche), std::move(Action));
-        QuandModale([] { return frmParamSimul; }, [this] { Clique(frmParamSimul->ButtonAnnuler); });
+        QuandModale([] { return frmParamSimul; }, [] { Clique(frmParamSimul->ButtonAnnuler); });
         Clique(frmSimulation->ToolButtonParametres);
     };
     VerifieChamps(
@@ -7860,7 +7860,7 @@ void TestInterface::feuxChampParChamp()
     OuvreFichier(f);
     const auto Feu = [] { return &cv->Feu[cv->v[4][8].NumFeu[est - 1] - 1]; };
     const auto FeuP = [] { return &cv->FeuP[cv->v[6][7].NumFeuP[sud - 1] - 1]; };
-    const auto DansFeux = [this](const std::function<void()> &Action) {
+    const auto DansFeux = [](const std::function<void()> &Action) {
         OuvreFicheFeu(4, 8, est);
         if (!QTest::currentTestFailed())
         {
@@ -7888,7 +7888,7 @@ void TestInterface::feuxChampParChamp()
     {
         return;
     }
-    const auto DansFeuxPietons = [this](const std::function<void()> &Action) { // Feu existant : bouton relâché puis
+    const auto DansFeuxPietons = [](const std::function<void()> &Action) { // Feu existant : bouton relâché puis
                                                                                // enfoncé pour rouvrir sa fiche
         CliqueCase(6, 7);
         frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
@@ -9748,7 +9748,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
         return k;
     };
     // Fiche fermée, bouton coché et numéro autre que celui de la case
-    const auto Prepare = [this, r, s](TRadioButton *Radio, TCSpinEdit *Numero, int Autre) {
+    const auto Prepare = [r, s](TRadioButton *Radio, TCSpinEdit *Numero, int Autre) {
         if (!r->isVisible())
         {
             s->ActionRechercher->Execute();
@@ -9758,7 +9758,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
         Clique(r->ButtonAnnuler);
         QVERIFY(!r->isVisible());
     };
-    const auto Ouvre = [this, s, r](QPoint Case) {
+    const auto Ouvre = [s, r](QPoint Case) {
         Focalise();
         CliqueCase(Case.x(), Case.y());
         s->ActionRechercher->Execute();
@@ -10502,7 +10502,7 @@ void TestInterface::aideContextuelle()
     // Paramètres (modale) : F1, puis Annuler
     UrlsOuvertes.clear();
     QuandModale([] { return frmParamSimul; },
-                [this] {
+                [] {
                     Touche(frmParamSimul->CSpinEditDureeVert, Qt::Key_F1);
                     Clique(frmParamSimul->ButtonAnnuler);
                 });
