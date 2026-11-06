@@ -24,6 +24,7 @@
 //---------------------------------------------------------------------------
 #include <QAbstractScrollArea>
 #include <QTimer>
+#include <functional>
 #include "vcl/controles.h"
 //---------------------------------------------------------------------------
 struct TGridCoord

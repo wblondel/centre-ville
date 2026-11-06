@@ -15,6 +15,7 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QRect>
+#include <functional>
 #include "vcl.h"
 //---------------------------------------------------------------------------
 class QPainter;

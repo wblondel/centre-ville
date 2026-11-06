@@ -18,6 +18,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include "simul.h"
 //---------------------------------------------------------------------------
 // Puits : reçoit les valeurs dans l'ordre du parcours. Le parcours est un

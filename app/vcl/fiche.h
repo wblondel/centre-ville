@@ -42,6 +42,9 @@
 #include <QPointer>
 #include <QScreen>
 #include <QShowEvent>
+#include <algorithm>
+#include <functional>
+#include <vector>
 #include <map>
 #include <type_traits>
 #include "actions.h"

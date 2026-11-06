@@ -26,6 +26,7 @@
 //---------------------------------------------------------------------------
 #include <QIcon>
 #include <QKeySequence>
+#include <functional>
 #include <map>
 #include <vector>
 #include "vcl.h"

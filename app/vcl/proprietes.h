@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include <functional>
 #include <type_traits>
+#include <utility>
 #include "compat/chaine.h"
 //---------------------------------------------------------------------------
 template <class T>

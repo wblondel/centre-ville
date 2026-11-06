@@ -5747,7 +5747,7 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
         }
         if (i <= NbMaxCasesDetectArretBus)
         { // Si toujours dans les distances on vérifie la dernière case (l'arrêt EST sur une route)
-            Trv |= Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretBus;
+            Trv = Trv || (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretBus != 0);
         }
         if (Trv)
         {
@@ -5797,7 +5797,7 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
         }
         if (i <= NbMaxCasesDetectArretTram)
         { // Si toujours dans les distances on vérifie la dernière case (l'arrêt EST sur une route)
-            Trv |= Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretTram;
+            Trv = Trv || (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretTram != 0);
         }
         if (Trv)
         {
@@ -5847,7 +5847,7 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
         }
         if (i <= NbMaxCasesDetectFileTaxi)
         { // Si toujours dans les distances on vérifie la dernière case (le place de taxi EST sur une route)
-            Trv |= Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceTaxi;
+            Trv = Trv || (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceTaxi != 0);
         }
         if (Trv)
         {
@@ -5897,7 +5897,7 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) // 
         }
         if (i <= NbMaxCasesDetectFileVehlib)
         { // Si toujours dans les distances on vérifie la dernière case (le place de vehlib EST sur une route)
-            Trv |= Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceVehlib;
+            Trv = Trv || (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceVehlib != 0);
         }
         if (Trv)
         {

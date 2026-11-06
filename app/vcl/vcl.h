@@ -16,6 +16,8 @@
 #include <QObject>
 #include <QString>
 #include <functional>
+#include <string>
+#include <utility>
 #include <vector>
 #include "compat/chaine.h"
 #include "compat/fichier.h"

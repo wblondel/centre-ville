@@ -7,6 +7,7 @@
 // #pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2) // portage : pragma C++Builder neutralisé
 //---------------------------------------------------------------------------
 #include <array>
+#include <utility>
 #include <vector>
 #include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
 #include "compat/temps.h"  // portage : remplace <systdate.h> (TDateTime, Time)
