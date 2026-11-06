@@ -7888,8 +7888,8 @@ void TestInterface::feuxChampParChamp()
     {
         return;
     }
-    const auto DansFeuxPietons = [](const std::function<void()> &Action) { // Feu existant : bouton relâché puis
-                                                                               // enfoncé pour rouvrir sa fiche
+    // Feu existant : bouton relâché puis enfoncé pour rouvrir sa fiche
+    const auto DansFeuxPietons = [](const std::function<void()> &Action) {
         CliqueCase(6, 7);
         frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
         QVERIFY(frmDefVoiePietons->isVisible());
