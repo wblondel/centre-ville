@@ -109,15 +109,15 @@ public:
     TEnsemble() = default;
     TEnsemble &operator<<(E e)
     {
-        Bits |= 1ULL << (int)e;
+        Bits |= 1ULL << static_cast<int>(e);
         return *this;
     }
     TEnsemble &operator>>(E e)
     {
-        Bits &= ~(1ULL << (int)e);
+        Bits &= ~(1ULL << static_cast<int>(e));
         return *this;
     }
-    [[nodiscard]] bool Contains(E e) const { return ((Bits >> (int)e) & 1ULL) != 0U; }
+    [[nodiscard]] bool Contains(E e) const { return ((Bits >> static_cast<int>(e)) & 1ULL) != 0U; }
     bool operator==(const TEnsemble &t) const { return Bits == t.Bits; }
 };
 //---------------------------------------------------------------------------

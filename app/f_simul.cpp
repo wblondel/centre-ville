@@ -365,9 +365,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                                 static_cast<int>((v->v(static_cast<direction>(d))->DirPoss > aucune) || // v3.8
                                                  (v->v(static_cast<direction>(d))->SensVoieTram > aucune_voie));
                 BordToiture +=
-                    static_cast<int>(PossDir[d]) * static_cast<int>(NatureSansDecor(v->v((direction)d)) != immeubles);
+                    static_cast<int>(PossDir[d]) * static_cast<int>(NatureSansDecor(v->v(static_cast<direction>(d))) != immeubles);
                 CoinToiture += static_cast<int>(CoinDir[d]) *
-                               static_cast<int>(NatureSansDecor(v->v((direction)d)->v(ADroiteDe[(direction)d])) ==
+                               static_cast<int>(NatureSansDecor(v->v(static_cast<direction>(d))->v(ADroiteDe[static_cast<direction>(d)])) ==
                                                 immeubles); // Immeuble voisin présent en coin.. 1=NE;2=SE;4=SO;8=NO
             }
             if (((Affichage & aff_env) != 0) && // v3.8.1 (aff_env)
@@ -930,11 +930,11 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                     asMsg = asMsg + Format(" %d%s",
                                            TableauDeConstantes(
                                                i,
-                                               asSupInf[(!!cv->Pieton[i - 1].EstVivant()) *
+                                               asSupInf[static_cast<int>(!!cv->Pieton[i - 1].EstVivant()) *
                                                         (1 + cv->Pieton[i - 1].DemiCase)] + // v4.3 (asSupInf remplace
                                                                                             // as12) v5.4.1 EstVivant()
                                                                                             // remplace Ecrase
-                                                   asEtatPieton[1 * (!!cv->Pieton[i - 1].Ecrase) + // "*" v4.3
+                                                   asEtatPieton[(1 * static_cast<int>(!!cv->Pieton[i - 1].Ecrase)) + // "*" v4.3
                                                                                                    // (création) v5.4.1
                                                                                                    // : asMort renommé
                                                                                                    // en asEtatPieton ;
@@ -942,9 +942,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                                                                                                    // lieu de "†"
                                                                                                    // réservé à
                                                                                                    // l'épidémie
-                                                                2 * (!!cv->Pieton[i - 1].Mort) + // v5.4.1 : affiche "†"
-                                                                4 * (!!(cv->Pieton[i - 1].EstContagieux() &&
-                                                                        (!cv->Pieton[i - 1].Mort)))] // v5.4.1 : affiche
+                                                                (2 * static_cast<int>(!!cv->Pieton[i - 1].Mort)) + // v5.4.1 : affiche "†"
+                                                                (4 * static_cast<int>(!!(cv->Pieton[i - 1].EstContagieux() &&
+                                                                        (!cv->Pieton[i - 1].Mort))))] // v5.4.1 : affiche
                                                                                                      // "‡"
                                                ));
                 }
@@ -956,7 +956,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             asMsg = asMsg + Format("Place Taxi %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlaceTaxi,
                                                        asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
-                                                       asSupInf[2 * v->EstQueueFileTaxis()], // v4.3 (asSupInf remplace
+                                                       asSupInf[2 * static_cast<int>(v->EstQueueFileTaxis())], // v4.3 (asSupInf remplace
                                                                                              // as12)
                                                        cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
         }
@@ -970,7 +970,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             asMsg = asMsg + Format("Place Prkg %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlacePark,
                                                        asSupInf[v->EstTeteFilePark()],                   // v5.0
-                                                       asSupInf[2 * v->EstQueueFilePark()],              // v5.0
+                                                       asSupInf[2 * static_cast<int>(v->EstQueueFilePark())],              // v5.0
                                                        cv->PlacePark[v->NumPlacePark - 1].NumFile + 1)); // v5.3
         }
         if (StatsAttenteTrafic && frmStatsAttenteTrafic)
@@ -987,7 +987,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_CURSEUR);
         }
 
-        const bool FeuxPietonsPresents = (v)->FeuxPietons(); // v5.2
+        const bool FeuxPietonsPresents = v->FeuxPietons(); // v5.2
 
         // Directions (Routes)
         NordPoss = ((v->DirPoss & N) == N);
@@ -1278,13 +1278,13 @@ bool TfrmSimulation::EnregistreModificationsAvant(operation_avant Operation)
     switch (Operation)
     {
     case oaNouveau:
-        asMessage = asQstEnregistrerFichier + (SaveDialog)->FileName + " avant de créer une nouvelle simulation ?";
+        asMessage = asQstEnregistrerFichier + SaveDialog->FileName + " avant de créer une nouvelle simulation ?";
         break;
     case oaOuvrir:
-        asMessage = asQstEnregistrerFichier + (SaveDialog)->FileName + " avant d'ouvrir une autre simulation ?";
+        asMessage = asQstEnregistrerFichier + SaveDialog->FileName + " avant d'ouvrir une autre simulation ?";
         break;
     case oaQuitter:
-        asMessage = asQstEnregistrerFichier + (SaveDialog)->FileName + " avant de quitter ?";
+        asMessage = asQstEnregistrerFichier + SaveDialog->FileName + " avant de quitter ?";
         break;
     }
     mrRep = AfficheMessage(asMessage, "Confirmation", tmQuestionFacultative, 0, 2); // Défaut = Oui, Echap = Annuler
@@ -1654,7 +1654,7 @@ bool TfrmSimulation::VerifieReseau()
                                                                                     // d'arrêts
             {
                 asMsgErr = Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(AnsiString((char)('A' + i)), cv->LigneTram[i].NumArret[j]));
+                                  TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
                 break;
             }
         }
@@ -1717,7 +1717,7 @@ bool TfrmSimulation::VerifieReseau()
             { // v5.2.2
                 if ((v->DirPoss & PossDir[d]) == PossDir[d])
                 {
-                    vv = &(cv->Voisine(i, j, d));
+                    vv = &cv->Voisine(i, j, d);
                     NbDirPossSansPsgBus += static_cast<int>(!vv->PassageBus);
                     dp = vv->DirPoss;
                     if ((dp == InvPossDir[d]) && (vv->NumPlaceVehlib == 0)) // v5.3 sauf Places vehlib pour lesquelles
@@ -1973,30 +1973,30 @@ void TfrmSimulation::AfficheBilan()
         asMsgBilan =
             Format(asFormatBilan,
                    TableauDeConstantes(
-                       nv, (long double)m, (long double)m, nvpe - 3, cv->TourCrt,
+                       nv, static_cast<long double>(m), static_cast<long double>(m), nvpe - 3, cv->TourCrt,
                        Format("%s (%.2f tour(s)/s, %.2f ms/tour)",
                               TableauDeConstantes(
                                   FormatDateTime("hh:nn:ss.zzz", cv->dtTemps),                             // v3.9.2
-                                  (long double)(cv->TourCrt / (24 * 3600 * (double)(cv->dtTemps))),        // v3.9.2
-                                  (long double)((24L * 3600000L * (double)(cv->dtTemps)) / cv->TourCrt))), // v3.9.2
-                       nva, (long double)((100.0 * nva) / nv), (long double)((1.0 * ncp) / nva),
-                       (long double)((100.0 * ncp) / nva / m), (long double)((1.0 * AttenteDepart) / nva),
-                       (long double)((100.0 * AttenteDepart) / nva / (nvpe - 3)), (long double)((1.0 * ntp) / nva),
-                       (long double)((100.0 * ntp) / nva / m), (long double)((1.0 * ncp) / nva),
-                       (long double)((100.0 * ncp) / ntp), (long double)((1.0 * (ntp - ncp)) / nva),
-                       (long double)((100.0 * (ntp - ncp)) / ntp)));
+                                  static_cast<long double>(cv->TourCrt / (24 * 3600 * static_cast<double>(cv->dtTemps))),        // v3.9.2
+                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) / cv->TourCrt))), // v3.9.2
+                       nva, static_cast<long double>((100.0 * nva) / nv), static_cast<long double>((1.0 * ncp) / nva),
+                       static_cast<long double>((100.0 * ncp) / nva / m), static_cast<long double>((1.0 * AttenteDepart) / nva),
+                       static_cast<long double>((100.0 * AttenteDepart) / nva / (nvpe - 3)), static_cast<long double>((1.0 * ntp) / nva),
+                       static_cast<long double>((100.0 * ntp) / nva / m), static_cast<long double>((1.0 * ncp) / nva),
+                       static_cast<long double>((100.0 * ncp) / ntp), static_cast<long double>((1.0 * (ntp - ncp)) / nva),
+                       static_cast<long double>((100.0 * (ntp - ncp)) / ntp)));
     }
     else
     {
         asMsgBilan =
             Format(asFormatBilanSansArrives,
                    TableauDeConstantes(
-                       nv, (long double)m, (long double)m, nvpe - 3, cv->TourCrt,
+                       nv, static_cast<long double>(m), static_cast<long double>(m), nvpe - 3, cv->TourCrt,
                        Format("%s (%.2f tour(s)/s, %.2f ms/tour)",
                               TableauDeConstantes(
                                   FormatDateTime("hh:nn:ss.zzz", cv->dtTemps),                               // v3.9.2
-                                  (long double)(cv->TourCrt / (24 * 3600 * (double)(cv->dtTemps))),          // v3.9.2
-                                  (long double)((24L * 3600000L * (double)(cv->dtTemps)) / cv->TourCrt))))); // v3.9.2
+                                  static_cast<long double>(cv->TourCrt / (24 * 3600 * static_cast<double>(cv->dtTemps))),          // v3.9.2
+                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) / cv->TourCrt))))); // v3.9.2
     }
     if (AfficheMessage(asMsgBilan, "Bilan", tmQuestionNecessaire, 0, 1) == trOui)
     { // Défaut = Oui, Echap = Non
@@ -2200,7 +2200,7 @@ void TfrmSimulation::TimerSimulTimer(TObject * /*Sender*/)
         {
             if (RestaureCopieReseau())
             {
-                Caption = "Centre-Ville - " + (SaveDialog)->FileName;
+                Caption = "Centre-Ville - " + SaveDialog->FileName;
                 SimulationModifiee = true; // à enregistrer : le fichier n'est plus accessible
                 StatusBar->Panels->Items[0]->Text = "Réseau d'avant la simulation rétabli : fichier inaccessible.";
             }
@@ -2225,8 +2225,8 @@ void TfrmSimulation::TimerSimulTimer(TObject * /*Sender*/)
         break;
     }
     // si aucune demande, on continue la simulation...
-    Application->Title = Format(asFrmTitleCV, TableauDeConstantes((int)(cv->TourCrt)));
-    Caption = Format(asFrmCaptionCV, TableauDeConstantes((SaveDialog)->FileName, (int)(cv->TourCrt)));
+    Application->Title = Format(asFrmTitleCV, TableauDeConstantes(cv->TourCrt));
+    Caption = Format(asFrmCaptionCV, TableauDeConstantes(SaveDialog->FileName, cv->TourCrt));
 
     if (cv->NbVehiculesArrives == cv->NbVehicules)
     {
@@ -2895,7 +2895,7 @@ void TfrmSimulation::ActionOuvrirExecute(TObject * /*Sender*/)
         // v5.4 : pas d'affectation inline du nom de fichier
         if (asNomFichAuto.IsEmpty())
         {
-            asNomFichier = (OpenDialog)->FileName;
+            asNomFichier = OpenDialog->FileName;
         }
         else
         {
@@ -3012,14 +3012,14 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject * /*Sender*/)
     AnsiString asNomFichier = "";
     int hfile = 0;
     AppelleAuChaos();
-    if ((!(SaveDialog)->FileName.IsEmpty()) || (!asNomFichAuto.IsEmpty()) || SaveDialog->Execute())
+    if ((!SaveDialog->FileName.IsEmpty()) || (!asNomFichAuto.IsEmpty()) || SaveDialog->Execute())
     {
         StatusBar->Panels->Items[0]->Text = "Enregistrement en cours...";
         // v6.0.2 : le fichier n'est remplacé qu'une fois écrit (l'original le vidait d'abord : un
         // disque plein le détruisait), sauf si le dossier interdit le fichier temporaire (Direct)
         bool Direct = false;
         if ((hfile = FileCreateRemplacement(
-                 asNomFichier = (asNomFichAuto.IsEmpty() ? (SaveDialog)->FileName : asNomFichAuto), &Direct)) !=
+                 asNomFichier = (asNomFichAuto.IsEmpty() ? SaveDialog->FileName : asNomFichAuto), &Direct)) !=
             -1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
         {
             bool Ok = cv->Sauve(hfile);
@@ -3212,7 +3212,7 @@ void TfrmSimulation::InterromptDemarrage()
 // Vrai : asNomFichAuto est le fichier qu'Arrêt rechargera.
 bool TfrmSimulation::EnregistreAvantMarche()
 {
-    String asNomFichier = (SaveDialog)->FileName;
+    String asNomFichier = SaveDialog->FileName;
     // ReadWrite ne vide pas le fichier, contrairement à FileCreate : si l'ouverture
     // échoue (fichier en lecture seule, volume du .dmg...), il reste intact
     if ((!asNomFichier.IsEmpty()) && (!QFile(Q(asNomFichier)).open(QIODevice::ReadWrite)))
@@ -3241,14 +3241,14 @@ bool TfrmSimulation::EnregistreAvantMarche()
             return false;
         }
     }
-    asNomFichAuto = (SaveDialog)->FileName;
+    asNomFichAuto = SaveDialog->FileName;
     EnregistrerAvant = true; // On teste si on annule l'enregistrement (j'emprunte EnregistrerAvant)
     ActionEnregistrer->Execute();
     const bool Ok = EnregistrerAvant; // Enregistrement Annulé si faux
     EnregistrerAvant = false;
     if (Ok)
     {
-        asNomFichAuto = (SaveDialog)->FileName; // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original
+        asNomFichAuto = SaveDialog->FileName; // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original
                                                 // redemandait à l'arrêt quoi ouvrir)
     }
     return Ok;

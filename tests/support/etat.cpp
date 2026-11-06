@@ -2,6 +2,7 @@
 // etat.cpp - Tests du moteur : export de l'état complet de la simulation
 //---------------------------------------------------------------------------
 #include "etat.h"
+#include <format>
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -15,9 +16,7 @@ const char *NomPartieEtat[NB_PARTIES_ETAT] = {
 //---------------------------------------------------------------------------
 std::string Hexa(std::uint64_t v)
 {
-    char Tampon[20];
-    std::snprintf(Tampon, sizeof(Tampon), "%016llx", static_cast<unsigned long long>(v));
-    return Tampon;
+    return std::format("{:016x}", v);
 }
 //---------------------------------------------------------------------------
 // Puits texte
@@ -101,16 +100,12 @@ template <class P> void ExportEtat::ExporteInfections(const pieton *p, P &s)
         const char *Noms[8] = {"deb", "fin", "fatal", "prm", "drn", "prmrang", "drnrang", "charge"};
         for (int j = 0; j < 8; j++)
         {
-            char n[48];
+            std::string n;
             if constexpr (P::Noms)
             {
-                std::snprintf(n, sizeof(n), "inf%d.%s", k, Noms[j]);
+                n = std::format("inf{}.{}", k, Noms[j]);
             }
-            else
-            {
-                n[0] = 0;
-            }
-            s.Champ(n, Valeurs[j]);
+            s.Champ(n.c_str(), Valeurs[j]);
         }
     }
     C(s, "nbinf", k);
@@ -626,24 +621,20 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                             {
                                 if (v->Attente[a][b] || v->Trafic[a][b])
                                 {
-                                    char n[48];
+                                    std::string n;
                                     if constexpr (P::Noms)
                                     {
-                                        std::snprintf(n, sizeof(n), "att%d.%d", a, b);
+                                        n = std::format("att{}.{}", a, b);
                                     }
-                                    else
-                                    {
-                                        n[0] = 0;
-                                    }
-                                    s.Champ(n, v->Attente[a][b]);
+                                    s.Champ(n.c_str(), v->Attente[a][b]);
                                     if constexpr (P::Noms)
                                     {
-                                        std::snprintf(n, sizeof(n), "tra%d.%d", a, b);
+                                        n = std::format("tra{}.{}", a, b);
                                     }
-                                    s.Champ(n, v->Trafic[a][b]);
+                                    s.Champ(n.c_str(), v->Trafic[a][b]);
                                     if constexpr (!P::Noms)
                                     {
-                                        s.Champ(n, (a * 1000) + b); // position dans l'empreinte
+                                        s.Champ(n.c_str(), (a * 1000) + b); // position dans l'empreinte
                                     }
                                 }
                             }

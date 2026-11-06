@@ -115,7 +115,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
                                                                                     // d'arrêts
             {
                 asMsgErr = Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(AnsiString((char)('A' + i)), cv->LigneTram[i].NumArret[j]));
+                                  TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
                 break;
             }
         }
@@ -178,7 +178,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
             { // v5.2.2
                 if ((v->DirPoss & PossDir[d]) == PossDir[d])
                 {
-                    vv = &(cv->Voisine(i, j, d));
+                    vv = &cv->Voisine(i, j, d);
                     NbDirPossSansPsgBus += static_cast<int>(!vv->PassageBus);
                     dp = vv->DirPoss;
                     if ((dp == InvPossDir[d]) && (vv->NumPlaceVehlib == 0)) // v5.3 sauf Places vehlib pour lesquelles
@@ -405,7 +405,7 @@ bool harnais::Demarre(AnsiString &asMsgErr)
     if (!cv->VerifieCalculDistances(TypeDistance))
     {
         asMsgErr = Format("Distance indéfinie (type %d) en (%d, %d)",
-                          TableauDeConstantes((int)TypeDistance, cv->xErr, cv->yErr));
+                          TableauDeConstantes(static_cast<int>(TypeDistance), cv->xErr, cv->yErr));
         return false;
     }
     cv->InitialiseInfosTrajetLignesBus();

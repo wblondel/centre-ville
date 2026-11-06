@@ -102,14 +102,14 @@ void TfrmInfosBus::RafraichitInfos()
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],
                        TableauDeConstantes(NumDrnArret, cv->ArretBus[NumDrnArret - 1].x,
-                                           cv->ArretBus[NumDrnArret - 1].y, (int)Bus->TourArriveDrnArret));
+                                           cv->ArretBus[NumDrnArret - 1].y, Bus->TourArriveDrnArret));
             DrnArret = &cv->v[cv->ArretBus[NumDrnArret - 1].x][cv->ArretBus[NumDrnArret - 1].y];
         }
         else
         { // Si pas encore d'arrêt... On prend le dépôt comme dernier arrêt
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],
-                       TableauDeConstantes(0, cv->DepotBus.x, cv->DepotBus.y, (int)Bus->TourDepart));
+                       TableauDeConstantes(0, cv->DepotBus.x, cv->DepotBus.y, Bus->TourDepart));
             DrnArret = &cv->v[cv->DepotBus.x][cv->DepotBus.y];
         }
         // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
@@ -118,7 +118,7 @@ void TfrmInfosBus::RafraichitInfos()
         LabelProchainArret->Caption =
             Format(asFrmNumeroCoordonnees[SVT],
                    TableauDeConstantes(NumArretSvt, cv->ArretBus[NumArretSvt - 1].x, cv->ArretBus[NumArretSvt - 1].y,
-                                       (int)Bus->TourDepartArretSvt)); // v6.0.2 : de ce bus (l'original lisait le
+                                       Bus->TourDepartArretSvt)); // v6.0.2 : de ce bus (l'original lisait le
                                                                        // premier)
         LabelTourSortie->Caption = IntToStr(Bus->TourDepart);
         LabelNbPersonnes->Caption = IntToStr(Bus->NbPersonnes);

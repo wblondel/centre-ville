@@ -135,6 +135,8 @@
 #include <QTimer>
 #include <QUrl>
 #include <QWheelEvent>
+#include <format>
+#include <iostream>
 #include <chrono>
 #include <condition_variable>
 #include <cstdio>
@@ -220,7 +222,7 @@ const dirposs DirPossC4x4[4][4] = {
 bool CaseLibre(int x, int y)
 {
     voie &v = cv->v[(x + cv->NbX) % cv->NbX][(y + cv->NbY) % cv->NbY];
-    return (v.DirPoss == 0) && (v.SensVoieTram == 0) && !NatureSansDecor(&v) && (v.NumParking == 0) &&
+    return (v.DirPoss == 0) && (v.SensVoieTram == 0) && (NatureSansDecor(&v) == 0) && (v.NumParking == 0) &&
            (v.NumArretBus == 0) && (v.NumArretTram == 0) && (v.NumPlaceTaxi == 0) && (v.NumPlacePark == 0) &&
            (v.NumPlaceVehlib == 0) && !v.PassagePietons && !v.EstDepotBus() && (v.NumFeu[0] == 0) &&
            (v.NumFeu[1] == 0) && (v.NumFeu[2] == 0) && (v.NumFeu[3] == 0) && (v.NumFeuP[0] == 0) &&
@@ -572,8 +574,7 @@ public:
               std::unique_lock<std::mutex> v(Verrou);
               if (!Fin.wait_for(v, std::chrono::seconds(Secondes), [this] { return Termine; }))
               {
-                  std::fprintf(stderr, "FAIL! : blocage de plus de %d s : %s\n", Secondes, Quoi);
-                  std::fflush(stderr);
+                  std::cerr << std::format("FAIL! : blocage de plus de {} s : {}", Secondes, Quoi) << std::endl;
                   std::_Exit(3);
               }
           })
@@ -1130,9 +1131,9 @@ class TestInterface : public QObject
     {
         ChampFiche c;
         c.Nom = Nom;
-        c.Min = [Champ] { return (int)Champ()->MinValue; };
-        c.Max = [Champ] { return (int)Champ()->MaxValue; };
-        c.Ecran = [Champ] { return (int)Champ()->Value; };
+        c.Min = [Champ] { return static_cast<int>(Champ()->MinValue); };
+        c.Max = [Champ] { return static_cast<int>(Champ()->MaxValue); };
+        c.Ecran = [Champ] { return static_cast<int>(Champ()->Value); };
         c.Saisit = [Champ](int v) { Champ()->Value = v; };
         c.Lu = std::move(Lu);
         return c;
@@ -1150,7 +1151,7 @@ class TestInterface : public QObject
             }
             return n;
         };
-        c.Ecran = [Groupe] { return (int)Groupe()->ItemIndex; };
+        c.Ecran = [Groupe] { return static_cast<int>(Groupe()->ItemIndex); };
         c.Saisit = [this, Groupe](int v) { CliqueChoix(Groupe(), v); };
         c.Lu = std::move(Lu);
         return c;
@@ -2615,13 +2616,11 @@ void TestInterface::nouveauEtGeneration()
             Attendu += Ligne + "\n";
         }
     }
-    char Tampon[4];
     for (int j = 0; j < cv->NbY; j++)
     {
         for (int i = 0; i < cv->NbX; i++)
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%x", static_cast<int>(cv->v[i][j].DirPoss));
-            Obtenu += Tampon;
+            Obtenu += std::format("{:x}", static_cast<int>(cv->v[i][j].DirPoss));
         }
         Obtenu += '\n';
     }
@@ -2831,7 +2830,7 @@ void TestInterface::fichesPrioritesEtFeux()
     Clique(frmSimulation->ToolButtonPriorites);
     QVERIFY(frmDefVoie->isVisible());
     QVERIFY(frmSimulation->ActionPriorites->Checked);
-    QCOMPARE(Q(frmDefVoie->LabelCoordonnees->Caption), QString::asprintf("%02d, %02d", x, y));
+    QCOMPARE(Q(frmDefVoie->LabelCoordonnees->Caption), QString::fromStdString(std::format("{:02d}, {:02d}", x, y)));
     QVERIFY(Groupe->Enabled);
     QCOMPARE((int)Groupe->ItemIndex, (int)a_droite);
     QVERIFY(!frmDefVoie->ButtonAppliquer->Enabled);
@@ -2959,7 +2958,7 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
     frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
     QVERIFY(frmDefVoiePietons->isVisible());
     QVERIFY(frmSimulation->ActionPrioritesPietons->Checked);
-    QCOMPARE(Q(frmDefVoiePietons->LabelCoordonnees->Caption), QString::asprintf("%02d, %02d", x, yn));
+    QCOMPARE(Q(frmDefVoiePietons->LabelCoordonnees->Caption), QString::fromStdString(std::format("{:02d}, {:02d}", x, yn)));
     QVERIFY(frmDefVoiePietons->SpeedButtonS->Enabled);
     QVERIFY(!frmDefVoiePietons->SpeedButtonN->Enabled);
     QVERIFY(!frmDefVoiePietons->SpeedButtonS->Down);
@@ -2976,7 +2975,7 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
     int n = cv->v[x][yn].NumFeuP[sud - 1];
     QVERIFY(n > 0);
     QCOMPARE((int)cv->v[x][ys].NumFeuP[nord - 1], n);
-    QCOMPARE(Q(frmDefFeuxPietons->LabelCoordonneesFeuPietonsOppose->Caption), QString::asprintf("%02d, %02d", x, ys));
+    QCOMPARE(Q(frmDefFeuxPietons->LabelCoordonneesFeuPietonsOppose->Caption), QString::fromStdString(std::format("{:02d}, {:02d}", x, ys)));
     QCOMPARE(Q(frmDefFeuxPietons->LabelDureeTraversee->Caption), QString::number(cv->FeuP[n - 1].DureeTraversee));
     QCOMPARE(NbFeuxPietonsDefinis(), NbFeuxP + 1);
     Clique(frmDefFeuxPietons->ButtonAnnuler);
@@ -3561,8 +3560,8 @@ void TestInterface::lignesDeplacementsEtClignotement()
                                                               .arg(d.Coins ? " (coins)" : "")
                                                               .arg(d.x0)
                                                               .arg(d.y0)
-                                                              .arg((int)g->Col)
-                                                              .arg((int)g->Row));
+                                                              .arg(static_cast<int>(g->Col))
+                                                              .arg(static_cast<int>(g->Row)));
             }
             Coins->Checked = false;
             // Premier arrêt de la ligne 1 remplacé par le 2, puis par le 3 : le curseur suit
@@ -3813,15 +3812,15 @@ QStringList EcartsFichesPriorites(const QString &Quoi)
         }
         for (int d = nord; d <= ouest; d++)
         {
-            if ((int)Groupes[d - 1]->ItemIndex != static_cast<int>(v.Priorite[d - 1]))
+            if (static_cast<int>(Groupes[d - 1]->ItemIndex) != static_cast<int>(v.Priorite[d - 1]))
             {
                 Ecarts << Quoi + QString::fromUtf8(" : priorité %1 affichée au lieu de %2 (direction %3)")
-                                     .arg((int)Groupes[d - 1]->ItemIndex)
+                                     .arg(static_cast<int>(Groupes[d - 1]->ItemIndex))
                                      .arg(static_cast<int>(v.Priorite[d - 1]))
                                      .arg(d);
             }
             if ((v.SensVoieTram == 0) && (v.NumParking == 0) &&
-                ((bool)Groupes[d - 1]->Enabled != !((v.DirPoss & PossDir[d]) == 0)))
+                (static_cast<bool>(Groupes[d - 1]->Enabled) != !((v.DirPoss & PossDir[d]) == 0)))
             {
                 Ecarts << Quoi + QString::fromUtf8(" : direction %1 %2 dans la fiche")
                                      .arg(d)
@@ -4451,7 +4450,7 @@ void Compare(QStringList &Ecarts, const char *Nom, const AnsiString &asObtenu, c
 }
 QString NumeroCoordonnees(int n, int x, int y)
 {
-    return QString::asprintf("%d (%02d, %02d)", n, x, y);
+    return QString::fromStdString(std::format("{} ({:02d}, {:02d})", n, x, y));
 }
 QString Cadre(int n, int x, int y)
 {
@@ -4609,7 +4608,7 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
         Compare(e, "titre", f.Fiche->Caption, QString("%1 (%2, %3)").arg(t.Titre).arg(x).arg(y));
         if (g->RowCount != 1 + t.Nb)
         {
-            e << QString("RowCount %1 au lieu de %2").arg((int)g->RowCount).arg(1 + t.Nb);
+            e << QString("RowCount %1 au lieu de %2").arg(static_cast<int>(g->RowCount)).arg(1 + t.Nb);
         }
         Compare(e, "[0][0]", g->Cells[0][0], QString());
         for (int d = 0; d < t.NbDir; d++)
@@ -4618,12 +4617,12 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
         }
         for (int k = 1; k <= t.Nb; k++)
         {
-            Compare(e, "numéro", g->Cells[0][k], QString::asprintf("%5d", k));
+            Compare(e, "numéro", g->Cells[0][k], QString::fromStdString(std::format("{:5d}", k)));
             for (int d = 0; d < t.NbDir; d++)
             {
                 const int de = t.Distance(k - 1, d);
                 Compare(e, "distance", g->Cells[d + 1][k],
-                        (de == DIST_INDEFINIE) ? QString("     ") : QString::asprintf("%5d", de));
+                        (de == DIST_INDEFINIE) ? QString("     ") : QString::fromStdString(std::format("{:5d}", de)));
             }
             for (int c = t.NbDir + 1; c < g->ColCount; c++)
             {
@@ -4835,8 +4834,8 @@ void TestInterface::fichesInfos()
     QVERIFY(JoueJusquAuTour(15));
     const auto Case = [] { return &cv->v[frmSimulation->DrawGridSimul->Col][frmSimulation->DrawGridSimul->Row]; };
     const auto Coordonnees = [] {
-        return QString::asprintf("%02d, %02d", (int)frmSimulation->DrawGridSimul->Col,
-                                 (int)frmSimulation->DrawGridSimul->Row);
+        return QString::fromStdString(std::format("{:02d}, {:02d}", static_cast<int>(frmSimulation->DrawGridSimul->Col),
+                                 static_cast<int>(frmSimulation->DrawGridSimul->Row)));
     };
     // Premier objet trouvé sur la carte (Numero(v) > 0), case courante
     const auto Trouve = [this](const std::function<int(voie *)> &Numero) -> int {
@@ -4879,7 +4878,7 @@ void TestInterface::fichesInfos()
                 Compare(e, "tours", f->LabelTours->Caption, QString::number(Tour - Veh->TourDepart));
                 Compare(e, "parcours", f->LabelParcours->Caption, QString::number(Veh->NbCasesParcourues));
                 Compare(e, "vitesse", f->LabelVitesse->Caption,
-                        QString::asprintf("%d/%d", 1 + ((v->NumVehicule - 1) % cv->NbVitesses), cv->NbVitesses));
+                        QString::fromStdString(std::format("{}/{}", 1 + ((v->NumVehicule - 1) % cv->NbVitesses), cv->NbVitesses)));
                 if (Veh->NumParkingArrivee)
                 {
                     Compare(e, "parking d'arrivée", f->LabelParkingArrivee->Caption,
@@ -4978,7 +4977,7 @@ void TestInterface::fichesInfos()
                         NumeroCoordonnees(b->NumArretSvt, cv->ArretBus[b->NumArretSvt - 1].x,
                                           cv->ArretBus[b->NumArretSvt - 1].y) +
                             QString(" depuis le tour %1").arg(b->TourDepartArretSvt));
-                Compare(e, "vitesse", f->LabelVitesse->Caption, QString::asprintf("1/%d", cv->NbVitesses));
+                Compare(e, "vitesse", f->LabelVitesse->Caption, QString::fromStdString(std::format("1/{}", cv->NbVitesses)));
             }
             else if (!f->RadioButtonAucunBus->Checked || !f->LabelDirection->isHidden())
             {
@@ -5420,8 +5419,8 @@ void TestInterface::fichePietonDansUnVehicule()
                     if ((s->DrawGridSimul->Col != c.x()) || (s->DrawGridSimul->Row != c.y()))
                     {
                         e << QString("curseur en (%1, %2)")
-                                 .arg((int)s->DrawGridSimul->Col)
-                                 .arg((int)s->DrawGridSimul->Row);
+                                 .arg(static_cast<int>(s->DrawGridSimul->Col))
+                                 .arg(static_cast<int>(s->DrawGridSimul->Row));
                     }
                     Montre(i + 1, c.x(), c.y());
                     Compare(e, "cadre", f->GroupBoxPieton->Caption, Cadre(i + 1, c.x(), c.y()));
@@ -8458,10 +8457,10 @@ void TestInterface::fichesEvolutionEtVehicules()
     QCOMPARE(Q(g->StringGridCoordParkings->Cells[1][0]), QString("Position"));
     for (int i = 0; i < ne; i++)
     {
-        QCOMPARE(Q(g->StringGridCoordParkings->Cells[0][1 + i]), QString::asprintf("%3d", 1 + i));
+        QCOMPARE(Q(g->StringGridCoordParkings->Cells[0][1 + i]), QString::fromStdString(std::format("{:3d}", 1 + i)));
         QCOMPARE(Q(g->StringGridCoordParkings->Cells[1][1 + i]),
                  QString("%1,%2").arg(cv->Parking[i].x).arg(cv->Parking[i].y));
-        QCOMPARE(Q(g->StringGridStatsVehicules->Cells[1 + i][0]), QString::asprintf("%3d", 1 + i));
+        QCOMPARE(Q(g->StringGridStatsVehicules->Cells[1 + i][0]), QString::fromStdString(std::format("{:3d}", 1 + i)));
     }
     // Écart entre le plus long et le plus court (onglet 0 : cases ; 1 : tours) des
     // véhicules arrivés, pour chaque départ (colonne) et chaque arrivée (ligne)
@@ -8494,7 +8493,7 @@ void TestInterface::fichesEvolutionEtVehicules()
                     }
                     NbNonNuls += (Nb && (Max > Min));
                     Compare(e, qPrintable(QString("(%1, %2)").arg(ed).arg(ea)),
-                            g->StringGridStatsVehicules->Cells[ed][ea], QString::asprintf("%4d", Nb ? Max - Min : 0));
+                            g->StringGridStatsVehicules->Cells[ed][ea], QString::fromStdString(std::format("{:4d}", Nb ? Max - Min : 0)));
                 }
             }
         }
@@ -8683,8 +8682,8 @@ void TestInterface::ficheFluiditeTrafic()
             const int Valeur = ts ? v->Trafic[ed][ea] : v->Attente[ed][ea];
             Detail = QString::fromUtf8(ts ? "Trafic en (%1, %2) au tour %3 : %4 véhicules (Max. %5) soit %6%"
                                           : "Attente en (%1, %2) au tour %3 : %4 tours (Max. %5) soit %6%")
-                         .arg((int)g->Col)
-                         .arg((int)g->Row)
+                         .arg(static_cast<int>(g->Col))
+                         .arg(static_cast<int>(g->Row))
                          .arg(cv->TourCrt)
                          .arg(Valeur)
                          .arg(r.m[ts])
@@ -8766,8 +8765,8 @@ void TestInterface::ficheFluiditeTrafic()
                         {
                             Ecarts << QString("%1 : curseur en (%2, %3) au lieu de (%4, %5)")
                                           .arg(Nom)
-                                          .arg((int)g->Col)
-                                          .arg((int)g->Row)
+                                          .arg(static_cast<int>(g->Col))
+                                          .arg(static_cast<int>(g->Row))
                                           .arg(x)
                                           .arg(y);
                         }
@@ -10006,14 +10005,14 @@ struct FenetreReduite
 QString EtatGrille(GrilleSimulation *g)
 {
     return QString::fromUtf8("case (%1, %2), sélection (%3, %4)-(%5, %6), vue (%7, %8)")
-        .arg((int)g->Col)
-        .arg((int)g->Row)
+        .arg(static_cast<int>(g->Col))
+        .arg(static_cast<int>(g->Row))
         .arg(g->Selection.Left)
         .arg(g->Selection.Top)
         .arg(g->Selection.Right)
         .arg(g->Selection.Bottom)
-        .arg((int)g->LeftCol)
-        .arg((int)g->TopRow);
+        .arg(static_cast<int>(g->LeftCol))
+        .arg(static_cast<int>(g->TopRow));
 }
 QString EtatAttendu(int Col, int Row, int Gauche, int Haut, int Ancre = -1, int AncreY = -1)
 { // Sélection de la case courante à l'ancre (par défaut, la case courante seule)

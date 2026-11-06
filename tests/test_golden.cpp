@@ -35,8 +35,8 @@ std::string PremiereLigneDifferente(const std::string &a, const std::string &b)
     std::string lb;
     for (int n = 1;; n++)
     {
-        const bool fa = (bool)std::getline(ia, la);
-        const bool fb = (bool)std::getline(ib, lb);
+        const bool fa = static_cast<bool>(std::getline(ia, la));
+        const bool fb = static_cast<bool>(std::getline(ib, lb));
         if (!fa && !fb)
         {
             return "aucune";

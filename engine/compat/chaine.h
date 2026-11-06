@@ -73,7 +73,7 @@ public:
     const void *Pointeur = nullptr;
     template <class T, std::enable_if_t<
                            std::is_integral_v<T> && (!std::is_same_v<T, char>) && (!std::is_same_v<T, bool>), int> = 0>
-    TVarRec(T v) : Genre(vtEntier), Entier((long long)v)
+    TVarRec(T v) : Genre(vtEntier), Entier(static_cast<long long>(v))
     {}
     TVarRec(char c) : Genre(vtCaractere), Chaine(1, c) {}
     TVarRec(bool b) : Genre(vtBooleen), Entier(static_cast<long long>(b)) {}

@@ -285,7 +285,7 @@ bool TfrmParamTram::AppliqueChoix()
                 if (CSpinEditNum->Value == 0)
                 {
                     asMsg = asMsg + Format(" - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
-                                           TableauDeConstantes(j, asOrdre[!(j - 1)], i));
+                                           TableauDeConstantes(j, asOrdre[(j - 1) == 0], i));
                 }
             }
         }

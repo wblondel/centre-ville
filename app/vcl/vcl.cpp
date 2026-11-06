@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <format>
 #include <string>
 #include <utility>
 //---------------------------------------------------------------------------
@@ -43,7 +44,7 @@ String ParamStr(int Index)
 //---------------------------------------------------------------------------
 String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
 { // Sous-ensemble utilisé par les fiches : hh, nn, ss, zzz et caractères littéraux
-    const auto Jours = (double)dt;
+    const auto Jours = static_cast<double>(dt);
     const auto ms = static_cast<long long>(std::floor(((Jours - std::floor(Jours)) * 86400000.0) + 0.5));
     const int h = static_cast<int>((ms / 3600000) % 24);
     const int n = static_cast<int>((ms / 60000) % 60);
@@ -51,32 +52,27 @@ String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
     const int z = static_cast<int>(ms % 1000);
     const std::string &f = asFormat.str();
     std::string r;
-    char Tampon[8];
     for (std::size_t i = 0; i < f.size();)
     {
         const auto Commence = [&](const char *m) { return f.compare(i, std::char_traits<char>::length(m), m) == 0; };
         if (Commence("hh"))
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%02d", h);
-            r += Tampon;
+            r += std::format("{:02d}", h);
             i += 2;
         }
         else if (Commence("nn"))
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%02d", n);
-            r += Tampon;
+            r += std::format("{:02d}", n);
             i += 2;
         }
         else if (Commence("ss"))
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%02d", s);
-            r += Tampon;
+            r += std::format("{:02d}", s);
             i += 2;
         }
         else if (Commence("zzz"))
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%03d", z);
-            r += Tampon;
+            r += std::format("{:03d}", z);
             i += 3;
         }
         else
@@ -154,10 +150,9 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
     }
     const int EntiersMin = (PremierZero < 0) ? 0 : NbAvant - PremierZero;
     // Chiffres : Valeur = 0,Chiffres x 10^(Exposant+1), arrondis à Decimales
-    char Tampon[64];
-    std::snprintf(Tampon, sizeof(Tampon), "%.16Le", std::fabs(Valeur));
-    std::string Chiffres = std::string(1, Tampon[0]) + std::string(Tampon + 2, 16);
-    int Exposant = std::atoi(std::strchr(Tampon, 'e') + 1);
+    const std::string Brut = std::format("{:.16e}", std::fabs(Valeur)); // d.dddddddddddddddde±xx
+    std::string Chiffres = Brut.substr(0, 1) + Brut.substr(2, 16);
+    int Exposant = std::stoi(Brut.substr(Brut.find('e') + 1));
     const int Garde = Exposant + 1 + Decimales;
     if (Garde < 0)
     {

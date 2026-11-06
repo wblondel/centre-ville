@@ -109,14 +109,14 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
         if (ts != 0)
         {
             asMsg = Format("Trafic en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%",
-                           TableauDeConstantes(x, y, (int)cv->TourCrt, cv->v[x][y].Trafic[ed][ea], m[ts],
-                                               (long double)((100.0 * cv->v[x][y].Trafic[ed][ea]) / m[ts])));
+                           TableauDeConstantes(x, y, cv->TourCrt, cv->v[x][y].Trafic[ed][ea], m[ts],
+                                               static_cast<long double>((100.0 * cv->v[x][y].Trafic[ed][ea]) / m[ts])));
         }
         else
         {
             asMsg = Format("Attente en (%d, %d) au tour %d : %d tours (Max. %d) soit %.3f%%",
-                           TableauDeConstantes(x, y, (int)cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
-                                               (long double)((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts])));
+                           TableauDeConstantes(x, y, cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
+                                               static_cast<long double>((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts])));
         }
     }
     return asMsg;

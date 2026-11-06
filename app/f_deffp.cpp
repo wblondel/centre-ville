@@ -174,8 +174,8 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
     AnalyseEtatFeux(); // Assistant pour les états de feux (v5.2.1)
     frmSimulation->SimulationModifiee = true;
     f->Etat = static_cast<etat_feu>(RadioGroupEtat->ItemIndex + static_cast<int>(RadioGroupEtat->ItemIndex == 2));
-    f->TypeDmdVert = (dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
-    f->TypePsgRouge = (psg_rouge)RadioGroupTypePsgRouge->ItemIndex;
+    f->TypeDmdVert = static_cast<dmd_vert>(RadioGroupTypeDmdVert->ItemIndex);
+    f->TypePsgRouge = static_cast<psg_rouge>(RadioGroupTypePsgRouge->ItemIndex);
     f->DureeVert = CSpinEditDureeVert->Value;
     f->DureeRouge = CSpinEditDureeRouge->Value;
 

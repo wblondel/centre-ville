@@ -28,7 +28,7 @@ void TfrmStatsVehicules::FormShow(TObject * /*Sender*/)
     int i = 0;
     const int ne = cv->NbParkings;
     frmSimulation->ActionStatsParkings->Checked = true;
-    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes((int)cv->TourCrt));
+    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes(cv->TourCrt));
     StringGridCoordParkings->RowCount = 1 + ne;
     StringGridStatsVehicules->Cells[0][0] = "A\\D";
     StringGridStatsVehicules->RowCount = 1 + ne;
@@ -66,7 +66,7 @@ void TfrmStatsVehicules::RafraichitInfos() const
     int Minimum = 0;
     int Maximum = 0;
     vehicule *v = nullptr;
-    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes((int)cv->TourCrt));
+    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes(cv->TourCrt));
     for (i = 0; i < n * n; i++)
     {
         if ((i % n) != (i / n))

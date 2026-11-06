@@ -69,6 +69,9 @@ CheckOptions:
   # Symboles non vérifiés : ceux de Qt (<QWidget> inclut qwidget.h) et ceux des en-têtes internes du
   # système, propres à chaque plateforme (<sys/_types/_off_t.h> sous macOS, <bits/...> sous Linux)
   misc-include-cleaner.IgnoreHeaders: '.*/Qt[A-Za-z]*/.*;.*/Qt[A-Za-z]*\.framework/.*;q[a-z0-9_]*\.h;sys/.*;bits/.*;.*/_types/.*;asm.*/.*;linux/.*;mach/.*;signal\.h;unistd\.h;fcntl\.h'
+  # X-macros générées depuis les .dfm (composants et événements des fiches) et static_assert de
+  # format_cvw.h, qui ont besoin du préprocesseur (# pour le nom du champ dans le message)
+  cppcoreguidelines-macro-usage.AllowedRegexp: '^(COMPOSANTS|EVENEMENTS)_|^(CONNECTE_EVENEMENT|LIE_COMPOSANT|CVW_ENUM_OCTET|CVW_CHAMP)$'
   # Les propriétés de la VCL (Propriete<T>) s'affectent à travers un pointeur vers un contrôle :
   # l'analyse les prend pour des lectures
   misc-const-correctness.WarnPointersAsPointers: false

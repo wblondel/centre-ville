@@ -170,7 +170,7 @@ public:
     explicit TFormT(TComponent *Owner) : B(ParentDe(Owner))
     {
         QWidget *w = this;
-        ComponentCount.Definit([this] { return (int)ListeComposants.size(); }, [](const int &) {});
+        ComponentCount.Definit([this] { return static_cast<int>(ListeComposants.size()); }, [](const int &) {});
         Caption.Definit([w] { return A(w->windowTitle()); }, [w](const AnsiString &as) { w->setWindowTitle(Q(as)); });
         Left.Definit([w] { return w->x(); }, [w](const int &v) { w->move(v, w->y()); });
         Top.Definit([w] { return w->y(); }, [w](const int &v) { w->move(w->x(), v); });

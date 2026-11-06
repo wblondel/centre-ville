@@ -176,7 +176,7 @@ void TfrmDefVoie::AppliqueChoix()
     // 3. On change les priorités
     for (int d = nord; d <= ouest; d++)
     {
-        v->Priorite[d - 1] = (priorite)RadioGroupPriorite[d - 1]->ItemIndex;
+        v->Priorite[d - 1] = static_cast<priorite>(RadioGroupPriorite[d - 1]->ItemIndex);
     }
 
     // 4. On met à jour l'accessibilité des boutons et groupes

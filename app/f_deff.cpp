@@ -129,9 +129,9 @@ bool TfrmDefFeux::AppliqueChoix()
     }
     f = &cv->Feu[Numero - 1];
     frmSimulation->SimulationModifiee = true;
-    f->Etat = (etat_feu)RadioGroupEtat->ItemIndex;
-    f->TypeDmdVert = (dmd_vert)RadioGroupTypeDmdVert->ItemIndex;
-    f->TypePsgRouge = (psg_rouge)RadioGroupTypePsgRouge->ItemIndex;
+    f->Etat = static_cast<etat_feu>(RadioGroupEtat->ItemIndex);
+    f->TypeDmdVert = static_cast<dmd_vert>(RadioGroupTypeDmdVert->ItemIndex);
+    f->TypePsgRouge = static_cast<psg_rouge>(RadioGroupTypePsgRouge->ItemIndex);
     f->DureeVert = CSpinEditDureeVert->Value;
     f->DureeRouge = CSpinEditDureeRouge->Value;
 

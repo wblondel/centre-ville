@@ -101,7 +101,7 @@ void TfrmInfosTram::RafraichitInfos()
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],
                        TableauDeConstantes(NumDrnArret, cv->ArretTram[NumDrnArret - 1].x,
-                                           cv->ArretTram[NumDrnArret - 1].y, (int)Tram->TourArriveDrnArret));
+                                           cv->ArretTram[NumDrnArret - 1].y, Tram->TourArriveDrnArret));
             DrnArret = &cv->v[cv->ArretTram[NumDrnArret - 1].x][cv->ArretTram[NumDrnArret - 1].y];
         }
         else
@@ -116,7 +116,7 @@ void TfrmInfosTram::RafraichitInfos()
         LabelProchainArret->Caption =
             Format(asFrmNumeroCoordonnees[SVT],
                    TableauDeConstantes(NumArretSvt, cv->ArretTram[NumArretSvt - 1].x, cv->ArretTram[NumArretSvt - 1].y,
-                                       (int)Tram->TourDepartArretSvt)); // v6.0.2 : de ce tram (l'original lisait le
+                                       Tram->TourDepartArretSvt)); // v6.0.2 : de ce tram (l'original lisait le
                                                                         // premier)
         LabelNbPersonnes->Caption = IntToStr(Tram->NbPersonnes);
         LabelTours->Caption = IntToStr(cv->TourCrt); // v6.0.2 : correct, tous les trams partent au tour 0

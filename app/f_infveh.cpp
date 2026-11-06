@@ -189,7 +189,7 @@ void TfrmInfosVehicule::RafraichitInfos()
             LabelAttente->Caption = "0,000%";
         }
         LabelVitesse->Caption =
-            Format(asFrmVitesse, TableauDeConstantes(1 + (v->NumVehicule - 1) % cv->NbVitesses, cv->NbVitesses));
+            Format(asFrmVitesse, TableauDeConstantes(1 + ((v->NumVehicule - 1) % cv->NbVitesses), cv->NbVitesses));
     }
     RendreVisibleInfos(Afficher);
 }

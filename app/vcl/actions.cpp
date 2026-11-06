@@ -436,7 +436,7 @@ bool TActionList::IsShortCut(TShortCut Raccourci, bool Executer)
     {
         if (a->ShortCut == Raccourci)
         {
-            return Executer ? a->Execute() : (bool)a->Enabled;
+            return Executer ? a->Execute() : static_cast<bool>(a->Enabled);
         }
     }
     return false;
@@ -649,15 +649,15 @@ void TMenuItem::LieAction(TAction *a)
 void TMenuItem::ActionChange(TAction *a)
 { // TMenuItem::ActionChange(Sender, CheckDefaults=false)
     Caption = a->Caption.Valeur();
-    Checked = (bool)a->Checked;
-    Enabled = (bool)a->Enabled;
+    Checked = static_cast<bool>(a->Checked);
+    Enabled = static_cast<bool>(a->Enabled);
     HelpContext = a->HelpContext;
     Hint = a->Hint.Valeur();
     ImageIndex = a->ImageIndex;
     Element->setIcon(a->Icone);
     ShortCut = a->ShortCut;
     Element->setShortcut(SequenceQt(ShortCut));
-    Visible = (bool)a->Visible;
+    Visible = static_cast<bool>(a->Visible);
 }
 //---------------------------------------------------------------------------
 void TMenuItem::LienChecked(bool Ancien, bool Nouveau)

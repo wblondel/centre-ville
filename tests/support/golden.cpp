@@ -2,6 +2,7 @@
 // golden.cpp - Tests du moteur : golden master de la simulation
 //---------------------------------------------------------------------------
 #include "golden.h"
+#include <format>
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
@@ -18,19 +19,15 @@ namespace
 {
 std::string Hexa8(std::uint64_t v)
 { // Empreinte 64 bits repliée sur 32 bits pour la ligne de chaque tour
-    char Tampon[12];
-    std::snprintf(Tampon, sizeof(Tampon), "%08x", static_cast<unsigned>((v >> 32) ^ (v & 0xFFFFFFFFU)));
-    return Tampon;
+    return std::format("{:08x}", static_cast<unsigned>((v >> 32) ^ (v & 0xFFFFFFFFU)));
 }
 //-------------------------------------------------------------------------
 std::string LigneTour(const centre_ville *cv)
 {
-    char Tampon[256];
-    std::snprintf(Tampon, sizeof(Tampon),
-                  "tour %d graine=%08x sortis=%d arrives=%d deplaces=%d gueris=%d infectes=%d morts=%d |", cv->TourCrt,
-                  alea::Graine(), cv->NbVehiculesSortis, cv->NbVehiculesArrives, cv->NbVehiculesDeplaces,
-                  cv->NbPietonsGueris, cv->NbPietonsInfectes, cv->NbPietonsMorts);
-    std::string Ligne(Tampon);
+    std::string Ligne =
+        std::format("tour {} graine={:08x} sortis={} arrives={} deplaces={} gueris={} infectes={} morts={} |", cv->TourCrt,
+                    alea::Graine(), cv->NbVehiculesSortis, cv->NbVehiculesArrives, cv->NbVehiculesDeplaces,
+                    cv->NbPietonsGueris, cv->NbPietonsInfectes, cv->NbPietonsMorts);
     // Clés courtes, dans l'ordre de partie_etat (voir l'en-tête des fichiers)
     const static char *Cles[peDistances] = {"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};
     for (int i = 0; i < peDistances; i++)
@@ -158,16 +155,13 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
     Texte += "depart x=" + std::to_string(x) + " y=" + std::to_string(y) + " d=" + std::to_string(static_cast<int>(d)) +
              "\n";
     cv->Genere(x, y, d);
-    char Tampon[16];
-    std::snprintf(Tampon, sizeof(Tampon), "%08x", alea::Graine());
-    Texte += "graine apres generation=" + std::string(Tampon) + "\n";
+    Texte += std::format("graine apres generation={:08x}\n", alea::Graine());
     Texte += "DirPoss (une ligne par ordonnée, un chiffre hexadécimal par case) :\n";
     for (int j = 0; j < cv->NbY; j++)
     {
         for (int i = 0; i < cv->NbX; i++)
         {
-            std::snprintf(Tampon, sizeof(Tampon), "%x", static_cast<int>(cv->v[i][j].DirPoss));
-            Texte += Tampon;
+            Texte += std::format("{:x}", static_cast<int>(cv->v[i][j].DirPoss));
         }
         Texte += '\n';
     }

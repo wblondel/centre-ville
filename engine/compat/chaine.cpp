@@ -6,10 +6,10 @@
 #include <cmath>
 #include <algorithm>
 #include <cctype>
-#include <clocale>
-#include <cstdio>
+#include <cstdint>
 #include <cstdlib>
 #include <stdexcept>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
@@ -48,30 +48,24 @@ namespace
     throw std::invalid_argument(std::string("Format(\"") + asFormat + "\") : " + Raison);
 }
 //-------------------------------------------------------------------------
-std::string Imprime(const char *Gabarit, int Precision, double Valeur)
-{
-    char Tampon[512];
-    std::snprintf(Tampon, sizeof(Tampon), Gabarit, Precision, Valeur);
-    // portage : snprintf suit LC_NUMERIC (QCoreApplication appelle setlocale) :
-    // on revient au '.', remplacé ensuite par FormatSettings.DecimalSeparator
-    const char *Point = std::localeconv()->decimal_point;
-    if (Point && (Point[0] != 0) && (Point[0] != '.') && (Point[1] == 0))
+std::string Imprime(char Type, int Precision, double Valeur)
+{ // Comme printf("%.*f"), "%.*E" ou "%.*G" dans la locale "C" : std::format ne dépend pas de LC_NUMERIC
+  // (QCoreApplication appelle setlocale) ; le '.' est remplacé ensuite par FormatSettings.DecimalSeparator
+    switch (Type)
     {
-        for (char *c = Tampon; (*c) != 0; c++)
-        {
-            if (*c == Point[0])
-            {
-                *c = '.';
-            }
-        }
+    case 'f':
+        return std::format("{:.{}f}", Valeur, Precision);
+    case 'E':
+        return std::format("{:.{}E}", Valeur, Precision);
+    default:
+        return std::format("{:.{}G}", Valeur, Precision);
     }
-    return Tampon;
 }
 //-------------------------------------------------------------------------
 std::string Exponentielle(int Precision, double Valeur)
 { // Delphi : "-d.ddd...E+ddd", Precision = nombre total de chiffres, exposant sur 3 chiffres
     Precision = std::max(Precision, 1);
-    std::string Brut = Imprime("%.*E", Precision - 1, Valeur);
+    std::string Brut = Imprime('E', Precision - 1, Valeur);
     const std::size_t e = Brut.find('E');
     if (e == std::string::npos)
     {
@@ -79,10 +73,8 @@ std::string Exponentielle(int Precision, double Valeur)
     }
     const std::string Mantisse = Brut.substr(0, e);
     const char Signe = Brut[e + 1];
-    const int Exposant = std::atoi(Brut.c_str() + e + 2);
-    char Tampon[16];
-    std::snprintf(Tampon, sizeof(Tampon), "E%c%03d", Signe, Exposant);
-    return Mantisse + Tampon;
+    const int Exposant = std::stoi(Brut.substr(e + 2));
+    return Mantisse + std::format("E{}{:03d}", Signe, Exposant);
 }
 //-------------------------------------------------------------------------
 std::string AvecSeparateurMilliers(const std::string &Nombre)
@@ -243,9 +235,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             const unsigned long long v = ((a.Entier < 0) && (a.Entier >= -2147483648LL))
                                              ? static_cast<unsigned long long>(static_cast<unsigned int>(a.Entier))
                                              : static_cast<unsigned long long>(a.Entier);
-            char Tampon[32];
-            std::snprintf(Tampon, sizeof(Tampon), "%llX", v);
-            Texte = Tampon;
+            Texte = std::format("{:X}", v);
             if (PrecisionDefinie && std::cmp_less(Texte.size(), Precision))
             {
                 Texte = std::string(static_cast<std::size_t>(Precision) - Texte.size(), '0') + Texte;
@@ -272,13 +262,13 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
                 Texte = Exponentielle(PrecisionDefinie ? Precision : 15, v);
                 break;
             case 'F':
-                Texte = Imprime("%.*f", PrecisionDefinie ? Precision : 2, v);
+                Texte = Imprime('f', PrecisionDefinie ? Precision : 2, v);
                 break;
             case 'G':
-                Texte = Imprime("%.*G", PrecisionDefinie ? Precision : 15, v);
+                Texte = Imprime('G', PrecisionDefinie ? Precision : 15, v);
                 break;
             case 'N':
-                Texte = AvecSeparateurMilliers(Imprime("%.*f", PrecisionDefinie ? Precision : 2, v));
+                Texte = AvecSeparateurMilliers(Imprime('f', PrecisionDefinie ? Precision : 2, v));
                 break;
             }
             { // portage : séparateurs de FormatSettings (le texte ne contient que des chiffres, signes, 'E', '.' et
@@ -322,10 +312,8 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             {
                 ErreurFormat(f, "%p attend un pointeur");
             }
-            char Tampon[32];
-            std::snprintf(Tampon, sizeof(Tampon), "%0*llX", static_cast<int>(2 * sizeof(void *)),
-                          static_cast<unsigned long long>((std::size_t)a.Pointeur));
-            Texte = Tampon;
+            Texte = std::format("{:0{}X}", reinterpret_cast<std::uintptr_t>(a.Pointeur), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : adresse affichée
+                                2 * sizeof(void *));
             break;
         }
         default:

@@ -305,11 +305,11 @@ void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = p->x;
         frmSimulation->DrawGridSimul->Row = p->y;
         StatusBar->SimpleText =
-            Format("Parking n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditParking->Value, p->x, p->y));
+            Format("Parking n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditParking->Value), p->x, p->y));
     }
     else
     {
-        StatusBar->SimpleText = Format("Parking n°%d non utilisé", TableauDeConstantes((int)CSpinEditParking->Value));
+        StatusBar->SimpleText = Format("Parking n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditParking->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -326,11 +326,11 @@ void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = f->x;
         frmSimulation->DrawGridSimul->Row = f->y;
         StatusBar->SimpleText =
-            Format("Feu n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditFeu->Value, f->x, f->y));
+            Format("Feu n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditFeu->Value), f->x, f->y));
     }
     else
     {
-        StatusBar->SimpleText = Format("Feu n°%d non utilisé", TableauDeConstantes((int)CSpinEditFeu->Value));
+        StatusBar->SimpleText = Format("Feu n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditFeu->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -347,11 +347,11 @@ void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = veh->x;
         frmSimulation->DrawGridSimul->Row = veh->y;
         StatusBar->SimpleText = Format("Véhicule n°%d trouvé en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditVehicule->Value, veh->x, veh->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditVehicule->Value), veh->x, veh->y));
     }
     else
     {
-        StatusBar->SimpleText = Format("Véhicule n°%d non utilisé", TableauDeConstantes((int)CSpinEditVehicule->Value));
+        StatusBar->SimpleText = Format("Véhicule n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditVehicule->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -368,7 +368,7 @@ void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = p->x;
         frmSimulation->DrawGridSimul->Row = p->y;
         StatusBar->SimpleText =
-            Format("Piéton n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditPieton->Value, p->x, p->y));
+            Format("Piéton n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value), p->x, p->y));
     }
     else if ((p->NumBus != 0) || (p->NumTram != 0) || (p->NumTaxi != 0) || (p->NumVehlib != 0)) // v5.4.1 : oubli tram,
                                                                                                 // taxi et vehlib.
@@ -379,7 +379,7 @@ void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
             frmSimulation->DrawGridSimul->Col = cv->Bus[p->NumBus - 1].x;
             frmSimulation->DrawGridSimul->Row = cv->Bus[p->NumBus - 1].y;
             StatusBar->SimpleText = Format("Piéton n°%d trouvé dans le bus n°%d (%d, %d)",
-                                           TableauDeConstantes((int)CSpinEditPieton->Value, (int)p->NumBus,
+                                           TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value), p->NumBus,
                                                                cv->Bus[p->NumBus - 1].x, cv->Bus[p->NumBus - 1].y));
         }
         if (p->NumTram != 0) // v6.0.2
@@ -387,7 +387,7 @@ void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
             frmSimulation->DrawGridSimul->Col = cv->Tram[p->NumTram - 1].x;
             frmSimulation->DrawGridSimul->Row = cv->Tram[p->NumTram - 1].y;
             StatusBar->SimpleText = Format("Piéton n°%d trouvé dans le tram n°%d (%d, %d)",
-                                           TableauDeConstantes((int)CSpinEditPieton->Value, (int)p->NumTram,
+                                           TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value), p->NumTram,
                                                                cv->Tram[p->NumTram - 1].x, cv->Tram[p->NumTram - 1].y));
         }
         if (p->NumTaxi != 0)
@@ -395,7 +395,7 @@ void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
             frmSimulation->DrawGridSimul->Col = cv->Taxi[p->NumTaxi - 1].x;
             frmSimulation->DrawGridSimul->Row = cv->Taxi[p->NumTaxi - 1].y;
             StatusBar->SimpleText = Format("Piéton n°%d trouvé dans le taxi n°%d (%d, %d)",
-                                           TableauDeConstantes((int)CSpinEditPieton->Value, (int)p->NumTaxi,
+                                           TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value), p->NumTaxi,
                                                                cv->Taxi[p->NumTaxi - 1].x, // v6.0.2 : l'original lisait
                                                                                            // cv->Bus (hors du tableau
                                                                                            // si NumTaxi>NbBus)
@@ -407,13 +407,13 @@ void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
             frmSimulation->DrawGridSimul->Row = cv->Vehlib[p->NumVehlib - 1].y;
             StatusBar->SimpleText =
                 Format("Piéton n°%d trouvé dans le vehlib n°%d (%d, %d)",
-                       TableauDeConstantes((int)CSpinEditPieton->Value, (int)p->NumVehlib,
+                       TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value), p->NumVehlib,
                                            cv->Vehlib[p->NumVehlib - 1].x, cv->Vehlib[p->NumVehlib - 1].y));
         }
     }
     else
     {
-        StatusBar->SimpleText = Format("Piéton n°%d non utilisé", TableauDeConstantes((int)CSpinEditPieton->Value));
+        StatusBar->SimpleText = Format("Piéton n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditPieton->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -450,12 +450,12 @@ void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = ab->x;
         frmSimulation->DrawGridSimul->Row = ab->y;
         StatusBar->SimpleText = Format("Arrêt de bus n°%d trouvé en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditArretBus->Value, ab->x, ab->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditArretBus->Value), ab->x, ab->y));
     }
     else
     { // Normalement impossible car tous les arrêts de bus doivent être définis avant de lancer la simulation
         StatusBar->SimpleText =
-            Format("Arrêt de bus n°%d non utilisé", TableauDeConstantes((int)CSpinEditArretBus->Value));
+            Format("Arrêt de bus n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditArretBus->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -472,11 +472,11 @@ void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = b->x;
         frmSimulation->DrawGridSimul->Row = b->y;
         StatusBar->SimpleText =
-            Format("Bus n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditBus->Value, b->x, b->y));
+            Format("Bus n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditBus->Value), b->x, b->y));
     }
     else
     { // Bus encore au dépôt
-        StatusBar->SimpleText = Format("Bus n°%d au dépôt", TableauDeConstantes((int)CSpinEditBus->Value));
+        StatusBar->SimpleText = Format("Bus n°%d au dépôt", TableauDeConstantes(static_cast<int>(CSpinEditBus->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -493,12 +493,12 @@ void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = at->x;
         frmSimulation->DrawGridSimul->Row = at->y;
         StatusBar->SimpleText = Format("Arrêt de tram n°%d trouvé en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditArretTram->Value, at->x, at->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditArretTram->Value), at->x, at->y));
     }
     else
     { // Normalement impossible car tous les arrêts de Tram doivent être définis avant de lancer la simulation
         StatusBar->SimpleText =
-            Format("Arrêt de tram n°%d non utilisé", TableauDeConstantes((int)CSpinEditArretTram->Value));
+            Format("Arrêt de tram n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditArretTram->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -515,11 +515,11 @@ void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = t->x;
         frmSimulation->DrawGridSimul->Row = t->y;
         StatusBar->SimpleText =
-            Format("Tram n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditTram->Value, t->x, t->y));
+            Format("Tram n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditTram->Value), t->x, t->y));
     }
     else
     { // Tram non encore utilisé
-        StatusBar->SimpleText = Format("Tram n°%d non utilisé", TableauDeConstantes((int)CSpinEditTram->Value));
+        StatusBar->SimpleText = Format("Tram n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditTram->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -536,11 +536,11 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = t->x;
         frmSimulation->DrawGridSimul->Row = t->y;
         StatusBar->SimpleText =
-            Format("Taxi n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditTaxi->Value, t->x, t->y));
+            Format("Taxi n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditTaxi->Value), t->x, t->y));
     }
     else
     {
-        StatusBar->SimpleText = Format("Taxi n°%d non utilisé", TableauDeConstantes((int)CSpinEditTaxi->Value));
+        StatusBar->SimpleText = Format("Taxi n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditTaxi->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -557,12 +557,12 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = pt->x;
         frmSimulation->DrawGridSimul->Row = pt->y;
         StatusBar->SimpleText = Format("Place de taxi n°%d trouvée en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditPlaceTaxi->Value, pt->x, pt->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditPlaceTaxi->Value), pt->x, pt->y));
     }
     else
     { // v6.0.2 : l'original gardait le texte précédent
         StatusBar->SimpleText =
-            Format("Place de taxi n°%d non utilisée", TableauDeConstantes((int)CSpinEditPlaceTaxi->Value));
+            Format("Place de taxi n°%d non utilisée", TableauDeConstantes(static_cast<int>(CSpinEditPlaceTaxi->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -578,7 +578,7 @@ void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/) const
     frmSimulation->DrawGridSimul->Row = cv->PlaceTaxi[ft->NumPlaceQueue].y;
     StatusBar->SimpleText =
         Format("file de taxis n°%d trouvée en (%d, %d)",
-               TableauDeConstantes((int)CSpinEditFileTaxi->Value, cv->PlaceTaxi[ft->NumPlaceQueue].x,
+               TableauDeConstantes(static_cast<int>(CSpinEditFileTaxi->Value), cv->PlaceTaxi[ft->NumPlaceQueue].x,
                                    cv->PlaceTaxi[ft->NumPlaceQueue].y));
 }
 //---------------------------------------------------------------------------
@@ -596,12 +596,12 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = pp->x;
         frmSimulation->DrawGridSimul->Row = pp->y;
         StatusBar->SimpleText = Format("Place de parking n°%d trouvée en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditPlacePark->Value, pp->x, pp->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditPlacePark->Value), pp->x, pp->y));
     }
     else
     { // v6.0.2 : l'original gardait le texte précédent
         StatusBar->SimpleText =
-            Format("Place de parking n°%d non utilisée", TableauDeConstantes((int)CSpinEditPlacePark->Value));
+            Format("Place de parking n°%d non utilisée", TableauDeConstantes(static_cast<int>(CSpinEditPlacePark->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -618,7 +618,7 @@ void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/) const
     frmSimulation->DrawGridSimul->Row = cv->PlacePark[fp->NumPlaceQueue].y;
     StatusBar->SimpleText =
         Format("file de parkings n°%d trouvée en (%d, %d)",
-               TableauDeConstantes((int)CSpinEditFilePark->Value, cv->PlacePark[fp->NumPlaceQueue].x,
+               TableauDeConstantes(static_cast<int>(CSpinEditFilePark->Value), cv->PlacePark[fp->NumPlaceQueue].x,
                                    cv->PlacePark[fp->NumPlaceQueue].y));
 }
 //---------------------------------------------------------------------------
@@ -635,11 +635,11 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = vl->x;
         frmSimulation->DrawGridSimul->Row = vl->y;
         StatusBar->SimpleText =
-            Format("Vehlib n°%d trouvé en (%d, %d)", TableauDeConstantes((int)CSpinEditVehlib->Value, vl->x, vl->y));
+            Format("Vehlib n°%d trouvé en (%d, %d)", TableauDeConstantes(static_cast<int>(CSpinEditVehlib->Value), vl->x, vl->y));
     }
     else
     {
-        StatusBar->SimpleText = Format("Vehlib n°%d non utilisé", TableauDeConstantes((int)CSpinEditVehlib->Value));
+        StatusBar->SimpleText = Format("Vehlib n°%d non utilisé", TableauDeConstantes(static_cast<int>(CSpinEditVehlib->Value)));
     }
 }
 //---------------------------------------------------------------------------
@@ -657,12 +657,12 @@ void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/) const
         frmSimulation->DrawGridSimul->Col = pv->x;
         frmSimulation->DrawGridSimul->Row = pv->y;
         StatusBar->SimpleText = Format("Place de vehlib n°%d trouvée en (%d, %d)",
-                                       TableauDeConstantes((int)CSpinEditPlaceVehlib->Value, pv->x, pv->y));
+                                       TableauDeConstantes(static_cast<int>(CSpinEditPlaceVehlib->Value), pv->x, pv->y));
     }
     else
     { // v6.0.2 : l'original gardait le texte précédent
         StatusBar->SimpleText =
-            Format("Place de vehlib n°%d non utilisée", TableauDeConstantes((int)CSpinEditPlaceVehlib->Value));
+            Format("Place de vehlib n°%d non utilisée", TableauDeConstantes(static_cast<int>(CSpinEditPlaceVehlib->Value)));
     }
 }
 //---------------------------------------------------------------------------

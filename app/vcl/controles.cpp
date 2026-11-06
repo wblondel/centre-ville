@@ -26,7 +26,6 @@
 #include <QStyleOption>
 #include <QStylePainter>
 #include <QTabBar>
-#include <cmath>
 #include <cstring>
 #include <utility>
 //---------------------------------------------------------------------------
@@ -577,7 +576,7 @@ TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QAbstractSpinBox>(Parent)
         [this] { // GetValue : StrToInt(Text), MinValue si le texte n'est pas un nombre
             bool Ok = false;
             const int v = lineEdit()->text().toInt(&Ok);
-            return Ok ? v : (int)MinValue;
+            return Ok ? v : static_cast<int>(MinValue);
         },
         [this](const int &v) { // SetValue : Text:=IntToStr(CheckValue(v)) ; comme WM_SETTEXT, curseur au début
             const QString t = QString::number(CheckValue(v));
@@ -1519,12 +1518,12 @@ void TToolButton::Clic()
 void TToolButton::ActionChange(TAction *a)
 { // TToolButton::ActionChange(Sender, CheckDefaults=false)
     Caption = a->Caption.Valeur();
-    Enabled = (bool)a->Enabled;
+    Enabled = static_cast<bool>(a->Enabled);
     Hint = a->Hint.Valeur();
-    Visible = (bool)a->Visible;
+    Visible = static_cast<bool>(a->Visible);
     ImageIndex = a->ImageIndex;
     setIcon(a->Icone);
-    Down = (bool)a->Checked;
+    Down = static_cast<bool>(a->Checked);
 }
 //---------------------------------------------------------------------------
 void TToolButton::LienChecked(bool Ancien, bool Nouveau)
@@ -1536,14 +1535,14 @@ void TToolButton::LienChecked(bool Ancien, bool Nouveau)
 }
 void TToolButton::LienEnabled(bool Ancien, bool Nouveau)
 {
-    if ((bool)Enabled == Ancien)
+    if (static_cast<bool>(Enabled) == Ancien)
     {
         Enabled = Nouveau;
     }
 }
 void TToolButton::LienVisible(bool Ancien, bool Nouveau)
 {
-    if ((bool)Visible == Ancien)
+    if (static_cast<bool>(Visible) == Ancien)
     {
         Visible = Nouveau;
     }
