@@ -1232,12 +1232,15 @@ public:
     // Distances (en cases) aux éléments, par élément puis par direction possible de la case. DistParking et
     // DistFilePark ont deux valeurs par direction : sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS).
     // Vides tant que la case n'a pas de direction possible ou que le réseau n'a pas l'élément.
-    std::vector<std::vector<std::array<int, 2>>> DistParking, // v3.5. Distances aux parkings
-        DistFilePark;                                         // v5.0. Distance jusqu'à la queue de la file de parkings
-    std::vector<std::vector<int>> DistArretBus,               // v3.0. Distance à un arrêt de bus
-        DistArretTram,   // v3.5. Distance à un arrêt de tram (uniquement quand SensVoieTram>aucune_voie)
-        DistFileTaxi,    // v3.6. Distance jusqu'à la queue de la file de taxis
-        DistPlaceVehlib; // v5.3. Distance jusqu'à une place de vehlib (sans notion de priorité)
+    using DistancesSimples = std::vector<std::vector<int>>;                // [élément][direction]
+    using DistancesDoubles = std::vector<std::vector<std::array<int, 2>>>; // [élément][direction][sans, avec]
+
+    DistancesDoubles DistParking;     // v3.5. Distances aux parkings
+    DistancesDoubles DistFilePark;    // v5.0. Distance jusqu'à la queue de la file de parkings
+    DistancesSimples DistArretBus;    // v3.0. Distance à un arrêt de bus
+    DistancesSimples DistArretTram;   // v3.5. Distance à un arrêt de tram (uniquement quand SensVoieTram>aucune_voie)
+    DistancesSimples DistFileTaxi;    // v3.6. Distance jusqu'à la queue de la file de taxis
+    DistancesSimples DistPlaceVehlib; // v5.3. Distance jusqu'à une place de vehlib (sans notion de priorité)
     // v2.2.7. Statistiques sur les passages de véhicules : Attente[ed][ea] et Trafic[ed][ea] avec
     // ed=ParkingDépart, ea=ParkingArrivée. Si ed=0, par ParkingArrivée (toute ParkingDépart confondue) ;
     // si ea=0, par ParkingDépart (toute ParkingArrivée confondue) ; si ed=ea=0, tous véhicules.
@@ -1302,12 +1305,13 @@ public:
     void RedessineCasesArretTram(direction d0); // v3.5
     [[nodiscard]] bool EstDepotBus() const;     // v3.0
 
-    void CalculeDistanceParking(int e, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
-    void CalculeDistanceArretBus(int ab, int Distance, direction DirOrig);                           // v3.0
+    // Distances à l'élément i, propagées depuis sa case. Le tableau de distances est un paramètre du template, et
+    // chaque instance accède directement à son membre (6.0.17 : deux parcours au lieu des cinq copies
+    // CalculeDistanceParking, ArretBus, FileTaxi, FilePark et PlaceVehlib ; définis et appelés dans simul.cpp)
+    template <DistancesSimples voie::*Distances> void CalculeDistance(int i, int Distance, direction DirOrig);
+    template <DistancesDoubles voie::*Distances>
+    void CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
     void CalculeDistanceArretTram(int at, int Distance, direction DirOrig);                          // v3.5
-    void CalculeDistanceFileTaxi(int ft, int Distance, direction DirOrig);                           // v3.6
-    void CalculeDistanceFilePark(int fp, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig); // v5.0
-    void CalculeDistancePlaceVehlib(int pv, int Distance, direction DirOrig);                        // v5.3
     void InitialiseInfosLignesBus();                                                                 // v3.0
     void ModifieSensVoieTram(direction DirOrig, direction DirDest);                                  // v3.5
     direction DirSensVoieTram(direction DirOrigine, int iDir);                                       // v3.5
