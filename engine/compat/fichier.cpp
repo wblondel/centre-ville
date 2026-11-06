@@ -2,6 +2,7 @@
 // compat/fichier.cpp - Portage de Centre-Ville hors de C++Builder
 //---------------------------------------------------------------------------
 #include "fichier.h"
+#include "compat/chaine.h"
 #include <algorithm>
 #include <atomic>
 #include <cerrno>
@@ -9,6 +10,9 @@
 #include <filesystem>
 #include <cstdio>
 #include <mutex>
+#include <string>
+#include <system_error>
+#include <utility>
 #include <vector>
 #ifdef _WIN32
 #include <fcntl.h>

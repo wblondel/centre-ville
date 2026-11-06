@@ -3,6 +3,7 @@
 //---------------------------------------------------------------------------
 #include "actions.h"
 #include "controles.h"
+#include "vcl.h"
 #include <QAction>
 #include <QActionGroup>
 #include <QApplication>
@@ -12,6 +13,7 @@
 #include <QPointer>
 #include <QWidget>
 #include <algorithm>
+#include <vector>
 //---------------------------------------------------------------------------
 // Touches
 //---------------------------------------------------------------------------

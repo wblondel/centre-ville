@@ -2,6 +2,8 @@
 // vcl/graphiques.cpp - Portage de Centre-Ville : TColor, TCanvas
 //---------------------------------------------------------------------------
 #include "graphiques.h"
+#include "compat/chaine.h"
+#include "vcl.h"
 #include <QApplication>
 #include <QFontMetrics>
 #include <QPainter>

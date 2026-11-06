@@ -222,7 +222,10 @@ public:
     Propriete<int> Value, MinValue, MaxValue, Increment;
     TNotifyEvent OnChange;
     TNotifyEvent OnExit; // v6.0.2 : en quittant le champ, et à Entrée, une fois la valeur dans les bornes
-    [[nodiscard]] bool Frappe() const { return !AffectationEnCours; } // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
+    [[nodiscard]] bool Frappe() const
+    {
+        return !AffectationEnCours;
+    }                                     // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
     bool GardeTouchesDeplacement = false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les
                                           // raccourcis de la fiche
     explicit TCSpinEdit(QWidget *Parent = nullptr);

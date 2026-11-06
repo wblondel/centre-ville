@@ -4,6 +4,8 @@
 #include "listeimages.h"
 #include <QPainter>
 #include <QtMath>
+#include <cstddef>
+#include <vector>
 //---------------------------------------------------------------------------
 QPixmap AgranditSansLissage(const QPixmap &Image, qreal Echelle)
 {

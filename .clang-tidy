@@ -66,8 +66,9 @@ Checks: >
 CheckOptions:
   # if (pointeur) reste idiomatique ; les entiers sont comparés explicitement
   readability-implicit-bool-conversion.AllowPointerConditions: true
-  # Les en-têtes de Qt (<QWidget> inclut qwidget.h) : les symboles de Qt ne sont pas vérifiés
-  misc-include-cleaner.IgnoreHeaders: '.*/Qt[A-Za-z]*/.*;.*/Qt[A-Za-z]*\.framework/.*;q[a-z0-9_]*\.h'
+  # Symboles non vérifiés : ceux de Qt (<QWidget> inclut qwidget.h) et ceux des en-têtes internes du
+  # système, propres à chaque plateforme (<sys/_types/_off_t.h> sous macOS, <bits/...> sous Linux)
+  misc-include-cleaner.IgnoreHeaders: '.*/Qt[A-Za-z]*/.*;.*/Qt[A-Za-z]*\.framework/.*;q[a-z0-9_]*\.h;sys/.*;bits/.*;.*/_types/.*;asm.*/.*;linux/.*;mach/.*;signal\.h;unistd\.h;fcntl\.h'
   # Les propriétés de la VCL (Propriete<T>) s'affectent à travers un pointeur vers un contrôle :
   # l'analyse les prend pour des lectures
   misc-const-correctness.WarnPointersAsPointers: false

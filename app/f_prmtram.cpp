@@ -1,15 +1,19 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "compat/chaine.h"
+#include "controles.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 #include "f_prmtram.h"
-#include "f_prmsim.h"
 #include "f_simul.h"
 //---------------------------------------------------------------------------
 #include "ui_f_prmtram.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 // #pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_prmtram_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 TfrmParamTram *frmParamTram;
 //---------------------------------------------------------------------------

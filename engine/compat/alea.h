@@ -18,8 +18,8 @@
 // quelle que soit la valeur demandée, ce qui revient à remplacer
 // srand(time(...)) par srand(g) dans AppelleAuChaos(), sans toucher au moteur.
 //
-// Ce fichier ne doit être inclus qu'après les en-têtes système : il redéfinit
-// rand() et srand() par des macros (le moteur les appelle sans qualification).
+// Le moteur appelle alea::Rand() et alea::Srand() là où l'original appelait
+// rand() et srand() (6.0.17 : ces deux macros sont retirées).
 //---------------------------------------------------------------------------
 #ifndef compat_aleaH
 #define compat_aleaH
@@ -36,7 +36,5 @@ void FixeGraine(unsigned Graine); // Force la graine utilisée par Srand() et l'
 void LibereGraine();              // Srand() utilise de nouveau la graine demandée
 } // namespace alea
 //---------------------------------------------------------------------------
-#define rand()   alea::Rand()
-#define srand(g) alea::Srand(g)
 //---------------------------------------------------------------------------
 #endif

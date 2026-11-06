@@ -2,8 +2,11 @@
 // etat.cpp - Tests du moteur : export de l'état complet de la simulation
 //---------------------------------------------------------------------------
 #include "etat.h"
+#include <cstdint>
 #include <cstdio>
+#include <string>
 #include "compat/alea.h"
+#include "simul.h"
 //---------------------------------------------------------------------------
 const char *NomPartieEtat[NB_PARTIES_ETAT] = {
     "centre", "feux",   "feuxp",   "parkings", "vehicules", "bus",       "trams",

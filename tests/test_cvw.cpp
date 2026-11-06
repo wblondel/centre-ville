@@ -2,12 +2,16 @@
 // test_cvw.cpp - Format .cvw : round-trip Charge -> Sauve et Verifie()
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <cstddef>
+#include <ios>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include "cartes.h"
+#include "catch2/catch_message.hpp"
 #include "format_reference.h"
 #include "harnais.h"
+#include "simul.h"
 #include "sortie.h"
 #include "vue.h"
 #include "compat/fichier.h"

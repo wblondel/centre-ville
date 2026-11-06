@@ -96,6 +96,14 @@
 // dossier CV_DOSSIER_CAPTURES (Démo au tour 0 et vers le tour 200, fiche_*.png,
 // carte_*.png pour la carte en statistiques de fluidité et de trafic).
 //---------------------------------------------------------------------------
+#include "actions.h"
+#include "base.h"
+#include "compat/chaine.h"
+#include "controles.h"
+#include "fiche.h"
+#include "grille/GrilleSimulation.h"
+#include "simul.h"
+#include "vcl.h"
 #include <QAbstractButton>
 #include <QApplication>
 #include <QCheckBox>
@@ -134,10 +142,13 @@
 #include <cstring>
 #include <deque>
 #include <fstream>
+#include <functional>
 #include <map>
+#include <memory>
 #include <mutex>
-#include <sstream>
+#include <string>
 #include <thread>
+#include <vector>
 #ifndef _WIN32
 #include <csignal>
 #include <utility>

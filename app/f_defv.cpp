@@ -1,4 +1,8 @@
 //---------------------------------------------------------------------------
+#include "compat/chaine.h"
+#include "controles.h"
+#include "simul.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -10,6 +14,7 @@
 //---------------------------------------------------------------------------
 #include "ui_f_defv.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_defv_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 TfrmDefVoie *frmDefVoie = nullptr;
 //---------------------------------------------------------------------------

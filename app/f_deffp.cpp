@@ -1,4 +1,8 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "compat/chaine.h"
+#include "simul.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -9,6 +13,7 @@
 #include "ui_f_deffp.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 // #pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_deffp_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 TfrmDefFeuxPietons *frmDefFeuxPietons = nullptr;
 //---------------------------------------------------------------------------

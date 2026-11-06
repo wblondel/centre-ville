@@ -77,7 +77,8 @@ class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMen
     void DefinitHautGauche(int Gauche, int Haut);
     [[nodiscard]] int ColonnesVisibles() const; // cases entièrement visibles
     [[nodiscard]] int LignesVisibles() const;
-    [[nodiscard]] int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
+    [[nodiscard]] int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la
+                                                           // grille
     [[nodiscard]] int LimiteVisible(bool Colonne) const;   // v6.0.12 : son bord droit ou bas, en pixels du viewport
 public:
     // Propriétés de TDrawGrid utilisées par la fiche

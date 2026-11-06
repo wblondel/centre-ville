@@ -10,9 +10,10 @@
 #include <QLocale>
 #include <QTranslator>
 #include <clocale>
+#include <utility>
 #include "application.h"
 //---------------------------------------------------------------------------
-#include "base.h"
+#include "compat/chaine.h"
 #include "f_simul.h"
 #include "f_defv.h"
 #include "f_defvp.h"
@@ -36,6 +37,7 @@
 #include "f_infvehlib.h"
 #include "f_defn.h"
 #include "f_epidemie.h"
+#include "vcl.h"
 //---------------------------------------------------------------------------
 bool OuvertureFichiers::eventFilter(QObject *o, QEvent *e)
 {

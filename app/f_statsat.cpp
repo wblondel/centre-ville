@@ -1,4 +1,8 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "compat/chaine.h"
+#include "controles.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -11,6 +15,7 @@
 #include "ui_f_statsat.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 // #pragma link "cspin" // portage
 #include "f_statsat_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 #define ATTENTE 0
 #define TRAFIC  1

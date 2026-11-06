@@ -237,10 +237,8 @@ public:
         {
             return Svt->EstContagieux(Tour);
         }
-        
-        
-            return false;
-        
+
+        return false;
     }
     bool Reinfecte(int Tour, int NumPieton, int Rang); // comme le constructeur mais pour une personne qui a déjà été
                                                        // infectée
@@ -254,10 +252,8 @@ public:
         {
             return Svt->DonneRang(Tour);
         }
-        
-        
-            return -1; // Non contagieux au moment du tour
-        
+
+        return -1; // Non contagieux au moment du tour
     }
     [[nodiscard]] int DonneChargeVirale(int Tour) const
     {
@@ -269,10 +265,8 @@ public:
         {
             return Svt->DonneChargeVirale(Tour);
         }
-        
-        
-            return 0;
-        
+
+        return 0;
     }
     [[nodiscard]] bool DoitSuccomber(int Tour) const;
     [[nodiscard]] int NbInfections() const
@@ -1057,7 +1051,8 @@ public:
     [[nodiscard]] bool EstTeteFile() const;              // v3.6
     [[nodiscard]] int PlaceQueueFile() const;            // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
     [[nodiscard]] int PlaceTeteFile() const;             // Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
-    [[nodiscard]] direction DirPlaceSvtMemeFile() const; // Retourne la direction vers laquelle il y a une place de la même file
+    [[nodiscard]] direction DirPlaceSvtMemeFile() const; // Retourne la direction vers laquelle il y a une place de la
+                                                         // même file
 };
 //---------------------------------------------------------------------------
 class file_taxi // v3.6 instances créées au lancement de la simulation
@@ -1107,7 +1102,7 @@ public:
     }
     ~taxi() = default;
     void AffecteNumero(int Num) { Numero = Num; }
-    void Definit(int f) { NumFile = f; }                 // 0 <= f < NbFilesTaxi
+    void Definit(int f) { NumFile = f; }                               // 0 <= f < NbFilesTaxi
     [[nodiscard]] bool Defini() const { return (x > -1) && (y > -1); } // v6.0.2 (Rechercher)
     void Place(int x0, int y0)
     {
@@ -1166,9 +1161,9 @@ public:
     bool Sauve(int hfile);
     void Verifie(AnsiString &asMsgErr) const;
     [[nodiscard]] bool EstQueueFile() const;  // v3.6
-    bool EstTeteFile();         // v3.6
+    bool EstTeteFile();                       // v3.6
     [[nodiscard]] int PlaceQueueFile() const; // Retourne 1+NumPlace si elle existe, 0 sinon.
-    int PlaceTeteFile();        // Retourne 1+NumPlace si elle existe, 0 sinon.
+    int PlaceTeteFile();                      // Retourne 1+NumPlace si elle existe, 0 sinon.
 };
 //---------------------------------------------------------------------------
 class file_park // v5.0 instances créées au lancement de la simulation
@@ -1349,7 +1344,7 @@ public:
         y = y0;
         Initialise();
     }
-    [[nodiscard]] voie *v(direction d) const;                              // v3.0
+    [[nodiscard]] voie *v(direction d) const;                // v3.0
     bool PrepareCalculDistances();                           // v3.0 : inclut également celui des arrêts de bus/tram
     void LibereDistances();                                  // v6.0.1
     bool PrepareCalculAttenteTrafic();                       // v2.2.7
@@ -1367,17 +1362,17 @@ public:
     void RetirePlaceTaxi();                                                        // v3.6
     void RetirePlacePark();                                                        // v5.0
     void RetirePlaceVehlib();                                                      // v5.3
-    [[nodiscard]] bool EstTeteArretBus() const;                                                  // v3.0
-    [[nodiscard]] bool EstTeteArretBus(int NumeroArretBus) const;                                // v3.0
-    [[nodiscard]] bool EstTeteArretTram() const;                                                 // v3.5
-    [[nodiscard]] bool EstTeteArretTram(int NumeroArretTram) const;                              // v3.5
-    [[nodiscard]] bool EstTeteBus() const;                                                       // v3.0
-    [[nodiscard]] bool EstTeteTram() const;                                                      // v3.5
+    [[nodiscard]] bool EstTeteArretBus() const;                                    // v3.0
+    [[nodiscard]] bool EstTeteArretBus(int NumeroArretBus) const;                  // v3.0
+    [[nodiscard]] bool EstTeteArretTram() const;                                   // v3.5
+    [[nodiscard]] bool EstTeteArretTram(int NumeroArretTram) const;                // v3.5
+    [[nodiscard]] bool EstTeteBus() const;                                         // v3.0
+    [[nodiscard]] bool EstTeteTram() const;                                        // v3.5
 
     [[nodiscard]] bool EstQueueFileTaxis() const;              // v3.6
     [[nodiscard]] bool EstTeteFileTaxis() const;               // v3.6
     [[nodiscard]] int PlaceQueueFileTaxi() const;              // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
-    int PlaceTeteFileTaxi();                     // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
+    int PlaceTeteFileTaxi();                                   // v3.6. Retourne 1+NumPlaceTaxi si elle existe, 0 sinon.
     [[nodiscard]] bool ExistePlusieursQueuesFileTaxis() const; // v3.6
     [[nodiscard]] bool ExistePlusieursTetesFileTaxis() const;  // v3.6
 
@@ -1387,13 +1382,14 @@ public:
     [[nodiscard]] bool ExistePlusieursQueuesFilePark() const; // v5.0
     [[nodiscard]] bool ExistePlusieursTetesFilePark() const;  // v5.0
 
-    [[nodiscard]] int OrientationPlaceVehlib() const; // v5.3 : Permet d'orienter l'image de la place selon l'orientation de la file !
+    [[nodiscard]] int OrientationPlaceVehlib() const; // v5.3 : Permet d'orienter l'image de la place selon
+                                                      // l'orientation de la file !
 
     void DefinitArretBus(int n) const;                // v3.0
     void DefinitArretTram(int n) const;               // v3.5
     void RedessineCasesArretBus(direction d0) const;  // v3.0
     void RedessineCasesArretTram(direction d0) const; // v3.5
-    [[nodiscard]] bool EstDepotBus() const;                         // v3.0
+    [[nodiscard]] bool EstDepotBus() const;           // v3.0
 
     void CalculeDistanceParking(int e, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
     void CalculeDistanceArretBus(int ab, int Distance, direction DirOrig);                           // v3.0
@@ -1404,7 +1400,7 @@ public:
     void InitialiseInfosLignesBus();                                                                 // v3.0
     void ModifieSensVoieTram(direction DirOrig, direction DirDest);                                  // v3.5
     direction DirSensVoieTram(direction DirOrigine, int iDir);                                       // v3.5
-    [[nodiscard]] bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) const;               // v3.5
+    [[nodiscard]] bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) const; // v3.5
     int NumDirPossSensVoieTram(direction DirOrigine, direction DirDestination);                      // v3.5
     int NbDirPossSensVoieTram(direction DirOrigine);                                                 // v3.5
     bool SupprimePassagePietonsInvalide();                                                           // v3.5
@@ -1413,8 +1409,8 @@ public:
     void DefinitNature(nature NvNature, bool Ecraser);
     void TuePietons(); // v4.3. Appelée par centre_ville::PlaceXXX (XXX = Vehicule, Bus, Tram, VehiculeTaxi ou
                        // VehiculeVehlib v5.3)
-    [[nodiscard]] bool FeuPietonsPossible() const;           // v5.2
-    void RedessineCase(bool EffaceFond) const; // v3.0
+    [[nodiscard]] bool FeuPietonsPossible() const; // v5.2
+    void RedessineCase(bool EffaceFond) const;     // v3.0
     bool Charge(int hfile);
     bool Sauve(int hfile);
     void Verifie(AnsiString &asMsgErr);
@@ -1574,12 +1570,12 @@ public:
     [[nodiscard]] int NumeroParkingLibre() const;
     [[nodiscard]] int ArretBusExistant(int x, int y) const;  // v3.0
     [[nodiscard]] int ArretTramExistant(int x, int y) const; // v3.5
-    int NumeroArretBusLibre(int x, int y);     // v3.0
-    int NumeroArretTramLibre(int x, int y);    // v3.5
+    int NumeroArretBusLibre(int x, int y);                   // v3.0
+    int NumeroArretTramLibre(int x, int y);                  // v3.5
     [[nodiscard]] int NumeroPlaceTaxiLibre() const;          // v3.6
-    [[nodiscard]] int NumeroPlaceParkLibre() const;          // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre avec
-                                               // NumeroPlaceVehlibLibre()
-    [[nodiscard]] int NumeroPlaceVehlibLibre() const;        // v5.3
+    [[nodiscard]] int NumeroPlaceParkLibre() const; // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre
+                                                    // avec NumeroPlaceVehlibLibre()
+    [[nodiscard]] int NumeroPlaceVehlibLibre() const; // v5.3
     int AjouteFeu(int x, int y, direction d);
     int AjouteFeuPietons(int x, int y, direction d); // v5.2
     void SupprimeFeu(int n) const;
@@ -1595,49 +1591,49 @@ public:
     void SupprimePlaceVehlibVoie(int x, int y) const; // v5.3
     int AjouteParking(int x, int y);
     void SupprimeParking(int n) const;
-    int AjouteArretBus(int x, int y);                    // v3.0
-    int AjouteArretTram(int x, int y);                   // v3.5
-    int AjoutePlaceTaxi(int x, int y);                   // v3.6
-    int AjoutePlacePark(int x, int y);                   // v5.0, v5.1 : ancien nom AjoutePlace
-    int AjoutePlaceVehlib(int x, int y);                 // v5.3
-    [[nodiscard]] bool ExisteCaseArretBus(int x, int y) const;         // v3.0
-    [[nodiscard]] bool ExisteCaseArretTram(int x, int y) const;        // v3.5
-    void SupprimeArretBus(int x, int y);                 // v3.0. Supprime sur une case seulement
-    void SupprimeArretBus(int n) const;                  // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
-    void SupprimeArretTram(int x, int y);                // v3.5. Supprime sur une case seulement
-    void SupprimeArretTram(int n) const;                 // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
-    void SupprimePlaceTaxi(int n) const;                 // v3.6
-    void SupprimePlacePark(int n) const;                 // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec
-                                                         // SupprimePlaceVehlib(n)
-    void SupprimePlaceVehlib(int n) const;               // v5.3
-    [[nodiscard]] sens SensPassagePietonsPossible(int x, int y) const; // v3.5
+    int AjouteArretBus(int x, int y);                           // v3.0
+    int AjouteArretTram(int x, int y);                          // v3.5
+    int AjoutePlaceTaxi(int x, int y);                          // v3.6
+    int AjoutePlacePark(int x, int y);                          // v5.0, v5.1 : ancien nom AjoutePlace
+    int AjoutePlaceVehlib(int x, int y);                        // v5.3
+    [[nodiscard]] bool ExisteCaseArretBus(int x, int y) const;  // v3.0
+    [[nodiscard]] bool ExisteCaseArretTram(int x, int y) const; // v3.5
+    void SupprimeArretBus(int x, int y);                        // v3.0. Supprime sur une case seulement
+    void SupprimeArretBus(int n) const;    // v3.0. Supprime complètement l'arrêt (sur TOUTES les cases)
+    void SupprimeArretTram(int x, int y);  // v3.5. Supprime sur une case seulement
+    void SupprimeArretTram(int n) const;   // v3.5. Supprime complètement l'arrêt (sur TOUTES les cases)
+    void SupprimePlaceTaxi(int n) const;   // v3.6
+    void SupprimePlacePark(int n) const;   // v5.0. v5.3 renommée de SupprimePlace(n) pour distinguer avec
+                                           // SupprimePlaceVehlib(n)
+    void SupprimePlaceVehlib(int n) const; // v5.3
+    [[nodiscard]] sens SensPassagePietonsPossible(int x, int y) const;                       // v3.5
     [[nodiscard]] direction CherchePassagePietons(int x, int y, sens SensRecherche) const;   // v2.0
     [[nodiscard]] direction ChercheArretBus(int x, int y, sens SensRecherche) const;         // v3.0
     [[nodiscard]] direction ChercheArretTram(int x, int y, sens SensRecherche) const;        // v3.5
     [[nodiscard]] direction CherchePlaceTaxi(int x, int y, sens SensRecherche) const;        // v3.6
     [[nodiscard]] direction CherchePlaceVehlib(int x, int y, sens SensRecherche) const;      // v5.3
-    void DefinitArretBus(int n, int x, int y) const;                           // v3.0
-    void DefinitArretTram(int n, int x, int y) const;                          // v3.5
+    void DefinitArretBus(int n, int x, int y) const;                                         // v3.0
+    void DefinitArretTram(int n, int x, int y) const;                                        // v3.5
     [[nodiscard]] direction DirectionArretBus(int x, int y) const;                           // v3.0
     [[nodiscard]] position_arret_bus_tram PositionArretBus(int x, int y, direction d) const; // v3.0
     [[nodiscard]] bool ArretsBusVoisinsDifferents(int x, int y) const;                       // v3.0
     [[nodiscard]] bool ArretsTramVoisinsDifferents(int x, int y) const;                      // v3.5
     [[nodiscard]] direction DirArretBusVoisin(int x, int y) const;                           // v3.0
     [[nodiscard]] direction DirArretTramVoisin(int x, int y) const;                          // v3.5
-    bool AjoutArretBusPossible(int x, int y);                                  // v3.0
-    bool AjoutArretTramPossible(int x, int y);                                 // v3.5
+    bool AjoutArretBusPossible(int x, int y);                                                // v3.0
+    bool AjoutArretTramPossible(int x, int y);                                               // v3.5
     [[nodiscard]] bool SuppressionArretBusPossible(int x, int y) const;                      // v3.0
     [[nodiscard]] bool SuppressionArretTramPossible(int x, int y) const;                     // v3.5
-    void InitialiseInfosLignesBus();                                           // v3.0
-    void InitialiseInfosLignesTram();                                          // v3.5
-    void InitialiseInfosTrajetLignesBus() const;                               // v3.0
-    void CalculeTrajetLignesBus();                                             // v3.0
-    void CalculeTrajetLignesTram();                                            // v3.5
+    void InitialiseInfosLignesBus();                                                         // v3.0
+    void InitialiseInfosLignesTram();                                                        // v3.5
+    void InitialiseInfosTrajetLignesBus() const;                                             // v3.0
+    void CalculeTrajetLignesBus();                                                           // v3.0
+    void CalculeTrajetLignesTram();                                                          // v3.5
     bool VerifieCalculDistances(type_distance &TypeDistance); // v3.5 : inclut également celui des arrêts de bus & tram
-    [[nodiscard]] bool PrepareCalculDistances() const;                      // v3.5 : inclut également celui des arrêts de bus & tram
-    void LibereDistances() const;            // v6.0.1 : distances obsolètes (réseau modifié après un échec de Marche)
+    [[nodiscard]] bool PrepareCalculDistances() const;        // v3.5 : inclut également celui des arrêts de bus & tram
+    void LibereDistances() const; // v6.0.1 : distances obsolètes (réseau modifié après un échec de Marche)
     [[nodiscard]] bool PrepareCalculAttenteTrafic() const; // v2.2.7
-    void PlaceVehicule(int x, int y, int NumVehicule); // v2.2.7
+    void PlaceVehicule(int x, int y, int NumVehicule);     // v2.2.7
     bool PrepareVehicules();
     void PlaceBus(int x, int y, int NumBus) const;               // v3.0
     void DefinitBus(int NumBus, int NumLigne);                   // v3.0
@@ -1653,13 +1649,13 @@ public:
     void DeplacePieton(int NumPieton, int x, int y, direction d) const; // v2.0
     bool ChangeDirectionSiPossible(int x, int y, dirposs dp);
     void CalculeDistances() const;
-    void RessuscitePietons() const;                                   // v4.3.1
-    void PlaceVehiculesSurPlacesPark();                               // v5.0
+    void RessuscitePietons() const;                                                 // v4.3.1
+    void PlaceVehiculesSurPlacesPark();                                             // v5.0
     [[nodiscard]] bool ExisteFeuPietons(int x, int y) const;                        // v5.2
-    void PrepareFeuxPietons() const;                                  // v5.2
+    void PrepareFeuxPietons() const;                                                // v5.2
     [[nodiscard]] bool FeuPietonsPossible(int x, int y, direction d) const;         // v5.2
     [[nodiscard]] bool PassagePietonFranchissable(int x, int y, direction d) const; // v5.2
-    void /*__fastcall*/ EffectueTourSimulation();                     // portage : convention d'appel C++Builder retirée
+    void /*__fastcall*/ EffectueTourSimulation(); // portage : convention d'appel C++Builder retirée
     bool Charge(int hfile);
     bool Sauve(int hfile);
     void Verifie(AnsiString &asMsgErr);
@@ -1668,7 +1664,7 @@ public:
     [[nodiscard]] inline bool TourDeDeplacementBus(int NumeroBus) const;
     [[nodiscard]] inline bool TourDeDeplacementTram(int NumeroTram) const; // v3.5
     [[nodiscard]] inline bool TourDeDeplacementTaxi(int NumeroTaxi) const; // v3.6
-    void TopChrono()                                         // v3.9.2
+    void TopChrono()                                                       // v3.9.2
     {
         dtTop = Time();
     }

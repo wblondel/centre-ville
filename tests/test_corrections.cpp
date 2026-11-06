@@ -4,11 +4,15 @@
 // Chaque cas échoue (ou, pour le blocage des vehlibs, ne se termine pas : le
 // délai de CTest le fait échouer) sur le moteur 6.0.0, identique à l'original.
 //---------------------------------------------------------------------------
+#include "catch2/catch_message.hpp"
+#include "compat/chaine.h"
+#include "simul.h"
 #include <catch2/catch_test_macros.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <ios>
 #include <string>
 #include <vector>
 #ifndef _WIN32

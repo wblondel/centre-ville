@@ -26,6 +26,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include "base.h"
+#include "vcl.h"
 //---------------------------------------------------------------------------
 namespace
 {

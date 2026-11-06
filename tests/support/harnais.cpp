@@ -3,9 +3,11 @@
 //---------------------------------------------------------------------------
 #include "harnais.h"
 #include <cstdio>
-#include <fstream>
-#include <iterator>
+#include "compat/chaine.h"
+#include <string>
 #include "compat/fichier.h"
+#include "simul.h"
+#include "vue.h"
 //---------------------------------------------------------------------------
 #define AUCUN_ELEMENT_PAR_DEFAUT false // f_simul.cpp
 //---------------------------------------------------------------------------

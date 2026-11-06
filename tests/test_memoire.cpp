@@ -16,8 +16,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 #include "cartes.h"
+#include "compat/chaine.h"
 #include "format_reference.h"
 #include "harnais.h"
+#include "simul.h"
 #include "sortie.h"
 #include "vue.h"
 #include "compat/alea.h"

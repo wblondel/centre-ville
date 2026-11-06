@@ -2,9 +2,12 @@
 // test_generation.cpp - Génération aléatoire de réseau et « Copier vers... »
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <filesystem>
 #include <fstream>
+#include <ios>
 #include <string>
 #include "cartes.h"
+#include "catch2/catch_message.hpp"
 #include "golden.h"
 #include "harnais.h"
 #include "sortie.h"

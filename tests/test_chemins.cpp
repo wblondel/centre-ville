@@ -12,7 +12,10 @@
 #include <utility>
 #include <vector>
 #include "cartes.h"
+#include "catch2/catch_message.hpp"
+#include "compat/chaine.h"
 #include "harnais.h"
+#include "simul.h"
 #include "sortie.h"
 #include "vue.h"
 #include "compat/alea.h"

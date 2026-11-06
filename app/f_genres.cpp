@@ -1,4 +1,7 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "simul.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -7,7 +10,7 @@
 //---------------------------------------------------------------------------
 #include "ui_f_genres.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_genres_composants.h" // portage : #pragma resource "*.dfm"
-#include "compat/alea.h"         // portage : rand() de la RTL Borland (après les en-têtes système)
+#include "compat/alea.h"         // portage : rand() de la RTL Borland
 //---------------------------------------------------------------------------
 TfrmGeneration *frmGeneration = nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------
@@ -35,9 +38,9 @@ void TfrmGeneration::ButtonOkClick(TObject * /*Sender*/) const
                                    TrackBarProbaTraverseeRoute->Position);
     // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
     // d'origine les évalue de gauche à droite (engine/README.md) : x, puis y, puis la direction
-    const int x = rand() % cv->NbX;
-    const int y = rand() % cv->NbY;
-    const auto d = static_cast<direction>(1 + (rand() % NBDIR));
+    const int x = alea::Rand() % cv->NbX;
+    const int y = alea::Rand() % cv->NbY;
+    const auto d = static_cast<direction>(1 + (alea::Rand() % NBDIR));
     cv->Genere(x, y, d);
     frmSimulation->DrawGridSimul->Repaint();
 }

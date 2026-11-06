@@ -11,7 +11,6 @@
 //   cvsim --golden DOSSIER_MAPS DOSSIER_GOLDEN
 //       Régénère les fichiers de référence du golden master.
 //---------------------------------------------------------------------------
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
@@ -19,9 +18,11 @@
 #include <iostream>
 #include <string>
 #include "cartes.h"
+#include "compat/chaine.h"
 #include "etat.h"
 #include "golden.h"
 #include "harnais.h"
+#include "simul.h"
 #include "vue.h"
 #include "compat/alea.h"
 //---------------------------------------------------------------------------

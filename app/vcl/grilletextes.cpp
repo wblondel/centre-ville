@@ -2,7 +2,9 @@
 // vcl/grilletextes.cpp - Portage de Centre-Ville : TStringGrid
 // (comportement de TCustomGrid / TStringGrid de la VCL, voir controles.h)
 //---------------------------------------------------------------------------
+#include "compat/chaine.h"
 #include "controles.h"
+#include "vcl.h"
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -11,7 +13,10 @@
 #include <QScrollBar>
 #include <QStyleOption>
 #include <QWheelEvent>
+#include <cstddef>
+#include <functional>
 #include <utility>
+#include <vector>
 //---------------------------------------------------------------------------
 namespace
 {

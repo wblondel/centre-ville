@@ -1,4 +1,9 @@
 //---------------------------------------------------------------------------
+#include "compat/chaine.h"
+#include "compat/fichier.h"
+#include "controles.h"
+#include "grille/GrilleSimulation.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -14,6 +19,7 @@
 #include "f_simul.h"
 
 #include <cmath>
+#include <utility>
 #include "f_defv.h"
 #include "f_defvp.h"
 #include "f_prmsim.h"
@@ -47,6 +53,7 @@
 //---------------------------------------------------------------------------
 #include "ui_f_simul.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py (app/ui/f_simul.ui)
 #include "f_simul_composants.h" // portage : #pragma resource "*.dfm" -> composants et gestionnaires de la fiche
+#include "vue.h"
 //---------------------------------------------------------------------------
 #define IDB_DIR       0
 #define IDB_FEU       4

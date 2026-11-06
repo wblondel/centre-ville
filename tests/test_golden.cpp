@@ -8,10 +8,13 @@
 //   cvsim --golden maps tests/golden
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <filesystem>
 #include <fstream>
+#include <ios>
 #include <sstream>
 #include <string>
 #include "cartes.h"
+#include "catch2/catch_message.hpp"
 #include "golden.h"
 #include "harnais.h"
 #include "sortie.h"

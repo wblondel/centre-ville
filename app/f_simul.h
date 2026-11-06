@@ -665,10 +665,10 @@ private:
             Caption = Caption.SubString(1, Caption.Length() - 1);
         }
     }
-    [[nodiscard]] bool SimulEstSanglante() const { return ActionSanglante->Checked; }                    // v4.3
-    void ModifieModeSanglant(bool Sanglant) const { ActionSanglante->Checked = Sanglant; } // v4.3
-    [[nodiscard]] bool ResurrectionEstDemandee() const { return ActionResurrection->Checked; }           // v4.3.1
-    void ModifieDemandeResurrection(bool Resurrection) const                               // v4.3.1
+    [[nodiscard]] bool SimulEstSanglante() const { return ActionSanglante->Checked; }          // v4.3
+    void ModifieModeSanglant(bool Sanglant) const { ActionSanglante->Checked = Sanglant; }     // v4.3
+    [[nodiscard]] bool ResurrectionEstDemandee() const { return ActionResurrection->Checked; } // v4.3.1
+    void ModifieDemandeResurrection(bool Resurrection) const                                   // v4.3.1
     {
         ActionResurrection->Checked = Resurrection;
         ActionResurrection->Enabled = !ActionResurrection->Checked;
@@ -677,7 +677,7 @@ private:
     [[nodiscard]] bool ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) const;
     void SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const;
     [[nodiscard]] bool ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) const; // v3.5
-    void SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) const;            // v3.5
+    void SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) const;                          // v3.5
     void ReinitialiseToutDansSelection(type_voie TypeVoie);
     bool ModifiePassagePietonsSiNecessaire(int x, int y);               // v2.0
     void AfficheStatsAttenteTrafic();                                   // v2.2.7

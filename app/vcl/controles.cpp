@@ -2,6 +2,10 @@
 // vcl/controles.cpp - Portage de Centre-Ville : contrôles de la VCL sur Qt
 //---------------------------------------------------------------------------
 #include "controles.h"
+#include "actions.h"
+#include "compat/chaine.h"
+#include "listeimages.h"
+#include "vcl.h"
 
 #include <cmath>
 #include <QAbstractButton>

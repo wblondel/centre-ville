@@ -3,6 +3,8 @@
 // (comportement de TCustomGrid / TCustomDrawGrid de la VCL)
 //---------------------------------------------------------------------------
 #include "GrilleSimulation.h"
+#include "controles.h"
+#include "vcl.h"
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>

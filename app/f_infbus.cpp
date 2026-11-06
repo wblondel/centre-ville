@@ -1,4 +1,7 @@
 //---------------------------------------------------------------------------
+#include "compat/chaine.h"
+#include "simul.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------

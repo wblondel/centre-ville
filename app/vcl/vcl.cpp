@@ -2,15 +2,19 @@
 // vcl/vcl.cpp - Portage de Centre-Ville : String, SysUtils, TApplication
 //---------------------------------------------------------------------------
 #include "vcl.h"
+#include "compat/chaine.h"
+#include "compat/temps.h"
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QScreen>
 #include <QStringList>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <string>
 #include <utility>
 //---------------------------------------------------------------------------
 String String::UpperCase() const

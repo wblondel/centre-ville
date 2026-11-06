@@ -13,9 +13,13 @@
 #include <QTextStream>
 #include <QUrl>
 #include <QWidget>
+#include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
 #include "base.h"
+#include "compat/chaine.h"
+#include "vcl.h"
+#include "vue.h"
 //---------------------------------------------------------------------------
 #define NBTYPESMESSAGE  5
 #define NBTYPESREPONSE  4

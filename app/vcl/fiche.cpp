@@ -7,7 +7,14 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <cstring>
+#include "actions.h"
+#include "controles.h"
+#include <functional>
+#include <map>
+#include <vector>
 #include "index_images.h"
+#include "listeimages.h"
+#include "vcl.h"
 //---------------------------------------------------------------------------
 namespace
 {

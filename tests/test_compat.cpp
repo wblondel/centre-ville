@@ -2,8 +2,10 @@
 // test_compat.cpp - Tests de la couche engine/compat
 //---------------------------------------------------------------------------
 #include <catch2/catch_test_macros.hpp>
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <iterator>
 #include <stdexcept>
 #include <string>
@@ -87,46 +89,46 @@ TEST_CASE("Format : séparateurs de FormatSettings (VCL en français)", "[compat
     CHECK(Format("%.2f", ARRAYOFCONST((3.14159))) == AnsiString("3.14"));
 }
 //---------------------------------------------------------------------------
-TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
+TEST_CASE("alea::Rand()/alea::Srand() : LCG de la RTL Borland", "[compat][alea]")
 { // Comportement vérifié par désassemblage de cvw 5.4.3.2 (engine/README.md)
     alea::LibereGraine();
     // État initial (_boot_srand) : graine 1 puis un pas
     CHECK(alea::GRAINE_INITIALE == 0x015A4E36U);
     // srand(g) pose la graine PUIS avance d'un pas : après srand(1), rand()
     // donne la suite Turbo C/Borland C++ (346, 130, 10982...) à partir du 2e tirage
-    srand(1);
+    alea::Srand(1);
     CHECK(alea::Graine() == alea::GRAINE_INITIALE);
     const int Attendu[10] = {130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
     for (const int i : Attendu)
     {
-        CHECK(rand() == i);
+        CHECK(alea::Rand() == i);
     }
     // Bornes : RAND_MAX Borland = 32767
-    srand(0xDEADBEEF);
+    alea::Srand(0xDEADBEEF);
     bool Max15Bits = true;
     for (int i = 0; i < 100000; i++)
     {
-        const int r = rand();
+        const int r = alea::Rand();
         Max15Bits = Max15Bits && (r >= 0) && (r <= alea::RAND_MAX_BORLAND);
     }
     CHECK(Max15Bits);
     // Un pas = graine*0x15A4E35+1 sur 32 bits ; rand() = bits 30..16 après le pas
-    srand(123);
+    alea::Srand(123);
     const unsigned Apres = (123U * 22695477U) + 1U;
     CHECK(alea::Graine() == Apres);
-    CHECK(rand() == (int)(((Apres * 22695477U + 1U) >> 16) & 0x7FFF));
+    CHECK(alea::Rand() == (int)(((Apres * 22695477U + 1U) >> 16) & 0x7FFF));
     CHECK(alea::Graine() == Apres * 22695477U + 1U);
 }
 //---------------------------------------------------------------------------
-TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
+TEST_CASE("alea::Rand()/alea::Srand() : graine injectable", "[compat][alea]")
 {
     alea::FixeGraine(42);
-    const int a = rand();
-    srand(987654); // ignorée tant que la graine est fixée (AppelleAuChaos)
-    const int b = rand();
+    const int a = alea::Rand();
+    alea::Srand(987654); // ignorée tant que la graine est fixée (AppelleAuChaos)
+    const int b = alea::Rand();
     CHECK(a == b);
     alea::LibereGraine();
-    srand(987654);
+    alea::Srand(987654);
     CHECK(alea::Graine() == 987654U * 22695477U + 1U);
 }
 //---------------------------------------------------------------------------

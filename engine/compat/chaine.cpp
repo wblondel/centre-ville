@@ -10,7 +10,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
+#include <string>
 #include <utility>
+#include <vector>
 //---------------------------------------------------------------------------
 TFormatSettings FormatSettings; // portage
 //---------------------------------------------------------------------------

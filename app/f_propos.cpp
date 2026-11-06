@@ -1,4 +1,8 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include "compat/chaine.h"
+#include "simul.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
@@ -10,10 +14,10 @@
 // #include <shellapi.hpp> // portage
 //---------------------------------------------------------------------------
 #include "f_propos.h"
-#include "f_simul.h"
 //---------------------------------------------------------------------------
 #include "ui_f_propos.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_propos_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 // ATTENTION : LE CHANGEMENT DE VERSION DOIT ÊTRE RÉPERCUTÉ sur :
 // · Le numéro de version dans les paramètres du projet

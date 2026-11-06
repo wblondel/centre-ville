@@ -6,11 +6,12 @@
 #include <cstdlib>
 #include <ctime>
 //---------------------------------------------------------------------------
+#include "compat/chaine.h"
 #include "vue.h" // portage : remplace base.h (AfficheMessage) et les fiches f_*.h
 #include "simul.h"
-#include "format_cvw.h"     // portage : remplace f_simul.h ; static_assert sur les types sérialisés
+#include "format_cvw.h"     // IWYU pragma: keep (static_assert sur les types sérialisés)
 #include "compat/fichier.h" // portage : remplace f_stats.h ; FileRead/FileWrite (SysUtils)
-#include "compat/alea.h" // portage : remplace f_statsv.h ; rand()/srand() de la RTL Borland (après les en-têtes système)
+#include "compat/alea.h"    // portage : remplace f_statsv.h ; rand()/srand() de la RTL Borland
 // #include "f_infveh.h" // portage : remplacé par vue.h
 // #include "f_infptn.h" // portage : remplacé par vue.h
 // #include "f_infbus.h" // portage : remplacé par vue.h
@@ -337,7 +338,7 @@ class E
 void AppelleAuChaos()
 {
     time_t t = 0;
-    srand((unsigned)time(&t));
+    alea::Srand((unsigned)time(&t));
 }
 //-----------------------------------------------------------------------------
 // Routines privées
@@ -475,16 +476,14 @@ bool infection::Reinfecte(int Tour, int NumPieton, int Rang) // comme le constru
         }
         return true;
     }
-    
-    
-        if (Svt)
-        {
-            return Svt->Reinfecte(Tour, NumPieton, Rang);
-        }
 
-        Svt = new infection(Tour, NumPieton, Rang);
-        return true;
-    
+    if (Svt)
+    {
+        return Svt->Reinfecte(Tour, NumPieton, Rang);
+    }
+
+    Svt = new infection(Tour, NumPieton, Rang);
+    return true;
 }
 //-----------------------------------------------------------------------------
 bool infection::DoitSuccomber(int Tour) const
@@ -497,10 +496,8 @@ bool infection::DoitSuccomber(int Tour) const
     {
         return Svt->DoitSuccomber(Tour);
     }
-    
-    
-        return false;
-    
+
+    return false;
 }
 //-----------------------------------------------------------------------------
 void pieton::Verifie(AnsiString &asMsgErr) const
@@ -945,18 +942,18 @@ bool feu::Sauve(int hfile)
     int xc = COORDCOPIE(x, cv->Xc);
     int yc = COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
     Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
-          (FileWrite(hfile, cv->CopieEnCours ? &xc : &x, sizeof(x)) != 0) && // v4.0.1
-          (FileWrite(hfile, cv->CopieEnCours ? &yc : &y, sizeof(y)) != 0) && // v4.0.1
-          (FileWrite(hfile, &Dir, sizeof(Dir)) != 0) && (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) &&
-          (FileWrite(hfile, &NbFeuxDmd, sizeof(NbFeuxDmd)) != 0) &&
-          (FileWrite(hfile, &NbFeuxAtt, sizeof(NbFeuxAtt)) != 0) &&
-          // v5.2 : /!\ On ne sauve pas les feux de piétons
-          (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
-          (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
-          (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
-          (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
-          (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
-          (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
+                          (FileWrite(hfile, cv->CopieEnCours ? &xc : &x, sizeof(x)) != 0) && // v4.0.1
+                          (FileWrite(hfile, cv->CopieEnCours ? &yc : &y, sizeof(y)) != 0) && // v4.0.1
+                          (FileWrite(hfile, &Dir, sizeof(Dir)) != 0) && (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) &&
+                          (FileWrite(hfile, &NbFeuxDmd, sizeof(NbFeuxDmd)) != 0) &&
+                          (FileWrite(hfile, &NbFeuxAtt, sizeof(NbFeuxAtt)) != 0) &&
+                          // v5.2 : /!\ On ne sauve pas les feux de piétons
+                          (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
+                          (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
+                          (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
+                          (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
+                          (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
+                          (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
 
     for (i = 0; (Ok != 0) && (i < NbFeuxDmd); i++)
     {
@@ -1337,17 +1334,18 @@ bool feu_pieton::Sauve(int hfile)
     int // v6.0.1 : COORDCOPIE
         yc[NBFEUXPIETONSPARNUMERO] = {COORDCOPIE(y[0], cv->Yc), COORDCOPIE(y[1], cv->Yc)};
     Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
-          (FileWrite(hfile, cv->CopieEnCours ? xc : x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
-          (FileWrite(hfile, cv->CopieEnCours ? yc : y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
-          (FileWrite(hfile, Dir, NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) != 0) &&
-          (FileWrite(hfile, iFeuDir, NBDIR * sizeof(iFeuDir[0])) != 0) &&
-          (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) && (FileWrite(hfile, &NbFeux, sizeof(NbFeux)) != 0) &&
-          (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
-          (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
-          (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
-          (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
-          (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
-          (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
+                          (FileWrite(hfile, cv->CopieEnCours ? xc : x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
+                          (FileWrite(hfile, cv->CopieEnCours ? yc : y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
+                          (FileWrite(hfile, Dir, NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) != 0) &&
+                          (FileWrite(hfile, iFeuDir, NBDIR * sizeof(iFeuDir[0])) != 0) &&
+                          (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) &&
+                          (FileWrite(hfile, &NbFeux, sizeof(NbFeux)) != 0) &&
+                          (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
+                          (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
+                          (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
+                          (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
+                          (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
+                          (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
     for (i = 0; (Ok != 0) && (i < NbFeux); i++)
     {
         Ok = FileWrite(hfile, &NumFeux[i], sizeof(NumFeux[i]));
@@ -1922,7 +1920,7 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
     }
     do // On choisit une place libre
     {
-        NumPlace = rand() % cv->NbPlacesVehlib;
+        NumPlace = alea::Rand() % cv->NbPlacesVehlib;
     } while ((NumPlace + 1 == NumPlaceDepart) || (!cv->PlaceVehlib[NumPlace].EstLibre()));
     place_vehlib *pv = cv->PlaceVehlib + NumPlace;
     const int xp = pv->x;
@@ -2055,7 +2053,8 @@ void bus::FaitMonterEtDescendre() // v3.0
     for (i = 0; i < cv->NbPietons; i++)
     {
         p = cv->Pieton + i;
-        if ((p->NumBus == Numero) && (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretBusDmd > (rand() % 100)))))
+        if ((p->NumBus == Numero) &&
+            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretBusDmd > (alea::Rand() % 100)))))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
         }
@@ -2410,7 +2409,7 @@ void tram::FaitMonterEtDescendre() // v3.5
     {
         p = cv->Pieton + i;
         if ((p->NumTram == Numero) &&
-            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTramDmd > (rand() % 100)))))
+            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTramDmd > (alea::Rand() % 100)))))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
         }
@@ -2875,7 +2874,7 @@ void taxi::CalculeProchaineDirection()
                 switch (Situation)
                 {
                 case stDepart:
-                    OrdreDir[i] += (rand() % 2);
+                    OrdreDir[i] += (alea::Rand() % 2);
                     break; // Le hasard dans toute sa splendeur (en fait le taxi promène le client)
                 case stRetour:
                     OrdreDir[i] += static_cast<int>(
@@ -2957,7 +2956,7 @@ direction taxi::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
                 switch (Situation)
                 {
                 case stDepart:
-                    OrdreDir[i] += (rand() % 2);
+                    OrdreDir[i] += (alea::Rand() % 2);
                     break; // Le hasard dans toute sa splendeur (en fait le taxi promène le client)
                 case stRetour:
                     OrdreDir[i] += static_cast<int>(
@@ -3016,7 +3015,7 @@ void taxi::FaitDescendrePietons() const
     {
         p = cv->Pieton + i;
         if ((p->NumTaxi == Numero) &&
-            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTaxiDmd > (rand() % 100)))))
+            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTaxiDmd > (alea::Rand() % 100)))))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra une prochaine fois
         }
@@ -3423,7 +3422,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
             }
         }
     }
-    nd = NbDirPossSensVoieTram(indefinie);                                                    // v3.5
+    nd = NbDirPossSensVoieTram(indefinie);                                                  // v3.5
     if (((nd > 0) && (nat > 0)) && (Ok = (!((DistArretTram = new int *[nat]) == nullptr)))) // v3.5
 
     {                                     // D'abord le nombre d'arrêts de tram
@@ -3958,10 +3957,8 @@ bool voie::RetirePieton(int NumPietonARetirer) // v2.0
 
         return false;
     }
-    
-    
-        return false;
-    
+
+    return false;
 }
 //-----------------------------------------------------------------------------
 void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, la montée et la descente du bus/tram
@@ -4078,8 +4075,8 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                                                                                                              // piéton
                                                                                                              // trouvé
                                                                                                              // ET
-                    ((rand() % 100) < cv->ProbaDirPsgPt)) // Probabilité d'y aller (paramètre)
-                {                                         // Il va vers le passage piéton trouvé
+                    ((alea::Rand() % 100) < cv->ProbaDirPsgPt)) // Probabilité d'y aller (paramètre)
+                {                                               // Il va vers le passage piéton trouvé
                     p->Dir = NvDir;
                     p->PsgPtTrv = true; // Indique qu'il est en train d'aller vers un passage piéton (inhibe les futures
                                         // recherches)
@@ -4088,8 +4085,8 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                     if ((cv->ProbaDirArretBus != 0) && // Si recherche d'arret de bus il y a ET
                         ((NvDir = cv->ChercheArretBus(x, y, static_cast<sens>(2 - (p->Dir % 2)))) != 0) && // Arret bus
                                                                                                            // trouvé ET
-                        ((rand() % 100) < cv->ProbaDirArretBus)) // Probabilité d'y aller (paramètre)
-                    {                                            // Il va vers l'arrêt de bus
+                        ((alea::Rand() % 100) < cv->ProbaDirArretBus)) // Probabilité d'y aller (paramètre)
+                    {                                                  // Il va vers l'arrêt de bus
                         p->Dir = NvDir;
                         p->ArretBusTrv = true; // Indique qu'il est en train d'aller vers un arrêt de bus (inhibe les
                                                // futures recherches)
@@ -4097,12 +4094,12 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                     else                                    // 3. Recherche d'arrêt de tram. v3.5
                         if ((cv->ProbaDirArretTram != 0) && // Si recherche d'arret de tram il y a ET
                             ((NvDir = cv->ChercheArretTram(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
-                             0) &&                                    // Arret
-                                                                      // tram
-                                                                      // trouvé
-                                                                      // ET
-                            ((rand() % 100) < cv->ProbaDirArretTram)) // Probabilité d'y aller (paramètre)
-                        {                                             // Il va vers l'arrêt de tram
+                             0) &&                                          // Arret
+                                                                            // tram
+                                                                            // trouvé
+                                                                            // ET
+                            ((alea::Rand() % 100) < cv->ProbaDirArretTram)) // Probabilité d'y aller (paramètre)
+                        {                                                   // Il va vers l'arrêt de tram
                             p->Dir = NvDir;
                             p->ArretTramTrv = true; // Indique qu'il est en train d'aller vers un arrêt de tram (inhibe
                                                     // les futures recherches)
@@ -4110,9 +4107,9 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                         else                                   // 4. Recherche de file de taxi. v3.6
                             if ((cv->ProbaDirFileTaxi != 0) && // Si recherche de file de taxi il y a ET
                                 ((NvDir = cv->CherchePlaceTaxi(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
-                                 0) &&                                   // Place de taxi trouvée ET
-                                ((rand() % 100) < cv->ProbaDirFileTaxi)) // Probabilité d'y aller (paramètre)
-                            {                                            // Il va vers le tête de file de taxi
+                                 0) &&                                         // Place de taxi trouvée ET
+                                ((alea::Rand() % 100) < cv->ProbaDirFileTaxi)) // Probabilité d'y aller (paramètre)
+                            {                                                  // Il va vers le tête de file de taxi
                                 p->Dir = NvDir;
                                 p->FileTaxiTrv = true; // Indique qu'il est en train d'aller vers une tête de file de
                                                        // taxi (inhibe les futures recherches)
@@ -4120,9 +4117,10 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                             else                                     // 5. Recherche de file de vehlib. v5.3
                                 if ((cv->ProbaDirFileVehlib != 0) && // Si recherche de file de vehlib il y a ET
                                     ((NvDir = cv->CherchePlaceVehlib(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
-                                     0) &&                                     // Place de vehlib trouvée ET
-                                    ((rand() % 100) < cv->ProbaDirFileVehlib)) // Probabilité d'y aller (paramètre)
-                                {                                              // Il va vers le tête de file de taxi
+                                     0) &&                                           // Place de vehlib trouvée ET
+                                    ((alea::Rand() % 100) < cv->ProbaDirFileVehlib)) // Probabilité d'y aller
+                                                                                     // (paramètre)
+                                { // Il va vers le tête de file de taxi
                                     p->Dir = NvDir;
                                     p->PlaceVehlibTrv = true; // Indique qu'il est en train d'aller vers une place de
                                                               // vehlib (inhibe les futures recherches)
@@ -4143,7 +4141,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                     {
                         if (cv->TourCrt - cv->Pieton[NumPieton[i] - 1].TourDrnDepl > 1 + (cv->AttenteMaxVeh / 2))
                         { // S'il a assez attendu (Paramètre AttenteVéhicule/2)
-                            for (DirTrv = false, dd = 1 - (2 * (rand() % 2)), d = 2 - dd;
+                            for (DirTrv = false, dd = 1 - (2 * (alea::Rand() % 2)), d = 2 - dd;
                                  (!DirTrv) && ((d != 0) && (d < NBDIR)); d += dd)
                             {
                                 NvDir = static_cast<direction>(1 + ((p->Dir + d - 1) % NBDIR)); // à Gauche ou à droite
@@ -4169,7 +4167,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                         // On choisit une direction à gauche ou à droite (sûre) s'il a assez attendu
                         {
                             p->AnnuleRechercheEnCours(); // Toute recherche est annulée car la direction a changé !
-                            p->Dir = static_cast<direction>(1 + ((p->Dir + 1 + (2 * (rand() % 2))) % NBDIR));
+                            p->Dir = static_cast<direction>(1 + ((p->Dir + 1 + (2 * (alea::Rand() % 2))) % NBDIR));
                         }
                     }
                     p->DemiCase++;
@@ -6259,7 +6257,7 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
     case 3:
         if (Dist[0] == Dist[1])
         {
-            return Dir[rand() % 2];
+            return Dir[alea::Rand() % 2];
         }
         return (Dist[0] < Dist[1] ? Dir[0] : Dir[1]);
 
@@ -6308,7 +6306,7 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) const 
     case 3:
         if (Dist[0] == Dist[1])
         {
-            return Dir[rand() % 2];
+            return Dir[alea::Rand() % 2];
         }
         return (Dist[0] < Dist[1] ? Dir[0] : Dir[1]);
 
@@ -6358,7 +6356,7 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) const
     case 3:
         if (Dist[0] == Dist[1])
         {
-            return Dir[rand() % 2];
+            return Dir[alea::Rand() % 2];
         }
         return (Dist[0] < Dist[1] ? Dir[0] : Dir[1]);
 
@@ -6407,7 +6405,7 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) const
     case 3:
         if (Dist[0] == Dist[1])
         {
-            return Dir[rand() % 2];
+            return Dir[alea::Rand() % 2];
         }
         return (Dist[0] < Dist[1] ? Dir[0] : Dir[1]);
 
@@ -6457,7 +6455,7 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) con
     case 3:
         if (Dist[0] == Dist[1])
         {
-            return Dir[rand() % 2];
+            return Dir[alea::Rand() % 2];
         }
         return (Dist[0] < Dist[1] ? Dir[0] : Dir[1]);
 
@@ -7430,9 +7428,9 @@ bool centre_ville::PreparePietons() // v2.0
     {
         do
         {
-            x = rand() % NbX;
-            y = rand() % NbY;
-            Dir = static_cast<direction>(1 + (rand() % 4));
+            x = alea::Rand() % NbX;
+            y = alea::Rand() % NbY;
+            Dir = static_cast<direction>(1 + (alea::Rand() % 4));
         } while (!v[x][y].PietonPeutAller(Dir));
         Pieton[i].Definit(x, y, Dir, 0);
         v[x][y].AjoutePieton(i);
@@ -7461,7 +7459,7 @@ void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) const
 
 //-----------------------------------------------------------------------------
 bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENTION : dp = N|E|S|O
-{                                                                            // On change si...
+{                                                                      // On change si...
     voie *vv = &v[x][y];
     if ((!vv->PassagePietons) && // v3.5
         (vv->NumArretBus == 0) && (TourCrt == 0) && ((vv->DirPoss != dp) || (!vv->PassageBus)) &&
@@ -8663,7 +8661,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
      frmSimulation->RedessineCase(x,y,true); */
         const int l =
             1 + ((LgrMinSgmtRoute * ((((d - 1) % 2) != 0) ? NbX : NbY)) / 10) + // Longueur du nouveau segment de route
-            (rand() % (1 + (((LgrMaxSgmtRoute - LgrMinSgmtRoute) * ((((d - 1) % 2) != 0) ? NbX : NbY)) / 10)));
+            (alea::Rand() % (1 + (((LgrMaxSgmtRoute - LgrMinSgmtRoute) * ((((d - 1) % 2) != 0) ? NbX : NbY)) / 10)));
         // AfficheMessage("Départ du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
         bool // MemeDir=false, // pour débogage
              // TraverseeRoute=true, // pour débogage
@@ -8677,10 +8675,11 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
             Ok = ((/*MemeDir=*/vc->DirPoss & PossDir[d]) == 0) &&          // S'il s'agit d'une direction possible = d
                  (!(DirOpposee = ((vc->DirPoss & InvPossDir[d]) != 0))) && // OU une direction opposée à d
                  ((vc->DirPoss == 0) ||
-                  /*TraverseeRoute=*/(ProbaTraverseeRoute > rand() % 10) || // OU une traversée de route refusée, ALORS
-                                                                            // on NE TRACE pas le segment de route sur
-                                                                            // la case.
-                  (EntreeIntersection = (ProbaEntreeIntersection > rand() % 10))); // OU une entrée d'intersection ?
+                  /*TraverseeRoute=*/(ProbaTraverseeRoute > alea::Rand() % 10) || // OU une traversée de route refusée,
+                                                                                  // ALORS on NE TRACE pas le segment de
+                                                                                  // route sur la case.
+                  (EntreeIntersection = (ProbaEntreeIntersection > alea::Rand() % 10))); // OU une entrée d'intersection
+                                                                                         // ?
             if (Ok)
             { // v5.4 : Conversion BCB6>BCBX pas de a+=b sur énumérés
                 vc->DirPoss =
@@ -8703,7 +8702,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
             {                          // ALORS on part A GAUCHE OU A DROITE (on évite les deux problèmes)
                 // AfficheMessage("DirOpposée||(!EntreeIntersection)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas
                 // Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
-                const int dd = 1 + ((d + (2 * (rand() % 2))) % NBDIR);
+                const int dd = 1 + ((d + (2 * (alea::Rand() % 2))) % NBDIR);
                 if (k == 0)
                 {
                     DejaFait[dd] = true;
@@ -8732,14 +8731,14 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
             if ((_V_(x, y, k, d).DirPoss & (NESO - InvPossDir[d])) != NESO - InvPossDir[d]) // peut-on continuer à créer
                                                                                             // des segments ?
             {
-                if (ProbaSortieIntersection > rand() % 10) // Crée-t-on une sortie d'intersection ?
+                if (ProbaSortieIntersection > alea::Rand() % 10) // Crée-t-on une sortie d'intersection ?
                 {
                     // AfficheMessage("SortieIntersection","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d],
                     // tmInformation,0,0);
                     int dd = 0;
                     do
                     {
-                        dd = 1 + (rand() % NBDIR);
+                        dd = 1 + (alea::Rand() % NBDIR);
                     } while (((_V_(x, y, k, d).DirPoss & PossDir[dd]) != 0) || (abs(d - dd) == 2));
                     Genere((x + (k * dx[d])) % NbX, (y + (k * dy[d])) % NbY, dd);
                     // frmSimulation->DrawGridSimul->Col=x;
@@ -8753,7 +8752,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
                 // tmInformation,0,0);
                 do
                 {
-                    dd = 1 + (rand() % NBDIR);
+                    dd = 1 + (alea::Rand() % NBDIR);
                 } while (((_V_(x, y, k, d).DirPoss & PossDir[dd]) != 0) || (abs(d - dd) == 2));
                 x = (x + (k * dx[d])) % NbX;
                 y = (y + (k * dy[d])) % NbY;

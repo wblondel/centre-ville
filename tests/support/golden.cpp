@@ -2,10 +2,15 @@
 // golden.cpp - Tests du moteur : golden master de la simulation
 //---------------------------------------------------------------------------
 #include "golden.h"
+#include <cstdint>
 #include <cstdio>
 #include <filesystem>
+#include "compat/chaine.h"
+#include <string>
+#include <system_error>
 #include "etat.h"
 #include "harnais.h"
+#include "simul.h"
 #include "vue.h"
 #include "compat/alea.h"
 //---------------------------------------------------------------------------
@@ -147,9 +152,9 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
     // L'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
     // d'origine (32 et 64 bits) les évalue de gauche à droite : x, puis y, puis
     // la direction (engine/README.md, « Vérifications sur le binaire d'origine »).
-    const int x = rand() % cv->NbX;
-    const int y = rand() % cv->NbY;
-    const auto d = static_cast<direction>(1 + (rand() % NBDIR));
+    const int x = alea::Rand() % cv->NbX;
+    const int y = alea::Rand() % cv->NbY;
+    const auto d = static_cast<direction>(1 + (alea::Rand() % NBDIR));
     Texte += "depart x=" + std::to_string(x) + " y=" + std::to_string(y) + " d=" + std::to_string(static_cast<int>(d)) +
              "\n";
     cv->Genere(x, y, d);
