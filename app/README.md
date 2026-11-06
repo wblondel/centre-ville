@@ -783,7 +783,8 @@ Tests ajoutés en 6.0.16 (`test_interface.cpp`) :
   sur fond sombre ; aucune couleur de la VCL changée sur fond clair ; jaune
   foncé sur fond clair.
 - `ongletsEntiers` : onglets de Véhicules dans la police de la fiche, aucun
-  libellé abrégé.
+  libellé abrégé (vérification sautée, comme `textesResserres`, si le moteur
+  de polices ignore `setStretch` : Windows en « offscreen », sans polices).
 
 ## Corrections de la 6.0.12 (annotées `// v6.0.12`)
 

@@ -7779,6 +7779,10 @@ void TestInterface::ongletsEntiers()
   QCOMPARE(QFontInfo(Onglets->font()).family(), QFontInfo(t->font()).family());
   QCOMPARE(Onglets->count(), 2);
   QVERIFY(Onglets->tabText(0).startsWith("Nb.cases"));
+  QFont Essai=t->font();
+  Essai.setStretch(90);
+  if (QFontMetricsF(Essai).horizontalAdvance(Onglets->tabText(0))>QFontMetricsF(t->font()).horizontalAdvance(Onglets->tabText(0))-1)
+   QSKIP("QFont::setStretch sans effet avec ce moteur de polices"); // Windows en « offscreen », sans polices
   QVERIFY2(t->OngletsEntiers(), qPrintable(QString::number(Onglets->font().stretch())));
  }
 //---------------------------------------------------------------------------
