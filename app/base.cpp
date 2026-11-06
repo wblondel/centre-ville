@@ -349,14 +349,14 @@ namespace
 {
 String stRepAide()
 {
-    QString stRep = QCoreApplication::applicationDirPath();
+    const QString stRepExe = QCoreApplication::applicationDirPath();
 #ifdef Q_OS_MACOS
-    if (stRep.endsWith("/Contents/MacOS"))
+    if (stRepExe.endsWith("/Contents/MacOS"))
     {
-        stRep = QDir::cleanPath(stRep + "/../Resources");
+        return A(QDir::cleanPath(stRepExe + "/../Resources") + "/");
     }
 #endif
-    return A(stRep + "/");
+    return A(stRepExe + "/");
 }
 //---------------------------------------------------------------------------
 // v5.4 : procédure privée (base.cpp) pour afficher une page HTML

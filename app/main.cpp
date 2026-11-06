@@ -13,8 +13,10 @@
 #include <QMessageBox>
 #include <exception>
 #include "application.h"
-#include "base.h"
-#include "vcl.h"
+#ifdef Q_OS_MACOS
+#include "base.h" // stRepLocalAppData, CopieCartesExemple
+#include "vcl.h"  // Q
+#endif
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {

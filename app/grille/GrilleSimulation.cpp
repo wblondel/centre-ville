@@ -568,11 +568,13 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
 //---------------------------------------------------------------------------
 void GrilleSimulation::keyPressEvent(QKeyEvent *e)
 { // TCustomGrid::KeyDown
-    bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier);
-    const bool Maj = e->modifiers().testFlag(Qt::ShiftModifier);
 #ifdef Q_OS_MACOS
-    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0U);
+  // Qt::ControlModifier est la touche Commande, Qt::MetaModifier la touche Control : l'une ou l'autre
+    const bool Ctrl = e->modifiers().testAnyFlags(Qt::ControlModifier | Qt::MetaModifier);
+#else
+    const bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier);
 #endif
+    const bool Maj = e->modifiers().testFlag(Qt::ShiftModifier);
     TGridCoord n = Courante;
     int g = HautGauche.X;
     int h = HautGauche.Y;

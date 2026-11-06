@@ -756,11 +756,13 @@ void TStringGrid::wheelEvent(QWheelEvent *e)
 //---------------------------------------------------------------------------
 void TStringGrid::keyPressEvent(QKeyEvent *e)
 { // TCustomGrid::KeyDown (sans goTabs ni goEditing)
-    bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier);
-    const bool Maj = e->modifiers().testFlag(Qt::ShiftModifier);
 #ifdef Q_OS_MACOS
-    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0U);
+  // Qt::ControlModifier est la touche Commande, Qt::MetaModifier la touche Control : l'une ou l'autre
+    const bool Ctrl = e->modifiers().testAnyFlags(Qt::ControlModifier | Qt::MetaModifier);
+#else
+    const bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier);
 #endif
+    const bool Maj = e->modifiers().testFlag(Qt::ShiftModifier);
     int c = ColCour;
     int r = LigCour;
     const int Page = qMax(1, verticalScrollBar()->pageStep());

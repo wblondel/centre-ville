@@ -164,6 +164,7 @@ void TestCartes::copieAuPremierLancement()
     }
 }
 //---------------------------------------------------------------------------
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : slot de Qt Test, sans membre hors macOS
 void TestCartes::paquetMacOS()
 {
 #ifndef Q_OS_MACOS

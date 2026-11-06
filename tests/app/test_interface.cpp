@@ -10172,9 +10172,10 @@ void TestInterface::grilleAuClavierALaMoletteEtAuxBarres()
     g->LeftCol = 0;
     g->TopRow = 0;
     QCOMPARE(EtatGrille(g), EtatAttendu(5, 5, 0, 0));
-    std::vector<Qt::KeyboardModifiers> Ctrl = {Qt::ControlModifier};
 #ifdef Q_OS_MACOS
-    Ctrl.emplace_back(Qt::MetaModifier); // touche Control
+    const std::vector<Qt::KeyboardModifiers> Ctrl = {Qt::ControlModifier, Qt::MetaModifier}; // Commande, Control
+#else
+    const std::vector<Qt::KeyboardModifiers> Ctrl = {Qt::ControlModifier};
 #endif
     for (const Qt::KeyboardModifiers m : Ctrl)
     {
@@ -10666,8 +10667,8 @@ void TestInterface::policesEtStyleWindows()
     const QString Diagnostic = QString("police de Rechercher : %1 (%2) ; MS Sans Serif trouvée : %3 ; Microsoft Sans "
                                        "Serif trouvée : %4 ; style : %5")
                                    .arg(QFontInfo(Police).family(), Police.families().join(", "))
-                                   .arg(QFontDatabase::hasFamily("MS Sans Serif"))
-                                   .arg(QFontDatabase::hasFamily("Microsoft Sans Serif"))
+                                   .arg(QFontDatabase::hasFamily("MS Sans Serif") ? "oui" : "non")
+                                   .arg(QFontDatabase::hasFamily("Microsoft Sans Serif") ? "oui" : "non")
                                    .arg(QApplication::style()->name());
     QVERIFY2(QFontInfo(Police).family() == QLatin1String("Microsoft Sans Serif"), qPrintable(Diagnostic));
     QVERIFY2(QApplication::style()->name() == QLatin1String("windowsvista"), qPrintable(Diagnostic));
