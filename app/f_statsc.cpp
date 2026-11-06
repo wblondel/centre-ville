@@ -20,7 +20,7 @@ void Composition()
  {
   if ((frmStatsComposition=new TfrmStatsComposition(Application)))
    { // portage : try/__finally -> garde RAII (Finalement)
-    Finalement const f([&]
+    const Finalement f([&]
     {
      frmStatsComposition->Release();
      frmStatsComposition=nullptr;

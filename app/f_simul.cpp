@@ -241,8 +241,8 @@ void TfrmSimulation::RedessineCase(int x, int y, bool EffaceFond) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::RafraichitActionsEdition(mode_edition ModeEdition)
  {
-  bool const EditionCase=(ModeEdition==meCase);
-  bool const EditionSelection=(ModeEdition==meSelection);
+  const bool EditionCase=(ModeEdition==meCase);
+  const bool EditionSelection=(ModeEdition==meSelection);
   int i = 0;
   for(i=0; i<ActionList->ActionCount; i++) { // v3.8.3
    if (ActionList->Actions[i]->Category=="Edition (case)") {
@@ -268,8 +268,8 @@ void TfrmSimulation::RafraichitActionsEdition(mode_edition ModeEdition)
 void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
       int Col, int Row, TRect &Rect, TGridDrawState  /*State*/)
  { // Dessin de chaque case (voie)
-  int const Colonnes=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
-  int const Lignes=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
+  const int Colonnes=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
+  const int Lignes=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
   int PassPoss=0;
   int BordTrottoir=0;
   int BordToiture=0;
@@ -286,7 +286,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
   direction DirArretBus; // v3.0
   voie *v=&cv->v[Col][Row];
   voie *vv = nullptr;
-  sens const Sens=cv->SensPassagePietonsPossible(Col, Row); // v2.0
+  const sens Sens=cv->SensPassagePietonsPossible(Col, Row); // v2.0
   pieton *p = nullptr; // v2.0
   vehicule *Veh = nullptr;
   bus *Bus = nullptr; // v3.0
@@ -297,17 +297,17 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
   bool EstPoss = false;
   bool SudPoss = false;
   bool OuestPoss = false;
-  bool const DefFeux= ((frmDefFeux != nullptr)&&  // v3.8.1
+  const bool DefFeux= ((frmDefFeux != nullptr)&&  // v3.8.1
                  frmDefFeux->Visible)||
                 ((frmDefFeuxPietons != nullptr)&&  // v5.2
                  frmDefFeuxPietons->Visible);
-  bool const EditionAutorisee= (!DefFeux)&&
+  const bool EditionAutorisee= (!DefFeux)&&
                          (cv->TourCrt == 0)&&
                          (!SimulationEnCours);
-  bool const ChgmtDirRoutesAutorise= (!v->PassagePietons)&& // v3.5
+  const bool ChgmtDirRoutesAutorise= (!v->PassagePietons)&& // v3.5
                                (v->NumArretBus == 0)&&
                                EditionAutorisee;
-  bool const ChgmtDirVoiesAutorise= (!v->PassagePietons)&& // v3.5
+  const bool ChgmtDirVoiesAutorise= (!v->PassagePietons)&& // v3.5
                               (v->NumArretTram == 0)&&
                               (v->Priorite[nord-1] == 0)&&
                               (v->Priorite[est-1] == 0)&&
@@ -507,7 +507,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
   if (((Affichage&aff_ptn) != 0)&&(v->NbPietons != 0)&&(NATURE(v)<=trottoirs)) // v3.8 (immeubles)
    {
     // 4a. Vue de mort
-    for(int const i : v->NumPieton) {
+    for(const int i : v->NumPieton) {
      if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
        p=&cv->Pieton[NumPieton=i-1];
@@ -524,7 +524,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
 	  }
 }
     // 4b. Vue de vivant
-    for(int const i : v->NumPieton) {
+    for(const int i : v->NumPieton) {
      if (i != 0)
       { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
        p=&cv->Pieton[NumPieton=i-1];
@@ -597,7 +597,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
     if (v->NumVehlib != 0) // 5a bis. On met les vehlibs. v5.3
      {
       Vlb=&cv->Vehlib[v->NumVehlib-1];
-      auto const dpv=static_cast<direction>(1+v->OrientationPlaceVehlib()); // Si le vehlib est sur une place, on prend le sens de la file
+      const auto dpv=static_cast<direction>(1+v->OrientationPlaceVehlib()); // Si le vehlib est sur une place, on prend le sens de la file
       dorig=((v->NumPlaceVehlib != 0)?
              InvDir[dpv]:
              ((Vlb->DirDrnDepl != 0)?
@@ -837,7 +837,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
       asMsg=asMsg+"Piéton";
       if (v->NbPietons>1) { asMsg=asMsg+"s";
 }
-      for(int const i : v->NumPieton) {
+      for(const int i : v->NumPieton) {
        if (i != 0) {
 		asMsg=asMsg+Format(" %d%s", ARRAYOFCONST(( i,
 												   asSupInf[(!!cv->Pieton[i-1].EstVivant())*(1+cv->Pieton[i-1].DemiCase)]+ // v4.3 (asSupInf remplace as12) v5.4.1 EstVivant() remplace Ecrase
@@ -879,7 +879,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/,
                         IDB_CURSEUR);
 }
 
-    bool const FeuxPietonsPresents=FEUXPIETONS(v); //v5.2
+    const bool FeuxPietonsPresents=FEUXPIETONS(v); //v5.2
 
     // Directions (Routes)
     NordPoss=((v->DirPoss&N)==N);
@@ -1186,8 +1186,8 @@ bool TfrmSimulation::ModifiePassagePietonsSiNecessaire(int x, int y) // v2.0
 void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
 { // v5.4 : manque int (???)
  const int NumSvtOrdSel[2][4]={{0,0,1,0},{1,1,1,1}};
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  int i = 0;
  int j = 0;
  int NbFeux = 0;
@@ -1684,7 +1684,7 @@ void TfrmSimulation::AfficheBilan()
   int MinDist = 0;
   int xe = 0;
   int ye = 0;
-  int const ne=cv->NbParkings;
+  const int ne=cv->NbParkings;
   int // NbParkings
       const nv=cv->NbVehicules;
   int // NbVehicules
@@ -1694,8 +1694,8 @@ void TfrmSimulation::AfficheBilan()
   int // NbVehiculesParParking
       ParcoursMin=0L;
   int AttenteDepart=0L;
-  int const ntp=cv->NbToursParcourus;
-  int const ncp=cv->NbCasesParcourues;
+  const int ntp=cv->NbToursParcourus;
+  const int ncp=cv->NbCasesParcourues;
   double m = NAN;
   AnsiString asMsgBilan;
   // 1. On calcule le parcours moyen
@@ -1827,7 +1827,7 @@ void TfrmSimulation::RafraichitFichesPriorites() const
 //---------------------------------------------------------------------------
 void TfrmSimulation::DrawGridSimulClick(TObject * /*Sender*/)
 {
- bool const PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
+ const bool PasDeSelectionFeux=(!(SelectionFeuxDmd||SelectionFeuxAtt||SelectionFeuxPtn)); // v5.2 : Ajout SelectionFeuxPtn
  if (frmDefVoie->Visible&&PasDeSelectionFeux) { frmDefVoie->RafraichitInfos();
 }
  if (frmDefVoiePietons->Visible&&PasDeSelectionFeux) { frmDefVoiePietons->RafraichitInfos(); //v5.2
@@ -1965,10 +1965,10 @@ bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie Type
   int x = 0;
   int y = 0;
   int NumFeu = 0;
-  int const xd=DrawGridSimul->Selection.Left;
-  int const yd=DrawGridSimul->Selection.Top;
-  int const xf=DrawGridSimul->Selection.Right;
-  int const yf=DrawGridSimul->Selection.Bottom;
+  const int xd=DrawGridSimul->Selection.Left;
+  const int yd=DrawGridSimul->Selection.Top;
+  const int xf=DrawGridSimul->Selection.Right;
+  const int yf=DrawGridSimul->Selection.Bottom;
   for(x=xd; (!Abandon)&&(x<=xf); x++) {
    for(y=yd; (!Abandon)&&(y<=yf); y++) {
     for(d=0; (!Abandon)&&(d<NBDIR); d++) {
@@ -2063,10 +2063,10 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const
   int x = 0;
   int y = 0;
   int NumFeu = 0;
-  int const xd=DrawGridSimul->Selection.Left;
-  int const yd=DrawGridSimul->Selection.Top;
-  int const xf=DrawGridSimul->Selection.Right;
-  int const yf=DrawGridSimul->Selection.Bottom;
+  const int xd=DrawGridSimul->Selection.Left;
+  const int yd=DrawGridSimul->Selection.Top;
+  const int xf=DrawGridSimul->Selection.Right;
+  const int yf=DrawGridSimul->Selection.Bottom;
   for(x=xd; x<=xf; x++) {
    for(y=yd; y<=yf; y++) {
     for(d=0; d<NBDIR; d++) {
@@ -2116,10 +2116,10 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
   int x = 0;
   int y = 0;
   int NumArret = 0;
-  int const xd=DrawGridSimul->Selection.Left;
-  int const yd=DrawGridSimul->Selection.Top;
-  int const xf=DrawGridSimul->Selection.Right;
-  int const yf=DrawGridSimul->Selection.Bottom;
+  const int xd=DrawGridSimul->Selection.Left;
+  const int yd=DrawGridSimul->Selection.Top;
+  const int xf=DrawGridSimul->Selection.Right;
+  const int yf=DrawGridSimul->Selection.Bottom;
   bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
   bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
   voie *v = nullptr;
@@ -2173,10 +2173,10 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) con
   int x = 0;
   int y = 0;
   int NumArret = 0;
-  int const xd=DrawGridSimul->Selection.Left;
-  int const yd=DrawGridSimul->Selection.Top;
-  int const xf=DrawGridSimul->Selection.Right;
-  int const yf=DrawGridSimul->Selection.Bottom;
+  const int xd=DrawGridSimul->Selection.Left;
+  const int yd=DrawGridSimul->Selection.Top;
+  const int xf=DrawGridSimul->Selection.Right;
+  const int yf=DrawGridSimul->Selection.Bottom;
   bool *ArretBusDejaVu=new bool[cv->NbArretsBus];
   bool *ArretTramDejaVu=new bool[cv->NbArretsTram];
   voie *v = nullptr;
@@ -2212,10 +2212,10 @@ void TfrmSimulation::ReinitialiseToutDansSelection(type_voie TypeVoie)
  {
   int x = 0;
   int y = 0;
-  int const xd=DrawGridSimul->Selection.Left;
-  int const yd=DrawGridSimul->Selection.Top;
-  int const xf=DrawGridSimul->Selection.Right;
-  int const yf=DrawGridSimul->Selection.Bottom;
+  const int xd=DrawGridSimul->Selection.Left;
+  const int yd=DrawGridSimul->Selection.Top;
+  const int xf=DrawGridSimul->Selection.Right;
+  const int yf=DrawGridSimul->Selection.Bottom;
   for(x=xd; x<=xf; x++) {
    for(y=yd; y<=yf; y++)
     {
@@ -2279,7 +2279,7 @@ void TfrmSimulation::AfficheStatsAttenteTrafic() // v2.2.7
  affichage AffSvg=Affichage;
  if ((frmStatsAttenteTrafic=new TfrmStatsAttenteTrafic(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement const f([&]
+   const Finalement f([&]
    {
     StatsAttenteTrafic=false;
     Affichage=AffSvg;
@@ -2349,8 +2349,8 @@ void TfrmSimulation::TimerClignotementErreurTimer(TObject * /*Sender*/) const
 void TfrmSimulation::DeplaceFeu() // v3.8.3
  {
   int d = 0;
-  int const xCrt=DrawGridSimul->Col;
-  int const yCrt=DrawGridSimul->Row;
+  const int xCrt=DrawGridSimul->Col;
+  const int yCrt=DrawGridSimul->Row;
   voie *vSrc = nullptr;
   voie *vDst = nullptr;
   feu *FeuADeplacer = nullptr;
@@ -2475,7 +2475,7 @@ void TfrmSimulation::ActionOuvrirExecute(TObject * /*Sender*/)
      // travaille sur cv (parkings et places renumérotés)
      centre_ville *AncienReseau=cv;
      cv=new centre_ville(AUCUN_ELEMENT_PAR_DEFAUT,0,0); // v non encore alloué, créé au chargement (v4.0)
-     bool const Charge=cv->Charge(hfile);
+     const bool Charge=cv->Charge(hfile);
      FileClose(hfile);
      centre_ville *ReseauEnTrop=Charge?AncienReseau:cv;
      centre_ville *NouveauCv=Charge?cv:AncienReseau;
@@ -2683,7 +2683,7 @@ bool TfrmSimulation::SauveCopieReseau()
   if (Ok)
    {
     CopieReseau->close(); // Le fichier et son nom restent, jusqu'à la destruction de CopieReseau
-    int const hfile=FileCreate(A(QDir::toNativeSeparators(CopieReseau->fileName())));
+    const int hfile=FileCreate(A(QDir::toNativeSeparators(CopieReseau->fileName())));
     Ok=(hfile!=-1);
     if (Ok)
      {
@@ -2698,7 +2698,7 @@ bool TfrmSimulation::SauveCopieReseau()
 bool TfrmSimulation::RestaureCopieReseau()
  { // Ni la copie ni l'état préparé utilisable (fichier temporaire effacé pendant
    // la simulation...) : fermeture
-  int const hfile=CopieReseau?FileOpen(A(QDir::toNativeSeparators(CopieReseau->fileName())), fmOpenRead):-1;
+  const int hfile=CopieReseau?FileOpen(A(QDir::toNativeSeparators(CopieReseau->fileName())), fmOpenRead):-1;
   bool Ok=(hfile!=-1);
   if (Ok)
    {
@@ -2764,7 +2764,7 @@ bool TfrmSimulation::EnregistreAvantMarche()
   asNomFichAuto=FILENAME(SaveDialog);
   EnregistrerAvant=true; // On teste si on annule l'enregistrement (j'emprunte EnregistrerAvant)
   ActionEnregistrer->Execute();
-  bool const Ok=EnregistrerAvant; // Enregistrement Annulé si faux
+  const bool Ok=EnregistrerAvant; // Enregistrement Annulé si faux
   EnregistrerAvant=false;
   if (Ok) { asNomFichAuto=FILENAME(SaveDialog); // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original redemandait à l'arrêt quoi ouvrir)
 }
@@ -3112,8 +3112,8 @@ void TfrmSimulation::ActionSommaireExecute(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionHautExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, N))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
@@ -3129,8 +3129,8 @@ void TfrmSimulation::ActionDirectionHautExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionDirectionDroiteExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, E))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
@@ -3145,8 +3145,8 @@ void TfrmSimulation::ActionDirectionDroiteExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDirectionBasExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, S))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
@@ -3162,8 +3162,8 @@ void TfrmSimulation::ActionDirectionBasExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionDirectionGaucheExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  if (cv->ChangeDirectionSiPossible(x, y, O))
   {
    ModifiePassagePietonsSiNecessaire(x, y);
@@ -3178,8 +3178,8 @@ void TfrmSimulation::ActionDirectionGaucheExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionEffacerRouteExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  for(int d=nord; d<=ouest; d++) {
   if ((cv->v[x][y].DirPoss&PossDir[d]) != 0) {
    cv->ChangeDirectionSiPossible(x, y, PossDir[d]); // Tente de supprimer chaque direction possible
@@ -3199,8 +3199,8 @@ void TfrmSimulation::ActionEffacerRouteExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionDirectionHautTramExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, nord), nord);
  SimulationModifiee=true;
 }
@@ -3208,8 +3208,8 @@ void TfrmSimulation::ActionDirectionHautTramExecute(
 void TfrmSimulation::ActionDirectionDroiteTramExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, est), est);
  SimulationModifiee=true;
 }
@@ -3217,8 +3217,8 @@ void TfrmSimulation::ActionDirectionDroiteTramExecute(
 void TfrmSimulation::ActionDirectionBasTramExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, sud), sud);
  SimulationModifiee=true;
 }
@@ -3226,8 +3226,8 @@ void TfrmSimulation::ActionDirectionBasTramExecute(
 void TfrmSimulation::ActionDirectionGaucheTramExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].ModifieSensVoieTram(DirectionOrigineCurseur(x, y, ouest), ouest);
  SimulationModifiee=true;
 }
@@ -3235,8 +3235,8 @@ void TfrmSimulation::ActionDirectionGaucheTramExecute(
 void TfrmSimulation::ActionEffacerVoieTramExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].SensVoieTram=aucune_voie;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
@@ -3244,8 +3244,8 @@ void TfrmSimulation::ActionEffacerVoieTramExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionToutDroitExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].ToutDroit^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
@@ -3269,8 +3269,8 @@ void TfrmSimulation::ActionPrioritesPietonsExecute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionParkingExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumParking = 0;
  if ((NumParking=cv->v[x][y].NumParking) != 0) // Si parking on le supprime
@@ -3306,10 +3306,10 @@ void TfrmSimulation::ActionParkingExecute(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionDepotBusExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
- int const xPrc=cv->DepotBus.x;
- int const yPrc=cv->DepotBus.y;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
+ const int xPrc=cv->DepotBus.x;
+ const int yPrc=cv->DepotBus.y;
  if (cv->v[x][y].EstDepotBus()) { // On supprime
   cv->DepotBus.Initialise();
  } else // On le pose sur la case courante
@@ -3324,8 +3324,8 @@ void TfrmSimulation::ActionDepotBusExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionPassagePietonsExecute(
       TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].PassagePietons^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
@@ -3338,8 +3338,8 @@ void TfrmSimulation::ActionPassagePietonsExecute(
 void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
 {
  int d = 0;
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumArretBus = 0;
  int NumArretTram = 0;
@@ -3440,8 +3440,8 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPassageBusExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  cv->v[x][y].PassageBus^=1;
  SimulationModifiee=true;
  RedessineCase(x, y, true);
@@ -3449,8 +3449,8 @@ void TfrmSimulation::ActionPassageBusExecute(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceTaxiExecute(TObject * /*Sender*/)
 {
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlaceTaxi = 0;
  if ((NumPlaceTaxi=cv->v[x][y].NumPlaceTaxi) != 0) // Si Place Taxi on la supprime
@@ -3495,20 +3495,20 @@ void TfrmSimulation::ActionDeplacerFeuDestinationExecute(
 void TfrmSimulation::ActionSegmentRouteExecute(TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
  int x0 = 0;
  int x1 = 0;
  int y0 = 0;
  int y1 = 0;
- int const dx=abs(Droite-Gauche);
- int const dy=abs(Bas-Haut);
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int dx=abs(Droite-Gauche);
+ const int dy=abs(Bas-Haut);
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
  x0=x1=xd; y0=y1=yd; // v6.0.4 : x1 et y1 lus sans valeur pour un segment d'une seule voie
 
  if ((dx>1)&&(dy>1))
@@ -3558,16 +3558,16 @@ void TfrmSimulation::ActionSegmentRouteExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionSegmentTramExecute(TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
- int const dx=abs(Droite-Gauche);
- int const dy=abs(Bas-Haut);
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
+ const int dx=abs(Droite-Gauche);
+ const int dy=abs(Bas-Haut);
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
 
  if ((dx>1)&&(dy>1))
   {
@@ -3612,14 +3612,14 @@ void TfrmSimulation::ActionSegmentTramExecute(TObject * /*Sender*/)
 void TfrmSimulation::ActionCoinSuperieurDroitExecute(TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
  for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
@@ -3637,14 +3637,14 @@ void TfrmSimulation::ActionCoinInferieurGaucheExecute(
       TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
  for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
@@ -3662,14 +3662,14 @@ void TfrmSimulation::ActionCoinSuperieurGaucheExecute(
       TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
  for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
@@ -3687,14 +3687,14 @@ void TfrmSimulation::ActionCoinInferieurDroitExecute(
       TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
- int const xd=DrawGridSimul->Col;
- int const yd=DrawGridSimul->Row;
- int const xf=(xd==Gauche?Droite:Gauche);
- int const yf=(yd==Haut?Bas:Haut);
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
+ const int xd=DrawGridSimul->Col;
+ const int yd=DrawGridSimul->Row;
+ const int xf=(xd==Gauche?Droite:Gauche);
+ const int yf=(yd==Haut?Bas:Haut);
 
  SimulationModifiee=true;
  for(i=yd; i!=yf; i+=(yf-yd)/abs(yf-yd)) {
@@ -3712,10 +3712,10 @@ void TfrmSimulation::ActionPeripheriqueExterieurExecute(
       TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
 
  if ((Gauche==Droite)||(Bas==Haut))
   {
@@ -3739,10 +3739,10 @@ void TfrmSimulation::ActionPeripheriqueInterieurExecute(
       TObject * /*Sender*/)
 {
  int i = 0;
- int const Gauche=DrawGridSimul->Selection.Left;
- int const Droite=DrawGridSimul->Selection.Right;
- int const Haut=DrawGridSimul->Selection.Top;
- int const Bas=DrawGridSimul->Selection.Bottom;
+ const int Gauche=DrawGridSimul->Selection.Left;
+ const int Droite=DrawGridSimul->Selection.Right;
+ const int Haut=DrawGridSimul->Selection.Top;
+ const int Bas=DrawGridSimul->Selection.Bottom;
  if ((Gauche==Droite)||(Bas==Haut))
   {
    AfficheMessage(asTracerEffacerPeripherique, asSelectionIncorrecte, tmAvertissement, 0, 0);
@@ -3858,7 +3858,7 @@ void TfrmSimulation::ActionDistancesFilesTaxiExecute(
 void TfrmSimulation::ActionSuivreVehiculeExecute(
       TObject * /*Sender*/) const
 {
- int const NumVehicule=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehicule;
+ const int NumVehicule=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehicule;
  if (NumVehicule == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3870,7 +3870,7 @@ void TfrmSimulation::ActionSuivreVehiculeExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivreBusExecute(TObject * /*Sender*/) const
 {
- int const NumBus=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumBus;
+ const int NumBus=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumBus;
  if (NumBus == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3882,7 +3882,7 @@ void TfrmSimulation::ActionSuivreBusExecute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivreTramExecute(TObject * /*Sender*/) const
 {
- int const NumTram=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTram;
+ const int NumTram=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTram;
  if (NumTram == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3894,7 +3894,7 @@ void TfrmSimulation::ActionSuivreTramExecute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivreTaxiExecute(TObject * /*Sender*/) const
 {
- int const NumTaxi=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTaxi;
+ const int NumTaxi=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTaxi;
  if (NumTaxi == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3906,7 +3906,7 @@ void TfrmSimulation::ActionSuivreTaxiExecute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivreVehlibExecute(TObject * /*Sender*/) const
 { // v5.3
- int const NumVehlib=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehlib;
+ const int NumVehlib=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehlib;
  if (NumVehlib == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3918,7 +3918,7 @@ void TfrmSimulation::ActionSuivreVehlibExecute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivrePieton1Execute(TObject * /*Sender*/) const
 {
- int const NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[0];
+ const int NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[0];
  if (NumPieton == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3930,7 +3930,7 @@ void TfrmSimulation::ActionSuivrePieton1Execute(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionSuivrePieton2Execute(TObject * /*Sender*/) const
 {
- int const NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[1];
+ const int NumPieton=cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[1];
  if (NumPieton == 0) { return;
 }
  if (!ActionRechercher->Checked) {
@@ -3988,8 +3988,8 @@ void TfrmSimulation::ActionNatureImmeubleExecute(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionCopierVersExecute(TObject * /*Sender*/)
 {
- int const NbX=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
- int const NbY=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
+ const int NbX=DrawGridSimul->Selection.Right-DrawGridSimul->Selection.Left+1;
+ const int NbY=DrawGridSimul->Selection.Bottom-DrawGridSimul->Selection.Top+1;
  if (!cv) { return;
 }
  if ((NbX<8)||(NbY<8))
@@ -4024,7 +4024,7 @@ Ce message récapitulatif sera mis à jour en fonction des contrôles ajoutés d
  const AnsiString asTitre=Caption;
  const bool Modifiee=SimulationModifiee;
  { // portage : try/__finally -> garde RAII (Finalement)
-  Finalement const f([&]
+  const Finalement f([&]
   {
    cv->PrepareCopie(FIN, 0, 0, 0, 0);
    SaveDialog->FileName=asNomEnregistrer;
@@ -4062,8 +4062,8 @@ void TfrmSimulation::TimerClignotementLocalisationTimer(
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceParkExecute(TObject * /*Sender*/)
 { // v5.0
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlace = 0;
  if ((NumPlace=cv->v[x][y].NumPlacePark) != 0) // Si Place de parking on la supprime
@@ -4121,8 +4121,8 @@ void TfrmSimulation::StatusBarResize(TObject * /*Sender*/) const
 //---------------------------------------------------------------------------
 void TfrmSimulation::ActionPlaceVehlibExecute(TObject * /*Sender*/)
 { // v5.3
- int const x=DrawGridSimul->Col;
- int const y=DrawGridSimul->Row;
+ const int x=DrawGridSimul->Col;
+ const int y=DrawGridSimul->Row;
  AnsiString asMsgOp;
  int NumPlace = 0;
  if ((NumPlace=cv->v[x][y].NumPlaceVehlib) != 0) // Si Place de vehlib on la supprime

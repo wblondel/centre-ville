@@ -26,7 +26,7 @@ class PuitsTexte
  {
   bool Ignore=false;
   public:
-  static const bool Noms=true;
+  const static bool Noms=true;
   std::string Texte;
   void Section(const char *Nom);
   // Ignorable : l'objet est entièrement « vide » (valeurs par défaut) ; le
@@ -39,7 +39,7 @@ class PuitsTexte
 class PuitsEmpreinte
  {
   public:
-  static const bool Noms=false;
+  const static bool Noms=false;
   std::uint64_t Empreinte=14695981039346656037ULL; // FNV-1a 64 bits, par mot de 64 bits
   void Ajoute(std::uint64_t v)
    {
@@ -62,7 +62,7 @@ enum partie_etat
   peDistances, // statique après CalculeDistances : hors état « complet »
   NB_PARTIES_ETAT,
  };
-extern const char *NomPartieEtat[NB_PARTIES_ETAT];
+const extern char *NomPartieEtat[NB_PARTIES_ETAT];
 //---------------------------------------------------------------------------
 class ExportEtat // ami de la classe infection (champs privés)
  {

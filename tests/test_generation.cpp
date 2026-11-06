@@ -32,7 +32,7 @@ TEST_CASE("Génération aléatoire de réseau à graine fixe", "[golden][generat
    {
     DYNAMIC_SECTION(Config.Nom)
      {
-      std::string const asTexte=ProduitGoldenGeneration(Config, FichierSortie(std::string("generation_")+Config.Nom+".cvw"));
+      const std::string asTexte=ProduitGoldenGeneration(Config, FichierSortie(std::string("generation_")+Config.Nom+".cvw"));
       CompareAuGolden(std::string("generation/")+Config.Nom+".txt", asTexte);
      }
    }
@@ -46,7 +46,7 @@ TEST_CASE("Copier vers... (PrepareCopie)", "[golden][copie]")
      {
       std::string asDossier=FichierSortie("copie/.");
       asDossier=asDossier.substr(0, asDossier.size()-2);
-      std::string const asTexte=ProduitGoldenCopie(CheminCarte(c), c.Nom, asDossier);
+      const std::string asTexte=ProduitGoldenCopie(CheminCarte(c), c.Nom, asDossier);
       CompareAuGolden(std::string("copie/")+c.Nom+".txt", asTexte);
      }
    }

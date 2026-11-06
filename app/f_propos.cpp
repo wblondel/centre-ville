@@ -49,7 +49,7 @@ namespace
    };
   void DessineTrait(QImage &Image, const Trait &t, int x, QRgb Clair, QRgb Ombre)
    {
-    int const y=1+(3*t.Bande);
+    const int y=1+(3*t.Bande);
     for(int i=t.x0; i<=t.x1; i++)
      {
       Image.setPixel(x+i, y, Clair);
@@ -62,16 +62,16 @@ namespace
 //---------------------------------------------------------------------------
 QPixmap ImageDeVersion(int Majeure, int Mineure)
  {
-  QString const stMajeure=QString::number(Majeure);
-  QString const stMineure=QString::number(Mineure);
+  const QString stMajeure=QString::number(Majeure);
+  const QString stMineure=QString::number(Mineure);
   QImage Image((13*(stMajeure.size()+stMineure.size()))+2, 22, QImage::Format_ARGB32);
   Image.fill(qRgb(0x00, 0x00, 0x00));
   int x=0;
-  for(QChar const c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+  for(const QChar c : stMajeure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }
   DessineTrait(Image, {.Bande=6, .x0=0, .x1=1}, x, qRgb(0xFF, 0xFF, 0x00), qRgb(0x80, 0x80, 0x00)); // virgule
   x+=2;
-  for(QChar const c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
+  for(const QChar c : stMineure) { for(const Trait &t : Chiffres[c.digitValue()]) { DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C)); 
 }x+=13; }
   return QPixmap::fromImage(Image);
  }

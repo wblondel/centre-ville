@@ -115,7 +115,7 @@ void TfrmRecherche::RadioButtonClick(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 static void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 : tirée de FixeNumeroMax
  {
-  TNotifyEvent const Change=CSpinEdit->OnChange;
+  const TNotifyEvent Change=CSpinEdit->OnChange;
   CSpinEdit->OnChange=nullptr;
   CSpinEdit->Value=Valeur;
   CSpinEdit->OnChange=Change;
@@ -148,8 +148,8 @@ static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int
 void TfrmRecherche::FormShow(TObject * /*Sender*/) const
 {
  int i = 0;
- int const x=frmSimulation->DrawGridSimul->Col;
- int const y=frmSimulation->DrawGridSimul->Row;
+ const int x=frmSimulation->DrawGridSimul->Col;
+ const int y=frmSimulation->DrawGridSimul->Row;
  voie *v=&cv->v[x][y];
  frmSimulation->ActionRechercher->Checked=true;
  FixeNumeroMax(CSpinEditParking, cv->NbParkings);
@@ -188,7 +188,7 @@ void TfrmRecherche::FormShow(TObject * /*Sender*/) const
 	 CSpinEditPieton->Value=v->NumPieton[1];
 	}
   }
- auto const Ailleurs=[x, y](int xe, int ye) { return (xe!=x)||(ye!=y); }; // v6.0.12 : voir FixeNumeroCase
+ const auto Ailleurs=[x, y](int xe, int ye) { return (xe!=x)||(ye!=y); }; // v6.0.12 : voir FixeNumeroCase
  if (v->NumBus != 0) { FixeNumeroCase(CSpinEditBus, RadioButtonBus, v->NumBus, Ailleurs(cv->Bus[v->NumBus-1].x, cv->Bus[v->NumBus-1].y)); // v3.0. v6.0.12 : FixeNumeroCase
 }
  if (v->NumArretBus != 0) { FixeNumeroCase(CSpinEditArretBus, RadioButtonArretBus, v->NumArretBus, Ailleurs(cv->ArretBus[v->NumArretBus-1].x, cv->ArretBus[v->NumArretBus-1].y)); // v3.0. v6.0.12
@@ -201,14 +201,14 @@ void TfrmRecherche::FormShow(TObject * /*Sender*/) const
 }
  if (v->NumPlaceTaxi != 0)
   {
-   int const f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile; // v6.0.12 : queue de la file, si la simulation a défini les files (sinon OnChange ne déplace pas le curseur)
+   const int f=cv->PlaceTaxi[v->NumPlaceTaxi-1].NumFile; // v6.0.12 : queue de la file, si la simulation a défini les files (sinon OnChange ne déplace pas le curseur)
    place_taxi *q=(cv->FileTaxi&&(f>=0)&&(f<cv->NbFilesTaxi))?cv->PlaceTaxi+cv->FileTaxi[f].NumPlaceQueue:nullptr;
    CSpinEditPlaceTaxi->Value=v->NumPlaceTaxi; // v3.6
    FixeNumeroCase(CSpinEditFileTaxi, RadioButtonFileTaxi, f+1, (q != nullptr)&&Ailleurs(q->x, q->y)); // v3.6. v6.0.12
   }
  if (v->NumPlacePark != 0) // v5.0
   {
-   int const f=cv->PlacePark[v->NumPlacePark-1].NumFile; // v6.0.12 : comme pour les taxis
+   const int f=cv->PlacePark[v->NumPlacePark-1].NumFile; // v6.0.12 : comme pour les taxis
    place_park *q=(cv->FilePark&&(f>=0)&&(f<cv->NbFilesPark))?cv->PlacePark+cv->FilePark[f].NumPlaceQueue:nullptr;
    CSpinEditPlacePark->Value=v->NumPlacePark;
    FixeNumeroCase(CSpinEditFilePark, RadioButtonFilePark, f+1, (q != nullptr)&&Ailleurs(q->x, q->y)); // v6.0.12

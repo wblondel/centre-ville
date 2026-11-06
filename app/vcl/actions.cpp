@@ -108,17 +108,17 @@ namespace
 //---------------------------------------------------------------------------
 TShortCut RaccourciVcl(const QKeyEvent *e)
  {
-  int const Touche=e->key();
+  const int Touche=e->key();
   if ((Touche==Qt::Key_Shift)||(Touche==Qt::Key_Control)||(Touche==Qt::Key_Alt)||
       (Touche==Qt::Key_Meta)||(Touche==Qt::Key_AltGr)||(Touche==Qt::Key_unknown)) { return 0;
 }
-  bool const PaveNumerique=e->modifiers().testFlag(Qt::KeypadModifier);
+  const bool PaveNumerique=e->modifiers().testFlag(Qt::KeypadModifier);
   int vk=PaveNumerique?0:ToucheVirtuellePhysique(e);
   if (vk == 0) { vk=ToucheVirtuelle(Touche, PaveNumerique);
 }
   if (vk == 0) { return 0;
 }
-  Qt::KeyboardModifiers const m=e->modifiers();
+  const Qt::KeyboardModifiers m=e->modifiers();
   TShortCut sc=vk;
   if (m.testFlag(Qt::ShiftModifier)) { sc|=scShift;
 }
@@ -141,7 +141,7 @@ QKeySequence SequenceQt(TShortCut Raccourci)
  {
   if (Raccourci == 0) { return {};
 }
-  int const vk=Raccourci&0xFF;
+  const int vk=Raccourci&0xFF;
   QString Nom;
   if (const char *n=NomTouche(vk)) { Nom=QString::fromLatin1(n);
   } else if (((vk>='0')&&(vk<='9'))||((vk>='A')&&(vk<='Z'))) { Nom=QChar(vk);
@@ -192,7 +192,7 @@ void TAction::DefinitChecked(bool Valeur)
   Verification=true;
   if (Valeur!=bChecked)
    {
-    std::vector<ClientAction *> const c=Clients;
+    const std::vector<ClientAction *> c=Clients;
     for(ClientAction *Client : c) { Client->LienChecked(bChecked, Valeur);
 }
     bChecked=Valeur;
@@ -211,7 +211,7 @@ void TAction::DefinitEnabled(bool Valeur)
  {
   if (Valeur==bEnabled) { return;
 }
-  std::vector<ClientAction *> const c=Clients;
+  const std::vector<ClientAction *> c=Clients;
   for(ClientAction *Client : c) { Client->LienEnabled(bEnabled, Valeur);
 }
   bEnabled=Valeur;
@@ -221,7 +221,7 @@ void TAction::DefinitVisible(bool Valeur)
  {
   if (Valeur==bVisible) { return;
 }
-  std::vector<ClientAction *> const c=Clients;
+  const std::vector<ClientAction *> c=Clients;
   for(ClientAction *Client : c) { Client->LienVisible(bVisible, Valeur);
 }
   bVisible=Valeur;
@@ -371,7 +371,7 @@ void TMenuItem::Click()
  { // TMenuItem::Click
   if (!bEnabled) { return;
 }
-  bool const AutoCheckLie=(ActionLiee != nullptr)&&(ActionLiee->AutoCheck==AutoCheck);
+  const bool AutoCheckLie=(ActionLiee != nullptr)&&(ActionLiee->AutoCheck==AutoCheck);
   if (AutoCheck&&((!ActionLiee)||(!AutoCheckLie))) {
    Checked=!bChecked;
 }
@@ -446,7 +446,7 @@ bool TMenu::IsShortCut(TShortCut Raccourci, bool Executer)
     std::vector<TMenuItem *> Chaine;
     for(TMenuItem *m=Element; m; m=m->Parent) { Chaine.insert(Chaine.begin(), m);
 }
-    QPointer<TMenu> const Moi(this);
+    const QPointer<TMenu> Moi(this);
     for(TMenuItem *m : Chaine) // DoClick : les parents d'abord, tous activés
      {
       if (!m->Enabled) { break;
@@ -555,7 +555,7 @@ namespace
          }
 }
 
-      TShortCut const sc=RaccourciVcl(k);
+      const TShortCut sc=RaccourciVcl(k);
       if (sc == 0)
        {
         if (e->type()!=QEvent::KeyPress) { return false;

@@ -40,7 +40,7 @@ void TfrmDefVoie::DefinitFeu(direction Dir) const
 //---------------------------------------------------------------------------
 void TfrmDefVoie::AppliqueChoix()
  {
-  AnsiString const asMsg;
+  const AnsiString asMsg;
   TRadioGroup *RadioGroupPriorite[NBDIR]={ RadioGroupPrioriteNord,
                                            RadioGroupPrioriteEst,
                                            RadioGroupPrioriteSud,
@@ -170,12 +170,12 @@ void TfrmDefVoie::RafraichitInfos()
     frmDefVoiePietons->Show();
     return;
    }
-  bool const VoiesTramEtRoutes=(v->SensVoieTram != 0)&&(v->DirPoss != 0);
-  bool const VoieTram[NBDIR]={ v->EstDirPossSensVoieTram(indefinie, nord),
+  const bool VoiesTramEtRoutes=(v->SensVoieTram != 0)&&(v->DirPoss != 0);
+  const bool VoieTram[NBDIR]={ v->EstDirPossSensVoieTram(indefinie, nord),
                          v->EstDirPossSensVoieTram(indefinie, est),
                          v->EstDirPossSensVoieTram(indefinie, sud),
                          v->EstDirPossSensVoieTram(indefinie, ouest),};
-  int const NbDirVoiesTram= static_cast<int>(VoieTram[nord-1])+
+  const int NbDirVoiesTram= static_cast<int>(VoieTram[nord-1])+
                       static_cast<int>(VoieTram[est-1])+
                       static_cast<int>(VoieTram[sud-1])+
                       static_cast<int>(VoieTram[ouest-1]);

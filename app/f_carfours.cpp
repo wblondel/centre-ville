@@ -92,7 +92,7 @@ void TfrmCarrefours::Active(int Colonnes, int Lignes)
   int i = 0;
   TComponent *Component = nullptr;
   AnsiString asType;
-  AnsiString const asTaille=IntToStr(Colonnes)+IntToStr(Lignes); // v6.0.10 : au lieu de IntToStr(10*Colonnes+Lignes), « 34 » aussi pour 2 x 14 (voir app/README.md)
+  const AnsiString asTaille=IntToStr(Colonnes)+IntToStr(Lignes); // v6.0.10 : au lieu de IntToStr(10*Colonnes+Lignes), « 34 » aussi pour 2 x 14 (voir app/README.md)
   for(i=0; i<ComponentCount; i++) { // v5.4 : plus facile de tester les inclusions que les exclusions ;^)
    if ((NomDe(Components[i]).SubString(1, 8)=="GroupBox")|| // portage : TComponent::Name -> NomDe
 	   (NomDe(Components[i]).SubString(1, 11)=="SpeedButton"))
@@ -121,14 +121,14 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
  int d1 = 0;
  int d2 = 0;
  int d3 = 0;
- int const xd=frmSimulation->DrawGridSimul->Selection.Left;
- int const yd=frmSimulation->DrawGridSimul->Selection.Top;
- int const xf=frmSimulation->DrawGridSimul->Selection.Right;
- int const yf=frmSimulation->DrawGridSimul->Selection.Bottom;
- int const mrRep=(static_cast<TSpeedButton*>(Sender))->Tag;
- int const Dimensions=mrRep/100;
- int const Orientation=(mrRep%100)/10;
- int const Type=mrRep%10;
+ const int xd=frmSimulation->DrawGridSimul->Selection.Left;
+ const int yd=frmSimulation->DrawGridSimul->Selection.Top;
+ const int xf=frmSimulation->DrawGridSimul->Selection.Right;
+ const int yf=frmSimulation->DrawGridSimul->Selection.Bottom;
+ const int mrRep=(static_cast<TSpeedButton*>(Sender))->Tag;
+ const int Dimensions=mrRep/100;
+ const int Orientation=(mrRep%100)/10;
+ const int Type=mrRep%10;
  int NumFeux[4];
  if ((Dimensions<44)&&(Type>1)) {
   while(cv->NbFeuxLibres()<3) {

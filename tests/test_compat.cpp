@@ -68,7 +68,7 @@ TEST_CASE("Format/ARRAYOFCONST : spécificateurs de SysUtils", "[compat][chaine]
 //---------------------------------------------------------------------------
 TEST_CASE("Format : séparateurs de FormatSettings (VCL en français)", "[compat][chaine]")
  { // L'application règle les séparateurs comme la VCL en français ; le moteur garde '.'
-  TFormatSettings const Sauvegarde=FormatSettings;
+  const TFormatSettings Sauvegarde=FormatSettings;
   FormatSettings.DecimalSeparator=',';
   FormatSettings.ThousandSeparator="\xC2\xA0"; // espace insécable
   CHECK(Format("%.2f (%.2f%%)", ARRAYOFCONST((3.14159, (long double)12.5)))==AnsiString("3,14 (12,50%)"));
@@ -88,7 +88,7 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
   srand(1);
   CHECK(alea::Graine()==alea::GRAINE_INITIALE);
   const int Attendu[10]={130, 10982, 1090, 11656, 7117, 17595, 6415, 22948, 31126, 9004};
-  for(int const i : Attendu) {
+  for(const int i : Attendu) {
    CHECK(rand()==i);
 }
   // Bornes : RAND_MAX Borland = 32767
@@ -96,7 +96,7 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
   bool Max15Bits=true;
   for(int i=0; i<100000; i++)
    {
-    int const r=rand();
+    const int r=rand();
     Max15Bits=Max15Bits&&(r>=0)&&(r<=alea::RAND_MAX_BORLAND);
    }
   CHECK(Max15Bits);
@@ -111,9 +111,9 @@ TEST_CASE("rand()/srand() : LCG de la RTL Borland", "[compat][alea]")
 TEST_CASE("rand()/srand() : graine injectable", "[compat][alea]")
  {
   alea::FixeGraine(42);
-  int const a=rand();
+  const int a=rand();
   srand(987654); // ignorée tant que la graine est fixée (AppelleAuChaos)
-  int const b=rand();
+  const int b=rand();
   CHECK(a==b);
   alea::LibereGraine();
   srand(987654);
@@ -255,7 +255,7 @@ namespace
    }
   void EcritTout(const AnsiString &asNom, const std::string &asOctets)
    {
-    int const h=FileCreate(asNom);
+    const int h=FileCreate(asNom);
     REQUIRE(h>0);
     FileWrite(h, asOctets.data(), static_cast<unsigned>(asOctets.size()));
     FileClose(h);

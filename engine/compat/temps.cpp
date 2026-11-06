@@ -11,7 +11,7 @@ namespace
   std::tm HeureLocale(int &Millisecondes)
    {
     using namespace std::chrono;
-    system_clock::time_point const Maintenant=system_clock::now();
+    const system_clock::time_point Maintenant=system_clock::now();
     std::time_t t=system_clock::to_time_t(Maintenant);
     Millisecondes=static_cast<int>(duration_cast<milliseconds>(Maintenant.time_since_epoch()).count()%1000);
     if (Millisecondes<0) { Millisecondes+=1000;

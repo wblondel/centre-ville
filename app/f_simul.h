@@ -43,7 +43,7 @@ enum operation_avant : char {oaNouveau, oaOuvrir, oaQuitter};
 enum mode_edition : char {meAucun, meCase, meSelection}; // pour RafraichitBoutonEdition. v3.5
 //---------------------------------------------------------------------------
 // Utilisée dans la classe TfrmSimulation
-extern const AnsiString asTitreCV;
+const extern AnsiString asTitreCV;
 //---------------------------------------------------------------------------
 // Classe de la fiche
 class TfrmSimulation : public TFormPrincipale // portage : TForm -> QMainWindow
@@ -548,7 +548,7 @@ private:
   bool SimulEstEnCours() const { return SimulEnCours; };
   void MarcheArretSimul(bool EnCours)
    {
-    bool const EtaitEnCours=SimulEnCours; // v6.0.2 : Arrêt en pause : le chrono est déjà arrêté
+    const bool EtaitEnCours=SimulEnCours; // v6.0.2 : Arrêt en pause : le chrono est déjà arrêté
     SimulEnCours=EnCours;
     if (EnCours) {
      cv->TopChrono();
@@ -709,6 +709,6 @@ extern TfrmSimulation *frmSimulation; // portage : PACKAGE
 // v3.5 : Ajout de Tram aux constantes de Couleur
 extern TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM];
 extern TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM];
-extern const AnsiString asMemInsuff, asErrInattendue, asFormatCoord;
+const extern AnsiString asMemInsuff, asErrInattendue, asFormatCoord;
 //---------------------------------------------------------------------------
 #endif

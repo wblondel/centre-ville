@@ -18,7 +18,7 @@ namespace
   // Premier octet différent entre deux contenus (-1 si identiques)
   long long PremierEcart(const std::string &a, const std::string &b)
    {
-    std::size_t const n=a.size()<b.size()?a.size():b.size();
+    const std::size_t n=a.size()<b.size()?a.size():b.size();
     for(std::size_t i=0; i<n; i++) {
      if (a[i]!=b[i]) { return static_cast<long long>(i);
 }
@@ -51,7 +51,7 @@ namespace
   //-------------------------------------------------------------------------
   void EcritFichier(const std::string &asChemin, const std::string &asContenu)
    {
-    int const h=FileCreate(asChemin.c_str());
+    const int h=FileCreate(asChemin.c_str());
     REQUIRE(h>0);
     REQUIRE(FileWrite(h, asContenu.data(), (unsigned)asContenu.size())==(int)asContenu.size());
     FileClose(h);
@@ -204,7 +204,7 @@ TEST_CASE("Chargement : élimination des feux fantômes (v5.1.1)", "[cvw][roundt
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw, format 0x530, 109 feux
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(Ref.Version==VERSION);
   const int NbX=LitEntier(asCarte, Champ(Ref, "NbX"));
@@ -225,7 +225,7 @@ TEST_CASE("Chargement : élimination des feux fantômes (v5.1.1)", "[cvw][roundt
   for(int x=0; asNomChamp.empty()&&(x<NbX); x++) {
    for(int y=0; asNomChamp.empty()&&(y<NbY); y++)
     {
-     std::string const n="case("+std::to_string(x)+","+std::to_string(y)+").NumFeu[0]";
+     const std::string n="case("+std::to_string(x)+","+std::to_string(y)+").NumFeu[0]";
      if (((x!=xf)||(y!=yf))&&(LitEntier(asCarte, Champ(Ref, n)) == 0)) { asNomChamp=n;
 }
     }
@@ -250,7 +250,7 @@ TEST_CASE("Chargement : parkings indéfinis retirés et renumérotés (v5.1)", "
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[0])); // 8x8.cvw : 4 parkings
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(LitEntier(asCarte, Champ(Ref, "NbParkings"))==4);
   int x[5];
@@ -284,7 +284,7 @@ TEST_CASE("Chargement : refus d'un fichier de version ultérieure", "[cvw]")
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[0]));
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   EcritEntier(asCarte, Champ(Ref, "Version"), VERSION+0x10);
   const std::string asFutur=FichierSortie("version_future.cvw");

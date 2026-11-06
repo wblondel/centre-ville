@@ -364,7 +364,7 @@ bool infection::DoitSuccomber(int Tour) const
 //-----------------------------------------------------------------------------
 void pieton::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -562,7 +562,7 @@ void feu::RetireFeuAtt(int NumFeu) // NumFeu(>0) doit être dans NumFeuxAtt[]
 //-----------------------------------------------------------------------------
 void feu::ChangeEtat()
  {
-  bool const ChgEtat=(Etat!=ProchainEtat);
+  const bool ChgEtat=(Etat!=ProchainEtat);
   Etat=ProchainEtat;
   if (ChgEtat) { vue->RedessineCase(x, y, false); // portage
 }
@@ -914,9 +914,9 @@ void feu_pieton::DefinitFeuOppose()
   int k = 0;
   for(k=1; cv->V_(x[0],y[0],k,Dir[0]).PassagePietons; k++) {;
 }
-  int const xx=(x[0]+(k*dx[Dir[0]]))%cv->NbX;
-  int const yy=(y[0]+(k*dy[Dir[0]]))%cv->NbY;
-  direction const dd=InvDir[Dir[0]];
+  const int xx=(x[0]+(k*dx[Dir[0]]))%cv->NbX;
+  const int yy=(y[0]+(k*dy[Dir[0]]))%cv->NbY;
+  const direction dd=InvDir[Dir[0]];
   x[1]=xx;
   y[1]=yy;
   Dir[1]=dd;
@@ -957,7 +957,7 @@ void feu_pieton::RetireFeu(int NumFeu) // //v5.2
 //-----------------------------------------------------------------------------
 void feu_pieton::ChangeEtat()
  {
-  bool const ChgEtat=(Etat!=ProchainEtat);
+  const bool ChgEtat=(Etat!=ProchainEtat);
   Etat=ProchainEtat;
   if (ChgEtat) {
    for(int i=0; i<NBFEUXPIETONSPARNUMERO; i++) {
@@ -1178,7 +1178,7 @@ bool parking::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void parking::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Parking n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Parking n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1211,12 +1211,12 @@ void vehicule::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction const AncDir=Dir; // v2.2.4
-  bool const Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
+  const direction AncDir=Dir; // v2.2.4
+  const bool Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   Dir=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings.
@@ -1295,11 +1295,11 @@ void vehicule::CalculeProchaineDirection()
 direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
  {
   voie *v=&(cv->V(x,y,Dir)); // Ici v est la prochaine case
-  bool const Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
+  const bool Prioritaire=(NivPriorite>normal); // v3.5 (pour DistParking)
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
@@ -1362,7 +1362,7 @@ bool vehicule::PeutPasser() const
 //-----------------------------------------------------------------------------
 void vehicule::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Véhicule n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Véhicule n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1412,7 +1412,7 @@ bool place_vehlib::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void place_vehlib::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Place Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Place Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1451,11 +1451,11 @@ void vehlib::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction const AncDir=Dir; // v2.2.4
+  const direction AncDir=Dir; // v2.2.4
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
 
   if ((Situation==svAttente)&&  // Si le vehlib attend,
       (NbPietonsQuiSontMontes() != 0)&& // On regarde déjà s'il y a des piétons qui veulent monter...
@@ -1531,7 +1531,7 @@ direction vehlib::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT 
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
 
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
@@ -1610,8 +1610,8 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
    }
   while((NumPlace+1==NumPlaceDepart)||(!cv->PlaceVehlib[NumPlace].EstLibre()));
   place_vehlib *pv=cv->PlaceVehlib+NumPlace;
-  int const xp=pv->x;
-  int const yp=pv->y;
+  const int xp=pv->x;
+  const int yp=pv->y;
   pv->NumVehlibReserve=Numero;
   NumPlaceArrivee=NumPlace+1;
   vue->RedessineCase(xp, yp, false); // portage
@@ -1621,8 +1621,8 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int const xp=p->x;
-  int const yp=p->y;
+  const int xp=p->x;
+  const int yp=p->y;
   if ((NbPersonnes<cv->NbMaxPersonnesVehlib)&&
       ((NumPlaceArrivee != 0)||ReservePlaceVehlibCible())) // v6.0.1 : le piéton ne monte que si une place d'arrivée est réservée (sinon il attend)
    {
@@ -1655,7 +1655,7 @@ int vehlib::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui atten
 //-----------------------------------------------------------------------------
 void vehlib::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Vehlib n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1711,15 +1711,15 @@ bool depot_bus::Sauve(int hfile) // v3.0
 //-----------------------------------------------------------------------------
 void depot_bus::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString const asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
+  const AnsiString asSource=Format("Dépot bus (%d,%d)", ARRAYOFCONST((x, y))); // v6.0.1 : "Dépot bus : " (sans spécificateur) dans l'original
   VerifiePosition(asMsgErr, asSource, x, y, PEUT_ETRE_INDEFINI);
  }
 //-----------------------------------------------------------------------------
 void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int const xp=p->x;
-  int const yp=p->y;
+  const int xp=p->x;
+  const int yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesBus)
    {
     NbPersonnes++;
@@ -1732,7 +1732,7 @@ void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
 void bus::FaitMonterEtDescendre() // v3.0
  {
   int i = 0;
-  direction const d=ADroiteDe[Dir];
+  const direction d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -1754,11 +1754,11 @@ void bus::CalculeProchaineDirection() // v3.0
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction const AncDir=Dir;
+  const direction AncDir=Dir;
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   Dir=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux arrêts de bus
   // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
@@ -1811,7 +1811,7 @@ direction bus::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETR
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Bus.+Tour) Modulo Directions Possibles
@@ -1868,7 +1868,7 @@ int bus::NumeroArretSuivant() const // v3.0
 //-----------------------------------------------------------------------------
 void bus::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString const asSource=Format("Bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -1961,7 +1961,7 @@ bool arret_bus::Sauve(int hfile) // v3.0
 void arret_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString const asSource=Format("Arrêt de bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Arrêt de bus n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2009,7 +2009,7 @@ bool ligne_bus::Sauve(int hfile) // v3.0
 void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString const asSource=Format("Ligne de bus n°%d", ARRAYOFCONST((Numero)));
+  const AnsiString asSource=Format("Ligne de bus n°%d", ARRAYOFCONST((Numero)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2028,8 +2028,8 @@ void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
 void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int const xp=p->x;
-  int const yp=p->y;
+  const int xp=p->x;
+  const int yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesTram)
    {
     NbPersonnes++;
@@ -2042,7 +2042,7 @@ void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
 void tram::FaitMonterEtDescendre() // v3.5
  {
   int i = 0;
-  direction const d=ADroiteDe[Dir];
+  const direction d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -2064,12 +2064,12 @@ void tram::CalculeProchaineDirection() // v3.5
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction const AncDir=DirDrnDepl;
+  const direction AncDir=DirDrnDepl;
   int OrdreDir[NBDIR]={0,0,0,0};
   int d = 0;
   int i = 0;
   int j = 0;
-  int const nd=v->NbDirPossSensVoieTram(indefinie);
+  const int nd=v->NbDirPossSensVoieTram(indefinie);
   int // Nombre total de directions (pour DistArretTram)
       const ndp=v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre de directions possibles
   Dir=indefinie;
@@ -2128,7 +2128,7 @@ direction tram::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
   int d = 0;
   int i = 0;
   int j = 0;
-  int const ndp=v->NbDirPossSensVoieTram(InvDir[Dir]); // Nombre de directions possibles
+  const int ndp=v->NbDirPossSensVoieTram(InvDir[Dir]); // Nombre de directions possibles
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
@@ -2186,7 +2186,7 @@ int tram::NumeroArretSuivant() const // v3.0
 //-----------------------------------------------------------------------------
 void tram::Verifie(AnsiString &asMsgErr) const // v3.03
  {
-  AnsiString const asSource=Format("Tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2279,7 +2279,7 @@ bool arret_tram::Sauve(int hfile) // v3.0
 void arret_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString const asSource=Format("Arrêt de tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Arrêt de tram n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2327,7 +2327,7 @@ bool ligne_tram::Sauve(int hfile) // v3.0
 void ligne_tram::Verifie(AnsiString &asMsgErr) // v3.0
  {
   int i = 0;
-  AnsiString const asSource=Format("Ligne de tram n°%d", ARRAYOFCONST((Numero)));
+  const AnsiString asSource=Format("Ligne de tram n°%d", ARRAYOFCONST((Numero)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2366,7 +2366,7 @@ bool place_taxi::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void place_taxi::Verifie(AnsiString &asMsgErr)
  {
-  AnsiString const asSource=Format("Place Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Place Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2440,11 +2440,11 @@ void taxi::CalculeProchaineDirection()
  {
   voie *v=&cv->v[x][y];
   voie *Voie = nullptr;
-  direction const AncDir=Dir; // v2.2.4
+  const direction AncDir=Dir; // v2.2.4
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
 
   if ((Situation==stAttente)&&  // Si le taxi attend,
       (NbPietonsQuiSontMontes() != 0)) // On regarde déjà s'il y a des piétons qui veulent monter...
@@ -2510,7 +2510,7 @@ direction taxi::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
   int OrdreDir[NBDIR]={0,0,0,0};
   int i = 0;
   int j = 0;
-  int const ndp=NbDir[v->DirPoss];
+  const int ndp=NbDir[v->DirPoss];
   direction DirAuCarrefour=indefinie;
   // On classe les dir.poss. dans l'ordre < des distances aux parkings si la case est libre.
   // En cas d'égalité, c'est le hasard : (N°Veh.+Tour) Modulo Directions Possibles
@@ -2561,7 +2561,7 @@ bool taxi::PeutPasser() const
 void taxi::FaitDescendrePietons() const
  {
   int i = 0;
-  direction const d=ADroiteDe[Dir];
+  const direction d=ADroiteDe[Dir];
   voie *v=&cv->V(x,y,d);
   pieton *p = nullptr;
   for(i=0; i<cv->NbPietons; i++)
@@ -2578,8 +2578,8 @@ void taxi::FaitDescendrePietons() const
 void taxi::FaitMonterPieton(int NumPietonAFaireMonter)
  {
   pieton *p=cv->Pieton+NumPietonAFaireMonter;
-  int const xp=p->x;
-  int const yp=p->y;
+  const int xp=p->x;
+  const int yp=p->y;
   if (NbPersonnes<cv->NbMaxPersonnesTaxi)
    {
     NbPersonnes++;
@@ -2610,7 +2610,7 @@ int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attenda
 //-----------------------------------------------------------------------------
 void taxi::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Taxi n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2641,7 +2641,7 @@ bool place_park::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void place_park::Verifie(AnsiString &asMsgErr) const
  {
-  AnsiString const asSource=Format("Place prkg n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
+  const AnsiString asSource=Format("Place prkg n°%d (%d,%d)", ARRAYOFCONST((Numero, x, y)));
   if (Numero<0) {
    asMsgErr+=asSource+Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
 }
@@ -2842,8 +2842,8 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
   int i = 0;
   int j = 0;
   int nd=NbDir[DirPoss];
-  int const ne=cv->NbParkings;
-  int const nab=cv->NbArretsBus;
+  const int ne=cv->NbParkings;
+  const int nab=cv->NbArretsBus;
   int // v3.0
       const nat=cv->NbArretsTram;
   int // v3.5
@@ -2951,7 +2951,7 @@ bool voie::PrepareCalculAttenteTrafic()
   bool Ok=true;
   int i = 0;
   int j = 0;
-  int const ne=cv->NbParkings;
+  const int ne=cv->NbParkings;
   LibereAttenteTrafic(); // v6.0.1
   NbParkingsAttente=ne; // v6.0.1
   if (ne>0)
@@ -3558,8 +3558,8 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 	// 1. Infection par contact
 	if (NbPietonsDehors==2)
 	 {
-	  int const np1=NumPietonDehors[0];
-	  int const np2=NumPietonDehors[1];
+	  const int np1=NumPietonDehors[0];
+	  const int np2=NumPietonDehors[1];
 	  pieton *p1=&cv->Pieton[np1-1];
 	  pieton *p2=&cv->Pieton[np2-1];
 	  if (p1->EstContagieux()&&
@@ -3592,7 +3592,7 @@ void voie::DeplacePietons() //v3.5 : Inclut l'attente aux arrêts de bus/tram, l
 //-----------------------------------------------------------------------------
 void voie::RetireArretBus() // v3.0
  {
-  int const Numero=NumArretBus;
+  const int Numero=NumArretBus;
   int d = 0;
   NumArretBus=0;
   if (vue) { vue->RedessineCase(x,y,true); // portage
@@ -3606,7 +3606,7 @@ void voie::RetireArretBus() // v3.0
 //-----------------------------------------------------------------------------
 void voie::RetireArretTram() // v3.5
  {
-  int const Numero=NumArretTram;
+  const int Numero=NumArretTram;
   int d = 0;
   NumArretTram=0;
   if (vue) { vue->RedessineCase(x,y,true); // portage
@@ -4219,7 +4219,7 @@ void voie::DefinitNature(nature NvNature, bool Ecraser) // v3.8
 void voie::TuePietons() // v4.3
  {
   int NbPietonsEcrases=0;
-  for(int const i : NumPieton) {
+  for(const int i : NumPieton) {
    if (i != 0)
     {
      NbPietonsEcrases++;
@@ -4324,7 +4324,7 @@ void voie::Verifie(AnsiString &asMsgErr)
   int i = 0;
   int xx = 0;
   int yy = 0;
-  AnsiString const asSource=Format("Case (%d,%d)", ARRAYOFCONST((x, y)));
+  const AnsiString asSource=Format("Case (%d,%d)", ARRAYOFCONST((x, y)));
   VerifiePosition(asMsgErr, asSource, x, y, DOIT_ETRE_DEFINI);
   VerifieDirPoss(asMsgErr, asSource, DirPoss);
   for(i=0; i<NBDIR; i++)
@@ -5080,7 +5080,7 @@ bool centre_ville::ExisteCaseArretBus(int x, int y) const // v3.0
  {
   bool Existe=false;
   int d = 0;
-  int const i=v[x][y].NumArretBus;
+  const int i=v[x][y].NumArretBus;
   voie *Voie = nullptr;
   for(d=nord; d<=ouest; d++)
    {
@@ -5100,7 +5100,7 @@ bool centre_ville::ExisteCaseArretTram(int x, int y) const // v3.5
  {
   bool Existe=false;
   int d = 0;
-  int const i=v[x][y].NumArretTram;
+  const int i=v[x][y].NumArretTram;
   voie *Voie = nullptr;
   for(d=nord; d<=ouest; d++)
    {
@@ -5118,7 +5118,7 @@ bool centre_ville::ExisteCaseArretTram(int x, int y) const // v3.5
 //-----------------------------------------------------------------------------
 void centre_ville::SupprimeArretBus(int x, int y) // v3.0. Supprime sur une case seulement
  {
-  int const i=v[x][y].NumArretBus;
+  const int i=v[x][y].NumArretBus;
   if ((i>0)&&(i<=NbArretsBus))
    {
     if (!ExisteCaseArretBus(x, y)) {
@@ -5130,7 +5130,7 @@ void centre_ville::SupprimeArretBus(int x, int y) // v3.0. Supprime sur une case
 //-----------------------------------------------------------------------------
 void centre_ville::SupprimeArretTram(int x, int y) // v3.5. Supprime sur une case seulement
  {
-  int const i=v[x][y].NumArretTram;
+  const int i=v[x][y].NumArretTram;
   if ((i>0)&&(i<=NbArretsTram))
    {
     if (!ExisteCaseArretTram(x, y)) {
@@ -5215,7 +5215,7 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  const direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectPsgPt == 0)|| // NbMaxCasesDetectPsgPt et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5251,7 +5251,7 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) const 
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  const direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectArretBus == 0)|| // NbMaxCasesDetectArretBus et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5290,7 +5290,7 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) const
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  const direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectArretTram == 0)|| // NbMaxCasesDetectArretTram et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5329,7 +5329,7 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) const
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  const direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectFileTaxi == 0)|| // NbMaxCasesDetectFileTaxi et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5368,7 +5368,7 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) con
   int i = 0;
   int d = 0;
   int Dist[2]={0,0};
-  direction const Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
+  const direction Dir[2]={static_cast<direction>(3-SensRecherche),static_cast<direction>(5-SensRecherche)};
   if ((NbMaxCasesDetectFileVehlib == 0)|| // NbMaxCasesDetectFileVehlib et
       (SensRecherche == 0)) { // SensRecherche
    return indefinie; //  doivent être définis (horizontal|vertical ; >0)
@@ -5571,7 +5571,7 @@ bool centre_ville::AjoutArretTramPossible(int x, int y) // v3.5
 bool centre_ville::SuppressionArretBusPossible(int x, int y) const // v3.0
  {
   int d = 0;
-  int const i=v[x][y].NumArretBus;
+  const int i=v[x][y].NumArretBus;
   int n=0;
   for(d=nord; d<=ouest; d++) {
    n+=static_cast<int>(_V(x,y,d).NumArretBus==i);
@@ -5582,7 +5582,7 @@ bool centre_ville::SuppressionArretBusPossible(int x, int y) const // v3.0
 bool centre_ville::SuppressionArretTramPossible(int x, int y) const // v3.5
  {
   int d = 0;
-  int const i=v[x][y].NumArretTram;
+  const int i=v[x][y].NumArretTram;
   int n=0;
   for(d=nord; d<=ouest; d++) {
    n+=static_cast<int>(_V(x,y,d).NumArretTram==i);
@@ -5847,7 +5847,7 @@ void centre_ville::IncrementeTrafic(int NumVehicule) const
 void centre_ville::IncrementeAttente(int NumVehicule) const
  { // A VOIR : créer infos trafic pour les parkings extérieurs.
   vehicule *veh=Vehicule+(NumVehicule-1);
-  int const n=TourCrt-veh->TourDrnDepl-1;
+  const int n=TourCrt-veh->TourDrnDepl-1;
   if (n>0)
    {
     if ((veh->NumParkingDepart != 0)&&(veh->NumParkingArrivee != 0)) {
@@ -6210,7 +6210,7 @@ bool centre_ville::PrepareVehlibs() // v5.3. Les vehlibs ainsi que leurs places
     NbVehlibs=0;
     return true;
    }
-  int const NbVehlibsADefinir=1+NUMVEHLIBPLACE(NbPlacesVehlib-1);
+  const int NbVehlibsADefinir=1+NUMVEHLIBPLACE(NbPlacesVehlib-1);
   int // On calcule le n° de vehlib pour la dernière place (NbPlacesVehlib-1) auquel on rajoute 1 pour avoir le nombre de vehlibs à créer.
       NumVehlib=0;
 
@@ -6243,7 +6243,7 @@ bool centre_ville::PreparePietons() // v2.0
   int x = 0;
   int y = 0;
   int i = 0;
-  int const NbPietonsAvantCreation=NbPietons;
+  const int NbPietonsAvantCreation=NbPietons;
   direction Dir;
   if (DefinitNbPietons(NbPietonsAvantCreation)!=NbPietonsAvantCreation) {
    return false;
@@ -6629,7 +6629,7 @@ bool centre_ville::Charge(int hfile)
   int // v5.1
 	  NvNbPlacesVehlib=0; // v5.3
   bool Ok = false;
-  int const Position=FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
+  const int Position=FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
   TailleFichierCharge=FileSeek(hfile, 0, 2);
   FileSeek(hfile, Position, 0);
   NbPietons=-1;
@@ -6999,7 +6999,7 @@ bool centre_ville::Sauve(int hfile)
 //-----------------------------------------------------------------------------
 void centre_ville::Verifie(AnsiString &asMsgErr)
  { // v5.0 : Calcul préalable pour le NbVehicules
-  int const NbMinVehicules= (NbParkings*(NbParkings-1))
+  const int NbMinVehicules= (NbParkings*(NbParkings-1))
                      +(2*NbPlacesPark);
   int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
       const NbMaxVehicules= NbParkings<2?0: // v6.0.3 : division par zéro dans l'original (signalé plus bas)
@@ -7269,7 +7269,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
     frmSimulation->DrawGridSimul->Col=x;
     frmSimulation->DrawGridSimul->Row=y;
     frmSimulation->RedessineCase(x,y,true); */
-    int const l=1+((LgrMinSgmtRoute*((((d-1)%2) != 0)?NbX:NbY))/10)+ // Longueur du nouveau segment de route
+    const int l=1+((LgrMinSgmtRoute*((((d-1)%2) != 0)?NbX:NbY))/10)+ // Longueur du nouveau segment de route
           (rand()%(1+(((LgrMaxSgmtRoute-LgrMinSgmtRoute)*((((d-1)%2) != 0)?NbX:NbY))/10)));
     //AfficheMessage("Départ du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
     bool //MemeDir=false, // pour débogage
@@ -7300,7 +7300,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
           (!EntreeIntersection)) // OU SI arrivée sur une route refusée
        { // ALORS on part A GAUCHE OU A DROITE (on évite les deux problèmes)
         //AfficheMessage("DirOpposée||(!EntreeIntersection)","("+IntToStr((x+k*dx[d])%NbX)+","+IntToStr((y+k*dy[d])%NbY)+"),Pas Ok,"+IntToStr(k)+"/"+IntToStr(l)+","+asDir[d], tmInformation,0,0);
-        int const dd=1+((d+(2*(rand()%2)))%NBDIR);
+        const int dd=1+((d+(2*(rand()%2)))%NBDIR);
         if (k == 0) {
          DejaFait[dd]=true;
         } else {

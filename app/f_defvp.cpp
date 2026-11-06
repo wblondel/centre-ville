@@ -32,7 +32,7 @@ void TfrmDefVoiePietons::DefinitFeu(direction Dir) const
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::AppliqueChoix()
  {
-  AnsiString const asMsg;
+  const AnsiString asMsg;
   frmSimulation->SimulationModifiee=true;
 
   // 1. On supprime les feux si on change de priorité (et on ferme la fiche DefFeuxPieton)
@@ -178,7 +178,7 @@ void TfrmDefVoiePietons::FormCreate(TObject * /*Sender*/)
 void TfrmDefVoiePietons::SpeedButtonClick(TObject *Sender)
 {
  auto *SpeedButtonNESO=static_cast<TSpeedButton*>(Sender);
- auto const d=static_cast<direction>(TagDe(static_cast<TComponent*>(Sender))+1); // portage : TComponent::Tag -> TagDe
+ const auto d=static_cast<direction>(TagDe(static_cast<TComponent*>(Sender))+1); // portage : TComponent::Tag -> TagDe
  ButtonAppliquer->Enabled=true;
  if (SpeedButtonNESO->Down)
   {

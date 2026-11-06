@@ -48,10 +48,10 @@ namespace
    {
     if (Nom.starts_with("case(")) { return false;
 }
-    std::size_t const p=Nom.rfind('.');
+    const std::size_t p=Nom.rfind('.');
     if (p==std::string::npos) { return false;
 }
-    std::string const Fin=Nom.substr(p+1);
+    const std::string Fin=Nom.substr(p+1);
     return (Fin=="x")||(Fin=="y")||Fin.starts_with("x[")||Fin.starts_with("y[");
    }
   //-------------------------------------------------------------------------
@@ -63,7 +63,7 @@ namespace
   //-------------------------------------------------------------------------
   void EcritFichier(const std::string &asChemin, const std::string &asContenu)
    {
-    int const h=FileCreate(asChemin.c_str());
+    const int h=FileCreate(asChemin.c_str());
     REQUIRE(h>0);
     REQUIRE(FileWrite(h, asContenu.data(), (unsigned)asContenu.size())==(int)asContenu.size());
     REQUIRE(FileFlush(h));
@@ -125,7 +125,7 @@ TEST_CASE("Vehlibs : sans place libre, le vehlib attend au lieu de figer la simu
 }
      }
     for(int p=0; p<cv->NbPlacesVehlib; p++) {
-     if (int const n=cv->PlaceVehlib[p].NumVehlibReserve)
+     if (const int n=cv->PlaceVehlib[p].NumVehlibReserve)
       {
        INFO("Tour " << t << ", place de vehlib n°" << p+1);
        REQUIRE(cv->Vehlib[n-1].NumPlaceArrivee==p+1);
@@ -152,7 +152,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
   AnsiString asMsgErr;
   REQUIRE(harnais::Demarre(asMsgErr));
   REQUIRE(cv->NbVehlibs==29);
-  auto const Ecart=[](int a, int b, int n) { int const e=std::abs(a-b); return std::min(e, n-e); }; // la carte est un tore
+  const auto Ecart=[](int a, int b, int n) { const int e=std::abs(a-b); return std::min(e, n-e); }; // la carte est un tore
   std::vector<int> VehlibAvant(cv->NbPietons);
   std::vector<int> xAvant(cv->NbPietons);
   std::vector<int> yAvant(cv->NbPietons);
@@ -216,7 +216,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
         for(int p=0; p<cv->NbPietons; p++) {
          if (VehlibAvant[p]==i+1)
           {
-           pieton  const&pt=cv->Pieton[p];
+           const pieton & pt=cv->Pieton[p];
            INFO("piéton n°" << p+1);
            if (pt.NumVehlib != 0)
             { // Aucun trottoir voisin ne pouvait l'accueillir : il reste à bord et
@@ -241,7 +241,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
      }
     for(int p=0; p<cv->NbPietons; p++)
      {
-      pieton  const&pt=cv->Pieton[p];
+      const pieton & pt=cv->Pieton[p];
       if (pt.NumVehlib != 0)
        {
         INFO("Tour " << t << ", piéton n°" << p+1);
@@ -255,7 +255,7 @@ TEST_CASE("Vehlibs : les passagers descendent à destination et redeviennent des
         }
      }
     for(int p=0; p<cv->NbPlacesVehlib; p++) {
-     if (int const n=cv->PlaceVehlib[p].NumVehlibReserve)
+     if (const int n=cv->PlaceVehlib[p].NumVehlibReserve)
       {
        INFO("Tour " << t << ", place de vehlib n°" << p+1);
        REQUIRE(cv->Vehlib[n-1].NumPlaceArrivee==p+1);
@@ -277,10 +277,10 @@ TEST_CASE("Ouverture : une erreur de lecture fait échouer Charge", "[correction
    // les chaînes de &&, et un champ lu en partie comptait pour lu
   VueNulle Vue;
   vue=&Vue;
-  auto const Charge=[](int h)
+  const auto Charge=[](int h)
    {
     cv=new centre_ville(false, 0, 0); // AUCUN_ELEMENT_PAR_DEFAUT
-    bool const Ok=cv->Charge(h);
+    const bool Ok=cv->Charge(h);
     delete cv;
     cv=nullptr;
     return Ok;
@@ -304,7 +304,7 @@ TEST_CASE("Ouverture : une erreur de lecture fait échouer Charge", "[correction
   CHECK_FALSE(Charge(h));
   FileClose(h);
   // Fichier coupé au milieu du dernier champ, et plus tôt
-  for(std::size_t const Coupe : {static_cast<std::size_t>(1), static_cast<std::size_t>(2), asOctets.size()/2, asOctets.size()-4})
+  for(const std::size_t Coupe : {static_cast<std::size_t>(1), static_cast<std::size_t>(2), asOctets.size()/2, asOctets.size()-4})
    {
     {
      std::ofstream f(asCopie, std::ios::binary|std::ios::trunc);
@@ -328,16 +328,16 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
   harnais::Ferme();
   const std::string asOctets=harnais::LitFichier(asSource);
   const std::string asCopie=FichierSortie("nombres_impossibles.cvw");
-  auto const Charge=[&asCopie](const std::string &asDonnees)
+  const auto Charge=[&asCopie](const std::string &asDonnees)
    {
     {
      std::ofstream f(asCopie, std::ios::binary|std::ios::trunc);
      f.write(asDonnees.data(), static_cast<std::streamsize>(asDonnees.size()));
     }
-    int const h=FileOpen(asCopie.c_str(), fmOpenRead);
+    const int h=FileOpen(asCopie.c_str(), fmOpenRead);
     REQUIRE(h>0);
     cv=new centre_ville(false, 0, 0); // AUCUN_ELEMENT_PAR_DEFAUT
-    bool const Ok=cv->Charge(h);
+    const bool Ok=cv->Charge(h);
     delete cv;
     cv=nullptr;
     FileClose(h);
@@ -357,7 +357,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
     }
 }
   // Zone sans case : v resterait nul
-  for(std::size_t const Position : {static_cast<std::size_t>(8), static_cast<std::size_t>(12)})
+  for(const std::size_t Position : {static_cast<std::size_t>(8), static_cast<std::size_t>(12)})
    {
     std::string asDonnees=asOctets;
     int Zero=0;
@@ -412,7 +412,7 @@ TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corre
    // les 64 Ko ou à la fermeture)
   VueNulle Vue;
   vue=&Vue;
-  for(int const c : {0, 4}) // 8x8 (7 Ko, moins qu'un tampon) et Géant (470 Ko)
+  for(const int c : {0, 4}) // 8x8 (7 Ko, moins qu'un tampon) et Géant (470 Ko)
    {
     DYNAMIC_SECTION(Cartes[c].Nom)
      {
@@ -525,7 +525,7 @@ TEST_CASE("Vérification d'intégrité : messages des contrôles de position, di
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw, format 0x530, 109 feux
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(Ref.Version==VERSION);
   const int NbY=LitEntier(asCarte, Champ(Ref, "NbY"));
@@ -570,7 +570,7 @@ TEST_CASE("Vérification d'intégrité : le message du dépôt de bus donne ses 
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[4])); // Géant.cvw : dépôt de bus défini
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   const int NbX=LitEntier(asCarte, Champ(Ref, "NbX"));
   const int y=LitEntier(asCarte, Champ(Ref, "depot.y"));
@@ -592,7 +592,7 @@ TEST_CASE("Vérification d'intégrité : moins de deux parkings, sans division p
    // de parkings : arrêt de l'application sur x86, valeur quelconque sur ARM
   VueNulle Vue;
   vue=&Vue;
-  for(int const NbParkings : {0, 1})
+  for(const int NbParkings : {0, 1})
    {
     cv=new centre_ville(true, NBXMIN, NBYMIN);
     cv->DefinitNbParkings(NbParkings);
@@ -613,7 +613,7 @@ TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[correctio
   VueNulle Vue;
   vue=&Vue;
   cv=new centre_ville(true, NBXMIN, NBYMIN);
-  auto const Liste=[](int *Num, int Nb) { return std::vector<int>(Num, Num+Nb); };
+  const auto Liste=[](int *Num, int Nb) { return std::vector<int>(Num, Num+Nb); };
   feu &f=cv->Feu[0];
   f.NbFeuxDmd=f.NbFeuxAtt=3;
   f.NumFeuxDmd=new int[3]{4, 5, 6};
@@ -633,7 +633,7 @@ TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[correctio
   CHECK(f.NbFeuxAtt==0);
   CHECK(f.NumFeuxAtt==nullptr);
   feu_pieton &p=cv->FeuP[0];
-  for(int const n : {4, 5, 6}) { p.AjouteFeu(n);
+  for(const int n : {4, 5, 6}) { p.AjouteFeu(n);
 }
   p.RetireFeu(5);
   CHECK(Liste(p.NumFeux, p.NbFeux)==std::vector<int>{4, 6});
@@ -696,7 +696,7 @@ TEST_CASE("Vérification d'intégrité : durées par défaut du vert et du rouge
   VueNulle Vue;
   vue=&Vue;
   std::string asCarte=harnais::LitFichier(CheminCarte(Cartes[0])); // 8x8.cvw
-  conversion_cvw const Ref=ConvertitEn530(asCarte);
+  const conversion_cvw Ref=ConvertitEn530(asCarte);
   REQUIRE(Ref.Ok);
   REQUIRE(Ref.Version==VERSION);
   REQUIRE(LitEntier(asCarte, Champ(Ref, "DureeOrange"))>=0);
@@ -759,7 +759,7 @@ TEST_CASE("Distances : place de parking ou de vehlib inaccessible, Marche refus�
     cv->DefinitNbParkings(2);
     cv->DefinitNbVehicules(8);
     cv->DefinitNbPietons(0);
-    for(int const x0 : {2, 12})
+    for(const int x0 : {2, 12})
      {
       const int x1=x0+6;
       const int y0=2;

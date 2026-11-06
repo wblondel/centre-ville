@@ -83,7 +83,7 @@ void TestCartes::initTestCase()
 void TestCartes::premierLancement()
  { // Dossier déjà créé par cvw, une carte modifiée par l'utilisateur
   QVERIFY(QDir().mkpath(stDossier));
-  QString const Modifiee=stDossier+"/"+Cartes.first();
+  const QString Modifiee=stDossier+"/"+Cartes.first();
   QFile f(Modifiee);
   QVERIFY(f.open(QIODevice::WriteOnly));
   f.write("carte modifiée");
@@ -117,10 +117,10 @@ void TestCartes::dossierDeStRepLocalAppData()
 //---------------------------------------------------------------------------
 void TestCartes::copieAuPremierLancement()
  { // Source en lecture seule, comme les ressources Qt de l'exécutable
-  QTemporaryDir const Dossier;
+  const QTemporaryDir Dossier;
   QVERIFY(Dossier.isValid());
-  QString const stSource=Dossier.path()+"/cartes";
-  QString const stCible=Dossier.path()+"/Patquoi.fr/Centre-Ville";
+  const QString stSource=Dossier.path()+"/cartes";
+  const QString stCible=Dossier.path()+"/Patquoi.fr/Centre-Ville";
   QVERIFY(QDir().mkpath(stSource));
   for(const QString &c : Cartes)
    {
@@ -162,7 +162,7 @@ void TestCartes::paquetMacOS()
   QTemporaryDir Accueil;
   QVERIFY(Accueil.isValid());
   QString stCible=Accueil.path()+"/Library/Application Support/Patquoi.fr/Centre-Ville";
-  auto const Lance=[&]
+  const auto Lance=[&]
    { // Qu'il tourne : la copie précède la création des fiches
     QProcess p;
     QProcessEnvironment e=QProcessEnvironment::systemEnvironment();

@@ -116,14 +116,14 @@ TStringGrid::TStringGrid(QWidget *Parent) : ControleVcl<QAbstractScrollArea>(Par
 void TStringGrid::PrepareVcl()
  { // Propriétés du TStringGrid dans le .dfm (valeurs par défaut de la VCL sinon)
   ControleVcl<QAbstractScrollArea>::PrepareVcl();
-  QString const Options=property("vclOptions").isValid()?property("vclOptions").toString():
+  const QString Options=property("vclOptions").isValid()?property("vclOptions").toString():
                   QString("goFixedVertLine,goFixedHorzLine,goVertLine,goHorzLine,goRangeSelect");
   TraitsFixesV=Options.contains("goFixedVertLine");
   TraitsFixesH=Options.contains("goFixedHorzLine");
   TraitsV=Options.contains("goVertLine");
   TraitsH=Options.contains("goHorzLine");
   PlageSelection=Options.contains("goRangeSelect");
-  QString const Barres=property("vclScrollBars").isValid()?property("vclScrollBars").toString():QString("ssBoth");
+  const QString Barres=property("vclScrollBars").isValid()?property("vclScrollBars").toString():QString("ssBoth");
   setHorizontalScrollBarPolicy(((Barres=="ssBoth")||(Barres=="ssHorizontal"))?Qt::ScrollBarAsNeeded:Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(((Barres=="ssBoth")||(Barres=="ssVertical"))?Qt::ScrollBarAsNeeded:Qt::ScrollBarAlwaysOff);
   if (property("vclBorderStyle").toString()=="bsNone") { setFrameStyle(QFrame::NoFrame);
@@ -160,7 +160,7 @@ void TStringGrid::PrepareVcl()
 //---------------------------------------------------------------------------
 AnsiString TStringGrid::LitCellule(int c, int r) const
  {
-  auto const i=Donnees.find({c, r});
+  const auto i=Donnees.find({c, r});
   return (i!=Donnees.end())?i->second:AnsiString();
  }
 //---------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void TStringGrid::EcritCellule(int c, int r, const AnsiString &as)
  { // TStringGrid::SetCells : mémorisée même hors de la grille, puis case redessinée
   if (as.IsEmpty()) { Donnees.erase({c, r}); } else { Donnees[{c, r}]=as;
 }
-  TRect const Rect=CellRect(c, r);
+  const TRect Rect=CellRect(c, r);
   if (Rect.Width()>0) { viewport()->update(Rect.Qt());
 }
  }
@@ -256,8 +256,8 @@ TRect TStringGrid::CellRect(int ACol, int ARow) const
 }
   if (((ACol>=NbFixesC)&&(ACol<PremCol))||((ARow>=NbFixesL)&&(ARow<PremLig))) { return {};
 }
-  int const x=DebutColonne(ACol);
-  int const y=DebutLigne(ARow);
+  const int x=DebutColonne(ACol);
+  const int y=DebutLigne(ARow);
   if ((x>=viewport()->width())||(y>=viewport()->height())) { return {};
 }
   return {x, y, x+Largeur(ACol), y+Hauteur(ARow)};
@@ -272,7 +272,7 @@ namespace
     int Ligne=Zone+Trait;
     for(int i=Nombre-1; i>=Fixes; i--)
      {
-      int const e=Taille(i);
+      const int e=Taille(i);
       if (e<=0) { continue;
 }
       Ligne-=e+Trait;
@@ -287,31 +287,31 @@ namespace
 void TStringGrid::MetAJourDefilement()
  { // TCustomGrid::UpdateScrollRange : barres seulement si des cases débordent
    // (la largeur d'une barre réduit la zone de l'autre, sauf barres superposées)
-  QSize const Max=maximumViewportSize();
+  const QSize Max=maximumViewportSize();
   int FixeC=0;
   int FixeL=0;
   for(int i=0; i<NbFixesC; i++) { FixeC+=Largeur(i)+Trait;
 }
   for(int i=0; i<NbFixesL; i++) { FixeL+=Hauteur(i)+Trait;
 }
-  auto const MaxGauche=[&](int Zone) { return CaseMax(NbColonnes, NbFixesC, Zone, Trait, FixeC, [this](int i) { return Largeur(i); }); };
-  auto const MaxHaut=[&](int Zone) { return CaseMax(NbLignes, NbFixesL, Zone, Trait, FixeL, [this](int i) { return Hauteur(i); }); };
+  const auto MaxGauche=[&](int Zone) { return CaseMax(NbColonnes, NbFixesC, Zone, Trait, FixeC, [this](int i) { return Largeur(i); }); };
+  const auto MaxHaut=[&](int Zone) { return CaseMax(NbLignes, NbFixesL, Zone, Trait, FixeL, [this](int i) { return Hauteur(i); }); };
   int lh=horizontalScrollBar()->sizeHint().height();
   int lv=verticalScrollBar()->sizeHint().width();
   if (style()->styleHint(QStyle::SH_ScrollBar_Transient, nullptr, this) != 0) { lh=lv=0;
 }
-  bool const AutoriseH=horizontalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
-  bool const AutoriseV=verticalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
+  const bool AutoriseH=horizontalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
+  const bool AutoriseV=verticalScrollBarPolicy()!=Qt::ScrollBarAlwaysOff;
   bool BarreH=AutoriseH&&(MaxGauche(Max.width())>NbFixesC);
   bool BarreV=AutoriseV&&(MaxHaut(Max.height())>NbFixesL);
   if (BarreH&&!BarreV) { BarreV=AutoriseV&&(MaxHaut(Max.height()-lh)>NbFixesL);
 }
   if (BarreV&&!BarreH) { BarreH=AutoriseH&&(MaxGauche(Max.width()-lv)>NbFixesC);
 }
-  int const Largeur=Max.width()-(BarreV?lv:0);
-  int const Hauteur=Max.height()-(BarreH?lh:0);
-  int const MaxG=MaxGauche(Largeur);
-  int const MaxH=MaxHaut(Hauteur);
+  const int Largeur=Max.width()-(BarreV?lv:0);
+  const int Hauteur=Max.height()-(BarreH?lh:0);
+  const int MaxG=MaxGauche(Largeur);
+  const int MaxH=MaxHaut(Hauteur);
   horizontalScrollBar()->setRange(0, MaxG-NbFixesC);
   horizontalScrollBar()->setPageStep(qMax(1, NbColonnes-MaxG));
   horizontalScrollBar()->setSingleStep(1);
@@ -339,8 +339,8 @@ void TStringGrid::DefinitHautGauche(int Gauche, int Haut)
 //---------------------------------------------------------------------------
 void TStringGrid::scrollContentsBy(int /*dx*/, int /*dy*/)
  {
-  int const g=NbFixesC+horizontalScrollBar()->value();
-  int const h=NbFixesL+verticalScrollBar()->value();
+  const int g=NbFixesC+horizontalScrollBar()->value();
+  const int h=NbFixesL+verticalScrollBar()->value();
   if ((g!=PremCol)||(h!=PremLig))
    {
     PremCol=g;
@@ -403,14 +403,14 @@ bool TStringGrid::CaseEn(const QPoint &p, int &c, int &r) const
    {
     if ((i>=NbFixesC)&&(i<PremCol)) { continue;
 }
-    int const x=DebutColonne(i);
+    const int x=DebutColonne(i);
     if ((p.x()>=x)&&(p.x()<x+Largeur(i)+Trait)) { c=i; break; }
    }
   for(int i=0; i<NbLignes; i++)
    {
     if ((i>=NbFixesL)&&(i<PremLig)) { continue;
 }
-    int const y=DebutLigne(i);
+    const int y=DebutLigne(i);
     if ((p.y()>=y)&&(p.y()<y+Hauteur(i)+Trait)) { r=i; break; }
    }
   return (c>=0)&&(r>=0);
@@ -422,34 +422,34 @@ void TStringGrid::paintEvent(QPaintEvent *e)
  { // TCustomGrid::Paint et TStringGrid::DrawCell (DefaultDrawing)
   QPainter p(viewport());
   const QRegion &Zone=e->region();
-  int const Largeur=viewport()->width();
-  int const Hauteur=viewport()->height();
-  QColor const Fond=CouleurQt(property("vclColor").isValid()?CouleurDepuisTexte(A(property("vclColor").toString())):clWindow);
-  QColor const Trace=CouleurQt(clSilver);
+  const int Largeur=viewport()->width();
+  const int Hauteur=viewport()->height();
+  const QColor Fond=CouleurQt(property("vclColor").isValid()?CouleurDepuisTexte(A(property("vclColor").toString())):clWindow);
+  const QColor Trace=CouleurQt(clSilver);
   p.fillRect(viewport()->rect(), Fond); // au-delà de la dernière case : Color
   // Case active de la fiche (TCustomGrid::IsActiveControl) : pas de surlignage ;
   // cadre de focus seulement si la grille a le focus
-  bool const Active=(window()->focusWidget()==this);
-  bool const Focus=hasFocus();
-  int const SelG=qMin(ColCour, ColAncre);
-  int const SelD=qMax(ColCour, ColAncre);
-  int const SelH=qMin(LigCour, LigAncre);
-  int const SelB=qMax(LigCour, LigAncre);
-  QFont const Police=font();
-  QFontMetrics const fm(Police);
+  const bool Active=(window()->focusWidget()==this);
+  const bool Focus=hasFocus();
+  const int SelG=qMin(ColCour, ColAncre);
+  const int SelD=qMax(ColCour, ColAncre);
+  const int SelH=qMin(LigCour, LigAncre);
+  const int SelB=qMax(LigCour, LigAncre);
+  const QFont Police=font();
+  const QFontMetrics fm(Police);
   p.setFont(Police);
   for(int r=0, y=0; (r<NbLignes)&&(y<Hauteur); r++)
    {
     if ((r>=NbFixesL)&&(r<PremLig)) { continue;
 }
-    int const h=this->Hauteur(r);
+    const int h=this->Hauteur(r);
     for(int c=0, x=0; (c<NbColonnes)&&(x<Largeur); c++)
      {
       if ((c>=NbFixesC)&&(c<PremCol)) { continue;
 }
-      int const w=this->Largeur(c);
-      QRect const Case(x, y, w, h);
-      bool const Fixe=(c<NbFixesC)||(r<NbFixesL);
+      const int w=this->Largeur(c);
+      const QRect Case(x, y, w, h);
+      const bool Fixe=(c<NbFixesC)||(r<NbFixesL);
       if (Zone.intersects(Case.adjusted(0, 0, Trait, Trait)))
        {
         QColor Texte=palette().color(QPalette::Text);
@@ -467,8 +467,8 @@ void TStringGrid::paintEvent(QPaintEvent *e)
          }
         else
          {
-          bool const Selectionnee=(c>=SelG)&&(c<=SelD)&&(r>=SelH)&&(r<=SelB);
-          bool const Courante=Active&&(c==ColCour)&&(r==LigCour);
+          const bool Selectionnee=(c>=SelG)&&(c<=SelD)&&(r>=SelH)&&(r<=SelB);
+          const bool Courante=Active&&(c==ColCour)&&(r==LigCour);
           if (Selectionnee&&!Courante)
            {
             p.fillRect(Case, palette().color(QPalette::Active, QPalette::Highlight));
@@ -479,7 +479,7 @@ void TStringGrid::paintEvent(QPaintEvent *e)
 }
          }
         // Canvas->TextRect(Rect, Rect.Left+2, Rect.Top+2, Cells[ACol][ARow])
-        auto const i=Donnees.find({c, r});
+        const auto i=Donnees.find({c, r});
         if (i!=Donnees.end())
          {
           QString s=Q(i->second);
@@ -601,7 +601,7 @@ void TStringGrid::keyPressEvent(QKeyEvent *e)
 #endif
   int c=ColCour;
   int r=LigCour;
-  int const Page=qMax(1, verticalScrollBar()->pageStep());
+  const int Page=qMax(1, verticalScrollBar()->pageStep());
   switch(e->key())
    {
     case Qt::Key_Up: if (Ctrl) { DefinitHautGauche(PremCol, PremLig-1); e->accept(); return; } r--; break;

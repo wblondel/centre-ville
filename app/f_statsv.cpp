@@ -24,7 +24,7 @@ TfrmStatsVehicules::TfrmStatsVehicules(TComponent* Owner)
 void TfrmStatsVehicules::FormShow(TObject * /*Sender*/)
 {
  int i = 0;
- int const ne=cv->NbParkings;
+ const int ne=cv->NbParkings;
  frmSimulation->ActionStatsParkings->Checked=true;
  frmStatsVehicules->Caption=Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
  StringGridCoordParkings->RowCount=1+ne;
@@ -60,7 +60,7 @@ void TfrmStatsVehicules::RafraichitInfos() const
  int i = 0;
  int ed = 0;
  int ea = 0;
- int const n=StringGridStatsVehicules->ColCount-1;
+ const int n=StringGridStatsVehicules->ColCount-1;
  int Record = 0;
  int Minimum = 0;
  int Maximum = 0;

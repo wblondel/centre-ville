@@ -57,9 +57,9 @@ void TfrmStatsAttenteTrafic::FormShow(TObject * /*Sender*/)
 TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
  {
   int s = 0;
-  int const ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
-  int const ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
-  int const ts=RadioGroupType->ItemIndex;
+  const int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
+  const int ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
+  const int ts=RadioGroupType->ItemIndex;
   if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings)) { return static_cast<TColor>(0); // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans l'original)
 }
   if ((m[ts] != 0)&&cv->v[x][y].Trafic&&cv->v[x][y].Attente) // v3.0
@@ -79,9 +79,9 @@ TColor TfrmStatsAttenteTrafic::CouleurCase(int x, int y)
 AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
  {  // v3.0
   AnsiString asMsg;
-  int const ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
-  int const ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
-  int const ts=RadioGroupType->ItemIndex;
+  const int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
+  const int ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
+  const int ts=RadioGroupType->ItemIndex;
   if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings)) { return asMsg; // portage : n° d'étape tapé hors bornes (lecture hors de Attente/Trafic dans l'original)
 }
   if ((m[ts] != 0)&&cv->v[x][y].Trafic&&cv->v[x][y].Attente)
@@ -110,8 +110,8 @@ void TfrmStatsAttenteTrafic::RecalculeEtVisualise()
  int y = 0;
  int n=0;
  int t[2]={0,0};
- int const ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
- int const ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
+ const int ed=CheckBoxParkingDepart->Checked?CSpinEditParkingDepart->Value:0;
+ const int ea=CheckBoxParkingArrivee->Checked?CSpinEditParkingArrivee->Value:0;
  if ((ed<0)||(ed>cv->NbParkings)||(ea<0)||(ea>cv->NbParkings))
   {
    AfficheMessage("Le n° d'étape est incorrect !", "Valeur incorrecte", tmAvertissement, 0, 0);
@@ -177,10 +177,10 @@ void TfrmStatsAttenteTrafic::RadioGroupTypeClick(
 void TfrmStatsAttenteTrafic::BitBtnDirClick(
       TObject *Sender) const
 {
- int const n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
+ const int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
  int // portage : TComponent::Name -> NomDe
      const dx=(n/10)-2;
- int const dy=(n%10)-2;
+ const int dy=(n%10)-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)

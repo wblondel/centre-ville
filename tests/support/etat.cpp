@@ -355,7 +355,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
        for(int y=0; y<cv->NbY; y++)
         {
          const voie *v=&cv->v[x][y];
-         int const ne=cv->NbParkings;
+         const int ne=cv->NbParkings;
          bool Vide=false;
          if constexpr (P::Noms)
           { // Cases vides omises du texte (toujours dans l'empreinte)
@@ -432,8 +432,8 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
        for(int y=0; y<cv->NbY; y++)
         {
          const voie *v=&cv->v[x][y];
-         int const nd=NbDir[v->DirPoss];
-         int const ndt=const_cast<voie*>(v)->NbDirPossSensVoieTram(indefinie);
+         const int nd=NbDir[v->DirPoss];
+         const int ndt=const_cast<voie*>(v)->NbDirPossSensVoieTram(indefinie);
          s.Objet("distances", (x*1000)+y);
          if (v->DistParking) {
           for(int e=0; e<cv->NbParkings; e++) {

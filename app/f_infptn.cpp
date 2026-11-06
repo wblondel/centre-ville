@@ -316,19 +316,19 @@ void TfrmInfosPieton::RafraichitInfos()
 	// v5.4.1 : partie Epidémie
 	if (frmSimulation->EpidemieActivee)
 	 {
-	  bool const Infection=p->EstContagieux();
-	  int const NbInfections=p->NbInfections();
+	  const bool Infection=p->EstContagieux();
+	  const int NbInfections=p->NbInfections();
 	  LabelInfecte->Caption=asOuiNon[!!Infection];
 	  LabelInfections->Caption=IntToStr(NbInfections); // portage : conversion implicite int -> AnsiString de C++Builder
 	  if (NbInfections>0)
 	   {
-		int const Rang=p->DonnePrmRang();
+		const int Rang=p->DonnePrmRang();
 		int // v5.4.2 : au lieu de DonneRang()
 			const DrnRang=p->DonneRang();
 		int // v5.4.2 : au lieu de DonneDrnRang()
 			const PrmTourDeb=p->DonneTourDeb(PREMIER);
-		int const DrnTourDeb=p->DonneTourDeb(DERNIER);
-		int const DrnTourFin=p->DonneTourFin();
+		const int DrnTourDeb=p->DonneTourDeb(DERNIER);
+		const int DrnTourFin=p->DonneTourFin();
 		LabelRangs->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((Rang, DrnRang)));
 		LabelTours->Caption=Format(asFrmPrmDrn, ARRAYOFCONST((PrmTourDeb, DrnTourDeb)));
 		if (Infection&&(DrnTourFin-DrnTourDeb>0)) {

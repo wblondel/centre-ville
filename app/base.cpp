@@ -104,13 +104,13 @@ String stRepLocalAppData()
  {
    String stResult;
    String stExePath = A(QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/"));
-   QString const stRepLocAppDataCvw = "/Patquoi.fr/Centre-Ville/";
-   QString const stBase = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+   const QString stRepLocAppDataCvw = "/Patquoi.fr/Centre-Ville/";
+   const QString stBase = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
    if (stBase.isEmpty()) {
      stResult = std::move(stExePath);
    } else
 	{
-	 QString const stRep = stBase + stRepLocAppDataCvw;
+	 const QString stRep = stBase + stRepLocAppDataCvw;
 	 if ((!QDir(stRep).exists()) && (!QDir().mkpath(stRep))) 
 	   {
 		 return stExePath;
@@ -130,15 +130,15 @@ String stRepLocalAppData()
 //---------------------------------------------------------------------------
 void CopieCartesExemple(const QString &stSource, const QString &stDestination)
  {
-  QDir const Destination(stDestination);
-  QString const stMarque=Destination.filePath(".cartes-copiees");
-  QStringList const Cartes=QDir(stSource).entryList({"*.cvw"}, QDir::Files);
+  const QDir Destination(stDestination);
+  const QString stMarque=Destination.filePath(".cartes-copiees");
+  const QStringList Cartes=QDir(stSource).entryList({"*.cvw"}, QDir::Files);
   if (Cartes.isEmpty()||QFile::exists(stMarque)||(!QDir().mkpath(stDestination))) { return;
 }
   bool Ok=true;
   for(const QString &stCarte : Cartes)
    {
-    QString const stCopie=Destination.filePath(stCarte);
+    const QString stCopie=Destination.filePath(stCarte);
     if (QFile::exists(stCopie)) { continue;
 }
     if (QFile::copy(QDir(stSource).filePath(stCarte), stCopie)) {
@@ -175,7 +175,7 @@ void DebugEcrit(const AnsiString& asMessage)
 //---------------------------------------------------------------------------
 void DebugFerme()
  {
-  String const stCheminEtFichierLog = stRepLocalAppData()+"cvw.log";
+  const String stCheminEtFichierLog = stRepLocalAppData()+"cvw.log";
   // On vide d'un coup dans un fichier
   if (slDebug)
    {
@@ -254,8 +254,8 @@ type_reponse AfficheMessage(const AnsiString& asMessage, const AnsiString& asTit
 int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Boutons, int HelpCtx)
  { // portage : Dialogs::MessageDlg (titres et libellés de la RTL en français)
   (void)HelpCtx;
-  static const char *Titres[]={"Avertissement", "Erreur", "Information", "Confirmation", ""};
-  static const QMessageBox::Icon Icones[]={QMessageBox::Warning, QMessageBox::Critical, QMessageBox::Information,
+  const static char *Titres[]={"Avertissement", "Erreur", "Information", "Confirmation", ""};
+  const static QMessageBox::Icon Icones[]={QMessageBox::Warning, QMessageBox::Critical, QMessageBox::Information,
                                            QMessageBox::Question, QMessageBox::NoIcon,};
   QMessageBox Boite(Icones[Type], QString::fromUtf8(Titres[Type]), Q(asMessage), QMessageBox::NoButton, FenetreParente());
   struct { TMsgDlgBtn b; QMessageBox::StandardButton q; int mr; } Correspondances[]=
@@ -265,7 +265,7 @@ int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
     {.b=mbAll, .q=QMessageBox::YesToAll, .mr=mrAll}, {.b=mbNoToAll, .q=QMessageBox::NoToAll, .mr=mrNoToAll},
     {.b=mbYesToAll, .q=QMessageBox::YesToAll, .mr=mrYesToAll}, {.b=mbHelp, .q=QMessageBox::Help, .mr=mrNone},
     {.b=mbClose, .q=QMessageBox::Close, .mr=mrClose},};
-  for(auto  const&c : Correspondances) {
+  for(const auto & c : Correspondances) {
    if (Boutons.Contains(c.b)) { Boite.addButton(c.q);
 }
 }
@@ -278,8 +278,8 @@ int MessageDlg(const AnsiString& asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
   } else if (Boutons.Contains(mbOK)) { Boite.setEscapeButton(QMessageBox::Ok);
 }
   Boite.exec();
-  QMessageBox::StandardButton const r=Boite.standardButton(Boite.clickedButton());
-  for(auto  const&c : Correspondances) {
+  const QMessageBox::StandardButton r=Boite.standardButton(Boite.clickedButton());
+  for(const auto & c : Correspondances) {
    if (Boutons.Contains(c.b)&&(c.q==r)) { return c.mr;
 }
 }
@@ -321,7 +321,7 @@ void AffichePageHtml(const String& stURL)
 	if (f.open(QIODevice::WriteOnly|QIODevice::Truncate))
 	 {
 	  // ' encodé : l'adresse est entre apostrophes dans content="0; url='...'"
-	  QString const stCible = Url.toString(QUrl::FullyEncoded).replace("'", "%27").toHtmlEscaped();
+	  const QString stCible = Url.toString(QUrl::FullyEncoded).replace("'", "%27").toHtmlEscaped();
 	  f.write(QString("<!DOCTYPE html>\n"
 					  "<html><head><meta charset=\"utf-8\">\n"
 					  "<meta http-equiv=\"refresh\" content=\"0; url='%1'\">\n"
@@ -336,11 +336,11 @@ void AffichePageHtml(const String& stURL)
 //---------------------------------------------------------------------------
 void AfficheAideContextuelle(QWidget *Form)
  {// v5.3 : conversion HLP > HTML.
-  int const HelpContext=Form?Form->window()->property("vclHelpContext").toInt():0; // portage : TForm::HelpContext
-  for(auto const i : caCorresp) {
+  const int HelpContext=Form?Form->window()->property("vclHelpContext").toInt():0; // portage : TForm::HelpContext
+  for(const auto i : caCorresp) {
 	if (i.Numero==HelpContext) // On recherche la rubrique HelpContext dans le tableau caCorresp
 	 { // v5.4 : conversion BCB6>BCBX (L"open" + String)
-	  String const stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString())+
+	  const String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString())+
 					 String("#")+
 					 String(i.szHREF);
 	  AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
@@ -353,13 +353,13 @@ void AfficheIndexAide(QWidget *Form)
  {// v5.3 : conversion HLP > HTML
   // v5.4 : Conversion BCB6>BCBX (String + L"open")
   (void)Form;
-  String const stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString());
+  const String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"html/index.html").toString());
   AffichePageHtml(stURL); // v5.4 : appel à CreateProcess au lieu de ShellExecute
  }
 //---------------------------------------------------------------------------
 void AfficheTutoriel() // v5.4 (appelée par TfrmSimulation::ActionTutorielExecute
  {
-  String const stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"tutocv/index.html").toString());
+  const String stURL = A(QUrl::fromLocalFile(Q(stRepAide())+"tutocv/index.html").toString());
   AffichePageHtml(stURL);
  }
 //---------------------------------------------------------------------------

@@ -15,7 +15,7 @@ void GenereReseau()
  {
   if ((frmGeneration=new TfrmGeneration(Application)))
    { // portage : try/__finally -> garde RAII (Finalement)
-    Finalement const f([&]
+    const Finalement f([&]
     {
      delete frmGeneration;
      frmGeneration=nullptr;
@@ -38,8 +38,8 @@ void TfrmGeneration::ButtonOkClick(TObject * /*Sender*/) const
                                  TrackBarProbaTraverseeRoute->Position);
  // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
  // d'origine les évalue de gauche à droite (engine/README.md) : x, puis y, puis la direction
- int const x=rand()%cv->NbX;
- int const y=rand()%cv->NbY; auto const d=static_cast<direction>(1+(rand()%NBDIR)); cv->Genere(x, y, d);
+ const int x=rand()%cv->NbX;
+ const int y=rand()%cv->NbY; const auto d=static_cast<direction>(1+(rand()%NBDIR)); cv->Genere(x, y, d);
  frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------

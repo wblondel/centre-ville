@@ -16,25 +16,25 @@ TfrmStatistiques::TfrmStatistiques(TComponent* Owner) : TForm(Owner) { Affichage
 //---------------------------------------------------------------------------
 void TfrmStatistiques::PaintBoxStatsPaint(TObject * /*Sender*/) const
 {
- bool const ParNbVehicules=(cv->TypeStats==par_nombre);
+ const bool ParNbVehicules=(cv->TypeStats==par_nombre);
  int i = 0;
  int j = 0;
  int x = 0;
  int y = 0;
- int const NbTours=cv->NbToursStats;
+ const int NbTours=cv->NbToursStats;
  int // v6.0.2 : dernier tour dont les statistiques sont calculées. Le moteur dessine pendant
 	 // le tour, puis passe au suivant : entre deux tours (fenêtre découverte, pause), TourCrt
 	 // est le tour à venir, et Stats[TourCrt%NbTours] celles d'il y a NbTours tours. Sauf
 	 // avant le premier tour et après le dernier, où TourCrt n'avance plus
 	 const DrnTour=(cv->TourEnCours||(cv->TourCrt == 0)||(cv->NbVehiculesArrives==cv->NbVehicules))?cv->TourCrt:cv->TourCrt-1;
- int const PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1);
- int const NbVehicules=cv->NbVehicules;
- int const NbPietons=cv->NbPietons;
+ const int PrmTour=(DrnTour<NbTours)?0:(DrnTour-NbTours+1);
+ const int NbVehicules=cv->NbVehicules;
+ const int NbPietons=cv->NbPietons;
  int // v5.4.1
 	 const NbMarques=ParNbVehicules?(NbVehicules/10):10;
- int const dt=1+(9*static_cast<int>(NbTours>=100L));
- int const xMax=PaintBoxStats->Width;
- int const yMax=PaintBoxStats->Height;
+ const int dt=1+(9*static_cast<int>(NbTours>=100L));
+ const int xMax=PaintBoxStats->Width;
+ const int yMax=PaintBoxStats->Height;
  int NbRestants = 0;
 
  // 0. légende selon le mode

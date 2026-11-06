@@ -1283,18 +1283,18 @@ class centre_ville
  };
 //---------------------------------------------------------------------------
 // v3.5 : remplacement des [5] par |NBDIR+1] et des [4] par [NBDIR]
-extern const dirposs PossDir[NBDIR+1], InvPossDir[NBDIR+1], RotPossDir[NBDIR][16];
-extern const int dxr[NBDIR+1], dyr[NBDIR+1], // v4.0 (const int->int)
+const extern dirposs PossDir[NBDIR+1], InvPossDir[NBDIR+1], RotPossDir[NBDIR][16];
+const extern int dxr[NBDIR+1], dyr[NBDIR+1], // v4.0 (const int->int)
                  NbDir[16],
                  NumDirdp[NBDIR+1][16];
-extern const sens SensPsgPt[16];
-extern const direction Dirdp[NBDIR][16],
+const extern sens SensPsgPt[16];
+const extern direction Dirdp[NBDIR][16],
                        InvDir[NBDIR+1],
                        AGaucheDe[NBDIR+1],
                        ADroiteDe[NBDIR+1];
-extern const sens_voie_tram SensVoieTramDir[NBDIR+1][NBDIR+1]; // v3.5
-extern const coin CoinDir[NBDIR+1]; // v3.8
-extern const AnsiString asDir[NBDIR+1],
+const extern sens_voie_tram SensVoieTramDir[NBDIR+1][NBDIR+1]; // v3.5
+const extern coin CoinDir[NBDIR+1]; // v3.8
+const extern AnsiString asDir[NBDIR+1],
                         asDirPoss[16];
 //---------------------------------------------------------------------------
 extern bool VerifierApresOuverture, VerifierAvantSimulation;

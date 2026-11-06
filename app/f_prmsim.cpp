@@ -96,7 +96,7 @@ void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des pos
  {
   if (((cv->NbParkings*(cv->NbParkings-1))+(2*cv->NbPlacesPark))<=0) { return; // v6.0.3 : moins de deux parkings sans place : division par zéro dans l'original
 }
-  int const NbMinVehicules= (cv->NbParkings*(cv->NbParkings-1))
+  const int NbMinVehicules= (cv->NbParkings*(cv->NbParkings-1))
                      +(2*cv->NbPlacesPark);
   int // v5.0 : 1 véh départ + 1 véh arrivée par place de parking
 	  const NbMaxVehicules= NbMinVehicules*(NBMAXVEHICULES/NbMinVehicules);
@@ -247,7 +247,7 @@ void TfrmParamSimul::BitBtnDefLignesBusClick(TObject * /*Sender*/)
 {
  if ((frmParamBus=new TfrmParamBus(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement const f([&]
+   const Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -269,7 +269,7 @@ void TfrmParamSimul::BitBtnDefLignesTramClick(TObject * /*Sender*/)
 { // v3.5
  if ((frmParamTram=new TfrmParamTram(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement const f([&]
+   const Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -286,7 +286,7 @@ void TfrmParamSimul::BitBtnDefTaxisClick(TObject * /*Sender*/)
 {
  if ((frmParamTaxi=new TfrmParamTaxi(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement const f([&]
+   const Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2
@@ -314,7 +314,7 @@ void TfrmParamSimul::BitBtnDefVehlibsClick(TObject * /*Sender*/)
 { // v5.3
  if ((frmParamVehlib=new TfrmParamVehlib(this)))
   { // portage : try/__finally -> garde RAII (Finalement)
-   Finalement const f([&]
+   const Finalement f([&]
    {
     frmSimulation->DrawGridSimul->Repaint();
     RetourFicheFille=true; // v6.0.2

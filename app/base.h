@@ -35,7 +35,7 @@ extern void DebugOuvre();
 extern void DebugEcrit(const AnsiString& asMessage);
 extern void DebugFerme();
 //---------------------------------------------------------------------------
-extern const AnsiString asDebutNomSpinEdit; // v5.4
+const extern AnsiString asDebutNomSpinEdit; // v5.4
 //---------------------------------------------------------------------------
 extern String stRepLocalAppData(); // v5.4
 extern void CopieCartesExemple(const QString &stSource, const QString &stDestination); // v6.0.1

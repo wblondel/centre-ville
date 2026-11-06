@@ -19,9 +19,9 @@ TfrmAffDistFilesPark::TfrmAffDistFilesPark(TComponent* Owner) : TForm(Owner) { C
 void TfrmAffDistFilesPark::EffaceInfos() const
  {
   int i = 0;
-  int const NbCol=StringGridDistances->ColCount;
-  int const NbLig=StringGridDistances->RowCount;
-  int const NbCases=NbCol*NbLig;
+  const int NbCol=StringGridDistances->ColCount;
+  const int NbLig=StringGridDistances->RowCount;
+  const int NbCases=NbCol*NbLig;
   for(i=0; i<NbCases; i++) { StringGridDistances->Cells[i%NbCol][i/NbCol]="";
 }
  }
@@ -32,8 +32,8 @@ void TfrmAffDistFilesPark::RafraichitInfos()
   int NbCases = 0;
   int NbX = 0;
   int de = 0;
-  int const x=frmSimulation->DrawGridSimul->Col;
-  int const y=frmSimulation->DrawGridSimul->Row;
+  const int x=frmSimulation->DrawGridSimul->Col;
+  const int y=frmSimulation->DrawGridSimul->Row;
   voie *v=&cv->v[x][y];
   EffaceInfos();
   if (!v->DistFilePark) { return;

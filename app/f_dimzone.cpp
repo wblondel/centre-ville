@@ -18,7 +18,7 @@ bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
   if ((frmDimensionsZone=new TfrmDimensionsZone(Application)))
    {
 	{ // portage : try/__finally -> garde RAII (Finalement)
-	 Finalement const f([&]
+	 const Finalement f([&]
 	 {
 	  delete frmDimensionsZone;
 	  frmDimensionsZone=nullptr;

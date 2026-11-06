@@ -27,7 +27,7 @@ namespace
                   cv->NbVehiculesDeplaces, cv->NbPietonsGueris, cv->NbPietonsInfectes, cv->NbPietonsMorts);
     std::string Ligne(Tampon);
     // Clés courtes, dans l'ordre de partie_etat (voir l'en-tête des fichiers)
-    static const char *Cles[peDistances]={"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};
+    const static char *Cles[peDistances]={"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};
     for(int i=0; i<peDistances; i++) {
      Ligne+=std::string(" ")+Cles[i]+"="+Hexa8(ExportEtat::Empreinte(cv, static_cast<partie_etat>(i), false));
 }
@@ -103,13 +103,13 @@ namespace
   std::uint64_t EmpreinteOctets(const std::string &asContenu)
    {
     std::uint64_t h=14695981039346656037ULL;
-    for(unsigned char const c : asContenu) { h^=c; h*=1099511628211ULL; }
+    for(const unsigned char c : asContenu) { h^=c; h*=1099511628211ULL; }
     return h;
    }
   //-------------------------------------------------------------------------
   std::string DescriptionFichier(const std::string &asChemin)
    {
-    std::string const asContenu=harnais::LitFichier(asChemin);
+    const std::string asContenu=harnais::LitFichier(asChemin);
     return "taille="+std::to_string(asContenu.size())+" empreinte="+Hexa(EmpreinteOctets(asContenu));
    }
  }
@@ -133,9 +133,9 @@ std::string ProduitGoldenGeneration(const config_generation &Config, const std::
   // L'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
   // d'origine (32 et 64 bits) les évalue de gauche à droite : x, puis y, puis
   // la direction (engine/README.md, « Vérifications sur le binaire d'origine »).
-  int const x=rand()%cv->NbX;
-  int const y=rand()%cv->NbY;
-  auto const d=static_cast<direction>(1+(rand()%NBDIR));
+  const int x=rand()%cv->NbX;
+  const int y=rand()%cv->NbY;
+  const auto d=static_cast<direction>(1+(rand()%NBDIR));
   Texte+="depart x="+std::to_string(x)+" y="+std::to_string(y)+" d="+std::to_string(static_cast<int>(d))+"\n";
   cv->Genere(x, y, d);
   char Tampon[16];
@@ -194,9 +194,9 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
      };
     for(const selection &s : Selections)
      {
-      std::size_t const NbMessages=Vue.Messages.size();
+      const std::size_t NbMessages=Vue.Messages.size();
       cv->PrepareCopie(DEBUT, s.x, s.y, s.nx, s.ny);
-      bool const Valide=cv->CopieValide();
+      const bool Valide=cv->CopieValide();
       Texte+=std::string("selection ")+s.Nom+" ("+std::to_string(s.x)+","+std::to_string(s.y)+","+
              std::to_string(s.nx)+","+std::to_string(s.ny)+") valide="+std::to_string(static_cast<int>(Valide))+"\n";
       const std::string asCopie=asDossierSortie+"/copie_"+asNomCarte+"_"+s.Nom+".cvw";
@@ -215,11 +215,11 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
      }
     // La copie réduite se recharge-t-elle sans erreur d'intégrité ?
     const std::string asReduite=asDossierSortie+"/copie_"+asNomCarte+"_reduite.cvw";
-    std::string const asContenu=harnais::LitFichier(asReduite);
+    const std::string asContenu=harnais::LitFichier(asReduite);
     if (!asContenu.empty())
      {
       harnais::Ferme();
-      bool const Ok=harnais::Ouvre(asReduite);
+      const bool Ok=harnais::Ouvre(asReduite);
       Texte+="rechargement copie reduite="+std::to_string(static_cast<int>(Ok));
       if (Ok)
        {

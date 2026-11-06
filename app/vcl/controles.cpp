@@ -35,7 +35,7 @@ template <class B> void ControleVcl<B>::PrepareVcl()
   if (v.isValid())
    { // Font.Height < 0 : hauteur des caractères en pixels (indépendant des ppp de l'écran)
     QFont f=w->font();
-    int const h=v.toInt();
+    const int h=v.toInt();
     f.setPixelSize(h<0?-h:qMax(1, static_cast<int>((0.85*h)+0.5)));
     w->setFont(f);
    }
@@ -43,7 +43,7 @@ template <class B> void ControleVcl<B>::PrepareVcl()
   if (v.isValid())
    {
     QPalette p=w->palette();
-    QColor const c=CouleurQt(CouleurDepuisTexte(A(v.toString())));
+    const QColor c=CouleurQt(CouleurDepuisTexte(A(v.toString())));
     p.setColor(QPalette::WindowText, c);
     p.setColor(QPalette::ButtonText, c);
     p.setColor(QPalette::Text, c);
@@ -66,7 +66,7 @@ void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur)
  {
   w->setProperty(Propriete, QString("0x%1").arg(static_cast<uint>(Couleur), 8, 16, QChar('0')));
   QPalette p=w->palette();
-  QColor const c=CouleurQt(Couleur);
+  const QColor c=CouleurQt(Couleur);
   if (std::strcmp(Propriete, "vclFontColor") == 0)
    {
     p.setColor(QPalette::WindowText, c);
@@ -88,16 +88,16 @@ QFont PoliceResserree(const QFont &Police, const QString &Texte, const QRect &Zo
   if (Texte.isEmpty()||(Zone.width()<=0)) { return Police;
 }
   bool Lignes=((Drapeaux&Qt::TextWordWrap) != 0)||Texte.contains('\n');
-  auto const Tient=[&](const QFont &f)
+  const auto Tient=[&](const QFont &f)
    {
-    QRectF const r=QFontMetricsF(f).boundingRect(QRectF(Zone), Drapeaux, Texte);
+    const QRectF r=QFontMetricsF(f).boundingRect(QRectF(Zone), Drapeaux, Texte);
     return (r.width()<=Zone.width()+0.5)&&(!Lignes||(r.height()<=Zone.height()+0.5));
    };
   // Resserrement mémorisé par police, texte, zone et drapeaux : les fiches
   // d'informations redessinent leurs libellés à chaque tour
   static QHash<QString, int> Memoire;
-  QString const Cle=Police.key()+'\x1F'+Texte+'\x1F'+QString::number(Zone.width())+'x'+QString::number(Zone.height())+'\x1F'+QString::number(Drapeaux);
-  auto const i=Memoire.constFind(Cle);
+  const QString Cle=Police.key()+'\x1F'+Texte+'\x1F'+QString::number(Zone.width())+'x'+QString::number(Zone.height())+'\x1F'+QString::number(Drapeaux);
+  const auto i=Memoire.constFind(Cle);
   int Etirement=100;
   if (i!=Memoire.constEnd()) { Etirement=*i;
   } else
@@ -107,7 +107,7 @@ QFont PoliceResserree(const QFont &Police, const QString &Texte, const QRect &Zo
        // texte reste coupé. La largeur suit l'étirement (QFont::setStretch)
        // sous Windows, son carré sous macOS (0,81 à 90, limite atteinte avant 85)
       QFont f=Police;
-      double const Largeur=QFontMetricsF(Police).horizontalAdvance(Texte);
+      const double Largeur=QFontMetricsF(Police).horizontalAdvance(Texte);
       for(int e=99; e>=85; e--)
        {
         f.setStretch(e);
@@ -148,9 +148,9 @@ namespace
   // haut du cadre. Faux : dessin du style, inchangé
   bool DessineCadreVcl(QGroupBox *g, const QStyleOptionGroupBox &o)
    {
-    QFontMetrics const m(g->font());
-    int const Milieu=g->title().isEmpty()?0:m.height()/2;
-    QRect const Cadre=g->style()->subControlRect(QStyle::CC_GroupBox, &o, QStyle::SC_GroupBoxFrame, g);
+    const QFontMetrics m(g->font());
+    const int Milieu=g->title().isEmpty()?0:m.height()/2;
+    const QRect Cadre=g->style()->subControlRect(QStyle::CC_GroupBox, &o, QStyle::SC_GroupBoxFrame, g);
     if (Cadre.top()<=Milieu+2) { return false;
 }
     QPainter p(g);
@@ -273,9 +273,9 @@ QIcon IconeGlyphe(const QPixmap &Glyphe, int NumGlyphs, qreal Echelle)
   QIcon i;
   if (Glyphe.isNull()) { return i;
 }
-  int const n=qMax(1, NumGlyphs);
-  int const w=Glyphe.width()/n;
-  int const h=Glyphe.height();
+  const int n=qMax(1, NumGlyphs);
+  const int w=Glyphe.width()/n;
+  const int h=Glyphe.height();
   i.addPixmap(AgranditSansLissage(Glyphe.copy(0, 0, w, h), Echelle), QIcon::Normal);
   if (n>=2) { i.addPixmap(AgranditSansLissage(Glyphe.copy(w, 0, w, h), Echelle), QIcon::Disabled);
 }
@@ -343,7 +343,7 @@ void TLabel::AjusteTaille()
   QString t=text();
   if (t.isEmpty()) { t=" ";
 }
-  QSize const s=fontMetrics().size(0, t);
+  const QSize s=fontMetrics().size(0, t);
   int x=this->x();
   if (alignment().testFlag(Qt::AlignRight)) { x+=width()-s.width();
 }
@@ -354,15 +354,15 @@ namespace
  { // Luminance relative et contraste (WCAG)
   double Luminance(const QColor &c)
    {
-    auto const Lineaire=[](double v) { return v<=0.03928?v/12.92:std::pow((v+0.055)/1.055, 2.4); };
+    const auto Lineaire=[](double v) { return v<=0.03928?v/12.92:std::pow((v+0.055)/1.055, 2.4); };
     return (0.2126*Lineaire(c.redF()))+(0.7152*Lineaire(c.greenF()))+(0.0722*Lineaire(c.blueF()));
    }
  }
 //---------------------------------------------------------------------------
 double Contraste(const QColor &a, const QColor &b)
  {
-  double const la=Luminance(a);
-  double const lb=Luminance(b);
+  const double la=Luminance(a);
+  const double lb=Luminance(b);
   return (qMax(la, lb)+0.05)/(qMin(la, lb)+0.05);
  }
 //---------------------------------------------------------------------------
@@ -370,7 +370,7 @@ QColor CouleurLisible(const QColor &Texte, const QColor &Fond)
  { // Éclaircie sur fond sombre, foncée sur fond clair, à teinte égale
   if (Contraste(Texte, Fond)>=3) { return Texte;
 }
-  bool const Sombre=Luminance(Fond)<0.18;
+  const bool Sombre=Luminance(Fond)<0.18;
   float h = NAN;
   float s = NAN;
   float l = NAN;
@@ -387,7 +387,7 @@ QColor CouleurLisible(const QColor &Texte, const QColor &Fond)
 //---------------------------------------------------------------------------
 void TLabel::paintEvent(QPaintEvent *e)
  { // Texte brut dessiné comme par QLabel::paintEvent (sans cadre ni retrait)
-  QRect const Zone=contentsRect().adjusted(margin(), margin(), -margin(), -margin());
+  const QRect Zone=contentsRect().adjusted(margin(), margin(), -margin(), -margin());
   int Drapeaux=static_cast<int>(QStyle::visualAlignment(layoutDirection(), alignment()).toInt());
   if (wordWrap()) { Drapeaux|=Qt::TextWordWrap;
 }
@@ -399,10 +399,10 @@ void TLabel::paintEvent(QPaintEvent *e)
     if (style()->styleHint(QStyle::SH_UnderlineShortcut, &o, this) == 0) { Drapeaux|=Qt::TextHideMnemonic;
 }
    }
-  QFont const f=PoliceResserree(font(), text(), Zone, Drapeaux);
+  const QFont f=PoliceResserree(font(), text(), Zone, Drapeaux);
   QPalette Palette=o.palette;
   if (property("vclFontColor").isValid()&&isEnabled()) {
-   for(QPalette::ColorGroup const g : {QPalette::Active, QPalette::Inactive}) {
+   for(const QPalette::ColorGroup g : {QPalette::Active, QPalette::Inactive}) {
     Palette.setColor(g, foregroundRole(), CouleurLisible(Palette.color(g, foregroundRole()), Palette.color(g, backgroundRole())));
 }
 }
@@ -444,15 +444,15 @@ TCSpinEdit::TCSpinEdit(QWidget *Parent) : ControleVcl<QAbstractSpinBox>(Parent)
   Value.Definit([this]
                  { // GetValue : StrToInt(Text), MinValue si le texte n'est pas un nombre
                   bool Ok=false;
-                  int const v=lineEdit()->text().toInt(&Ok);
+                  const int v=lineEdit()->text().toInt(&Ok);
                   return Ok?v:(int)MinValue;
                  },
                 [this](const int &v)
                  { // SetValue : Text:=IntToStr(CheckValue(v)) ; comme WM_SETTEXT, curseur au début
-                  QString const t=QString::number(CheckValue(v));
+                  const QString t=QString::number(CheckValue(v));
                   if (t==lineEdit()->text()) { return;
 }
-                  bool const Avant=AffectationEnCours; // OnChange peut affecter Value à son tour
+                  const bool Avant=AffectationEnCours; // OnChange peut affecter Value à son tour
                   AffectationEnCours=true;
                   lineEdit()->setText(t);
                   lineEdit()->setCursorPosition(0);
@@ -483,8 +483,8 @@ void TCSpinEdit::PrepareVcl()
 //---------------------------------------------------------------------------
 int TCSpinEdit::CheckValue(int v) const
  { // v6.0.3 : bornes appliquées sauf si MinValue=MaxValue=0 (CSPIN.pas : seulement si MaxValue<>MinValue, donc aucune borne pour un seul numéro possible)
-  int const Min=MinValue;
-  int const Max=MaxValue;
+  const int Min=MinValue;
+  const int Max=MaxValue;
   if ((Max!=Min)||(Max!=0))
    {
     if (v<Min) { return Min;
@@ -510,7 +510,7 @@ QAbstractSpinBox::StepEnabled TCSpinEdit::stepEnabled() const
 QValidator::State TCSpinEdit::validate(QString &input, int &pos) const
  { // Caractères admis par IsValidChar, quel que soit le texte obtenu
   Q_UNUSED(pos);
-  for(QChar const c : input) {
+  for(const QChar c : input) {
    if (((c<'0')||(c>'9'))&&(c!='+')&&(c!='-')&&(c!=QLatin1Char(FormatSettings.DecimalSeparator))) {
     return QValidator::Invalid;
 }
@@ -523,7 +523,7 @@ void TCSpinEdit::focusInEvent(QFocusEvent *e)
    // clic ; pas quand la fenêtre retrouve l'activation (après une boîte de
    // message, par exemple), le champ étant resté le contrôle actif de la fiche
   ControleVcl<QAbstractSpinBox>::focusInEvent(e);
-  bool const Entree=!ControleActif;
+  const bool Entree=!ControleActif;
   ControleActif=true;
   if (Entree&&(e->reason()!=Qt::MouseFocusReason)) { selectAll();
 }
@@ -542,7 +542,7 @@ void TCSpinEdit::focusOutEvent(QFocusEvent *e)
 //---------------------------------------------------------------------------
 void TCSpinEdit::Valide()
  {
-  int const v=Value;
+  const int v=Value;
   bool Nombre=false;
   lineEdit()->text().toInt(&Nombre);
   if (!Nombre||(CheckValue(v)!=v)) { Value=v; // SetValue(Value). v6.0.3 : texte vide, « - » ou « + » remplacé par la valeur qu'il vaut
@@ -600,7 +600,7 @@ void TBitBtn::PrepareVcl()
  {
   TButton::PrepareVcl();
   NumGlyphs=qMax(1, property("vclNumGlyphs").toInt());
-  QString const Glyphe=property("vclGlyph").toString();
+  const QString Glyphe=property("vclGlyph").toString();
   if (!Glyphe.isEmpty())
    {
     TBitmap b;
@@ -720,8 +720,8 @@ namespace
       QStyleOptionButton Option;
       Option.initFrom(b);
       Option.text=b->text();
-      QRect const Zone=b->style()->subElementRect(QStyle::SE_RadioButtonClickRect, &Option, b);
-      QPoint const p=m->position().toPoint();
+      const QRect Zone=b->style()->subElementRect(QStyle::SE_RadioButtonClickRect, &Option, b);
+      const QPoint p=m->position().toPoint();
       if (Zone.contains(p)||!b->rect().contains(p)) { return false;
 }
       // Même événement, au centre de la zone sensible de Qt
@@ -778,7 +778,7 @@ void TSpeedButton::PrepareVcl()
   AllowAllUp=property("vclAllowAllUp").toBool();
   NumGlyphs=qMax(1, property("vclNumGlyphs").toInt());
   setCheckable(GroupIndex!=0); // GroupIndex=0 : jamais enfoncé (Down reste à false)
-  QString const Glyphe=property("vclGlyph").toString();
+  const QString Glyphe=property("vclGlyph").toString();
   if (!Glyphe.isEmpty())
    {
     TBitmap b;
@@ -843,7 +843,7 @@ TShape::TShape(QWidget *Parent) : ControleVcl<QWidget>(Parent)
 void TShape::PrepareVcl()
  {
   ControleVcl<QWidget>::PrepareVcl();
-  QString const s=property("vclShape").toString();
+  const QString s=property("vclShape").toString();
   if (s=="stCircle") { Shape=stCircle;
   } else if (s=="stEllipse") { Shape=stEllipse;
   } else if (s=="stSquare") { Shape=stSquare;
@@ -869,7 +869,7 @@ void TShape::paintEvent(QPaintEvent * /*event*/)
   int y=0;
   if ((Shape==stSquare)||(Shape==stRoundSquare)||(Shape==stCircle))
    {
-    int const m=qMin(w, h);
+    const int m=qMin(w, h);
     x=(w-m)/2; y=(h-m)/2; w=h=m;
    }
   if ((Shape==stEllipse)||(Shape==stCircle)) {
@@ -1003,7 +1003,7 @@ void TTabControl::paintEvent(QPaintEvent * /*event*/)
   QPainter p(this);
   QStyleOptionTabWidgetFrame o;
   o.initFrom(this);
-  int const h=Onglets?Onglets->height():0;
+  const int h=Onglets?Onglets->height():0;
   o.rect=rect().adjusted(0, qMax(0, h-2), 0, 0);
   o.shape=QTabBar::RoundedNorth;
   o.tabBarSize=Onglets?Onglets->size():QSize();
@@ -1048,9 +1048,9 @@ void TStatusBar::PrepareVcl()
     AnsiString asTexte;
     for(const QString &kv : s.split(';'))
      {
-      int const i=static_cast<int>(kv.indexOf('='));
-      QString const k=kv.left(i);
-      QString const v=kv.mid(i+1);
+      const int i=static_cast<int>(kv.indexOf('='));
+      const QString k=kv.left(i);
+      const QString v=kv.mid(i+1);
       if (k=="Width") { Largeur=v.toInt();
       } else if (k=="Alignment") { Alignement=(v=="taCenter")?TStatusPanel::taCenter:
                                          (v=="taRightJustify")?TStatusPanel::taRightJustify:
@@ -1073,12 +1073,12 @@ void TStatusBar::PrepareVcl()
 void TStatusBar::paintEvent(QPaintEvent * /*unused*/)
  { // Panneaux à largeur fixe séparés par un trait, texte en retrait de 2 pixels
   QPainter p(this);
-  QColor const Fond=palette().color(QPalette::Window);
+  const QColor Fond=palette().color(QPalette::Window);
   p.fillRect(rect(), Fond);
-  QFont const f=Font->Qt();
+  const QFont f=Font->Qt();
   p.setFont(f);
-  QColor const Ombre=Fond.darker(140);
-  QColor const Texte=palette().color(QPalette::WindowText);
+  const QColor Ombre=Fond.darker(140);
+  const QColor Texte=palette().color(QPalette::WindowText);
   if (SimplePanel||Panels->Items.empty())
    {
     p.setPen(Texte);
@@ -1088,12 +1088,12 @@ void TStatusBar::paintEvent(QPaintEvent * /*unused*/)
   int x=0;
   for(TStatusPanel *Panneau : Panels->Items)
    {
-    int const w=Panneau->Width;
-    QRect const r(x, 0, w, height());
+    const int w=Panneau->Width;
+    const QRect r(x, 0, w, height());
     p.setPen(Ombre);
     p.drawLine(r.right(), 2, r.right(), height()-3);
     p.setPen(Texte);
-    int const a=(Panneau->Alignment==TStatusPanel::taCenter)?Qt::AlignHCenter:
+    const int a=(Panneau->Alignment==TStatusPanel::taCenter)?Qt::AlignHCenter:
           (Panneau->Alignment==TStatusPanel::taRightJustify)?Qt::AlignRight:Qt::AlignLeft;
     p.save();
     p.setClipRect(r.adjusted(0, 0, -2, 0));
@@ -1118,7 +1118,7 @@ bool TStatusBar::event(QEvent *e)
    {
     if (AutoHint)
      {
-      AnsiString const as=A(static_cast<QStatusTipEvent *>(e)->tip());
+      const AnsiString as=A(static_cast<QStatusTipEvent *>(e)->tip());
       if (SimplePanel||Panels->Items.empty()) { SimpleText=as;
       } else { Panels->Items[0]->Text=as;
 }
@@ -1245,8 +1245,8 @@ bool TOpenDialog::Execute()
 }
   if (!DefaultExt.IsEmpty()) { d.setDefaultSuffix(Q(DefaultExt));
 }
-  QString const Nom=Q(FileName);
-  QFileInfo const Info(Nom);
+  const QString Nom=Q(FileName);
+  const QFileInfo Info(Nom);
   if (!Nom.isEmpty()&&Info.isAbsolute())
    {
     d.setDirectory(Info.absolutePath());
@@ -1272,9 +1272,9 @@ void ConfigureNonVisuel(QObject *Composant, const QStringList &Proprietes)
  {
   for(const QString &kv : Proprietes)
    {
-    int const i=static_cast<int>(kv.indexOf('='));
-    QString const k=kv.left(i);
-    QString const v=kv.mid(i+1);
+    const int i=static_cast<int>(kv.indexOf('='));
+    const QString k=kv.left(i);
+    const QString v=kv.mid(i+1);
     if (auto *t=dynamic_cast<TTimer *>(Composant))
      {
       if (k=="Interval") { t->Interval=v.toInt();

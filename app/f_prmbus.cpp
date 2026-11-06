@@ -109,8 +109,8 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 {
  auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
  int i = 0;
- int const k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
- int const n=CSpinEdit->Value;
+ const int k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9));
+ const int n=CSpinEdit->Value;
  int AncNumArretBusAMontrer = 0;
  switch(k/10)
   {
@@ -151,7 +151,7 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 void TfrmParamBus::CSpinEditExit(TObject *Sender)
 { // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
  auto *CSpinEdit=static_cast<TCSpinEdit*>(Sender);
- int const n=CSpinEdit->Value;
+ const int n=CSpinEdit->Value;
  if ((n<=0)||(n>cv->NbArretsBus)) {
   CSpinEdit->Value=0;
  } else
@@ -174,10 +174,10 @@ void TfrmParamBus::MenuItemClick(TObject *Sender)
 
 void TfrmParamBus::BitBtnDirClick(TObject *Sender) const
 {
- int const n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
+ const int n=StrToInt(NomDe(static_cast<TComponent*>(Sender)).SubString(7, NomDe(static_cast<TComponent*>(Sender)).Length()-6));
  int // portage : TComponent::Name -> NomDe
      const dx=(n/10)-2;
- int const dy=(n%10)-2;
+ const int dy=(n%10)-2;
  if (CheckBoxCoins->Checked)
   {
    switch(dx)

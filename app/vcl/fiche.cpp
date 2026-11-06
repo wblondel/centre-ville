@@ -64,7 +64,7 @@ namespace
 //---------------------------------------------------------------------------
 QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
  {
-  QString const n=QString::fromUtf8(Nom);
+  const QString n=QString::fromUtf8(Nom);
   QObject *o=nullptr;
   if (std::strcmp(Classe, "TActionList") == 0)
    {
@@ -149,7 +149,7 @@ void LieurComposants::Termine()
     {
      for(QAction *a : Menu->actions())
       {
-       auto const i=ElementsMenus.find(a);
+       const auto i=ElementsMenus.find(a);
        if (i==ElementsMenus.end()) { continue;
 }
        TMenuItem *m=i->second;
@@ -173,14 +173,14 @@ void LieurComposants::Termine()
        }
 }
     };
-  for(auto  const&c : Composants)
+  for(const auto & c : Composants)
    {
     if (auto *p=dynamic_cast<TPopupMenu *>(c.second)) {
      Arbre(p->Menu, nullptr, p->Items);
     } else if (auto *mm=dynamic_cast<TMainMenu *>(c.second)) {
      for(QAction *a : mm->Barre->actions())
       {
-       auto const i=ElementsMenus.find(a);
+       const auto i=ElementsMenus.find(a);
        if (i==ElementsMenus.end()) { continue;
 }
        TMenuItem *m=i->second;
@@ -191,11 +191,11 @@ void LieurComposants::Termine()
 }
    }
   // Boutons de barres d'outils : action ou menu associé
-  for(auto  const&c : Composants) {
+  for(const auto & c : Composants) {
    if (auto *b=dynamic_cast<TToolButton *>(c.second))
     {
-     QString const Action=b->property("vclAction").toString();
-     QString const Menu=b->property("vclMenuItem").toString();
+     const QString Action=b->property("vclAction").toString();
+     const QString Menu=b->property("vclMenuItem").toString();
      b->LieAction(Action.isEmpty()?nullptr:dynamic_cast<TAction *>(Composants[Action]));
      if (!Menu.isEmpty()) { b->MenuItem=dynamic_cast<TMenuItem *>(Composants[Menu]);
 }
@@ -207,7 +207,7 @@ void LieurComposants::Termine()
   for(QWidget *w : AvecMenus) {
    if (auto *m=dynamic_cast<AvecMenuContextuel *>(w))
     {
-     QString const p=w->property("vclPopupMenu").toString();
+     const QString p=w->property("vclPopupMenu").toString();
      if (!p.isEmpty()) { m->PopupMenu=dynamic_cast<TPopupMenu *>(Composants[p]);
 }
     }
@@ -226,7 +226,7 @@ void LieurComposants::Termine()
   // Align des contrôles
   for(QWidget *w : Fiche->findChildren<QWidget *>())
    {
-    QString const a=w->property("vclAlign").toString();
+    const QString a=w->property("vclAlign").toString();
     QWidget *p=w->parentWidget();
     if (a.isEmpty()||(a=="alNone")||!p||p->property("vclAligneur").toBool()) { continue;
 }
@@ -235,7 +235,7 @@ void LieurComposants::Termine()
     Aligne(p);
    }
   // Police de la fiche (Font.Height en pixels)
-  QVariant const h=Fiche->property("vclFontHeight");
+  const QVariant h=Fiche->property("vclFontHeight");
   if (h.isValid())
    {
     QFont f=Fiche->font();
@@ -248,7 +248,7 @@ void LieurComposants::Termine()
   for(QWidget *w : AvecPolice) {
    if (w->testAttribute(Qt::WA_SetFont))
     {
-     QStringList const Familles=FamillesQt(w->font().families().value(0));
+     const QStringList Familles=FamillesQt(w->font().families().value(0));
      if (Familles.size()>1)
       {
        QFont f=w->font();
@@ -275,7 +275,7 @@ int ToucheVirtuelleDe(const QKeyEvent *e)
 TShiftState EtatTouches(const QKeyEvent *e)
  {
   TShiftState s;
-  Qt::KeyboardModifiers const m=e->modifiers();
+  const Qt::KeyboardModifiers m=e->modifiers();
   if (m.testFlag(Qt::ShiftModifier)) { s<<ssShift;
 }
   if (m.testFlag(Qt::ControlModifier)) { s<<ssCtrl;

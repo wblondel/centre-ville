@@ -32,18 +32,18 @@ String ParamStr(int Index)
 //---------------------------------------------------------------------------
 String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
  { // Sous-ensemble utilisé par les fiches : hh, nn, ss, zzz et caractères littéraux
-  auto const Jours=(double)dt;
-  auto const ms=static_cast<long long>(std::floor(((Jours-std::floor(Jours))*86400000.0)+0.5));
-  int const h=static_cast<int>((ms/3600000)%24);
-  int const n=static_cast<int>((ms/60000)%60);
-  int const s=static_cast<int>((ms/1000)%60);
-  int const z=static_cast<int>(ms%1000);
+  const auto Jours=(double)dt;
+  const auto ms=static_cast<long long>(std::floor(((Jours-std::floor(Jours))*86400000.0)+0.5));
+  const int h=static_cast<int>((ms/3600000)%24);
+  const int n=static_cast<int>((ms/60000)%60);
+  const int s=static_cast<int>((ms/1000)%60);
+  const int z=static_cast<int>(ms%1000);
   const std::string &f=asFormat.str();
   std::string r;
   char Tampon[8];
   for(std::size_t i=0; i<f.size();)
    {
-    auto const Commence=[&](const char *m) { return f.compare(i, std::char_traits<char>::length(m), m)==0; };
+    const auto Commence=[&](const char *m) { return f.compare(i, std::char_traits<char>::length(m), m)==0; };
     if (Commence("hh")) { std::snprintf(Tampon, sizeof(Tampon), "%02d", h); r+=Tampon; i+=2; }
     else if (Commence("nn")) { std::snprintf(Tampon, sizeof(Tampon), "%02d", n); r+=Tampon; i+=2; }
     else if (Commence("ss")) { std::snprintf(Tampon, sizeof(Tampon), "%02d", s); r+=Tampon; i+=2; }
@@ -57,7 +57,7 @@ String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
 int StrToInt(const AnsiString &asTexte)
  {
   bool Ok=false;
-  int const n=Q(asTexte).trimmed().toInt(&Ok);
+  const int n=Q(asTexte).trimmed().toInt(&Ok);
   if (!Ok) { throw std::invalid_argument("'"+asTexte.str()+"' n'est pas une valeur entière correcte");
 }
   return n;
@@ -83,8 +83,8 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
   bool Point=false;
   for(std::size_t i=0; i<f.size(); i++)
    {
-    char const c=f[i];
-    if ((c=='"')||(c=='\'')) { std::size_t const j=f.find(c, i+1); i=(j==std::string::npos)?f.size():j; }
+    const char c=f[i];
+    if ((c=='"')||(c=='\'')) { const std::size_t j=f.find(c, i+1); i=(j==std::string::npos)?f.size():j; }
     else if ((c=='.')&&!Point) { Point=true;
     } else if ((c=='0')||(c=='#'))
      {
@@ -94,17 +94,17 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
 }}
      }
    }
-  int const EntiersMin=(PremierZero<0)?0:NbAvant-PremierZero;
+  const int EntiersMin=(PremierZero<0)?0:NbAvant-PremierZero;
   // Chiffres : Valeur = 0,Chiffres x 10^(Exposant+1), arrondis à Decimales
   char Tampon[64];
   std::snprintf(Tampon, sizeof(Tampon), "%.16Le", std::fabs(Valeur));
   std::string Chiffres=std::string(1, Tampon[0])+std::string(Tampon+2, 16);
   int Exposant=std::atoi(std::strchr(Tampon, 'e')+1);
-  int const Garde=Exposant+1+Decimales;
+  const int Garde=Exposant+1+Decimales;
   if (Garde<0) { Chiffres.clear();
   } else if (std::cmp_less(Garde,Chiffres.size()))
    {
-    bool const Haut=Chiffres[static_cast<std::size_t>(Garde)]>='5';
+    const bool Haut=Chiffres[static_cast<std::size_t>(Garde)]>='5';
     Chiffres.resize(static_cast<std::size_t>(Garde));
     if (Haut)
      {
@@ -116,14 +116,14 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
 }
      }
    }
-  bool const Zero=Chiffres.find_first_not_of('0')==std::string::npos;
+  const bool Zero=Chiffres.find_first_not_of('0')==std::string::npos;
   std::string Entier;
   std::string Fraction;
   for(int i=0; i<Exposant+1; i++) { Entier+=std::cmp_less(i,Chiffres.size())?Chiffres[static_cast<std::size_t>(i)]:'0';
 }
   for(int i=0; i<Decimales; i++)
    {
-    int const j=Exposant+1+i;
+    const int j=Exposant+1+i;
     Fraction+=((j>=0)&&std::cmp_less(j,Chiffres.size()))?Chiffres[static_cast<std::size_t>(j)]:'0';
    }
   Entier.erase(0, qMin(Entier.find_first_not_of('0'), Entier.size()));
@@ -138,7 +138,7 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
   std::size_t Decimale=0;
   for(std::size_t i=0; i<f.size(); i++)
    {
-    char const c=f[i];
+    const char c=f[i];
     if ((c=='"')||(c=='\''))
      {
       std::size_t j=f.find(c, i+1);

@@ -16,7 +16,7 @@
 inline std::string FichierSortie(const std::string &asNom)
  {
   std::string asChemin=std::string(CV_DOSSIER_SORTIE)+"/"+asNom;
-  std::filesystem::path const p(std::u8string(asChemin.begin(), asChemin.end()));
+  const std::filesystem::path p(std::u8string(asChemin.begin(), asChemin.end()));
   std::filesystem::create_directories(p.parent_path());
   return asChemin;
  }

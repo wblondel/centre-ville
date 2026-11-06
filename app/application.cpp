@@ -61,7 +61,7 @@ void InitialiseApplication(QApplication & /*App*/)
   // Boutons des boîtes de dialogue en français (« Oui », « Non », « Annuler »)
   // (qtbase_fr.qm, ou qt_fr.qm où windeployqt fusionne les traductions de Qt)
   static QTranslator Traduction;
-  QString const stTraductions=QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+  const QString stTraductions=QLibraryInfo::path(QLibraryInfo::TranslationsPath);
   if (Traduction.load(QLocale(QLocale::French), "qtbase", "_", stTraductions)||
       Traduction.load(QLocale(QLocale::French), "qt", "_", stTraductions)) {
    QApplication::installTranslator(&Traduction);

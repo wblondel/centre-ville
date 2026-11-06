@@ -66,7 +66,7 @@ class LieurComposants
    {
     Membre=dynamic_cast<T *>(Lie(Nom, NomClasse<T>()));
    }
-  template <class T> static const char *NomClasse()
+  template <class T> const static char *NomClasse()
    {
     if constexpr (std::is_same_v<T, TAction>) { return "TAction";
     } else if constexpr (std::is_same_v<T, TActionList>) { return "TActionList";
@@ -198,10 +198,10 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
      {
       iModalResult=mrNone;
       Modale=true;
-      bool const EtaitModale=this->testAttribute(Qt::WA_ShowModal);
+      const bool EtaitModale=this->testAttribute(Qt::WA_ShowModal);
       this->setAttribute(Qt::WA_ShowModal, true);
       this->setResult(0);
-      QPointer<QDialog> const Garde(this);
+      const QPointer<QDialog> Garde(this);
       QEventLoop Boucle;
       BoucleModale=&Boucle;
       BoucleTerminee=false;
@@ -236,7 +236,7 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
    }
   QObject *FindComponent(const AnsiString &asNom)
    {
-    auto const i=Composants.find(Q(asNom));
+    const auto i=Composants.find(Q(asNom));
     if (i!=Composants.end()) { return i->second;
 }
     return B::template findChild<QObject *>(Q(asNom));
@@ -247,7 +247,7 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     QWidget *w=this;
     KeyPreview=w->property("vclKeyPreview").toBool();
     HelpContext=w->property("vclHelpContext").toInt();
-    QString const Bord=w->property("vclBorderStyle").toString();
+    const QString Bord=w->property("vclBorderStyle").toString();
     Qt::WindowFlags f=w->windowFlags();
     if ((Bord=="bsToolWindow")||(Bord=="bsSizeToolWin")) { f|=Qt::Tool;
 }
@@ -256,7 +256,7 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     if constexpr (std::is_base_of_v<QDialog, B>) {
      if (w->property("vclBorderIcons").isValid())
       { // BorderIcons : boutons de la barre de titre (biMinimize : f_prmbus réduit sa fiche)
-       QString const Icones=w->property("vclBorderIcons").toString();
+       const QString Icones=w->property("vclBorderIcons").toString();
        f|=Qt::CustomizeWindowHint|Qt::WindowTitleHint;
        f&=~(Qt::WindowSystemMenuHint|Qt::WindowCloseButtonHint|Qt::WindowMinimizeButtonHint|
             Qt::WindowMaximizeButtonHint|Qt::WindowContextHelpButtonHint);
@@ -272,10 +272,10 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
 }
     if (f!=w->windowFlags()) { w->setWindowFlags(f);
 }
-    QVariant const Couleur=w->property("vclColor");
+    const QVariant Couleur=w->property("vclColor");
     if (Couleur.isValid())
      { // Color de la fiche, si elle n'est pas une couleur système (bit 31)
-      TColor const c=CouleurDepuisTexte(A(Couleur.toString()));
+      const TColor c=CouleurDepuisTexte(A(Couleur.toString()));
       if ((c&0xFF000000) == 0u)
        {
         QPalette p=w->palette();
@@ -286,7 +286,7 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
      }
     if ((Bord=="bsDialog")||(Bord=="bsSingle")||(Bord=="bsToolWindow")) { w->setFixedSize(w->size());
 }
-    QString const Actif=w->property("vclActiveControl").toString();
+    const QString Actif=w->property("vclActiveControl").toString();
     if (!Actif.isEmpty()) {
      if (auto *c=w->findChild<QWidget *>(Actif)) {
       c->setFocus(Qt::OtherFocusReason); // fiche cachée : le focus lui sera donné à l'activation
@@ -341,8 +341,8 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
      // Échap = premier bouton Cancel ; sans bouton concerné, la touche continue
     if ((e->modifiers()&~Qt::KeypadModifier) != Qt::NoModifier) { return false;
 }
-    bool const Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter);
-    bool const Echap=(e->key()==Qt::Key_Escape);
+    const bool Entree=(e->key()==Qt::Key_Return)||(e->key()==Qt::Key_Enter);
+    const bool Echap=(e->key()==Qt::Key_Escape);
     if (!Entree&&!Echap) { return false;
 }
     if (Entree) { // v6.0.2 : la VCL n'envoie pas CM_EXIT : le bouton aurait lu la valeur tapée, hors des bornes
@@ -374,11 +374,11 @@ template <class B> class TFormT : public B, public FicheVclBase, public AvecMenu
     if (PremierAffichage)
      {
       PremierAffichage=false;
-      QString const Position=this->property("vclPosition").toString();
+      const QString Position=this->property("vclPosition").toString();
       QWidget *Ref=(Position=="poMainFormCenter")?FichePrincipaleQt:nullptr;
       if ((Position=="poScreenCenter")||(Ref&&(Ref!=this)))
        {
-        QRect const Zone=Ref?Ref->frameGeometry():(this->screen()?this->screen()->availableGeometry():QRect());
+        const QRect Zone=Ref?Ref->frameGeometry():(this->screen()?this->screen()->availableGeometry():QRect());
         QRect g=this->frameGeometry();
         g.moveCenter(Zone.center());
         this->move(g.topLeft());

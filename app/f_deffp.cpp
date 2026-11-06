@@ -69,7 +69,7 @@ void TfrmDefFeuxPietons::RafraichitFeuxPietons()
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::AnalyseEtatFeux() const // v5.2.1
  {
-  auto const EtatFP=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
+  const auto EtatFP=static_cast<etat_feu>(RadioGroupEtat->ItemIndex+static_cast<int>(RadioGroupEtat->ItemIndex==2));
   etat_feu EtatFC=inactif;
   etat_feu EtatCrt;
   bool FeuxFCDifferents=false;
