@@ -140,9 +140,13 @@ if(TARGET cvwfiches)
     ENVIRONMENT "CV_CARTE=${PROJECT_SOURCE_DIR}/maps/Démo.cvw;CV_DOSSIER_CAPTURES=${CMAKE_CURRENT_BINARY_DIR}/sortie/captures;QT_QPA_PLATFORM=offscreen;QT_FORCE_STDERR_LOGGING=1"
     TIMEOUT 300
   )
-  # Sous AddressSanitizer, le test est plusieurs fois plus lent
+  # Sous AddressSanitizer, le test est plusieurs fois plus lent. Sans optimisation (Debug, couverture),
+  # les accès aux conteneurs standard (std::vector, std::array) sont des appels de fonction : environ
+  # 4 minutes au lieu d'une et quart en Release (6.0.17)
   if(CMAKE_CXX_FLAGS MATCHES "sanitize")
     set_tests_properties(interface.demo PROPERTIES TIMEOUT 1800)
+  elseif(NOT CMAKE_BUILD_TYPE MATCHES "Rel")
+    set_tests_properties(interface.demo PROPERTIES TIMEOUT 900)
   endif()
 
   # Borne d'un indice testée après son usage, dans les fiches (v6.0.2) : tools/audit_bornes.py,
