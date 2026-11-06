@@ -131,7 +131,7 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
     // Libellés
     for (i = 1; i < 7; i++)
     {
-        (static_cast<TLabel *>(FindComponent(asLabel + IntToStr(i))))->Enabled = ARendreVisible;
+        (dynamic_cast<TLabel *>(FindComponent(asLabel + IntToStr(i))))->Enabled = ARendreVisible;
     }
     // Données
     LabelDirection->Visible = ARendreVisible;
@@ -144,7 +144,7 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
     CheckBoxEpidemie->Checked = ARendreVisible && frmSimulation->EpidemieActivee;
     for (i = 7; i < 14; i++)
     { // v5.4.1 (+9)
-        (static_cast<TLabel *>(FindComponent(asLabel + IntToStr(i))))->Enabled = CheckBoxEpidemie->Checked;
+        (dynamic_cast<TLabel *>(FindComponent(asLabel + IntToStr(i))))->Enabled = CheckBoxEpidemie->Checked;
     }
     LabelInfecte->Visible = CheckBoxEpidemie->Checked;
     LabelInfections->Visible = CheckBoxEpidemie->Checked;

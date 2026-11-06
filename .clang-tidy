@@ -32,6 +32,8 @@
 #    (grille, tableaux, fiches) ; une méthode qui le modifie à travers eux passerait pour const ;
 #  - readability-function-cognitive-complexity, readability-function-size : les règles de la
 #    simulation sont de longues fonctions, que les découper changerait trop ;
+#  - readability-avoid-nested-conditional-operator : les choix en chaîne (a ? x : b ? y : z), alignés
+#    par clang-format comme une table, se lisent mieux qu'une cascade de if ;
 #  - readability-identifier-length : x, y, d, i sont les noms naturels de la grille ;
 #  - readability-trailing-comma : simple style, et clang-format met alors un élément par ligne.
 Checks: >
@@ -64,6 +66,7 @@ Checks: >
   -readability-make-member-function-const,
   -readability-function-cognitive-complexity,
   -readability-function-size,
+  -readability-avoid-nested-conditional-operator,
   -readability-identifier-length,
   -readability-trailing-comma
 CheckOptions:

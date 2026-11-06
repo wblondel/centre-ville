@@ -594,11 +594,7 @@ void TMenuItem::Click()
     {
         Checked = !bChecked;
     }
-    if (OnClick && ActionLiee && ActionLiee->OnExecute)
-    {
-        OnClick(this);
-    }
-    else if (ActionLiee)
+    if (ActionLiee && !(OnClick && ActionLiee->OnExecute))
     {
         ActionLiee->Execute();
     }

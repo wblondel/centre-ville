@@ -88,7 +88,13 @@ class Finalement
 public:
     explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
     Finalement(const Finalement &) = delete;
-    ~Finalement() { Code(); }
+    Finalement &operator=(const Finalement &) = delete;
+    Finalement(Finalement &&) = delete;
+    Finalement &operator=(Finalement &&) = delete;
+    ~Finalement()
+    {
+        Code();
+    } // NOLINT(bugprone-exception-escape) : comme __finally, une exception du code de sortie termine le programme
 };
 //---------------------------------------------------------------------------
 // TShiftState

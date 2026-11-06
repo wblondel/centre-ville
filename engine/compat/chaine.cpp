@@ -91,9 +91,9 @@ std::string AvecSeparateurMilliers(const std::string &Nombre)
     {
         if ((n != 0U) && ((n % 3) == 0U))
         {
-            Resultat = "," + Resultat;
+            Resultat.insert(0, 1, ',');
         }
-        Resultat = Nombre[i - 1] + Resultat;
+        Resultat.insert(0, 1, Nombre[i - 1]);
     }
     return Nombre.substr(0, Debut) + Resultat;
 }
@@ -222,7 +222,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             std::string Chiffres = std::to_string(Absolu);
             if (PrecisionDefinie && std::cmp_less(Chiffres.size(), Precision))
             {
-                Chiffres = std::string(static_cast<std::size_t>(Precision) - Chiffres.size(), '0') + Chiffres;
+                Chiffres.insert(0, static_cast<std::size_t>(Precision) - Chiffres.size(), '0');
             }
             Texte = (Negatif ? "-" : "") + Chiffres;
             break;
@@ -239,7 +239,7 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             Texte = std::format("{:X}", v);
             if (PrecisionDefinie && std::cmp_less(Texte.size(), Precision))
             {
-                Texte = std::string(static_cast<std::size_t>(Precision) - Texte.size(), '0') + Texte;
+                Texte.insert(0, static_cast<std::size_t>(Precision) - Texte.size(), '0');
             }
             break;
         }
@@ -328,7 +328,14 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
         if (LargeurDefinie && std::cmp_less(Texte.size(), Largeur))
         {
             const std::string Bourrage(static_cast<std::size_t>(Largeur) - Texte.size(), ' ');
-            Texte = AGauche ? Texte + Bourrage : Bourrage + Texte;
+            if (AGauche)
+            {
+                Texte += Bourrage;
+            }
+            else
+            {
+                Texte.insert(0, Bourrage);
+            }
         }
         Resultat += Texte;
     }

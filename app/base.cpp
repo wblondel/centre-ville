@@ -267,7 +267,7 @@ int MessageDlg(const AnsiString &asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
     };
     QMessageBox Boite(Icones[Type], QString::fromUtf8(Titres[Type]), Q(asMessage), QMessageBox::NoButton,
                       FenetreParente());
-    struct
+    const struct
     {
         TMsgDlgBtn b;
         QMessageBox::StandardButton q;

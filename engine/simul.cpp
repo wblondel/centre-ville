@@ -4,6 +4,7 @@
 //---------------------------------------------------------------------------
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
 //---------------------------------------------------------------------------
@@ -783,49 +784,46 @@ void feu::Evolue()
             DefinitProchainEtat();
         }
         break;
-    case rouge: // Le vert n'est pas encore demandé
-        if (!DemandeVert)
-        {
-            if ((cv->TourCrt - TourDrnChgEtat > DureeRouge) && // la durée du rouge est écoulée ET
-                ((TypeDmdVert == immediate) ||                 // La demande est immédiate Ou
-                 (((NumVeh = cv->v[x][y].NumVehicule) != 0) && // un véhicule est sur la case et
-                  (cv->Vehicule[NumVeh - 1].Dir == Dir)) ||    // dans la direction du feu... Ou
-                 (((NumVL = cv->v[x][y].NumVehlib) != 0) &&    // (v5.3) un vehlib est sur la case et
-                  (cv->Vehlib[NumVL - 1].Dir == Dir)) ||       // dans la direction du feu... Ou
-                 (((NumBus = cv->v[x][y].NumBus) != 0) &&      // un bus est sur la case et
-                  (cv->Bus[NumBus - 1].Dir == Dir)) ||
-                 (((NumTram = cv->v[x][y].NumTram) != 0) && // un tram est sur la case et
-                  (cv->Tram[NumTram - 1].Dir == Dir)) ||    // dans la direction du feu... (v3.5)
-                 (((NumTaxi = cv->v[x][y].NumTaxi) != 0) && // un taxi est sur la case et
-                  (cv->Taxi[NumTaxi - 1].Dir == Dir))))     // dans la direction du feu... (v3.6)
-            { // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
-                for (i = 0; (i < NbFeuxAtt) && ((cv->Feu[NumFeuxAtt[i] - 1].Etat != vert) ||
-                                                ((cv->Feu[NumFeuxAtt[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
-                                                 (!cv->Feu[NumFeuxAtt[i] - 1].RougeDemande)));
+    case rouge:                                                               // Le vert n'est pas encore demandé
+        if ((!DemandeVert) && ((cv->TourCrt - TourDrnChgEtat > DureeRouge) && // la durée du rouge est écoulée ET
+                               ((TypeDmdVert == immediate) ||                 // La demande est immédiate Ou
+                                (((NumVeh = cv->v[x][y].NumVehicule) != 0) && // un véhicule est sur la case et
+                                 (cv->Vehicule[NumVeh - 1].Dir == Dir)) ||    // dans la direction du feu... Ou
+                                (((NumVL = cv->v[x][y].NumVehlib) != 0) &&    // (v5.3) un vehlib est sur la case et
+                                 (cv->Vehlib[NumVL - 1].Dir == Dir)) ||       // dans la direction du feu... Ou
+                                (((NumBus = cv->v[x][y].NumBus) != 0) &&      // un bus est sur la case et
+                                 (cv->Bus[NumBus - 1].Dir == Dir)) ||
+                                (((NumTram = cv->v[x][y].NumTram) != 0) && // un tram est sur la case et
+                                 (cv->Tram[NumTram - 1].Dir == Dir)) ||    // dans la direction du feu... (v3.5)
+                                (((NumTaxi = cv->v[x][y].NumTaxi) != 0) && // un taxi est sur la case et
+                                 (cv->Taxi[NumTaxi - 1].Dir == Dir)))))    // dans la direction du feu... (v3.6)
+        { // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
+            for (i = 0; (i < NbFeuxAtt) && ((cv->Feu[NumFeuxAtt[i] - 1].Etat != vert) ||
+                                            ((cv->Feu[NumFeuxAtt[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
+                                             (!cv->Feu[NumFeuxAtt[i] - 1].RougeDemande)));
+                 i++)
+            {
+                ;
+            }
+            // v5.2 : on vérifie les feux piétons (comme ci-dessus)
+            if (!(DemandeVert = (i < NbFeuxAtt))) // Si pas de demande de vert dans les feux de circulation
+            {
+                for (i = 0; (i < NbFeuxPtn) && ((cv->FeuP[NumFeuxPtn[i] - 1].Etat != vert) || // ETAT=Etat pour les
+                                                                                              // feux adverses et
+                                                                                              // non l'état pour les
+                                                                                              // piétons (compte le
+                                                                                              // temps de traversée
+                                                ((cv->FeuP[NumFeuxPtn[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
+                                                 (!cv->FeuP[NumFeuxPtn[i] - 1].RougeDemande)));
                      i++)
                 {
                     ;
                 }
-                // v5.2 : on vérifie les feux piétons (comme ci-dessus)
-                if (!(DemandeVert = (i < NbFeuxAtt))) // Si pas de demande de vert dans les feux de circulation
-                {
-                    for (i = 0; (i < NbFeuxPtn) && ((cv->FeuP[NumFeuxPtn[i] - 1].Etat != vert) || // ETAT=Etat pour les
-                                                                                                  // feux adverses et
-                                                                                                  // non l'état pour les
-                                                                                                  // piétons (compte le
-                                                                                                  // temps de traversée
-                                                    ((cv->FeuP[NumFeuxPtn[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
-                                                     (!cv->FeuP[NumFeuxPtn[i] - 1].RougeDemande)));
-                         i++)
-                    {
-                        ;
-                    }
-                    DemandeVert = (i < NbFeuxPtn);
-                }
-                if (DemandeVert)
-                {
-                    TourDrnChgEtat = cv->TourCrt; // v5.2: DemandeVert est défini ci-dessus
-                }
+                DemandeVert = (i < NbFeuxPtn);
+            }
+            if (DemandeVert)
+            {
+                TourDrnChgEtat = cv->TourCrt; // v5.2: DemandeVert est défini ci-dessus
             }
         }
         // Le vert est demandé...
@@ -1231,23 +1229,21 @@ void feu_pieton::Evolue()
                 }
             }
         }
-        if (!DemandeVert) // Le vert n'est pas encore demandé
-        {
-            if ((cv->TourCrt - TourDrnChgEtat > DureeRouge) && // la durée du rouge est écoulée ET
-                ((TypeDmdVert == immediate) ||                 // La demande est immédiate Ou
-                 PietonAttend()))                              // un pieton attend au pied d'un des feux de piétons
-            { // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
-                for (i = 0; (i < NbFeux) && ((cv->Feu[NumFeux[i] - 1].Etat != vert) ||
-                                             ((cv->Feu[NumFeux[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
-                                              (!cv->Feu[NumFeux[i] - 1].RougeDemande)));
-                     i++)
-                {
-                    ;
-                }
-                if ((DemandeVert = (i < NbFeux)))
-                {
-                    TourDrnChgEtat = cv->TourCrt;
-                }
+        if ((!DemandeVert) &&                               // Le vert n'est pas encore demandé
+            ((cv->TourCrt - TourDrnChgEtat > DureeRouge) && // la durée du rouge est écoulée ET
+             ((TypeDmdVert == immediate) ||                 // La demande est immédiate Ou
+              PietonAttend())))                             // un pieton attend au pied d'un des feux de piétons
+        { // Alors...On demande le vert DES QU'UN DES FEUX (devant être rouge) EST VERT
+            for (i = 0; (i < NbFeux) && ((cv->Feu[NumFeux[i] - 1].Etat != vert) ||
+                                         ((cv->Feu[NumFeux[i] - 1].TourDrnChgEtat == cv->TourCrt) &&
+                                          (!cv->Feu[NumFeux[i] - 1].RougeDemande)));
+                 i++)
+            {
+                ;
+            }
+            if ((DemandeVert = (i < NbFeux)))
+            {
+                TourDrnChgEtat = cv->TourCrt;
             }
         }
         // Le vert est demandé...
@@ -3684,35 +3680,33 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
                         }
                     }
                     else // 1ter. SOIT 1 vehLib voisin arrivant sur la case ? Priorité 1. v5.3
-                        if ((NumLV != 0) && (NumVehicule == 0))
+                        if (((NumLV != 0) && (NumVehicule == 0)) &&
+                            ((NivPriorite[d] =
+                                  static_cast<int>((cv->Vehlib[NumLV - 1].Dir == InvDir[d]) && // 1 VEHLIB Qui arrive
+                                                                                               // sur la case...
+                                                   cv->TourDeDeplacementVehlib(NumLV - 1) &&   // ET que c'est son tour
+                                                                                               // de déplacement...
+                                                                                               // (multivitesse)
+                                                   (cv->Vehlib[NumLV - 1].Situation == svDepart) && // ET qu'il est
+                                                                                                    // sur le départ
+                                                   (NumVehlib == 0))) != 0)) // et qu'y a pas de taxi sur la case
                         {
-                            if ((NivPriorite[d] =
-                                     static_cast<int>((cv->Vehlib[NumLV - 1].Dir == InvDir[d]) && // 1 VEHLIB Qui arrive
-                                                                                                  // sur la case...
-                                                      cv->TourDeDeplacementVehlib(NumLV - 1) && // ET que c'est son tour
-                                                                                                // de déplacement...
-                                                                                                // (multivitesse)
-                                                      (cv->Vehlib[NumLV - 1].Situation == svDepart) && // ET qu'il est
-                                                                                                       // sur le départ
-                                                      (NumVehlib == 0))) != 0) // et qu'y a pas de taxi sur la case
-                            {
-                                // 2. Sont-ils obligés de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
-                                NivPriorite[d] +=
-                                    static_cast<int>(((v->Priorite[InvDir[d] - 1] == stop) &&
-                                                      (cv->Vehlib[NumLV - 1].TourDrnDepl > cv->TourCrt - 2L)) ||
+                            // 2. Sont-ils obligés de s'arrêter (stop non marqué ou feu non vert) ? Priorité 2
+                            NivPriorite[d] +=
+                                static_cast<int>(((v->Priorite[InvDir[d] - 1] == stop) &&
+                                                  (cv->Vehlib[NumLV - 1].TourDrnDepl > cv->TourCrt - 2L)) ||
+                                                 ((v->Priorite[InvDir[d] - 1] == feux) &&
+                                                  (cv->Feu[v->NumFeu[InvDir[d] - 1] - 1].Etat > vert)));
+                            // 3. Doivent-ils céder le passage (clp ou stop marqué) ? Priorité 3
+                            NivPriorite[d] +=
+                                2 * static_cast<int>((v->Priorite[InvDir[d] - 1] == cedez_le_passage) ||
+                                                     ((v->Priorite[InvDir[d] - 1] == stop) &&
+                                                      (cv->TourCrt - cv->Vehlib[NumLV - 1].TourDrnDepl >= 2L)));
+                            // 4. Taxi sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
+                            NivPriorite[d] +=
+                                3 * static_cast<int>((v->Priorite[InvDir[d] - 1] == a_droite) ||
                                                      ((v->Priorite[InvDir[d] - 1] == feux) &&
-                                                      (cv->Feu[v->NumFeu[InvDir[d] - 1] - 1].Etat > vert)));
-                                // 3. Doivent-ils céder le passage (clp ou stop marqué) ? Priorité 3
-                                NivPriorite[d] +=
-                                    2 * static_cast<int>((v->Priorite[InvDir[d] - 1] == cedez_le_passage) ||
-                                                         ((v->Priorite[InvDir[d] - 1] == stop) &&
-                                                          (cv->TourCrt - cv->Vehlib[NumLV - 1].TourDrnDepl >= 2L)));
-                                // 4. Taxi sur voie à priorité à droite (ou feu inactif/vert) ? Priorité 4
-                                NivPriorite[d] +=
-                                    3 * static_cast<int>((v->Priorite[InvDir[d] - 1] == a_droite) ||
-                                                         ((v->Priorite[InvDir[d] - 1] == feux) &&
-                                                          (cv->Feu[v->NumFeu[InvDir[d] - 1] - 1].Etat < orange)));
-                            }
+                                                      (cv->Feu[v->NumFeu[InvDir[d] - 1] - 1].Etat < orange)));
                         }
     }
     // 5. Entre véhicules prioritaires (V.P.) :
@@ -4071,10 +4065,11 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                 (!p->PlaceVehlibTrv))           //                            vers une place de vehlibs (v5.3)
             {                                   // 1. Recherche de passage piéton
                 if ((cv->ProbaDirPsgPt != 0) && // Si recherche de passage piéton il y a ET
-                    ((NvDir = cv->CherchePassagePietons(x, y, static_cast<sens>(2 - (p->Dir % 2)))) != 0) && // Passage
-                                                                                                             // piéton
-                                                                                                             // trouvé
-                                                                                                             // ET
+                    ((NvDir = cv->CherchePassagePietons(x, y, ((p->Dir % 2) != 0 ? horizontal : vertical))) !=
+                     0) &&                                      // Passage
+                                                                // piéton
+                                                                // trouvé
+                                                                // ET
                     ((alea::Rand() % 100) < cv->ProbaDirPsgPt)) // Probabilité d'y aller (paramètre)
                 {                                               // Il va vers le passage piéton trouvé
                     p->Dir = NvDir;
@@ -4083,8 +4078,9 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                 }
                 else                                   // 2. Recherche d'arrêt de bus. v3.0
                     if ((cv->ProbaDirArretBus != 0) && // Si recherche d'arret de bus il y a ET
-                        ((NvDir = cv->ChercheArretBus(x, y, static_cast<sens>(2 - (p->Dir % 2)))) != 0) && // Arret bus
-                                                                                                           // trouvé ET
+                        ((NvDir = cv->ChercheArretBus(x, y, ((p->Dir % 2) != 0 ? horizontal : vertical))) !=
+                         0) &&                                         // Arret bus
+                                                                       // trouvé ET
                         ((alea::Rand() % 100) < cv->ProbaDirArretBus)) // Probabilité d'y aller (paramètre)
                     {                                                  // Il va vers l'arrêt de bus
                         p->Dir = NvDir;
@@ -4093,7 +4089,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                     }
                     else                                    // 3. Recherche d'arrêt de tram. v3.5
                         if ((cv->ProbaDirArretTram != 0) && // Si recherche d'arret de tram il y a ET
-                            ((NvDir = cv->ChercheArretTram(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
+                            ((NvDir = cv->ChercheArretTram(x, y, ((p->Dir % 2) != 0 ? horizontal : vertical))) !=
                              0) &&                                          // Arret
                                                                             // tram
                                                                             // trouvé
@@ -4106,7 +4102,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                         }
                         else                                   // 4. Recherche de file de taxi. v3.6
                             if ((cv->ProbaDirFileTaxi != 0) && // Si recherche de file de taxi il y a ET
-                                ((NvDir = cv->CherchePlaceTaxi(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
+                                ((NvDir = cv->CherchePlaceTaxi(x, y, ((p->Dir % 2) != 0 ? horizontal : vertical))) !=
                                  0) &&                                         // Place de taxi trouvée ET
                                 ((alea::Rand() % 100) < cv->ProbaDirFileTaxi)) // Probabilité d'y aller (paramètre)
                             {                                                  // Il va vers le tête de file de taxi
@@ -4116,8 +4112,10 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                             }
                             else                                     // 5. Recherche de file de vehlib. v5.3
                                 if ((cv->ProbaDirFileVehlib != 0) && // Si recherche de file de vehlib il y a ET
-                                    ((NvDir = cv->CherchePlaceVehlib(x, y, static_cast<sens>(2 - (p->Dir % 2)))) !=
-                                     0) &&                                           // Place de vehlib trouvée ET
+                                    ((NvDir = cv->CherchePlaceVehlib(
+                                          x, y, ((p->Dir % 2) != 0 ? horizontal : vertical))) != 0) && // Place de
+                                                                                                       // vehlib trouvée
+                                                                                                       // ET
                                     ((alea::Rand() % 100) < cv->ProbaDirFileVehlib)) // Probabilité d'y aller
                                                                                      // (paramètre)
                                 { // Il va vers le tête de file de taxi
@@ -4894,7 +4892,7 @@ int voie::NumDirPossSensVoieTram(direction DirOrigine, direction DirDestination)
     return i;
 }
 //-----------------------------------------------------------------------------
-int voie::NbDirPossSensVoieTram(direction DirOrigine) // v3.5
+int voie::NbDirPossSensVoieTram(direction DirOrigine) const // v3.5
 {
     int n = 0;
     for (int DirDestination = nord; DirDestination <= ouest; DirDestination++)
@@ -7035,6 +7033,7 @@ bool centre_ville::PrepareVehicules()
     for (int i = 0; i < NumPrmVehiculePlacePark; i++)
     {
         assert((NumParkingDepart >= 1) && (NumParkingDepart <= NbParkings));
+        // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound) : NumParkingDepart borné par l'assert ci-dessus
         Vehicule[i].Definit(Parking[NumParkingDepart - 1].x, Parking[NumParkingDepart - 1].y, indefinie,
                             NumParkingDepart, NumParkingArrivee, 0, 0, // v5.0 : On ne traite ici que les
                                                                        // départs/arrivées parkings souterrains
@@ -7073,6 +7072,7 @@ bool centre_ville::PrepareVehicules()
                (NumPlaceParkArrivee <= NbPlacesPark));
         NumFileParkDepart = (NumPlaceParkDepart != 0) ? (1 + PlacePark[NumPlaceParkDepart - 1].NumFile) : 0;
         NumFileParkArrivee = (NumPlaceParkArrivee != 0) ? (1 + PlacePark[NumPlaceParkArrivee - 1].NumFile) : 0;
+        // NOLINTNEXTLINE(clang-analyzer-security.ArrayBound) : places bornées par l'assert ci-dessus
         Vehicule[i].Definit(
             ((NumPlaceParkDepart != 0) ? PlacePark[NumPlaceParkDepart - 1].x : Parking[NumParkingDepart - 1].x),
             ((NumPlaceParkDepart != 0) ? PlacePark[NumPlaceParkDepart - 1].y : Parking[NumParkingDepart - 1].y),
@@ -7214,9 +7214,8 @@ void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
     vl->DirDrnDepl = vl->Dir;
     v[x][y].NumVehlib = NumVehlib;
     v[x][y].RedessineCase(false);
-    switch (vl->Situation)
+    if (vl->Situation == svDepart)
     {
-    case svDepart:
         if (((NumPlace = v[x][y].NumPlaceVehlib) != 0) &&              // Si c'est une place de vehlib ET
             (NumPlace == vl->NumPlaceArrivee) &&                       // c'est la place d'arrivée ET
             (PlaceVehlib[NumPlace - 1].NumVehlibReserve == NumVehlib)) // elle a été réservée pour ce vehlib
@@ -7227,9 +7226,6 @@ void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
             vl->Situation = svAttente;
             PlaceVehlib[NumPlace - 1].NumVehlibReserve = 0;
         }
-        break;
-    default:
-        break;
     }
 }
 //-----------------------------------------------------------------------------
@@ -7380,7 +7376,9 @@ bool centre_ville::PrepareVehlibs() // v5.3. Les vehlibs ainsi que leurs places
         NbVehlibs = 0;
         return true;
     }
-    const auto NumVehlibPlace = [this](int x) { return static_cast<int>(0.5 + (x * (TauxRemplissageVehlib / 100.0))); };
+    const auto NumVehlibPlace = [this](int x) {
+        return static_cast<int>(std::lround(x * (TauxRemplissageVehlib / 100.0)));
+    };
     const int NbVehlibsADefinir = 1 + NumVehlibPlace(NbPlacesVehlib - 1);
     int // On calcule le n° de vehlib pour la dernière place (NbPlacesVehlib-1) auquel on rajoute 1 pour avoir le nombre
         // de vehlibs à créer.

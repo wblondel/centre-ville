@@ -568,7 +568,8 @@ void GrilleSimulation::contextMenuEvent(QContextMenuEvent *e)
 //---------------------------------------------------------------------------
 void GrilleSimulation::keyPressEvent(QKeyEvent *e)
 { // TCustomGrid::KeyDown
-    bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier), Maj = e->modifiers().testFlag(Qt::ShiftModifier);
+    bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier);
+    const bool Maj = e->modifiers().testFlag(Qt::ShiftModifier);
 #ifdef Q_OS_MACOS
     Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0U);
 #endif

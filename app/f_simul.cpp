@@ -410,14 +410,10 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                         }
                     }
                     // Ensuite les décors (sauf pelouse)
-                    switch (v->Nature) // v3.9
+                    if (v->Nature == arbre) // v3.9
                     {
-                    case arbre:
                         VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top,
                                                   IDB_ARBRE + ((Col + Row) % 4));
-                        break;
-                    default:
-                        break;
                     }
                 }
                 // 1b. Immeubles.
@@ -1257,7 +1253,8 @@ void TfrmSimulation::RedimensionneZone()
 void TfrmSimulation::FormCreate(TObject * /*Sender*/)
 { // Initialise les indicateurs. v5.4 : la màj de la base de registres est faite par l'installateur
     // v5.4 : on applique la résolution courante sur la taille des cases par rapport à la définition prédéfinie
-    Affichage = static_cast<affichage>(aff_sign | aff_voie | aff_env); // v3.8.1 (aff_env)
+    Affichage = static_cast<affichage>(aff_sign | aff_voie | aff_env); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
+                                                                       // : masque de bits ; v3.8.1 (aff_env)
     xErr = -1;
     yErr = -1;
     Pause = false; // v3.5

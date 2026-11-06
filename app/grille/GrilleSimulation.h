@@ -56,10 +56,8 @@ enum TGridDrawStateElement { gdSelected, gdFocused, gdFixed };
 using TGridDrawState = TEnsemble<TGridDrawStateElement>;
 using TDrawCellEvent = std::function<void(TObject *Sender, int ACol, int ARow, TRect &Rect, TGridDrawState State)>;
 //---------------------------------------------------------------------------
-class GrilleSimulation : public ControleVcl<QAbstractScrollArea>,
-                         public AvecMenuContextuel // NOLINT(misc-multiple-inheritance)
-                                                   // : widget Qt et services
-                                                   // de la VCL (mixins)
+// NOLINTNEXTLINE(misc-multiple-inheritance) : widget Qt et services de la VCL (mixins)
+class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMenuContextuel
 {
     TCanvas CanvasGrille;
     TGridCoord Courante, Ancre, HautGauche;
@@ -98,7 +96,8 @@ public:
     void PrepareVcl() override;
     [[nodiscard]] TRect CellRect(int ACol, int ARow) const;
     void InvalidateCell(int ACol, int ARow); // RedessineCase -> update(rect)
-    void Repaint();                          // TControl::Repaint : dessin immédiat
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method) : Repaint de la grille, appelé sur son type
+    void Repaint(); // TControl::Repaint : dessin immédiat
 protected:
     void paintEvent(QPaintEvent *e) override;
     void resizeEvent(QResizeEvent *e) override;

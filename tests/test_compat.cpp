@@ -117,8 +117,8 @@ TEST_CASE("alea::Rand()/alea::Srand() : LCG de la RTL Borland", "[compat][alea]"
     alea::Srand(123);
     const unsigned Apres = (123U * 22695477U) + 1U;
     CHECK(alea::Graine() == Apres);
-    CHECK(alea::Rand() == (int)(((Apres * 22695477U + 1U) >> 16) & 0x7FFF));
-    CHECK(alea::Graine() == Apres * 22695477U + 1U);
+    CHECK(alea::Rand() == static_cast<int>((((Apres * 22695477U) + 1U) >> 16) & 0x7FFF));
+    CHECK(alea::Graine() == (Apres * 22695477U) + 1U);
 }
 //---------------------------------------------------------------------------
 TEST_CASE("alea::Rand()/alea::Srand() : graine injectable", "[compat][alea]")
@@ -130,7 +130,7 @@ TEST_CASE("alea::Rand()/alea::Srand() : graine injectable", "[compat][alea]")
     CHECK(a == b);
     alea::LibereGraine();
     alea::Srand(987654);
-    CHECK(alea::Graine() == 987654U * 22695477U + 1U);
+    CHECK(alea::Graine() == (987654U * 22695477U) + 1U);
 }
 //---------------------------------------------------------------------------
 TEST_CASE("FileCreate/FileWrite/FileRead/FileSeek/FileClose", "[compat][fichier]")
@@ -214,7 +214,7 @@ TEST_CASE("FileRead/FileWrite : tampon transparent (gros volumes, lecture/écrit
     CHECK(FileWrite(h, &Ecrit, 4) == 4); // octets 4 à 7
     unsigned char Suivant = 0;
     CHECK(FileRead(h, &Suivant, 1) == 1); // octet 8
-    CHECK(Suivant == (unsigned char)(8 * 7 + 3));
+    CHECK(Suivant == static_cast<unsigned char>((8 * 7) + 3));
     FileClose(h);
     h = FileOpen(asNom, fmOpenRead);
     REQUIRE(h > 0);
@@ -266,9 +266,11 @@ namespace
 {
 std::string LitTout(const AnsiString &asNom)
 {
-    std::ifstream f(
-        std::filesystem::path(std::u8string(reinterpret_cast<const char8_t *>(asNom.str().data()), asNom.str().size())),
-        std::ios::binary);
+    std::ifstream f(std::filesystem::path(std::u8string(
+                        reinterpret_cast<const char8_t *>(
+                            asNom.str().data()) /* NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : UTF-8 */,
+                        asNom.str().size())),
+                    std::ios::binary);
     return {std::istreambuf_iterator<char>(f), {}};
 }
 void EcritTout(const AnsiString &asNom, const std::string &asOctets)
@@ -280,7 +282,9 @@ void EcritTout(const AnsiString &asNom, const std::string &asOctets)
 }
 std::filesystem::path CheminDe(const AnsiString &asNom)
 {
-    return {std::u8string(reinterpret_cast<const char8_t *>(asNom.str().data()), asNom.str().size())};
+    return {std::u8string(reinterpret_cast<const char8_t *>(
+                              asNom.str().data()) /* NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : UTF-8 */,
+                          asNom.str().size())};
 }
 // Fichiers du dossier de sortie : aucun fichier temporaire ne doit rester
 std::size_t NbFichiers(const std::filesystem::path &Dossier)

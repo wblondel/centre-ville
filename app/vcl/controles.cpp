@@ -39,7 +39,7 @@ template <class B> void ControleVcl<B>::PrepareVcl()
     { // Font.Height < 0 : hauteur des caractères en pixels (indépendant des ppp de l'écran)
         QFont f = w->font();
         const int h = v.toInt();
-        f.setPixelSize(h < 0 ? -h : qMax(1, static_cast<int>((0.85 * h) + 0.5)));
+        f.setPixelSize(h < 0 ? -h : qMax(1, static_cast<int>(std::lround(0.85 * h))));
         w->setFont(f);
     }
     v = w->property("vclFontColor");

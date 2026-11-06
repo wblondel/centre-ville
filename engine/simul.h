@@ -1405,7 +1405,7 @@ public:
     direction DirSensVoieTram(direction DirOrigine, int iDir);                                       // v3.5
     [[nodiscard]] bool EstDirPossSensVoieTram(direction DirOrigine, direction DirDestination) const; // v3.5
     int NumDirPossSensVoieTram(direction DirOrigine, direction DirDestination);                      // v3.5
-    int NbDirPossSensVoieTram(direction DirOrigine);                                                 // v3.5
+    [[nodiscard]] int NbDirPossSensVoieTram(direction DirOrigine) const;                             // v3.5
     bool SupprimePassagePietonsInvalide();                                                           // v3.5
     bool ExisteVoieDansDirection(type_voie TypeVoie, direction d); // v3.5 // v5.4 : pas de inline pour éviter
                                                                    // avertissement "non trouvé"

@@ -78,7 +78,7 @@ QByteArray Contenu(const QString &asFichier)
 QSet<QString> Ancres(const QString &asPage)
 {
     QSet<QString> Resultat;
-    // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal les chaînes brutes qui contiennent des guillemets
+    // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal ces chaînes brutes
     const QRegularExpression Motif("<a\\s[^>]*\\bname\\s*=\\s*\"([^\"]+)\"|\\bid\\s*=\\s*\"([^\"]+)\"",
                                    QRegularExpression::CaseInsensitiveOption);
     const QString stPage = QString::fromUtf8(Contenu(asPage));
@@ -113,8 +113,7 @@ class TestAide : public QObject // NOLINT(misc-use-internal-linkage) : classe de
     { // Adresse chargée par la page de redirection (balise meta et lien)
         const QString stPage = QString::fromUtf8(Contenu(Page.toLocalFile()));
         const QRegularExpressionMatch Meta =
-            // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal les chaînes brutes qui contiennent des
-            // guillemets
+            // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal ces chaînes brutes
             QRegularExpression("<meta http-equiv=\"refresh\" content=\"0; url='([^']*)'\">").match(stPage);
         const QRegularExpressionMatch Lien = QRegularExpression("<a href=\"([^\"]*)\">").match(stPage);
         if (!Meta.hasMatch() || !Lien.hasMatch() || (Meta.captured(1) != Lien.captured(1)))
@@ -176,7 +175,7 @@ void TestAide::tableDesContextes()
 void TestAide::contextesDesFiches()
 { // HelpContext des fiches et des composants (.dfm -> .ui) : tous dans la table
     const QSet<QString> AncresGuide = Ancres(CV_DOSSIER_DOCS "/guide/index.html");
-    // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal les chaînes brutes qui contiennent des guillemets
+    // NOLINTNEXTLINE(modernize-raw-string-literal) : moc lit mal ces chaînes brutes
     const QRegularExpression Propriete("<property name=\"vclHelpContext\"[^>]*>\\s*<number>(\\d+)</number>");
     int n = 0;
     for (const QString &stUi : QDir(CV_DOSSIER_UI).entryList({"*.ui"}))

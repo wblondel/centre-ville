@@ -162,6 +162,7 @@ public:
     }
     // TControl::Repaint : dessin immédiat, sauf pendant le dessin d'un autre
     // contrôle (RafraichitActionsEdition depuis OnDrawCell) : dessin différé
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method) : Repaint de la grille, appelé sur son type
     void Repaint()
     {
         if (TCanvas::NbDessinsEnCours != 0)

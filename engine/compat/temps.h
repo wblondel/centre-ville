@@ -14,6 +14,7 @@ class TDateTime
 public:
     double Val;
     TDateTime() : Val(0.0) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     TDateTime(double d) : Val(d) {}
     // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     TDateTime(int i) : Val(static_cast<double>(i)) {}

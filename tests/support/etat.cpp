@@ -657,7 +657,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
             {
                 const voie *v = &cv->v[x][y];
                 const int nd = NbDir[v->DirPoss];
-                const int ndt = const_cast<voie *>(v)->NbDirPossSensVoieTram(indefinie);
+                const int ndt = v->NbDirPossSensVoieTram(indefinie);
                 s.Objet("distances", (x * 1000) + y);
                 if (v->DistParking)
                 {

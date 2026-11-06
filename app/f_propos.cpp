@@ -153,7 +153,7 @@ QPixmap ImageDeVersion(int Majeure, int Mineure)
 {
     const QString stMajeure = QString::number(Majeure);
     const QString stMineure = QString::number(Mineure);
-    QImage Image((13 * (stMajeure.size() + stMineure.size())) + 2, 22, QImage::Format_ARGB32);
+    QImage Image(static_cast<int>((13 * (stMajeure.size() + stMineure.size())) + 2), 22, QImage::Format_ARGB32);
     Image.fill(qRgb(0x00, 0x00, 0x00));
     int x = 0;
     for (const QChar c : stMajeure)

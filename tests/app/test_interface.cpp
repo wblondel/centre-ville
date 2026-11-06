@@ -135,6 +135,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <QWheelEvent>
+#include <exception>
 #include <format>
 #include <iostream>
 #include <chrono>
@@ -851,7 +852,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         }
         return Fin();
     }
-    bool JoueJusquAuTour(long Tour)
+    static bool JoueJusquAuTour(long Tour)
     {
         return JoueTours([Tour] { return cv->TourCrt >= Tour; }, 10000);
     }
@@ -1270,7 +1271,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         QTest::mouseDClick(g->viewport(), Qt::LeftButton, Qt::KeyboardModifiers(), Centre);
         g->Repaint();
     }
-    void PoseFeu(int x, int y, TRadioGroup *Groupe)
+    static void PoseFeu(int x, int y, TRadioGroup *Groupe)
     { // Fiche Priorités : feu dans une direction
         CliqueCase(x, y);
         Clique(frmSimulation->ToolButtonPriorites);
@@ -1402,7 +1403,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
     }
     template <class T> static T *Composant(TForm *Fiche, const QString &Nom)
     {
-        return (T *)Fiche->FindComponent(A(Nom));
+        return dynamic_cast<T *>(Fiche->FindComponent(A(Nom)));
     }
     void DansFicheLignes(const FicheLignes &l, const std::function<void(TForm *)> &Action)
     { // Paramètres, la fiche des lignes (Action), puis Annuler dans Paramètres
@@ -1892,7 +1893,7 @@ void TestInterface::enregistrementImpossible()
     }
     {
         // (avec le droit d'entrer dans le dossier, que LectureSeule retirerait)
-        struct DroitsDossier
+        const struct DroitsDossier
         {
             explicit DroitsDossier(QString d) : Dossier(std::move(d)) {}
             DroitsDossier(const DroitsDossier &) = delete;
@@ -2375,8 +2376,8 @@ void TestInterface::interruptionTramsImpossibles()
     QVERIFY2(DemarreSansBlocage("Marche, trams corrigés"), qPrintable(Messages.join('\n')));
     for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
-        QCOMPARE(cv->LigneBus[i].NbBus, cv->LigneBus[i].NbArrets ? 1 + (cv->LigneBus[i].NbArrets - 1) / 3 : 0);
-        QCOMPARE(cv->LigneTram[i].NbTrams, cv->LigneTram[i].NbArrets ? 1 + (cv->LigneTram[i].NbArrets - 1) / 3 : 0);
+        QCOMPARE(cv->LigneBus[i].NbBus, cv->LigneBus[i].NbArrets ? 1 + ((cv->LigneBus[i].NbArrets - 1) / 3) : 0);
+        QCOMPARE(cv->LigneTram[i].NbTrams, cv->LigneTram[i].NbArrets ? 1 + ((cv->LigneTram[i].NbArrets - 1) / 3) : 0);
     }
     QVERIFY(JoueJusquAuTour(5));
     QVERIFY(Arrete());
@@ -3722,7 +3723,7 @@ void TestInterface::ficheCarrefours()
         for (int i = 0; i < NBDIR; i++)
         {
             const feu &f = cv->Feu[NumFeux[i] - 1];
-            QCOMPARE((int)f.Etat, 1 + 2 * ((1 + 2 + i) % 2)); // Type=2
+            QCOMPARE(static_cast<int>(f.Etat), 1 + (2 * ((1 + 2 + i) % 2))); // Type=2
             QCOMPARE(f.NbFeuxDmd, 2);
             QCOMPARE(f.NbFeuxAtt, 2);
             QCOMPARE(f.NumFeuxDmd[0], NumFeux[(i + 1) % NBDIR]);
@@ -6097,7 +6098,7 @@ void TestInterface::epidemieSansPietonDansLaBarreDEtat()
 { // v6.0.8 : affichage épidémie sur un réseau sans piéton : la barre d'état divisait par
   // NbPietons à chaque tour (plantage sous Windows et Linux, « 0 % » sous macOS ARM)
     TfrmSimulation *s = frmSimulation;
-    struct Retablit
+    const struct Retablit
     { // Affichage d'origine pour les tests suivants, même après un échec
         ~Retablit()
         {
@@ -6915,7 +6916,7 @@ void TestInterface::dessinsPendantLaSimulation()
         }
         frmSimulation->ActionRechercher->Checked = false;
     };
-    struct Retablit
+    const struct Retablit
     {
         std::function<void()> FermeRecherche;
         ~Retablit()
@@ -7287,12 +7288,12 @@ void TestInterface::reseauNonConnexeSansParking()
             Ecarts << QString::fromUtf8("%1 : réseau modifié").arg(QString::fromUtf8(c.Type));
         }
         for (TForm *Fiche : {
-                 (TForm *)frmAffDistParkings,
-                 (TForm *)frmAffDistArretsBus,
-                 (TForm *)frmAffDistArretsTram,
-                 (TForm *)frmAffDistFilesTaxi,
-                 (TForm *)frmAffDistFilesPark,
-                 (TForm *)frmAffDistPlacesVehlib,
+                 static_cast<TForm *>(frmAffDistParkings),
+                 static_cast<TForm *>(frmAffDistArretsBus),
+                 static_cast<TForm *>(frmAffDistArretsTram),
+                 static_cast<TForm *>(frmAffDistFilesTaxi),
+                 static_cast<TForm *>(frmAffDistFilesPark),
+                 static_cast<TForm *>(frmAffDistPlacesVehlib),
              })
         {
             if (Fiche->isVisible())
@@ -8838,7 +8839,7 @@ void TestInterface::ficheFluiditeTrafic()
                     // « Le n° d'étape est incorrect ! » ; curseur déplacé pendant ce temps : case
                     // sans statistique pour ce trajet (noire, sans détail) ; en quittant le champ,
                     // numéro ramené dans les bornes et statistiques recalculées
-                    const int NbMessages = Messages.size();
+                    const int NbMessages = static_cast<int>(Messages.size());
                     f->CSpinEditParkingDepart->selectAll();
                     QTest::keyClicks(f->CSpinEditParkingDepart, QString::number(10 * cv->NbParkings));
                     if ((Messages.size() != NbMessages + 1) ||
@@ -10230,7 +10231,7 @@ void TestInterface::selectionAuDelaDeLaVue()
     QVERIFY(QTest::qWaitFor([g, Cv]() { return g->Selection.Right >= Cv + 3; }, 3000));
     const qint64 ms = Duree.elapsed();
     const int Avance = g->Selection.Right - Cv;
-    QVERIFY2(Avance <= ms / 50 + 1, qPrintable(QString("%1 cases en %2 ms").arg(Avance).arg(ms)));
+    QVERIFY2(Avance <= (ms / 50) + 1, qPrintable(QString("%1 cases en %2 ms").arg(Avance).arg(ms)));
     QCOMPARE((int)g->LeftCol, g->Selection.Right - Cv + 1);
     QCOMPARE(g->Selection.Top, 2);
     QCOMPARE(g->Selection.Bottom, 2);
@@ -10544,7 +10545,7 @@ void TestInterface::textesResserres() // NOLINT(readability-convert-member-funct
     // l'étirement sous Windows, son carré sous macOS)
     const QFont Plancher = PoliceResserree(f, t, QRect(0, 0, qFloor(w / 3), 20), Dr);
     QVERIFY2(Plancher.stretch() >= 85, qPrintable(QString::number(Plancher.stretch())));
-    QVERIFY(QFontMetricsF(Plancher).horizontalAdvance(t) >= 0.8 * w - 0.01);
+    QVERIFY(QFontMetricsF(Plancher).horizontalAdvance(t) >= (0.8 * w) - 0.01);
     QFont AuDela = Plancher;
     AuDela.setStretch(Plancher.stretch() - 1);
     QVERIFY((Plancher.stretch() == 85) || (QFontMetricsF(AuDela).horizontalAdvance(t) < 0.8 * w));
@@ -10580,7 +10581,8 @@ void TestInterface::textesResserres() // NOLINT(readability-convert-member-funct
                 continue; // fiches filles : parcourues pour elles-mêmes
             }
             const QRect Zone = l->contentsRect();
-            const int Drapeaux = int(l->alignment()) | (l->buddy() ? static_cast<int>(Qt::TextShowMnemonic) : 0);
+            const int Drapeaux =
+                static_cast<int>(l->alignment()) | (l->buddy() ? static_cast<int>(Qt::TextShowMnemonic) : 0);
             const QFont p = PoliceResserree(l->font(), l->text(), Zone, Drapeaux);
             const double Largeur = QFontMetricsF(p).boundingRect(QRectF(Zone), Drapeaux, l->text()).width();
             if (Largeur > Zone.width() + 0.5)
@@ -10680,6 +10682,7 @@ void TestInterface::cleanupTestCase()
 }
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
+try
 { // La carte (variable d'environnement CV_CARTE, en Unicode sur tous les
   // systèmes) est copiée puis passée à l'application comme « cvw <copie> »
     const QTemporaryDir Temp;
@@ -10698,6 +10701,11 @@ int main(int argc, char *argv[])
     DossierCaptures = qEnvironmentVariable("CV_DOSSIER_CAPTURES");
     TestInterface t;
     return QTest::qExec(&t, argc, argv);
+}
+catch (const std::exception &e)
+{
+    std::cerr << e.what() << '\n';
+    return EXIT_FAILURE;
 }
 //---------------------------------------------------------------------------
 #include "test_interface.moc"

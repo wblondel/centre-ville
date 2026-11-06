@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QPalette>
 #include <QStyle>
+#include <cmath>
 #include <map>
 #include <string>
 //---------------------------------------------------------------------------
@@ -119,7 +120,7 @@ QFont TFont::Qt() const
     }
     else if (Height > 0)
     {
-        f.setPixelSize(qMax(1, static_cast<int>((0.85 * Height) + 0.5))); // hauteur de cellule
+        f.setPixelSize(qMax(1, static_cast<int>(std::lround(0.85 * Height)))); // hauteur de cellule
     }
     f.setBold(Style.Contains(fsBold));
     f.setItalic(Style.Contains(fsItalic));

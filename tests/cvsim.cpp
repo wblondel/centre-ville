@@ -11,6 +11,7 @@
 //   cvsim --golden DOSSIER_MAPS DOSSIER_GOLDEN
 //       Régénère les fichiers de référence du golden master.
 //---------------------------------------------------------------------------
+#include <exception>
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
@@ -79,6 +80,7 @@ int RegenereGolden(const std::string &asMaps, const std::string &asGolden)
 } // namespace
 //---------------------------------------------------------------------------
 int main(int argc, char *const *argv)
+try
 {
     if (argc < 2)
     {
@@ -104,7 +106,7 @@ int main(int argc, char *const *argv)
     {
         if ((std::strcmp(argv[i], "--tours") == 0) && (i + 1 < argc))
         {
-            NbTours = std::atoi(argv[++i]);
+            NbTours = std::stoi(argv[++i]);
         }
         else if ((std::strcmp(argv[i], "--graine") == 0) && (i + 1 < argc))
         {
@@ -121,7 +123,7 @@ int main(int argc, char *const *argv)
         }
         else if ((std::strcmp(argv[i], "--resurrection") == 0) && (i + 1 < argc))
         {
-            TourResurrection = std::atoi(argv[++i]);
+            TourResurrection = std::stoi(argv[++i]);
         }
         else if ((std::strcmp(argv[i], "--sauve") == 0) && (i + 1 < argc))
         {
@@ -197,5 +199,10 @@ int main(int argc, char *const *argv)
     harnais::Ferme();
     vue = nullptr;
     return Retour;
+}
+catch (const std::exception &e)
+{
+    std::cerr << e.what() << '\n';
+    return EXIT_FAILURE;
 }
 //---------------------------------------------------------------------------

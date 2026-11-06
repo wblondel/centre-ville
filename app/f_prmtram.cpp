@@ -139,16 +139,16 @@ void TfrmParamTram::CSpinEditChange(TObject *Sender)
     const int k = StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length() - 9));
     const int n = CSpinEdit->Value;
     int AncNumArretTramAMontrer = 0;
-    switch (k / 10)
+    if ((k / 10) == 0) // Nombre d'arrêts
     {
-    case 0: // Nombre d'arrêts
         for (i = 1; i <= NBMAXARRETSBUSTRAMPARLIGNE; i++)
         {
             (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * k) + i))))->Visible =
                 (i <= n);
         }
-        break;
-    default: // N°d'arrêt de tram
+    }
+    else // N°d'arrêt de tram
+    {
         // v6.0.2 : pendant la frappe, le texte n'est pas réécrit (l'original le remettait à 0 ou au suivant à chaque
         // chiffre) : voir CSpinEditExit
         if ((n <= 0) || (n > cv->NbArretsTram)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de
@@ -179,7 +179,6 @@ void TfrmParamTram::CSpinEditChange(TObject *Sender)
             frmSimulation->DrawGridSimul->Col = cv->ArretTram[NumArretTramAMontrer - 1].x;
             frmSimulation->DrawGridSimul->Row = cv->ArretTram[NumArretTramAMontrer - 1].y;
         }
-        break;
     }
     if (!InitialisationEnCours)
     {

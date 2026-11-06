@@ -81,7 +81,8 @@ long long LitSysteme(int fd, char *Tampon, std::size_t n)
 #ifdef _WIN32
     return _read(fd, Tampon, (unsigned)n);
 #else
-    return static_cast<long long>(read(fd, Tampon, n));
+    return static_cast<long long>(read(fd, Tampon, n)); // NOLINT(clang-analyzer-unix.BlockInCriticalSection) : le
+                                                        // verrou protège le tampon du fichier
 #endif
 }
 //-------------------------------------------------------------------------

@@ -2,7 +2,8 @@
 #ifndef f_simulH
 #define f_simulH
 //---------------------------------------------------------------------------
-#include "vcl/fiche.h"               // portage : remplace les en-têtes de la VCL (ActnList, ComCtrls, Menus...)
+#include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL (ActnList, ComCtrls, Menus...)
+#include <cmath>
 #include "grille/GrilleSimulation.h" // portage : TDrawGrid
 #include "vue.h"                     // portage : IVueSimulation
 // #include <Controls.hpp> // portage
@@ -639,7 +640,7 @@ private:
         if (SimulEnCours)
         {
             TypeDemande = tdRien;
-            TimerSimul->Interval = static_cast<unsigned>(0.5 + (1000.0 / cv->NbToursParSeconde));
+            TimerSimul->Interval = static_cast<int>(std::lround(1000.0 / cv->NbToursParSeconde));
             TimerSimul->Enabled = true;
         }
         InitialiseDeplacementFeu(); // v3.5

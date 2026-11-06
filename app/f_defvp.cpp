@@ -185,8 +185,8 @@ void TfrmDefVoiePietons::FormHide(TObject * /*Sender*/)
         }
         frmSimulation->ActionPrioritesPietons->Checked = false;
     }
-    catch (...)
-    {}; // portage : __except(true) (exceptions structurées de Windows) -> catch(...)
+    catch (...) // NOLINT(bugprone-empty-catch) : portage de __except(true), qui ignorait toute erreur à la fermeture
+    {}
 }
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::ButtonAideClick(TObject * /*Sender*/)

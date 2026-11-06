@@ -30,13 +30,14 @@ public:
         Ecrit = std::move(Ecriture);
     }
     [[nodiscard]] T Valeur() const { return Lit(); }
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     operator T() const { return Lit(); }
     // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
     template <class E>
     explicit operator E() const
         requires(std::is_enum_v<E>)
     {
-        return (E)Lit();
+        return static_cast<E>(Lit());
     }
     Propriete &operator=(const T &v)
     {
@@ -56,17 +57,17 @@ public:
     // Opérateurs composés (Tag^=1, Checked^=true, Width+=...)
     template <class U> Propriete &operator^=(const U &v)
     {
-        Ecrit((T)(Lit() ^ v));
+        Ecrit(static_cast<T>(Lit() ^ v));
         return *this;
     }
     template <class U> Propriete &operator+=(const U &v)
     {
-        Ecrit((T)(Lit() + v));
+        Ecrit(static_cast<T>(Lit() + v));
         return *this;
     }
     template <class U> Propriete &operator-=(const U &v)
     {
-        Ecrit((T)(Lit() - v));
+        Ecrit(static_cast<T>(Lit() - v));
         return *this;
     }
 };

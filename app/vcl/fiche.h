@@ -150,6 +150,8 @@ protected:
     void DefinitPrincipale() { EstPrincipale = true; }
 
 public:
+    TFormT(const TFormT &) = delete;
+    TFormT &operator=(const TFormT &) = delete;
     Propriete<AnsiString> Caption;
     Propriete<int> Left, Top, Width, Height, ClientWidth, ClientHeight, ModalResult;
     Propriete<bool> Visible, Enabled;
@@ -235,6 +237,8 @@ public:
             });
         }
     }
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
+    // GCC, Clang)
     ~TFormT() override
     {
         DesinscritFicheRaccourcis(this);

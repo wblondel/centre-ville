@@ -200,7 +200,7 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
         const std::string asNormal = asDossierSortie + "/copie_" + asNomCarte + "_normal.cvw";
         for (const char *Suffixe : {"_complete.cvw", "_reduite.cvw"})
         { // Pas de copie d'une exécution précédente
-            std::string asAncienne = asDossierSortie + "/copie_" + asNomCarte + Suffixe;
+            const std::string asAncienne = std::format("{}/copie_{}{}", asDossierSortie, asNomCarte, Suffixe);
             std::error_code e;
             std::filesystem::remove(std::filesystem::path(std::u8string(asAncienne.begin(), asAncienne.end())), e);
         }
@@ -222,7 +222,7 @@ std::string ProduitGoldenCopie(const std::string &asCheminCarte, const std::stri
             Texte += std::string("selection ") + s.Nom + " (" + std::to_string(s.x) + "," + std::to_string(s.y) + "," +
                      std::to_string(s.nx) + "," + std::to_string(s.ny) +
                      ") valide=" + std::to_string(static_cast<int>(Valide)) + "\n";
-            const std::string asCopie = asDossierSortie + "/copie_" + asNomCarte + "_" + s.Nom + ".cvw";
+            const std::string asCopie = std::format("{}/copie_{}_{}.cvw", asDossierSortie, asNomCarte, s.Nom);
             if (Valide)
             {
                 harnais::Sauve(asCopie); // ActionEnregistrer->Execute()

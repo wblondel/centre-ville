@@ -34,7 +34,7 @@ public:
     TImage *ImageO{};
     TImage *ImageN{};
     TImage *ImageE{};
-    TImage *Image0{};
+    TImage *Image0{}; // NOLINT(misc-confusable-identifiers) : noms des composants du .dfm
     TSpeedButton *SpeedButtonN{};
     TSpeedButton *SpeedButtonE{};
     TSpeedButton *SpeedButtonO{};

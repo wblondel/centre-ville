@@ -378,7 +378,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
         return Ok;
     };
     CHECK(Charge(asOctets));
-    struct
+    const struct
     {
         const char *Nom;
         std::size_t Position;

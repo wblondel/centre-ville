@@ -27,8 +27,8 @@ static_assert(sizeof(nature) == 4, "Format .cvw : nature sur 4 octets");
 //---------------------------------------------------------------------------
 #define CVW_ENUM_OCTET(e)                                                                                              \
     static_assert(sizeof(e) == 1, "Format .cvw : " #e " sur 1 octet");                                                 \
-    static_assert(std::is_same<std::underlying_type<e>::type, signed char>::value, #e " : type sous-jacent signed "    \
-                                                                                      "char")
+    static_assert(std::is_same_v<std::underlying_type_t<e>, signed char>, #e " : type sous-jacent signed "             \
+                                                                             "char")
 CVW_ENUM_OCTET(priorite);
 CVW_ENUM_OCTET(direction);
 CVW_ENUM_OCTET(sens);
