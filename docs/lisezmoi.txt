@@ -32,6 +32,10 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.15]
+ - Aucun changement visible : les tests vérifient que le programme se construit
+   sans le code d'origine de la version 5.4.3.2.
+
 [Version 6.0.14]
  - Aucun changement visible : l'AppImage Linux est construite dans un conteneur
    Ubuntu 22.04. Elle demande toujours la glibc 2.35 ou plus récente.

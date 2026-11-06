@@ -96,7 +96,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.14)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.15)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -686,8 +686,9 @@ Visuel :
   espaces de « %5d », comme l'original, mais avec d'autres largeurs. Cadre
   et barre de titre des fenêtres outils (`bsSizeToolWin`) du système :
   `Height=26+21*RowCount` donne une grille de `RowCount` lignes entières,
-  comme avec le cadre que suppose le code d'origine (`src/A_FAIRE.txt`
-  prévoyait de revoir ce calcul).
+  comme avec le cadre que suppose le code d'origine. L'auteur prévoyait de
+  revoir ce calcul, pour déduire la taille de la fiche de celle de la grille
+  (`src/A_FAIRE.txt`).
 - **Onglets** (`TTabControl` de Statistiques véhicules) : style du système ;
   avec la police de remplacement, les deux libellés sont élidés (« … ») pour
   tenir dans la largeur de la VCL.
