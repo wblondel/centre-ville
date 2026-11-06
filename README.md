@@ -116,9 +116,10 @@ PATH=".venv-lint/bin:$PATH" actionlint
 .venv-lint/bin/zizmor .github/workflows
 cmake --preset dev && cmake --build --preset dev
 .venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
+.venv-lint/bin/python tools/format_cpp.py --verifie --clang-format .venv-lint/bin/clang-format
 ```
 
-`clang-tidy` ne fait échouer que les constats absents de `tools/lint/clang-tidy-reference.txt`, qui liste ceux du code porté sous Linux, ainsi que 5 vus seulement sous macOS, pour que le lint passe aussi en local. Fausse alerte : `// NOLINT(regle)` sur la ligne, avec le motif. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md), et la manière de signaler une faille dans [`SECURITY.md`](SECURITY.md).
+Le moindre constat de `clang-tidy` fait échouer le lint : les règles sont dans `.clang-tidy`, avec le motif de chaque règle écartée. Une fausse alerte s'annote dans le code, avec son motif : `// NOLINT(regle)` sur la ligne, ou `// NOLINTNEXTLINE(regle)` au-dessus. Le C++ est mis en forme par `clang-format` (`.clang-format`) : `tools/format_cpp.py` sans option met tout en forme. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md), et la manière de signaler une faille dans [`SECURITY.md`](SECURITY.md).
 
 ### 5. Publier une version
 1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).

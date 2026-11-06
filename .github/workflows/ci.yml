@@ -25,8 +25,8 @@ name: CI
 # Job « couverture » : chaque semaine, ou à la main. Rapport à lire, sans seuil : un
 # pourcentage imposé pousserait à tester les boutons d'aide plutôt que ce qui compte.
 #
-# Jobs de lint : tools/lint/requirements.txt fixe les versions. clang-tidy n'échoue que
-# sur un constat absent de tools/lint/clang-tidy-reference.txt (tools/lint_cpp.py).
+# Jobs de lint : tools/lint/requirements.txt fixe les versions. Le moindre constat de clang-tidy
+# (tools/lint_cpp.py) et le moindre écart de mise en forme (tools/format_cpp.py) font échouer la CI.
 
 on:
   # Chaque semaine : voir les dérives des outils et des images sans attendre une PR
@@ -73,7 +73,7 @@ jobs:
           fi
           fichiers=$(git diff --name-only HEAD^1 HEAD)
           echo "$fichiers"
-          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^ruff\.toml$|^\.github/workflows/ci\.yml$|^\.github/actions/' <<< "$fichiers"; then
+          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^\.clang-format(-ignore)?$|^ruff\.toml$|^\.github/workflows/ci\.yml$|^\.github/actions/' <<< "$fichiers"; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
             echo "code=false" >> "$GITHUB_OUTPUT"
@@ -272,10 +272,13 @@ jobs:
           cmake -S . -B build/lint -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCV_APP=ON -DCV_TESTS=ON -DCMAKE_GLOBAL_AUTOGEN_TARGET=ON
           cmake --build build/lint --target autogen --parallel
 
-      - name: Install clang-tidy
+      - name: Install clang-tidy and clang-format
         run: |
           python3 -m venv "$RUNNER_TEMP/lint"
           "$RUNNER_TEMP/lint/bin/pip" install --quiet -r tools/lint/requirements.txt
+
+      - name: Check formatting (clang-format)
+        run: python3 tools/format_cpp.py --verifie --clang-format "$RUNNER_TEMP/lint/bin/clang-format"
 
       - name: Run clang-tidy
         run: >
