@@ -231,6 +231,8 @@ void TfrmParamBus::BitBtnDirClick(TObject *Sender)
         case +1:
             frmSimulation->DrawGridSimul->Col = frmSimulation->DrawGridSimul->ColCount - 1;
             break;
+        default:
+            break;
         }
         switch (dy)
         {
@@ -239,6 +241,8 @@ void TfrmParamBus::BitBtnDirClick(TObject *Sender)
             break;
         case +1:
             frmSimulation->DrawGridSimul->Row = frmSimulation->DrawGridSimul->RowCount - 1;
+            break;
+        default:
             break;
         }
     }

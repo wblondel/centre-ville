@@ -18,7 +18,8 @@ const int NB_LIGNES = 9, NB_ARRETS_PAR_LIGNE = 9, NB_DIR = 4;
 //-------------------------------------------------------------------------
 class lecteur
 {
-    const std::string &s;
+    const std::string &s; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : contenu lu, qui survit au
+                          // lecteur
     std::size_t Pos = 0;
 
 public:
@@ -49,7 +50,8 @@ public:
 class ecrivain
 {
 public:
-    conversion_cvw &c;
+    conversion_cvw &c; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : conversion écrite, qui survit à
+                       // l'écrivain
     explicit ecrivain(conversion_cvw &Conversion) : c(Conversion) {}
     void Brut(const std::string &Nom, const std::string &o)
     {

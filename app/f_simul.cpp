@@ -320,9 +320,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
     int                 // v2.2
         Vlr = 0;        // v5.3
     TColor CoulTxt = 0; // v3.0.5
-    direction dorig;
-    direction ddest;
-    direction DirArretBus; // v3.0
+    direction dorig{};
+    direction ddest{};
+    direction DirArretBus{}; // v3.0
     voie *v = &cv->v[Col][Row];
     voie *vv = nullptr;
     const sens Sens = cv->SensPassagePietonsPossible(Col, Row); // v2.0
@@ -942,10 +942,10 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                         Format(" %d%s",
                                TableauDeConstantes(
                                    i,
-                                   AnsiString(asSupInf[static_cast<int>(!!cv->Pieton[i - 1].EstVivant()) *
-                                                       (1 + cv->Pieton[i - 1].DemiCase)]) + // v4.3 (asSupInf remplace
-                                                                                            // as12) v5.4.1 EstVivant()
-                                                                                            // remplace Ecrase
+                                   AnsiString(asSupInf[cv->Pieton[i - 1].EstVivant() ? 1 + cv->Pieton[i - 1].DemiCase
+                                                                                     : 0]) + // v4.3 (asSupInf remplace
+                                                                                             // as12) v5.4.1 EstVivant()
+                                                                                             // remplace Ecrase
                                        asEtatPieton[(1 * static_cast<int>(!!cv->Pieton[i - 1].Ecrase)) + // "*" v4.3
                                                                                                          // (création)
                                                                                                          // v5.4.1 :
@@ -970,13 +970,12 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         }
         if (v->NumPlaceTaxi != 0)
         { // v3.6
-            asMsg = asMsg +
-                    Format("Place Taxi %d%s%s File %d. ",
-                           TableauDeConstantes(v->NumPlaceTaxi,
-                                               asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
-                                               asSupInf[2 * static_cast<int>(v->EstQueueFileTaxis())], // v4.3 (asSupInf
-                                                                                                       // remplace as12)
-                                               cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1));       // v5.3
+            asMsg = asMsg + Format("Place Taxi %d%s%s File %d. ",
+                                   TableauDeConstantes(v->NumPlaceTaxi,
+                                                       asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
+                                                       asSupInf[v->EstQueueFileTaxis() ? 2 : 0], // v4.3 (asSupInf
+                                                                                                 // remplace as12)
+                                                       cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
         }
         if (v->NumTaxi != 0)
         { // v3.6
@@ -987,9 +986,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         { // v5.0
             asMsg = asMsg + Format("Place Prkg %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlacePark,
-                                                       asSupInf[v->EstTeteFilePark()],                        // v5.0
-                                                       asSupInf[2 * static_cast<int>(v->EstQueueFilePark())], // v5.0
-                                                       cv->PlacePark[v->NumPlacePark - 1].NumFile + 1));      // v5.3
+                                                       asSupInf[v->EstTeteFilePark()],                   // v5.0
+                                                       asSupInf[v->EstQueueFilePark() ? 2 : 0],          // v5.0
+                                                       cv->PlacePark[v->NumPlacePark - 1].NumFile + 1)); // v5.3
         }
         if (StatsAttenteTrafic && frmStatsAttenteTrafic)
         { // v3.0 : Affichage du détail des statistiques de fluidité det de trafic
@@ -1287,7 +1286,7 @@ void TfrmSimulation::FormDestroy(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 bool TfrmSimulation::EnregistreModificationsAvant(operation_avant Operation)
 {
-    type_reponse mrRep;
+    type_reponse mrRep{};
     AnsiString asMessage;
     if ((!SimulationModifiee) || Pause || SimulEnCours)
     {                // v5.1.1 : pas d'enregistrement si simulation en cours (enregistrement auotomatique déjà fait)
@@ -1611,7 +1610,7 @@ bool TfrmSimulation::VerifieReseau()
         NbCasesPietonPeutAller = 0; // v3.8
     const AnsiString asMsgOk = "Réseau correct.";
     AnsiString asMsgErr;
-    dirposs dp;
+    dirposs dp{};
     voie *v = nullptr;
     voie *vv = nullptr;
     cv->VerifOk = false;
@@ -2505,7 +2504,7 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
     bool *ArretBusDejaVu = new bool[cv->NbArretsBus];
     bool *ArretTramDejaVu = new bool[cv->NbArretsTram];
     voie *v = nullptr;
-    type_voie TypeVoieCrt;
+    type_voie TypeVoieCrt{};
     for (i = 0; i < cv->NbArretsBus; i++)
     {
         ArretBusDejaVu[i] = false;
@@ -2579,7 +2578,7 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
     bool *ArretBusDejaVu = new bool[cv->NbArretsBus];
     bool *ArretTramDejaVu = new bool[cv->NbArretsTram];
     voie *v = nullptr;
-    type_voie TypeVoieCrt;
+    type_voie TypeVoieCrt{};
     for (i = 0; i < cv->NbArretsBus; i++)
     {
         ArretBusDejaVu[i] = false;
@@ -3012,6 +3011,8 @@ Le réseau affiché est conservé.",
                     break;
                 case 500:
                     MenuItem500DrnTours->Checked = true;
+                    break;
+                default:
                     break;
                 }
 

@@ -59,8 +59,9 @@ class LieurComposants
     QObject *Lie(const char *Nom, const char *Classe);
 
 public:
-    std::map<QString, QObject *> &Composants;
-    std::vector<QObject *> Ordre; // composants dans l'ordre du .dfm (TComponent::Components)
+    std::map<QString, QObject *> &Composants; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : table de la
+                                              // fiche, qui survit au lieur
+    std::vector<QObject *> Ordre;             // composants dans l'ordre du .dfm (TComponent::Components)
     FicheRaccourcis Raccourcis;
     LieurComposants(QWidget *f, const char *Nom, std::map<QString, QObject *> &c)
         : Fiche(f), Fichier(Nom), Composants(c)
@@ -121,7 +122,9 @@ int ToucheVirtuelleDe(const QKeyEvent *e); // code VK de la touche (OnKeyDown)
 extern QWidget *FichePrincipaleQt;         // fiche principale (parent des fiches secondaires)
 TShiftState EtatTouches(const QKeyEvent *e);
 //---------------------------------------------------------------------------
-template <class B> class TFormT : public B, public FicheVclBase, public AvecMenuContextuel
+template <class B>
+class TFormT : public B, public FicheVclBase, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance) : widget Qt
+                                                                        // et services de la VCL (mixins)
 {
     bool PremierAffichage = true, Modale = false, EstPrincipale = false;
     int iModalResult = 0;
@@ -160,8 +163,9 @@ public:
     std::function<void(TObject *, char &)> OnKeyPress;
     Propriete<int> ComponentCount;
     class TableauComposants
-    { // TComponent::Components[i]
-        const std::vector<QObject *> &Liste;
+    {                                        // TComponent::Components[i]
+        const std::vector<QObject *> &Liste; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : liste de la
+                                             // fiche qui le contient
 
     public:
         explicit TableauComposants(const std::vector<QObject *> &l) : Liste(l) {}
@@ -231,7 +235,11 @@ public:
             });
         }
     }
-    ~TFormT() override { DesinscritFicheRaccourcis(this); }
+    ~TFormT() override
+    {
+        DesinscritFicheRaccourcis(this);
+    } // NOLINT(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC, GCC,
+      // Clang)
     static QWidget *ParentDe(TComponent *Owner)
     { // Fiches secondaires au-dessus de la fiche principale (MainFormOnTaskBar)
         QWidget *p = qobject_cast<QWidget *>(Owner);
@@ -307,7 +315,8 @@ public:
             return mrNone;
         }
     }
-    void DefinitModalResult(int mr) override
+    void DefinitModalResult(int mr) override // NOLINT(portability-template-virtual-member-function) : compilée pour
+                                             // chaque classe de base (CI sous MSVC, GCC, Clang)
     { // ModalResult<>0 pendant ShowModal : la boucle modale ferme la fiche après le
       // traitement du message en cours (le gestionnaire OnClick va jusqu'au bout)
         iModalResult = mr;
@@ -516,7 +525,8 @@ protected:
         }
         return false;
     }
-    void showEvent(QShowEvent *e) override
+    void showEvent(QShowEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée pour
+                                           // chaque classe de base (CI sous MSVC, GCC, Clang)
     {
         B::showEvent(e);
         if (e->spontaneous())
@@ -542,7 +552,8 @@ protected:
             OnShow(this);
         }
     }
-    void hideEvent(QHideEvent *e) override
+    void hideEvent(QHideEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée pour
+                                           // chaque classe de base (CI sous MSVC, GCC, Clang)
     {
         B::hideEvent(e);
         if (!e->spontaneous() && OnHide)
@@ -550,7 +561,8 @@ protected:
             OnHide(this);
         }
     }
-    void closeEvent(QCloseEvent *e) override
+    void closeEvent(QCloseEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée pour
+                                             // chaque classe de base (CI sous MSVC, GCC, Clang)
     { // TCustomForm::Close : CloseQuery, puis caHide (fiche secondaire) ou fin de l'application
         bool CanClose = true;
         if (OnCloseQuery)
@@ -572,7 +584,8 @@ protected:
             QCoreApplication::quit();
         }
     }
-    void mousePressEvent(QMouseEvent *e) override
+    void mousePressEvent(QMouseEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée
+                                                  // pour chaque classe de base (CI sous MSVC, GCC, Clang)
     {
         B::mousePressEvent(e);
         if (e->button() == Qt::LeftButton)
@@ -580,7 +593,8 @@ protected:
             e->accept();
         }
     }
-    void mouseReleaseEvent(QMouseEvent *e) override
+    void mouseReleaseEvent(QMouseEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée
+                                                    // pour chaque classe de base (CI sous MSVC, GCC, Clang)
     { // TControl::WMLButtonUp : OnClick de la fiche (clic hors des contrôles)
         B::mouseReleaseEvent(e);
         if ((e->button() == Qt::LeftButton) && this->rect().contains(e->position().toPoint()) && OnClick)
@@ -588,7 +602,9 @@ protected:
             OnClick(this);
         }
     }
-    void contextMenuEvent(QContextMenuEvent *e) override
+    void contextMenuEvent(QContextMenuEvent *e) override // NOLINT(portability-template-virtual-member-function) :
+                                                         // compilée pour chaque classe de base (CI sous MSVC, GCC,
+                                                         // Clang)
     { // TControl::WMContextMenu : menu contextuel de la fiche (les contrôles sans menu laissent passer le clic droit)
         if (AvecMenuContextuel::PopupMenu)
         {
@@ -599,7 +615,8 @@ protected:
             B::contextMenuEvent(e);
         }
     }
-    void keyPressEvent(QKeyEvent *e) override
+    void keyPressEvent(QKeyEvent *e) override // NOLINT(portability-template-virtual-member-function) : compilée pour
+                                              // chaque classe de base (CI sous MSVC, GCC, Clang)
     {
         if constexpr (std::is_base_of_v<QDialog, B>)
         {

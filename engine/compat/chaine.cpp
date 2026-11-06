@@ -271,6 +271,8 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             case 'N':
                 Texte = AvecSeparateurMilliers(Imprime('f', PrecisionDefinie ? Precision : 2, v));
                 break;
+            default:
+                break;
             }
             { // portage : séparateurs de FormatSettings (le texte ne contient que des chiffres, signes, 'E', '.' et
               // ',')

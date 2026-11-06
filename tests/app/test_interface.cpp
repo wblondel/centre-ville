@@ -566,6 +566,8 @@ class LimiteDeTemps
     std::thread Fil;
 
 public:
+    LimiteDeTemps(const LimiteDeTemps &) = delete;
+    LimiteDeTemps &operator=(const LimiteDeTemps &) = delete;
     LimiteDeTemps(const char *Quoi, int Secondes)
         : Fil([this, Quoi, Secondes] {
               std::unique_lock<std::mutex> v(Verrou);
@@ -595,6 +597,8 @@ class LectureSeule
     QFile::Permissions Droits;
 
 public:
+    LectureSeule(const LectureSeule &) = delete;
+    LectureSeule &operator=(const LectureSeule &) = delete;
     explicit LectureSeule(const QString &f) : Fichier(f), Droits(QFile::permissions(f))
     {
         QFile::setPermissions(f, QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther);
@@ -681,6 +685,8 @@ class LimiteFichiers : public QObject
     }
 
 public:
+    LimiteFichiers(const LimiteFichiers &) = delete;
+    LimiteFichiers &operator=(const LimiteFichiers &) = delete;
     explicit LimiteFichiers(QString asEtape = QString()) : Etape(std::move(asEtape))
     {
         getrlimit(RLIMIT_FSIZE, &Ancienne);
@@ -697,7 +703,7 @@ public:
     ~LimiteFichiers() override
     {
         setrlimit(RLIMIT_FSIZE, &Ancienne);
-        std::signal(SIGXFSZ, AncienSignal);
+        static_cast<void>(std::signal(SIGXFSZ, AncienSignal));
     }
     bool eventFilter(QObject *o, QEvent *e) override
     {
@@ -1842,7 +1848,7 @@ void TestInterface::enregistrementImpossible()
     QVERIFY(setrlimit(RLIMIT_FSIZE, &Limite) == 0);
     Enregistre(f);
     setrlimit(RLIMIT_FSIZE, &Ancienne);
-    std::signal(SIGXFSZ, AncienSignal);
+    static_cast<void>(std::signal(SIGXFSZ, AncienSignal));
     QCOMPARE(Messages.size(), 1);
     QVERIFY2(Messages.first().contains(QString::fromUtf8("Erreur de données dans le fichier")),
              qPrintable(Messages.first()));
@@ -1886,6 +1892,9 @@ void TestInterface::enregistrementImpossible()
         // (avec le droit d'entrer dans le dossier, que LectureSeule retirerait)
         struct DroitsDossier
         {
+            explicit DroitsDossier(QString d) : Dossier(std::move(d)) {}
+            DroitsDossier(const DroitsDossier &) = delete;
+            DroitsDossier &operator=(const DroitsDossier &) = delete;
             QString Dossier;
             ~DroitsDossier()
             {
@@ -9987,6 +9996,8 @@ namespace
 {
 struct FenetreReduite
 { // Fenêtre principale en (20, 50), 500 x 400 ; rétablie à la fin du test
+    FenetreReduite(const FenetreReduite &) = delete;
+    FenetreReduite &operator=(const FenetreReduite &) = delete;
     QRect Avant;
     TNotifyEvent ClicAvant;
     int NbClics = 0;

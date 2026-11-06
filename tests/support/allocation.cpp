@@ -29,7 +29,7 @@ namespace
 {
 void *Alloue(std::size_t n) noexcept
 {
-    void *p = std::calloc((n != 0U) ? n : 1, 1);
+    void *p = std::calloc((n != 0U) ? n : 1, 1); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
     if (p)
     {
         AllocationsVives++;
@@ -42,7 +42,7 @@ void Libere(void *p) noexcept
     {
         AllocationsVives--;
     }
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 } // namespace
 //---------------------------------------------------------------------------

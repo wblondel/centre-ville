@@ -112,7 +112,9 @@ public:
 //---------------------------------------------------------------------------
 // Propriétés communes à tous les contrôles (TControl / TWinControl)
 //---------------------------------------------------------------------------
-template <class B> class ControleVcl : public B, public ControleVclBase
+template <class B>
+class ControleVcl : public B, public ControleVclBase // NOLINT(misc-multiple-inheritance) : widget Qt et services de la
+                                                     // VCL (mixins)
 {
     PoliceControle Police;
 
@@ -121,7 +123,8 @@ public:
     Propriete<bool> Visible, Enabled;
     Propriete<AnsiString> Hint, Name;
     Propriete<TColor> Color;
-    PoliceControle *const Font = &Police;
+    PoliceControle *const Font = &Police; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : Font désigne
+                                          // toujours la police du contrôle
     TNotifyEvent OnClick;
     explicit ControleVcl(QWidget *Parent = nullptr) : B(Parent)
     {
@@ -172,7 +175,8 @@ public:
     }
     void SetFocus() { B::setFocus(); }
     [[nodiscard]] bool Focused() const { return B::hasFocus(); }
-    void PrepareVcl() override; // police, couleurs, curseur
+    void PrepareVcl() override; // NOLINT(portability-template-virtual-member-function) : compilée pour chaque classe de
+                                // base (CI sous MSVC, GCC, Clang) ; police, couleurs, curseur
 };
 //---------------------------------------------------------------------------
 // AutoSize (True par défaut, sauf WordWrap) : à chaque Caption=... du code, le
@@ -391,7 +395,8 @@ public:
 
     public:
         Colonne(TStringGrid *gg, int cc) : g(gg), c(cc) {}
-        class Cellule
+        class Cellule // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur
+                      // (VCL)
         {
             TStringGrid *g;
             int c, r;
@@ -409,6 +414,10 @@ public:
             }
             Cellule &operator=(const Cellule &x)
             {
+                if (this == &x)
+                {
+                    return *this;
+                }
                 g->EcritCellule(c, r, AnsiString(x));
                 return *this;
             }
@@ -516,7 +525,8 @@ public:
     explicit TTrackBar(QWidget *Parent = nullptr);
 };
 //---------------------------------------------------------------------------
-class TPanel : public ControleVcl<QFrame>, public AvecMenuContextuel
+class TPanel : public ControleVcl<QFrame>, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance) : widget Qt et
+                                                                     // services de la VCL (mixins)
 {
 public:
     explicit TPanel(QWidget *Parent = nullptr) : ControleVcl<QFrame>(Parent) {}
@@ -581,10 +591,14 @@ public:
 class TStatusPanels
 {
 public:
+    TStatusPanels() = default;
+    TStatusPanels(const TStatusPanels &) = delete;
+    TStatusPanels &operator=(const TStatusPanels &) = delete;
     std::vector<TStatusPanel *> Items;
     ~TStatusPanels();
 };
-class TStatusBar : public ControleVcl<QStatusBar>, public AvecMenuContextuel
+class TStatusBar : public ControleVcl<QStatusBar>, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance) :
+                                                                             // widget Qt et services de la VCL (mixins)
 {
     TStatusPanels PanneauxVcl;
     AnsiString asSimpleText;

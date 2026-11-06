@@ -201,6 +201,8 @@ void TfrmStatsAttenteTrafic::ParametresParkingsClick(TObject *Sender)
             CSpinEditParkingArrivee->SetFocus();
         }
         break;
+    default:
+        break;
     }
     RecalculeEtVisualise();
 }
@@ -228,6 +230,8 @@ void TfrmStatsAttenteTrafic::BitBtnDirClick(TObject *Sender)
         case +1:
             frmSimulation->DrawGridSimul->Col = frmSimulation->DrawGridSimul->ColCount - 1;
             break;
+        default:
+            break;
         }
         switch (dy)
         {
@@ -236,6 +240,8 @@ void TfrmStatsAttenteTrafic::BitBtnDirClick(TObject *Sender)
             break;
         case +1:
             frmSimulation->DrawGridSimul->Row = frmSimulation->DrawGridSimul->RowCount - 1;
+            break;
+        default:
             break;
         }
     }

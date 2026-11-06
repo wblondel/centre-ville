@@ -56,7 +56,9 @@ enum TGridDrawStateElement { gdSelected, gdFocused, gdFixed };
 using TGridDrawState = TEnsemble<TGridDrawStateElement>;
 using TDrawCellEvent = std::function<void(TObject *Sender, int ACol, int ARow, TRect &Rect, TGridDrawState State)>;
 //---------------------------------------------------------------------------
-class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMenuContextuel
+class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance)
+                                                                                            // : widget Qt et services
+                                                                                            // de la VCL (mixins)
 {
     TCanvas CanvasGrille;
     TGridCoord Courante, Ancre, HautGauche;

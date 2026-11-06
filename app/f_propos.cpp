@@ -207,6 +207,8 @@ void TfrmAPropos::TimerTimer(TObject * /*Sender*/)
         VirtualImageList->GetBitmap(2, Bitmap);
         LabelTexte->Font->Color = clRed;
         break;
+    default:
+        break;
     }
     SpeedButtonOk->Glyph = Bitmap;
     if (FermetureAutomatique && (TempsEcoule == 2))

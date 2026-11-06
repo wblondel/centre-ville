@@ -59,6 +59,8 @@ inline constexpr const char *asTitreCV = "Centre-Ville";
 class TfrmSimulation : public TFormPrincipale // portage : TForm -> QMainWindow
 {
 public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
+    TfrmSimulation(const TfrmSimulation &) = delete;
+    TfrmSimulation &operator=(const TfrmSimulation &) = delete;
     TTimer *TimerSimul{};
     TTimer *TimerClignotementLocalisation{};
     TTimer *TimerClignotementErreur{};
@@ -535,7 +537,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionAfficherInfectionExecute(TObject *Sender);
 
 private:
-    affichage Affichage;
+    affichage Affichage{};
     bool SimulEnCours{}, SimulModifiee{}, EnregistrerAvant{}, DeplacementFeuEnCours{}, RedimensionnementEnCours{};
     int xErr{}, yErr{}, xDeplFeu{}, yDeplFeu{}, xCrt, yCrt, xPrc, yPrc; // Détecteurs de direction du curseur. v3.5
     direction DirOrigVoieTram;                                          // v3.5
@@ -694,7 +696,7 @@ private:
     bool EnregistreAvantMarche();
 
 public:
-    type_demande TypeDemande;
+    type_demande TypeDemande{};
     Propriete<bool> SimulationEnCours;    // portage : __property {read=SimulEstEnCours, write=MarcheArretSimul}
     Propriete<bool> SimulationModifiee;   // portage : __property {read=SimulEstModifiee, write=ModifieSimul}
     Propriete<bool> SimulationSanglante;  // v4.3 // portage : __property {read=SimulEstSanglante,

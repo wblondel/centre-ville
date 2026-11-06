@@ -15,7 +15,7 @@ namespace
 {
 void *Alloue(std::size_t n)
 {
-    void *p = std::malloc((n != 0U) ? n : 1);
+    void *p = std::malloc((n != 0U) ? n : 1); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
     if (p)
     {
         std::memset(p, 0xA5, (n != 0U) ? n : 1);
@@ -54,26 +54,26 @@ void *operator new[](std::size_t n, const std::nothrow_t & /*unused*/) noexcept
 //---------------------------------------------------------------------------
 void operator delete(void *p) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 void operator delete[](void *p) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 void operator delete(void *p, std::size_t /*unused*/) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 void operator delete[](void *p, std::size_t /*unused*/) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 void operator delete(void *p, const std::nothrow_t & /*unused*/) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 void operator delete[](void *p, const std::nothrow_t & /*unused*/) noexcept
 {
-    std::free(p);
+    std::free(p); // NOLINT(cppcoreguidelines-no-malloc) : operator new remplacé
 }
 //---------------------------------------------------------------------------

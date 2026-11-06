@@ -67,7 +67,7 @@ public:
     int x{}, y{};
     int NbFeux,   // Nbre de feux liés
         *NumFeux; // Liste des feux liés
-    direction Direction;
+    direction Direction{};
     explicit TfrmDefFeuxPietons(TComponent *Owner);
     void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)
     bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouté le feu

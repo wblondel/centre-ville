@@ -15,7 +15,8 @@
 #include <type_traits>
 #include "compat/chaine.h"
 //---------------------------------------------------------------------------
-template <class T> class Propriete
+template <class T>
+class Propriete // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
 {
     std::function<T()> Lit;
     std::function<void(const T &)> Ecrit;
@@ -40,6 +41,10 @@ public:
     // Affectation d'une propriété à une autre : copie de la valeur, pas des accesseurs
     Propriete &operator=(const Propriete &p)
     {
+        if (this == &p)
+        {
+            return *this;
+        }
         Ecrit(p.Lit());
         return *this;
     }
@@ -63,7 +68,9 @@ public:
 //---------------------------------------------------------------------------
 // Propriétés texte : mêmes méthodes qu'AnsiString (Caption[Caption.Length()]...)
 //---------------------------------------------------------------------------
-template <> class Propriete<AnsiString>
+template <>
+class Propriete<AnsiString> // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la
+                            // valeur (VCL)
 {
     std::function<AnsiString()> Lit;
     std::function<void(const AnsiString &)> Ecrit;
@@ -93,6 +100,10 @@ public:
     }
     Propriete &operator=(const Propriete &p)
     {
+        if (this == &p)
+        {
+            return *this;
+        }
         Ecrit(p.Lit());
         return *this;
     }

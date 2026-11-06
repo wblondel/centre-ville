@@ -92,7 +92,8 @@ struct TFont
 // Sous-objet affecté par copie, comme les propriétés objet de la VCL
 // (Canvas->Font=DrawGridSimul->Font copie la police au lieu du pointeur)
 //---------------------------------------------------------------------------
-template <class T> class SousObjet
+template <class T>
+class SousObjet // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
 {
     T Objet;
     void Acces()
@@ -135,6 +136,10 @@ public:
     }
     SousObjet &operator=(const SousObjet &s)
     {
+        if (this == &s)
+        {
+            return *this;
+        }
         Objet = s.Objet;
         Acces();
         return *this;
@@ -190,7 +195,7 @@ public:
 // OnChange : le bouton dont c'est le Glyph se redessine (AffecteGlyphe).
 // La copie ne transmet que l'image, pas OnChange (TBitmap::Assign).
 //---------------------------------------------------------------------------
-class TBitmap
+class TBitmap // NOLINT(cppcoreguidelines-special-member-functions) : la copie prend l'image, pas OnChange (VCL)
 {
 public:
     QPixmap Image;
@@ -199,6 +204,10 @@ public:
     TBitmap(const TBitmap &b) : Image(b.Image) {}
     TBitmap &operator=(const TBitmap &b)
     {
+        if (this == &b)
+        {
+            return *this;
+        }
         Image = b.Image;
         Changed();
         return *this;

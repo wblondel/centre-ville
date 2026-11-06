@@ -215,6 +215,8 @@ class infection // v5.4.1
         PrmRang, DrnRang,           // 0 = patient zéro.
         ChargeVirale;               // Est incrémenté à chaque (ré)infection dans la période contagieuse
 public:
+    infection(const infection &) = delete;
+    infection &operator=(const infection &) = delete;
     friend class ExportEtat; // portage : lecture de l'état complet (tests du moteur)
     infection *Svt;
     explicit infection(const centre_ville *cv); // Patient zéro
@@ -302,6 +304,8 @@ class pieton // v2.0
     int Numero;
 
 public:
+    pieton(const pieton &) = delete;
+    pieton &operator=(const pieton &) = delete;
     int x{}, y{}, Dir{}, DemiCase{}, NumArretBus{}, // v3.0. Arrêt de bus d'attente (si >0). Le piéton se trouve à côté
                                                     // de cet arrêt (à droite de la tête de l'arrêt de bus)
         NumArretTram{}, // v3.5. Arrêt de tram d'attente (si >0). Le piéton se trouve à côté de cet arrêt (à droite de
@@ -505,8 +509,10 @@ class feu
     bool CopieEnCours; // v5.1
     int Numero;        // v5.1 : devenu public
 public:
+    feu(const feu &) = delete;
+    feu &operator=(const feu &) = delete;
     int x{}, y{}, Dir{}; // Orientation. Mais il peut y avoir max. 2 feux par case;
-    etat_feu Etat, ProchainEtat;
+    etat_feu Etat{}, ProchainEtat{};
     int NbFeuxDmd{}, // Nbre de feux demandant le rouge
         NbFeuxAtt{}, // Nbre de feux devant être rouge pour que celui-ci (this) passe au vert
         NbFeuxPtn{}, // Nbre de feux piétons liés (v5.2). ATTENTION: défini au lancement de la simulation car le lien
@@ -516,13 +522,13 @@ public:
         *NumFeuxPtn, // Liste des feux de piétons (v5.2). ATTENTION: définie au lancement de la simulation car le lien
                      // est établi depuis les feux de piétons.
         DureeRouge{}, DureeVert{}, TourDrnChgEtat{}; // Tour du dernier changement d'état
-    dmd_vert TypeDmdVert;   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
-    psg_rouge TypePsgRouge; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
-    bool DemandeVert{},     // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
-        FeuxTousRouges{},   // Indique que les feux (FeuxAtt) sont tous rouges
-        RougeDemande{},     // Indique qu'un feu demande le rouge
-        ProchainVert{},     // Indique qu'il est autorisé à passer au vert
-        VerifEnCours{};     // Drapeau pour Verifie()
+    dmd_vert TypeDmdVert{};   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
+    psg_rouge TypePsgRouge{}; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
+    bool DemandeVert{},       // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
+        FeuxTousRouges{},     // Indique que les feux (FeuxAtt) sont tous rouges
+        RougeDemande{},       // Indique qu'un feu demande le rouge
+        ProchainVert{},       // Indique qu'il est autorisé à passer au vert
+        VerifEnCours{};       // Drapeau pour Verifie()
     void Initialise()
     {
         x = -1;
@@ -618,24 +624,26 @@ class feu_pieton // v5.2
     int Numero;
 
 public:
+    feu_pieton(const feu_pieton &) = delete;
+    feu_pieton &operator=(const feu_pieton &) = delete;
     int x[NBFEUXPIETONSPARNUMERO]{}, y[NBFEUXPIETONSPARNUMERO]{},
         Dir[NBFEUXPIETONSPARNUMERO]{}, // Deux feux pitons sont positionnés de part et d'autre d'un passage piétons.
                                        // NumFeuDir
         iFeuDir[NBDIR]{}; // (Arch, qu'est-ce qu'y feut dire ?) ...Permet d'avoir directement les coordonnées du feu en
                           // fonction de la direction Attention à l'accès : iFeuDir[(direction)d-1]
-    etat_feu Etat, ProchainEtat;
+    etat_feu Etat{}, ProchainEtat{};
     int NbFeux{},                                    // Nbre de feux de circulation liés
         *NumFeux,                                    // Liste des feux de circulation liés
         DureeRouge{}, DureeVert{}, DureeTraversee{}, // Soit 1+2*Cases Passage piéton. Défini quand le feu opposé est
                                                      // placé
         TourDrnChgEtat{};                            // Tour du dernier changement d'état
-    dmd_vert TypeDmdVert;   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
-    psg_rouge TypePsgRouge; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
-    bool DemandeVert{},     // Indique qu'il demande le rouge (à ceux qui ont Numero dans NumFeuxPtn[])
-        FeuxTousRouges{},   // Indique que les feux (NumFeux) sont tous rouges
-        RougeDemande{},     // Indique qu'un feu demande le rouge
-        ProchainVert{},     // Indique qu'il est autorisé à passer au vert
-        VerifEnCours{};     // Drapeau pour Verifie()
+    dmd_vert TypeDmdVert{};   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
+    psg_rouge TypePsgRouge{}; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
+    bool DemandeVert{},       // Indique qu'il demande le rouge (à ceux qui ont Numero dans NumFeuxPtn[])
+        FeuxTousRouges{},     // Indique que les feux (NumFeux) sont tous rouges
+        RougeDemande{},       // Indique qu'un feu demande le rouge
+        ProchainVert{},       // Indique qu'il est autorisé à passer au vert
+        VerifEnCours{};       // Drapeau pour Verifie()
     void Initialise();
     feu_pieton()
     {
@@ -721,8 +729,8 @@ class vehicule // instances créées au lancement de la simulation
 
 public:
     int x{}, y{};
-    direction Dir, DirDrnDepl;
-    niveau_priorite NivPriorite;                   // v2.2
+    direction Dir{}, DirDrnDepl{};
+    niveau_priorite NivPriorite{};                 // v2.2
     int NumParkingDepart{}, NumParkingArrivee{},   // Index-1 de centre_ville::Parking[]
         NumFileParkDepart{}, NumFileParkArrivee{}, // v5.0. NumParking{Depart|Arrivee} exclusif avec
                                                    // NumFilePark{Depart|Arrivee}. Index-1 de centre_ville.FilePark[]
@@ -797,7 +805,7 @@ class bus // v3.0 instances créées au lancement de la simulation
     int Numero;
 
 public:
-    direction Dir, DirDrnDepl, DirAvtDrnDepl;
+    direction Dir{}, DirDrnDepl{}, DirAvtDrnDepl{};
     int x{}, y{}, NumLigne{}, NumDrnArret{}, NumArretSvt{}, // Index-1 de centre_ville::ArretBus
         NbPersonnes{},        // Correspond aux nombre de Pieton ayant NumBus = Numero (piétons dans le bus)
         TourDrnDepl{},        // Tour du dernier déplacement effectué
@@ -904,7 +912,7 @@ class tram // v3.5 instances créées au lancement de la simulation
 
 public:
     int x{}, y{}, NumLigne{};
-    direction Dir, DirDrnDepl, DirAvtDrnDepl;
+    direction Dir{}, DirDrnDepl{}, DirAvtDrnDepl{};
     int NumDrnArret{}, NumArretSvt{}, // Index-1 de centre_ville::ArretTram
         NbPersonnes{},                // Correspond aux nombre de Pieton ayant NumTram = Numero (piétons dans le tram)
         TourDrnDepl{},                // Tour du dernier déplacement effectué
@@ -1069,7 +1077,7 @@ class taxi // v3.6 instances créées au lancement de la simulation
     int Numero;
 
 public:
-    situation_taxi Situation;
+    situation_taxi Situation{};
     int x{}, y{}, NumFile{},                       // 0 <= NumFile < NbTaxis
         NbPersonnes{}, NbCourses{}, TourDrnDepl{}, // Tour du dernier déplacement effectué
         TourDepartDrnCourse{},                     // Tour pour le départ d'une course
@@ -1078,7 +1086,7 @@ public:
         NbCasesParcourues{},                       // Nombre de cases parcourues
         NbCasesParcouruesDrnCourse{},              // Idem mais remis à 0 à chaque départ d'une course
         NbToursRepos{}; // Tours pendant lesquels le bus ne s'est pas déplacé du fait de la vitesse réduite
-    direction Dir, DirDrnDepl;
+    direction Dir{}, DirDrnDepl{};
     void Initialise()
     {
         NumFile = x = y = -1;
@@ -1219,9 +1227,9 @@ class vehlib // v5.3 instances créées au lancement de la simulation
     int Numero;
 
 public:
-    situation_vehlib Situation;
+    situation_vehlib Situation{};
     int x{}, y{};
-    direction Dir, DirDrnDepl;
+    direction Dir{}, DirDrnDepl{};
     int NumPlaceDepart{},  // Place de départ. 0 = pas placé sinon index+1 de centre_ville.PlaceVehlib[].
         NumPlaceArrivee{}, // Place réservée. 0 = pas encore réservé sinon Index+1 de centre_ville.PlaceVehlib[].
         NbPersonnes{}, TourDrnDepl{}, // Tour du dernier déplacement effectué
@@ -1276,11 +1284,13 @@ class voie
     int x, y;
 
 public:
-    dirposs DirPoss;
-    sens_voie_tram SensVoieTram; // v3.5. 0 = aucune voie. Sinon 0<SensVoieTram<64.
+    voie(const voie &) = delete;
+    voie &operator=(const voie &) = delete;
+    dirposs DirPoss{};
+    sens_voie_tram SensVoieTram{}; // v3.5. 0 = aucune voie. Sinon 0<SensVoieTram<64.
     priorite Priorite[4]{};
-    nature Nature; // v3.8. 0 = rien (fond noir), poids fort = type (voies,trottoirs,immeubles), poid faible = décors
-                   // (arbre, pelouse, etc.)
+    nature Nature{}; // v3.8. 0 = rien (fond noir), poids fort = type (voies,trottoirs,immeubles), poid faible = décors
+                     // (arbre, pelouse, etc.)
     bool ToutDroit{}, PassagePietons{}, // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
         PassageBus{}, // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
         LigneBus[NBMAXLIGNESBUSTRAM]{},   // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation
@@ -1438,6 +1448,8 @@ class centre_ville
     void IncrementeAttente(int NumVehicule); // v2.2.7
     void IncrementeTrafic(int NumVehicule);  // v2.2.7
 public:
+    centre_ville(const centre_ville &) = delete;
+    centre_ville &operator=(const centre_ville &) = delete;
     bool TourEnCours,
         CopieEnCours;         // v4.0.1 Copie en cours de la sélection dans un fichier
     TDateTime dtTop, dtTemps; // v3.9.2

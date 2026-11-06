@@ -485,7 +485,7 @@ TEST_CASE("Enregistrement : une erreur d'écriture fait échouer Sauve", "[corre
             REQUIRE(setrlimit(RLIMIT_FSIZE, &Limite) == 0);
             const bool Enregistre = harnais::SauveSansChaos(asLimite);
             setrlimit(RLIMIT_FSIZE, &Ancienne);
-            std::signal(SIGXFSZ, AncienSignal);
+            static_cast<void>(std::signal(SIGXFSZ, AncienSignal));
             CHECK_FALSE(Enregistre);
 #endif
             // Sans erreur, l'enregistrement aboutit toujours

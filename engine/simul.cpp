@@ -3505,8 +3505,8 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
         NumXV = 0;
     int // NUMéro du taXi Voisin. v3.6
         NivPriorite[5] = {0, 0, 0, 0, 0};
-    direction DirCrt;
-    direction DirAuCarrefour;
+    direction DirCrt{};
+    direction DirAuCarrefour{};
     voie *v = nullptr;
 
     NumProchVL = NumProchTaxi = NumProchTram = NumProchBus = NumProchVeh = 0; // Aucun par défaut. v5.3 (vehlib)
@@ -3977,7 +3977,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
     int NumPietonDehors[NBMAXPIETONSPARCASE] = {0, 0}; // v5.4.1 : pour savoir si l'on peut effectuer la contamination
     pieton *p = nullptr;
     pieton *pv = nullptr;
-    direction NvDir;
+    direction NvDir{};
     for (i = 0; i < NBMAXPIETONSPARCASE; i++)
     {
         if ((NumPieton[i] != 0) && (cv->Pieton[NumPieton[i] - 1].NumBus == 0) && // Ne doit pas être dans un bus, v3.0
@@ -6626,7 +6626,7 @@ direction centre_ville::DirArretTramVoisin(int x, int y) const // v3.5
 bool centre_ville::AjoutArretBusPossible(int x, int y) // v3.0
 {
     int d = 0;
-    direction DirArretVoisin;
+    direction DirArretVoisin{};
     bool Possible = false;
     if ((v[x][y].DirPoss != 0) && (!ArretsBusVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux arrêts
                                                                        // différents voisins
@@ -6655,7 +6655,7 @@ bool centre_ville::AjoutArretBusPossible(int x, int y) // v3.0
 bool centre_ville::AjoutArretTramPossible(int x, int y) // v3.5
 {
     int d = 0;
-    direction DirArretVoisin;
+    direction DirArretVoisin{};
     bool Possible = false;
     if ((v[x][y].SensVoieTram != 0) && (!ArretsTramVoisinsDifferents(x, y))) // C'est de la route ET il n'y a pas deux
                                                                              // arrêts différents voisins
@@ -6747,7 +6747,7 @@ void centre_ville::CalculeTrajetLignesBus() // v3.0.3
     int DistArretBus = 0;
     int DistCrt = 0;
     int NumArretSvt = 0;
-    direction DirSvt;
+    direction DirSvt{};
     voie *Voie = nullptr;
     for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
@@ -6790,10 +6790,10 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
     int DistArretTram = 0;
     int DistCrt = 0;
     int NumArretSvt = 0;
-    direction DirCrt;
-    direction DirPrc;
+    direction DirCrt{};
+    direction DirPrc{};
     direction // v3.8
-        DirSvt;
+        DirSvt{};
     voie *Voie = nullptr;
     for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
@@ -7437,7 +7437,7 @@ bool centre_ville::PreparePietons() // v2.0
     int y = 0;
     int i = 0;
     const int NbPietonsAvantCreation = NbPietons;
-    direction Dir;
+    direction Dir{};
     if (DefinitNbPietons(NbPietonsAvantCreation) != NbPietonsAvantCreation)
     {
         return false;
@@ -7797,10 +7797,10 @@ void /*__fastcall*/ centre_ville::EffectueTourSimulation() // portage
     // 6a. On rafraîchit les véhicules (la direction a pu changé)
     for (i = 0; i < 2 * NbParkings; i++)
     {
-        if (Vehicule[i * (NbVehicules / NbParkings / 2)].Defini())
+        const int NumVeh = i * (NbVehicules / NbParkings / 2);
+        if (Vehicule[NumVeh].Defini())
         {
-            vue->RedessineCase(Vehicule[i * (NbVehicules / NbParkings / 2)].x, // portage
-                               Vehicule[i * (NbVehicules / NbParkings / 2)].y, false);
+            vue->RedessineCase(Vehicule[NumVeh].x, Vehicule[NumVeh].y, false); // portage
         }
     }
     // 6b. Et les bus (la direction a pu changé). v3.0

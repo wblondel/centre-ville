@@ -294,6 +294,8 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
             frmSimulation->RedessineCase(xd + 4, yd + 7, true);
             frmSimulation->RedessineCase(xd, yd + 4, true);
             break;
+        default:
+            break;
         }
         ModalResult = mrRep;
     }

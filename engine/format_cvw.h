@@ -116,10 +116,10 @@ CVW_CHAMP(feu, DureeVert, 4);
 CVW_CHAMP(feu, DemandeVert, 1);
 CVW_CHAMP(feu, RougeDemande, 1);
 // feu_pieton::Charge/Sauve
-CVW_CHAMP(feu_pieton, x, 4 * NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, y, 4 * NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, Dir, 4 * NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, iFeuDir, 4 * NBDIR);
+CVW_CHAMP(feu_pieton, x, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, y, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, Dir, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, iFeuDir, sizeof(int) * NBDIR);
 CVW_CHAMP(feu_pieton, Etat, 1);
 CVW_CHAMP(feu_pieton, NbFeux, 4);
 CVW_CHAMP(feu_pieton, TypeDmdVert, 1);
@@ -144,17 +144,17 @@ CVW_CHAMP(arret_bus, x, 4);
 CVW_CHAMP(arret_bus, y, 4);
 CVW_CHAMP(arret_bus, Ligne, NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_bus, NbLignes, 4);
-CVW_CHAMP(arret_bus, NumLigne, 4 * NBMAXLIGNESBUSTRAM);
+CVW_CHAMP(arret_bus, NumLigne, sizeof(int) * NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_tram, x, 4);
 CVW_CHAMP(arret_tram, y, 4);
 CVW_CHAMP(arret_tram, Ligne, NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_tram, NbLignes, 4);
-CVW_CHAMP(arret_tram, NumLigne, 4 * NBMAXLIGNESBUSTRAM);
+CVW_CHAMP(arret_tram, NumLigne, sizeof(int) * NBMAXLIGNESBUSTRAM);
 // ligne_bus, ligne_tram
 CVW_CHAMP(ligne_bus, NbArrets, 4);
-CVW_CHAMP(ligne_bus, NumArret, 4 * NBMAXARRETSBUSTRAMPARLIGNE);
+CVW_CHAMP(ligne_bus, NumArret, sizeof(int) * NBMAXARRETSBUSTRAMPARLIGNE);
 CVW_CHAMP(ligne_tram, NbArrets, 4);
-CVW_CHAMP(ligne_tram, NumArret, 4 * NBMAXARRETSBUSTRAMPARLIGNE);
+CVW_CHAMP(ligne_tram, NumArret, sizeof(int) * NBMAXARRETSBUSTRAMPARLIGNE);
 // voie::Charge/Sauve (x et y sont privés : des int)
 CVW_CHAMP(voie, DirPoss, 1);
 CVW_CHAMP(voie, SensVoieTram, 1);
@@ -170,8 +170,8 @@ CVW_CHAMP(voie, NumPlacePark, 4);
 CVW_CHAMP(voie, NumPlaceVehlib, 4);
 CVW_CHAMP(voie, NumSpotVehlib, 4);
 CVW_CHAMP(voie, Priorite, NBFEUXPARCASE);
-CVW_CHAMP(voie, NumFeu, 4 * NBFEUXPARCASE);
-CVW_CHAMP(voie, NumFeuP, 4 * NBFEUXPARCASE);
+CVW_CHAMP(voie, NumFeu, sizeof(int) * NBFEUXPARCASE);
+CVW_CHAMP(voie, NumFeuP, sizeof(int) * NBFEUXPARCASE);
 #undef CVW_CHAMP
 //---------------------------------------------------------------------------
 #endif

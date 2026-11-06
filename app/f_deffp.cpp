@@ -88,7 +88,7 @@ void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
     const auto EtatFP =
         static_cast<etat_feu>(RadioGroupEtat->ItemIndex + static_cast<int>(RadioGroupEtat->ItemIndex == 2));
     etat_feu EtatFC = inactif;
-    etat_feu EtatCrt;
+    etat_feu EtatCrt{};
     bool FeuxFCDifferents = false;
     // On relève l'état des feux de circulation liés
 

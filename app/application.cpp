@@ -60,7 +60,7 @@ bool OuvertureFichiers::eventFilter(QObject *o, QEvent *e)
 void InitialiseApplication(QApplication & /*App*/)
 {
     // Format de la VCL en français : séparateur décimal ',' (compat/chaine.h)
-    std::setlocale(LC_NUMERIC, "C");
+    static_cast<void>(std::setlocale(LC_NUMERIC, "C"));
     FormatSettings.DecimalSeparator = ',';
     FormatSettings.ThousandSeparator = "\xC2\xA0";
     // Boutons des boîtes de dialogue en français (« Oui », « Non », « Annuler »)

@@ -134,6 +134,8 @@ void TfrmStatsVehicules::RafraichitInfos()
             }
         }
         break;
+    default:
+        break;
     }
     StringGridStatsVehicules->Repaint();
 }
