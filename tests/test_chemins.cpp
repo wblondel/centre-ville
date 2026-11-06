@@ -237,7 +237,7 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
                                  : (v.SensVoieTram && !v.DirPoss);
                 for (int d = nord; Libre && (d <= ouest); d++)
                 {
-                    Libre = !(Bus ? cv->V(x, y, d).NumArretBus : cv->V(x, y, d).NumArretTram);
+                    Libre = !(Bus ? cv->Voisine(x, y, d).NumArretBus : cv->Voisine(x, y, d).NumArretTram);
                 }
                 if (Libre && !(Bus ? v.NumArretBus : v.NumArretTram))
                 {

@@ -40,7 +40,7 @@ bool TfrmDefFeux::RafraichitInfos()
     }
     v->NumFeu[Direction - 1] = Numero;
     f = &cv->Feu[Numero - 1];
-    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", TableauDeConstantes(x, y));
     LabelDirection->Caption = asDir[Direction];
     if (Numero != 0)
     {
@@ -97,7 +97,7 @@ bool TfrmDefFeux::RafraichitInfos()
                 {
                     LabelFeuxPietons->Caption =
                         LabelFeuxPietons->Caption +
-                        Format((LabelFeuxPietons->Caption == "") ? "%d" : ", %d", ARRAYOFCONST((i + 1)));
+                        Format((LabelFeuxPietons->Caption == "") ? "%d" : ", %d", TableauDeConstantes(i + 1));
                     NbFeuxP++;
                 }
             }

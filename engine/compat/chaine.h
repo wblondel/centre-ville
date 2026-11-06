@@ -88,7 +88,7 @@ public:
 };
 //---------------------------------------------------------------------------
 // portage : point d'extension, pour que l'interface puisse passer ses
-// propriétés (__property de la VCL) à ARRAYOFCONST
+// propriétés (__property de la VCL) à TableauDeConstantes (ARRAYOFCONST de la VCL)
 template <class T> TVarRec VersTVarRec(const T &v)
 {
     return TVarRec(v);
@@ -97,9 +97,6 @@ template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &...v)
 {
     return std::vector<TVarRec>{VersTVarRec(v)...};
 }
-//---------------------------------------------------------------------------
-// ARRAYOFCONST((a, b, c)) -> TableauDeConstantes (a, b, c)
-#define ARRAYOFCONST(valeurs) TableauDeConstantes valeurs
 //---------------------------------------------------------------------------
 // portage : séparateurs utilisés par Format (SysUtils::FormatSettings). La VCL
 // les prenait dans les paramètres régionaux de Windows (',' et espace

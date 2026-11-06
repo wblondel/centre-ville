@@ -48,14 +48,14 @@ void TfrmAffDistParkings::RafraichitInfos()
         return;
     }
     NbCases = (NbX = 1 + NbDir[v->DirPoss]) * (1 + cv->NbParkings);
-    Caption = "Parkings " + Format(asFormatCoord, ARRAYOFCONST((x, y)));
+    Caption = "Parkings " + Format(asFormatCoord, TableauDeConstantes(x, y));
     for (i = 0; i < NbCases; i++)
     {
         if (i != 0)
         {
             if ((i % NbX) == 0)
             {
-                StringGridDistances->Cells[i % NbX][i / NbX] = Format("%5d", ARRAYOFCONST((i / NbX)));
+                StringGridDistances->Cells[i % NbX][i / NbX] = Format("%5d", TableauDeConstantes(i / NbX));
             }
             if ((i != 0) && (i < NbX))
             {
@@ -67,7 +67,7 @@ void TfrmAffDistParkings::RafraichitInfos()
                     ((de = v->DistParking[(i / NbX) - 1][(i % NbX) - 1][CheckBoxCouloirsBus->Checked]) ==
                      DIST_INDEFINIE)
                         ? String("     ")
-                        : Format("%5d", ARRAYOFCONST((de)));
+                        : Format("%5d", TableauDeConstantes(de));
             }
         }
     }

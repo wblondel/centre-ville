@@ -101,11 +101,12 @@ void TfrmDefVoie::AppliqueChoix()
             if (RefTrv != 0)
             { // A. On a trouvé des références au feu à supprimer
                 if (AfficheMessage(Format(asFrmMsgSuppr,
-                                          ARRAYOFCONST((asDir[d],
-                                                        asVoieOuPieton[!RefVoie], // v6.0.5 : l'original testait !NumRef
-                                                        (RefVoie ? NumRef : NumRefP) + 1,
-                                                        RefVoie ? cv->Feu[NumRef].x : cv->FeuP[NumRefP].x[0],
-                                                        RefVoie ? cv->Feu[NumRef].y : cv->FeuP[NumRefP].y[0]))),
+                                          TableauDeConstantes(asDir[d],
+                                                              asVoieOuPieton[!RefVoie], // v6.0.5 : l'original testait
+                                                                                        // !NumRef
+                                                              (RefVoie ? NumRef : NumRefP) + 1,
+                                                              RefVoie ? cv->Feu[NumRef].x : cv->FeuP[NumRefP].x[0],
+                                                              RefVoie ? cv->Feu[NumRef].y : cv->FeuP[NumRefP].y[0])),
                                    "Suppression de feu", tmQuestionNecessaire, 1, 1) == trOui)
                 {
                     // A.1.a On supprime les références au feu à supprimer
@@ -214,7 +215,7 @@ void TfrmDefVoie::RafraichitInfos()
     };
     const int NbDirVoiesTram = static_cast<int>(VoieTram[nord - 1]) + static_cast<int>(VoieTram[est - 1]) +
                                static_cast<int>(VoieTram[sud - 1]) + static_cast<int>(VoieTram[ouest - 1]);
-    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", TableauDeConstantes(x, y));
 
     RadioGroupPrioriteNord->Enabled = (!VoiesTramEtRoutes) && (v->NumParking == 0) && (!v->EstDepotBus()) &&
                                       (NbDirVoiesTram < 3) && (((v->DirPoss & N) == N) || VoieTram[nord - 1]);

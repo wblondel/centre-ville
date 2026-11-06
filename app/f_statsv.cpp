@@ -28,7 +28,7 @@ void TfrmStatsVehicules::FormShow(TObject * /*Sender*/)
     int i = 0;
     const int ne = cv->NbParkings;
     frmSimulation->ActionStatsParkings->Checked = true;
-    frmStatsVehicules->Caption = Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
+    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes((int)cv->TourCrt));
     StringGridCoordParkings->RowCount = 1 + ne;
     StringGridStatsVehicules->Cells[0][0] = "A\\D";
     StringGridStatsVehicules->RowCount = 1 + ne;
@@ -37,10 +37,11 @@ void TfrmStatsVehicules::FormShow(TObject * /*Sender*/)
     StringGridCoordParkings->Cells[1][0] = "Position";
     for (i = 0; i < ne; i++)
     {
-        StringGridCoordParkings->Cells[0][1 + i] = Format("%3d", ARRAYOFCONST((1 + i)));
-        StringGridStatsVehicules->Cells[0][1 + i] = Format("%3d", ARRAYOFCONST((1 + i)));
-        StringGridStatsVehicules->Cells[1 + i][0] = Format("%3d", ARRAYOFCONST((1 + i)));
-        StringGridCoordParkings->Cells[1][1 + i] = Format("%d,%d", ARRAYOFCONST((cv->Parking[i].x, cv->Parking[i].y)));
+        StringGridCoordParkings->Cells[0][1 + i] = Format("%3d", TableauDeConstantes(1 + i));
+        StringGridStatsVehicules->Cells[0][1 + i] = Format("%3d", TableauDeConstantes(1 + i));
+        StringGridStatsVehicules->Cells[1 + i][0] = Format("%3d", TableauDeConstantes(1 + i));
+        StringGridCoordParkings->Cells[1][1 + i] =
+            Format("%d,%d", TableauDeConstantes(cv->Parking[i].x, cv->Parking[i].y));
     }
     RafraichitInfos(); // v6.0.2 : l'original laissait la grille vide jusqu'au tour suivant
 }
@@ -65,7 +66,7 @@ void TfrmStatsVehicules::RafraichitInfos() const
     int Minimum = 0;
     int Maximum = 0;
     vehicule *v = nullptr;
-    frmStatsVehicules->Caption = Format(asTitre, ARRAYOFCONST(((int)cv->TourCrt)));
+    frmStatsVehicules->Caption = Format(asTitre, TableauDeConstantes((int)cv->TourCrt));
     for (i = 0; i < n * n; i++)
     {
         if ((i % n) != (i / n))
@@ -96,7 +97,7 @@ void TfrmStatsVehicules::RafraichitInfos() const
                             if (Maximum - Minimum > Record)
                             { // Si record battu on écrit
                                 StringGridStatsVehicules->Cells[ed][ea] =
-                                    Format("%4d", ARRAYOFCONST((Maximum - Minimum)));
+                                    Format("%4d", TableauDeConstantes(Maximum - Minimum));
                             }
                         }
                     }
@@ -125,7 +126,7 @@ void TfrmStatsVehicules::RafraichitInfos() const
                             if (Maximum - Minimum > Record)
                             { // Si record battu on écrit
                                 StringGridStatsVehicules->Cells[ed][ea] =
-                                    Format("%4d", ARRAYOFCONST((Maximum - Minimum)));
+                                    Format("%4d", TableauDeConstantes(Maximum - Minimum));
                             }
                         }
                     }

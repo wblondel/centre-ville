@@ -179,9 +179,9 @@ TfrmAPropos::TfrmAPropos(TComponent *Owner) : TForm(Owner)
                                                                                      // CMakeLists.txt
     LabelSousVersion->Caption = AnsiString(",") + IntToStr(CV_VERSION_CORRECTIVE);   // portage
 #if defined(_WIN64) || defined(__LP64__) // portage : 64 bits aussi hors de Windows (Qt 6 n'existe qu'en 64 bits)
-    LabelAlignement->Caption = Format(LabelAlignement->Caption, ARRAYOFCONST((64)));
+    LabelAlignement->Caption = Format(LabelAlignement->Caption, TableauDeConstantes(64));
 #else
-    LabelAlignement->Caption = Format(LabelAlignement->Caption, ARRAYOFCONST((32)));
+    LabelAlignement->Caption = Format(LabelAlignement->Caption, TableauDeConstantes(32));
 #endif
     LabelHDPI->Caption = LabelHDPI->Caption + FormatFloat("0.0", Screen->PixelsPerInch / 96.0); // v5.4.1
 }
@@ -214,7 +214,7 @@ void TfrmAPropos::TimerTimer(TObject * /*Sender*/)
 void TfrmAPropos::FormShow(TObject * /*Sender*/)
 {
     TempsEcoule = 0;
-    Bitmap = new TBITMAP;
+    Bitmap = new TBitmap;
     VirtualImageList->GetBitmap(0, Bitmap);
     SpeedButtonOk->Glyph = Bitmap;
     Timer->Enabled = true;

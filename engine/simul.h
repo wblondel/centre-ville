@@ -9,76 +9,68 @@
 #include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
 #include "compat/temps.h"  // portage : remplace <systdate.h> (TDateTime, Time)
 //---------------------------------------------------------------------------
-#define NBXDEF 99  // v4.0 (NBX->NBXDEF)
-#define NBYDEF 63  // v4.0 (NBY->NBYDEF)
-#define NBXMIN 8   // v4.0
-#define NBYMIN 8   // v4.0
-#define NBXMAX 200 // v6.0.3 : nouvelle zone seulement (mémoire, et pile du calcul récursif des distances)
-#define NBYMAX 200 // v6.0.3
+constexpr int NBXDEF = 99;  // v4.0 (NBX->NBXDEF)
+constexpr int NBYDEF = 63;  // v4.0 (NBY->NBYDEF)
+constexpr int NBXMIN = 8;   // v4.0
+constexpr int NBYMIN = 8;   // v4.0
+constexpr int NBXMAX = 200; // v6.0.3 : nouvelle zone seulement (mémoire, et pile du calcul récursif des distances)
+constexpr int NBYMAX = 200; // v6.0.3
 //---------------------------------------------------------------------------
-#define NBDIR                      4
-#define NBFEUXDEFAUT               2 // v5.1 : anciennement 30
-#define NBFEUXPIETONDEFAUT         2 // v5.2
-#define NBETAPESDEFAUT             2 // v5.1 : anciennement 4
-#define NBVEHICULESDEFAUT          120
-#define NBPIETONSDEFAUT            30 // v2.0 (25% des véhicules = 120/4 = 30)
-#define NBNIVEAUXPRIORITE          3  // v2.2
-#define NBMAXETAPES                32
-#define NBMAXVEHICULES             9999                                           // v5.0.3 - Au lieu de 1000
-#define NBMAXPIETONSPARCASE        2                                              // v2.0
-#define NBMAXLIGNESBUSTRAM         9                                              // v3.5
-#define NBMAXARRETSBUSTRAMPARLIGNE 9                                              // v3.5
-#define NBMAXBUSTRAMPARLIGNE       3                                              // v3.5
-#define NBMAXARRETSBUSTRAM         NBMAXLIGNESBUSTRAM *NBMAXARRETSBUSTRAMPARLIGNE // v3.5
-#define NBMAXBUSTRAM               NBMAXLIGNESBUSTRAM *NBMAXBUSTRAMPARLIGNE       // v3.5
-#define NBSENSVOIETRAMBASE         7                                              // v3.5
-#define NBSENSVOIETRAM             64 // v3.5 (2^NBSENSVOIETRAMBASE-1=2^6=64)
-#define NBTYPESVOIE                2  // v3.5
-#define NBSITUATIONSTAXI           4  // v3.6
-#define NBFEUXPARCASE              4  // v5.2
-#define NBFEUXPIETONSPARNUMERO     2  // v5.2
+constexpr int NBDIR = 4;
+constexpr int NBFEUXDEFAUT = 2;       // v5.1 : anciennement 30
+constexpr int NBFEUXPIETONDEFAUT = 2; // v5.2
+constexpr int NBETAPESDEFAUT = 2;     // v5.1 : anciennement 4
+constexpr int NBVEHICULESDEFAUT = 120;
+constexpr int NBPIETONSDEFAUT = 30;  // v2.0 (25% des véhicules = 120/4 = 30)
+constexpr int NBNIVEAUXPRIORITE = 3; // v2.2
+constexpr int NBMAXETAPES = 32;
+constexpr int NBMAXVEHICULES = 9999;                                                // v5.0.3 - Au lieu de 1000
+constexpr int NBMAXPIETONSPARCASE = 2;                                              // v2.0
+constexpr int NBMAXLIGNESBUSTRAM = 9;                                               // v3.5
+constexpr int NBMAXARRETSBUSTRAMPARLIGNE = 9;                                       // v3.5
+constexpr int NBMAXBUSTRAMPARLIGNE = 3;                                             // v3.5
+constexpr int NBMAXARRETSBUSTRAM = NBMAXLIGNESBUSTRAM * NBMAXARRETSBUSTRAMPARLIGNE; // v3.5
+constexpr int NBMAXBUSTRAM = NBMAXLIGNESBUSTRAM * NBMAXBUSTRAMPARLIGNE;             // v3.5
+constexpr int NBSENSVOIETRAMBASE = 7;                                               // v3.5
+constexpr int NBSENSVOIETRAM = 64;        // v3.5 (2^NBSENSVOIETRAMBASE-1=2^6=64)
+constexpr int NBTYPESVOIE = 2;            // v3.5
+constexpr int NBSITUATIONSTAXI = 4;       // v3.6
+constexpr int NBFEUXPARCASE = 4;          // v5.2
+constexpr int NBFEUXPIETONSPARNUMERO = 2; // v5.2
 //---------------------------------------------------------------------------
 // valeurs de distance particulières
-#define DIST_INDEFINIE 32767
+constexpr int DIST_INDEFINIE = 32767;
 //---------------------------------------------------------------------------
-// Filtre pour ne donner que la nature (sans les décors) dans la propriété Nature (poids fort)
-#define NATURE(v)  ((v)->Nature & 0x7FFF0000)
-#define _NATURE(n) ((n) & 0x7FFF0000)
+// Filtre pour ne donner que la nature (sans les décors) dans la propriété Nature (poids fort) :
+// NatureSansDecor(), après la classe voie
 //---------------------------------------------------------------------------
 // 3ème index de voie::DistParking[][][]
-#define SANSPSGBUS 0
-#define AVECPSGBUS 1
+constexpr int SANSPSGBUS = 0;
+constexpr int AVECPSGBUS = 1;
 //---------------------------------------------------------------------------
 // Index de RotPossDir
-#define R90D 1
-#define R180 2
-#define R90G 3
+constexpr int R90D = 1;
+constexpr int R180 = 2;
+constexpr int R90G = 3;
 //---------------------------------------------------------------------------
-#define VERSION    0x530 // v3.0. La version change SSI le format de fichiers change (v5.3)
-#define VERSIONMIN 0x300 // v3.0. Version minimale stockée : NE PAS MODIFIER
-#define VERSIONANC 0x200 // v3.0. Version non stockée compatible : NE PAS MODIFIER
+constexpr int VERSION = 0x530;    // v3.0. La version change SSI le format de fichiers change (v5.3)
+constexpr int VERSIONMIN = 0x300; // v3.0. Version minimale stockée : NE PAS MODIFIER
+constexpr int VERSIONANC = 0x200; // v3.0. Version non stockée compatible : NE PAS MODIFIER
 //--------------------------------------------------------------------------- Voie
-#define V(x, y, d)  v[((x) + dx[d]) % cv->NbX][((y) + dy[d]) % cv->NbY] // en dehors de la classe centre_ville (v4.0)
-#define _V(x, y, d) v[((x) + dx[d]) % NbX][((y) + dy[d]) % NbY]         // depuis la classe centre_ville (v4.0)
-#define V_(x, y, n, d)                                                                                                 \
-    v[((x) + (n) * dx[d]) % cv->NbX][((y) + (n) * dy[d]) % cv->NbY] // en dehors de la classe centre_ville (v4.0)
-#define _V_(x, y, n, d) v[((x) + (n) * dx[d]) % NbX][((y) + (n) * dy[d]) % NbY] // depuis la classe centre_ville (v4.0)
+// Case voisine dans la direction d, ou à n cases : centre_ville::Voisine() (6.0.17 : anciennes macros V, _V, V_, _V_)
 //--------------------------------------------------------------------------- Feux Piétons (v5.2)
-#define FEUXPIETONS(v) ((v)->NumFeuP[0] + (v)->NumFeuP[1] + (v)->NumFeuP[2] + (v)->NumFeuP[3] > 0)
-#define _FEUXPIETONS   (NumFeuP[0] + NumFeuP[1] + NumFeuP[2] + NumFeuP[3] > 0)
-#define IFEUDIR(n, d)  (cv->FeuP[(n) - 1].iFeuDir[d])
-#define IFEUOPPDIR(d)  iFeuDir[InvDir[d] - 1]
+// voie::FeuxPietons() (6.0.17 : anciennes macros FEUXPIETONS et FeuxPietons())
 //---------------------------------------------------------------------------
 // #define min(x,y) (((x)<(y))?(x):(y)) // portage : inutilisée par le moteur, retirée (conflit avec la STL)
 // #define max(x,y) (((x)>(y))?(x):(y)) // portage : inutilisée par le moteur, retirée (conflit avec la STL)
 //---------------------------------------------------------------------------
 // Pour centre_ville::PrepareCopie(...)
-#define DEBUT true
-#define FIN   false
+constexpr bool DEBUT = true;
+constexpr bool FIN = false;
 //---------------------------------------------------------------------------
 // v5.4.1 : Pour infection::DonneTourDeb(bool Dernier) et DonneNumPieton(bool Dernier)
-#define PREMIER false
-#define DERNIER true
+constexpr bool PREMIER = false;
+constexpr bool DERNIER = true;
 //---------------------------------------------------------------------------
 // Version 1.5 : Ajout de la vitesse
 //  - Ajout de la propriété NbVitesses dans la classe centre_ville.
@@ -1414,7 +1406,17 @@ public:
     bool Charge(int hfile);
     bool Sauve(int hfile);
     void Verifie(AnsiString &asMsgErr);
+    [[nodiscard]] bool FeuxPietons() const // v5.2 (macros FEUXPIETONS et FeuxPietons())
+    {
+        return NumFeuP[0] + NumFeuP[1] + NumFeuP[2] + NumFeuP[3] > 0;
+    }
 };
+//---------------------------------------------------------------------------
+// Nature sans les décors (poids fort de voie::Nature ; macro NATURE)
+inline int NatureSansDecor(const voie *v)
+{
+    return v->Nature & 0x7FFF0000;
+}
 //---------------------------------------------------------------------------
 class stats
 {
@@ -1520,7 +1522,10 @@ public:
     bool VerifOk, DistancesCalculees, QuadrillageStats;
     type_stats TypeStats;
 
-    voie **v{};                               // Dimensions modifiables (v4.0)
+    voie **v{}; // Dimensions modifiables (v4.0)
+    // Case voisine dans la direction d, ou à n cases dans la direction d, sur le tore (macros V, _V, V_, _V_)
+    [[nodiscard]] voie &Voisine(int x, int y, int d) const;
+    [[nodiscard]] voie &Voisine(int x, int y, int n, int d) const;
     feu *Feu;                                 // Tableau de feux
     feu_pieton *FeuP;                         // v5.2 Tableau de feux piéton
     parking *Parking;                         // Tableau des parkings
@@ -1573,8 +1578,8 @@ public:
     int NumeroArretBusLibre(int x, int y);                   // v3.0
     int NumeroArretTramLibre(int x, int y);                  // v3.5
     [[nodiscard]] int NumeroPlaceTaxiLibre() const;          // v3.6
-    [[nodiscard]] int NumeroPlaceParkLibre() const; // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre
-                                                    // avec NumeroPlaceVehlibLibre()
+    [[nodiscard]] int NumeroPlaceParkLibre() const;   // v5.0. v5.3 renommée de NumeroPlaceLibre pour ne pas confondre
+                                                      // avec NumeroPlaceVehlibLibre()
     [[nodiscard]] int NumeroPlaceVehlibLibre() const; // v5.3
     int AjouteFeu(int x, int y, direction d);
     int AjouteFeuPietons(int x, int y, direction d); // v5.2
@@ -1729,6 +1734,15 @@ extern int dx[NBDIR + 1], dy[NBDIR + 1],
     SvgNbArretsTram, // v3.5
     SvgNbPlacesTaxi; // v3.6
 extern centre_ville *cv;
+//---------------------------------------------------------------------------
+inline voie &centre_ville::Voisine(int x, int y, int d) const
+{
+    return v[(x + dx[d]) % NbX][(y + dy[d]) % NbY];
+}
+inline voie &centre_ville::Voisine(int x, int y, int n, int d) const
+{
+    return v[(x + (n * dx[d])) % NbX][(y + (n * dy[d])) % NbY];
+}
 //---------------------------------------------------------------------------
 extern void AppelleAuChaos();
 //---------------------------------------------------------------------------

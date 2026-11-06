@@ -13,33 +13,32 @@
 #include "ui_f_infptn.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_infptn_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-#define NBSITUATIONS 17 // v5.3 (+3) v5.4.1 (+1)
-#define NBPOSITIONS  6  // v5.3 (+1)
+constexpr int NBSITUATIONS = 17; // v5.3 (+3) v5.4.1 (+1)
+constexpr int NBPOSITIONS = 6;   // v5.3 (+1)
 //---------------------------------------------------------------------------
 // Positions
-#define DANSUNBUS  2
-#define DANSUNTRAM 3
-#define DANSUNTAXI 4
-#define DANSVEHLIB 5 // v5.3
+constexpr int DANSUNBUS = 2;
+constexpr int DANSUNTRAM = 3;
+constexpr int DANSUNTAXI = 4;
+constexpr int DANSVEHLIB = 5; // v5.3
 //---------------------------------------------------------------------------
 // Situations
-#define SEPROMENE      0
-#define PSGPTTRV       1
-#define ARRETBUSTRV    2
-#define ARRETTRAMTRV   3
-#define FILETAXITRV    4
-#define PLACEVEHLIBTRV 5
-#define ATTENDUNBUS    6
-#define ATTENDDSLEBUS  7
-#define ATTENDUNTRAM   8
-#define ATTENDDSLETRAM 9
-#define ATTENDUNTAXI   10
-#define ATTENDDSLETAXI 11
-#define ATTENDUNVEHLIB 12 // v5.3
-#define ATTENDDSVEHLIB 13 // v5.3
-#define VEUTDESCENDRE  14
-#define ECRASE         15
-#define MORT           16 // v5.4.1
+constexpr int PSGPTTRV = 1;
+constexpr int ARRETBUSTRV = 2;
+constexpr int ARRETTRAMTRV = 3;
+constexpr int FILETAXITRV = 4;
+constexpr int PLACEVEHLIBTRV = 5;
+constexpr int ATTENDUNBUS = 6;
+constexpr int ATTENDDSLEBUS = 7;
+constexpr int ATTENDUNTRAM = 8;
+constexpr int ATTENDDSLETRAM = 9;
+constexpr int ATTENDUNTAXI = 10;
+constexpr int ATTENDDSLETAXI = 11;
+constexpr int ATTENDUNVEHLIB = 12; // v5.3
+constexpr int ATTENDDSVEHLIB = 13; // v5.3
+constexpr int VEUTDESCENDRE = 14;
+constexpr int ECRASE = 15;
+constexpr int MORT = 16; // v5.4.1
 //---------------------------------------------------------------------------
 TfrmInfosPieton *frmInfosPieton;
 //---------------------------------------------------------------------------
@@ -93,33 +92,33 @@ void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)
             GroupBoxPieton->Caption =
                 GroupBoxPieton->Caption +
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((NumPieton, cv->Bus[p->NumBus - 1].x, cv->Bus[p->NumBus - 1].y)));
+                       TableauDeConstantes(NumPieton, cv->Bus[p->NumBus - 1].x, cv->Bus[p->NumBus - 1].y));
         }
         else if (p->NumTram != 0)
         {
             GroupBoxPieton->Caption =
                 GroupBoxPieton->Caption +
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((NumPieton, cv->Tram[p->NumTram - 1].x, cv->Tram[p->NumTram - 1].y)));
+                       TableauDeConstantes(NumPieton, cv->Tram[p->NumTram - 1].x, cv->Tram[p->NumTram - 1].y));
         }
         else if (p->NumTaxi != 0)
         {
             GroupBoxPieton->Caption =
                 GroupBoxPieton->Caption +
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((NumPieton, cv->Taxi[p->NumTaxi - 1].x, cv->Taxi[p->NumTaxi - 1].y)));
+                       TableauDeConstantes(NumPieton, cv->Taxi[p->NumTaxi - 1].x, cv->Taxi[p->NumTaxi - 1].y));
         }
         else if (p->NumVehlib != 0)
         {
             GroupBoxPieton->Caption =
                 GroupBoxPieton->Caption +
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((NumPieton, cv->Vehlib[p->NumVehlib - 1].x, cv->Vehlib[p->NumVehlib - 1].y)));
+                       TableauDeConstantes(NumPieton, cv->Vehlib[p->NumVehlib - 1].x, cv->Vehlib[p->NumVehlib - 1].y));
         }
         else
         { // à pied
             GroupBoxPieton->Caption =
-                GroupBoxPieton->Caption + Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumPieton, p->x, p->y)));
+                GroupBoxPieton->Caption + Format(asFrmNumeroCoordonnees, TableauDeConstantes(NumPieton, p->x, p->y));
         }
         GroupBoxPieton->Caption = GroupBoxPieton->Caption + " ";
     }
@@ -162,7 +161,7 @@ void TfrmInfosPieton::RafraichitInfos()
     v = &cv->v[x][y];
     p = nullptr;
     NumPieton = 0;
-    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if (frmRecherche && frmRecherche->Visible && frmRecherche->RadioButtonPieton->Checked)
     {
         NumPieton = frmRecherche->CSpinEditPieton->Value;
@@ -295,29 +294,30 @@ void TfrmInfosPieton::RafraichitInfos()
         // LabelArretBusTramFileTaxiVehlib)
         if (p->NumBus != 0)
         {
-            LabelBusTramTaxiVehlib->Caption = Format(
-                asFrmNumeroCoordonnees, ARRAYOFCONST((p->NumBus, cv->Bus[p->NumBus - 1].x, cv->Bus[p->NumBus - 1].y)));
+            LabelBusTramTaxiVehlib->Caption =
+                Format(asFrmNumeroCoordonnees,
+                       TableauDeConstantes(p->NumBus, cv->Bus[p->NumBus - 1].x, cv->Bus[p->NumBus - 1].y));
             LabelPosition->Caption = asPosition[DANSUNBUS];
         }
         else if (p->NumTram != 0)
         {
             LabelBusTramTaxiVehlib->Caption =
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((p->NumTram, cv->Tram[p->NumTram - 1].x, cv->Tram[p->NumTram - 1].y)));
+                       TableauDeConstantes(p->NumTram, cv->Tram[p->NumTram - 1].x, cv->Tram[p->NumTram - 1].y));
             LabelPosition->Caption = asPosition[DANSUNTRAM];
         }
         else if (p->NumTaxi != 0) // v3.6
         {
             LabelBusTramTaxiVehlib->Caption =
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((p->NumTaxi, cv->Taxi[p->NumTaxi - 1].x, cv->Taxi[p->NumTaxi - 1].y)));
+                       TableauDeConstantes(p->NumTaxi, cv->Taxi[p->NumTaxi - 1].x, cv->Taxi[p->NumTaxi - 1].y));
             LabelPosition->Caption = asPosition[DANSUNTAXI];
         }
         else if (p->NumVehlib != 0) // v5.3
         {
             LabelBusTramTaxiVehlib->Caption =
-                Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((p->NumVehlib, cv->Vehlib[p->NumVehlib - 1].x, cv->Vehlib[p->NumVehlib - 1].y)));
+                Format(asFrmNumeroCoordonnees, TableauDeConstantes(p->NumVehlib, cv->Vehlib[p->NumVehlib - 1].x,
+                                                                   cv->Vehlib[p->NumVehlib - 1].y));
             LabelPosition->Caption = asPosition[DANSVEHLIB];
         }
         else
@@ -327,26 +327,26 @@ void TfrmInfosPieton::RafraichitInfos()
         }
         if (p->NumArretBus != 0)
         {
-            LabelArretBusTramFileTaxiVehlib->Caption = Format(
-                asFrmNumeroCoordonnees,
-                ARRAYOFCONST((p->NumArretBus, cv->ArretBus[p->NumArretBus - 1].x, cv->ArretBus[p->NumArretBus - 1].y)));
+            LabelArretBusTramFileTaxiVehlib->Caption =
+                Format(asFrmNumeroCoordonnees, TableauDeConstantes(p->NumArretBus, cv->ArretBus[p->NumArretBus - 1].x,
+                                                                   cv->ArretBus[p->NumArretBus - 1].y));
         }
         else if (p->NumArretTram != 0)
         {
-            LabelArretBusTramFileTaxiVehlib->Caption =
-                Format(asFrmNumeroCoordonnees, ARRAYOFCONST((p->NumArretTram, cv->ArretTram[p->NumArretTram - 1].x,
-                                                             cv->ArretTram[p->NumArretTram - 1].y)));
+            LabelArretBusTramFileTaxiVehlib->Caption = Format(
+                asFrmNumeroCoordonnees, TableauDeConstantes(p->NumArretTram, cv->ArretTram[p->NumArretTram - 1].x,
+                                                            cv->ArretTram[p->NumArretTram - 1].y));
         }
         else if (p->NumFileTaxi != 0)
         {
             LabelArretBusTramFileTaxiVehlib->Caption = Format(
                 asFrmNumeroCoordonnees,
-                ARRAYOFCONST(
-                    (p->NumFileTaxi, // v6.0.2 : PlaceTeteFile() commence à 1 (l'original lisait la place suivante, hors
-                                     // du tableau pour la dernière)
-                     cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi - 1].NumPlaceQueue].PlaceTeteFile() - 1].x,
-                     cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi - 1].NumPlaceQueue].PlaceTeteFile() - 1]
-                         .y)));
+                TableauDeConstantes(
+                    p->NumFileTaxi, // v6.0.2 : PlaceTeteFile() commence à 1 (l'original lisait la place suivante, hors
+                                    // du tableau pour la dernière)
+                    cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi - 1].NumPlaceQueue].PlaceTeteFile() - 1].x,
+                    cv->PlaceTaxi[cv->PlaceTaxi[cv->FileTaxi[p->NumFileTaxi - 1].NumPlaceQueue].PlaceTeteFile() - 1]
+                        .y));
         }
         else
         {
@@ -370,8 +370,8 @@ void TfrmInfosPieton::RafraichitInfos()
                     const PrmTourDeb = p->DonneTourDeb(PREMIER);
                 const int DrnTourDeb = p->DonneTourDeb(DERNIER);
                 const int DrnTourFin = p->DonneTourFin();
-                LabelRangs->Caption = Format(asFrmPrmDrn, ARRAYOFCONST((Rang, DrnRang)));
-                LabelTours->Caption = Format(asFrmPrmDrn, ARRAYOFCONST((PrmTourDeb, DrnTourDeb)));
+                LabelRangs->Caption = Format(asFrmPrmDrn, TableauDeConstantes(Rang, DrnRang));
+                LabelTours->Caption = Format(asFrmPrmDrn, TableauDeConstantes(PrmTourDeb, DrnTourDeb));
                 if (Infection && (DrnTourFin - DrnTourDeb > 0))
                 {
                     LabelPeriodeInfectiosite->Caption =

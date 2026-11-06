@@ -33,8 +33,8 @@ void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
     if (ARendreVisible)
     {
         RadioButtonTaxiNumero->Checked = true;
-        GroupBoxTaxi->Caption =
-            GroupBoxTaxi->Caption + Format(asFrmNumeroCoordonnees, ARRAYOFCONST((v->NumTaxi, Taxi->x, Taxi->y))) + " ";
+        GroupBoxTaxi->Caption = GroupBoxTaxi->Caption +
+                                Format(asFrmNumeroCoordonnees, TableauDeConstantes(v->NumTaxi, Taxi->x, Taxi->y)) + " ";
     }
     else
     {
@@ -70,7 +70,7 @@ void TfrmInfosTaxi::RafraichitInfos()
     y = frmSimulation->DrawGridSimul->Row;
     v = &cv->v[x][y];
     Taxi = nullptr;
-    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumTaxi > 0)))
     {
         Taxi = cv->Taxi + v->NumTaxi - 1;
@@ -79,8 +79,8 @@ void TfrmInfosTaxi::RafraichitInfos()
         LabelNumeroFile->Caption = IntToStr(Taxi->NumFile + 1);
         NumPlaceTeteFile = cv->PlaceTaxi[cv->FileTaxi[Taxi->NumFile].NumPlaceQueue].PlaceTeteFile();
         LabelTeteFileOrigine->Caption =
-            Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumPlaceTeteFile, cv->PlaceTaxi[NumPlaceTeteFile - 1].x,
-                                                         cv->PlaceTaxi[NumPlaceTeteFile - 1].y)));
+            Format(asFrmNumeroCoordonnees, TableauDeConstantes(NumPlaceTeteFile, cv->PlaceTaxi[NumPlaceTeteFile - 1].x,
+                                                               cv->PlaceTaxi[NumPlaceTeteFile - 1].y));
         LabelNbPersonnes->Caption = IntToStr(Taxi->NbPersonnes);
         LabelParcours->Caption = IntToStr(Taxi->NbCasesParcourues);
         LabelToursDepuisDepart->Caption = IntToStr(cv->TourCrt - Taxi->TourDepartDrnCourse);
@@ -94,7 +94,7 @@ void TfrmInfosTaxi::RafraichitInfos()
                                                                                     // du tableau)
         }
         LabelDistanceTeteFileDepart->Caption = IntToStr(MinDistFile);
-        LabelVitesse->Caption = Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
+        LabelVitesse->Caption = Format(asFrmVitesse, TableauDeConstantes(1, cv->NbVitesses));
     }
     RendreVisibleInfos(Afficher);
 }

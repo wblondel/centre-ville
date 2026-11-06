@@ -640,7 +640,8 @@ TEST_CASE("Vérification d'intégrité : le message du dépôt de bus donne ses 
     AnsiString asMsgErr;
     cv->Verifie(asMsgErr);
     harnais::Ferme();
-    CHECK(asMsgErr.str() == Format("Dépot bus (%d,%d): abscisse incorrecte (%d)\n", ARRAYOFCONST((NbX, y, NbX))).str());
+    CHECK(asMsgErr.str() ==
+          Format("Dépot bus (%d,%d): abscisse incorrecte (%d)\n", TableauDeConstantes(NbX, y, NbX)).str());
     CHECK(Vue.Messages.empty());
     vue = nullptr;
 }

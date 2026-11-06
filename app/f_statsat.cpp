@@ -17,8 +17,8 @@
 #include "f_statsat_composants.h" // portage : #pragma resource "*.dfm"
 #include "vue.h"
 //---------------------------------------------------------------------------
-#define ATTENTE 0
-#define TRAFIC  1
+constexpr int ATTENTE = 0;
+constexpr int TRAFIC = 1;
 //---------------------------------------------------------------------------
 TfrmStatsAttenteTrafic *frmStatsAttenteTrafic;
 //---------------------------------------------------------------------------
@@ -62,8 +62,8 @@ void TfrmStatsAttenteTrafic::FormShow(TObject * /*Sender*/)
     {
         Caption = "Statistiques de fluidité et de trafic au tour n°" + IntToStr(cv->TourCrt);
     }
-    CSpinEditParkingDepart->MAXVALUE = cv->NbParkings;
-    CSpinEditParkingArrivee->MAXVALUE = cv->NbParkings;
+    CSpinEditParkingDepart->MaxValue = cv->NbParkings;
+    CSpinEditParkingArrivee->MaxValue = cv->NbParkings;
     RecalculeEtVisualise();
 }
 //---------------------------------------------------------------------------
@@ -109,14 +109,14 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
         if (ts != 0)
         {
             asMsg = Format("Trafic en (%d, %d) au tour %d : %d véhicules (Max. %d) soit %.3f%%",
-                           ARRAYOFCONST((x, y, (int)cv->TourCrt, cv->v[x][y].Trafic[ed][ea], m[ts],
-                                         (long double)((100.0 * cv->v[x][y].Trafic[ed][ea]) / m[ts]))));
+                           TableauDeConstantes(x, y, (int)cv->TourCrt, cv->v[x][y].Trafic[ed][ea], m[ts],
+                                               (long double)((100.0 * cv->v[x][y].Trafic[ed][ea]) / m[ts])));
         }
         else
         {
             asMsg = Format("Attente en (%d, %d) au tour %d : %d tours (Max. %d) soit %.3f%%",
-                           ARRAYOFCONST((x, y, (int)cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
-                                         (long double)((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts]))));
+                           TableauDeConstantes(x, y, (int)cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
+                                               (long double)((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts])));
         }
     }
     return asMsg;

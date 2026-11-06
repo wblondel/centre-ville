@@ -225,7 +225,7 @@ public:
     [[nodiscard]] bool Frappe() const
     {
         return !AffectationEnCours;
-    }                                     // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
+    } // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
     bool GardeTouchesDeplacement = false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les
                                           // raccourcis de la fiche
     explicit TCSpinEdit(QWidget *Parent = nullptr);

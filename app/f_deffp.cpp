@@ -37,7 +37,7 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
     }
     v->NumFeuP[Direction - 1] = Numero;
     f = &cv->FeuP[Numero - 1];
-    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", TableauDeConstantes(x, y));
     LabelDirection->Caption = asDir[Direction];
     if (Numero != 0)
     {
@@ -69,7 +69,8 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
     // Affichage du nombre de feux de la liste
     LabelNbFeux->Caption = IntToStr(NbFeux);
     LabelCoordonneesFeuPietonsOppose->Caption =
-        Format("%2.2d, %2.2d", ARRAYOFCONST((f->x[f->IFEUOPPDIR(Direction)], f->y[f->IFEUOPPDIR(Direction)])));
+        Format("%2.2d, %2.2d",
+               TableauDeConstantes(f->x[f->iFeuDir[InvDir[Direction] - 1]], f->y[f->iFeuDir[InvDir[Direction] - 1]]));
     ButtonAppliquer->Enabled = false; // v5.2 : En cas de changement de coordonnées (boîte non modale) => Annulation
                                       // implicite donc Appliquer ne peut être actif.
     return true;
@@ -78,7 +79,8 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
 void TfrmDefFeuxPietons::RafraichitFeuxPietons()
 {
     frmSimulation->RedessineCase(x, y, true);
-    frmSimulation->RedessineCase(f->x[f->IFEUOPPDIR(Direction)], f->y[f->IFEUOPPDIR(Direction)], true);
+    frmSimulation->RedessineCase(f->x[f->iFeuDir[InvDir[Direction] - 1]], f->y[f->iFeuDir[InvDir[Direction] - 1]],
+                                 true);
 }
 //---------------------------------------------------------------------------
 void TfrmDefFeuxPietons::AnalyseEtatFeux() const // v5.2.1

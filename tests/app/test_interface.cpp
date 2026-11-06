@@ -220,11 +220,11 @@ const dirposs DirPossC4x4[4][4] = {
 bool CaseLibre(int x, int y)
 {
     voie &v = cv->v[(x + cv->NbX) % cv->NbX][(y + cv->NbY) % cv->NbY];
-    return (v.DirPoss == 0) && (v.SensVoieTram == 0) && !NATURE(&v) && (v.NumParking == 0) && (v.NumArretBus == 0) &&
-           (v.NumArretTram == 0) && (v.NumPlaceTaxi == 0) && (v.NumPlacePark == 0) && (v.NumPlaceVehlib == 0) &&
-           !v.PassagePietons && !v.EstDepotBus() && (v.NumFeu[0] == 0) && (v.NumFeu[1] == 0) && (v.NumFeu[2] == 0) &&
-           (v.NumFeu[3] == 0) && (v.NumFeuP[0] == 0) && (v.NumFeuP[1] == 0) && (v.NumFeuP[2] == 0) &&
-           (v.NumFeuP[3] == 0);
+    return (v.DirPoss == 0) && (v.SensVoieTram == 0) && !NatureSansDecor(&v) && (v.NumParking == 0) &&
+           (v.NumArretBus == 0) && (v.NumArretTram == 0) && (v.NumPlaceTaxi == 0) && (v.NumPlacePark == 0) &&
+           (v.NumPlaceVehlib == 0) && !v.PassagePietons && !v.EstDepotBus() && (v.NumFeu[0] == 0) &&
+           (v.NumFeu[1] == 0) && (v.NumFeu[2] == 0) && (v.NumFeu[3] == 0) && (v.NumFeuP[0] == 0) &&
+           (v.NumFeuP[1] == 0) && (v.NumFeuP[2] == 0) && (v.NumFeuP[3] == 0);
 }
 //-------------------------------------------------------------------------
 // Zone libre de l à h cases entourée d'une marge libre, en haut à gauche de
@@ -2081,7 +2081,7 @@ void TestInterface::ouvertureEnEchec()
         QVERIFY2(OctetsReseau() == Octets, c.Nom);
         QCOMPARE(Q(frmSimulation->Caption), Titre);
         QCOMPARE(Q(frmSimulation->StatusBar->Panels->Items[0]->Text), QString::fromUtf8("Chargement NON effectué."));
-        QCOMPARE(QFileInfo(Q(FILENAME(frmSimulation->SaveDialog))).fileName(), QFileInfo(Reseau).fileName());
+        QCOMPARE(QFileInfo(Q((frmSimulation->SaveDialog)->FileName)).fileName(), QFileInfo(Reseau).fileName());
         // Le chargement avait écrasé les voisinages (dx, dy suivent les dimensions de la zone)
         QCOMPARE(dx[ouest], cv->NbX - 1);
         QCOMPARE(dy[nord], cv->NbY - 1);
@@ -2760,7 +2760,7 @@ void TestInterface::ficheNature()
     {
         for (int j = 0; j < 2; j++)
         {
-            QCOMPARE((int)NATURE(&cv->v[xz + i][yz + j]), (int)trottoirs);
+            QCOMPARE((int)NatureSansDecor(&cv->v[xz + i][yz + j]), (int)trottoirs);
         }
     }
     QVERIFY(frmSimulation->SimulationModifiee);
@@ -2771,7 +2771,7 @@ void TestInterface::ficheNature()
     Clique(frmDefNature->ButtonFermer);
     QVERIFY(!frmDefNature->isVisible());
     QVERIFY(!frmSimulation->ActionDefinirNature->Checked);
-    QCOMPARE((int)NATURE(&cv->v[xz][yz]), (int)trottoirs);
+    QCOMPARE((int)NatureSansDecor(&cv->v[xz][yz]), (int)trottoirs);
     // Réouverture par le menu : fiche réinitialisée (FormShow)
     frmSimulation->MenuItemDefinirNature->ElementQt()->trigger();
     QVERIFY(frmDefNature->isVisible());
@@ -2779,7 +2779,7 @@ void TestInterface::ficheNature()
     CliqueChoix(frmDefNature->RadioGroupNature, 2);
     Touche(frmDefNature->ButtonAppliquer, Qt::Key_Escape); // Échap = Fermer
     QVERIFY(!frmDefNature->isVisible());
-    QCOMPARE((int)NATURE(&cv->v[xz + 1][yz + 1]), (int)trottoirs);
+    QCOMPARE((int)NatureSansDecor(&cv->v[xz + 1][yz + 1]), (int)trottoirs);
 }
 //---------------------------------------------------------------------------
 void TestInterface::fichesPrioritesEtFeux()
@@ -2944,7 +2944,7 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
         PlaceCurseur(x, j);
         QVERIFY(frmSimulation->ActionNatureTrottoir->Enabled);
         frmSimulation->ActionNatureTrottoir->Execute();
-        QCOMPARE((int)NATURE(&cv->v[x][j]), (int)trottoirs);
+        QCOMPARE((int)NatureSansDecor(&cv->v[x][j]), (int)trottoirs);
     }
     for (int j = y; j < ys; j++)
     {
@@ -5959,7 +5959,7 @@ void TestInterface::copierVersUnFichier()
     QVERIFY(OctetsReseau() == Reseau);
     QCOMPARE(Q(s->Caption), Q(asTitre));
     QVERIFY(s->SimulationModifiee);
-    QCOMPARE(QFileInfo(Q(FILENAME(s->SaveDialog))).fileName(), QFileInfo(Original).fileName());
+    QCOMPARE(QFileInfo(Q((s->SaveDialog)->FileName)).fileName(), QFileInfo(Original).fileName());
     QVERIFY(Contenu(Original) == Vide);
     // Enregistrer écrit donc l'original, pas la copie
     const QByteArray OctetsCopie = Contenu(Copie);
@@ -6251,7 +6251,7 @@ void TestInterface::verificationDuReseauMessageParMessage()
             .Nom = "case dirigée vers le dépôt",
             .Pose =
                 [dx0, dy0] {
-                    voie &w = cv->V(dx0, dy0, est);
+                    voie &w = cv->Voisine(dx0, dy0, est);
                     w.DirPoss = static_cast<dirposs>(w.DirPoss | O);
                 },
             .Message = C("On ne peut diriger une case vers le dépôt de bus (il est en SORTIE SEULE)."),
@@ -9179,7 +9179,7 @@ void TestInterface::ficheRecherche()
         {
             voie *v = &cv->v[x][y];
             if ((v->DirPoss == 0) && (v->SensVoieTram == 0) && (v->NumParking == 0) && (v->NbPietons == 0) &&
-                (NATURE(v) == immeubles))
+                (NatureSansDecor(v) == immeubles))
             {
                 Vide = QPoint(x, y);
             }

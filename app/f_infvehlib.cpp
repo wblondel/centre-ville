@@ -34,9 +34,9 @@ void TfrmInfosVehlib::RendreVisibleInfos(bool ARendreVisible)
     if (ARendreVisible)
     {
         RadioButtonVehlibNumero->Checked = true;
-        GroupBoxVehlib->Caption = GroupBoxVehlib->Caption +
-                                  Format(asFrmNumeroCoordonnees, ARRAYOFCONST((v->NumVehlib, Vehlib->x, Vehlib->y))) +
-                                  " ";
+        GroupBoxVehlib->Caption =
+            GroupBoxVehlib->Caption +
+            Format(asFrmNumeroCoordonnees, TableauDeConstantes(v->NumVehlib, Vehlib->x, Vehlib->y)) + " ";
     }
     else
     {
@@ -69,21 +69,22 @@ void TfrmInfosVehlib::RafraichitInfos()
     y = frmSimulation->DrawGridSimul->Row;
     v = &cv->v[x][y];
     Vehlib = nullptr;
-    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumVehlib > 0)))
     {
         Vehlib = cv->Vehlib + v->NumVehlib - 1;
         LabelSituation->Caption = asSituation[Vehlib->Situation];
         LabelDirection->Caption = asDir[Vehlib->Dir];
-        LabelNumeroPlaceDepart->Caption = Format(
-            asFrmNumeroCoordonnees, ARRAYOFCONST((Vehlib->NumPlaceDepart, cv->PlaceVehlib[Vehlib->NumPlaceDepart - 1].x,
-                                                  cv->PlaceVehlib[Vehlib->NumPlaceDepart - 1].y)));
+        LabelNumeroPlaceDepart->Caption =
+            Format(asFrmNumeroCoordonnees,
+                   TableauDeConstantes(Vehlib->NumPlaceDepart, cv->PlaceVehlib[Vehlib->NumPlaceDepart - 1].x,
+                                       cv->PlaceVehlib[Vehlib->NumPlaceDepart - 1].y));
         if (Vehlib->NumPlaceArrivee != 0)
         {
             LabelNumeroPlaceArrivee->Caption =
                 Format(asFrmNumeroCoordonnees,
-                       ARRAYOFCONST((Vehlib->NumPlaceArrivee, cv->PlaceVehlib[Vehlib->NumPlaceArrivee - 1].x,
-                                     cv->PlaceVehlib[Vehlib->NumPlaceArrivee - 1].y)));
+                       TableauDeConstantes(Vehlib->NumPlaceArrivee, cv->PlaceVehlib[Vehlib->NumPlaceArrivee - 1].x,
+                                           cv->PlaceVehlib[Vehlib->NumPlaceArrivee - 1].y));
         }
         else
         {
@@ -114,7 +115,7 @@ void TfrmInfosVehlib::RafraichitInfos()
         {
             LabelDistancePlaceArrivee->Caption = asNA;
         }
-        LabelVitesse->Caption = Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
+        LabelVitesse->Caption = Format(asFrmVitesse, TableauDeConstantes(1, cv->NbVitesses));
     }
     RendreVisibleInfos(Afficher);
 }

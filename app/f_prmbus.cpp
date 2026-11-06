@@ -88,7 +88,7 @@ void TfrmParamBus::FormShow(TObject * /*Sender*/)
         {
             if (cv->NbArretsBus < NBMAXARRETSBUSTRAMPARLIGNE)
             {
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->MAXVALUE =
+                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->MaxValue =
                     cv->NbArretsBus;
             }
             (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Value =
@@ -98,7 +98,7 @@ void TfrmParamBus::FormShow(TObject * /*Sender*/)
                 (cv->TourCrt > 0) && (cv->LigneBus[i - 1].NbArrets > 0);
             for (j = 1; j <= NBMAXARRETSBUSTRAMPARLIGNE; j++)
             {
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->MAXVALUE =
+                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->MaxValue =
                     cv->NbArretsBus;
                 (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Value =
                     cv->LigneBus[i - 1].NumArret[j - 1];
@@ -285,16 +285,16 @@ bool TfrmParamBus::AppliqueChoix()
                 if (CSpinEditNum->Value == 0)
                 {
                     asMsg = asMsg + Format(" - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
-                                           ARRAYOFCONST((j, asOrdre[!(j - 1)], i)));
+                                           TableauDeConstantes(j, asOrdre[!(j - 1)], i));
                 }
             }
         }
     }
     if (!asMsg.IsEmpty())
     {
-        AfficheMessage(
-            Format("Le réseau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
-            "Impossible de continuer", tmAvertissement, 0, 0);
+        AfficheMessage(Format("Le réseau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.",
+                              TableauDeConstantes(asMsg)),
+                       "Impossible de continuer", tmAvertissement, 0, 0);
         return false;
     }
     // 2. On valide les lignes de bus

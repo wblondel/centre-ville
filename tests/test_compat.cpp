@@ -51,28 +51,29 @@ TEST_CASE("AnsiString : sous-ensemble utilisé par le moteur", "[compat][chaine]
 //---------------------------------------------------------------------------
 TEST_CASE("Format/ARRAYOFCONST : spécificateurs de SysUtils", "[compat][chaine]")
 {
-    CHECK(Format("Piéton n°%d (%d,%d)", ARRAYOFCONST((7, -1, 12))) == AnsiString("Piéton n°7 (-1,12)"));
-    CHECK(Format("%d/%d", ARRAYOFCONST((3, 10))) == AnsiString("3/10"));
-    CHECK(Format("feu %s mais (%d)", ARRAYOFCONST((AnsiString("Nord"), (int)3))) == AnsiString("feu Nord mais (3)"));
-    CHECK(Format("%s", ARRAYOFCONST(("abc"))) == AnsiString("abc"));
-    CHECK(Format("100%%", ARRAYOFCONST((0))) == AnsiString("100%"));
+    CHECK(Format("Piéton n°%d (%d,%d)", TableauDeConstantes(7, -1, 12)) == AnsiString("Piéton n°7 (-1,12)"));
+    CHECK(Format("%d/%d", TableauDeConstantes(3, 10)) == AnsiString("3/10"));
+    CHECK(Format("feu %s mais (%d)", TableauDeConstantes(AnsiString("Nord"), (int)3)) ==
+          AnsiString("feu Nord mais (3)"));
+    CHECK(Format("%s", TableauDeConstantes("abc")) == AnsiString("abc"));
+    CHECK(Format("100%%", TableauDeConstantes(0)) == AnsiString("100%"));
     // Arguments surnuméraires ignorés (cf. depot_bus::Verifie)
-    CHECK(Format("Dépot bus : ", ARRAYOFCONST((1, 2))) == AnsiString("Dépot bus : "));
+    CHECK(Format("Dépot bus : ", TableauDeConstantes(1, 2)) == AnsiString("Dépot bus : "));
     // Largeur, justification, précision
-    CHECK(Format("[%5d]", ARRAYOFCONST((42))) == AnsiString("[   42]"));
-    CHECK(Format("[%-5d]", ARRAYOFCONST((42))) == AnsiString("[42   ]"));
-    CHECK(Format("[%.4d]", ARRAYOFCONST((-42))) == AnsiString("[-0042]"));
-    CHECK(Format("[%*d]", ARRAYOFCONST((4, 7))) == AnsiString("[   7]"));
-    CHECK(Format("%x", ARRAYOFCONST((255))) == AnsiString("FF"));
-    CHECK(Format("%.2f", ARRAYOFCONST((3.14159))) == AnsiString("3.14"));
-    CHECK(Format("%f", ARRAYOFCONST((2.5))) == AnsiString("2.50"));
-    CHECK(Format("%.3e", ARRAYOFCONST((1234.5))) == AnsiString("1.23E+003"));
-    CHECK(Format("%.2s", ARRAYOFCONST(("abc"))) == AnsiString("ab"));
+    CHECK(Format("[%5d]", TableauDeConstantes(42)) == AnsiString("[   42]"));
+    CHECK(Format("[%-5d]", TableauDeConstantes(42)) == AnsiString("[42   ]"));
+    CHECK(Format("[%.4d]", TableauDeConstantes(-42)) == AnsiString("[-0042]"));
+    CHECK(Format("[%*d]", TableauDeConstantes(4, 7)) == AnsiString("[   7]"));
+    CHECK(Format("%x", TableauDeConstantes(255)) == AnsiString("FF"));
+    CHECK(Format("%.2f", TableauDeConstantes(3.14159)) == AnsiString("3.14"));
+    CHECK(Format("%f", TableauDeConstantes(2.5)) == AnsiString("2.50"));
+    CHECK(Format("%.3e", TableauDeConstantes(1234.5)) == AnsiString("1.23E+003"));
+    CHECK(Format("%.2s", TableauDeConstantes("abc")) == AnsiString("ab"));
     // Index explicite
-    CHECK(Format("%1:s-%0:s", ARRAYOFCONST(("a", "b"))) == AnsiString("b-a"));
+    CHECK(Format("%1:s-%0:s", TableauDeConstantes("a", "b")) == AnsiString("b-a"));
     // Erreurs (EConvertError dans la VCL)
-    CHECK_THROWS_AS(Format("%d", ARRAYOFCONST(("texte"))), std::invalid_argument);
-    CHECK_THROWS_AS(Format("%d %d", ARRAYOFCONST((1))), std::invalid_argument);
+    CHECK_THROWS_AS(Format("%d", TableauDeConstantes("texte")), std::invalid_argument);
+    CHECK_THROWS_AS(Format("%d %d", TableauDeConstantes(1)), std::invalid_argument);
 }
 //---------------------------------------------------------------------------
 TEST_CASE("Format : séparateurs de FormatSettings (VCL en français)", "[compat][chaine]")
@@ -80,13 +81,13 @@ TEST_CASE("Format : séparateurs de FormatSettings (VCL en français)", "[compat
     const TFormatSettings Sauvegarde = FormatSettings;
     FormatSettings.DecimalSeparator = ',';
     FormatSettings.ThousandSeparator = "\xC2\xA0"; // espace insécable
-    CHECK(Format("%.2f (%.2f%%)", ARRAYOFCONST((3.14159, (long double)12.5))) == AnsiString("3,14 (12,50%)"));
-    CHECK(Format("%n", ARRAYOFCONST((1234567.891))) == AnsiString("1\xC2\xA0"
-                                                                  "234\xC2\xA0"
-                                                                  "567,89"));
-    CHECK(Format("%d %s", ARRAYOFCONST((1000, "a.b"))) == AnsiString("1000 a.b"));
+    CHECK(Format("%.2f (%.2f%%)", TableauDeConstantes(3.14159, (long double)12.5)) == AnsiString("3,14 (12,50%)"));
+    CHECK(Format("%n", TableauDeConstantes(1234567.891)) == AnsiString("1\xC2\xA0"
+                                                                       "234\xC2\xA0"
+                                                                       "567,89"));
+    CHECK(Format("%d %s", TableauDeConstantes(1000, "a.b")) == AnsiString("1000 a.b"));
     FormatSettings = Sauvegarde;
-    CHECK(Format("%.2f", ARRAYOFCONST((3.14159))) == AnsiString("3.14"));
+    CHECK(Format("%.2f", TableauDeConstantes(3.14159)) == AnsiString("3.14"));
 }
 //---------------------------------------------------------------------------
 TEST_CASE("alea::Rand()/alea::Srand() : LCG de la RTL Borland", "[compat][alea]")

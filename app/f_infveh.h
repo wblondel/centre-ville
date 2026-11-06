@@ -10,10 +10,10 @@
 //---------------------------------------------------------------------------
 #include "simul.h"
 // v5.0 ----------------------------------------------------------------------
-#define DEPART   0
-#define ARRIVEE  1
-#define PARKING  0
-#define FILEPARK 1
+constexpr int DEPART = 0;
+constexpr int ARRIVEE = 1;
+constexpr int PARKING = 0;
+constexpr int FILEPARK = 1;
 //---------------------------------------------------------------------------
 class TfrmInfosVehicule : public TForm
 {

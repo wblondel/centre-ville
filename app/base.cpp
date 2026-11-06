@@ -21,10 +21,9 @@
 #include "vcl.h"
 #include "vue.h"
 //---------------------------------------------------------------------------
-#define NBTYPESMESSAGE  5
-#define NBTYPESREPONSE  4
-#define NBMAXBOUTONS    3
-#define NBCONTEXTESAIDE 57
+constexpr int NBTYPESMESSAGE = 5;
+constexpr int NBMAXBOUTONS = 3;
+constexpr int NBCONTEXTESAIDE = 57;
 //---------------------------------------------------------------------------
 // portage : MessageBoxW -> QMessageBox (mêmes icônes, boutons et bouton par défaut)
 const QMessageBox::Icon Style[NBTYPESMESSAGE] = {QMessageBox::Information, QMessageBox::Warning, QMessageBox::Critical,

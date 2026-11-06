@@ -51,7 +51,7 @@ public: // portage : __published
 
 private:
     int TempsEcoule{};
-    TBITMAP *Bitmap{};
+    TBitmap *Bitmap{};
 
 public: // Déclarations de l'utilisateur
     bool FermetureAutomatique{};

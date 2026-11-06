@@ -24,15 +24,15 @@ class QTemporaryFile;
 //---------------------------------------------------------------------------
 // v5.4 : les glyphes de TSpeedButtons sont chargées manuellement (HDPI)
 //---------------------------------------------------------------------------
-#define GLYPHE_DEF   0
-#define GLYPHE_DEFF  1
-#define GLYPHE_DEFFP 2
-#define GLYPHE_SELF  3
-#define GLYPHE_DEFB  4
-#define GLYPHE_DEFTR 5
-#define GLYPHE_DEFTX 6
-#define GLYPHE_DEFVL 7
-#define GLYPHE_DIR   8
+constexpr int GLYPHE_DEF = 0;
+constexpr int GLYPHE_DEFF = 1;
+constexpr int GLYPHE_DEFFP = 2;
+constexpr int GLYPHE_SELF = 3;
+constexpr int GLYPHE_DEFB = 4;
+constexpr int GLYPHE_DEFTR = 5;
+constexpr int GLYPHE_DEFTX = 6;
+constexpr int GLYPHE_DEFVL = 7;
+constexpr int GLYPHE_DIR = 8;
 //----------------------------------------------------------------------------------------------------------------------
 // Types énumérés. /!\ v5.4 : le type char a été forcé pour que l'énuméré ne prenne pas la taille d'un entier (4 octets)
 //----------------------------------------------------------------------------------------------------------------------

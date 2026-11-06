@@ -113,8 +113,8 @@ void TfrmParamSimul::CalculeChoixPossiblesNbVehicules() // v5.0 : Calcul des pos
     int                                                                                      // v5.0.3
         const NbVehicules = NbMinVehicules * (CSpinEditNbVehicules->Value / NbMinVehicules); // v5.0.3
     CSpinEditNbVehicules->Increment = NbMinVehicules;
-    CSpinEditNbVehicules->MINVALUE = NbMinVehicules;
-    CSpinEditNbVehicules->MAXVALUE = NbMaxVehicules;
+    CSpinEditNbVehicules->MinValue = NbMinVehicules;
+    CSpinEditNbVehicules->MaxValue = NbMaxVehicules;
     // v5.0.3 : recalcul modulo NbVehicules
     if (CSpinEditNbVehicules->Value != NbVehicules)
     {
@@ -148,11 +148,11 @@ void TfrmParamSimul::FormShow(TObject * /*Sender*/)
     {
         if (frmDimensionsZone) // v4.4.0
         {
-            Caption = Caption + Format(" [%dx%d]", ARRAYOFCONST((frmDimensionsZone->NbX, frmDimensionsZone->NbY)));
+            Caption = Caption + Format(" [%dx%d]", TableauDeConstantes(frmDimensionsZone->NbX, frmDimensionsZone->NbY));
         }
         else
         {
-            Caption = Caption + Format(" [%dx%d]", ARRAYOFCONST((cv->NbX, cv->NbY)));
+            Caption = Caption + Format(" [%dx%d]", TableauDeConstantes(cv->NbX, cv->NbY));
         }
     }
     if (cv->NbVehicules != 0)

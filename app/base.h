@@ -10,15 +10,6 @@
 //---------------------------------------------------------------------------
 class QWidget;
 //---------------------------------------------------------------------------
-// Propriétés de TCSpinEdit
-#define MINVALUE MinValue
-#define MAXVALUE MaxValue
-// Propriétés de TOpen/CloseDialog
-#define FILENAME(x) ((x)->FileName)
-// Types
-#define TBITMAP      TBitmap // portage : Graphics::TBitmap -> vcl/graphiques.h
-#define CONTROLCOUNT ControlCount
-//---------------------------------------------------------------------------
 // portage : macros min/max de src/simul.h, retirées du moteur (conflit avec la
 // STL) et utilisées par 5 fiches. Fonctions plutôt que macros, pour ne pas
 // casser les en-têtes de Qt et de la STL ; même résultat que

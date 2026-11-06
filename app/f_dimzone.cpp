@@ -64,7 +64,7 @@ void TfrmDimensionsZone::ButtonCreerClick(TObject * /*Sender*/)
     NbY = CSpinEditNbY->Value;
     if ((NbX > NBXMAX) || (NbY > NBYMAX))
     { // v6.0.3 : aucune limite dans l'original (mémoire épuisée, plantage)
-        AfficheMessage(Format("Vous devez spécifier une zone d'au plus %dx%d.", ARRAYOFCONST((NBXMAX, NBYMAX))),
+        AfficheMessage(Format("Vous devez spécifier une zone d'au plus %dx%d.", TableauDeConstantes(NBXMAX, NBYMAX)),
                        "Zone trop grande", tmAvertissement, 0, 0);
     }
     else if ((NbX >= NBXMIN) && (NbY >= NBYMIN))
@@ -73,7 +73,7 @@ void TfrmDimensionsZone::ButtonCreerClick(TObject * /*Sender*/)
     }
     else
     {
-        AfficheMessage(Format("Vous devez spécifier une zone d'au moins %dx%d.", ARRAYOFCONST((NBXMIN, NBYMIN))),
+        AfficheMessage(Format("Vous devez spécifier une zone d'au moins %dx%d.", TableauDeConstantes(NBXMIN, NBYMIN)),
                        "Zone insuffisante", tmAvertissement, 0, 0);
     }
 }

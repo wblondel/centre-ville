@@ -36,9 +36,9 @@ void TfrmInfosVehicule::RendreVisibleInfos(bool ARendreVisible)
     if (ARendreVisible)
     {
         RadioButtonVehiculeNumero->Checked = true;
-        GroupBoxVehicule->Caption = GroupBoxVehicule->Caption +
-                                    Format(asFrmNumeroCoordonnees, ARRAYOFCONST((v->NumVehicule, Veh->x, Veh->y))) +
-                                    " ";
+        GroupBoxVehicule->Caption =
+            GroupBoxVehicule->Caption +
+            Format(asFrmNumeroCoordonnees, TableauDeConstantes(v->NumVehicule, Veh->x, Veh->y)) + " ";
     }
     else
     {
@@ -87,7 +87,7 @@ void TfrmInfosVehicule::RafraichitInfos()
     y = frmSimulation->DrawGridSimul->Row;
     v = &cv->v[x][y];
     Veh = nullptr;
-    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumVehicule > 0)))
     {
         Veh = cv->Vehicule + v->NumVehicule - 1;
@@ -103,34 +103,36 @@ void TfrmInfosVehicule::RafraichitInfos()
 
         if (NumFileParkDepart != 0) // v5.0
         {
-            LabelDepart->Caption = Format(asFrmFileParking[FILEPARK], ARRAYOFCONST((asDepartArrivee[DEPART])));
-            LabelParkingDepart->Caption = Format(
-                asFrmNumeroCoordonnees,
-                ARRAYOFCONST((NumFileParkDepart, cv->PlacePark[cv->FilePark[NumFileParkDepart - 1].NumPlaceQueue].x,
-                              cv->PlacePark[cv->FilePark[NumFileParkDepart - 1].NumPlaceQueue].y)));
+            LabelDepart->Caption = Format(asFrmFileParking[FILEPARK], TableauDeConstantes(asDepartArrivee[DEPART]));
+            LabelParkingDepart->Caption =
+                Format(asFrmNumeroCoordonnees,
+                       TableauDeConstantes(NumFileParkDepart,
+                                           cv->PlacePark[cv->FilePark[NumFileParkDepart - 1].NumPlaceQueue].x,
+                                           cv->PlacePark[cv->FilePark[NumFileParkDepart - 1].NumPlaceQueue].y));
         }
         else
         {
-            LabelDepart->Caption = Format(asFrmFileParking[PARKING], ARRAYOFCONST((asDepartArrivee[DEPART])));
-            LabelParkingDepart->Caption =
-                Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumParkingDepart, cv->Parking[NumParkingDepart - 1].x,
-                                                             cv->Parking[NumParkingDepart - 1].y)));
+            LabelDepart->Caption = Format(asFrmFileParking[PARKING], TableauDeConstantes(asDepartArrivee[DEPART]));
+            LabelParkingDepart->Caption = Format(
+                asFrmNumeroCoordonnees, TableauDeConstantes(NumParkingDepart, cv->Parking[NumParkingDepart - 1].x,
+                                                            cv->Parking[NumParkingDepart - 1].y));
         }
 
         if (NumFileParkArrivee != 0) // v5.0
         {
-            LabelArrivee->Caption = Format(asFrmFileParking[FILEPARK], ARRAYOFCONST((asDepartArrivee[ARRIVEE])));
-            LabelParkingArrivee->Caption = Format(
-                asFrmNumeroCoordonnees,
-                ARRAYOFCONST((NumFileParkArrivee, cv->PlacePark[cv->FilePark[NumFileParkArrivee - 1].NumPlaceQueue].x,
-                              cv->PlacePark[cv->FilePark[NumFileParkArrivee - 1].NumPlaceQueue].y)));
+            LabelArrivee->Caption = Format(asFrmFileParking[FILEPARK], TableauDeConstantes(asDepartArrivee[ARRIVEE]));
+            LabelParkingArrivee->Caption =
+                Format(asFrmNumeroCoordonnees,
+                       TableauDeConstantes(NumFileParkArrivee,
+                                           cv->PlacePark[cv->FilePark[NumFileParkArrivee - 1].NumPlaceQueue].x,
+                                           cv->PlacePark[cv->FilePark[NumFileParkArrivee - 1].NumPlaceQueue].y));
         }
         else
         {
-            LabelArrivee->Caption = Format(asFrmFileParking[PARKING], ARRAYOFCONST((asDepartArrivee[ARRIVEE])));
-            LabelParkingArrivee->Caption =
-                Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumParkingArrivee, cv->Parking[NumParkingArrivee - 1].x,
-                                                             cv->Parking[NumParkingArrivee - 1].y)));
+            LabelArrivee->Caption = Format(asFrmFileParking[PARKING], TableauDeConstantes(asDepartArrivee[ARRIVEE]));
+            LabelParkingArrivee->Caption = Format(
+                asFrmNumeroCoordonnees, TableauDeConstantes(NumParkingArrivee, cv->Parking[NumParkingArrivee - 1].x,
+                                                            cv->Parking[NumParkingArrivee - 1].y));
         }
 
         LabelTourSortie->Caption = IntToStr(Veh->TourDepart);
@@ -187,7 +189,7 @@ void TfrmInfosVehicule::RafraichitInfos()
             LabelAttente->Caption = "0,000%";
         }
         LabelVitesse->Caption =
-            Format(asFrmVitesse, ARRAYOFCONST((1 + (v->NumVehicule - 1) % cv->NbVitesses, cv->NbVitesses)));
+            Format(asFrmVitesse, TableauDeConstantes(1 + (v->NumVehicule - 1) % cv->NbVitesses, cv->NbVitesses));
     }
     RendreVisibleInfos(Afficher);
 }

@@ -88,8 +88,8 @@ void TfrmDefVoiePietons::RafraichitInfos()
         if (v->NumFeuP[d - 1] != 0)
         {
             feu_pieton *f = cv->FeuP + (v->NumFeuP[d - 1] - 1);
-            xfo[d - 1] = f->x[f->IFEUOPPDIR(d)];
-            yfo[d - 1] = f->y[f->IFEUOPPDIR(d)];
+            xfo[d - 1] = f->x[f->iFeuDir[InvDir[d] - 1]];
+            yfo[d - 1] = f->y[f->iFeuDir[InvDir[d] - 1]];
         }
         else
         {
@@ -104,10 +104,10 @@ void TfrmDefVoiePietons::RafraichitInfos()
         frmDefVoie->Show();
         return;
     }
-    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format("%2.2d, %2.2d", TableauDeConstantes(x, y));
     for (int d = nord; d <= ouest; d++)
     {
-        SpeedButton[d - 1]->Enabled = cv->V(x, y, d).PassagePietons && (NATURE(v) == trottoirs);
+        SpeedButton[d - 1]->Enabled = cv->Voisine(x, y, d).PassagePietons && (NatureSansDecor(v) == trottoirs);
         SpeedButton[d - 1]->Down = (v->NumFeuP[d - 1] > 0);
         Image[d - 1]->Visible = SpeedButton[d - 1]->Enabled;
     }

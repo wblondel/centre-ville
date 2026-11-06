@@ -11,8 +11,8 @@
 #include "ui_f_statsc.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_statsc_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-#define SURROUTE 0
-#define SURVOIE  1
+constexpr int SURROUTE = 0;
+constexpr int SURVOIE = 1;
 //---------------------------------------------------------------------------
 TfrmStatsComposition *frmStatsComposition = nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------

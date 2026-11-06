@@ -13,9 +13,9 @@
 #include "f_inftram_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
 // Pour asFrmNumeroCoordonnees
-#define NXY 0
-#define DRN 1
-#define SVT 2
+constexpr int NXY = 0;
+constexpr int DRN = 1;
+constexpr int SVT = 2;
 //---------------------------------------------------------------------------
 TfrmInfosTram *frmInfosTram;
 //---------------------------------------------------------------------------
@@ -44,7 +44,8 @@ void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
     {
         RadioButtonTramNumero->Checked = true;
         GroupBoxTram->Caption = GroupBoxTram->Caption +
-                                Format(asFrmNumeroCoordonnees[NXY], ARRAYOFCONST((v->NumTram, Tram->x, Tram->y))) + " ";
+                                Format(asFrmNumeroCoordonnees[NXY], TableauDeConstantes(v->NumTram, Tram->x, Tram->y)) +
+                                " ";
     }
     else
     {
@@ -89,7 +90,7 @@ void TfrmInfosTram::RafraichitInfos()
     y = frmSimulation->DrawGridSimul->Row;
     v = &cv->v[x][y];
     Tram = nullptr;
-    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumTram > 0)))
     {
         Tram = cv->Tram + v->NumTram - 1;
@@ -99,14 +100,14 @@ void TfrmInfosTram::RafraichitInfos()
         {
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],
-                       ARRAYOFCONST((NumDrnArret, cv->ArretTram[NumDrnArret - 1].x, cv->ArretTram[NumDrnArret - 1].y,
-                                     (int)Tram->TourArriveDrnArret)));
+                       TableauDeConstantes(NumDrnArret, cv->ArretTram[NumDrnArret - 1].x,
+                                           cv->ArretTram[NumDrnArret - 1].y, (int)Tram->TourArriveDrnArret));
             DrnArret = &cv->v[cv->ArretTram[NumDrnArret - 1].x][cv->ArretTram[NumDrnArret - 1].y];
         }
         else
         { // Si pas encore d'arrêt... On prend le premier arrêt de la ligne comme dernier arrêt
             LabelDernierArret->Caption =
-                Format(asFrmNumeroCoordonnees[DRN], ARRAYOFCONST((0, cv->ArretTram[0].x, cv->ArretTram[0].y, 0)));
+                Format(asFrmNumeroCoordonnees[DRN], TableauDeConstantes(0, cv->ArretTram[0].x, cv->ArretTram[0].y, 0));
             DrnArret = &cv->v[cv->ArretTram[0].x][cv->ArretTram[0].y];
         }
         // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
@@ -114,8 +115,9 @@ void TfrmInfosTram::RafraichitInfos()
         NumArretSvt = Tram->NumArretSvt;
         LabelProchainArret->Caption =
             Format(asFrmNumeroCoordonnees[SVT],
-                   ARRAYOFCONST((NumArretSvt, cv->ArretTram[NumArretSvt - 1].x, cv->ArretTram[NumArretSvt - 1].y,
-                                 (int)Tram->TourDepartArretSvt))); // v6.0.2 : de ce tram (l'original lisait le premier)
+                   TableauDeConstantes(NumArretSvt, cv->ArretTram[NumArretSvt - 1].x, cv->ArretTram[NumArretSvt - 1].y,
+                                       (int)Tram->TourDepartArretSvt)); // v6.0.2 : de ce tram (l'original lisait le
+                                                                        // premier)
         LabelNbPersonnes->Caption = IntToStr(Tram->NbPersonnes);
         LabelTours->Caption = IntToStr(cv->TourCrt); // v6.0.2 : correct, tous les trams partent au tour 0
                                                      // (PrepareTrams) : c'est TourCrt-TourDepart des bus
@@ -143,7 +145,7 @@ void TfrmInfosTram::RafraichitInfos()
         {
             LabelAttente->Caption = "0,000%";
         }
-        LabelVitesse->Caption = Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
+        LabelVitesse->Caption = Format(asFrmVitesse, TableauDeConstantes(1, cv->NbVitesses));
     }
     RendreVisibleInfos(Afficher);
 }
