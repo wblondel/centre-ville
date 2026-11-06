@@ -1641,25 +1641,32 @@ bool TfrmSimulation::VerifieReseau()
     }
     for (i = 0; Ok && (i < cv->NbArretsBus); i++)
     {
-        if (cv->ArretBus[i].Defini() && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
-        { // v3.0.3
-            xErr = cv->ArretBus[i].x;
-            yErr = cv->ArretBus[i].y;
-            asMsgErr = Format("La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
-                              TableauDeConstantes(i + 1));
-            break;
+        if (cv->ArretBus[i].Defini())
+        {
+            Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1);
+            if ((!Ok))
+            { // v3.0.3
+                xErr = cv->ArretBus[i].x;
+                yErr = cv->ArretBus[i].y;
+                asMsgErr = Format("La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
+                                  TableauDeConstantes(i + 1));
+                break;
+            }
         }
     }
     for (i = 0; Ok && (i < cv->NbArretsTram); i++)
     {
-        if (cv->ArretTram[i].Defini() &&
-            (!(Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1))))
-        { // v3.0.3
-            xErr = cv->ArretTram[i].x;
-            yErr = cv->ArretTram[i].y;
-            asMsgErr = Format("La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
-                              TableauDeConstantes(i + 1));
-            break;
+        if (cv->ArretTram[i].Defini())
+        {
+            Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1);
+            if ((!Ok))
+            { // v3.0.3
+                xErr = cv->ArretTram[i].x;
+                yErr = cv->ArretTram[i].y;
+                asMsgErr = Format("La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
+                                  TableauDeConstantes(i + 1));
+                break;
+            }
         }
     }
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0
@@ -2271,62 +2278,68 @@ bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie Type
         {
             for (d = 0; (!Abandon) && (d < NBDIR); d++)
             {
-                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)) && // v3.5. v6.0.5 :
-                                                                                                    // d+1, l'original
-                                                                                                    // regardait la
-                                                                                                    // direction
-                                                                                                    // précédente et
-                                                                                                    // oubliait des
-                                                                                                    // références
-                    ((NumFeu = cv->v[x][y].NumFeu[d]) != 0))
+                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
-                    for (i = 0; (!Abandon) && (i < cv->NbFeux); i++)
+                    NumFeu = cv->v[x][y].NumFeu[d];
+                    if ( // v3.5. v6.0.5 :
+                         // d+1, l'original
+                         // regardait la
+                         // direction
+                         // précédente et
+                         // oubliait des
+                         // références
+                        (NumFeu != 0))
                     {
-                        for (j = 0; (!Abandon) && (j < cv->Feu[i].NbFeuxDmd); j++)
+                        for (i = 0; (!Abandon) && (i < cv->NbFeux); i++)
                         {
-                            if (cv->Feu[i].NumFeuxDmd[j] == NumFeu)
+                            for (j = 0; (!Abandon) && (j < cv->Feu[i].NbFeuxDmd); j++)
                             {
-                                switch (MessageDlg(Format("\
-Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
-Ce dernier demande que le premier soit rouge pour passer au vert.\n\n\
-Si vous continuez, le feu n°%d sera supprimé.\n\
-Êtes-vous sûr de vouloir continuer ?",
-                                                          TableauDeConstantes(i + 1, NumFeu, NumFeu)),
-                                                   mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll, 0))
+                                if (cv->Feu[i].NumFeuxDmd[j] == NumFeu)
                                 {
-                                case mrYesToAll:
-                                    ToutSupprimer = true;
-                                    Abandon = true;
-                                    break;
-                                case mrNo:
-                                    ToutSupprimer = false;
-                                    Abandon = true;
-                                default:
-                                    break;
+                                    switch (MessageDlg(Format("\
+    Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
+    Ce dernier demande que le premier soit rouge pour passer au vert.\n\n\
+    Si vous continuez, le feu n°%d sera supprimé.\n\
+    Êtes-vous sûr de vouloir continuer ?",
+                                                              TableauDeConstantes(i + 1, NumFeu, NumFeu)),
+                                                       mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll,
+                                                       0))
+                                    {
+                                    case mrYesToAll:
+                                        ToutSupprimer = true;
+                                        Abandon = true;
+                                        break;
+                                    case mrNo:
+                                        ToutSupprimer = false;
+                                        Abandon = true;
+                                    default:
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        for (j = 0; (!Abandon) && (j < cv->Feu[i].NbFeuxAtt); j++)
-                        {
-                            if (cv->Feu[i].NumFeuxAtt[j] == NumFeu)
+                            for (j = 0; (!Abandon) && (j < cv->Feu[i].NbFeuxAtt); j++)
                             {
-                                switch (MessageDlg(Format("\
-Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
-Ce dernier doit être rouge pour que le premier passe au vert.\n\n\
-Si vous continuez, le feu n°%d sera supprimé.\n\
-Êtes-vous sûr de vouloir continuer ?",
-                                                          TableauDeConstantes(i + 1, NumFeu, NumFeu)),
-                                                   mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll, 0))
+                                if (cv->Feu[i].NumFeuxAtt[j] == NumFeu)
                                 {
-                                case mrYesToAll:
-                                    ToutSupprimer = true;
-                                    Abandon = true;
-                                    break;
-                                case mrNo:
-                                    ToutSupprimer = false;
-                                    Abandon = true;
-                                default:
-                                    break;
+                                    switch (MessageDlg(Format("\
+    Le feu n°%d dépend du feu n°%d (à supprimer) :\n\
+    Ce dernier doit être rouge pour que le premier passe au vert.\n\n\
+    Si vous continuez, le feu n°%d sera supprimé.\n\
+    Êtes-vous sûr de vouloir continuer ?",
+                                                              TableauDeConstantes(i + 1, NumFeu, NumFeu)),
+                                                       mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll,
+                                                       0))
+                                    {
+                                    case mrYesToAll:
+                                        ToutSupprimer = true;
+                                        Abandon = true;
+                                        break;
+                                    case mrNo:
+                                        ToutSupprimer = false;
+                                        Abandon = true;
+                                    default:
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -2342,31 +2355,35 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
         {
             for (d = 0; (!Abandon) && (d < NBDIR); d++)
             {
-                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)) &&
-                    ((NumFeu = cv->v[x][y].NumFeu[d]) != 0))
+                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
-                    for (i = 0; (!Abandon) && (i < cv->NbFeuxPieton); i++)
+                    NumFeu = cv->v[x][y].NumFeu[d];
+                    if ((NumFeu != 0))
                     {
-                        for (j = 0; (!Abandon) && (j < cv->FeuP[i].NbFeux); j++)
+                        for (i = 0; (!Abandon) && (i < cv->NbFeuxPieton); i++)
                         {
-                            if (cv->FeuP[i].NumFeux[j] == NumFeu)
+                            for (j = 0; (!Abandon) && (j < cv->FeuP[i].NbFeux); j++)
                             {
-                                switch (MessageDlg(Format("\
-Le feu de piétons n°%d dépend du feu n°%d (à supprimer).\n\n\
-Si vous continuez, le feu n°%d sera supprimé.\n\
-Êtes-vous sûr de vouloir continuer ?",
-                                                          TableauDeConstantes(i + 1, NumFeu, NumFeu)),
-                                                   mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll, 0))
+                                if (cv->FeuP[i].NumFeux[j] == NumFeu)
                                 {
-                                case mrYesToAll:
-                                    ToutSupprimer = true;
-                                    Abandon = true;
-                                    break;
-                                case mrNo:
-                                    ToutSupprimer = false;
-                                    Abandon = true;
-                                default:
-                                    break;
+                                    switch (MessageDlg(Format("\
+    Le feu de piétons n°%d dépend du feu n°%d (à supprimer).\n\n\
+    Si vous continuez, le feu n°%d sera supprimé.\n\
+    Êtes-vous sûr de vouloir continuer ?",
+                                                              TableauDeConstantes(i + 1, NumFeu, NumFeu)),
+                                                       mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbYesToAll,
+                                                       0))
+                                    {
+                                    case mrYesToAll:
+                                        ToutSupprimer = true;
+                                        Abandon = true;
+                                        break;
+                                    case mrNo:
+                                        ToutSupprimer = false;
+                                        Abandon = true;
+                                    default:
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -2396,29 +2413,33 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
         {
             for (d = 0; d < NBDIR; d++)
             {
-                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)) && // v3.5. v6.0.5 :
-                                                                                                    // d+1, l'original
-                                                                                                    // regardait la
-                                                                                                    // direction
-                                                                                                    // précédente et
-                                                                                                    // oubliait des
-                                                                                                    // références
-                    ((NumFeu = cv->v[x][y].NumFeu[d]) != 0))
+                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
-                    for (i = 0; i < cv->NbFeux; i++)
+                    NumFeu = cv->v[x][y].NumFeu[d];
+                    if ( // v3.5. v6.0.5 :
+                         // d+1, l'original
+                         // regardait la
+                         // direction
+                         // précédente et
+                         // oubliait des
+                         // références
+                        (NumFeu != 0))
                     {
-                        for (j = 0; j < cv->Feu[i].NbFeuxDmd; j++)
+                        for (i = 0; i < cv->NbFeux; i++)
                         {
-                            if (cv->Feu[i].NumFeuxDmd[j] == NumFeu)
+                            for (j = 0; j < cv->Feu[i].NbFeuxDmd; j++)
                             {
-                                cv->Feu[i].RetireFeuDmd(NumFeu);
+                                if (cv->Feu[i].NumFeuxDmd[j] == NumFeu)
+                                {
+                                    cv->Feu[i].RetireFeuDmd(NumFeu);
+                                }
                             }
-                        }
-                        for (j = 0; j < cv->Feu[i].NbFeuxAtt; j++)
-                        {
-                            if (cv->Feu[i].NumFeuxAtt[j] == NumFeu)
+                            for (j = 0; j < cv->Feu[i].NbFeuxAtt; j++)
                             {
-                                cv->Feu[i].RetireFeuAtt(NumFeu);
+                                if (cv->Feu[i].NumFeuxAtt[j] == NumFeu)
+                                {
+                                    cv->Feu[i].RetireFeuAtt(NumFeu);
+                                }
                             }
                         }
                     }
@@ -2433,16 +2454,19 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
         {
             for (d = 0; d < NBDIR; d++)
             {
-                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)) &&
-                    ((NumFeu = cv->v[x][y].NumFeu[d]) != 0))
+                if (cv->v[x][y].ExisteVoieDansDirection(TypeVoie, static_cast<direction>(d + 1)))
                 {
-                    for (i = 0; i < cv->NbFeuxPieton; i++)
+                    NumFeu = cv->v[x][y].NumFeu[d];
+                    if ((NumFeu != 0))
                     {
-                        for (j = 0; j < cv->FeuP[i].NbFeux; j++)
+                        for (i = 0; i < cv->NbFeuxPieton; i++)
                         {
-                            if (cv->FeuP[i].NumFeux[j] == NumFeu)
+                            for (j = 0; j < cv->FeuP[i].NbFeux; j++)
                             {
-                                cv->FeuP[i].RetireFeu(NumFeu);
+                                if (cv->FeuP[i].NumFeux[j] == NumFeu)
+                                {
+                                    cv->FeuP[i].RetireFeu(NumFeu);
+                                }
                             }
                         }
                     }

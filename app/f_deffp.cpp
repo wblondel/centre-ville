@@ -89,9 +89,13 @@ void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
         {
             EtatFC = cv->Feu[NumFeux[i] - 1].Etat;
         }
-        else if ((EtatCrt = cv->Feu[NumFeux[i] - 1].Etat) != 0)
+        else
         {
-            FeuxFCDifferents = FeuxFCDifferents || (EtatFC != EtatCrt);
+            EtatCrt = cv->Feu[NumFeux[i] - 1].Etat;
+            if (EtatCrt != 0)
+            {
+                FeuxFCDifferents = FeuxFCDifferents || (EtatFC != EtatCrt);
+            }
         }
     }
     if (EtatFP == 0)

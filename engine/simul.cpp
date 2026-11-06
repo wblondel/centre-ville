@@ -1823,10 +1823,13 @@ int vehlib::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui atten
             v = &cv->Voisine(x, y, d);
             for (int i = 0; (NbPersonnes <= cv->NbMaxPersonnesVehlib) && (i < NBMAXPIETONSPARCASE); i++)
             {
-                if ((v->NumPieton[i] != 0) && (p = &cv->Pieton[v->NumPieton[i] - 1])->AttendVehlib &&
-                    (p->NumPlaceVehlib == NumPlaceDepart))
+                if ((v->NumPieton[i] != 0))
                 {
-                    FaitMonterPieton(v->NumPieton[i] - 1);
+                    p = &cv->Pieton[v->NumPieton[i] - 1];
+                    if (p->AttendVehlib && (p->NumPlaceVehlib == NumPlaceDepart))
+                    {
+                        FaitMonterPieton(v->NumPieton[i] - 1);
+                    }
                 }
             }
         }
@@ -2305,16 +2308,22 @@ void tram::CalculeProchaineDirection() // v3.5
     {
         for (j = 0; j < nd; j++)
         {
-            if ((i != j) && // Direction possible
-                v->EstDirPossSensVoieTram(InvDir[AncDir], static_cast<direction>(d = v->DirSensVoieTram(indefinie, i))))
+            if ((i != j))
             {
-                // On dégringole si distance supérieure.
-                OrdreDir[d - 1] += static_cast<int>(
-                    (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
-                    ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
-                     ((d != AncDir) || // En cas d'égalité, préfère garder la direction courante // v3.5 : || par && !
-                      ((i + Numero + cv->TourCrt) % nd > (j + Numero + cv->TourCrt) % nd)))); // sinon tirage au hasard
-                                                                                              // (Ici TourCrt+1)
+                d = v->DirSensVoieTram(indefinie, i);
+                if ( // Direction possible
+                    v->EstDirPossSensVoieTram(InvDir[AncDir], static_cast<direction>(d)))
+                {
+                    // On dégringole si distance supérieure.
+                    OrdreDir[d - 1] += static_cast<int>(
+                        (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
+                        ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
+                         ((d != AncDir) || // En cas d'égalité, préfère garder la direction courante // v3.5 : || par &&
+                                           // !
+                          ((i + Numero + cv->TourCrt) % nd > (j + Numero + cv->TourCrt) % nd)))); // sinon tirage au
+                                                                                                  // hasard (Ici
+                                                                                                  // TourCrt+1)
+                }
             }
         }
     }
@@ -2378,17 +2387,21 @@ direction tram::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
     {
         for (j = 0; j < ndp; j++)
         {
-            if ((i != j) && // Direction possible
-                v->EstDirPossSensVoieTram(InvDir[Dir], static_cast<direction>(d = v->DirSensVoieTram(indefinie, i))))
+            if ((i != j))
             {
-                // On dégringole si distance supérieure.
-                OrdreDir[d - 1] += static_cast<int>(
-                    (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
-                    ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
-                     ((d != Dir) || // En cas d'égalité, préfère garder la direction courante. // v3.5 : || par && !
-                      ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard en
-                                                                                                // cas d'égalité (Ici
-                                                                                                // TourCrt+1)
+                d = v->DirSensVoieTram(indefinie, i);
+                if ( // Direction possible
+                    v->EstDirPossSensVoieTram(InvDir[Dir], static_cast<direction>(d)))
+                {
+                    // On dégringole si distance supérieure.
+                    OrdreDir[d - 1] += static_cast<int>(
+                        (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
+                        ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
+                         ((d != Dir) || // En cas d'égalité, préfère garder la direction courante. // v3.5 : || par && !
+                          ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard
+                                                                                                    // en cas d'égalité
+                                                                                                    // (Ici TourCrt+1)
+                }
             }
         }
     }
@@ -2915,10 +2928,13 @@ int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attenda
         v = &cv->Voisine(x, y, d);
         for (int i = 0; (NbPersonnes <= cv->NbMaxPersonnesTaxi) && (i < NBMAXPIETONSPARCASE); i++)
         {
-            if ((v->NumPieton[i] != 0) && (p = &cv->Pieton[v->NumPieton[i] - 1])->AttendTaxi &&
-                (p->NumFileTaxi - 1 == NumFile))
+            if ((v->NumPieton[i] != 0))
             {
-                FaitMonterPieton(v->NumPieton[i] - 1);
+                p = &cv->Pieton[v->NumPieton[i] - 1];
+                if (p->AttendTaxi && (p->NumFileTaxi - 1 == NumFile))
+                {
+                    FaitMonterPieton(v->NumPieton[i] - 1);
+                }
             }
         }
     }
@@ -3671,24 +3687,28 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                 p->AttendTram = true;
                 p->TourAttTram = cv->TourCrt;
             }
-            if (p->FileTaxiTrv && ((n = cv->Voisine(x, y, p->Dir).NumPlaceTaxi) != 0))
-            {                                                                // Si file de taxis trouvée
-                if ((!PassagePietons) && cv->PlaceTaxi[n - 1].EstTeteFile()) // v3.6. Pas sur passage piétons
-                { // Phase 2 : Si File de taxi trouvée ET qu'il arrive dessus et que c'est la tête de la file ALORS il
-                  // attend le taxi (bloque le piéton)
-                    p->NumFileTaxi = cv->PlaceTaxi[n - 1].NumFile + 1;
-                    p->FileTaxiTrv = false;
-                    p->AttendTaxi = true;
-                    p->TourAttTaxi = cv->TourCrt;
-                }
-                else
-                { // Phase 1 : Recherche de la tête de la file de taxi. ATTENTION ! p->NumFileTaxi>0 n'implique pas que
-                  // le piéton attend un taxi comme les bus ou les trams.
-                    if (p->NumFileTaxi == 0)
-                    {
-                        p->NumFileTaxi = cv->PlaceTaxi[n - 1].NumFile + 1; // On fixe la file à chercher
+            if (p->FileTaxiTrv)
+            {
+                n = cv->Voisine(x, y, p->Dir).NumPlaceTaxi;
+                if ((n != 0))
+                {                                                                // Si file de taxis trouvée
+                    if ((!PassagePietons) && cv->PlaceTaxi[n - 1].EstTeteFile()) // v3.6. Pas sur passage piétons
+                    { // Phase 2 : Si File de taxi trouvée ET qu'il arrive dessus et que c'est la tête de la file ALORS
+                      // il attend le taxi (bloque le piéton)
+                        p->NumFileTaxi = cv->PlaceTaxi[n - 1].NumFile + 1;
+                        p->FileTaxiTrv = false;
+                        p->AttendTaxi = true;
+                        p->TourAttTaxi = cv->TourCrt;
                     }
-                    p->ChercheFileTaxi(); // Change p->Dir pour se diriger vers la tête de file
+                    else
+                    { // Phase 1 : Recherche de la tête de la file de taxi. ATTENTION ! p->NumFileTaxi>0 n'implique pas
+                      // que le piéton attend un taxi comme les bus ou les trams.
+                        if (p->NumFileTaxi == 0)
+                        {
+                            p->NumFileTaxi = cv->PlaceTaxi[n - 1].NumFile + 1; // On fixe la file à chercher
+                        }
+                        p->ChercheFileTaxi(); // Change p->Dir pour se diriger vers la tête de file
+                    }
                 }
             }
 
@@ -6533,11 +6553,15 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 }
                 for (k = 0; Ok && (k < NbPlacesVehlib); k++)
                 {
-                    if (PlaceVehlib[k].Definie() && (!(Ok = (v[i][j].DistPlaceVehlib[k][d] < DIST_INDEFINIE))))
+                    if (PlaceVehlib[k].Definie())
                     {
-                        xErr = i;
-                        yErr = j;
-                        TypeDistance = files_vehlib;
+                        Ok = (v[i][j].DistPlaceVehlib[k][d] < DIST_INDEFINIE);
+                        if ((!Ok))
+                        {
+                            xErr = i;
+                            yErr = j;
+                            TypeDistance = files_vehlib;
+                        }
                     }
                 }
             }
@@ -6547,11 +6571,15 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
             {
                 for (k = 0; Ok && (k < NbArretsTram); k++)
                 {
-                    if (ArretTram[k].Defini() && (!(Ok = (v[i][j].DistArretTram[k][d] < DIST_INDEFINIE))))
+                    if (ArretTram[k].Defini())
                     {
-                        xErr = i;
-                        yErr = j;
-                        TypeDistance = arrets_tram;
+                        Ok = (v[i][j].DistArretTram[k][d] < DIST_INDEFINIE);
+                        if ((!Ok))
+                        {
+                            xErr = i;
+                            yErr = j;
+                            TypeDistance = arrets_tram;
+                        }
                     }
                 }
             }
