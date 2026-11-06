@@ -658,10 +658,11 @@ class LimiteFichiers : public QObject
 public:
     LimiteFichiers(const LimiteFichiers &) = delete;
     LimiteFichiers &operator=(const LimiteFichiers &) = delete;
-    explicit LimiteFichiers(QString asEtape = QString()) : Etape(std::move(asEtape))
+    explicit LimiteFichiers(QString asEtape = QString())
+        : AncienSignal(std::signal(SIGXFSZ, SIG_IGN)), Etape(std::move(asEtape))
     {
         getrlimit(RLIMIT_FSIZE, &Ancienne);
-        AncienSignal = std::signal(SIGXFSZ, SIG_IGN);
+
         if (Etape.isEmpty())
         {
             Pose();
@@ -10002,12 +10003,12 @@ struct FenetreReduite
     QRect Avant;
     TNotifyEvent ClicAvant;
     int NbClics = 0;
-    FenetreReduite()
+    FenetreReduite() : Avant(frmSimulation->geometry()), ClicAvant(frmSimulation->DrawGridSimul->OnClick)
     {
-        Avant = frmSimulation->geometry();
+
         frmSimulation->setGeometry(20, 50, 500, 400);
         QApplication::processEvents();
-        ClicAvant = frmSimulation->DrawGridSimul->OnClick;
+
         frmSimulation->DrawGridSimul->OnClick = [this](TObject *Sender) {
             NbClics++;
             ClicAvant(Sender);

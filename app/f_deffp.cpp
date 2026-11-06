@@ -18,10 +18,10 @@
 //---------------------------------------------------------------------------
 TfrmDefFeuxPietons *frmDefFeuxPietons = nullptr;
 //---------------------------------------------------------------------------
-TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent *Owner) : TForm(Owner)
+TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent *Owner) : TForm(Owner), NbFeux(0)
 {
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
-    NbFeux = 0;
+
     // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
     frmSimulation->AffecteGlyphe(GLYPHE_SELF, SpeedButtonSelFeux->Glyph);
 }

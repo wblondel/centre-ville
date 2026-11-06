@@ -13,9 +13,9 @@
 //---------------------------------------------------------------------------
 TfrmStatistiques *frmStatistiques;
 //---------------------------------------------------------------------------
-TfrmStatistiques::TfrmStatistiques(TComponent *Owner) : TForm(Owner)
+TfrmStatistiques::TfrmStatistiques(TComponent *Owner) : TForm(Owner), AffichageEpidemique(false)
 {
-    AffichageEpidemique = false;
+
     ChargeFiche();
 } // portage : membre à zéro (TObject::NewInstance), chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------

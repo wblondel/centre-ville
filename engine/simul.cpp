@@ -292,26 +292,19 @@ void VerifiePsgRouge(AnsiString &asMsgErr, const AnsiString &asSource, psg_rouge
 //-----------------------------------------------------------------------------
 infection::infection(const centre_ville *cv) // Patient zéro initialisé à la création (centre_ville *cv) ou au démarrage
                                              // de la simulation
-{
-    TourDeb = 0;
-    TourFin = cv->EpidemieInfectiosite; // au tour TourFin, le piéton n'est plus contagieux
-    TourFatal = 0;                      // Permet de savoir le tour fatal (TourFatal + cv->EpidemieInfectiosite)
-    NumDrnPieton = NumPrmPieton = 0;    // Pas de patient source car patient zéro donc... vaut zéro !
-    DrnRang = PrmRang = 0;              // Patient zéro ben... vaut zéro !
-    ChargeVirale = 1;                   // Incrémenté à chaque (ré)infection sur la période de contagion
-    Svt = nullptr;
-}
+    : TourDeb(0), TourFin(cv->EpidemieInfectiosite), // au tour TourFin, le piéton n'est plus contagieux
+      TourFatal(0),                     // Permet de savoir le tour fatal (TourFatal + cv->EpidemieInfectiosite)
+      NumPrmPieton(0), NumDrnPieton(0), // Pas de patient source car patient zéro donc... vaut zéro !
+      PrmRang(0), DrnRang(0),           // Patient zéro ben... vaut zéro !
+      ChargeVirale(1),                  // Incrémenté à chaque (ré)infection sur la période de contagion
+      Svt(nullptr)
+{}
 //-----------------------------------------------------------------------------
 infection::infection(int Tour, int NumPieton, int Rang) // v5.4.1. NumPieton>0 (pieton::Numero+1)
-{
-    TourDeb = Tour + 1; // Le piéton est contagieux à partir du tour suivant
-    TourFin = Tour + 1 + cv->EpidemieInfectiosite;
-    TourFatal = 0;
-    NumDrnPieton = NumPrmPieton = NumPieton;
-    DrnRang = PrmRang = Rang;
-    ChargeVirale = 1;
-    Svt = nullptr;
-}
+    : TourDeb(Tour + 1),                                // Le piéton est contagieux à partir du tour suivant
+      TourFin(Tour + 1 + cv->EpidemieInfectiosite), TourFatal(0), NumPrmPieton(NumPieton), NumDrnPieton(NumPieton),
+      PrmRang(Rang), DrnRang(Rang), ChargeVirale(1), Svt(nullptr)
+{}
 //-----------------------------------------------------------------------------
 bool infection::Reinfecte(int Tour, int NumPieton, int Rang) // comme le constructeur mais pour une personne qui a déjà
                                                              // été infectée
@@ -4850,64 +4843,9 @@ void centre_ville::RetablitVoisinages() const // v6.0.2
 }
 //-----------------------------------------------------------------------------
 centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY) // v4.0 (NbX, NbY)
-{
-    this->NbX = NbX;
-    this->NbY = NbY; // v4.0
+    : NbX(NbX), NbY(NbY)
+{ // Les autres membres ont leur valeur par défaut dans la déclaration (simul.h)
     CreeZone();
-    CopieEnCours = TourEnCours = false; // v4.0.1 (CopieEnCours)
-    Xc = Yc = NbXc = NbYc = 0;          // v4.0.1
-    dtTop = dtTemps = 0;                // v3.9.2
-    NbToursParcourus = NbCasesParcourues = TourCrt = 0L;
-    NbToursParSeconde = 10L; // v4.2 (NbToursParSeconde=10L au lieu de 2L)
-    NbVehiculesSortis = NbVehiculesDeplaces = NbVehiculesArrives = 0L;
-    NbPietonsGueris = NbPietonsInfectes = NbPietonsMorts = 0L; // v5.4.1 : stats épidémiques des piétons
-    DureeOrange = NbParkings = NbTrams = NbBus = NbVehicules = NbFeux = NbFeuxPieton = 0L; // v3.0 (NbBus) v3.5
-                                                                                           // (NbTrams), v5.2
-                                                                                           // (NbFeuxPieton)
-    DureeVert = DureeRouge = 0L; // v6.0.1 : indéterminées pour un nouveau réseau (avant la fiche Paramètres)
-    AttenteMaxVeh = 10L;
-    NbVitesses = 1;
-    NbToursStats = 100;
-    TypeStats = par_pourcentage; // v3.5
-    NbMaxCasesDetectPsgPt = 5;   // v3.0.5
-    ProbaDirPsgPt = 50;
-    NbMaxCasesDetectFileVehlib = NbMaxCasesDetectFileTaxi = NbMaxCasesDetectArretTram = NbMaxCasesDetectArretBus =
-        3;                                                                             // v3.6 (taxi) v5.3 (vehlib)
-    ProbaDirFileVehlib = ProbaDirFileTaxi = ProbaDirArretTram = ProbaDirArretBus = 50; // v3.6 (taxi) v5.3 (vehlib)
-    ProbaArretTaxiDmd = ProbaArretTramDmd = ProbaArretBusDmd = 10;                     // v3.6 (taxi)
-    TauxRemplissageVehlib = 80; // v5.3. 80% par défaut pour avoir 4/5 pour que des places soient libres au moment des
-                                // premiers vehlibs pris...
-    NbMaxPersonnesTram = NbMaxPersonnesBus = 100;                              // v3.5
-    NbMaxPersonnesVehlib = NbMaxPersonnesTaxi = 3;                             // v3.6 (taxi) v5.3 (vehlib)
-    NbToursStopArretTram = NbToursStopArretBus = 3;                            // v3.5
-    NbMaxToursAttenteTaxi = NbMaxToursAttenteTram = NbMaxToursAttenteBus = 25; // v3.6 (taxi) v5.3 (vehlib)
-    VerifOk = DistancesCalculees = QuadrillageStats = false;
-    NbFilesPark = NbPlacesPark = 0L; // v5.0
-    NbVehlibs = NbPlacesVehlib = 0L; // v5.3. v6.0.1 : NbVehlibs (indéterminé pour un fichier antérieur à 0x530)
-    Feu.clear();
-    FeuP.clear(); // v6.0.1 : indéterminé sans feux de piétons (libéré par IncrementeNombre au premier ajout)
-    Parking.clear();
-    Vehicule.clear();
-    Vehlib.clear(); // v5.3
-    Bus.clear();    // v3.0
-    Tram.clear();   // v3.5
-    Pieton.clear(); // v2.0
-    Stats.clear();
-    ArretBus.clear();    // v3.0
-    NbLignesBus = 0;     // v3.0
-    NbArretsBus = 0;     // v3.0
-    ArretTram.clear();   // v3.5
-    NbLignesTram = 0;    // v3.5
-    NbArretsTram = 0;    // v3.5
-    NbTaxis = 0;         // v3.6
-    NbPlacesTaxi = 0;    // v3.6
-    NbFilesTaxi = 0;     // v3.6
-    Taxi.clear();        // v3.6
-    PlaceTaxi.clear();   // v3.6
-    FileTaxi.clear();    // v3.6
-    PlacePark.clear();   // v5.0
-    FilePark.clear();    // v5.0
-    PlaceVehlib.clear(); // v5.3
     for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
         LigneBus[i].AffecteNumero(i + 1);  // v3.0
@@ -4922,14 +4860,6 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY) // v4.0 (
         DefinitNbVehicules(NBVEHICULESDEFAUT);
         DefinitNbPietons(NBPIETONSDEFAUT); // v2.0
     }
-    // Propriétés pour la génération aléatoire de réseau (v4.2)
-    LgrMinSgmtRoute = LgrMaxSgmtRoute = ProbaSortieIntersection = ProbaEntreeIntersection = ProbaTraverseeRoute = 0;
-    // v5.4.1 paramètres par défaut de l'épidémie (si activée)
-    EpidemieInfectiosite = 100;         // Nb tours
-    EpidemieIterationPatientZero = 100; // Nb piétons
-    EpidemieChargeFatale = 10;          // Charge virale à partir de laquelle le piéton succombera au bout de la période
-                                        // d'infectiosité
-    EpidemieReinfections = 0;           // v5.4.2
 }
 //-----------------------------------------------------------------------------
 centre_ville::~centre_ville()

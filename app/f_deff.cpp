@@ -19,8 +19,7 @@ TfrmDefFeux *frmDefFeux = nullptr;
 TfrmDefFeux::TfrmDefFeux(TComponent *Owner) : TForm(Owner)
 {
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
-    NbFeuxDmd = 0;
-    NbFeuxAtt = 0;
+
     // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
     frmSimulation->AffecteGlyphe(GLYPHE_SELF, SpeedButtonSelFeuxAtt->Glyph);
     frmSimulation->AffecteGlyphe(GLYPHE_SELF, SpeedButtonSelFeuxDmd->Glyph);

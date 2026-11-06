@@ -317,14 +317,14 @@ QKeySequence SequenceQt(TShortCut Raccourci)
 //---------------------------------------------------------------------------
 // TAction
 //---------------------------------------------------------------------------
-TAction::TAction(QAction *Modele, TActionList *Liste) : QObject(Liste), ActionList(Liste)
+TAction::TAction(QAction *Modele, TActionList *Liste)
+    : QObject(Liste), bChecked(Modele->isChecked()), bEnabled(Modele->isEnabled()), bVisible(Modele->isVisible()),
+      ActionList(Liste)
 {
     setObjectName(Modele->objectName());
     asCaption = A(Modele->text());
     asHint = A(Modele->statusTip());
-    bChecked = Modele->isChecked();
-    bEnabled = Modele->isEnabled();
-    bVisible = Modele->isVisible();
+
     Category = A(Modele->property("categorie").toString());
     ImageIndex = Modele->property("vclImageIndex").isValid() ? Modele->property("vclImageIndex").toInt() : -1;
     GroupIndex = Modele->property("vclGroupIndex").toInt();
@@ -513,12 +513,13 @@ TMenuItem::TMenuItem(QAction *Feuille, QObject *Parent) : QObject(Parent), Eleme
     AfficheCoche();
 }
 //---------------------------------------------------------------------------
-TMenuItem::TMenuItem(QMenu *Menu, QObject *Parent) : QObject(Parent), Element(Menu->menuAction()), SousMenu(Menu)
+TMenuItem::TMenuItem(QMenu *Menu, QObject *Parent)
+    : QObject(Parent), Element(Menu->menuAction()), SousMenu(Menu), bEnabled(Menu->isEnabled())
 {
     setObjectName(Menu->objectName());
     asCaption = A(Menu->title());
     asHint = A(Menu->statusTip());
-    bEnabled = Menu->isEnabled();
+
     Tag = Menu->property("vclTag").toInt();
     HelpContext = Menu->property("vclHelpContext").toInt();
     ImageIndex = Menu->property("vclImageIndex").isValid() ? Menu->property("vclImageIndex").toInt() : -1;

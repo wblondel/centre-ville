@@ -76,10 +76,9 @@ constexpr const char *asFrmPrmDrn = "%d, %d";                    // v5.4.1
 constexpr std::array<const char *, 2> asEtatFinal = {"Guéri", "Mort"};
 constexpr const char *asNA = "N/A";
 //---------------------------------------------------------------------------
-TfrmInfosPieton::TfrmInfosPieton(TComponent *Owner) : TForm(Owner)
+TfrmInfosPieton::TfrmInfosPieton(TComponent *Owner) : TForm(Owner), NumPieton(0)
 {
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
-    NumPieton = 0;
 }
 //---------------------------------------------------------------------------
 void TfrmInfosPieton::RendreVisibleInfos(bool ARendreVisible)

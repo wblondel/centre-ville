@@ -76,15 +76,10 @@ public:
     void BitBtnDefVehlibsClick(TObject *Sender);
 
 private: // Déclarations de l'utilisateur
-    bool NbVehiculesChange,
-        NbPietonsChange, // v2.0
-        NbFeuxChange, NbParkingsChange,
-        NbArretsBusChange,  // v3.0
-        NbArretsTramChange, // v3.5
-        NbPlacesTaxiChange, // v3.6
-        NbPlacesParkChange, // v5.0
-        RetourFicheFille,   // v6.0.2 : prochain FormShow au retour d'une fiche fille
-        Initialisation{};
+    bool NbVehiculesChange{};
+    bool NbPietonsChange{};  // v2.0
+    bool RetourFicheFille{}; // v6.0.2 : prochain FormShow au retour d'une fiche fille
+    bool Initialisation{};
     bool AppliqueChoix();
     void CalculeChoixPossiblesNbVehicules(); // v5.0
 public:                                      // Déclarations de l'utilisateur

@@ -33,16 +33,14 @@ void Parametres()
 //---------------------------------------------------------------------------
 TfrmParamSimul::TfrmParamSimul(TComponent *Owner) : TForm(Owner)
 {
-    ChargeFiche();            // portage : chargement du .dfm, puis OnCreate
-    RetourFicheFille = false; // v6.0.2
-    NbFeuxChange = false;
-    NbParkingsChange = false;
-    NbVehiculesChange = false;
-    NbPietonsChange = false;    // v2.0
-    NbArretsBusChange = false;  // v3.0
-    NbArretsTramChange = false; // v3.5
-    NbPlacesTaxiChange = false; // v3.6
-    NbPlacesParkChange = false; // v5.0
+    ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
+    // v6.0.2
+
+    // v2.0
+    // v3.0
+    // v3.5
+    // v3.6
+    // v5.0
     // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
     frmSimulation->AffecteGlyphe(GLYPHE_DEFB, BitBtnDefLignesBus->Glyph);
     frmSimulation->AffecteGlyphe(GLYPHE_DEFTR, BitBtnDefLignesTram->Glyph);

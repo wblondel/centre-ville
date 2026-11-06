@@ -251,11 +251,12 @@ Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?";
 constexpr std::array<const char *, 4> asTypeVoie = {"", "routes", "voies de trams", ""};
 constexpr std::array<const char *, 4> asTypeArret = {"", "de bus", "de tram", ""};
 //---------------------------------------------------------------------------
-TfrmSimulation::TfrmSimulation(TComponent *Owner) : TFormPrincipale(Owner) // portage : TForm -> QMainWindow
-{                                                                          // Constructeur de la fiche
+TfrmSimulation::TfrmSimulation(TComponent *Owner)
+    : TFormPrincipale(Owner), DirOrigVoieTram(indefinie) // portage : TForm -> QMainWindow
+{                                                        // Constructeur de la fiche
     ChargeFiche();
     yCrt = xCrt = yPrc = xPrc = -1;
-    DirOrigVoieTram = indefinie; // v3.5 // portage : ChargeFiche() = chargement du .dfm et OnCreate
+    // v3.5 // portage : ChargeFiche() = chargement du .dfm et OnCreate
     // v5.4 : Boîte Ouvrir/Enregistrer sur le dossier où sont les fichiers .cvw
     OpenDialog->InitialDir = stRepLocalAppData();
     SaveDialog->InitialDir = stRepLocalAppData();
