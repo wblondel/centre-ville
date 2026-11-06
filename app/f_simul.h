@@ -53,7 +53,7 @@ enum operation_avant : char { oaNouveau, oaOuvrir, oaQuitter };
 enum mode_edition : char { meAucun, meCase, meSelection }; // pour RafraichitBoutonEdition. v3.5
 //---------------------------------------------------------------------------
 // Utilisée dans la classe TfrmSimulation
-const extern AnsiString asTitreCV;
+inline constexpr const char *asTitreCV = "Centre-Ville";
 //---------------------------------------------------------------------------
 // Classe de la fiche
 class TfrmSimulation : public TFormPrincipale // portage : TForm -> QMainWindow
@@ -722,6 +722,8 @@ extern TfrmSimulation *frmSimulation; // portage : PACKAGE
 // v3.5 : Ajout de Tram aux constantes de Couleur
 extern TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM];
 extern TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM];
-const extern AnsiString asMemInsuff, asErrInattendue, asFormatCoord;
+inline constexpr const char *asMemInsuff = "Mémoire insuffisante !";
+inline constexpr const char *asErrInattendue = "Erreur inattendue";
+inline constexpr const char *asFormatCoord = "(%d, %d)";
 //---------------------------------------------------------------------------
 #endif

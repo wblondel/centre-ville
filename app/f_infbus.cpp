@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "compat/chaine.h"
+#include <array>
 #include "simul.h"
 #include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
@@ -19,17 +20,16 @@ constexpr int SVT = 2;
 //---------------------------------------------------------------------------
 TfrmInfosBus *frmInfosBus;
 //---------------------------------------------------------------------------
-const AnsiString asDebutTitreCadreBus = "                           ",
-                 asFrmNumeroCoordonnees[3] =
-                     {
-                         "%d (%2.2d, %2.2d)",
-                         "%d (%2.2d, %2.2d)  jusqu'au tour %d",
-                         "%d (%2.2d, %2.2d) depuis le tour %d",
-                     },
-                 asFrmCoordonnees = "%2.2d, %2.2d",
-                 asFrmPourcentage = "#.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais
-                                              // "#.000%"
-    asFrmVitesse = "%d/%d";
+constexpr const char *asDebutTitreCadreBus = "                           ";
+constexpr std::array<const char *, 3> asFrmNumeroCoordonnees = {
+    "%d (%2.2d, %2.2d)",
+    "%d (%2.2d, %2.2d)  jusqu'au tour %d",
+    "%d (%2.2d, %2.2d) depuis le tour %d",
+};
+constexpr const char *asFrmCoordonnees = "%2.2d, %2.2d";
+constexpr const char *asFrmPourcentage = "#.000%"; // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais
+                                                   // // "#.000%"
+constexpr const char *asFrmVitesse = "%d/%d";
 //---------------------------------------------------------------------------
 TfrmInfosBus::TfrmInfosBus(TComponent *Owner) : TForm(Owner)
 {
@@ -55,7 +55,7 @@ void TfrmInfosBus::RendreVisibleInfos(bool ARendreVisible)
     RadioButtonAucunBus->Enabled = !ARendreVisible;
     for (i = 1; i < 17; i++)
     {
-        (static_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
+        (dynamic_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
     }
     LabelDirection->Visible = ARendreVisible;
     LabelNumeroLigne->Visible = ARendreVisible;
@@ -107,9 +107,8 @@ void TfrmInfosBus::RafraichitInfos()
         }
         else
         { // Si pas encore d'arrêt... On prend le dépôt comme dernier arrêt
-            LabelDernierArret->Caption =
-                Format(asFrmNumeroCoordonnees[DRN],
-                       TableauDeConstantes(0, cv->DepotBus.x, cv->DepotBus.y, Bus->TourDepart));
+            LabelDernierArret->Caption = Format(
+                asFrmNumeroCoordonnees[DRN], TableauDeConstantes(0, cv->DepotBus.x, cv->DepotBus.y, Bus->TourDepart));
             DrnArret = &cv->v[cv->DepotBus.x][cv->DepotBus.y];
         }
         // portage : l'ordre d'évaluation des arguments n'est pas spécifié en C++ ; le binaire
@@ -119,7 +118,7 @@ void TfrmInfosBus::RafraichitInfos()
             Format(asFrmNumeroCoordonnees[SVT],
                    TableauDeConstantes(NumArretSvt, cv->ArretBus[NumArretSvt - 1].x, cv->ArretBus[NumArretSvt - 1].y,
                                        Bus->TourDepartArretSvt)); // v6.0.2 : de ce bus (l'original lisait le
-                                                                       // premier)
+                                                                  // premier)
         LabelTourSortie->Caption = IntToStr(Bus->TourDepart);
         LabelNbPersonnes->Caption = IntToStr(Bus->NbPersonnes);
         LabelTours->Caption = IntToStr(cv->TourCrt - Bus->TourDepart);

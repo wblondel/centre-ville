@@ -110,7 +110,7 @@ public:
     {
         if ((e->type() == QEvent::Resize) || (e->type() == QEvent::LayoutRequest))
         {
-            Aligne(static_cast<QWidget *>(o));
+            Aligne(dynamic_cast<QWidget *>(o));
         }
         return false;
     }
@@ -175,7 +175,7 @@ QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
     {
         if (auto *b = Fiche->findChild<QMenuBar *>(n))
         {
-            Raccourcis.Menu = static_cast<TMainMenu *>(o = new TMainMenu(b));
+            Raccourcis.Menu = dynamic_cast<TMainMenu *>(o = new TMainMenu(b));
         }
     }
     else if ((std::strcmp(Classe, "TTimer") == 0) || (std::strcmp(Classe, "TOpenDialog") == 0) ||

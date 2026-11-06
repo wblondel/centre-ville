@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "compat/chaine.h"
+#include <array>
 #include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
@@ -14,7 +15,7 @@
 //---------------------------------------------------------------------------
 TfrmAffDistFilesTaxi *frmAffDistFilesTaxi;
 //---------------------------------------------------------------------------
-const AnsiString asDir1[NBDIR + 1] = {"", "   ­", "   ®", "   ¯", "   ¬"};
+constexpr std::array<const char *, NBDIR + 1> asDir1 = {"", "   ­", "   ®", "   ¯", "   ¬"};
 //---------------------------------------------------------------------------
 TfrmAffDistFilesTaxi::TfrmAffDistFilesTaxi(TComponent *Owner) : TForm(Owner)
 {

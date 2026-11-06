@@ -14,7 +14,8 @@
 #include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
-TFormatSettings FormatSettings; // portage
+TFormatSettings FormatSettings; // NOLINT(bugprone-throwing-static-initialization,cert-err58-cpp) : "," tient dans une
+                                // chaîne courte, sans allocation
 //---------------------------------------------------------------------------
 AnsiString AnsiString::SubString(int Index, int Count) const
 { // Comme la VCL : Index à partir de 1, bornes tolérées
@@ -312,7 +313,8 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             {
                 ErreurFormat(f, "%p attend un pointeur");
             }
-            Texte = std::format("{:0{}X}", reinterpret_cast<std::uintptr_t>(a.Pointeur), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : adresse affichée
+            Texte = std::format("{:0{}X}", reinterpret_cast<std::uintptr_t>(a.Pointeur), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+                                                                                         // : adresse affichée
                                 2 * sizeof(void *));
             break;
         }

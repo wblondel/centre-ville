@@ -1,0 +1,6 @@
+# Tests : la configuration de la racine, sauf la règle que Catch2 ne peut pas suivre
+# (chaque TEST_CASE s'enregistre dans un objet statique dont le constructeur peut lever une exception).
+InheritParentConfig: true
+Checks: >
+  -bugprone-throwing-static-initialization,
+  -cert-err58-cpp

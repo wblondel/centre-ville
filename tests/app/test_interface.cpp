@@ -2958,7 +2958,8 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
     frmSimulation->MenuItemPrioritesPietons->ElementQt()->trigger();
     QVERIFY(frmDefVoiePietons->isVisible());
     QVERIFY(frmSimulation->ActionPrioritesPietons->Checked);
-    QCOMPARE(Q(frmDefVoiePietons->LabelCoordonnees->Caption), QString::fromStdString(std::format("{:02d}, {:02d}", x, yn)));
+    QCOMPARE(Q(frmDefVoiePietons->LabelCoordonnees->Caption),
+             QString::fromStdString(std::format("{:02d}, {:02d}", x, yn)));
     QVERIFY(frmDefVoiePietons->SpeedButtonS->Enabled);
     QVERIFY(!frmDefVoiePietons->SpeedButtonN->Enabled);
     QVERIFY(!frmDefVoiePietons->SpeedButtonS->Down);
@@ -2975,7 +2976,8 @@ void TestInterface::fichesPrioritesEtFeuxPietons()
     int n = cv->v[x][yn].NumFeuP[sud - 1];
     QVERIFY(n > 0);
     QCOMPARE((int)cv->v[x][ys].NumFeuP[nord - 1], n);
-    QCOMPARE(Q(frmDefFeuxPietons->LabelCoordonneesFeuPietonsOppose->Caption), QString::fromStdString(std::format("{:02d}, {:02d}", x, ys)));
+    QCOMPARE(Q(frmDefFeuxPietons->LabelCoordonneesFeuPietonsOppose->Caption),
+             QString::fromStdString(std::format("{:02d}, {:02d}", x, ys)));
     QCOMPARE(Q(frmDefFeuxPietons->LabelDureeTraversee->Caption), QString::number(cv->FeuP[n - 1].DureeTraversee));
     QCOMPARE(NbFeuxPietonsDefinis(), NbFeuxP + 1);
     Clique(frmDefFeuxPietons->ButtonAnnuler);
@@ -3763,14 +3765,14 @@ QStringList CarrefoursActifs()
     QStringList Actifs;
     for (const char *g : GroupesCarrefours)
     {
-        if ((static_cast<QWidget *>(frmCarrefours->FindComponent(g)))->isEnabled())
+        if ((dynamic_cast<QWidget *>(frmCarrefours->FindComponent(g)))->isEnabled())
         {
             Actifs << g;
         }
     }
     for (const BoutonCarrefour &b : BoutonsCarrefours)
     {
-        if ((static_cast<QWidget *>(frmCarrefours->FindComponent(b.Nom)))->isEnabled())
+        if ((dynamic_cast<QWidget *>(frmCarrefours->FindComponent(b.Nom)))->isEnabled())
         {
             Actifs << b.Nom;
         }
@@ -3897,7 +3899,7 @@ void TestInterface::carrefoursDeChaqueBouton()
         QuandModale([] { return frmCarrefours; },
                     [&] {
                         Actifs = CarrefoursActifs();
-                        TSpeedButton *s = static_cast<TSpeedButton *>(frmCarrefours->FindComponent(b.Nom));
+                        TSpeedButton *s = dynamic_cast<TSpeedButton *>(frmCarrefours->FindComponent(b.Nom));
                         Glyphe = !s->icon().isNull();
                         Clique(s);
                     });
@@ -4059,7 +4061,7 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
         ReponseQuestions = Reponse;
         Messages.clear();
         QuandModale([] { return frmCarrefours; },
-                    [Nom, this] { Clique(static_cast<TSpeedButton *>(frmCarrefours->FindComponent(Nom))); });
+                    [Nom, this] { Clique(dynamic_cast<TSpeedButton *>(frmCarrefours->FindComponent(Nom))); });
         Clique(frmSimulation->ToolButtonCarrefours);
         ReponseQuestions = QMessageBox::No;
         if (!Etapes.empty())
@@ -4457,7 +4459,11 @@ QString Cadre(int n, int x, int y)
     return QString(27, ' ') + NumeroCoordonnees(n, x, y) + " ";
 }
 // Pourcentages (FormatFloat « #.000% » ou « 0.000% » de la VCL)
-const QRegularExpression Pourcentage("^(-?\\d*,\\d{3}%|NAN|-?INF)$");
+bool EstPourcentage(const QString &Texte)
+{
+    static const QRegularExpression Motif(R"(^(-?\d*,\d{3}%|NAN|-?INF)$)");
+    return Motif.match(Texte).hasMatch();
+}
 } // namespace
 //---------------------------------------------------------------------------
 void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures)
@@ -4835,7 +4841,7 @@ void TestInterface::fichesInfos()
     const auto Case = [] { return &cv->v[frmSimulation->DrawGridSimul->Col][frmSimulation->DrawGridSimul->Row]; };
     const auto Coordonnees = [] {
         return QString::fromStdString(std::format("{:02d}, {:02d}", static_cast<int>(frmSimulation->DrawGridSimul->Col),
-                                 static_cast<int>(frmSimulation->DrawGridSimul->Row)));
+                                                  static_cast<int>(frmSimulation->DrawGridSimul->Row)));
     };
     // Premier objet trouvé sur la carte (Numero(v) > 0), case courante
     const auto Trouve = [this](const std::function<int(voie *)> &Numero) -> int {
@@ -4878,7 +4884,8 @@ void TestInterface::fichesInfos()
                 Compare(e, "tours", f->LabelTours->Caption, QString::number(Tour - Veh->TourDepart));
                 Compare(e, "parcours", f->LabelParcours->Caption, QString::number(Veh->NbCasesParcourues));
                 Compare(e, "vitesse", f->LabelVitesse->Caption,
-                        QString::fromStdString(std::format("{}/{}", 1 + ((v->NumVehicule - 1) % cv->NbVitesses), cv->NbVitesses)));
+                        QString::fromStdString(
+                            std::format("{}/{}", 1 + ((v->NumVehicule - 1) % cv->NbVitesses), cv->NbVitesses)));
                 if (Veh->NumParkingArrivee)
                 {
                     Compare(e, "parking d'arrivée", f->LabelParkingArrivee->Caption,
@@ -4887,7 +4894,7 @@ void TestInterface::fichesInfos()
                 }
                 for (TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente})
                 {
-                    if (!Pourcentage.match(Q(l->Caption)).hasMatch())
+                    if (!EstPourcentage(Q(l->Caption)))
                     {
                         e << ("pourcentage : " + Q(l->Caption));
                     }
@@ -4977,7 +4984,8 @@ void TestInterface::fichesInfos()
                         NumeroCoordonnees(b->NumArretSvt, cv->ArretBus[b->NumArretSvt - 1].x,
                                           cv->ArretBus[b->NumArretSvt - 1].y) +
                             QString(" depuis le tour %1").arg(b->TourDepartArretSvt));
-                Compare(e, "vitesse", f->LabelVitesse->Caption, QString::fromStdString(std::format("1/{}", cv->NbVitesses)));
+                Compare(e, "vitesse", f->LabelVitesse->Caption,
+                        QString::fromStdString(std::format("1/{}", cv->NbVitesses)));
             }
             else if (!f->RadioButtonAucunBus->Checked || !f->LabelDirection->isHidden())
             {
@@ -5058,7 +5066,7 @@ void TestInterface::fichesInfos()
                         QString::number(Tour - t->TourArriveDrnArret));
                 for (TLabel *l : {f->LabelParcoursEffectue, f->LabelDetour, f->LabelAttente})
                 {
-                    if (!Pourcentage.match(Q(l->Caption)).hasMatch())
+                    if (!EstPourcentage(Q(l->Caption)))
                     {
                         e << ("pourcentage : " + Q(l->Caption));
                     }
@@ -6983,7 +6991,7 @@ void TestInterface::dessinsPendantLaSimulation()
     auto CocheLignes = [g](TForm *Fiche, int &NbCochees) {
         for (int i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
         {
-            if (TCheckBox *c = static_cast<TCheckBox *>(Fiche->FindComponent("CheckBox" + IntToStr(i))); c->Visible)
+            if (TCheckBox *c = dynamic_cast<TCheckBox *>(Fiche->FindComponent("CheckBox" + IntToStr(i))); c->Visible)
             {
                 c->Checked = true;
                 NbCochees++;
@@ -8493,7 +8501,8 @@ void TestInterface::fichesEvolutionEtVehicules()
                     }
                     NbNonNuls += (Nb && (Max > Min));
                     Compare(e, qPrintable(QString("(%1, %2)").arg(ed).arg(ea)),
-                            g->StringGridStatsVehicules->Cells[ed][ea], QString::fromStdString(std::format("{:4d}", Nb ? Max - Min : 0)));
+                            g->StringGridStatsVehicules->Cells[ed][ea],
+                            QString::fromStdString(std::format("{:4d}", Nb ? Max - Min : 0)));
                 }
             }
         }

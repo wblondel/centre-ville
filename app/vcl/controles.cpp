@@ -873,7 +873,7 @@ public:
     {
         if (e->type() == QEvent::Paint)
         { // QRadioButton::initStyleOption, puis DessineCase
-            auto *b = static_cast<QRadioButton *>(o);
+            auto *b = dynamic_cast<QRadioButton *>(o);
             QStyleOptionButton Option;
             Option.initFrom(b);
             Option.text = b->text();
@@ -900,8 +900,8 @@ public:
         {
             return false;
         }
-        auto *b = static_cast<QRadioButton *>(o);
-        auto *m = static_cast<QMouseEvent *>(e);
+        auto *b = dynamic_cast<QRadioButton *>(o);
+        auto *m = dynamic_cast<QMouseEvent *>(e);
         QStyleOptionButton Option;
         Option.initFrom(b);
         Option.text = b->text();
@@ -1251,7 +1251,7 @@ void TTabControl::AjusteOnglets()
 //---------------------------------------------------------------------------
 bool TTabControl::OngletsEntiers() const
 {
-    return (Onglets == nullptr) || static_cast<BarreOnglets *>(Onglets)->TextesEntiers();
+    return (Onglets == nullptr) || dynamic_cast<BarreOnglets *>(Onglets)->TextesEntiers();
 }
 //---------------------------------------------------------------------------
 void TTabControl::changeEvent(QEvent *e)
@@ -1417,7 +1417,7 @@ bool TStatusBar::event(QEvent *e)
     {
         if (AutoHint)
         {
-            const AnsiString as = A(static_cast<QStatusTipEvent *>(e)->tip());
+            const AnsiString as = A(dynamic_cast<QStatusTipEvent *>(e)->tip());
             if (SimplePanel || Panels->Items.empty())
             {
                 SimpleText = as;

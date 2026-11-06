@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "compat/chaine.h"
+#include <array>
 #include "simul.h"
 #include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
@@ -19,17 +20,16 @@ constexpr int SVT = 2;
 //---------------------------------------------------------------------------
 TfrmInfosTram *frmInfosTram;
 //---------------------------------------------------------------------------
-const AnsiString asDebutTitreCadreTram = "                           ",
-                 asFrmNumeroCoordonnees[3] =
-                     {
-                         "%d (%2.2d, %2.2d)",
-                         "%d (%2.2d, %2.2d)  jusqu'au tour %d",
-                         "%d (%2.2d, %2.2d) depuis le tour %d",
-                     },
-                 asFrmCoordonnees = "%2.2d, %2.2d",
-                 asFrmPourcentage = "0.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais
-                                              // "#.000%"
-    asFrmVitesse = "%d/%d";
+constexpr const char *asDebutTitreCadreTram = "                           ";
+constexpr std::array<const char *, 3> asFrmNumeroCoordonnees = {
+    "%d (%2.2d, %2.2d)",
+    "%d (%2.2d, %2.2d)  jusqu'au tour %d",
+    "%d (%2.2d, %2.2d) depuis le tour %d",
+};
+constexpr const char *asFrmCoordonnees = "%2.2d, %2.2d";
+constexpr const char *asFrmPourcentage = "0.000%"; // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais
+                                                   // // "#.000%"
+constexpr const char *asFrmVitesse = "%d/%d";
 //---------------------------------------------------------------------------
 TfrmInfosTram::TfrmInfosTram(TComponent *Owner) : TForm(Owner)
 {
@@ -55,7 +55,7 @@ void TfrmInfosTram::RendreVisibleInfos(bool ARendreVisible)
     RadioButtonAucunTram->Enabled = !ARendreVisible;
     for (i = 1; i < 16; i++)
     {
-        (static_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
+        (dynamic_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
     }
     LabelDirection->Visible = ARendreVisible;
     LabelNumeroLigne->Visible = ARendreVisible;
@@ -117,7 +117,7 @@ void TfrmInfosTram::RafraichitInfos()
             Format(asFrmNumeroCoordonnees[SVT],
                    TableauDeConstantes(NumArretSvt, cv->ArretTram[NumArretSvt - 1].x, cv->ArretTram[NumArretSvt - 1].y,
                                        Tram->TourDepartArretSvt)); // v6.0.2 : de ce tram (l'original lisait le
-                                                                        // premier)
+                                                                   // premier)
         LabelNbPersonnes->Caption = IntToStr(Tram->NbPersonnes);
         LabelTours->Caption = IntToStr(cv->TourCrt); // v6.0.2 : correct, tous les trams partent au tour 0
                                                      // (PrepareTrams) : c'est TourCrt-TourDepart des bus

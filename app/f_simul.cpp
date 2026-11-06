@@ -7,6 +7,7 @@
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
+#include <array>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -171,58 +172,64 @@ TColor CoulLigneBusTram[NBMAXLIGNESBUSTRAM] = {clBlue,
 TColor CoulTLigneBusTram[NBMAXLIGNESBUSTRAM] = {clWhite, clBlack, clBlack, clBlack, clBlack,
                                                 clBlack, clWhite, clWhite, clBlack};
 //---------------------------------------------------------------------------
-const AnsiString asVide,
-    asFrmTitleCV = "Centre-Ville [%d]", asFrmCaptionCV = "Centre-Ville - %s [%d]", asTitreCV = "Centre-Ville",
-    asAsterisque[2] = {"", "*"},  // v3.6
-    asSupInf[3] = {"", ">", "<"}, // v3.6. Remplacement par <,> pour Linux (v3.8). v4.3 : asSupInf remplace as12
-    asEtatPieton[6] = {"",  "*", "†", "†*",
-                       "‡", "‡*"}, // v4.3 (création) v5.4.1 : asMort renommé en asEtatPieton ; "†" devient "*" pour
-                                   // "écrasé" alors que "†" est réservé à "Mort" (victime de l'épidémie) ; asEtatPieton
-                                   // fonction de pieton::Ecrase+2*pieton::Mort+4*pieton::EstContagieux()
-    asQstEnregistrerFichier = "Voulez-vous enregistrer le fichier ",
-    asTypeVehicule[NBNIVEAUXPRIORITE] = {"", "d'urgence", "de police"}, asDebutNom[2] = {"ToolBar", "MenuItem"}, // v3.5
-    asNomElementBarreOutils[NBELEMENTSBARREOUTILS] = {"Fichier",    "Affichage",    "EditionCase", "EditionSelection",
-                                                      "Simulation", "Informations", "Statistiques"}, // v3.5 : ajout.
-                                                                                                     // v5.4 :
-                                                                                                     // suppression de
-                                                                                                     // "Menu"
-    asTypeDistance[NBTYPESDISTANCE] = {"",
-                                       "à un parking",
-                                       "à un arrêt de bus",
-                                       "à un arrêt de tram",
-                                       "à une file de taxis",
-                                       "à une file de parkings",
-                                       "à une place de vehlib"}, // v6.0.8 : la v5.0 avait mis les files de parkings à
-                                                                 // la place des files de taxis
-    asChargementNonEffectue = "Chargement non effectué", asSauvegardeNonEffectuee = "Sauvegarde non effectuée",
-    asErrInattendue = "Erreur inattendue", asMemInsuff = "Mémoire insuffisante !",
-    asFrmReseauNonConnexe[2] =
-        {
-            "\
-Le réseau n'est pas connexe : une distance %s n'a pas pu être définie !\n\
-Un tableau des distances va apparaître pour vous aider à résoudre le problème.", // v3.5
-            "\
-Le réseau n'est pas connexe : une distance %s n'a pas pu être définie !\n\
-Un tableau des distances va apparaître pour vous aider à résoudre le problème.\n\n\
-ATTENTION ! S'il y a des zones où seuls les bus et les véhicules prioritaires peuvent passer, TOUTES CES ZONES DOIVENT ÊTRE DÉFINIES COMME PASSAGE RÉSERVÉ AUX BUS.\n\
-En d'autres termes, il ne doit pas y avoir de zones non réservées aux bus isolées par des zones réservées aux bus.",
-        },
-    asSelectionIncorrecte = "Sélection incorrecte", asTracerEffacerPeripherique = "\
+constexpr const char *asVide = "";
+constexpr const char *asFrmTitleCV = "Centre-Ville [%d]";
+constexpr const char *asFrmCaptionCV = "Centre-Ville - %s [%d]";
+constexpr std::array<const char *, 2> asAsterisque = {"", "*"};  // v3.6
+constexpr std::array<const char *, 3> asSupInf = {"", ">", "<"}; // v3.6. Remplacement par <,> pour Linux (v3.8). v4.3 :
+                                                                 // asSupInf remplace as12
+constexpr std::array<const char *, 6> asEtatPieton = {
+    "",  "*", "†", "†*",
+    "‡", "‡*"}; // v4.3 (création) v5.4.1 : asMort renommé en asEtatPieton ; "†" devient "*" pour // "écrasé" alors que
+                // "†" est réservé à "Mort" (victime de l'épidémie) ; asEtatPieton // fonction de
+                // pieton::Ecrase+2*pieton::Mort+4*pieton::EstContagieux()
+constexpr const char *asQstEnregistrerFichier = "Voulez-vous enregistrer le fichier ";
+constexpr std::array<const char *, NBNIVEAUXPRIORITE> asTypeVehicule = {"", "d'urgence", "de police"};
+constexpr std::array<const char *, 2> asDebutNom = {"ToolBar", "MenuItem"}; // v3.5
+constexpr std::array<const char *, NBELEMENTSBARREOUTILS> asNomElementBarreOutils = {
+    "Fichier",    "Affichage",    "EditionCase", "EditionSelection",
+    "Simulation", "Informations", "Statistiques"}; // v3.5 : ajout. // v5.4 : // suppression de // "Menu"
+constexpr std::array<const char *, NBTYPESDISTANCE> asTypeDistance = {"",
+                                                                      "à un parking",
+                                                                      "à un arrêt de bus",
+                                                                      "à un arrêt de tram",
+                                                                      "à une file de taxis",
+                                                                      "à une file de parkings",
+                                                                      "à une place de vehlib"}; // v6.0.8 : la v5.0
+                                                                                                // avait mis les files
+                                                                                                // de parkings à // la
+                                                                                                // place des files de
+                                                                                                // taxis
+constexpr const char *asChargementNonEffectue = "Chargement non effectué";
+constexpr const char *asSauvegardeNonEffectuee = "Sauvegarde non effectuée";
+constexpr std::array<const char *, 2> asFrmReseauNonConnexe = {
+    "Le réseau n'est pas connexe : une distance %s n'a pas pu être définie !\n"
+    "Un tableau des distances va apparaître pour vous aider à résoudre le problème.", // v3.5
+    "Le réseau n'est pas connexe : une distance %s n'a pas pu être définie !\n"
+    "Un tableau des distances va apparaître pour vous aider à résoudre le problème.\n\n"
+    "ATTENTION ! S'il y a des zones où seuls les bus et les véhicules prioritaires peuvent passer, TOUTES CES ZONES "
+    "DOIVENT ÊTRE DÉFINIES COMME PASSAGE RÉSERVÉ AUX BUS.\n"
+    "En d'autres termes, il ne doit pas y avoir de zones non réservées aux bus isolées par des zones réservées aux "
+    "bus.",
+};
+constexpr const char *asSelectionIncorrecte = "Sélection incorrecte";
+constexpr const char *asTracerEffacerPeripherique = "\
 Pour tracer ou effacer un périphérique,\n\
-vous devez sélectionner au moins 2 lignes et 2 colonnes.",
-    asNombreLignesColonnesDifferent =
-        "Le nombre de lignes sélectionnées doit être différent du nombre de colonnes sélectionnées.",
-    asTracerEffacerRoute = "\
+vous devez sélectionner au moins 2 lignes et 2 colonnes.";
+constexpr const char *asNombreLignesColonnesDifferent =
+    "Le nombre de lignes sélectionnées doit être différent du nombre de colonnes sélectionnées.";
+constexpr const char *asTracerEffacerRoute = "\
 Vous ne devez sélectionner...\n\
  - qu'1 SEULE LIGNE ou qu'1 SEULE COLONNE pour tracer ou effacer une voie À SENS UNIQUE.\n\
- - que 2 LIGNES ou 2 COLONNES pour tracer ou effacer une voie À DOUBLE SENS.",
-    asErrDsReseau = "\
+ - que 2 LIGNES ou 2 COLONNES pour tracer ou effacer une voie À DOUBLE SENS.";
+constexpr const char *asErrDsReseau = "\
 Une erreur a été trouvée dans le réseau !\n\n\
 La cause est affichée en bas de la fenêtre et le curseur jaune clignotant sur le réseau indique l'endroit de l'erreur.\n\
 Corriger puis réessayer.\n\n\
-Pour plus d'informations, allez dans le sommaire de l'aide (Maj+Alt+F1) et choisissez la rubrique \"Lancement de la simulation, Messages d'erreur, Vérification du réseau\".", // v3.5
-    asAvertissement = "Impossible de continuer", asNbParkingsInsuff = "Il manque des parkings !",
-    asCleExtCvw = "\\.cvw", asCleCvw = "\\Cvw", asCvw = "Cvw", asFormatCoord = "(%d, %d)", asFormatBilan = "\
+Pour plus d'informations, allez dans le sommaire de l'aide (Maj+Alt+F1) et choisissez la rubrique \"Lancement de la simulation, Messages d'erreur, Vérification du réseau\"."; // v3.5
+constexpr const char *asAvertissement = "Impossible de continuer";
+constexpr const char *asNbParkingsInsuff = "Il manque des parkings !";
+constexpr const char *asFormatBilan = "\
 Données initiales\n\n\
  - Nombre de véhicules : %d\n\
  - Parcours minimal moyen par véhicule (cases) : %.2f\n\
@@ -236,8 +243,8 @@ Bilan au tour n°%d\n\n\
  - Temps moyen du parcours par véhicule (tours) : %.2f (%.2f%%) dont\n\
     · Déplacement par véhicule (tours) : %.2f (%.2f%%)\n\
     · Attente par véhicule (tours) : %.2f (%.2f%%)\n\n\
-Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?",
-    asFormatBilanSansArrives = "\
+Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?";
+constexpr const char *asFormatBilanSansArrives = "\
 Données initiales\n\n\
  - Nombre de véhicules : %d\n\
  - Parcours minimal moyen par véhicule (cases) : %.2f\n\
@@ -246,8 +253,9 @@ Données initiales\n\n\
 Bilan au tour n°%d\n\n\
  - Durée de la simulation : %s\n\
  - Aucun véhicule n'est encore arrivé.\n\n\
-Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?",
-    asTypeVoie[4] = {"", "routes", "voies de trams", ""}, asTypeArret[4] = {"", "de bus", "de tram", ""};
+Voulez-vous voir les statistiques de fluidité et de trafic en couleurs ?";
+constexpr std::array<const char *, 4> asTypeVoie = {"", "routes", "voies de trams", ""};
+constexpr std::array<const char *, 4> asTypeArret = {"", "de bus", "de tram", ""};
 //---------------------------------------------------------------------------
 TfrmSimulation::TfrmSimulation(TComponent *Owner) : TFormPrincipale(Owner) // portage : TForm -> QMainWindow
 {                                                                          // Constructeur de la fiche
@@ -364,11 +372,13 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                 BordTrottoir += static_cast<int>(PossDir[d]) *
                                 static_cast<int>((v->v(static_cast<direction>(d))->DirPoss > aucune) || // v3.8
                                                  (v->v(static_cast<direction>(d))->SensVoieTram > aucune_voie));
-                BordToiture +=
-                    static_cast<int>(PossDir[d]) * static_cast<int>(NatureSansDecor(v->v(static_cast<direction>(d))) != immeubles);
-                CoinToiture += static_cast<int>(CoinDir[d]) *
-                               static_cast<int>(NatureSansDecor(v->v(static_cast<direction>(d))->v(ADroiteDe[static_cast<direction>(d)])) ==
-                                                immeubles); // Immeuble voisin présent en coin.. 1=NE;2=SE;4=SO;8=NO
+                BordToiture += static_cast<int>(PossDir[d]) *
+                               static_cast<int>(NatureSansDecor(v->v(static_cast<direction>(d))) != immeubles);
+                CoinToiture +=
+                    static_cast<int>(CoinDir[d]) *
+                    static_cast<int>(
+                        NatureSansDecor(v->v(static_cast<direction>(d))->v(ADroiteDe[static_cast<direction>(d)])) ==
+                        immeubles); // Immeuble voisin présent en coin.. 1=NE;2=SE;4=SO;8=NO
             }
             if (((Affichage & aff_env) != 0) && // v3.8.1 (aff_env)
                 (PassPoss == 0) && (v->SensVoieTram == 0))
@@ -755,7 +765,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         CoulTxt = clTeal;
         for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
         {
-            CheckBox = static_cast<TCheckBox *>(frmParamBus->FindComponent("CheckBox" + IntToStr(i + 1)));
+            CheckBox = dynamic_cast<TCheckBox *>(frmParamBus->FindComponent("CheckBox" + IntToStr(i + 1)));
             if (CheckBox->Visible && CheckBox->Checked && v->LigneBus[i])
             {
                 DrawGridSimul->Canvas->Brush->Color = CoulLigneBusTram[i];
@@ -781,7 +791,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         CoulTxt = clTeal;
         for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
         {
-            CheckBox = static_cast<TCheckBox *>(frmParamTram->FindComponent("CheckBox" + IntToStr(i + 1)));
+            CheckBox = dynamic_cast<TCheckBox *>(frmParamTram->FindComponent("CheckBox" + IntToStr(i + 1)));
             if (CheckBox->Visible && CheckBox->Checked && v->LigneTram[i])
             {
                 DrawGridSimul->Canvas->Brush->Color = CoulLigneBusTram[i];
@@ -927,38 +937,46 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             {
                 if (i != 0)
                 {
-                    asMsg = asMsg + Format(" %d%s",
-                                           TableauDeConstantes(
-                                               i,
-                                               asSupInf[static_cast<int>(!!cv->Pieton[i - 1].EstVivant()) *
-                                                        (1 + cv->Pieton[i - 1].DemiCase)] + // v4.3 (asSupInf remplace
+                    asMsg =
+                        asMsg +
+                        Format(" %d%s",
+                               TableauDeConstantes(
+                                   i,
+                                   AnsiString(asSupInf[static_cast<int>(!!cv->Pieton[i - 1].EstVivant()) *
+                                                       (1 + cv->Pieton[i - 1].DemiCase)]) + // v4.3 (asSupInf remplace
                                                                                             // as12) v5.4.1 EstVivant()
                                                                                             // remplace Ecrase
-                                                   asEtatPieton[(1 * static_cast<int>(!!cv->Pieton[i - 1].Ecrase)) + // "*" v4.3
-                                                                                                   // (création) v5.4.1
-                                                                                                   // : asMort renommé
-                                                                                                   // en asEtatPieton ;
-                                                                                                   // affiche "*" au
-                                                                                                   // lieu de "†"
-                                                                                                   // réservé à
-                                                                                                   // l'épidémie
-                                                                (2 * static_cast<int>(!!cv->Pieton[i - 1].Mort)) + // v5.4.1 : affiche "†"
-                                                                (4 * static_cast<int>(!!(cv->Pieton[i - 1].EstContagieux() &&
-                                                                        (!cv->Pieton[i - 1].Mort))))] // v5.4.1 : affiche
-                                                                                                     // "‡"
-                                               ));
+                                       asEtatPieton[(1 * static_cast<int>(!!cv->Pieton[i - 1].Ecrase)) + // "*" v4.3
+                                                                                                         // (création)
+                                                                                                         // v5.4.1 :
+                                                                                                         // asMort
+                                                                                                         // renommé en
+                                                                                                         // asEtatPieton
+                                                                                                         // ; affiche
+                                                                                                         // "*" au lieu
+                                                                                                         // de "†"
+                                                                                                         // réservé à
+                                                                                                         // l'épidémie
+                                                    (2 * static_cast<int>(!!cv->Pieton[i - 1].Mort)) + // v5.4.1 :
+                                                                                                       // affiche "†"
+                                                    (4 * static_cast<int>(!!(cv->Pieton[i - 1].EstContagieux() &&
+                                                                             (!cv->Pieton[i - 1].Mort))))] // v5.4.1 :
+                                                                                                           // affiche
+                                                                                                           // "‡"
+                                   ));
                 }
             }
             asMsg = asMsg + ". ";
         }
         if (v->NumPlaceTaxi != 0)
         { // v3.6
-            asMsg = asMsg + Format("Place Taxi %d%s%s File %d. ",
-                                   TableauDeConstantes(v->NumPlaceTaxi,
-                                                       asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
-                                                       asSupInf[2 * static_cast<int>(v->EstQueueFileTaxis())], // v4.3 (asSupInf remplace
-                                                                                             // as12)
-                                                       cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
+            asMsg = asMsg +
+                    Format("Place Taxi %d%s%s File %d. ",
+                           TableauDeConstantes(v->NumPlaceTaxi,
+                                               asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
+                                               asSupInf[2 * static_cast<int>(v->EstQueueFileTaxis())], // v4.3 (asSupInf
+                                                                                                       // remplace as12)
+                                               cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
         }
         if (v->NumTaxi != 0)
         { // v3.6
@@ -969,9 +987,9 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         { // v5.0
             asMsg = asMsg + Format("Place Prkg %d%s%s File %d. ",
                                    TableauDeConstantes(v->NumPlacePark,
-                                                       asSupInf[v->EstTeteFilePark()],                   // v5.0
-                                                       asSupInf[2 * static_cast<int>(v->EstQueueFilePark())],              // v5.0
-                                                       cv->PlacePark[v->NumPlacePark - 1].NumFile + 1)); // v5.3
+                                                       asSupInf[v->EstTeteFilePark()],                        // v5.0
+                                                       asSupInf[2 * static_cast<int>(v->EstQueueFilePark())], // v5.0
+                                                       cv->PlacePark[v->NumPlacePark - 1].NumFile + 1));      // v5.3
         }
         if (StatsAttenteTrafic && frmStatsAttenteTrafic)
         { // v3.0 : Affichage du détail des statistiques de fluidité det de trafic
@@ -1653,8 +1671,9 @@ bool TfrmSimulation::VerifieReseau()
                 (!(Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
                                                                                     // d'arrêts
             {
-                asMsgErr = Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
+                asMsgErr =
+                    Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
+                           TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
                 break;
             }
         }
@@ -1976,14 +1995,18 @@ void TfrmSimulation::AfficheBilan()
                        nv, static_cast<long double>(m), static_cast<long double>(m), nvpe - 3, cv->TourCrt,
                        Format("%s (%.2f tour(s)/s, %.2f ms/tour)",
                               TableauDeConstantes(
-                                  FormatDateTime("hh:nn:ss.zzz", cv->dtTemps),                             // v3.9.2
-                                  static_cast<long double>(cv->TourCrt / (24 * 3600 * static_cast<double>(cv->dtTemps))),        // v3.9.2
-                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) / cv->TourCrt))), // v3.9.2
+                                  FormatDateTime("hh:nn:ss.zzz", cv->dtTemps), // v3.9.2
+                                  static_cast<long double>(cv->TourCrt /
+                                                           (24 * 3600 * static_cast<double>(cv->dtTemps))), // v3.9.2
+                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) /
+                                                           cv->TourCrt))), // v3.9.2
                        nva, static_cast<long double>((100.0 * nva) / nv), static_cast<long double>((1.0 * ncp) / nva),
-                       static_cast<long double>((100.0 * ncp) / nva / m), static_cast<long double>((1.0 * AttenteDepart) / nva),
-                       static_cast<long double>((100.0 * AttenteDepart) / nva / (nvpe - 3)), static_cast<long double>((1.0 * ntp) / nva),
-                       static_cast<long double>((100.0 * ntp) / nva / m), static_cast<long double>((1.0 * ncp) / nva),
-                       static_cast<long double>((100.0 * ncp) / ntp), static_cast<long double>((1.0 * (ntp - ncp)) / nva),
+                       static_cast<long double>((100.0 * ncp) / nva / m),
+                       static_cast<long double>((1.0 * AttenteDepart) / nva),
+                       static_cast<long double>((100.0 * AttenteDepart) / nva / (nvpe - 3)),
+                       static_cast<long double>((1.0 * ntp) / nva), static_cast<long double>((100.0 * ntp) / nva / m),
+                       static_cast<long double>((1.0 * ncp) / nva), static_cast<long double>((100.0 * ncp) / ntp),
+                       static_cast<long double>((1.0 * (ntp - ncp)) / nva),
                        static_cast<long double>((100.0 * (ntp - ncp)) / ntp)));
     }
     else
@@ -1994,9 +2017,11 @@ void TfrmSimulation::AfficheBilan()
                        nv, static_cast<long double>(m), static_cast<long double>(m), nvpe - 3, cv->TourCrt,
                        Format("%s (%.2f tour(s)/s, %.2f ms/tour)",
                               TableauDeConstantes(
-                                  FormatDateTime("hh:nn:ss.zzz", cv->dtTemps),                               // v3.9.2
-                                  static_cast<long double>(cv->TourCrt / (24 * 3600 * static_cast<double>(cv->dtTemps))),          // v3.9.2
-                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) / cv->TourCrt))))); // v3.9.2
+                                  FormatDateTime("hh:nn:ss.zzz", cv->dtTemps), // v3.9.2
+                                  static_cast<long double>(cv->TourCrt /
+                                                           (24 * 3600 * static_cast<double>(cv->dtTemps))), // v3.9.2
+                                  static_cast<long double>((24L * 3600000L * static_cast<double>(cv->dtTemps)) /
+                                                           cv->TourCrt))))); // v3.9.2
     }
     if (AfficheMessage(asMsgBilan, "Bilan", tmQuestionNecessaire, 0, 1) == trOui)
     { // Défaut = Oui, Echap = Non
@@ -2730,9 +2755,9 @@ direction TfrmSimulation::DirectionOrigineCurseur(int x, int y, direction DirDes
 //---------------------------------------------------------------------------
 void TfrmSimulation::MenuItemBarreOutilsClick(TObject *Sender)
 {
-    TToolBar *ToolBar = static_cast<TToolBar *>(
-        FindComponent(asDebutNom[TOOLBAR] + asNomElementBarreOutils[(static_cast<TMenuItem *>(Sender))->Tag]));
-    auto *MenuItem = static_cast<TMenuItem *>(Sender);
+    TToolBar *ToolBar = dynamic_cast<TToolBar *>(FindComponent(
+        AnsiString(asDebutNom[TOOLBAR]) + asNomElementBarreOutils[(dynamic_cast<TMenuItem *>(Sender))->Tag]));
+    auto *MenuItem = dynamic_cast<TMenuItem *>(Sender);
     MenuItem->Checked ^= true;
     ToolBar->Visible = MenuItem->Checked;
 }
@@ -2743,8 +2768,8 @@ void TfrmSimulation::PopupMenuBarreOutilsPopup(TObject * /*Sender*/)
     TMenuItem *MenuItem = nullptr;
     for (const auto &asNomElementBarreOutil : asNomElementBarreOutils)
     {
-        MenuItem = static_cast<TMenuItem *>(FindComponent(asDebutNom[MENUITEM] + asNomElementBarreOutil));
-        ToolBar = static_cast<TToolBar *>(FindComponent(asDebutNom[TOOLBAR] + asNomElementBarreOutil));
+        MenuItem = dynamic_cast<TMenuItem *>(FindComponent(AnsiString(asDebutNom[MENUITEM]) + asNomElementBarreOutil));
+        ToolBar = dynamic_cast<TToolBar *>(FindComponent(AnsiString(asDebutNom[TOOLBAR]) + asNomElementBarreOutil));
         MenuItem->Checked = ToolBar->Visible;
     }
 }
@@ -3249,7 +3274,7 @@ bool TfrmSimulation::EnregistreAvantMarche()
     if (Ok)
     {
         asNomFichAuto = SaveDialog->FileName; // Réseau sans nom : choisi par la boîte d'ActionEnregistrer (l'original
-                                                // redemandait à l'arrêt quoi ouvrir)
+                                              // redemandait à l'arrêt quoi ouvrir)
     }
     return Ok;
 }
@@ -3338,7 +3363,7 @@ void TfrmSimulation::ActionMarcheExecute(TObject * /*Sender*/)
         if (!cv->VerifieCalculDistances(TypeDistance)) // Sont-elles toutes définies ?
         {
             StatusBar->Panels->Items[0]->Text =
-                Format("La case (%d, %d) a une distance " + asTypeDistance[TypeDistance] + " indéfinie.",
+                Format(AnsiString("La case (%d, %d) a une distance ") + asTypeDistance[TypeDistance] + " indéfinie.",
                        TableauDeConstantes(xErr = cv->xErr, yErr = cv->yErr));
             if ((xErr > -1) && (yErr > -1))
             {

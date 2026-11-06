@@ -261,11 +261,11 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
 //---------------------------------------------------------------------------
 // TScreen
 //---------------------------------------------------------------------------
-namespace
-{
-TScreen EcranVcl;
+TScreen *Screen()
+{ // Créé au premier appel : une exception éventuelle reste interceptable
+    static TScreen Ecran;
+    return &Ecran;
 }
-TScreen *Screen = &EcranVcl;
 //---------------------------------------------------------------------------
 TScreen::TScreen()
 {

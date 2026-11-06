@@ -208,7 +208,7 @@ void TfrmDefVoiePietons::FormCreate(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmDefVoiePietons::SpeedButtonClick(TObject *Sender)
 {
-    auto *SpeedButtonNESO = static_cast<TSpeedButton *>(Sender);
+    auto *SpeedButtonNESO = dynamic_cast<TSpeedButton *>(Sender);
     const auto d = static_cast<direction>(TagDe(static_cast<TComponent *>(Sender)) + 1); // portage : TComponent::Tag ->
                                                                                          // TagDe
     ButtonAppliquer->Enabled = true;

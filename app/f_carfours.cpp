@@ -58,18 +58,6 @@ const dirposs DirPossC4x4[4][4] =
                   {aucune, S, N, aucune},
               };
 //---------------------------------------------------------------------------
-const AnsiString asNbFeuxLibresInsuffisant = "\
-Il reste moins de %d feux de libres !\n\
-Il faut...\n\
- - Soit supprimer des feux existants puis réessayer,\n\
- - Soit augmenter le nombre maximum de feux puis réessayer ; Pour ce faire :\n\
-   · Enregistrer le réseau actuel,\n\
-   · Dans les paramètres de simulation, augmenter le nombre de feux maximum\n\
-   · Cocher \"Maintenus à l'ouverture\"\n\
-   · Appuyer sur Ok puis confirmer la suppression des feux\n\
-   · Ouvrir à nouveau le réseau (SURTOUT NE PAS ENREGISTRER les modifications)\n\
-   · Réessayer.",
-                 asImpossibleCreerCarrefour = "Impossible de créer le carrefour";
 //---------------------------------------------------------------------------
 int Carrefours(int Colonnes, int Lignes)
 {
@@ -116,7 +104,7 @@ void TfrmCarrefours::Active(int Colonnes, int Lignes)
         {
             Component = Components[i];
             asType = AnsiString(NomClasseDe(Component)); // portage : TObject::ClassName() -> NomClasseDe
-            (static_cast<QWidget *>(Component))
+            (dynamic_cast<QWidget *>(Component))
                 ->setEnabled(
                     ((asType == "TGroupBox") && // portage : TControl::Enabled -> QWidget::setEnabled
                      (NomDe(Component).SubString(9, 2) == asTaille)) ||                               // v6.0.10
@@ -143,7 +131,7 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
     const int yd = frmSimulation->DrawGridSimul->Selection.Top;
     const int xf = frmSimulation->DrawGridSimul->Selection.Right;
     const int yf = frmSimulation->DrawGridSimul->Selection.Bottom;
-    const int mrRep = (static_cast<TSpeedButton *>(Sender))->Tag;
+    const int mrRep = (dynamic_cast<TSpeedButton *>(Sender))->Tag;
     const int Dimensions = mrRep / 100;
     const int Orientation = (mrRep % 100) / 10;
     const int Type = mrRep % 10;

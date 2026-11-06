@@ -16,7 +16,7 @@
 //---------------------------------------------------------------------------
 TfrmStatsVehicules *frmStatsVehicules;
 //---------------------------------------------------------------------------
-const AnsiString asTitre = "Statistique des véhicules d'une étape à l'autre [Tour %d]";
+constexpr const char *asTitre = "Statistique des véhicules d'une étape à l'autre [Tour %d]";
 //---------------------------------------------------------------------------
 TfrmStatsVehicules::TfrmStatsVehicules(TComponent *Owner) : TForm(Owner)
 {

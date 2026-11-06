@@ -33,7 +33,7 @@ TfrmStatsAttenteTrafic::TfrmStatsAttenteTrafic(TComponent *Owner) : TForm(Owner)
         if (i != 4)
         { // v5.4 : plus de zoom !
             frmSimulation->AffecteGlyphe(GLYPHE_DIR + i,
-                                         (static_cast<TBitBtn *>(FindComponent(
+                                         (dynamic_cast<TBitBtn *>(FindComponent(
                                               UnicodeString("BitBtn" + IntToStr(1 + (i % 3)) + IntToStr(1 + (i / 3))))))
                                              ->Glyph);
         }
@@ -114,9 +114,10 @@ AnsiString TfrmStatsAttenteTrafic::asMsgDetailCase(int x, int y)
         }
         else
         {
-            asMsg = Format("Attente en (%d, %d) au tour %d : %d tours (Max. %d) soit %.3f%%",
-                           TableauDeConstantes(x, y, cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
-                                               static_cast<long double>((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts])));
+            asMsg =
+                Format("Attente en (%d, %d) au tour %d : %d tours (Max. %d) soit %.3f%%",
+                       TableauDeConstantes(x, y, cv->TourCrt, cv->v[x][y].Attente[ed][ea], m[ts],
+                                           static_cast<long double>((100.0 * cv->v[x][y].Attente[ed][ea]) / m[ts])));
         }
     }
     return asMsg;
@@ -255,7 +256,7 @@ void TfrmStatsAttenteTrafic::BitBtnDirClick(TObject *Sender) const
 //---------------------------------------------------------------------------
 void TfrmStatsAttenteTrafic::RubriqueClick(TObject *Sender)
 {
-    TBitBtn *BitBtn = static_cast<TBitBtn *>(
+    TBitBtn *BitBtn = dynamic_cast<TBitBtn *>(
         FindComponent("BitBtn" + IntToStr(TagDe(static_cast<TComponent *>(Sender))))); // portage
                                                                                        // :
                                                                                        // TComponent::Tag

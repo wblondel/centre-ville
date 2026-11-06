@@ -822,7 +822,7 @@ public:
         {
             return false;
         }
-        auto *k = static_cast<QKeyEvent *>(e);
+        auto *k = dynamic_cast<QKeyEvent *>(e);
         if (e->type() == QEvent::KeyRelease)
         { // KeyPreview : OnKeyUp de la fiche
             FicheRaccourcis *f = FicheDe(w);

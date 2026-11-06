@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "compat/chaine.h"
+#include <array>
 #include "controles.h"
 #include "simul.h"
 #include "vcl.h"
@@ -18,13 +19,13 @@
 //---------------------------------------------------------------------------
 TfrmDefVoie *frmDefVoie = nullptr;
 //---------------------------------------------------------------------------
-const AnsiString asFrmMsgSuppr = "\
+constexpr const char *asFrmMsgSuppr = "\
 Le feu %s (à supprimer) est référencé par le feu %sn°%d (%d,%d).\n\
 Si vous choisissez de supprimer le feu, TOUTES les références seront supprimées.\n\n\
-Voulez-vous néanmoins le supprimer ?",   // v5.2 : ajout d'un paramètre permettant d'indiquer si la référence est un feu
-                                         // de circulation ou de piéton
-    asVoieOuPieton[2] = {"", "piéton "}, // v5.2 : Paramètre %s de la chaîne ci-dessus
-    asMAJIgnoree = "Modifications de priorité ignorées";
+Voulez-vous néanmoins le supprimer ?"; // v5.2 : ajout d'un paramètre permettant d'indiquer si la référence est un feu
+                                       // // de circulation ou de piéton
+constexpr std::array<const char *, 2> asVoieOuPieton = {"", "piéton "}; // v5.2 : Paramètre %s de la chaîne ci-dessus
+constexpr const char *asMAJIgnoree = "Modifications de priorité ignorées";
 
 //---------------------------------------------------------------------------
 TfrmDefVoie::TfrmDefVoie(TComponent *Owner) : TForm(Owner)
@@ -302,7 +303,7 @@ void TfrmDefVoie::FormCreate(TObject * /*Sender*/)
 
 void TfrmDefVoie::RadioGroupPrioriteClick(TObject *Sender)
 { // v5.2 : Factorisation
-    auto *RadioGroupPriorite = static_cast<TRadioGroup *>(Sender);
+    auto *RadioGroupPriorite = dynamic_cast<TRadioGroup *>(Sender);
     if (RadioGroupPriorite->ItemIndex != v->Priorite[RadioGroupPriorite->Tag])
     {
         ButtonAppliquer->Enabled = true;

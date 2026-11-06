@@ -25,8 +25,8 @@ std::string Hexa8(std::uint64_t v)
 std::string LigneTour(const centre_ville *cv)
 {
     std::string Ligne =
-        std::format("tour {} graine={:08x} sortis={} arrives={} deplaces={} gueris={} infectes={} morts={} |", cv->TourCrt,
-                    alea::Graine(), cv->NbVehiculesSortis, cv->NbVehiculesArrives, cv->NbVehiculesDeplaces,
+        std::format("tour {} graine={:08x} sortis={} arrives={} deplaces={} gueris={} infectes={} morts={} |",
+                    cv->TourCrt, alea::Graine(), cv->NbVehiculesSortis, cv->NbVehiculesArrives, cv->NbVehiculesDeplaces,
                     cv->NbPietonsGueris, cv->NbPietonsInfectes, cv->NbPietonsMorts);
     // Clés courtes, dans l'ordre de partie_etat (voir l'en-tête des fichiers)
     const static char *Cles[peDistances] = {"c", "f", "fp", "pk", "v", "b", "t", "x", "pl", "vl", "p", "k"};

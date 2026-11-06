@@ -34,7 +34,6 @@ const int BoutonDefaut[NBTYPESMESSAGE][NBMAXBOUTONS] = {
     {0, 0, 0}, {0, 0, 0}, {0, 1, 0}, {0, 1, 2},
 };
 //---------------------------------------------------------------------------
-const AnsiString asDebutNomSpinEdit = "CSpinEdit";
 //---------------------------------------------------------------------------
 const struct
 {
@@ -194,7 +193,7 @@ public:
     bool eventFilter(QObject * /*watched*/, QEvent *e) override
     {
         return ((e->type() == QEvent::KeyPress) || (e->type() == QEvent::ShortcutOverride)) &&
-               (static_cast<QKeyEvent *>(e)->key() == Qt::Key_Escape);
+               (dynamic_cast<QKeyEvent *>(e)->key() == Qt::Key_Escape);
     }
 };
 //-------------------------------------------------------------------------
@@ -237,7 +236,7 @@ type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTit
     }
     if (QAbstractButton *b = Boutons[BoutonDefaut[Type][OrdreBoutonDefaut]])
     {
-        Boite.setDefaultButton(static_cast<QPushButton *>(b));
+        Boite.setDefaultButton(dynamic_cast<QPushButton *>(b));
     }
     Boite.exec();
     switch (Boite.standardButton(Boite.clickedButton()))

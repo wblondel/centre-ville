@@ -244,13 +244,6 @@ const bool DirPossSensVoieTramBase[NBSENSVOIETRAMBASE][NBDIR + 1][NBDIR + 1] = {
 //---------------------------------------------------------------------------
 const coin CoinDir[NBDIR + 1] = {aucun_coin, haut_droite, bas_droite, bas_gauche, haut_gauche}; // v3.8
 //---------------------------------------------------------------------------
-const AnsiString asDir[NBDIR + 1] = {"", "Nord", "Est", "Sud", "Ouest"},
-                               asDirPoss[16] = {
-                                   "",          "Nord",           "Est",           "Nord+Est",
-                                   "Sud",       "Nord+Sud",       "Est+Sud",       "Nord+Est+Sud",
-                                   "Ouest",     "Nord+Ouest",     "Est+Ouest",     "Nord+Est+Ouest",
-                                   "Sud+Ouest", "Nord+Sud+Ouest", "Est+Sud+Ouest", "Nord+Est+Sud+Ouest",
-                               };
 //---------------------------------------------------------------------------
 // v6.0.2 : FileRead renvoie le nombre d'octets lus, ou -1 : les deux étaient vrais dans
 // les chaînes de && des Charge(). Seul un champ lu en entier compte pour lu
@@ -368,9 +361,11 @@ void VerifieDirection(AnsiString &asMsgErr, const AnsiString &asSource, directio
 {
     if (((d < indefinie) && PeutEtreIndefinie) || ((d <= indefinie) && (!PeutEtreIndefinie)) || (d > ouest))
     {
-        asMsgErr += asSource + Format(": direction incorrecte (%d)\n", TableauDeConstantes(static_cast<int>(d))); // v5.4 enum as
-                                                                                                     // char type (cast
-                                                                                                     // int)
+        asMsgErr +=
+            asSource + Format(": direction incorrecte (%d)\n", TableauDeConstantes(static_cast<int>(d))); // v5.4 enum
+                                                                                                          // as char
+                                                                                                          // type (cast
+                                                                                                          // int)
     }
 }
 //-----------------------------------------------------------------------------
@@ -378,8 +373,10 @@ void VerifiePriorite(AnsiString &asMsgErr, const AnsiString &asSource, priorite 
 {
     if ((p < a_droite) || (p > feux))
     {
-        asMsgErr += asSource + Format(": priorité incorrecte (%d)\n", TableauDeConstantes(static_cast<int>(p))); // v5.4 enum as char
-                                                                                                    // type (cast int)
+        asMsgErr +=
+            asSource + Format(": priorité incorrecte (%d)\n", TableauDeConstantes(static_cast<int>(p))); // v5.4 enum as
+                                                                                                         // char type
+                                                                                                         // (cast int)
     }
 }
 //-----------------------------------------------------------------------------
@@ -387,13 +384,13 @@ void VerifieDirPoss(AnsiString &asMsgErr, const AnsiString &asSource, dirposs dp
 {
     if ((dp < aucune) || (dp > NESO))
     {
-        asMsgErr +=
-            asSource + Format(": directions possibles incorrectes (%d)\n", TableauDeConstantes(static_cast<int>(dp))); // v5.4
-                                                                                                          // enum as
-                                                                                                          // char
-                                                                                                          // type
-                                                                                                          // (cast
-                                                                                                          // int)
+        asMsgErr += asSource + Format(": directions possibles incorrectes (%d)\n",
+                                      TableauDeConstantes(static_cast<int>(dp))); // v5.4
+                                                                                  // enum as
+                                                                                  // char
+                                                                                  // type
+                                                                                  // (cast
+                                                                                  // int)
     }
 }
 //-----------------------------------------------------------------------------
@@ -401,8 +398,11 @@ void VerifieEtat(AnsiString &asMsgErr, const AnsiString &asSource, etat_feu e)
 {
     if ((e < inactif) || (e > rouge))
     {
-        asMsgErr += asSource + Format(": état incorrect (%d)\n", TableauDeConstantes(static_cast<int>(e))); // v5.4 enum as char type
-                                                                                               // (cast int)
+        asMsgErr += asSource + Format(": état incorrect (%d)\n", TableauDeConstantes(static_cast<int>(e))); // v5.4 enum
+                                                                                                            // as char
+                                                                                                            // type
+                                                                                                            // (cast
+                                                                                                            // int)
     }
 }
 //-----------------------------------------------------------------------------
@@ -410,13 +410,13 @@ void VerifieDmdVert(AnsiString &asMsgErr, const AnsiString &asSource, dmd_vert d
 {
     if ((dv < arrivee_vehicule) || (dv > immediate))
     {
-        asMsgErr +=
-            asSource + Format(": type de demande du vert incorrect (%d)\n", TableauDeConstantes(static_cast<int>(dv))); // v5.4
-                                                                                                           // enum as
-                                                                                                           // char
-                                                                                                           // type
-                                                                                                           // (cast
-                                                                                                           // int)
+        asMsgErr += asSource + Format(": type de demande du vert incorrect (%d)\n",
+                                      TableauDeConstantes(static_cast<int>(dv))); // v5.4
+                                                                                  // enum as
+                                                                                  // char
+                                                                                  // type
+                                                                                  // (cast
+                                                                                  // int)
     }
 }
 //-----------------------------------------------------------------------------
@@ -1550,7 +1550,7 @@ void vehicule::CalculeProchaineDirection()
 //-----------------------------------------------------------------------------
 direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETRE DEFINIE
 {
-    voie *v = &cv->Voisine(x, y, Dir);             // Ici v est la prochaine case
+    voie *v = &cv->Voisine(x, y, Dir);               // Ici v est la prochaine case
     const bool Prioritaire = (NivPriorite > normal); // v3.5 (pour DistParking)
     int OrdreDir[NBDIR] = {0, 0, 0, 0};
     int i = 0;
@@ -5089,8 +5089,12 @@ void voie::Verifie(AnsiString &asMsgErr)
         if ((NumFeu[i] != 0) && (Priorite[i] != feux))
         {
             asMsgErr += asSource + Format(": numéro de feu %s mais priorité différente de Feu (%d)\n",
-                                          TableauDeConstantes(asDir[i + 1], static_cast<int>(Priorite[i]))); // v5.4 enum as char
-                                                                                                // type (cast int)
+                                          TableauDeConstantes(asDir[i + 1], static_cast<int>(Priorite[i]))); // v5.4
+                                                                                                             // enum as
+                                                                                                             // char
+                                                                                                             // type
+                                                                                                             // (cast
+                                                                                                             // int)
         }
         if ((NumFeu[i] < 0) || (NumFeu[i] > cv->NbFeux))
         {
@@ -6507,7 +6511,7 @@ direction centre_ville::DirectionArretBus(int x, int y) const // v3.0
     for (d = nord; d <= ouest; d++)
     {                                                         // On prend la dernière possibilité en cas de litige
         if (((v[x][y].DirPoss & PossDir[d]) == 0) &&          // Si pas de déplacement vers d ET
-            (Voisine(x, y, d).DirPoss == 0) &&                    // Mur vers d ET
+            (Voisine(x, y, d).DirPoss == 0) &&                // Mur vers d ET
             ((v[x][y].DirPoss & PossDir[AGaucheDe[d]]) != 0)) // Direction possible à gauche (sens de la circulation de
                                                               // la voie)
         {
@@ -8400,7 +8404,8 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     }
     if ((TypeStats < par_nombre) || (TypeStats > par_pourcentage))
     {
-        asMsgErr += Format("Le type de statistique est incorrect (%d)\n", TableauDeConstantes(static_cast<int>(TypeStats)));
+        asMsgErr +=
+            Format("Le type de statistique est incorrect (%d)\n", TableauDeConstantes(static_cast<int>(TypeStats)));
     }
     if ((NbVitesses < 1) || (NbVitesses > 3))
     {
@@ -8691,7 +8696,7 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
             EntreeIntersection = true;
         for (k = 0, Ok = true, AutreDirection = false; Ok && (k <= l); k++)
         {
-            voie *vc = &Voisine(x, y, k, d);                             // Case suivante
+            voie *vc = &Voisine(x, y, k, d);                               // Case suivante
             Ok = ((/*MemeDir=*/vc->DirPoss & PossDir[d]) == 0) &&          // S'il s'agit d'une direction possible = d
                  (!(DirOpposee = ((vc->DirPoss & InvPossDir[d]) != 0))) && // OU une direction opposée à d
                  ((vc->DirPoss == 0) ||

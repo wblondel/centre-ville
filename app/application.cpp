@@ -43,7 +43,7 @@ bool OuvertureFichiers::eventFilter(QObject *o, QEvent *e)
 {
     if (e->type() == QEvent::FileOpen)
     {
-        QString f = static_cast<QFileOpenEvent *>(e)->file();
+        QString f = dynamic_cast<QFileOpenEvent *>(e)->file();
         if (frmSimulation && frmSimulation->isVisible())
         {
             frmSimulation->OuvreFichierDemande(A(QDir::toNativeSeparators(f)));

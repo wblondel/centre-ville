@@ -32,7 +32,7 @@ extern void DebugOuvre();
 extern void DebugEcrit(const AnsiString &asMessage);
 extern void DebugFerme();
 //---------------------------------------------------------------------------
-const extern AnsiString asDebutNomSpinEdit; // v5.4
+inline constexpr const char *asDebutNomSpinEdit = "CSpinEdit"; // v5.4
 //---------------------------------------------------------------------------
 extern String stRepLocalAppData();                                                     // v5.4
 extern void CopieCartesExemple(const QString &stSource, const QString &stDestination); // v6.0.1

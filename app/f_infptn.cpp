@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "base.h"
+#include <array>
 #include "compat/chaine.h"
 #include "simul.h"
 #include "vcl.h"
@@ -42,37 +43,38 @@ constexpr int MORT = 16; // v5.4.1
 //---------------------------------------------------------------------------
 TfrmInfosPieton *frmInfosPieton;
 //---------------------------------------------------------------------------
-const AnsiString asLabel = "Label", asDebutTitreCadrePieton = "                           ",
-                 asFrmNumeroCoordonnees = "%d (%2.2d, %2.2d)", asFrmCoordonnees = "%2.2d, %2.2d",
-                 asFrmPourcentage = "#.000%", // v3.0. v5.4.1 : FormatFloat n'utilise pas le format "%.3f%%" mais
-                                              // "#.000%"
-    asFrmPourcents = "0.0%",                  // v5.4.1 : porucentage à 0,1 près
-    asFrmDemiCase = "0.0",                    // v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
-    asPosition[NBPOSITIONS] = {"Entrée de la case", "Sortie de la case", "Dans un bus", "Dans un tram",
-                               "Dans un taxi",      "Dans un vehlib"}, // v5.3 (vehlib). v6.0.2 : « ans un vehlib »
-    asSituation[NBSITUATIONS] =
-        {
-            "Se promène",
-            "Se dirige vers un passage piéton",
-            "Se dirige vers un arrêt de bus",
-            "Se dirige vers un arrêt de trams",
-            "Se dirige vers une file de taxis",
-            "Se dirige vers une file de vehlibs", // v5.3
-            "Attend un bus à l'arrêt",
-            "Attend dans le bus",
-            "Attend un tram à l'arrêt",
-            "Attend dans le tram",
-            "Attend un taxi en tête de file",
-            "Attend dans le taxi",
-            "Attend un vehlib",      // v5.3
-            "Attend dans le vehlib", // v5.3
-            "Descend au prochain arrêt",
-            "Ecrasé (mode sanglant)",
-            "Mort (épidémie)",
-        },
-                 asOuiNon[2] = {"Non", "Oui"}, // v5.4.1
-    asFrmPrmDrn = "%d, %d",                    // v5.4.1
-    asEtatFinal[2] = {"Guéri", "Mort"}, asNA = "N/A";
+constexpr const char *asLabel = "Label";
+constexpr const char *asDebutTitreCadrePieton = "                           ";
+constexpr const char *asFrmNumeroCoordonnees = "%d (%2.2d, %2.2d)";
+constexpr const char *asFrmCoordonnees = "%2.2d, %2.2d";
+constexpr const char *asFrmPourcents = "0.0%"; // v5.4.1 : porucentage à 0,1 près
+constexpr const char *asFrmDemiCase = "0.0";   // v5.4.1 : FormatFloat n'utilise pas le format "%.1f" mais "#.0"
+constexpr std::array<const char *, NBPOSITIONS> asPosition = {
+    "Entrée de la case", "Sortie de la case", "Dans un bus",
+    "Dans un tram",      "Dans un taxi",      "Dans un vehlib"}; // v5.3 (vehlib). v6.0.2 : « ans un vehlib »
+constexpr std::array<const char *, NBSITUATIONS> asSituation = {
+    "Se promène",
+    "Se dirige vers un passage piéton",
+    "Se dirige vers un arrêt de bus",
+    "Se dirige vers un arrêt de trams",
+    "Se dirige vers une file de taxis",
+    "Se dirige vers une file de vehlibs",
+    "Attend un bus à l'arrêt",
+    "Attend dans le bus",
+    "Attend un tram à l'arrêt",
+    "Attend dans le tram",
+    "Attend un taxi en tête de file",
+    "Attend dans le taxi",
+    "Attend un vehlib",
+    "Attend dans le vehlib",
+    "Descend au prochain arrêt",
+    "Ecrasé (mode sanglant)",
+    "Mort (épidémie)",
+};                                                               // v5.3 // v5.3 // v5.3
+constexpr std::array<const char *, 2> asOuiNon = {"Non", "Oui"}; // v5.4.1
+constexpr const char *asFrmPrmDrn = "%d, %d";                    // v5.4.1
+constexpr std::array<const char *, 2> asEtatFinal = {"Guéri", "Mort"};
+constexpr const char *asNA = "N/A";
 //---------------------------------------------------------------------------
 TfrmInfosPieton::TfrmInfosPieton(TComponent *Owner) : TForm(Owner)
 {

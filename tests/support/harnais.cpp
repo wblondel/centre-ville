@@ -114,8 +114,9 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
                 (!(Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
                                                                                     // d'arrêts
             {
-                asMsgErr = Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
+                asMsgErr =
+                    Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
+                           TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
                 break;
             }
         }

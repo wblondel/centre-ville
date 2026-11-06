@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------
 #include "f_inftaxi.h"
 
+#include <array>
 #include <algorithm>
 #include "f_simul.h"
 #include "base.h"
@@ -16,10 +17,12 @@
 //---------------------------------------------------------------------------
 TfrmInfosTaxi *frmInfosTaxi;
 //---------------------------------------------------------------------------
-const AnsiString asDebutTitreCadreTaxi = "                           ", asFrmNumeroCoordonnees = "%d (%2.2d, %2.2d)",
-                 asFrmCoordonnees = "%2.2d, %2.2d", asFrmPourcentage = "%.3f%%", asFrmVitesse = "%d/%d",
-                 asSituation[NBSITUATIONSTAXI] = {"En attente", "Départ d'une course", "Dépôt de client(s)",
-                                                  "Retour d'une course"};
+constexpr const char *asDebutTitreCadreTaxi = "                           ";
+constexpr const char *asFrmNumeroCoordonnees = "%d (%2.2d, %2.2d)";
+constexpr const char *asFrmCoordonnees = "%2.2d, %2.2d";
+constexpr const char *asFrmVitesse = "%d/%d";
+constexpr std::array<const char *, NBSITUATIONSTAXI> asSituation = {"En attente", "Départ d'une course",
+                                                                    "Dépôt de client(s)", "Retour d'une course"};
 //---------------------------------------------------------------------------
 TfrmInfosTaxi::TfrmInfosTaxi(TComponent *Owner) : TForm(Owner)
 {
@@ -44,7 +47,7 @@ void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
     RadioButtonAucunTaxi->Enabled = !ARendreVisible;
     for (i = 1; i < 13; i++)
     {
-        (static_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
+        (dynamic_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
     }
     LabelSituation->Visible = ARendreVisible;
     LabelDirection->Visible = ARendreVisible;

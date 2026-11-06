@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------------
 // #pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2) // portage : pragma C++Builder neutralisé
 //---------------------------------------------------------------------------
+#include <array>
 #include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
 #include "compat/temps.h"  // portage : remplace <systdate.h> (TDateTime, Time)
 //---------------------------------------------------------------------------
@@ -1725,7 +1726,12 @@ const extern sens SensPsgPt[16];
 const extern direction Dirdp[NBDIR][16], InvDir[NBDIR + 1], AGaucheDe[NBDIR + 1], ADroiteDe[NBDIR + 1];
 const extern sens_voie_tram SensVoieTramDir[NBDIR + 1][NBDIR + 1]; // v3.5
 const extern coin CoinDir[NBDIR + 1];                              // v3.8
-const extern AnsiString asDir[NBDIR + 1], asDirPoss[16];
+inline constexpr std::array<const char *, NBDIR + 1> asDir = {"", "Nord", "Est", "Sud", "Ouest"};
+inline constexpr std::array<const char *, 16> asDirPoss = {
+    "",          "Nord",           "Est",           "Nord+Est",           "Sud",       "Nord+Sud",
+    "Est+Sud",   "Nord+Est+Sud",   "Ouest",         "Nord+Ouest",         "Est+Ouest", "Nord+Est+Ouest",
+    "Sud+Ouest", "Nord+Sud+Ouest", "Est+Sud+Ouest", "Nord+Est+Sud+Ouest",
+};
 //---------------------------------------------------------------------------
 extern bool VerifierApresOuverture, VerifierAvantSimulation;
 extern int dx[NBDIR + 1], dy[NBDIR + 1],

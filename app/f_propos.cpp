@@ -6,6 +6,7 @@
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
 // #pragma hdrstop // portage
 //---------------------------------------------------------------------------
+#include <array>
 #include <QDesktopServices> // portage : ShellExecute -> QDesktopServices::openUrl
 #include <QImage>           // portage
 #include <QPixmap>          // portage
@@ -41,96 +42,100 @@ struct Trait
 {
     int Bande, x0, x1;
 };
-const std::vector<Trait> Chiffres[10] = {
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 1, .x1 = 4},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 1, .x1 = 4},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 1, .x1 = 4},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 4},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 1, .x1 = 4},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 0
-    {{.Bande = 0, .x0 = 8, .x1 = 11},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 8, .x1 = 11}}, // 1
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 1, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 4},
-     {.Bande = 5, .x0 = 1, .x1 = 4},
-     {.Bande = 6, .x0 = 1, .x1 = 11}}, // 2
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 4, .x1 = 11},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 3
-    {{.Bande = 0, .x0 = 4, .x1 = 8},
-     {.Bande = 1, .x0 = 3, .x1 = 6},
-     {.Bande = 2, .x0 = 2, .x1 = 5},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 1, .x1 = 4},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 11},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 8, .x1 = 11}}, // 4 (d'origine)
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 1, .x1 = 4},
-     {.Bande = 2, .x0 = 1, .x1 = 8},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 4},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 1, .x1 = 4},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 5 (d'origine)
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 1, .x1 = 4},
-     {.Bande = 2, .x0 = 1, .x1 = 8},
-     {.Bande = 3, .x0 = 1, .x1 = 4},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 4},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 1, .x1 = 4},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 6
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 8, .x1 = 11},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 8, .x1 = 11}}, // 7
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 1, .x1 = 4},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 1, .x1 = 4},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 1, .x1 = 11},
-     {.Bande = 4, .x0 = 1, .x1 = 4},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 1, .x1 = 4},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 8
-    {{.Bande = 0, .x0 = 1, .x1 = 11},
-     {.Bande = 1, .x0 = 1, .x1 = 4},
-     {.Bande = 1, .x0 = 8, .x1 = 11},
-     {.Bande = 2, .x0 = 1, .x1 = 4},
-     {.Bande = 2, .x0 = 8, .x1 = 11},
-     {.Bande = 3, .x0 = 1, .x1 = 11},
-     {.Bande = 4, .x0 = 8, .x1 = 11},
-     {.Bande = 5, .x0 = 8, .x1 = 11},
-     {.Bande = 6, .x0 = 4, .x1 = 8}}, // 9
-};
+const std::array<std::vector<Trait>, 10> &Chiffres()
+{ // Construits au premier appel : une exception éventuelle reste interceptable
+    static const std::array<std::vector<Trait>, 10> Tableau = {{
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 1, .x1 = 4},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 1, .x1 = 4},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 1, .x1 = 4},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 4},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 1, .x1 = 4},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 0
+        {{.Bande = 0, .x0 = 8, .x1 = 11},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 8, .x1 = 11}}, // 1
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 1, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 4},
+         {.Bande = 5, .x0 = 1, .x1 = 4},
+         {.Bande = 6, .x0 = 1, .x1 = 11}}, // 2
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 4, .x1 = 11},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 3
+        {{.Bande = 0, .x0 = 4, .x1 = 8},
+         {.Bande = 1, .x0 = 3, .x1 = 6},
+         {.Bande = 2, .x0 = 2, .x1 = 5},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 1, .x1 = 4},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 11},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 8, .x1 = 11}}, // 4 (d'origine)
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 1, .x1 = 4},
+         {.Bande = 2, .x0 = 1, .x1 = 8},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 4},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 1, .x1 = 4},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 5 (d'origine)
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 1, .x1 = 4},
+         {.Bande = 2, .x0 = 1, .x1 = 8},
+         {.Bande = 3, .x0 = 1, .x1 = 4},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 4},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 1, .x1 = 4},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 6
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 8, .x1 = 11},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 8, .x1 = 11}}, // 7
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 1, .x1 = 4},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 1, .x1 = 4},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 1, .x1 = 11},
+         {.Bande = 4, .x0 = 1, .x1 = 4},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 1, .x1 = 4},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 8
+        {{.Bande = 0, .x0 = 1, .x1 = 11},
+         {.Bande = 1, .x0 = 1, .x1 = 4},
+         {.Bande = 1, .x0 = 8, .x1 = 11},
+         {.Bande = 2, .x0 = 1, .x1 = 4},
+         {.Bande = 2, .x0 = 8, .x1 = 11},
+         {.Bande = 3, .x0 = 1, .x1 = 11},
+         {.Bande = 4, .x0 = 8, .x1 = 11},
+         {.Bande = 5, .x0 = 8, .x1 = 11},
+         {.Bande = 6, .x0 = 4, .x1 = 8}}, // 9
+    }};
+    return Tableau;
+}
 void DessineTrait(QImage &Image, const Trait &t, int x, QRgb Clair, QRgb Ombre)
 {
     const int y = 1 + (3 * t.Bande);
@@ -153,7 +158,7 @@ QPixmap ImageDeVersion(int Majeure, int Mineure)
     int x = 0;
     for (const QChar c : stMajeure)
     {
-        for (const Trait &t : Chiffres[c.digitValue()])
+        for (const Trait &t : Chiffres()[c.digitValue()])
         {
             DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C));
         }
@@ -163,7 +168,7 @@ QPixmap ImageDeVersion(int Majeure, int Mineure)
     x += 2;
     for (const QChar c : stMineure)
     {
-        for (const Trait &t : Chiffres[c.digitValue()])
+        for (const Trait &t : Chiffres()[c.digitValue()])
         {
             DessineTrait(Image, t, x, qRgb(0xB5, 0xE6, 0x1D), qRgb(0x22, 0xB1, 0x4C));
         }
@@ -183,7 +188,7 @@ TfrmAPropos::TfrmAPropos(TComponent *Owner) : TForm(Owner)
 #else
     LabelAlignement->Caption = Format(LabelAlignement->Caption, TableauDeConstantes(32));
 #endif
-    LabelHDPI->Caption = LabelHDPI->Caption + FormatFloat("0.0", Screen->PixelsPerInch / 96.0); // v5.4.1
+    LabelHDPI->Caption = LabelHDPI->Caption + FormatFloat("0.0", Screen()->PixelsPerInch / 96.0); // v5.4.1
 }
 //---------------------------------------------------------------------------
 void TfrmAPropos::TimerTimer(TObject * /*Sender*/)

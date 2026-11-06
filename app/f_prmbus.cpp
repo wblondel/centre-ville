@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "base.h"
+#include <array>
 #include "compat/chaine.h"
 #include "controles.h"
 #include "vcl.h"
@@ -17,7 +18,7 @@
 //---------------------------------------------------------------------------
 TfrmParamBus *frmParamBus;
 //---------------------------------------------------------------------------
-const AnsiString asOrdre[2] = {"ème", "er"};
+constexpr std::array<const char *, 2> asOrdre = {"ème", "er"};
 //---------------------------------------------------------------------------
 TfrmParamBus::TfrmParamBus(TComponent *Owner) : TForm(Owner)
 {
@@ -28,7 +29,7 @@ TfrmParamBus::TfrmParamBus(TComponent *Owner) : TForm(Owner)
         if (i != 4)
         { // v5.4 : plus de zoom !
             frmSimulation->AffecteGlyphe(GLYPHE_DIR + i,
-                                         (static_cast<TBitBtn *>(FindComponent(
+                                         (dynamic_cast<TBitBtn *>(FindComponent(
                                               UnicodeString("BitBtn" + IntToStr(1 + (i % 3)) + IntToStr(1 + (i / 3))))))
                                              ->Glyph);
         }
@@ -37,7 +38,7 @@ TfrmParamBus::TfrmParamBus(TComponent *Owner) : TForm(Owner)
     { // v6.0.2 : champs des n° d'arrêts
         for (int j = 1; j <= NBMAXARRETSBUSTRAMPARLIGNE; j++)
         {
-            Connecte((static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->OnExit,
+            Connecte((dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->OnExit,
                      this, &TfrmParamBus::CSpinEditExit);
         }
     }
@@ -88,35 +89,35 @@ void TfrmParamBus::FormShow(TObject * /*Sender*/)
         {
             if (cv->NbArretsBus < NBMAXARRETSBUSTRAMPARLIGNE)
             {
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->MaxValue =
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->MaxValue =
                     cv->NbArretsBus;
             }
-            (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Value =
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Value =
                 cv->LigneBus[i - 1].NbArrets;
-            (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Enabled = cv->TourCrt == 0;
-            (static_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i))))->Visible =
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Enabled = cv->TourCrt == 0;
+            (dynamic_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i))))->Visible =
                 (cv->TourCrt > 0) && (cv->LigneBus[i - 1].NbArrets > 0);
             for (j = 1; j <= NBMAXARRETSBUSTRAMPARLIGNE; j++)
             {
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->MaxValue =
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->MaxValue =
                     cv->NbArretsBus;
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Value =
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Value =
                     cv->LigneBus[i - 1].NumArret[j - 1];
-                (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Enabled =
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Enabled =
                     cv->TourCrt == 0;
             }
             asNumLigne = IntToStr(i);
-            Shape = static_cast<TShape *>(FindComponent("Shape" + asNumLigne));
+            Shape = dynamic_cast<TShape *>(FindComponent("Shape" + asNumLigne));
             Shape->Brush->Color = CoulLigneBusTram[i - 1];
             Shape->Pen->Color = CoulLigneBusTram[i - 1];
-            (static_cast<TLabel *>(FindComponent("LabelL" + asNumLigne)))->Font->Color = CoulTLigneBusTram[i - 1];
+            (dynamic_cast<TLabel *>(FindComponent("LabelL" + asNumLigne)))->Font->Color = CoulTLigneBusTram[i - 1];
         }
     }
     else
     {
         for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
         {
-            (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Visible = false;
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Visible = false;
         }
         AfficheMessage(
             "Vous devez poser au moins un arrêt de bus sur le réseau pour pouvoir définir le réseau de lignes de bus.",
@@ -133,7 +134,7 @@ void TfrmParamBus::FormShow(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmParamBus::CSpinEditChange(TObject *Sender)
 {
-    auto *CSpinEdit = static_cast<TCSpinEdit *>(Sender);
+    auto *CSpinEdit = dynamic_cast<TCSpinEdit *>(Sender);
     int i = 0;
     const int k = StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length() - 9));
     const int n = CSpinEdit->Value;
@@ -143,7 +144,8 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
     case 0: // Nombre d'arrêts
         for (i = 1; i <= NBMAXARRETSBUSTRAMPARLIGNE; i++)
         {
-            (static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * k) + i))))->Visible = (i <= n);
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * k) + i))))->Visible =
+                (i <= n);
         }
         break;
     default: // N°d'arrêt de bus
@@ -187,7 +189,7 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
 //---------------------------------------------------------------------------
 void TfrmParamBus::CSpinEditExit(TObject *Sender)
 { // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
-    auto *CSpinEdit = static_cast<TCSpinEdit *>(Sender);
+    auto *CSpinEdit = dynamic_cast<TCSpinEdit *>(Sender);
     const int n = CSpinEdit->Value;
     if ((n <= 0) || (n > cv->NbArretsBus))
     {
@@ -207,7 +209,7 @@ void TfrmParamBus::ButtonAideClick(TObject * /*Sender*/)
 
 void TfrmParamBus::MenuItemClick(TObject *Sender)
 {
-    (static_cast<TBitBtn *>(FindComponent("BitBtn" + IntToStr(TagDe(static_cast<TComponent *>(Sender))))))
+    (dynamic_cast<TBitBtn *>(FindComponent("BitBtn" + IntToStr(TagDe(static_cast<TComponent *>(Sender))))))
         ->Click(); // portage : TComponent::Tag -> TagDe
 }
 //---------------------------------------------------------------------------
@@ -276,12 +278,12 @@ bool TfrmParamBus::AppliqueChoix()
     // 1. On vérifie que tous les arrêts sont définis
     for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
     {
-        CSpinEditNb = static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
+        CSpinEditNb = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
         if (CSpinEditNb->Value != 0)
         {
             for (j = 1; j <= CSpinEditNb->Value; j++)
             {
-                CSpinEditNum = static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
+                CSpinEditNum = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
                 if (CSpinEditNum->Value == 0)
                 {
                     asMsg = asMsg + Format(" - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
@@ -302,13 +304,13 @@ bool TfrmParamBus::AppliqueChoix()
     cv->InitialiseInfosLignesBus();
     for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
     {
-        CSpinEditNb = static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
+        CSpinEditNb = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
         if ((cv->LigneBus[i - 1].NbArrets = CSpinEditNb->Value) != 0)
         {
             cv->NbLignesBus++;
             for (j = 1; j <= CSpinEditNb->Value; j++)
             {
-                CSpinEditNum = static_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
+                CSpinEditNum = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
                 cv->LigneBus[i - 1].NumArret[j - 1] = CSpinEditNum->Value;
                 cv->ArretBus[CSpinEditNum->Value - 1].AjouteLigneBus(i); // v3.0.5
             }
@@ -353,7 +355,7 @@ void TfrmParamBus::CheckBoxClick(TObject *Sender)
 {
     if (CheckBoxTout->Tag == 0)
     {
-        if ((static_cast<TCheckBox *>(Sender))->Checked)
+        if ((dynamic_cast<TCheckBox *>(Sender))->Checked)
         { // v5.3
             WindowState = wsMinimized;
         }
@@ -367,7 +369,7 @@ void TfrmParamBus::CheckBoxToutClick(TObject * /*Sender*/)
     CheckBoxTout->Tag = 1;
     for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
-        (static_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i + 1))))->Checked =
+        (dynamic_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i + 1))))->Checked =
             (cv->LigneBus[i].NbArrets > 0) ? CheckBoxTout->Checked : false;
     }
     CheckBoxTout->Tag = 0;

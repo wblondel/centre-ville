@@ -151,7 +151,7 @@ int StrToInt(const AnsiString &asTexte); // texte invalide : exception (EConvert
 // plus proche (la moitié vers le haut), NAN/INF comme la VCL
 String FormatFloat(const AnsiString &asFormat, long double Valeur);
 //---------------------------------------------------------------------------
-// TScreen (Screen->PixelsPerInch) : résolution de l'écran principal comme la
+// TScreen (Screen()->PixelsPerInch) : résolution de l'écran principal comme la
 // donne Windows, 96 × facteur d'échelle (192 sur un écran Retina)
 //---------------------------------------------------------------------------
 class TScreen
@@ -160,7 +160,7 @@ public:
     Propriete<int> PixelsPerInch;
     TScreen();
 };
-extern TScreen *Screen;
+TScreen *Screen(); // Screen de la VCL
 //---------------------------------------------------------------------------
 // TApplication (Application->Title...)
 //---------------------------------------------------------------------------

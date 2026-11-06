@@ -16,7 +16,7 @@ constexpr int SURVOIE = 1;
 //---------------------------------------------------------------------------
 TfrmStatsComposition *frmStatsComposition = nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------
-const AnsiString asFrmPC = "###.##"; // v5.4, le format de FormatFloat a changé : "###.##" au lieu de "%6.2f"
+constexpr const char *asFrmPC = "###.##"; // v5.4, le format de FormatFloat a changé : "###.##" au lieu de "%6.2f"
 //---------------------------------------------------------------------------
 void Composition()
 {
