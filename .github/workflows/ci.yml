@@ -303,6 +303,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # La compilation et les tests ne lisent pas src/ (code d'origine) : seuls les jobs
+      # « fiches » et « images » en ont besoin. Le mettre de côté vérifie que rien d'autre ne le lit
+      - name: Set src/ aside
+        run: mv src "$RUNNER_TEMP/src-origine"
+
       - name: Prepare Qt, Ninja and Clang
         uses: ./.github/actions/prepare-qt
         with:
