@@ -3304,7 +3304,7 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
                     NivPriorite[d] =
                         static_cast<int>((cv->Tram[NumTV - 1].Dir == InvDir[d]) && // 1 TRAM Qui arrive sur la case...
                                          cv->TourDeDeplacementTram(NumTV - 1) &&   // ET que c'est son tour de
-                                                                                 // déplacement... (multivitesse)
+                                                                                   // déplacement... (multivitesse)
                                          (cv->TourCrt >= cv->Tram[NumTV - 1].TourDepartArretSvt) && // ET que c'est son
                                                                                                     // tour de départ
                                                                                                     // vers le prochain

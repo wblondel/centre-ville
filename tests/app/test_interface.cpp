@@ -3691,7 +3691,8 @@ void TestInterface::ficheCarrefours()
         for (int i = 0; i < NBDIR; i++)
         {
             QCOMPARE((int)cv->v[xf[i]][yf[i]].Priorite[df[i] - 1], (int)feux);
-            QVERIFY((NumFeux[i] = cv->v[xf[i]][yf[i]].NumFeu[df[i] - 1]) > 0);
+            NumFeux[i] = cv->v[xf[i]][yf[i]].NumFeu[df[i] - 1];
+            QVERIFY(NumFeux[i] > 0);
         }
         for (int i = 0; i < NBDIR; i++)
         {

@@ -107,47 +107,60 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     {
         for (j = 0; Ok && (j < NBMAXARRETSBUSTRAMPARLIGNE); j++)
         {
-            if ((j < cv->LigneBus[i].NbArrets) &&
-                (!(Ok = cv->ArretBus[cv->LigneBus[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
-                                                                                  // d'arrêts
+            if ((j < cv->LigneBus[i].NbArrets))
             {
-                asMsgErr = Format("La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(i + 1, cv->LigneBus[i].NumArret[j]));
-                break;
+                Ok = cv->ArretBus[cv->LigneBus[i].NumArret[j] - 1].Defini();
+                if ((!Ok)) // v3.5 : Oubli du test du nombre
+                           // d'arrêts
+                {
+                    asMsgErr = Format("La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
+                                      TableauDeConstantes(i + 1, cv->LigneBus[i].NumArret[j]));
+                    break;
+                }
             }
 
-            if ((j < cv->LigneTram[i].NbArrets) &&
-                (!(Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
-                                                                                    // d'arrêts
+            if ((j < cv->LigneTram[i].NbArrets))
             {
-                asMsgErr =
-                    Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                           TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
-                break;
+                Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini();
+                if ((!Ok)) // v3.5 : Oubli du test du nombre
+                           // d'arrêts
+                {
+                    asMsgErr = Format(
+                        "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
+                        TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
+                    break;
+                }
             }
         }
     }
     for (i = 0; Ok && (i < cv->NbArretsBus); i++)
     {
-        if (cv->ArretBus[i].Defini() && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
-        { // v3.0.3
-            xErr = cv->ArretBus[i].x;
-            yErr = cv->ArretBus[i].y;
-            asMsgErr = Format("La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
-                              TableauDeConstantes(i + 1));
-            break;
+        if (cv->ArretBus[i].Defini())
+        {
+            Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1);
+            if ((!Ok))
+            { // v3.0.3
+                xErr = cv->ArretBus[i].x;
+                yErr = cv->ArretBus[i].y;
+                asMsgErr = Format("La tête de l'arrêt de bus n°%d n'est pas définie ou est incorrecte.",
+                                  TableauDeConstantes(i + 1));
+                break;
+            }
         }
     }
     for (i = 0; Ok && (i < cv->NbArretsTram); i++)
     {
-        if (cv->ArretTram[i].Defini() &&
-            (!(Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1))))
-        { // v3.0.3
-            xErr = cv->ArretTram[i].x;
-            yErr = cv->ArretTram[i].y;
-            asMsgErr = Format("La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
-                              TableauDeConstantes(i + 1));
-            break;
+        if (cv->ArretTram[i].Defini())
+        {
+            Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1);
+            if ((!Ok))
+            { // v3.0.3
+                xErr = cv->ArretTram[i].x;
+                yErr = cv->ArretTram[i].y;
+                asMsgErr = Format("La tête de l'arrêt de tram n°%d n'est pas définie ou est incorrecte.",
+                                  TableauDeConstantes(i + 1));
+                break;
+            }
         }
     }
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0

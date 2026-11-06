@@ -494,10 +494,12 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
             VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_PSGPT + Sens - 1);
         }
         // 2d. On peint l'arrêt de bus
-        if ((v->NumArretBus != 0) && ((DirArretBus = cv->DirectionArretBus(Col, Row)) != 0)) // v3.0
+        if (v->NumArretBus != 0) // v3.0
         {
-            if ((!frmParamBus) || (!frmParamBus->Visible) || (frmParamBus->NumArretBusAMontrer != v->NumArretBus) ||
-                (frmParamBus->TimerClignotement->Tag != 0))
+            DirArretBus = cv->DirectionArretBus(Col, Row);
+            if ((DirArretBus != 0) &&
+                ((!frmParamBus) || (!frmParamBus->Visible) || (frmParamBus->NumArretBusAMontrer != v->NumArretBus) ||
+                 (frmParamBus->TimerClignotement->Tag != 0)))
             {
                 VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top,
                                           IDB_ARRETBUS + (3 * (DirArretBus - 1)) +
@@ -1619,23 +1621,29 @@ bool TfrmSimulation::VerifieReseau()
     {
         for (j = 0; Ok && (j < NBMAXARRETSBUSTRAMPARLIGNE); j++)
         {
-            if ((j < cv->LigneBus[i].NbArrets) &&
-                (!(Ok = cv->ArretBus[cv->LigneBus[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
-                                                                                  // d'arrêts
+            if ((j < cv->LigneBus[i].NbArrets))
             {
-                asMsgErr = Format("La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
-                                  TableauDeConstantes(i + 1, cv->LigneBus[i].NumArret[j]));
-                break;
+                Ok = cv->ArretBus[cv->LigneBus[i].NumArret[j] - 1].Defini();
+                if ((!Ok)) // v3.5 : Oubli du test du nombre
+                           // d'arrêts
+                {
+                    asMsgErr = Format("La ligne de bus n°%d utilise l'arrêt n°%d qui n'est pas défini.",
+                                      TableauDeConstantes(i + 1, cv->LigneBus[i].NumArret[j]));
+                    break;
+                }
             }
 
-            if ((j < cv->LigneTram[i].NbArrets) &&
-                (!(Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini()))) // v3.5 : Oubli du test du nombre
-                                                                                    // d'arrêts
+            if ((j < cv->LigneTram[i].NbArrets))
             {
-                asMsgErr =
-                    Format("La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
-                           TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
-                break;
+                Ok = cv->ArretTram[cv->LigneTram[i].NumArret[j] - 1].Defini();
+                if ((!Ok)) // v3.5 : Oubli du test du nombre
+                           // d'arrêts
+                {
+                    asMsgErr = Format(
+                        "La ligne de tram n°%s utilise l'arrêt n°%d qui n'est pas défini.",
+                        TableauDeConstantes(AnsiString(static_cast<char>('A' + i)), cv->LigneTram[i].NumArret[j]));
+                    break;
+                }
             }
         }
     }
@@ -2506,13 +2514,18 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
         {
             v = &cv->v[x][y];
             TypeVoieCrt = tvAucun;
-            // v5.4 : conversion CBC6>BCBX (pas de += dans les énumérés)
-            if (((((TypeVoie & tvRoute) != 0) && (v->DirPoss != 0) && ((NumArret = v->NumArretBus) != 0) &&
-                  ((TypeVoieCrt =
-                        static_cast<type_voie>((static_cast<int>(TypeVoieCrt)) + (static_cast<int>(tvRoute)))) != 0)) ||
-                 (((TypeVoie & tvVoieTram) != 0) && (v->SensVoieTram != 0) && ((NumArret = v->NumArretTram) != 0) &&
-                  ((TypeVoieCrt = static_cast<type_voie>((static_cast<int>(TypeVoieCrt)) +
-                                                         (static_cast<int>(tvVoieTram)))) != 0))) &&
+            // L'arrêt de la case : de bus sur une route, sinon de tram sur une voie de tram
+            if (((TypeVoie & tvRoute) != 0) && (v->DirPoss != 0) && (v->NumArretBus != 0))
+            {
+                NumArret = v->NumArretBus;
+                TypeVoieCrt = tvRoute;
+            }
+            else if (((TypeVoie & tvVoieTram) != 0) && (v->SensVoieTram != 0) && (v->NumArretTram != 0))
+            {
+                NumArret = v->NumArretTram;
+                TypeVoieCrt = tvVoieTram;
+            }
+            if ((TypeVoieCrt != tvAucun) &&
                 ((((TypeVoieCrt & tvRoute) != 0) && (!ArretBusDejaVu[NumArret - 1])) ||
                  (((TypeVoieCrt & tvVoieTram) != 0) && (!ArretTramDejaVu[NumArret - 1])))) // v3.5
             {
@@ -2578,11 +2591,18 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
         {
             v = &cv->v[x][y];
             TypeVoieCrt = tvAucun;
-            // v5.4 : conversion CBC6>BCBX (= au lieu de += dans les énumérés)
-            if (((((TypeVoie & tvRoute) != 0) && (v->DirPoss != 0) && ((NumArret = v->NumArretBus) != 0) &&
-                  ((TypeVoieCrt = tvRoute) != 0)) ||
-                 (((TypeVoie & tvVoieTram) != 0) && (v->SensVoieTram != 0) && ((NumArret = v->NumArretTram) != 0) &&
-                  ((TypeVoieCrt = ((TypeVoieCrt != 0) ? tvTout : tvVoieTram)) != 0))) &&
+            // L'arrêt de la case : de bus sur une route, sinon de tram sur une voie de tram
+            if (((TypeVoie & tvRoute) != 0) && (v->DirPoss != 0) && (v->NumArretBus != 0))
+            {
+                NumArret = v->NumArretBus;
+                TypeVoieCrt = tvRoute;
+            }
+            else if (((TypeVoie & tvVoieTram) != 0) && (v->SensVoieTram != 0) && (v->NumArretTram != 0))
+            {
+                NumArret = v->NumArretTram;
+                TypeVoieCrt = tvVoieTram;
+            }
+            if ((TypeVoieCrt != tvAucun) &&
                 ((((TypeVoieCrt & tvRoute) != 0) && (!ArretBusDejaVu[NumArret - 1])) || // v6.0.6 : NumArret-1,
                                                                                         // l'original lisait hors du
                                                                                         // tableau pour le dernier arrêt
