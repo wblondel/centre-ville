@@ -25,7 +25,7 @@ private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
     explicit TfrmAffDistFilesPark(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
-    void EffaceInfos() const;
+    void EffaceInfos();
     void RafraichitInfos();
 };
 //---------------------------------------------------------------------------

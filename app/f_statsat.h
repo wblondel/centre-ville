@@ -61,12 +61,12 @@ public: // portage : __published	// Composants gérés par l'EDI
     TMenuItem *Sep1{};
     TMenuItem *Sep2{};
     TMenuItem *RubriqueZoom{};
-    void PaintBoxPaint(TObject *Sender) const;
+    void PaintBoxPaint(TObject *Sender);
     void FormShow(TObject *Sender);
 
     void ParametresParkingsClick(TObject *Sender);
     void RadioGroupTypeClick(TObject *Sender);
-    void BitBtnDirClick(TObject *Sender) const;
+    void BitBtnDirClick(TObject *Sender);
 
     void RubriqueClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);

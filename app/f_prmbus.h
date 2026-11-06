@@ -200,13 +200,13 @@ public: // portage : __published	// Composants gérés par l'EDI
     static void CSpinEditExit(TObject *Sender); // v6.0.2
     void ButtonAideClick(TObject *Sender);
     void MenuItemClick(TObject *Sender);
-    void BitBtnDirClick(TObject *Sender) const;
-    void TimerClignotementTimer(TObject *Sender) const;
+    void BitBtnDirClick(TObject *Sender);
+    void TimerClignotementTimer(TObject *Sender);
 
     void ButtonOkClick(TObject *Sender);
     void ButtonAppliquerClick(TObject *Sender);
 
-    void CSpinEditParametresChange(TObject *Sender) const;
+    void CSpinEditParametresChange(TObject *Sender);
     void CheckBoxClick(TObject *Sender);
 
     void CheckBoxToutClick(TObject *Sender);
@@ -215,7 +215,7 @@ public: // portage : __published	// Composants gérés par l'EDI
 private: // Déclarations de l'utilisateur
     int NbArretsBus{};
     bool InitialisationEnCours{};
-    void RafraichitNbBus() const;
+    void RafraichitNbBus();
     bool AppliqueChoix();
 
 public: // Déclarations de l'utilisateur

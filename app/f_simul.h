@@ -421,21 +421,21 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void FormDestroy(TObject *Sender);
     void DrawGridSimulDblClick(TObject *Sender);
     void FormShow(TObject *Sender);
-    static void RafraichitFichesInfos();    // v6.0.2
-    void RafraichitFichesPriorites() const; // v6.0.11
+    static void RafraichitFichesInfos(); // v6.0.2
+    void RafraichitFichesPriorites();    // v6.0.11
     void DrawGridSimulClick(TObject *Sender);
     void TimerSimulTimer(TObject *Sender);
     void FormCloseQuery(TObject *Sender, bool &CanClose);
     void MenuItemBarreOutilsClick(TObject *Sender);
     void PopupMenuBarreOutilsPopup(TObject *Sender);
     void FormKeyUp(TObject *Sender, WORD &Key, TShiftState Shift);
-    void TimerClignotementErreurTimer(TObject *Sender) const;
+    void TimerClignotementErreurTimer(TObject *Sender);
     void ActionQuitterExecute(TObject *Sender);
-    void ActionVerifierApresOuvertureExecute(TObject *Sender) const;
+    void ActionVerifierApresOuvertureExecute(TObject *Sender);
     void ActionNouveauExecute(TObject *Sender);
     void ActionOuvrirExecute(TObject *Sender);
     void ActionEnregistrerExecute(TObject *Sender);
-    void ActionEnregistrerSousExecute(TObject *Sender) const;
+    void ActionEnregistrerSousExecute(TObject *Sender);
     void ActionAfficherDirectionsExecute(TObject *Sender);
     void ActionAfficherSignalisationExecute(TObject *Sender);
     void ActionAfficherVoiesExecute(TObject *Sender);
@@ -448,17 +448,17 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionMarcheExecute(TObject *Sender);
     void ActionInterruptionExecute(TObject *Sender);
     void ActionArretExecute(TObject *Sender);
-    void ActionVerifierAvantSimulationExecute(TObject *Sender) const;
+    void ActionVerifierAvantSimulationExecute(TObject *Sender);
     void ActionEvolutionExecute(TObject *Sender);
-    void ActionStatsAff10ToursExecute(TObject *Sender) const;
-    void ActionStatsAff20ToursExecute(TObject *Sender) const;
-    void ActionStatsAff50ToursExecute(TObject *Sender) const;
-    void ActionStatsAff100ToursExecute(TObject *Sender) const;
-    void ActionStatsAff200ToursExecute(TObject *Sender) const;
-    void ActionStatsAff500ToursExecute(TObject *Sender) const;
-    void ActionStatsAffParVehiculeExecute(TObject *Sender) const;
-    void ActionStatsAffParPourcentExecute(TObject *Sender) const;
-    void ActionStatsAffQuadrillageExecute(TObject *Sender) const;
+    void ActionStatsAff10ToursExecute(TObject *Sender);
+    void ActionStatsAff20ToursExecute(TObject *Sender);
+    void ActionStatsAff50ToursExecute(TObject *Sender);
+    void ActionStatsAff100ToursExecute(TObject *Sender);
+    void ActionStatsAff200ToursExecute(TObject *Sender);
+    void ActionStatsAff500ToursExecute(TObject *Sender);
+    void ActionStatsAffParVehiculeExecute(TObject *Sender);
+    void ActionStatsAffParPourcentExecute(TObject *Sender);
+    void ActionStatsAffQuadrillageExecute(TObject *Sender);
     void ActionFluiditeTraficExecute(TObject *Sender);
     static void ActionCompositionExecute(TObject *Sender);
     void ActionStatsParkingsExecute(TObject *Sender);
@@ -475,7 +475,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionDirectionGaucheTramExecute(TObject *Sender);
     void ActionEffacerVoieTramExecute(TObject *Sender);
     void ActionToutDroitExecute(TObject *Sender);
-    void ActionPrioritesExecute(TObject *Sender) const;
+    void ActionPrioritesExecute(TObject *Sender);
     void ActionParkingExecute(TObject *Sender);
     void ActionDepotBusExecute(TObject *Sender);
     void ActionPassagePietonsExecute(TObject *Sender);
@@ -496,25 +496,25 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionCarrefoursExecute(TObject *Sender);
     void ActionEffacerRoutesExecute(TObject *Sender);
     void ActionEffacerVoiesTramExecute(TObject *Sender);
-    void ActionDefinirNatureExecute(TObject *Sender) const;
-    void ActionRechercherExecute(TObject *Sender) const;
-    void ActionDetailVehiculeExecute(TObject *Sender) const;
-    void ActionDetailBusExecute(TObject *Sender) const;
-    void ActionDetailTramExecute(TObject *Sender) const;
-    void ActionDetailPietonExecute(TObject *Sender) const;
-    void ActionDetailTaxiExecute(TObject *Sender) const;
-    void ActionDetailVehlibExecute(TObject *Sender) const;
-    void ActionDistancesParkingsExecute(TObject *Sender) const;
-    void ActionDistancesArretsBusExecute(TObject *Sender) const;
-    void ActionDistancesArretsTramExecute(TObject *Sender) const;
-    void ActionDistancesFilesTaxiExecute(TObject *Sender) const;
-    void ActionSuivreVehiculeExecute(TObject *Sender) const;
-    void ActionSuivreBusExecute(TObject *Sender) const;
-    void ActionSuivreTramExecute(TObject *Sender) const;
-    void ActionSuivreTaxiExecute(TObject *Sender) const;
-    void ActionSuivreVehlibExecute(TObject *Sender) const;
-    void ActionSuivrePieton1Execute(TObject *Sender) const;
-    void ActionSuivrePieton2Execute(TObject *Sender) const;
+    void ActionDefinirNatureExecute(TObject *Sender);
+    void ActionRechercherExecute(TObject *Sender);
+    void ActionDetailVehiculeExecute(TObject *Sender);
+    void ActionDetailBusExecute(TObject *Sender);
+    void ActionDetailTramExecute(TObject *Sender);
+    void ActionDetailPietonExecute(TObject *Sender);
+    void ActionDetailTaxiExecute(TObject *Sender);
+    void ActionDetailVehlibExecute(TObject *Sender);
+    void ActionDistancesParkingsExecute(TObject *Sender);
+    void ActionDistancesArretsBusExecute(TObject *Sender);
+    void ActionDistancesArretsTramExecute(TObject *Sender);
+    void ActionDistancesFilesTaxiExecute(TObject *Sender);
+    void ActionSuivreVehiculeExecute(TObject *Sender);
+    void ActionSuivreBusExecute(TObject *Sender);
+    void ActionSuivreTramExecute(TObject *Sender);
+    void ActionSuivreTaxiExecute(TObject *Sender);
+    void ActionSuivreVehlibExecute(TObject *Sender);
+    void ActionSuivrePieton1Execute(TObject *Sender);
+    void ActionSuivrePieton2Execute(TObject *Sender);
     void ActionDecorsArbreExecute(TObject *Sender);
     void ActionDecorsPelouseExecute(TObject *Sender);
     void ActionNatureTrottoirExecute(TObject *Sender);
@@ -522,16 +522,16 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionCopierVersExecute(TObject *Sender);
     void ActionSanglanteExecute(TObject *Sender);
     void ActionResurrectionExecute(TObject *Sender);
-    void TimerClignotementLocalisationTimer(TObject *Sender) const;
-    void ActionDistancesFilesParkExecute(TObject *Sender) const;
+    void TimerClignotementLocalisationTimer(TObject *Sender);
+    void ActionDistancesFilesParkExecute(TObject *Sender);
     static void ActionTutorielExecute(TObject *Sender);
-    void ActionRafraichirExecute(TObject *Sender) const;
+    void ActionRafraichirExecute(TObject *Sender);
     void StatusBarResize(TObject *Sender) const;
-    void ActionPrioritesPietonsExecute(TObject *Sender) const;
+    void ActionPrioritesPietonsExecute(TObject *Sender);
     void ActionPlaceVehlibExecute(TObject *Sender);
-    void ActionDistancesPlacesVehlibExecute(TObject *Sender) const;
+    void ActionDistancesPlacesVehlibExecute(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
-    void ActionEpidemieExecute(TObject *Sender) const;
+    void ActionEpidemieExecute(TObject *Sender);
     void ActionAfficherInfectionExecute(TObject *Sender);
 
 private:
@@ -666,18 +666,18 @@ private:
         }
     }
     [[nodiscard]] bool SimulEstSanglante() const { return ActionSanglante->Checked; }          // v4.3
-    void ModifieModeSanglant(bool Sanglant) const { ActionSanglante->Checked = Sanglant; }     // v4.3
+    void ModifieModeSanglant(bool Sanglant) { ActionSanglante->Checked = Sanglant; }           // v4.3
     [[nodiscard]] bool ResurrectionEstDemandee() const { return ActionResurrection->Checked; } // v4.3.1
-    void ModifieDemandeResurrection(bool Resurrection) const                                   // v4.3.1
+    void ModifieDemandeResurrection(bool Resurrection)                                         // v4.3.1
     {
         ActionResurrection->Checked = Resurrection;
         ActionResurrection->Enabled = !ActionResurrection->Checked;
     }
     [[nodiscard]] bool EpidemieEstActive() const { return ActionEpidemie->Checked; } // v5.4.1
-    [[nodiscard]] bool ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) const;
-    void SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const;
-    [[nodiscard]] bool ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) const; // v3.5
-    void SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) const;                          // v3.5
+    [[nodiscard]] bool ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie);
+    void SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie);
+    [[nodiscard]] bool ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie); // v3.5
+    void SupprimeArretsUtilisesDansSelection(type_voie TypeVoie);                          // v3.5
     void ReinitialiseToutDansSelection(type_voie TypeVoie);
     bool ModifiePassagePietonsSiNecessaire(int x, int y);               // v2.0
     void AfficheStatsAttenteTrafic();                                   // v2.2.7
@@ -709,10 +709,10 @@ public:
     ~TfrmSimulation() override;                           // portage : OnDestroy
     IVueSimulation *VueMoteur{};                          // portage : implémentation d'IVueSimulation (vue du moteur)
     void OuvreFichierDemande(const String &asNomFichier); // portage : QFileOpenEvent (macOS)
-    void RedessineCase(int x, int y, bool EffaceFond) const;
+    void RedessineCase(int x, int y, bool EffaceFond);
     void AfficheBilan();
     bool SupprimeToutDansSelection(type_voie TypeVoie);
-    void AffecteGlyphe(const int NumGlyphe, TBitmap *Glyphe) const
+    void AffecteGlyphe(const int NumGlyphe, TBitmap *Glyphe)
     { // v5.4 pour affecter les BitBtn->Glyph à partir d'une virtualImageList et supporter le HDPI
         VirtualImageListGlyphes->GetBitmap(NumGlyphe, Glyphe);
     }

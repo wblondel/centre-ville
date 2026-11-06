@@ -44,7 +44,7 @@ private: // Déclarations de l'utilisateur
     voie *v{};
     int x{}, y{};
     TBitBtn *BitBtn[NBDIR]{}; // v5.2
-    void DefinitFeu(direction Dir) const;
+    void DefinitFeu(direction Dir);
 
 public: // Déclarations de l'utilisateur
     explicit TfrmDefVoie(TComponent *Owner);

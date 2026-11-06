@@ -12,10 +12,10 @@ class TfrmStatistiques : public TForm
 {
 public: // portage : __published	// Composants gérés par l'EDI
     TPaintBox *PaintBoxStats{};
-    void PaintBoxStatsPaint(TObject *Sender) const;
+    void PaintBoxStatsPaint(TObject *Sender);
     static void FormShow(TObject *Sender);
     static void FormHide(TObject *Sender);
-    void FormCreate(TObject *Sender) const;
+    void FormCreate(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private:                      // Déclarations de l'utilisateur

@@ -28,7 +28,7 @@ TfrmDefVoiePietons::TfrmDefVoiePietons(TComponent *Owner) : TForm(Owner)
     frmSimulation->AffecteGlyphe(GLYPHE_DEFFP, SpeedButtonO->Glyph);
 }
 //---------------------------------------------------------------------------
-void TfrmDefVoiePietons::DefinitFeu(direction Dir) const
+void TfrmDefVoiePietons::DefinitFeu(direction Dir)
 {
     frmDefFeuxPietons->Direction = Dir;
     frmDefFeuxPietons->x = x;

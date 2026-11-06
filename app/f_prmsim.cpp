@@ -259,7 +259,7 @@ void TfrmParamSimul::BitBtnAppliqueDureeFeuRougeClick(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditDureeVertChange(TObject * /*Sender*/) const
+void TfrmParamSimul::CSpinEditDureeVertChange(TObject * /*Sender*/)
 {
     if (!Initialisation)
     {
@@ -268,7 +268,7 @@ void TfrmParamSimul::CSpinEditDureeVertChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::CSpinEditDureeRougeChange(TObject * /*Sender*/) const
+void TfrmParamSimul::CSpinEditDureeRougeChange(TObject * /*Sender*/)
 {
     if (!Initialisation)
     {
@@ -277,7 +277,7 @@ void TfrmParamSimul::CSpinEditDureeRougeChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmParamSimul::Change(TObject * /*Sender*/) const
+void TfrmParamSimul::Change(TObject * /*Sender*/)
 {
     if (!Initialisation)
     {

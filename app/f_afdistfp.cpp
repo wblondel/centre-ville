@@ -22,7 +22,7 @@ TfrmAffDistFilesPark::TfrmAffDistFilesPark(TComponent *Owner) : TForm(Owner)
     ChargeFiche();
 } // portage : chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmAffDistFilesPark::EffaceInfos() const
+void TfrmAffDistFilesPark::EffaceInfos()
 {
     int i = 0;
     const int NbCol = StringGridDistances->ColCount;

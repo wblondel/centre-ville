@@ -58,7 +58,7 @@ private:                       // Déclarations de l'utilisateur
     int x{}, y{}, xfo[NBDIR]{}, yfo[NBDIR]{};
     TSpeedButton *SpeedButton[NBDIR]{};
     TImage *Image[NBDIR]{};
-    void DefinitFeu(direction Dir) const;
+    void DefinitFeu(direction Dir);
 
 public: // Déclarations de l'utilisateur
     explicit TfrmDefVoiePietons(TComponent *Owner);

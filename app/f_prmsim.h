@@ -63,10 +63,10 @@ public: // portage : __published	// Composants gérés par l'EDI
 
     static void BitBtnAppliqueDureeFeuVertClick(TObject *Sender);
     static void BitBtnAppliqueDureeFeuRougeClick(TObject *Sender);
-    void CSpinEditDureeVertChange(TObject *Sender) const;
-    void CSpinEditDureeRougeChange(TObject *Sender) const;
+    void CSpinEditDureeVertChange(TObject *Sender);
+    void CSpinEditDureeRougeChange(TObject *Sender);
     void CSpinEditNbPietonsChange(TObject *Sender);
-    void Change(TObject *Sender) const;
+    void Change(TObject *Sender);
     void BitBtnDefLignesBusClick(TObject *Sender);
 
     void ButtonAideClick(TObject *Sender);

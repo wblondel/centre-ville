@@ -35,7 +35,7 @@ TfrmStatsComposition::TfrmStatsComposition(TComponent *Owner) : TForm(Owner)
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmStatsComposition::FormShow(TObject * /*Sender*/) const
+void TfrmStatsComposition::FormShow(TObject * /*Sender*/)
 {
     voie *vv = nullptr;
     int i = 0;

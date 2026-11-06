@@ -31,9 +31,9 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *Label7{};
     TLabel *Label8{};
     TCheckBox *CheckBoxReinfections{};
-    void ButtonOkClick(TObject *Sender) const;
+    void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-    void FormShow(TObject *Sender) const;
+    void FormShow(TObject *Sender);
 
 private: // Déclarations utilisateur
 public:  // Déclarations utilisateur

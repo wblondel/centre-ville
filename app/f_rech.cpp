@@ -171,7 +171,7 @@ void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int Numero
 }
 } // namespace
 //---------------------------------------------------------------------------
-void TfrmRecherche::FormShow(TObject * /*Sender*/) const
+void TfrmRecherche::FormShow(TObject * /*Sender*/)
 {
     int i = 0;
     const int x = frmSimulation->DrawGridSimul->Col;
@@ -283,19 +283,19 @@ void TfrmRecherche::FormShow(TObject * /*Sender*/) const
     frmSimulation->TimerClignotementLocalisation->Enabled = true; // v4.4.1 : on fait à présent clignoter le curseur
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditXChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditXChange(TObject * /*Sender*/)
 {
     frmSimulation->DrawGridSimul->Col = CSpinEditX->Value;
     StatusBar->SimpleText = "";
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditYChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditYChange(TObject * /*Sender*/)
 {
     frmSimulation->DrawGridSimul->Row = CSpinEditY->Value;
     StatusBar->SimpleText = "";
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->Parking) || (CSpinEditParking->Value < 1) || (CSpinEditParking->Value > cv->NbParkings))
     {
@@ -317,7 +317,7 @@ void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->Feu) || (CSpinEditFeu->Value < 1) || (CSpinEditFeu->Value > cv->NbFeux))
     {
@@ -339,7 +339,7 @@ void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->Vehicule) || (CSpinEditVehicule->Value < 1) || (CSpinEditVehicule->Value > cv->NbVehicules))
     {
@@ -361,7 +361,7 @@ void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->Pieton) || (CSpinEditPieton->Value < 1) || (CSpinEditPieton->Value > cv->NbPietons))
     {
@@ -444,7 +444,7 @@ void TfrmRecherche::ButtonAideClick(TObject * /*Sender*/)
     AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/)
 { // v3.0
     if ((!cv) || (!cv->ArretBus) || (CSpinEditArretBus->Value < 1) || (CSpinEditArretBus->Value > cv->NbArretsBus))
     {
@@ -466,7 +466,7 @@ void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/)
 { // v3.0
     if ((!cv) || (!cv->Bus) || (CSpinEditBus->Value < 1) || (CSpinEditBus->Value > cv->NbBus))
     {
@@ -487,7 +487,7 @@ void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/)
 { // v3.5
     if ((!cv) || (!cv->ArretTram) || (CSpinEditArretTram->Value < 1) || (CSpinEditArretTram->Value > cv->NbArretsTram))
     {
@@ -509,7 +509,7 @@ void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/)
 { // v3.5
     if ((!cv) || (!cv->Tram) || (CSpinEditTram->Value < 1) || (CSpinEditTram->Value > cv->NbTrams))
     {
@@ -531,7 +531,7 @@ void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->Taxi) || (CSpinEditTaxi->Value < 1) || (CSpinEditTaxi->Value > cv->NbTaxis))
     {
@@ -553,7 +553,7 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->PlaceTaxi) || (CSpinEditPlaceTaxi->Value < 1) || (CSpinEditPlaceTaxi->Value > cv->NbPlacesTaxi))
     {
@@ -575,7 +575,7 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->FileTaxi) || (CSpinEditFileTaxi->Value < 1) || (CSpinEditFileTaxi->Value > cv->NbFilesTaxi))
     {
@@ -592,7 +592,7 @@ void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/) const
 }
 //---------------------------------------------------------------------------
 
-void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->PlacePark) || (CSpinEditPlacePark->Value < 1) || (CSpinEditPlacePark->Value > cv->NbPlacesPark))
     {
@@ -615,7 +615,7 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/) const
 }
 //---------------------------------------------------------------------------
 
-void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/)
 {
     if ((!cv) || (!cv->FilePark) || (CSpinEditFilePark->Value < 1) || (CSpinEditFilePark->Value > cv->NbFilesPark))
     {
@@ -631,7 +631,7 @@ void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/) const
                                    cv->PlacePark[fp->NumPlaceQueue].y));
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/)
 { // v5.3
     if ((!cv) || (!cv->Vehlib) || (CSpinEditVehlib->Value < 1) || (CSpinEditVehlib->Value > cv->NbVehlibs))
     {
@@ -653,7 +653,7 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/) const
     }
 }
 //---------------------------------------------------------------------------
-void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/) const
+void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/)
 { // v5.3
     if ((!cv) || (!cv->PlaceVehlib) || (CSpinEditPlaceVehlib->Value < 1) ||
         (CSpinEditPlaceVehlib->Value > cv->NbPlacesVehlib))

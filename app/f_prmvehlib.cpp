@@ -45,7 +45,7 @@ void TfrmParamVehlib::FormShow(TObject * /*Sender*/)
     InitialisationEnCours = false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::AppliqueChoix() const
+void TfrmParamVehlib::AppliqueChoix()
 {
     cv->NbMaxPersonnesVehlib = CSpinEditNbMaxPersonnesVehlib->Value;
     cv->NbMaxCasesDetectFileVehlib = CSpinEditNbCasesMaxPlaceVehlib->Value;
@@ -55,7 +55,7 @@ void TfrmParamVehlib::AppliqueChoix() const
     ButtonAppliquer->Enabled = false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamVehlib::CSpinEditParametresChange(TObject * /*Sender*/) const
+void TfrmParamVehlib::CSpinEditParametresChange(TObject * /*Sender*/)
 {
     if (!InitialisationEnCours)
     {

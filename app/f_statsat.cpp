@@ -45,7 +45,7 @@ TfrmStatsAttenteTrafic::TfrmStatsAttenteTrafic(TComponent *Owner) : TForm(Owner)
     CSpinEditParkingArrivee->GardeTouchesDeplacement = true;
 }
 //---------------------------------------------------------------------------
-void TfrmStatsAttenteTrafic::PaintBoxPaint(TObject * /*Sender*/) const
+void TfrmStatsAttenteTrafic::PaintBoxPaint(TObject * /*Sender*/)
 {
     for (int i = 0; i < 128; i++)
     {
@@ -211,7 +211,7 @@ void TfrmStatsAttenteTrafic::RadioGroupTypeClick(TObject * /*Sender*/)
     frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
-void TfrmStatsAttenteTrafic::BitBtnDirClick(TObject *Sender) const
+void TfrmStatsAttenteTrafic::BitBtnDirClick(TObject *Sender)
 {
     const int n = StrToInt(
         NomDe(static_cast<TComponent *>(Sender)).SubString(7, NomDe(static_cast<TComponent *>(Sender)).Length() - 6));

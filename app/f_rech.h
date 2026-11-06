@@ -52,28 +52,28 @@ public: // portage : __published	// Composants gérés par l'EDI
     TRadioButton *RadioButtonPlaceVehlib{};
     TCSpinEdit *CSpinEditPlaceVehlib{};
     void RadioButtonClick(TObject *Sender);
-    void FormShow(TObject *Sender) const;
-    void CSpinEditXChange(TObject *Sender) const;
-    void CSpinEditYChange(TObject *Sender) const;
-    void CSpinEditParkingChange(TObject *Sender) const;
-    void CSpinEditFeuChange(TObject *Sender) const;
+    void FormShow(TObject *Sender);
+    void CSpinEditXChange(TObject *Sender);
+    void CSpinEditYChange(TObject *Sender);
+    void CSpinEditParkingChange(TObject *Sender);
+    void CSpinEditFeuChange(TObject *Sender);
 
-    void CSpinEditVehiculeChange(TObject *Sender) const;
+    void CSpinEditVehiculeChange(TObject *Sender);
     void ButtonAnnulerClick(TObject *Sender);
     static void FormHide(TObject *Sender);
-    void CSpinEditPietonChange(TObject *Sender) const;
+    void CSpinEditPietonChange(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-    void CSpinEditArretBusChange(TObject *Sender) const;
-    void CSpinEditBusChange(TObject *Sender) const;
-    void CSpinEditArretTramChange(TObject *Sender) const;
-    void CSpinEditTramChange(TObject *Sender) const;
-    void CSpinEditTaxiChange(TObject *Sender) const;
-    void CSpinEditPlaceTaxiChange(TObject *Sender) const;
-    void CSpinEditFileTaxiChange(TObject *Sender) const;
-    void CSpinEditPlaceParkChange(TObject *Sender) const;
-    void CSpinEditFileParkChange(TObject *Sender) const;
-    void CSpinEditVehlibChange(TObject *Sender) const;
-    void CSpinEditPlaceVehlibChange(TObject *Sender) const;
+    void CSpinEditArretBusChange(TObject *Sender);
+    void CSpinEditBusChange(TObject *Sender);
+    void CSpinEditArretTramChange(TObject *Sender);
+    void CSpinEditTramChange(TObject *Sender);
+    void CSpinEditTaxiChange(TObject *Sender);
+    void CSpinEditPlaceTaxiChange(TObject *Sender);
+    void CSpinEditFileTaxiChange(TObject *Sender);
+    void CSpinEditPlaceParkChange(TObject *Sender);
+    void CSpinEditFileParkChange(TObject *Sender);
+    void CSpinEditVehlibChange(TObject *Sender);
+    void CSpinEditPlaceVehlibChange(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur

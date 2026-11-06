@@ -23,10 +23,10 @@ public: // portage : __published	// Composants gérés par l'EDI
     TButton *ButtonAide{};
     TCheckBox *CheckBoxAfficherParametres{};
     TCheckBox *CheckBoxGenererReseau{};
-    void FormShow(TObject *Sender) const;
+    void FormShow(TObject *Sender);
     void ButtonCreerClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-    void FormKeyPress(TObject *Sender, char &Key) const;
+    void FormKeyPress(TObject *Sender, char &Key);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur

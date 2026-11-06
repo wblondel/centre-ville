@@ -267,7 +267,7 @@ TfrmSimulation::TfrmSimulation(TComponent *Owner) : TFormPrincipale(Owner) // po
     SaveDialog->InitialDir = stRepLocalAppData();
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::RedessineCase(int x, int y, bool EffaceFond) const
+void TfrmSimulation::RedessineCase(int x, int y, bool EffaceFond)
 {
     (void)EffaceFond; // portage : WM_ERASEBKGND sans effet visible, la grille peint chacune de ses cases
     // portage : InvalidateRect(DrawGridSimul->Handle, &CellRect, EffaceFond) -> update(rect) de la case
@@ -2108,7 +2108,7 @@ void TfrmSimulation::RafraichitFichesInfos()
 // sélection, comme après l'édition de la case courante (ActionEffacerRouteExecute...). Sinon
 // OK y réécrivait les priorités et les feux d'avant sur une case que la commande avait
 // effacée ou redessinée, jusqu'à poser un feu sur une case sans route
-void TfrmSimulation::RafraichitFichesPriorites() const
+void TfrmSimulation::RafraichitFichesPriorites()
 {
     if (ActionPriorites->Checked)
     {
@@ -2289,7 +2289,7 @@ void TfrmSimulation::TimerSimulTimer(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) const // v3.5 (TypeVoie)
+bool TfrmSimulation::ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) // v3.5 (TypeVoie)
 {
     bool Abandon = false;
     bool ToutSupprimer = true;
@@ -2416,7 +2416,7 @@ Si vous continuez, le feu n°%d sera supprimé.\n\
     return ToutSupprimer;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const
+void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie)
 {
     int i = 0;
     int j = 0;
@@ -2490,7 +2490,7 @@ void TfrmSimulation::SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const
     }
 }
 //---------------------------------------------------------------------------
-bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) const // v3.5
+bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) // v3.5
 {
     bool Abandon = false;
     bool ToutSupprimer = true;
@@ -2566,7 +2566,7 @@ Si vous continuez, il sera supprimé.\n\
     return ToutSupprimer;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) const
+void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
 {
     int i = 0;
     int x = 0;
@@ -2783,7 +2783,7 @@ void TfrmSimulation::FormKeyUp(TObject *Sender, WORD &Key, TShiftState Shift)
   MenuItem->Click(); */
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::TimerClignotementErreurTimer(TObject * /*Sender*/) const
+void TfrmSimulation::TimerClignotementErreurTimer(TObject * /*Sender*/)
 {
     TimerClignotementErreur->Tag ^= 1; // v3.5
     cv->v[xErr][yErr].RedessineCase(false);
@@ -2863,7 +2863,7 @@ void TfrmSimulation::ActionQuitterExecute(TObject * /*Sender*/)
     Close();
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionVerifierApresOuvertureExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionVerifierApresOuvertureExecute(TObject * /*Sender*/)
 {
     ActionVerifierApresOuverture->Checked ^= true;
     VerifierApresOuverture = ActionVerifierApresOuverture->Checked;
@@ -3098,7 +3098,7 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionEnregistrerSousExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionEnregistrerSousExecute(TObject * /*Sender*/)
 {
     if (SaveDialog->Execute())
     {
@@ -3532,7 +3532,7 @@ void TfrmSimulation::ActionArretExecute(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionVerifierAvantSimulationExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionVerifierAvantSimulationExecute(TObject * /*Sender*/)
 {
     ActionVerifierAvantSimulation->Checked ^= true;
     VerifierAvantSimulation = ActionVerifierAvantSimulation->Checked; // v3.8.3
@@ -3546,43 +3546,43 @@ void TfrmSimulation::ActionEvolutionExecute(TObject * /*Sender*/)
     frmStatistiques->Visible = ActionEvolution->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff10ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff10ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff10Tours->Checked = true;
     cv->NbToursStats = 10;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff20ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff20ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff20Tours->Checked = true;
     cv->NbToursStats = 20;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff50ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff50ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff50Tours->Checked = true;
     cv->NbToursStats = 50;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff100ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff100ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff100Tours->Checked = true;
     cv->NbToursStats = 100;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff200ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff200ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff200Tours->Checked = true;
     cv->NbToursStats = 200;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAff500ToursExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAff500ToursExecute(TObject * /*Sender*/)
 {
     ActionStatsAff500Tours->Checked = true;
     cv->NbToursStats = 500;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAffParVehiculeExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAffParVehiculeExecute(TObject * /*Sender*/)
 {
     ActionStatsAffParVehicule->Checked = true;
     cv->TypeStats = par_nombre;
@@ -3592,7 +3592,7 @@ void TfrmSimulation::ActionStatsAffParVehiculeExecute(TObject * /*Sender*/) cons
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAffParPourcentExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAffParPourcentExecute(TObject * /*Sender*/)
 {
     ActionStatsAffParPourcent->Checked = true;
     cv->TypeStats = par_pourcentage;
@@ -3602,7 +3602,7 @@ void TfrmSimulation::ActionStatsAffParPourcentExecute(TObject * /*Sender*/) cons
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionStatsAffQuadrillageExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionStatsAffQuadrillageExecute(TObject * /*Sender*/)
 {
     ActionStatsAffQuadrillage->Checked ^= true;
     cv->QuadrillageStats = ActionStatsAffQuadrillage->Checked;
@@ -3821,13 +3821,13 @@ void TfrmSimulation::ActionToutDroitExecute(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionPrioritesExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionPrioritesExecute(TObject * /*Sender*/)
 {
     ActionPriorites->Checked ^= true;
     frmDefVoie->Visible = ActionPriorites->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionPrioritesPietonsExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionPrioritesPietonsExecute(TObject * /*Sender*/)
 { // v5.2
     ActionPrioritesPietons->Checked ^= true;
     frmDefVoiePietons->Visible = ActionPrioritesPietons->Checked;
@@ -4405,74 +4405,74 @@ void TfrmSimulation::ActionEffacerVoiesTramExecute(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDefinirNatureExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDefinirNatureExecute(TObject * /*Sender*/)
 {
     ActionDefinirNature->Checked ^= true;
     frmDefNature->Visible = ActionDefinirNature->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionRechercherExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionRechercherExecute(TObject * /*Sender*/)
 {
     ActionRechercher->Checked ^= true;
     frmRecherche->Visible = ActionRechercher->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailVehiculeExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailVehiculeExecute(TObject * /*Sender*/)
 {
     ActionDetailVehicule->Checked ^= true;
     frmInfosVehicule->Visible = ActionDetailVehicule->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailBusExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailBusExecute(TObject * /*Sender*/)
 {
     ActionDetailBus->Checked ^= true;
     frmInfosBus->Visible = ActionDetailBus->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailTramExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailTramExecute(TObject * /*Sender*/)
 {
     ActionDetailTram->Checked ^= true;
     frmInfosTram->Visible = ActionDetailTram->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailPietonExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailPietonExecute(TObject * /*Sender*/)
 {
     ActionDetailPieton->Checked ^= true;
     frmInfosPieton->Visible = ActionDetailPieton->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailTaxiExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailTaxiExecute(TObject * /*Sender*/)
 {
     ActionDetailTaxi->Checked ^= true;
     frmInfosTaxi->Visible = ActionDetailTaxi->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDistancesParkingsExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesParkingsExecute(TObject * /*Sender*/)
 {
     ActionDistancesParkings->Checked ^= true;
     frmAffDistParkings->Visible = ActionDistancesParkings->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDistancesArretsBusExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesArretsBusExecute(TObject * /*Sender*/)
 {
     ActionDistancesArretsBus->Checked ^= true;
     frmAffDistArretsBus->Visible = ActionDistancesArretsBus->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDistancesArretsTramExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesArretsTramExecute(TObject * /*Sender*/)
 {
     ActionDistancesArretsTram->Checked ^= true;
     frmAffDistArretsTram->Visible = ActionDistancesArretsTram->Checked;
 }
 //---------------------------------------------------------------------------
 
-void TfrmSimulation::ActionDistancesFilesTaxiExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesFilesTaxiExecute(TObject * /*Sender*/)
 {
     ActionDistancesFilesTaxi->Checked ^= true;
     frmAffDistFilesTaxi->Visible = ActionDistancesFilesTaxi->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivreVehiculeExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivreVehiculeExecute(TObject * /*Sender*/)
 {
     const int NumVehicule = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehicule;
     if (NumVehicule == 0)
@@ -4487,7 +4487,7 @@ void TfrmSimulation::ActionSuivreVehiculeExecute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditVehicule->Value = NumVehicule;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivreBusExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivreBusExecute(TObject * /*Sender*/)
 {
     const int NumBus = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumBus;
     if (NumBus == 0)
@@ -4502,7 +4502,7 @@ void TfrmSimulation::ActionSuivreBusExecute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditBus->Value = NumBus;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivreTramExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivreTramExecute(TObject * /*Sender*/)
 {
     const int NumTram = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTram;
     if (NumTram == 0)
@@ -4517,7 +4517,7 @@ void TfrmSimulation::ActionSuivreTramExecute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditTram->Value = NumTram;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivreTaxiExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivreTaxiExecute(TObject * /*Sender*/)
 {
     const int NumTaxi = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumTaxi;
     if (NumTaxi == 0)
@@ -4532,7 +4532,7 @@ void TfrmSimulation::ActionSuivreTaxiExecute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditTaxi->Value = NumTaxi;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivreVehlibExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivreVehlibExecute(TObject * /*Sender*/)
 { // v5.3
     const int NumVehlib = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumVehlib;
     if (NumVehlib == 0)
@@ -4547,7 +4547,7 @@ void TfrmSimulation::ActionSuivreVehlibExecute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditVehlib->Value = NumVehlib;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivrePieton1Execute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivrePieton1Execute(TObject * /*Sender*/)
 {
     const int NumPieton = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[0];
     if (NumPieton == 0)
@@ -4562,7 +4562,7 @@ void TfrmSimulation::ActionSuivrePieton1Execute(TObject * /*Sender*/) const
     frmRecherche->CSpinEditPieton->Value = NumPieton;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionSuivrePieton2Execute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionSuivrePieton2Execute(TObject * /*Sender*/)
 {
     const int NumPieton = cv->v[DrawGridSimul->Col][DrawGridSimul->Row].NumPieton[1];
     if (NumPieton == 0)
@@ -4716,7 +4716,7 @@ void TfrmSimulation::ActionResurrectionExecute(TObject * /*Sender*/) // v4.3.1
     ResurrectionDemandee = true;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::TimerClignotementLocalisationTimer(TObject * /*Sender*/) const
+void TfrmSimulation::TimerClignotementLocalisationTimer(TObject * /*Sender*/)
 {
     TimerClignotementLocalisation->Tag ^= 1; // v4.4.1
     cv->v[DrawGridSimul->Col][DrawGridSimul->Row].RedessineCase(false);
@@ -4760,7 +4760,7 @@ void TfrmSimulation::ActionPlaceParkExecute(TObject * /*Sender*/)
     StatusBar->Panels->Items[0]->Text = asMsgOp;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDistancesFilesParkExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesFilesParkExecute(TObject * /*Sender*/)
 { // v5.0
     ActionDistancesFilesPark->Checked ^= true;
     frmAffDistFilesPark->Visible = ActionDistancesFilesPark->Checked;
@@ -4771,7 +4771,7 @@ void TfrmSimulation::ActionTutorielExecute(TObject * /*Sender*/)
     AfficheTutoriel(); // v5.4 : fonction qui appelle ExecuteProcess au lieu de ShellExecute à cause de Windows 10
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionRafraichirExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionRafraichirExecute(TObject * /*Sender*/)
 {
     DrawGridSimul->Repaint(); // v5.1.1
 }
@@ -4819,13 +4819,13 @@ void TfrmSimulation::ActionPlaceVehlibExecute(TObject * /*Sender*/)
     StatusBar->Panels->Items[0]->Text = asMsgOp;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDistancesPlacesVehlibExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDistancesPlacesVehlibExecute(TObject * /*Sender*/)
 { // v5.3
     ActionDistancesPlacesVehlib->Checked ^= true;
     frmAffDistPlacesVehlib->Visible = ActionDistancesPlacesVehlib->Checked;
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionDetailVehlibExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionDetailVehlibExecute(TObject * /*Sender*/)
 {
     ActionDetailVehlib->Checked ^= true;
     frmInfosVehlib->Visible = ActionDetailVehlib->Checked;
@@ -4853,7 +4853,7 @@ void TfrmSimulation::FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmSimulation::ActionEpidemieExecute(TObject * /*Sender*/) const
+void TfrmSimulation::ActionEpidemieExecute(TObject * /*Sender*/)
 { // v5.4.1
     if (ActionEpidemie->Checked)
     { // v5.4.2 : l'action est en AutoCheck et la case dans les paramètres n'est plus modifiable

@@ -46,7 +46,7 @@ void TfrmParamTaxi::FormShow(TObject * /*Sender*/)
     InitialisationEnCours = false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::AppliqueChoix() const
+void TfrmParamTaxi::AppliqueChoix()
 {
     cv->NbMaxPersonnesTaxi = CSpinEditNbMaxPersonnesTaxi->Value;
     cv->NbMaxCasesDetectFileTaxi = CSpinEditNbCasesMaxPlaceTaxi->Value;
@@ -57,7 +57,7 @@ void TfrmParamTaxi::AppliqueChoix() const
     ButtonAppliquer->Enabled = false;
 }
 //---------------------------------------------------------------------------
-void TfrmParamTaxi::CSpinEditParametresChange(TObject * /*Sender*/) const
+void TfrmParamTaxi::CSpinEditParametresChange(TObject * /*Sender*/)
 {
     if (!InitialisationEnCours)
     {

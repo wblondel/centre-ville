@@ -31,7 +31,7 @@ TfrmGeneration::TfrmGeneration(TComponent *Owner) : TForm(Owner)
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmGeneration::ButtonOkClick(TObject * /*Sender*/) const
+void TfrmGeneration::ButtonOkClick(TObject * /*Sender*/)
 {
     cv->PrepareGenerationAleatoire(TrackBarTailleMinSegments->Position, TrackBarTailleMaxSegments->Position,
                                    TrackBarProbaSortieIntersection->Position, TrackBarProbaEntreeIntersection->Position,

@@ -231,13 +231,13 @@ void TfrmAPropos::FormHide(TObject * /*Sender*/)
     delete Bitmap;
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::LabelURLClick(TObject * /*Sender*/) const
+void TfrmAPropos::LabelURLClick(TObject * /*Sender*/)
 { // v5.4 : conversion BCB6>BCBX (string)
     // portage : ShellExecute(NULL, L"open", LabelURL->Caption.c_str(), NULL, NULL, SW_SHOWMAXIMIZED)
     QDesktopServices::openUrl(QUrl(Q(LabelURL->Caption)));
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::LabelEMailClick(TObject * /*Sender*/) const
+void TfrmAPropos::LabelEMailClick(TObject * /*Sender*/)
 { // v5.4 : conversion BCB6>BCBX (string)
     // portage : ShellExecute(NULL, L"open", String("mailto:"+...).c_str(), NULL, NULL, SW_SHOWMAXIMIZED)
     QDesktopServices::openUrl(QUrl(Q(String("mailto:" + LabelEMail->Caption + "?subject=Centre-ville"))));
@@ -248,7 +248,7 @@ void TfrmAPropos::FormCreate(TObject * /*Sender*/)
     FermetureAutomatique = false;
 }
 //---------------------------------------------------------------------------
-void TfrmAPropos::FormKeyPress(TObject * /*Sender*/, char &Key) const
+void TfrmAPropos::FormKeyPress(TObject * /*Sender*/, char &Key)
 {
     if ((Key == 13) || (Key == 27))
     {

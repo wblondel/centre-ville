@@ -28,6 +28,8 @@
 #    infections chaînées ;
 #  - modernize-use-trailing-return-type : simple style ;
 #  - performance-enum-size : la taille des énumérés fait partie du format .cvw ;
+#  - readability-make-member-function-const : l'état de la simulation est tenu par des pointeurs
+#    (grille, tableaux, fiches) ; une méthode qui le modifie à travers eux passerait pour const ;
 #  - readability-function-cognitive-complexity, readability-function-size : les règles de la
 #    simulation sont de longues fonctions, que les découper changerait trop ;
 #  - readability-identifier-length : x, y, d, i sont les noms naturels de la grille ;
@@ -59,6 +61,7 @@ Checks: >
   -misc-no-recursion,
   -modernize-use-trailing-return-type,
   -performance-enum-size,
+  -readability-make-member-function-const,
   -readability-function-cognitive-complexity,
   -readability-function-size,
   -readability-identifier-length,

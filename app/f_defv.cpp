@@ -38,7 +38,7 @@ TfrmDefVoie::TfrmDefVoie(TComponent *Owner) : TForm(Owner)
     frmSimulation->AffecteGlyphe(GLYPHE_DEFF, BitBtnDefFeuO->Glyph);
 }
 
-void TfrmDefVoie::DefinitFeu(direction Dir) const
+void TfrmDefVoie::DefinitFeu(direction Dir)
 {
     frmDefFeux->Direction = Dir;
     frmDefFeux->x = x;

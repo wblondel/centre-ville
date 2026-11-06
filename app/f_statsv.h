@@ -29,7 +29,7 @@ private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
     explicit TfrmStatsVehicules(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
-    void RafraichitInfos() const;
+    void RafraichitInfos();
 };
 //---------------------------------------------------------------------------
 extern TfrmStatsVehicules *frmStatsVehicules;

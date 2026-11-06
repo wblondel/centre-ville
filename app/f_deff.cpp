@@ -169,13 +169,13 @@ bool TfrmDefFeux::AppliqueChoix()
     return true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RafraichitInfosFeuxDmd() const
+void TfrmDefFeux::RafraichitInfosFeuxDmd()
 {
     ButtonAppliquer->Enabled = true;
     LabelNbFeuxDmd->Caption = IntToStr(NbFeuxDmd);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::RafraichitInfosFeuxAtt() const
+void TfrmDefFeux::RafraichitInfosFeuxAtt()
 {
     ButtonAppliquer->Enabled = true;
     LabelNbFeuxAtt->Caption = IntToStr(NbFeuxAtt);
@@ -193,7 +193,7 @@ void TfrmDefFeux::FormShow(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::FormHide(TObject * /*Sender*/) const
+void TfrmDefFeux::FormHide(TObject * /*Sender*/)
 {
     int i = 0;
     frmSimulation->ActionPriorites->Enabled = true;
@@ -259,12 +259,12 @@ void TfrmDefFeux::RadioGroupTypeDmdVertClick(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::CSpinEditDureeVertChange(TObject * /*Sender*/) const
+void TfrmDefFeux::CSpinEditDureeVertChange(TObject * /*Sender*/)
 {
     ButtonAppliquer->Enabled = true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject * /*Sender*/) const
+void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject * /*Sender*/)
 {
     int i = 0;
     if (SpeedButtonSelFeuxDmd->Down && (!SpeedButtonSelFeuxAtt->Down))
@@ -280,7 +280,7 @@ void TfrmDefFeux::SpeedButtonSelFeuxDmdClick(TObject * /*Sender*/) const
     frmSimulation->ActionPriorites->Enabled = !(frmSimulation->SelectionFeuxDmd || frmSimulation->SelectionFeuxAtt);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject * /*Sender*/) const
+void TfrmDefFeux::SpeedButtonSelFeuxAttClick(TObject * /*Sender*/)
 {
     int i = 0;
     if (SpeedButtonSelFeuxAtt->Down && (!SpeedButtonSelFeuxDmd->Down))

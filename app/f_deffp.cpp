@@ -83,7 +83,7 @@ void TfrmDefFeuxPietons::RafraichitFeuxPietons()
                                  true);
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::AnalyseEtatFeux() const // v5.2.1
+void TfrmDefFeuxPietons::AnalyseEtatFeux() // v5.2.1
 {
     const auto EtatFP =
         static_cast<etat_feu>(RadioGroupEtat->ItemIndex + static_cast<int>(RadioGroupEtat->ItemIndex == 2));
@@ -201,7 +201,7 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
     return true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::RafraichitInfosFeux() const
+void TfrmDefFeuxPietons::RafraichitInfosFeux()
 {
     ButtonAppliquer->Enabled = true;
     LabelNbFeux->Caption = IntToStr(NbFeux);
@@ -278,12 +278,12 @@ void TfrmDefFeuxPietons::RadioGroupTypeDmdVertClick(TObject * /*Sender*/)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject * /*Sender*/) const
+void TfrmDefFeuxPietons::CSpinEditDureeVertChange(TObject * /*Sender*/)
 {
     ButtonAppliquer->Enabled = true;
 }
 //---------------------------------------------------------------------------
-void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject * /*Sender*/) const
+void TfrmDefFeuxPietons::SpeedButtonSelFeuxClick(TObject * /*Sender*/)
 {
     int i = 0;
     frmSimulation->SelectionFeuxPtn = SpeedButtonSelFeux->Down;

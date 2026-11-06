@@ -22,7 +22,7 @@ TfrmAffDistArretsTram::TfrmAffDistArretsTram(TComponent *Owner) : TForm(Owner)
     ChargeFiche();
 } // portage : chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmAffDistArretsTram::EffaceInfos() const
+void TfrmAffDistArretsTram::EffaceInfos()
 {
     int i = 0;
     const int NbCol = StringGridDistances->ColCount;

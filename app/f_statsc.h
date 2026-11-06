@@ -127,7 +127,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *Label48{};
     TLabel *Label49{};
     TLabel *Label55{};
-    void FormShow(TObject *Sender) const;
+    void FormShow(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 

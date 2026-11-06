@@ -43,10 +43,10 @@ public: // portage : __published
     void TimerTimer(TObject *Sender);
     void FormShow(TObject *Sender);
     void FormHide(TObject *Sender);
-    void LabelURLClick(TObject *Sender) const;
-    void LabelEMailClick(TObject *Sender) const;
+    void LabelURLClick(TObject *Sender);
+    void LabelEMailClick(TObject *Sender);
     void FormCreate(TObject *Sender);
-    void FormKeyPress(TObject *Sender, char &Key) const;
+    void FormKeyPress(TObject *Sender, char &Key);
     static void LabelClick(TObject *Sender);
 
 private:

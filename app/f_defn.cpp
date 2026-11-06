@@ -23,7 +23,7 @@ TfrmDefNature::TfrmDefNature(TComponent *Owner) : TForm(Owner)
     // Height=Height*Screen->PixelsPerInch/96;
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::RadioGroupNatureClick(TObject * /*Sender*/) const
+void TfrmDefNature::RadioGroupNatureClick(TObject * /*Sender*/)
 {
     if (RadioGroupNature->ItemIndex == 1)
     {
@@ -37,7 +37,7 @@ void TfrmDefNature::RadioGroupNatureClick(TObject * /*Sender*/) const
     ButtonAppliquer->Enabled = (RadioGroupNature->ItemIndex > -1);
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::ButtonAppliquerClick(TObject * /*Sender*/) const
+void TfrmDefNature::ButtonAppliquerClick(TObject * /*Sender*/)
 {
     bool BordGauche = false;
     bool BordDroit = false;
@@ -111,7 +111,7 @@ void TfrmDefNature::ButtonAideClick(TObject * /*Sender*/)
     AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
-void TfrmDefNature::FormShow(TObject * /*Sender*/) const
+void TfrmDefNature::FormShow(TObject * /*Sender*/)
 {
     frmSimulation->ActionDefinirNature->Checked = true;
     RadioGroupNature->ItemIndex = -1;

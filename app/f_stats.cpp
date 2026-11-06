@@ -19,7 +19,7 @@ TfrmStatistiques::TfrmStatistiques(TComponent *Owner) : TForm(Owner)
     ChargeFiche();
 } // portage : membre à zéro (TObject::NewInstance), chargement du .dfm, puis OnCreate
 //---------------------------------------------------------------------------
-void TfrmStatistiques::PaintBoxStatsPaint(TObject * /*Sender*/) const
+void TfrmStatistiques::PaintBoxStatsPaint(TObject * /*Sender*/)
 {
     const bool ParNbVehicules = (cv->TypeStats == par_nombre);
     int i = 0;
@@ -168,7 +168,7 @@ void TfrmStatistiques::FormHide(TObject * /*Sender*/)
     frmSimulation->ActionEvolution->Checked = false;
 }
 //---------------------------------------------------------------------------
-void TfrmStatistiques::FormCreate(TObject * /*Sender*/) const
+void TfrmStatistiques::FormCreate(TObject * /*Sender*/)
 {
     PaintBoxStats->Canvas->Pen->Style = psSolid;
     PaintBoxStats->Canvas->Pen->Mode = pmCopy;

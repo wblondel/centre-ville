@@ -50,7 +50,7 @@ TfrmDimensionsZone::TfrmDimensionsZone(TComponent *Owner) : TForm(Owner)
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
-void TfrmDimensionsZone::FormShow(TObject * /*Sender*/) const
+void TfrmDimensionsZone::FormShow(TObject * /*Sender*/)
 {
     CSpinEditNbX->Value = NbX;
     CSpinEditNbY->Value = NbY;
@@ -84,7 +84,7 @@ void TfrmDimensionsZone::ButtonAideClick(TObject * /*Sender*/)
 }
 //---------------------------------------------------------------------------
 
-void TfrmDimensionsZone::FormKeyPress(TObject * /*Sender*/, char &Key) const
+void TfrmDimensionsZone::FormKeyPress(TObject * /*Sender*/, char &Key)
 {
     if (CSpinEditNbX->Focused() || CSpinEditNbY->Focused())
     {

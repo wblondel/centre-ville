@@ -203,7 +203,7 @@ public:
         Changed();
         return *this;
     }
-    void Changed() const
+    void Changed()
     {
         if (OnChange)
         {

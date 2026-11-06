@@ -30,7 +30,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TTrackBar *TrackBarProbaTraverseeRoute{};
     TLabel *LabelRq{};
     TButton *ButtonAide{};
-    void ButtonOkClick(TObject *Sender) const;
+    void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 

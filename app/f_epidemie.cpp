@@ -20,7 +20,7 @@ TfrmEpidemie::TfrmEpidemie(TComponent *Owner) : TForm(Owner)
                    // v5.4.2 : Tout est fait dans FormShow
 }
 //---------------------------------------------------------------------------
-void TfrmEpidemie::ButtonOkClick(TObject * /*Sender*/) const
+void TfrmEpidemie::ButtonOkClick(TObject * /*Sender*/)
 {
     // On enregistre les paramètres
     cv->EpidemieInfectiosite = CSpinEditInfectiosite->Value;
@@ -36,7 +36,7 @@ void TfrmEpidemie::ButtonAideClick(TObject * /*Sender*/)
 }
 //---------------------------------------------------------------------------
 
-void TfrmEpidemie::FormShow(TObject * /*Sender*/) const
+void TfrmEpidemie::FormShow(TObject * /*Sender*/)
 {
     // On charge les paramètres
     CSpinEditInfectiosite->Value = cv->EpidemieInfectiosite;        // Nb tours (100 par défaut)

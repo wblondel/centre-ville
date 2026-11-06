@@ -35,12 +35,12 @@ public: // portage : __published	// Composants gérés par l'EDI
     void ButtonAppliquerClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
     void FormShow(TObject *Sender);
-    void CSpinEditParametresChange(TObject *Sender) const;
+    void CSpinEditParametresChange(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur
     bool InitialisationEnCours{};
-    void AppliqueChoix() const;
+    void AppliqueChoix();
 
 public: // Déclarations de l'utilisateur
     explicit TfrmParamVehlib(TComponent *Owner);

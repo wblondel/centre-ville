@@ -20,10 +20,10 @@ public: // portage : __published	// Composants gérés par l'EDI
     TButton *ButtonAide{};
     TLabel *LabelRq{};
     TCheckBox *CheckBoxPelouse{};
-    void RadioGroupNatureClick(TObject *Sender) const;
-    void ButtonAppliquerClick(TObject *Sender) const;
+    void RadioGroupNatureClick(TObject *Sender);
+    void ButtonAppliquerClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-    void FormShow(TObject *Sender) const;
+    void FormShow(TObject *Sender);
     static void FormHide(TObject *Sender);
     void ButtonFermerClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);

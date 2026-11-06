@@ -56,7 +56,7 @@ void TfrmStatsVehicules::ButtonFermerClick(TObject * /*Sender*/)
     Hide();
 }
 //---------------------------------------------------------------------------
-void TfrmStatsVehicules::RafraichitInfos() const
+void TfrmStatsVehicules::RafraichitInfos()
 {
     int i = 0;
     int ed = 0;

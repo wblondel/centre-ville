@@ -48,11 +48,11 @@ public: // portage : __published	// Composants gérés par l'EDI
     void RadioGroupEtatClick(TObject *Sender);
     void RadioGroupTypeDmdVertClick(TObject *Sender);
 
-    void CSpinEditDureeVertChange(TObject *Sender) const;
+    void CSpinEditDureeVertChange(TObject *Sender);
     void ButtonAppliquerClick(TObject *Sender);
     void ButtonAnnulerClick(TObject *Sender);
     void FormHide(TObject *Sender);
-    void SpeedButtonSelFeuxClick(TObject *Sender) const;
+    void SpeedButtonSelFeuxClick(TObject *Sender);
     void RadioGroupTypePsgRougeClick(TObject *Sender);
 
     void ButtonAideClick(TObject *Sender);
@@ -72,9 +72,9 @@ public:
     void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)
     bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouté le feu
     void RafraichitFeuxPietons();
-    void AnalyseEtatFeux() const; // v5.2.1
+    void AnalyseEtatFeux(); // v5.2.1
     bool AppliqueChoix();
-    void RafraichitInfosFeux() const;
+    void RafraichitInfosFeux();
 };
 //---------------------------------------------------------------------------
 extern TfrmDefFeuxPietons *frmDefFeuxPietons;

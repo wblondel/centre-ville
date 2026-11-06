@@ -44,7 +44,7 @@ TfrmParamBus::TfrmParamBus(TComponent *Owner) : TForm(Owner)
     }
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::RafraichitNbBus() const
+void TfrmParamBus::RafraichitNbBus()
 {
     int i = 0;
     int NbBus = 0;
@@ -214,7 +214,7 @@ void TfrmParamBus::MenuItemClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::BitBtnDirClick(TObject *Sender) const
+void TfrmParamBus::BitBtnDirClick(TObject *Sender)
 {
     const int n = StrToInt(
         NomDe(static_cast<TComponent *>(Sender)).SubString(7, NomDe(static_cast<TComponent *>(Sender)).Length() - 6));
@@ -258,7 +258,7 @@ void TfrmParamBus::BitBtnDirClick(TObject *Sender) const
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::TimerClignotementTimer(TObject * /*Sender*/) const
+void TfrmParamBus::TimerClignotementTimer(TObject * /*Sender*/)
 {
     TimerClignotement->Tag ^= 1;
     if (NumArretBusAMontrer != 0)
@@ -342,7 +342,7 @@ void TfrmParamBus::ButtonAppliquerClick(TObject * /*Sender*/)
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::CSpinEditParametresChange(TObject * /*Sender*/) const
+void TfrmParamBus::CSpinEditParametresChange(TObject * /*Sender*/)
 {
     if (!InitialisationEnCours)
     {
