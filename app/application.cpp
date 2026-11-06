@@ -66,10 +66,11 @@ void InitialiseApplication(QApplication &App)
    App.installTranslator(&Traduction);
   // Polices de Windows absentes ailleurs. MS Sans Serif, police « raster »,
   // n'est pas utilisable par Qt même sous Windows : Microsoft Sans Serif, sa
-  // version TrueType aux mêmes mesures (fournie par Windows), puis la police
-  // du système, plus large (libellés coupés)
-  QFont::insertSubstitutions("MS Sans Serif", {"Microsoft Sans Serif", QFont().defaultFamily()});
-  QFont::insertSubstitutions("Small Fonts", {"Verdana", "Tahoma", "DejaVu Sans", QFont().defaultFamily()});
+  // version TrueType aux mêmes mesures (fournie par Windows et macOS), puis
+  // (v6.0.16) Arial ou ses équivalents libres aux mêmes largeurs (Linux),
+  // enfin la police du système, plus large (libellés coupés)
+  QFont::insertSubstitutions("MS Sans Serif", {"Microsoft Sans Serif", "Arial", "Liberation Sans", "Arimo", QFont().defaultFamily()});
+  QFont::insertSubstitutions("Small Fonts", {"Microsoft Sans Serif", "Arial", "Liberation Sans", "Arimo", "DejaVu Sans", QFont().defaultFamily()});
 #ifdef Q_OS_WIN
   // Style « windowsvista » (contrôles de Windows 10), plus proche de la VCL que
   // « windows11 », le style par défaut de Qt sous Windows 11, dont les flèches

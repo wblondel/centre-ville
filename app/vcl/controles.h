@@ -49,6 +49,22 @@ class QTabBar;
 // appliquée à la palette (fond rempli sauf contrôle Transparent)
 void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur);
 //---------------------------------------------------------------------------
+// v6.0.16 : texte qui ne tient pas dans sa zone (libellés, cases à cocher,
+// boutons radio, boutons), les polices de remplacement étant plus larges que
+// celles de Windows (Microsoft Sans Serif sous macOS : 2 % en moyenne, jusqu'à
+// 8 %). Police resserrée (QFont::setStretch) juste assez pour qu'il tienne, au
+// dessin seulement : tailles et positions du .dfm gardées. Police inchangée
+// si le texte tient
+QFont PoliceResserree(const QFont &Police, const QString &Texte, const QRect &Zone, int Drapeaux);
+//---------------------------------------------------------------------------
+// v6.0.16 : couleur de texte fixée par le .dfm (bleu marine, bordeaux, violet
+// de Composition), illisible sur le fond sombre du thème du système (macOS) :
+// sous un contraste de 3, éclaircie, ou foncée sur fond clair, à teinte égale,
+// jusqu'au contraste de 4,5 (WCAG). Inchangée si elle se lit (thème clair,
+// fond fixé par le .dfm). Contraste : de 1 (aucun) à 21 (noir sur blanc)
+double Contraste(const QColor &a, const QColor &b);
+QColor CouleurLisible(const QColor &Texte, const QColor &Fond);
+//---------------------------------------------------------------------------
 // Contrôle fenêtré de Windows (bouton, case à cocher, curseur...) : le clic lui
 // donne le focus, ce qui fait sortir le contrôle précédent (CMExit d'un
 // TCSpinEdit) ; sous macOS, Qt ne le leur donne qu'à la tabulation (TabFocus)
@@ -154,6 +170,7 @@ class TLabel : public ControleVcl<QLabel>
   explicit TLabel(QWidget *Parent=nullptr);
   void PrepareVcl() override;
   protected:
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
   void mousePressEvent(QMouseEvent *e) override;
   void mouseReleaseEvent(QMouseEvent *e) override;
  };
@@ -201,6 +218,8 @@ class TButton : public ControleVcl<QPushButton>
   explicit TButton(QWidget *Parent=nullptr);
   void Click();
   void PrepareVcl() override;
+  protected:
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
  };
 //---------------------------------------------------------------------------
 class TBitBtn : public TButton
@@ -223,6 +242,7 @@ class TCheckBox : public ControleVcl<QCheckBox>
   protected:
   // Zone sensible de la VCL : tout le contrôle (Qt : la case et le texte)
   bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
  };
 //---------------------------------------------------------------------------
 class TRadioButton : public ControleVcl<QRadioButton>
@@ -233,6 +253,7 @@ class TRadioButton : public ControleVcl<QRadioButton>
   explicit TRadioButton(QWidget *Parent=nullptr);
   protected:
   bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
  };
 //---------------------------------------------------------------------------
 class TGroupBox : public ControleVcl<QGroupBox>
@@ -240,6 +261,8 @@ class TGroupBox : public ControleVcl<QGroupBox>
   public:
   Propriete<AnsiString> Caption;
   explicit TGroupBox(QWidget *Parent=nullptr);
+  protected:
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : cadre de la VCL (DessineCadreVcl)
  };
 //---------------------------------------------------------------------------
 class TRadioGroup : public ControleVcl<QGroupBox>
@@ -251,6 +274,8 @@ class TRadioGroup : public ControleVcl<QGroupBox>
   Propriete<int> ItemIndex;
   explicit TRadioGroup(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  protected:
+  void paintEvent(QPaintEvent *e) override; // v6.0.16 : cadre de la VCL (DessineCadreVcl)
  };
 //---------------------------------------------------------------------------
 class TSpeedButton : public ControleVcl<QToolButton>
@@ -438,13 +463,16 @@ class TPaintBox : public ControleVcl<QWidget>
 class TTabControl : public ControleVcl<QWidget>
  {
   QTabBar *Onglets=nullptr;
+  void AjusteOnglets(); // v6.0.16 : police du contrôle, resserrée si les onglets ne tiennent pas
   public:
   Propriete<int> TabIndex;
   TNotifyEvent OnChange;
   explicit TTabControl(QWidget *Parent=nullptr);
   void PrepareVcl() override;
+  bool OngletsEntiers() const; // v6.0.16 : texte d'aucun onglet abrégé
   protected:
   void paintEvent(QPaintEvent *e) override;
+  void changeEvent(QEvent *e) override; // v6.0.16 : police changée (police de la fiche, après PrepareVcl)
  };
 //---------------------------------------------------------------------------
 // TStatusBar : panneaux de largeur fixe dessinés comme la VCL

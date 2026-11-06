@@ -9,6 +9,8 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFocusEvent>
+#include <QFontMetricsF>
+#include <QHash>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMouseEvent>
@@ -16,7 +18,9 @@
 #include <QStatusTipEvent>
 #include <QStyle>
 #include <QStyleOption>
+#include <QStylePainter>
 #include <QTabBar>
+#include <cmath>
 #include <cstring>
 //---------------------------------------------------------------------------
 // Commun
@@ -71,6 +75,92 @@ void DefinitCouleurControle(QWidget *w, const char *Propriete, TColor Couleur)
     if (!w->property("vclTransparent").toBool()) w->setAutoFillBackground(true);
    }
   w->setPalette(p);
+ }
+//---------------------------------------------------------------------------
+QFont PoliceResserree(const QFont &Police, const QString &Texte, const QRect &Zone, int Drapeaux)
+ { // Largeur seule pour une ligne (une ligne un peu plus haute que le contrôle
+   // n'est pas coupée), hauteur aussi pour plusieurs lignes ou le retour à la ligne
+  if (Texte.isEmpty()||(Zone.width()<=0)) return Police;
+  bool Lignes=(Drapeaux&Qt::TextWordWrap)||Texte.contains('\n');
+  auto Tient=[&](const QFont &f)
+   {
+    QRectF r=QFontMetricsF(f).boundingRect(QRectF(Zone), Drapeaux, Texte);
+    return (r.width()<=Zone.width()+0.5)&&(!Lignes||(r.height()<=Zone.height()+0.5));
+   };
+  // Resserrement mémorisé par police, texte, zone et drapeaux : les fiches
+  // d'informations redessinent leurs libellés à chaque tour
+  static QHash<QString, int> Memoire;
+  QString Cle=Police.key()+'\x1F'+Texte+'\x1F'+QString::number(Zone.width())+'x'+QString::number(Zone.height())+'\x1F'+QString::number(Drapeaux);
+  auto i=Memoire.constFind(Cle);
+  int Etirement=100;
+  if (i!=Memoire.constEnd()) Etirement=*i;
+  else
+   {
+    if (!Tient(Police))
+     { // Au plus 20 % plus étroit, et pas sous l'étirement 85 : au-delà, le
+       // texte reste coupé. La largeur suit l'étirement (QFont::setStretch)
+       // sous Windows, son carré sous macOS (0,81 à 90, limite atteinte avant 85)
+      QFont f=Police;
+      double Largeur=QFontMetricsF(Police).horizontalAdvance(Texte);
+      for(int e=99; e>=85; e--)
+       {
+        f.setStretch(e);
+        if (QFontMetricsF(f).horizontalAdvance(Texte)<0.8*Largeur) break;
+        Etirement=e;
+        if (Tient(f)) break;
+       }
+     }
+    if (Memoire.size()>4096) Memoire.clear();
+    Memoire.insert(Cle, Etirement);
+   }
+  if (Etirement==100) return Police;
+  QFont f=Police;
+  f.setStretch(Etirement);
+  return f;
+ }
+//---------------------------------------------------------------------------
+namespace
+ { // Case à cocher ou bouton radio dessiné comme par Qt (QCheckBox::paintEvent),
+   // le texte dans la police resserrée s'il ne tient pas à côté de la case
+  void DessineCase(QAbstractButton *b, const QStyleOptionButton &o, bool Radio)
+   {
+    QStylePainter p(b);
+    QRect Zone=b->style()->subElementRect(Radio?QStyle::SE_RadioButtonContents:QStyle::SE_CheckBoxContents, &o, b);
+    if (!o.icon.isNull()) Zone.setLeft(Zone.left()+o.iconSize.width()+4);
+    p.setFont(PoliceResserree(b->font(), o.text, Zone, Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic));
+    p.drawControl(Radio?QStyle::CE_RadioButton:QStyle::CE_CheckBox, o);
+   }
+  // v6.0.16 : cadre d'un TGroupBox ou d'un TRadioGroup comme dans la VCL
+  // (TCustomGroupBox.Paint) : trait du haut au milieu du titre, titre à 8
+  // pixels du bord. Seulement si le style le place plus bas (macOS : titre
+  // au-dessus du cadre), où les contrôles, placés pour la VCL, chevauchaient le
+  // haut du cadre. Faux : dessin du style, inchangé
+  bool DessineCadreVcl(QGroupBox *g, const QStyleOptionGroupBox &o)
+   {
+    QFontMetrics m(g->font());
+    int Milieu=g->title().isEmpty()?0:m.height()/2;
+    QRect Cadre=g->style()->subControlRect(QStyle::CC_GroupBox, &o, QStyle::SC_GroupBoxFrame, g);
+    if (Cadre.top()<=Milieu+2) return false;
+    QPainter p(g);
+    int Drapeaux=Qt::AlignLeft|Qt::AlignVCenter|Qt::TextShowMnemonic;
+    if (!g->style()->styleHint(QStyle::SH_UnderlineShortcut, &o, g)) Drapeaux|=Qt::TextHideMnemonic;
+    QRect Titre=m.boundingRect(QRect(8, 0, g->width()-16, m.height()), Drapeaux, g->title());
+    Titre.setHeight(m.height());
+    // Le trait du haut s'interrompt sous le titre (le fond du cadre reste dessous)
+    QRegion Zone(g->rect());
+    if (!g->title().isEmpty()) Zone-=QRect(Titre.left()-2, 0, Titre.width()+4, Milieu+2);
+    p.setClipRegion(Zone);
+    QStyleOptionFrame f;
+    f.QStyleOption::operator=(o);
+    f.rect=g->rect().adjusted(0, Milieu, 0, 0);
+    f.lineWidth=o.lineWidth;
+    f.midLineWidth=o.midLineWidth;
+    f.features=QStyleOptionFrame::None;
+    g->style()->drawPrimitive(QStyle::PE_FrameGroupBox, &f, &p, g);
+    p.setClipping(false);
+    g->style()->drawItemText(&p, Titre, Drapeaux, g->palette(), g->isEnabled(), g->title(), QPalette::WindowText);
+    return true;
+   }
  }
 //---------------------------------------------------------------------------
 void FocusAuClic(QWidget *w)
@@ -199,6 +289,59 @@ void TLabel::AjusteTaille()
   int x=this->x();
   if (alignment()&Qt::AlignRight) x+=width()-s.width();
   setGeometry(x, y(), s.width(), s.height());
+ }
+//---------------------------------------------------------------------------
+namespace
+ { // Luminance relative et contraste (WCAG)
+  double Luminance(const QColor &c)
+   {
+    auto Lineaire=[](double v) { return v<=0.03928?v/12.92:std::pow((v+0.055)/1.055, 2.4); };
+    return 0.2126*Lineaire(c.redF())+0.7152*Lineaire(c.greenF())+0.0722*Lineaire(c.blueF());
+   }
+ }
+//---------------------------------------------------------------------------
+double Contraste(const QColor &a, const QColor &b)
+ {
+  double la=Luminance(a), lb=Luminance(b);
+  return (qMax(la, lb)+0.05)/(qMin(la, lb)+0.05);
+ }
+//---------------------------------------------------------------------------
+QColor CouleurLisible(const QColor &Texte, const QColor &Fond)
+ { // Éclaircie sur fond sombre, foncée sur fond clair, à teinte égale
+  if (Contraste(Texte, Fond)>=3) return Texte;
+  bool Sombre=Luminance(Fond)<0.18;
+  float h, s, l, a;
+  Texte.getHslF(&h, &s, &l, &a);
+  QColor c=Texte;
+  for(int i=0; (i<50)&&(Contraste(c, Fond)<4.5); i++)
+   {
+    l=qBound(0.0f, l+(Sombre?0.02f:-0.02f), 1.0f);
+    c=QColor::fromHslF(h, s, l, a);
+   }
+  return c;
+ }
+//---------------------------------------------------------------------------
+void TLabel::paintEvent(QPaintEvent *e)
+ { // Texte brut dessiné comme par QLabel::paintEvent (sans cadre ni retrait)
+  QRect Zone=contentsRect().adjusted(margin(), margin(), -margin(), -margin());
+  int Drapeaux=static_cast<int>(QStyle::visualAlignment(layoutDirection(), alignment()).toInt());
+  if (wordWrap()) Drapeaux|=Qt::TextWordWrap;
+  QStyleOption o;
+  o.initFrom(this);
+  if (buddy())
+   {
+    Drapeaux|=Qt::TextShowMnemonic;
+    if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &o, this)) Drapeaux|=Qt::TextHideMnemonic;
+   }
+  QFont f=PoliceResserree(font(), text(), Zone, Drapeaux);
+  QPalette Palette=o.palette;
+  if (property("vclFontColor").isValid()&&isEnabled())
+   for(QPalette::ColorGroup g : {QPalette::Active, QPalette::Inactive})
+    Palette.setColor(g, foregroundRole(), CouleurLisible(Palette.color(g, foregroundRole()), Palette.color(g, backgroundRole())));
+  if (((f==font())&&(Palette==o.palette))||(frameShape()!=QFrame::NoFrame)||(indent()>0)) { QLabel::paintEvent(e); return; }
+  QPainter p(this);
+  p.setFont(f);
+  style()->drawItemText(&p, Zone, Drapeaux, Palette, isEnabled(), text(), foregroundRole());
  }
 //---------------------------------------------------------------------------
 namespace
@@ -341,6 +484,18 @@ void TButton::PrepareVcl()
   Default=isDefault();
  }
 //---------------------------------------------------------------------------
+void TButton::paintEvent(QPaintEvent *)
+ { // QPushButton::paintEvent, le texte dans la police resserrée s'il ne tient
+   // pas (à côté de l'icône d'un TBitBtn)
+  QStylePainter p(this);
+  QStyleOptionButton o;
+  initStyleOption(&o);
+  QRect Zone=style()->subElementRect(QStyle::SE_PushButtonContents, &o, this);
+  if (!o.icon.isNull()) Zone.setLeft(Zone.left()+o.iconSize.width()+4);
+  p.setFont(PoliceResserree(font(), o.text, Zone, Qt::AlignHCenter|Qt::AlignVCenter|Qt::TextShowMnemonic));
+  p.drawControl(QStyle::CE_PushButton, o);
+ }
+//---------------------------------------------------------------------------
 void TButton::Click()
  { // TButton::Click : ModalResult de la fiche, puis OnClick
   if (ModalResult!=mrNone)
@@ -397,9 +552,30 @@ TRadioButton::TRadioButton(QWidget *Parent) : ControleVcl<QRadioButton>(Parent)
   QObject::connect(this, &QRadioButton::toggled, this, [this](bool b) { if (b&&OnClick) OnClick(this); });
  }
 //---------------------------------------------------------------------------
+void TCheckBox::paintEvent(QPaintEvent *)
+ {
+  QStyleOptionButton o;
+  initStyleOption(&o);
+  DessineCase(this, o, false);
+ }
+//---------------------------------------------------------------------------
+void TRadioButton::paintEvent(QPaintEvent *)
+ {
+  QStyleOptionButton o;
+  initStyleOption(&o);
+  DessineCase(this, o, true);
+ }
+//---------------------------------------------------------------------------
 TGroupBox::TGroupBox(QWidget *Parent) : ControleVcl<QGroupBox>(Parent)
  {
   Caption.Definit([this]() { return A(title()); }, [this](const AnsiString &as) { setTitle(Q(as)); });
+ }
+//---------------------------------------------------------------------------
+void TGroupBox::paintEvent(QPaintEvent *e)
+ {
+  QStyleOptionGroupBox o;
+  initStyleOption(&o);
+  if (!DessineCadreVcl(this, o)) QGroupBox::paintEvent(e);
  }
 //---------------------------------------------------------------------------
 TRadioGroup::TRadioGroup(QWidget *Parent) : ControleVcl<QGroupBox>(Parent)
@@ -420,13 +596,29 @@ TRadioGroup::TRadioGroup(QWidget *Parent) : ControleVcl<QGroupBox>(Parent)
 //---------------------------------------------------------------------------
 namespace
  { // Éléments d'un TRadioGroup (QRadioButton créés par uic) : un clic n'importe
-   // où dans l'élément le coche, comme dans la VCL (Qt : la case et le texte)
+   // où dans l'élément le coche, comme dans la VCL (Qt : la case et le texte) ;
+   // v6.0.16 : texte resserré s'il ne tient pas, comme celui d'un TRadioButton
   class ClicElement : public QObject
    {
     public:
     using QObject::QObject;
     bool eventFilter(QObject *o, QEvent *e) override
      {
+      if (e->type()==QEvent::Paint)
+       { // QRadioButton::initStyleOption, puis DessineCase
+        QRadioButton *b=static_cast<QRadioButton *>(o);
+        QStyleOptionButton Option;
+        Option.initFrom(b);
+        Option.text=b->text();
+        Option.icon=b->icon();
+        Option.iconSize=b->iconSize();
+        if (b->isDown()) Option.state|=QStyle::State_Sunken;
+        Option.state|=b->isChecked()?QStyle::State_On:QStyle::State_Off;
+        if (b->testAttribute(Qt::WA_Hover)&&b->underMouse()) Option.state|=QStyle::State_MouseOver;
+        else Option.state&=~QStyle::State_MouseOver;
+        DessineCase(b, Option, true);
+        return true;
+       }
       if ((e->type()!=QEvent::MouseButtonPress)&&(e->type()!=QEvent::MouseButtonRelease)&&
           (e->type()!=QEvent::MouseButtonDblClick)&&(e->type()!=QEvent::MouseMove)) return false;
       QRadioButton *b=static_cast<QRadioButton *>(o);
@@ -444,6 +636,13 @@ namespace
       return true;
      }
    };
+ }
+//---------------------------------------------------------------------------
+void TRadioGroup::paintEvent(QPaintEvent *e)
+ {
+  QStyleOptionGroupBox o;
+  initStyleOption(&o);
+  if (!DessineCadreVcl(this, o)) QGroupBox::paintEvent(e);
  }
 //---------------------------------------------------------------------------
 void TRadioGroup::PrepareVcl()
@@ -606,6 +805,26 @@ void TPaintBox::paintEvent(QPaintEvent *)
   Canvas->Termine();
  }
 //---------------------------------------------------------------------------
+namespace
+ { // v6.0.16 : onglets dont le texte est abrégé (QTabBar::initStyleOption abrège
+   // le texte qui ne tient pas dans l'onglet, une fois ses marges réduites)
+  class BarreOnglets : public QTabBar
+   {
+    public:
+    using QTabBar::QTabBar;
+    bool TextesEntiers() const
+     {
+      for(int i=0; i<count(); i++)
+       {
+        QStyleOptionTab o;
+        initStyleOption(&o, i);
+        if (o.text!=tabText(i)) return false;
+       }
+      return true;
+     }
+   };
+ }
+//---------------------------------------------------------------------------
 TTabControl::TTabControl(QWidget *Parent) : ControleVcl<QWidget>(Parent)
  {
   TabIndex.Definit([this]() { return Onglets?Onglets->currentIndex():-1; },
@@ -615,16 +834,42 @@ TTabControl::TTabControl(QWidget *Parent) : ControleVcl<QWidget>(Parent)
 void TTabControl::PrepareVcl()
  {
   ControleVcl<QWidget>::PrepareVcl();
-  Onglets=new QTabBar(this);
+  Onglets=new BarreOnglets(this);
   Onglets->setDrawBase(false); // le cadre de la page est dessiné par paintEvent
   Onglets->setExpanding(false);
   Onglets->setUsesScrollButtons(false);
   Onglets->setElideMode(Qt::ElideRight);
   for(const QString &s : property("vclTabsStrings").toStringList()) Onglets->addTab(s);
   if (property("vclTabIndex").isValid()) Onglets->setCurrentIndex(property("vclTabIndex").toInt());
-  Onglets->setGeometry(0, 0, width(), Onglets->sizeHint().height());
+  AjusteOnglets();
   Onglets->lower(); // sous les contrôles de la page
   QObject::connect(Onglets, &QTabBar::currentChanged, this, [this](int) { if (OnChange) OnChange(this); });
+ }
+//---------------------------------------------------------------------------
+void TTabControl::AjusteOnglets()
+ { // Police du contrôle (celle de la fiche), comme dans la VCL : sous macOS, Qt
+   // donnait aux onglets la police du système, plus grande (texte abrégé).
+   // Resserrée, au plus à 90, tant qu'un texte est abrégé
+  if (!Onglets) return;
+  QFont f=font();
+  Onglets->setFont(f);
+  Onglets->setGeometry(0, 0, width(), Onglets->sizeHint().height());
+  for(int e=99; (e>=90)&&!OngletsEntiers(); e--)
+   {
+    f.setStretch(e);
+    Onglets->setFont(f);
+   }
+ }
+//---------------------------------------------------------------------------
+bool TTabControl::OngletsEntiers() const
+ {
+  return !Onglets||static_cast<BarreOnglets *>(Onglets)->TextesEntiers();
+ }
+//---------------------------------------------------------------------------
+void TTabControl::changeEvent(QEvent *e)
+ {
+  ControleVcl<QWidget>::changeEvent(e);
+  if (e->type()==QEvent::FontChange) AjusteOnglets();
  }
 //---------------------------------------------------------------------------
 void TTabControl::paintEvent(QPaintEvent *)

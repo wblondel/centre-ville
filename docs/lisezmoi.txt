@@ -32,6 +32,12 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.16]
+ - Sous macOS, les textes des fiches ne sont plus coupés : un texte trop long
+   est légèrement resserré. Les notes en petits caractères sont entières.
+ - Sous macOS, les cadres de groupe sont dessinés comme sous Windows, et les
+   couleurs de la fiche Composition restent lisibles en mode sombre.
+
 [Version 6.0.15]
  - Aucun changement visible : les tests vérifient que le programme se construit
    sans le code d'origine de la version 5.4.3.2.

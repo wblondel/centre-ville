@@ -109,6 +109,9 @@
 #include <QFocusEvent>
 #include <QFontDatabase>
 #include <QFontInfo>
+#include <QFontMetricsF>
+#include <QStyleOption>
+#include <QtMath>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -1125,6 +1128,9 @@ class TestInterface : public QObject
   void menuContextuelDeLaGrille();
   // Couche VCL
   void controleCSpinEdit();
+  void textesResserres();
+  void couleursLisibles();
+  void ongletsEntiers();
   // Services système (phase 7)
   void aideContextuelle();
   // Affichage natif de Windows (recette)
@@ -7679,6 +7685,112 @@ void TestInterface::aideContextuelle()
   QCOMPARE(AdresseAide(UrlsOuvertes[0]), Rubrique("PDLS")); // HelpContext 311
   QVERIFY(Messages.isEmpty());
   QDesktopServices::unsetUrlHandler("file");
+ }
+//---------------------------------------------------------------------------
+void TestInterface::textesResserres()
+ { // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
+   // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
+   // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
+   // tient. Libellés des fiches : texte entier, une fois resserré (cases à
+   // cocher et boutons radio : selon la taille de la case du style, celle de
+   // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
+  QFont f=frmRecherche->RadioButtonParking->font();
+  QString t=QString::fromUtf8("Place parking n°");
+  int Dr=Qt::AlignLeft|Qt::AlignVCenter;
+  double w=QFontMetricsF(f).horizontalAdvance(t);
+  QFont Essai=f;
+  Essai.setStretch(90);
+  if (QFontMetricsF(Essai).horizontalAdvance(t)>w-1) QSKIP("QFont::setStretch sans effet avec ce moteur de polices");
+  QCOMPARE(PoliceResserree(f, t, QRect(0, 0, qCeil(w)+2, 20), Dr), f);
+  QRect Etroite(0, 0, qFloor(w*0.96), 20);
+  QFont r=PoliceResserree(f, t, Etroite, Dr);
+  QVERIFY2((r.stretch()<100)&&(r.stretch()>90), qPrintable(QString::number(r.stretch())));
+  QVERIFY(QFontMetricsF(r).horizontalAdvance(t)<=Etroite.width()+0.5);
+  QFont UnCranDeMoins=r;
+  UnCranDeMoins.setStretch(r.stretch()+1); // juste assez : un cran de moins ne tiendrait pas
+  QVERIFY(QFontMetricsF(UnCranDeMoins).horizontalAdvance(t)>Etroite.width()+0.5);
+  // Au plus 20 % plus étroit, pas sous l'étirement 85 (la largeur suit
+  // l'étirement sous Windows, son carré sous macOS)
+  QFont Plancher=PoliceResserree(f, t, QRect(0, 0, qFloor(w/3), 20), Dr);
+  QVERIFY2(Plancher.stretch()>=85, qPrintable(QString::number(Plancher.stretch())));
+  QVERIFY(QFontMetricsF(Plancher).horizontalAdvance(t)>=0.8*w-0.01);
+  QFont AuDela=Plancher;
+  AuDela.setStretch(Plancher.stretch()-1);
+  QVERIFY((Plancher.stretch()==85)||(QFontMetricsF(AuDela).horizontalAdvance(t)<0.8*w));
+  // Retour à la ligne : trois mots sur trois lignes, deux par ligne une fois
+  // resserré, pour tenir dans la hauteur de deux lignes
+  QString Mots="cases cases cases";
+  QFontMetricsF m(f);
+  QRect Deux(0, 0, qFloor(m.horizontalAdvance("cases cases")*0.97), qCeil(2*m.lineSpacing())+1);
+  int DrLignes=Dr|Qt::TextWordWrap;
+  QVERIFY(m.boundingRect(QRectF(Deux), DrLignes, Mots).height()>Deux.height());
+  QFont Resserree=PoliceResserree(f, Mots, Deux, DrLignes);
+  QVERIFY2((Resserree.stretch()<100)&&(Resserree.stretch()>90), qPrintable(QString::number(Resserree.stretch())));
+  QVERIFY(QFontMetricsF(Resserree).boundingRect(QRectF(Deux), DrLignes, Mots).height()<=Deux.height()+0.5);
+  // Libellés des fiches créées au démarrage, avec Microsoft Sans Serif
+  // (Windows, macOS) : chaque texte tient, une fois resserré
+  if (!QFontDatabase::hasFamily("Microsoft Sans Serif")) return;
+  QStringList Coupes;
+  for(QWidget *Fiche : QApplication::topLevelWidgets())
+   {
+    if (!Fiche->objectName().startsWith("frm")) continue;
+    for(QLabel *q : Fiche->findChildren<QLabel *>())
+     {
+      TLabel *l=dynamic_cast<TLabel *>(q); // TLabel, sans Q_OBJECT : pas de qobject_cast
+      if (!l||(l->window()!=Fiche)||l->wordWrap()||l->text().isEmpty()) continue; // fiches filles : parcourues pour elles-mêmes
+      QRect Zone=l->contentsRect();
+      int Drapeaux=int(l->alignment())|(l->buddy()?int(Qt::TextShowMnemonic):0);
+      QFont p=PoliceResserree(l->font(), l->text(), Zone, Drapeaux);
+      double Largeur=QFontMetricsF(p).boundingRect(QRectF(Zone), Drapeaux, l->text()).width();
+      if (Largeur>Zone.width()+0.5)
+       Coupes<<QString::fromUtf8("%1/%2 « %3 » : %4 pour %5").arg(Fiche->objectName(), l->objectName(), l->text()).arg(Largeur, 0, 'f', 1).arg(Zone.width());
+     }
+   }
+  QVERIFY2(Coupes.isEmpty(), qPrintable(Coupes.join(" | "))); // une ligne : la recette Windows ne garde que la ligne de FAIL!
+ }
+//---------------------------------------------------------------------------
+void TestInterface::couleursLisibles()
+ { // v6.0.16 : couleurs de texte fixées par le .dfm (Composition), sous le
+   // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
+   // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
+   // clair de la VCL, vert et rouge sur fond sombre)
+  QColor Sombre(30, 30, 30), Clair(236, 236, 236);
+  for(TColor c : {clNavy, clMaroon, clPurple})
+   {
+    QColor Texte=CouleurQt(c);
+    QVERIFY(Contraste(Texte, Sombre)<3);
+    QColor l=CouleurLisible(Texte, Sombre);
+    QVERIFY2(Contraste(l, Sombre)>=4.5, qPrintable(Texte.name()+" -> "+l.name()));
+    QVERIFY2(qAbs(l.hslHue()-Texte.hslHue())<=2, qPrintable(Texte.name()+" -> "+l.name()));
+   }
+  for(TColor c : {clNavy, clMaroon, clPurple, clGreen, clRed})
+   QCOMPARE(CouleurLisible(CouleurQt(c), Clair), CouleurQt(c));
+  for(TColor c : {clGreen, clRed})
+   QCOMPARE(CouleurLisible(CouleurQt(c), Sombre), CouleurQt(c));
+  QVERIFY(Contraste(CouleurQt(clNavy), Sombre)<2); // bleu marine sur fond sombre : illisible sans correction
+  QCOMPARE(CouleurLisible(QColor(Qt::black), QColor(Qt::white)), QColor(Qt::black));
+  // Sur fond clair, une couleur trop claire est foncée
+  QColor Jaune=CouleurQt(clYellow), JauneLisible=CouleurLisible(Jaune, Clair);
+  QVERIFY(Contraste(JauneLisible, Clair)>=4.5);
+  QVERIFY(JauneLisible.lightness()<Jaune.lightness());
+ }
+//---------------------------------------------------------------------------
+void TestInterface::ongletsEntiers()
+ { // v6.0.16 : onglets de Véhicules dans la police de la fiche (sous macOS, Qt
+   // leur donnait celle du système, plus grande : texte abrégé), resserrée
+   // tant qu'un texte est abrégé
+  TTabControl *t=frmStatsVehicules->TabControl;
+  QTabBar *Onglets=t->findChild<QTabBar *>();
+  QVERIFY(Onglets);
+  QCOMPARE(Onglets->font().pixelSize(), t->font().pixelSize());
+  QCOMPARE(QFontInfo(Onglets->font()).family(), QFontInfo(t->font()).family());
+  QCOMPARE(Onglets->count(), 2);
+  QVERIFY(Onglets->tabText(0).startsWith("Nb.cases"));
+  QFont Essai=t->font();
+  Essai.setStretch(90);
+  if (QFontMetricsF(Essai).horizontalAdvance(Onglets->tabText(0))>QFontMetricsF(t->font()).horizontalAdvance(Onglets->tabText(0))-1)
+   QSKIP("QFont::setStretch sans effet avec ce moteur de polices"); // Windows en « offscreen », sans polices
+  QVERIFY2(t->OngletsEntiers(), qPrintable(QString::number(Onglets->font().stretch())));
  }
 //---------------------------------------------------------------------------
 void TestInterface::policesEtStyleWindows()

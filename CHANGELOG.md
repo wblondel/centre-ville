@@ -4,6 +4,45 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.16] — textes entiers et fiches lisibles sous macOS
+
+Cette version corrige l'affichage des fiches, vérifié contrôle par contrôle sous macOS : 282
+contrôles de 23 fiches avaient un texte coupé. Les positions et les tailles des contrôles
+restent celles de la version d'origine. Le format des fichiers `.cvw` ne change pas (0x530), ni la
+simulation des cartes livrées (golden master identique).
+
+### Bogues corrigés
+
+- **Textes coupés** : sous macOS, la police des fiches (Microsoft Sans Serif, équivalent de
+  MS Sans Serif) est un peu plus large que sous Windows, de 2 % en moyenne et jusqu'à 8 %.
+  La fin de nombreux libellés, cases à cocher, boutons radio et boutons était coupée
+  (« Place parking n », « Attente totale cumulé », « Appliquer »…). Un texte qui ne tient
+  pas est maintenant légèrement resserré, juste assez pour tenir ; les autres ne changent
+  pas. Les textes sur plusieurs lignes qui manquaient de hauteur
+  (« À propos », note des Paramètres, Priorités piétons) tiennent aussi.
+- **Notes en petits caractères** : la police Small Fonts était remplacée par Verdana, plus
+  large de 13 % en moyenne et jusqu'à 35 %. Les notes « (*) » des Paramètres et des fiches
+  d'informations étaient coupées de moitié. Elle est remplacée par Microsoft Sans Serif,
+  aux mêmes largeurs que la police d'origine, sous Windows et macOS ; sous Linux, par Arial
+  ou ses équivalents libres (Liberation Sans, Arimo), comme MS Sans Serif.
+- **Cadres de groupe** : sous macOS, le titre d'un cadre est au-dessus du cadre, et non sur
+  son trait du haut comme dans la version d'origine. Les contrôles, placés pour la version
+  d'origine, chevauchaient le haut du cadre (Paramètres, Feu, Statistiques…). Le cadre est
+  maintenant dessiné comme dans la version d'origine, le titre sur son trait du haut.
+- **Couleurs illisibles en mode sombre** : les couleurs fixées par les fiches (bleu marine,
+  bordeaux, violet de Composition) étaient presque invisibles sur le fond sombre de macOS.
+  Une couleur qui se lit mal sur le fond est éclaircie, à teinte égale ; en mode clair,
+  rien ne change.
+- **Onglets abrégés** : les onglets de Véhicules (Statistiques) avaient la police du
+  système, plus grande, et leur texte était abrégé (« Nb.cases entre le + long et le +
+  co… »). Ils ont la police de la fiche, comme dans la version d'origine.
+
+### Tests
+
+Nouveaux tests de l'interface : texte resserré juste assez, dans une limite, et libellés
+entiers dans toutes les fiches créées au démarrage ; couleurs éclaircies sur fond sombre et
+inchangées sur fond clair ; onglets de Véhicules entiers.
+
 ## [6.0.15] — compilation et tests vérifiés sans le code d'origine
 
 Cette version ne change pas le programme. `src/` garde le code VCL d'origine, en lecture
