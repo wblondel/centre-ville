@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------
 class TfrmDimensionsZone : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TCSpinEdit *CSpinEditNbX{};
+public:
+    TCSpinEdit *CSpinEditNbX{}; // portage : __published	// Composants gérés par l'EDI
     TCSpinEdit *CSpinEditNbY{};
     TLabel *Label1{};
     TLabel *Label2{};
@@ -30,8 +30,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur
-public:  // Déclarations de l'utilisateur
-    int NbX{}, NbY{};
+public:
+    int NbX{}, NbY{}; // Déclarations de l'utilisateur
     explicit TfrmDimensionsZone(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

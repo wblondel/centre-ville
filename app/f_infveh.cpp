@@ -78,8 +78,7 @@ void TfrmInfosVehicule::RafraichitInfos()
     int NumParkingArrivee = 0;
     int NumFileParkDepart = 0;
     int NumFileParkArrivee = 0;
-    int // v5.0
-        NbDirPoss = 0;
+    int NbDirPoss = 0; // v5.0
     bool Prioritaire = false;
     int DejaParcouru = 0;
     int ResteAParcourir = 0;

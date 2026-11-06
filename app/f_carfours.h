@@ -16,8 +16,8 @@
 //---------------------------------------------------------------------------
 class TfrmCarrefours : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TGroupBox *GroupBox34{};
+public:
+    TGroupBox *GroupBox34{}; // portage : __published	// Composants gérés par l'EDI
     TSpeedButton *SpeedButton34b1{};
     TSpeedButton *SpeedButton34b2{};
     TSpeedButton *SpeedButton34b3{};

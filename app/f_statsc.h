@@ -11,8 +11,8 @@
 //---------------------------------------------------------------------------
 class TfrmStatsComposition : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label1{};
+public:
+    TLabel *Label1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *Label2{};
     TLabel *Label3{};
     TLabel *Label4{};

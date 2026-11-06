@@ -10,17 +10,18 @@
 //---------------------------------------------------------------------------
 class TfrmStatistiques : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TPaintBox *PaintBoxStats{};
+public:
+    TPaintBox *PaintBoxStats{}; // portage : __published	// Composants gérés par l'EDI
     void PaintBoxStatsPaint(TObject *Sender);
     static void FormShow(TObject *Sender);
     static void FormHide(TObject *Sender);
     void FormCreate(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private:                      // Déclarations de l'utilisateur
-public:                       // Déclarations de l'utilisateur
-    bool AffichageEpidemique; // v5.4.1. Définit avant l'appel à FormShow par frmSimulation
+private: // Déclarations de l'utilisateur
+public:
+    bool AffichageEpidemique; // Déclarations de l'utilisateur // v5.4.1. Définit avant l'appel à FormShow par
+                              // frmSimulation
     explicit TfrmStatistiques(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

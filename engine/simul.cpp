@@ -761,12 +761,9 @@ void feu::Evolue()
     int i = 0;
     int NumVeh = 0;
     int NumVL = 0;
-    int // v5.3
-        NumBus = 0;
-    int // v3.0
-        NumTram = 0;
-    int                  // v3.5
-        NumTaxi = 0;     // v3.6
+    int NumBus = 0;      // v5.3
+    int NumTram = 0;     // v3.0
+    int NumTaxi = 0;     // v3.5 // v3.6
     ProchainEtat = Etat; // Par défaut
     switch (Etat)
     {
@@ -1326,10 +1323,12 @@ bool feu_pieton::Sauve(int hfile)
 {
     int i = 0;
     int Ok = 0;
-    int // xc,yc : gestion copie vers fichier (v4.0.1)
-        xc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(x[0], cv->Xc), CoordonneeCopiee(x[1], cv->Xc)};
-    int // v6.0.1 : COORDCOPIE
-        yc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(y[0], cv->Yc), CoordonneeCopiee(y[1], cv->Yc)};
+    int xc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(x[0], cv->Xc), CoordonneeCopiee(x[1], cv->Xc)}; // xc,yc :
+                                                                                                       // gestion copie
+                                                                                                       // vers fichier
+                                                                                                       // (v4.0.1)
+    int yc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(y[0], cv->Yc), CoordonneeCopiee(y[1], cv->Yc)}; // v6.0.1 :
+                                                                                                       // COORDCOPIE
     Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
                           (FileWrite(hfile, cv->CopieEnCours ? xc : x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
                           (FileWrite(hfile, cv->CopieEnCours ? yc : y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
@@ -2430,8 +2429,8 @@ void tram::CalculeProchaineDirection() // v3.5
     int i = 0;
     int j = 0;
     const int nd = v->NbDirPossSensVoieTram(indefinie);
-    int                                                       // Nombre total de directions (pour DistArretTram)
-        const ndp = v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre de directions possibles
+    const int ndp = v->NbDirPossSensVoieTram(InvDir[AncDir]); // Nombre total de directions (pour DistArretTram) //
+                                                              // Nombre de directions possibles
     Dir = indefinie;
     // On classe les dir.poss. dans l'ordre < des distances aux arrêts de tram
     // En cas d'égalité, c'est le hasard : (N°Tram.+Tour) Modulo Directions Possibles
@@ -3323,14 +3322,10 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
     int nd = NbDir[DirPoss];
     const int ne = cv->NbParkings;
     const int nab = cv->NbArretsBus;
-    int // v3.0
-        const nat = cv->NbArretsTram;
-    int // v3.5
-        const nft = cv->NbFilesTaxi;
-    int // v3.6
-        const nfp = cv->NbFilesPark;
-    int                                 // v5.0
-        const npv = cv->NbPlacesVehlib; // v5.3
+    const int nat = cv->NbArretsTram;   // v3.0
+    const int nft = cv->NbFilesTaxi;    // v3.5
+    const int nfp = cv->NbFilesPark;    // v3.6
+    const int npv = cv->NbPlacesVehlib; // v5.0 // v5.3
     LibereDistances();                  // v6.0.1
     NbDirDist = nd;
     NbParkingsDist = ne;
@@ -3495,16 +3490,11 @@ void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Néc
     int d = 0;
     int MaxNivP = 0;
     int NumVV = 0;
-    int // NUMéro du Véhicule Voisin. v3.0
-        NumLV = 0;
-    int // NUMéro du vehLib Voisin. v5.3
-        NumBV = 0;
-    int // NUMéro du Bus Voisin. v3.0
-        NumTV = 0;
-    int // NUMéro du Tram Voisin. v3.5
-        NumXV = 0;
-    int // NUMéro du taXi Voisin. v3.6
-        NivPriorite[5] = {0, 0, 0, 0, 0};
+    int NumLV = 0;                        // NUMéro du Véhicule Voisin. v3.0
+    int NumBV = 0;                        // NUMéro du vehLib Voisin. v5.3
+    int NumTV = 0;                        // NUMéro du Bus Voisin. v3.0
+    int NumXV = 0;                        // NUMéro du Tram Voisin. v3.5
+    int NivPriorite[5] = {0, 0, 0, 0, 0}; // NUMéro du taXi Voisin. v3.6
     direction DirCrt{};
     direction DirAuCarrefour{};
     voie *v = nullptr;
@@ -6792,8 +6782,7 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
     int NumArretSvt = 0;
     direction DirCrt{};
     direction DirPrc{};
-    direction // v3.8
-        DirSvt{};
+    direction DirSvt{}; // v3.8
     voie *Voie = nullptr;
     for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
@@ -7036,16 +7025,11 @@ bool centre_ville::PrepareVehicules()
     int NumParkingDepart = 1;
     int NumParkingArrivee = 2;
     int NumFileParkDepart = 0;
-    int // v5.0
-        NumFileParkArrivee = 0;
-    int // v5.0
-        NumPlaceParkDepart = 0;
-    int // v5.0
-        NumPlaceParkArrivee = 0;
-    int // v5.0
-        const NumPrmVehiculePlacePark = NbVehicules - (2 * NbPlacesPark);
-    int // v5.0
-        const NbVehiculesAvantCreation = NbVehicules;
+    int NumFileParkArrivee = 0;                                           // v5.0
+    int NumPlaceParkDepart = 0;                                           // v5.0
+    int NumPlaceParkArrivee = 0;                                          // v5.0
+    const int NumPrmVehiculePlacePark = NbVehicules - (2 * NbPlacesPark); // v5.0
+    const int NbVehiculesAvantCreation = NbVehicules;                     // v5.0
     if (DefinitNbVehicules(NbVehiculesAvantCreation) != NbVehiculesAvantCreation)
     {
         return false;
@@ -7901,10 +7885,8 @@ bool centre_ville::Charge(int hfile)
     int i = 0;
     int j = 0;
     int NvNbParkings = 0;
-    int // v5.1
-        NvNbPlacesPark = 0;
-    int                       // v5.1
-        NvNbPlacesVehlib = 0; // v5.3
+    int NvNbPlacesPark = 0;   // v5.1
+    int NvNbPlacesVehlib = 0; // v5.1 // v5.3
     bool Ok = false;
     const int Position = FileSeek(hfile, 0, 1); // v6.0.2 : taille du fichier, pour NombreCredible
     TailleFichierCharge = FileSeek(hfile, 0, 2);

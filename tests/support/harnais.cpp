@@ -56,8 +56,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     int j = 0;
     int d = 0;
     int NbDirPossSansPsgBus = 0;
-    int                             // v3.5
-        NbCasesPietonPeutAller = 0; // v3.8
+    int NbCasesPietonPeutAller = 0; // v3.5 // v3.8
     const AnsiString asMsgOk = "Réseau correct.";
     asMsgErr = ""; // harnais : variable locale devenue paramètre
     dirposs dp{};

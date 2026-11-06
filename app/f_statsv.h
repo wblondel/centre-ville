@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmStatsVehicules : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonFermer{};
+public:
+    TButton *ButtonFermer{}; // portage : __published	// Composants gérés par l'EDI
     TTabControl *TabControl{};
     TStringGrid *StringGridStatsVehicules{};
     TStringGrid *StringGridCoordParkings{};

@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmInfosPieton : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonOk{};
+public:
+    TButton *ButtonOk{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *Label0{};
     TLabel *LabelCoordonnees{};
     TRadioButton *RadioButtonAucunPieton{};
@@ -54,8 +54,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void ButtonAideClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    voie *v{};
+private:
+    voie *v{}; // Déclarations de l'utilisateur
     pieton *p{};
     int x{}, y{}, NumPieton;
     void RendreVisibleInfos(bool Visible);

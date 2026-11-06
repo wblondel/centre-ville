@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmStatsAttenteTrafic : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TRadioGroup *RadioGroupType{};
+public:
+    TRadioGroup *RadioGroupType{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *Label1{};
     TLabel *Label2{};
     TLabel *Label3{};
@@ -71,8 +71,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void RubriqueClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    int m[2]{};
+private:
+    int m[2]{}; // Déclarations de l'utilisateur
     void RecalculeEtVisualise();
 
 public: // Déclarations de l'utilisateur

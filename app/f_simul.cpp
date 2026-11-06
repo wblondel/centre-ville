@@ -313,13 +313,10 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
     int BordTrottoir = 0;
     int BordToiture = 0;
     int CoinToiture = 0;
-    int // v3.8
-        NumPieton = 0;
-    int // v2.0
-        NivPriorite = 0;
-    int                 // v2.2
-        Vlr = 0;        // v5.3
-    TColor CoulTxt = 0; // v3.0.5
+    int NumPieton = 0;   // v3.8
+    int NivPriorite = 0; // v2.0
+    int Vlr = 0;         // v2.2 // v5.3
+    TColor CoulTxt = 0;  // v3.0.5
     direction dorig{};
     direction ddest{};
     direction DirArretBus{}; // v3.0
@@ -1347,16 +1344,11 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
     int j = 0;
     int NbFeux = 0;
     int *NumFeu = nullptr;
-    int // Variables de transition
-        NumFeuVoie[2] = {0, 0};
-    int // Numéros de feux de la voie {Prm,Drn}
-        NbFeuxListe = 0;
-    int // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
-        NbFeuxVoie = 0;
-    int // Nombre de feux dans la voie v[Col][Row]
-        NbNonSel = 0;
-    int                        // Compteur du nombre de feux non sélectionnés
-        Selection[2] = {0, 0}; // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
+    int NumFeuVoie[2] = {0, 0}; // Variables de transition
+    int NbFeuxListe = 0;        // Numéros de feux de la voie {Prm,Drn}
+    int NbFeuxVoie = 0;         // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
+    int NbNonSel = 0;           // Nombre de feux dans la voie v[Col][Row]
+    int Selection[2] = {0, 0};  // Compteur du nombre de feux non sélectionnés // 0=Aucun;1=Prm;2=Drn;3=Prm+Drn (Anc,Nv)
     // Traite le clic sur la case avec des feux lors d'une sélection de feux :
     // 2 feux = passage de aucun à feu1, de feu1 à feu2,
     //                  de feu2 à feu1+feu2 et de feu1+feu2 à aucun.
@@ -1606,8 +1598,7 @@ bool TfrmSimulation::VerifieReseau()
     int j = 0;
     int d = 0;
     int NbDirPossSansPsgBus = 0;
-    int                             // v3.5
-        NbCasesPietonPeutAller = 0; // v3.8
+    int NbCasesPietonPeutAller = 0; // v3.5 // v3.8
     const AnsiString asMsgOk = "Réseau correct.";
     AnsiString asMsgErr;
     dirposs dp{};
@@ -1944,14 +1935,11 @@ void TfrmSimulation::AfficheBilan()
     int xe = 0;
     int ye = 0;
     const int ne = cv->NbParkings;
-    int // NbParkings
-        const nv = cv->NbVehicules;
-    int // NbVehicules
-        const nva = cv->NbVehiculesArrives;
-    int // NbVehiculesArrivés
+    const int nv = cv->NbVehicules;         // NbParkings
+    const int nva = cv->NbVehiculesArrives; // NbVehicules
+    int                                     // NbVehiculesArrivés
         const nvpe = nv / ne;
-    int // NbVehiculesParParking
-        ParcoursMin = 0L;
+    int ParcoursMin = 0L; // NbVehiculesParParking
     int AttenteDepart = 0L;
     const int ntp = cv->NbToursParcourus;
     const int ncp = cv->NbCasesParcourues;

@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmDefVoiePietons : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label1{};
+public:
+    TLabel *Label1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelCoordonnees{};
     TButton *ButtonOk{};
     TButton *ButtonAnnuler{};
@@ -51,9 +51,9 @@ public: // portage : __published	// Composants gérés par l'EDI
     void SpeedButtonClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private:                       // Déclarations de l'utilisateur
-    bool FeuExistant[NBDIR]{}; // Indique lors de l'affichage de la fenêtre, l'existence des feux. Sert à l'annulation
-                               // (suppression)
+private:
+    bool FeuExistant[NBDIR]{}; // Déclarations de l'utilisateur // Indique lors de l'affichage de la fenêtre,
+                               // l'existence des feux. Sert à l'annulation (suppression)
     voie *v{};
     int x{}, y{}, xfo[NBDIR]{}, yfo[NBDIR]{};
     TSpeedButton *SpeedButton[NBDIR]{};

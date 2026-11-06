@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmDefNature : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TRadioGroup *RadioGroupNature{};
+public:
+    TRadioGroup *RadioGroupNature{}; // portage : __published	// Composants gérés par l'EDI
     TCheckBox *CheckBoxEcraser{};
     TButton *ButtonAppliquer{};
     TButton *ButtonFermer{};

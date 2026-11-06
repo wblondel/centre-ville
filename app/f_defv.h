@@ -14,8 +14,8 @@
 //---------------------------------------------------------------------------
 class TfrmDefVoie : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label1{};
+public:
+    TLabel *Label1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelCoordonnees{};
     TRadioGroup *RadioGroupPrioriteNord{};
     TRadioGroup *RadioGroupPrioriteOuest{};
@@ -40,8 +40,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void RadioGroupPrioriteClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    voie *v{};
+private:
+    voie *v{}; // Déclarations de l'utilisateur
     int x{}, y{};
     TBitBtn *BitBtn[NBDIR]{}; // v5.2
     void DefinitFeu(direction Dir);

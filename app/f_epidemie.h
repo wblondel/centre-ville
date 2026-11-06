@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------
 class TfrmEpidemie : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TGroupBox *GroupBox{};
+public:
+    TGroupBox *GroupBox{}; // portage : __published	// Composants gérés par l'EDI
     TCSpinEdit *CSpinEditInfectiosite{};
     TLabel *Label1{};
     TCSpinEdit *CSpinEditPatientZero{};

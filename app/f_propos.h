@@ -21,8 +21,8 @@
 class QPixmap; // portage
 class TfrmAPropos : public TForm
 {
-public: // portage : __published
-    TTimer *Timer{};
+public:
+    TTimer *Timer{}; // portage : __published
     TLabel *LabelCV1{};
     TLabel *LabelAuteur1{};
     TLabel *LabelEMail{};
@@ -53,8 +53,8 @@ private:
     int TempsEcoule{};
     TBitmap *Bitmap{};
 
-public: // Déclarations de l'utilisateur
-    bool FermetureAutomatique{};
+public:
+    bool FermetureAutomatique{}; // Déclarations de l'utilisateur
     explicit TfrmAPropos(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

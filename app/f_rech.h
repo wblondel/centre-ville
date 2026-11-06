@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------
 class TfrmRecherche : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TRadioButton *RadioButtonCoordonnees{};
+public:
+    TRadioButton *RadioButtonCoordonnees{}; // portage : __published	// Composants gérés par l'EDI
     TCSpinEdit *CSpinEditX{};
     TCSpinEdit *CSpinEditY{};
     TRadioButton *RadioButtonParking{};

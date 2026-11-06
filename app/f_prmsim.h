@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------
 class TfrmParamSimul : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TButton *ButtonOk{};
+public:
+    TButton *ButtonOk{}; // portage : __published	// Composants gérés par l'EDI
     TButton *ButtonAnnuler{};
     TGroupBox *GroupBoxNbElements{};
     TLabel *LabelNbVehicules{};

@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmParamTram : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TGroupBox *GroupBox1{};
+public:
+    TGroupBox *GroupBox1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *Label3{};
     TLabel *Label2{};
     TShape *Shape1{};
@@ -212,14 +212,14 @@ public: // portage : __published	// Composants gérés par l'EDI
     void CheckBoxToutClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    int NbArretsTram{};
+private:
+    int NbArretsTram{}; // Déclarations de l'utilisateur
     bool InitialisationEnCours{};
     void RafraichitNbTrams();
     bool AppliqueChoix();
 
-public: // Déclarations de l'utilisateur
-    int NumArretTramAMontrer{};
+public:
+    int NumArretTramAMontrer{}; // Déclarations de l'utilisateur
     explicit TfrmParamTram(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

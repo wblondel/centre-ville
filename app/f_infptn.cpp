@@ -366,10 +366,8 @@ void TfrmInfosPieton::RafraichitInfos()
             if (NbInfections > 0)
             {
                 const int Rang = p->DonnePrmRang();
-                int // v5.4.2 : au lieu de DonneRang()
-                    const DrnRang = p->DonneRang();
-                int // v5.4.2 : au lieu de DonneDrnRang()
-                    const PrmTourDeb = p->DonneTourDeb(PREMIER);
+                const int DrnRang = p->DonneRang();              // v5.4.2 : au lieu de DonneRang()
+                const int PrmTourDeb = p->DonneTourDeb(PREMIER); // v5.4.2 : au lieu de DonneDrnRang()
                 const int DrnTourDeb = p->DonneTourDeb(DERNIER);
                 const int DrnTourFin = p->DonneTourFin();
                 LabelRangs->Caption = Format(asFrmPrmDrn, TableauDeConstantes(Rang, DrnRang));

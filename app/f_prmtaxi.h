@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmParamTaxi : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TGroupBox *GroupBox{};
+public:
+    TGroupBox *GroupBox{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelNbCasesMaxPsgPtn{};
     TLabel *Label23{};
     TLabel *Label24{};
@@ -40,8 +40,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void CSpinEditParametresChange(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    bool InitialisationEnCours{};
+private:
+    bool InitialisationEnCours{}; // Déclarations de l'utilisateur
     void AppliqueChoix();
 
 public: // Déclarations de l'utilisateur

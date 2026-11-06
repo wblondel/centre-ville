@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmParamVehlib : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label21{};
+public:
+    TLabel *Label21{}; // portage : __published	// Composants gérés par l'EDI
     TCSpinEdit *CSpinEditNbMaxPersonnesVehlib{};
     TLabel *Label22{};
     TGroupBox *GroupBox{};
@@ -38,8 +38,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void CSpinEditParametresChange(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    bool InitialisationEnCours{};
+private:
+    bool InitialisationEnCours{}; // Déclarations de l'utilisateur
     void AppliqueChoix();
 
 public: // Déclarations de l'utilisateur

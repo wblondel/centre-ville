@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TfrmAffDistParkings : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TStringGrid *StringGridDistances{};
+public:
+    TStringGrid *StringGridDistances{}; // portage : __published	// Composants gérés par l'EDI
     TCheckBox *CheckBoxCouloirsBus{};
     TPanel *Panel{};
     void FormShow(TObject *Sender);

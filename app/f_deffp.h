@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmDefFeuxPietons : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TLabel *Label1{};
+public:
+    TLabel *Label1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelCoordonnees{};
     TLabel *Label2{};
     TLabel *LabelDirection{};

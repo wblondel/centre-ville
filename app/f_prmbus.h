@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmParamBus : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TGroupBox *GroupBox1{};
+public:
+    TGroupBox *GroupBox1{}; // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelNbArretsBus{};
     TLabel *Label3{};
     TLabel *Label2{};
@@ -212,14 +212,14 @@ public: // portage : __published	// Composants gérés par l'EDI
     void CheckBoxToutClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
-private: // Déclarations de l'utilisateur
-    int NbArretsBus{};
+private:
+    int NbArretsBus{}; // Déclarations de l'utilisateur
     bool InitialisationEnCours{};
     void RafraichitNbBus();
     bool AppliqueChoix();
 
-public: // Déclarations de l'utilisateur
-    int NumArretBusAMontrer{};
+public:
+    int NumArretBusAMontrer{}; // Déclarations de l'utilisateur
     explicit TfrmParamBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };

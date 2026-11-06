@@ -10,8 +10,8 @@
 //---------------------------------------------------------------------------
 class TfrmAffDistArretsTram : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TStringGrid *StringGridDistances{};
+public:
+    TStringGrid *StringGridDistances{}; // portage : __published	// Composants gérés par l'EDI
     void FormShow(TObject *Sender);
     static void FormHide(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
