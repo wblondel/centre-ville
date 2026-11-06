@@ -60,7 +60,7 @@ void TfrmAffDistArretsBus::RafraichitInfos()
             }
             if ((i != 0) && (i < NbX))
             {
-                StringGridDistances->Cells[i % NbX][i / NbX] = asDir1[Dirdp[(i % NbX) - 1][v->DirPoss]];
+                StringGridDistances->Cells[i % NbX][i / NbX] = asDir1[Dirdp[i - 1][v->DirPoss]];
             }
             if (((i % NbX) != 0) && (i >= NbX))
             { // v5.4 : conversion BCB6>BCBX (AnsiString>String)

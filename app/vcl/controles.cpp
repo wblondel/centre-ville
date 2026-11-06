@@ -934,7 +934,7 @@ void TRadioGroup::PrepareVcl()
 { // Éléments générés par dfm2ui : <Nom>_0, <Nom>_1...
     ControleVcl<QGroupBox>::PrepareVcl();
     Groupe = new QButtonGroup(this);
-    auto *Filtre = new ClicElement(this);
+    auto *Filtre = new ClicElement(this); // appartient à son parent Qt (this)
     for (int i = 0;; i++)
     {
         auto *b = findChild<QRadioButton *>(objectName() + "_" + QString::number(i), Qt::FindDirectChildrenOnly);
@@ -953,7 +953,7 @@ void TRadioGroup::PrepareVcl()
             }
         });
     }
-}
+} // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks) : Filtre appartient à son parent Qt
 //---------------------------------------------------------------------------
 // TSpeedButton
 //---------------------------------------------------------------------------

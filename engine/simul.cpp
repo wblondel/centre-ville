@@ -3,6 +3,7 @@
 // #pragma hdrstop // portage : C++Builder
 //---------------------------------------------------------------------------
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
 #include <ctime>
 //---------------------------------------------------------------------------
@@ -5591,6 +5592,7 @@ int centre_ville::DefinitFilesTaxi() // v3.6
         {
             if (PlaceTaxi[i].Definie() && PlaceTaxi[i].EstQueueFile())
             {
+                assert(NumFile < NbFilesTaxi); // autant de files que de queues comptées plus haut
                 FileTaxi[NumFile].Definit(i);
                 PlaceTaxi[i].DefinitFile(NumFile);
                 NumFile++;
@@ -5660,6 +5662,7 @@ int centre_ville::DefinitFilesPark() // v5.0
         {
             if (PlacePark[i].Definie() && PlacePark[i].EstQueueFile())
             {
+                assert(NumFilePark < NbFilesPark); // autant de files que de queues comptées plus haut
                 FilePark[NumFilePark].Definit(i);
                 PlacePark[i].DefinitFile(NumFilePark);
                 NumFilePark++;
@@ -6239,9 +6242,8 @@ direction centre_ville::CherchePassagePietons(int x, int y, sens SensRecherche) 
     }
     for (d = 0; d < 2; d++)
     {
-        for (Trv = false, i = 1;
-             (!(Trv = Voisine(x, y, i, 3 - SensRecherche + (2 * d)).PassagePietons) &&
-              (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectPsgPt));
+        for (i = 1; (!(Trv = Voisine(x, y, i, 3 - SensRecherche + (2 * d)).PassagePietons) &&
+                     (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectPsgPt));
              i++)
         {
             ;
@@ -6285,9 +6287,8 @@ direction centre_ville::ChercheArretBus(int x, int y, sens SensRecherche) // v3.
     }
     for (d = 0; d < 2; d++)
     {
-        for (Trv = false, i = 1;
-             (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretBus != 0)) &&
-              (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectArretBus));
+        for (i = 1; (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretBus != 0)) &&
+                     (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectArretBus));
              i++)
         {
             ;
@@ -6335,9 +6336,8 @@ direction centre_ville::ChercheArretTram(int x, int y, sens SensRecherche) // v3
     }
     for (d = 0; d < 2; d++)
     {
-        for (Trv = false, i = 1;
-             (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretTram != 0)) &&
-              (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectArretTram));
+        for (i = 1; (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumArretTram != 0)) &&
+                     (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectArretTram));
              i++)
         {
             ;
@@ -6385,9 +6385,8 @@ direction centre_ville::CherchePlaceTaxi(int x, int y, sens SensRecherche) // v3
     }
     for (d = 0; d < 2; d++)
     {
-        for (Trv = false, i = 1;
-             (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceTaxi != 0)) &&
-              (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectFileTaxi));
+        for (i = 1; (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceTaxi != 0)) &&
+                     (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectFileTaxi));
              i++)
         {
             ;
@@ -6435,9 +6434,8 @@ direction centre_ville::CherchePlaceVehlib(int x, int y, sens SensRecherche) // 
     }
     for (d = 0; d < 2; d++)
     {
-        for (Trv = false, i = 1;
-             (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceVehlib != 0)) &&
-              (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectFileVehlib));
+        for (i = 1; (!(Trv = (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).NumPlaceVehlib != 0)) &&
+                     (Voisine(x, y, i, 3 - SensRecherche + (2 * d)).DirPoss == 0) && (i <= NbMaxCasesDetectFileVehlib));
              i++)
         {
             ;
@@ -6790,7 +6788,7 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
         {
             for (j = 0; j < LigneTram[i].NbArrets; j++)
             {
-                DirPrc = DirSvt = indefinie; // v3.8
+                DirPrc = indefinie; // v3.8
                 Voie = &v[ArretTram[LigneTram[i].NumArret[j] - 1].x][ArretTram[LigneTram[i].NumArret[j] - 1].y];
                 Voie->LigneTram[i] = true;
                 NumArretSvt = LigneTram[i].NumArret[(j + 1) % LigneTram[i].NbArrets];
@@ -7036,6 +7034,7 @@ bool centre_ville::PrepareVehicules()
     }
     for (int i = 0; i < NumPrmVehiculePlacePark; i++)
     {
+        assert((NumParkingDepart >= 1) && (NumParkingDepart <= NbParkings));
         Vehicule[i].Definit(Parking[NumParkingDepart - 1].x, Parking[NumParkingDepart - 1].y, indefinie,
                             NumParkingDepart, NumParkingArrivee, 0, 0, // v5.0 : On ne traite ici que les
                                                                        // départs/arrivées parkings souterrains
@@ -7070,6 +7069,8 @@ bool centre_ville::PrepareVehicules()
         NumPlaceParkArrivee = ((i - NumPrmVehiculePlacePark) / NbPlacesPark) *
                               (1 + ((i - NumPrmVehiculePlacePark) % NbPlacesPark)); // Place à l'arrivée pour les
                                                                                     // dernières
+        assert((NumPlaceParkDepart >= 0) && (NumPlaceParkDepart <= NbPlacesPark) && (NumPlaceParkArrivee >= 0) &&
+               (NumPlaceParkArrivee <= NbPlacesPark));
         NumFileParkDepart = (NumPlaceParkDepart != 0) ? (1 + PlacePark[NumPlaceParkDepart - 1].NumFile) : 0;
         NumFileParkArrivee = (NumPlaceParkArrivee != 0) ? (1 + PlacePark[NumPlaceParkArrivee - 1].NumFile) : 0;
         Vehicule[i].Definit(

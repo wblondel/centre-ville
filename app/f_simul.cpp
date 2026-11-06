@@ -560,7 +560,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         {
             if (i != 0)
             { // On décale les piétons pour qu'ils puissent entrer dans une case. On prend alors la direction du premier
-                p = &cv->Pieton[NumPieton = i - 1];
+                p = &cv->Pieton[i - 1];
                 if (p->Ecrase)
                 { // v4.3
                     VirtualImageList8x8->Draw(DrawGridSimul->Canvas, Rect.Left, Rect.Top, IDB_SANG);
