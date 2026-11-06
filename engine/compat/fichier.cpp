@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <cstdio>
 #include <mutex>
+#include <span>
 #include <string>
 #include <system_error>
 #include <utility>
@@ -88,13 +89,14 @@ long long LitSysteme(int fd, char *Tampon, std::size_t n)
 //-------------------------------------------------------------------------
 bool EcritSysteme(int fd, const char *Tampon, std::size_t n)
 {
+    const std::span<const char> Octets(Tampon, n);
     std::size_t Total = 0;
     while (Total < n)
     {
 #ifdef _WIN32
-        int k = _write(fd, Tampon + Total, (unsigned)(n - Total));
+        int k = _write(fd, Octets.subspan(Total).data(), static_cast<unsigned>(n - Total));
 #else
-        const ssize_t k = write(fd, Tampon + Total, n - Total);
+        const ssize_t k = write(fd, Octets.subspan(Total).data(), n - Total);
 #endif
         if (k <= 0)
         {
@@ -247,7 +249,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
     {
         return -1;
     }
-    char *Destination = static_cast<char *>(Tampon);
+    const std::span<char> Destination(static_cast<char *>(Tampon), NbOctets);
     unsigned Total = 0;
     while (Total < NbOctets)
     {
@@ -255,7 +257,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
         {
             if (NbOctets - Total >= TAILLE_TAMPON)
             { // Gros bloc : lecture directe
-                const long long n = LitSysteme(f->fd, Destination + Total, NbOctets - Total);
+                const long long n = LitSysteme(f->fd, Destination.subspan(Total).data(), NbOctets - Total);
                 if (n < 0)
                 {
                     return -1;
@@ -284,7 +286,7 @@ int FileRead(int Handle, void *Tampon, unsigned NbOctets)
         }
         std::size_t k = f->Lecture.size() - f->PosLecture;
         k = std::min<std::size_t>(k, NbOctets - Total);
-        std::memcpy(Destination + Total, f->Lecture.data() + f->PosLecture, k);
+        std::memcpy(Destination.subspan(Total).data(), std::span(f->Lecture).subspan(f->PosLecture).data(), k);
         f->PosLecture += k;
         Total += static_cast<unsigned>(k);
     }
@@ -303,8 +305,8 @@ int FileWrite(int Handle, const void *Tampon, unsigned NbOctets)
     {
         Synchronise(f);
     }
-    f->Ecriture.insert(f->Ecriture.end(), static_cast<const char *>(Tampon),
-                       static_cast<const char *>(Tampon) + NbOctets);
+    const std::span<const char> Octets(static_cast<const char *>(Tampon), NbOctets);
+    f->Ecriture.insert(f->Ecriture.end(), Octets.begin(), Octets.end());
     if ((f->Ecriture.size() >= TAILLE_TAMPON) && !Synchronise(f))
     {
         return -1;

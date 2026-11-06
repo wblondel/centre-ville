@@ -176,8 +176,7 @@ public:
     }
     void SetFocus() { B::setFocus(); }
     [[nodiscard]] bool Focused() const { return B::hasFocus(); }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang) ;…
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void PrepareVcl() override;
 };
 //---------------------------------------------------------------------------

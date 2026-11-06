@@ -75,7 +75,8 @@ void TfrmInfosVehlib::RafraichitInfos()
     v = &cv->v[x][y];
     Vehlib = nullptr;
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
-    if ((Afficher = (v->NumVehlib > 0)))
+    Afficher = (v->NumVehlib > 0);
+    if (Afficher)
     {
         Vehlib = &cv->Vehlib[v->NumVehlib - 1];
         LabelSituation->Caption = asSituation[Vehlib->Situation];

@@ -241,8 +241,7 @@ public:
     ~TFormT() override
     {
         DesinscritFicheRaccourcis(this);
-        // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous
-        // MSVC, GCC, Clang)
+        // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     }
     static QWidget *ParentDe(TComponent *Owner)
     { // Fiches secondaires au-dessus de la fiche principale (MainFormOnTaskBar)
@@ -319,8 +318,7 @@ public:
             return mrNone;
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void DefinitModalResult(int mr) override
     { // ModalResult<>0 pendant ShowModal : la boucle modale ferme la fiche après le
       // traitement du message en cours (le gestionnaire OnClick va jusqu'au bout)
@@ -430,15 +428,18 @@ protected:
         {
             w->setMinimumWidth(c.toInt() - CadreLargeur);
         }
-        if ((c = w->property("vclConstraintsMaxWidth")).isValid())
+        c = w->property("vclConstraintsMaxWidth");
+        if (c.isValid())
         {
             w->setMaximumWidth(c.toInt() - CadreLargeur);
         }
-        if ((c = w->property("vclConstraintsMinHeight")).isValid())
+        c = w->property("vclConstraintsMinHeight");
+        if (c.isValid())
         {
             w->setMinimumHeight(c.toInt() - CadreHauteur);
         }
-        if ((c = w->property("vclConstraintsMaxHeight")).isValid())
+        c = w->property("vclConstraintsMaxHeight");
+        if (c.isValid())
         {
             w->setMaximumHeight(c.toInt() - CadreHauteur);
         }
@@ -532,8 +533,7 @@ protected:
         dynamic_cast<TButton *>(*Trouve)->Click();
         return true;
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void showEvent(QShowEvent *e) override
     {
         B::showEvent(e);
@@ -560,8 +560,7 @@ protected:
             OnShow(this);
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void hideEvent(QHideEvent *e) override
     {
         B::hideEvent(e);
@@ -570,8 +569,7 @@ protected:
             OnHide(this);
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void closeEvent(QCloseEvent *e) override
     { // TCustomForm::Close : CloseQuery, puis caHide (fiche secondaire) ou fin de l'application
         bool CanClose = true;
@@ -594,8 +592,7 @@ protected:
             QCoreApplication::quit();
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void mousePressEvent(QMouseEvent *e) override
     {
         B::mousePressEvent(e);
@@ -604,8 +601,7 @@ protected:
             e->accept();
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void mouseReleaseEvent(QMouseEvent *e) override
     { // TControl::WMLButtonUp : OnClick de la fiche (clic hors des contrôles)
         B::mouseReleaseEvent(e);
@@ -614,8 +610,7 @@ protected:
             OnClick(this);
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void contextMenuEvent(QContextMenuEvent *e) override
     { // TControl::WMContextMenu : menu contextuel de la fiche (les contrôles sans menu laissent passer le clic droit)
         if (AvecMenuContextuel::PopupMenu)
@@ -627,8 +622,7 @@ protected:
             B::contextMenuEvent(e);
         }
     }
-    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
-    // GCC, Clang)
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque base
     void keyPressEvent(QKeyEvent *e) override
     {
         if constexpr (std::is_base_of_v<QDialog, B>)

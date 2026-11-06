@@ -91,12 +91,14 @@ void TfrmInfosTram::RafraichitInfos()
     v = &cv->v[x][y];
     Tram = nullptr;
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
-    if ((Afficher = (v->NumTram > 0)))
+    Afficher = (v->NumTram > 0);
+    if (Afficher)
     {
         Tram = &cv->Tram[v->NumTram - 1];
         LabelDirection->Caption = asDir[Tram->Dir];
         LabelNumeroLigne->Caption = AnsiString(static_cast<char>('A' + Tram->NumLigne - 1));
-        if ((NumDrnArret = Tram->NumDrnArret) != 0)
+        NumDrnArret = Tram->NumDrnArret;
+        if (NumDrnArret != 0)
         {
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],

@@ -19,7 +19,8 @@ TfrmDimensionsZone *frmDimensionsZone = nullptr; // portage : =NULL explicite
 bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
 {
     int mrRep = mrCancel;
-    if ((frmDimensionsZone = new TfrmDimensionsZone(Application)))
+    frmDimensionsZone = new TfrmDimensionsZone(Application);
+    if (frmDimensionsZone)
     {
         { // portage : try/__finally -> garde RAII (Finalement)
             const Finalement f([&] {
@@ -28,7 +29,8 @@ bool DefinitDimensionsZone(int &NbX, int &NbY, bool &GenereReseau)
             });
             frmDimensionsZone->NbX = NbX;
             frmDimensionsZone->NbY = NbY;
-            if ((mrRep = frmDimensionsZone->ShowModal()) == mrOk)
+            mrRep = frmDimensionsZone->ShowModal();
+            if (mrRep == mrOk)
             {
                 NbX = frmDimensionsZone->NbX;
                 NbY = frmDimensionsZone->NbY;

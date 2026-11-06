@@ -90,7 +90,8 @@ void TfrmInfosVehicule::RafraichitInfos()
     v = &cv->v[x][y];
     Veh = nullptr;
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
-    if ((Afficher = (v->NumVehicule > 0)))
+    Afficher = (v->NumVehicule > 0);
+    if (Afficher)
     {
         Veh = &cv->Vehicule[v->NumVehicule - 1];
         NumParkingDepart = Veh->NumParkingDepart;     // v5.0

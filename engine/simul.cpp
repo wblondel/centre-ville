@@ -411,7 +411,8 @@ void pieton::ChercheFileTaxi() // v3.6
         Dir = DirPlace;
         return;
     }
-    if ((ProchDir = cv->PlaceTaxi[NumPlaceTaxi - 1].DirPlaceSvtMemeFile()) != DirPlace)
+    ProchDir = cv->PlaceTaxi[NumPlaceTaxi - 1].DirPlaceSvtMemeFile();
+    if (ProchDir != DirPlace)
     {
         if (cv->Voisine(x, y, ProchDir).PietonPeutAller(ProchDir))
         {
@@ -673,7 +674,8 @@ void feu::Evolue()
                 ;
             }
             // v5.2 : on vérifie les feux piétons (comme ci-dessus)
-            if (!(DemandeVert = (i < NbFeuxAtt))) // Si pas de demande de vert dans les feux de circulation
+            DemandeVert = (i < NbFeuxAtt);
+            if (!(DemandeVert)) // Si pas de demande de vert dans les feux de circulation
             {
                 for (i = 0; (i < NbFeuxPtn) && ((cv->FeuP[NumFeuxPtn[i] - 1].Etat != vert) || // ETAT=Etat pour les
                                                                                               // feux adverses et
@@ -732,7 +734,8 @@ void feu::Evolue()
                 ;
             }
             // v5.2 : Idem pour les feux piétons
-            if ((FeuxTousRouges = (i == NbFeuxAtt))) // Si Feux de circulation tous Rouges
+            FeuxTousRouges = (i == NbFeuxAtt);
+            if (FeuxTousRouges) // Si Feux de circulation tous Rouges
             {
                 for (i = 0; (i < NbFeuxPtn) && (cv->FeuP[NumFeuxPtn[i] - 1].Etat == rouge) &&
                             (cv->FeuP[NumFeuxPtn[i] - 1].DemandeVert || cv->FeuP[NumFeuxPtn[i] - 1].ProchainVert ||
@@ -1047,7 +1050,8 @@ bool feu_pieton::PietonAttend()
     {
         for (int j = 0; (!Attend) && (j < NBMAXPIETONSPARCASE); j++)
         {
-            if ((NumPieton = cv->v[x[i]][y[i]].NumPieton[j]) != 0)
+            NumPieton = cv->v[x[i]][y[i]].NumPieton[j];
+            if (NumPieton != 0)
             {
                 pieton *p = &cv->Pieton[NumPieton - 1];
                 Attend = p->PsgPtTrv && (p->Dir == Dir[i]); // Le piéton attend dans le sens du feu piéton.
@@ -1105,7 +1109,8 @@ void feu_pieton::Evolue()
             {
                 ;
             }
-            if ((DemandeVert = (i < NbFeux)))
+            DemandeVert = (i < NbFeux);
+            if (DemandeVert)
             {
                 TourDrnChgEtat = cv->TourCrt;
             }
@@ -1135,7 +1140,8 @@ void feu_pieton::Evolue()
             {
                 ;
             }
-            if ((FeuxTousRouges = (i == NbFeux)))
+            FeuxTousRouges = (i == NbFeux);
+            if (FeuxTousRouges)
             {
                 TourDrnChgEtat = cv->TourCrt;
             }
@@ -3807,7 +3813,8 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                                  (!DirTrv) && ((d != 0) && (d < NBDIR)); d += dd)
                             {
                                 NvDir = static_cast<direction>(1 + ((p->Dir + d - 1) % NBDIR)); // à Gauche ou à droite
-                                if ((DirTrv = cv->Voisine(x, y, NvDir).PietonPeutAller(NvDir)))
+                                DirTrv = cv->Voisine(x, y, NvDir).PietonPeutAller(NvDir);
+                                if (DirTrv)
                                 {
                                     p->AnnuleRechercheEnCours(); // Toute recherche est annulée car la direction a
                                                                  // changé !
@@ -5391,7 +5398,8 @@ int centre_ville::ArretTramExistant(int x, int y) const // v3.5
 int centre_ville::NumeroArretBusLibre(int x, int y) // v3.0
 {
     int i = 0;
-    if ((i = ArretBusExistant(x, y)) != 0)
+    i = ArretBusExistant(x, y);
+    if (i != 0)
     {
         return i; // L'arrêt existe déjà (case contiguë qui communique : va ou vient)
     }
@@ -5406,7 +5414,8 @@ int centre_ville::NumeroArretBusLibre(int x, int y) // v3.0
 int centre_ville::NumeroArretTramLibre(int x, int y) // v3.5
 {
     int i = 0;
-    if ((i = ArretTramExistant(x, y)) != 0)
+    i = ArretTramExistant(x, y);
+    if (i != 0)
     {
         return i; // L'arrêt existe déjà (case contiguë qui communique : va ou vient)
     }
@@ -6467,7 +6476,8 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                     if (v[i][j].PassageBus ||                                // Si passage de bus OU
                         Voisine(i, j, Dirdp[d][v[i][j].DirPoss]).PassageBus) // pointe sur un passage de bus
                     { // On ne teste que la distance AVEC passage de bus
-                        if (!(Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE)))
+                        Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE);
+                        if (!(Ok))
                         {
                             xErr = i;
                             yErr = j;
@@ -6476,8 +6486,9 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                     }
                     else
                     {
-                        if (!(Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
-                                   (v[i][j].DistParking[k][d][SANSPSGBUS] < DIST_INDEFINIE)))
+                        Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
+                             (v[i][j].DistParking[k][d][SANSPSGBUS] < DIST_INDEFINIE);
+                        if (!(Ok))
                         {
                             xErr = i;
                             yErr = j;
@@ -6497,7 +6508,8 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 }
                 for (k = 0; Ok && (k < NbFilesTaxi); k++)
                 { // v3.6
-                    if (!(Ok = (v[i][j].DistFileTaxi[k][d] < DIST_INDEFINIE)))
+                    Ok = (v[i][j].DistFileTaxi[k][d] < DIST_INDEFINIE);
+                    if (!(Ok))
                     {
                         xErr = i;
                         yErr = j;
@@ -7264,7 +7276,8 @@ bool centre_ville::PassagePietonFranchissable(int x, int y, direction d) const /
     {
         ;
     }
-    if ((NumFeuP = Voisine(x, y, k, d).NumFeuP[InvDir[d] - 1]) != 0)
+    NumFeuP = Voisine(x, y, k, d).NumFeuP[InvDir[d] - 1];
+    if (NumFeuP != 0)
     {
         Possible = (FeuP[NumFeuP - 1].Etat != rouge);
     }

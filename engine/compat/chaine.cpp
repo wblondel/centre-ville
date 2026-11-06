@@ -14,8 +14,7 @@
 #include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
-// NOLINTNEXTLINE(bugprone-throwing-static-initialization,cert-err58-cpp) : "," tient dans une chaîne courte, sans
-// allocation
+// NOLINTNEXTLINE(bugprone-throwing-static-initialization,cert-err58-cpp) : « , » tient sans allocation
 TFormatSettings FormatSettings;
 //---------------------------------------------------------------------------
 AnsiString AnsiString::SubString(int Index, int Count) const

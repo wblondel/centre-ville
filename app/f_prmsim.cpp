@@ -22,7 +22,8 @@ TfrmParamSimul *frmParamSimul = nullptr;
 //---------------------------------------------------------------------------
 void Parametres()
 {
-    if ((frmParamSimul = new TfrmParamSimul(frmSimulation)))
+    frmParamSimul = new TfrmParamSimul(frmSimulation);
+    if (frmParamSimul)
     {
         frmParamSimul->ShowModal();
         delete frmParamSimul;
@@ -287,7 +288,8 @@ void TfrmParamSimul::Change(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnDefLignesBusClick(TObject * /*Sender*/)
 {
-    if ((frmParamBus = new TfrmParamBus(this)))
+    frmParamBus = new TfrmParamBus(this);
+    if (frmParamBus)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             frmSimulation->DrawGridSimul->Repaint();
@@ -308,7 +310,8 @@ void TfrmParamSimul::ButtonAideClick(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnDefLignesTramClick(TObject * /*Sender*/)
 { // v3.5
-    if ((frmParamTram = new TfrmParamTram(this)))
+    frmParamTram = new TfrmParamTram(this);
+    if (frmParamTram)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             frmSimulation->DrawGridSimul->Repaint();
@@ -324,7 +327,8 @@ void TfrmParamSimul::BitBtnDefLignesTramClick(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmParamSimul::BitBtnDefTaxisClick(TObject * /*Sender*/)
 {
-    if ((frmParamTaxi = new TfrmParamTaxi(this)))
+    frmParamTaxi = new TfrmParamTaxi(this);
+    if (frmParamTaxi)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             frmSimulation->DrawGridSimul->Repaint();
@@ -350,7 +354,8 @@ void TfrmParamSimul::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*
 
 void TfrmParamSimul::BitBtnDefVehlibsClick(TObject * /*Sender*/)
 { // v5.3
-    if ((frmParamVehlib = new TfrmParamVehlib(this)))
+    frmParamVehlib = new TfrmParamVehlib(this);
+    if (frmParamVehlib)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             frmSimulation->DrawGridSimul->Repaint();

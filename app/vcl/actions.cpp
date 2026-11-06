@@ -685,7 +685,8 @@ bool TMenu::IsShortCut(TShortCut Raccourci, bool Executer)
     TMenuItem *Element = nullptr;
     for (TMenuItem *m : Items)
     {
-        if ((Element = m->Find(Raccourci)))
+        Element = m->Find(Raccourci);
+        if (Element)
         {
             break;
         }

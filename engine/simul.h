@@ -1674,7 +1674,8 @@ public:
     bool CopieValide();                                             // v4.2.1
     void PrepareCopie(bool EnCours, int x, int y, int NbX, int NbY) // v4.0.1
     {
-        if ((CopieEnCours = EnCours))
+        CopieEnCours = EnCours;
+        if (CopieEnCours)
         {
             Xc = x;
             Yc = y;

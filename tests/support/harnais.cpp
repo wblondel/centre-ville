@@ -17,7 +17,8 @@ bool harnais::Ouvre(const std::string &asNomFichier)
 { // f_simul.cpp, TfrmSimulation::ActionOuvrirExecute (partie moteur)
     int hfile = 0;
     AppelleAuChaos();
-    if ((hfile = FileOpen(asNomFichier.c_str(), fmOpenRead)) < 0)
+    hfile = FileOpen(asNomFichier.c_str(), fmOpenRead);
+    if (hfile < 0)
     {
         return false; // harnais : -1 si échec
     }
@@ -36,7 +37,8 @@ bool harnais::Ouvre(const std::string &asNomFichier)
 bool harnais::SauveSansChaos(const std::string &asNomFichier)
 {
     int hfile = 0;
-    if ((hfile = FileCreate(asNomFichier.c_str())) < 0)
+    hfile = FileCreate(asNomFichier.c_str());
+    if (hfile < 0)
     {
         return false;
     }
@@ -72,7 +74,8 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     int yErr = -1; // harnais : membres de TfrmSimulation
     for (i = 0; Ok && (i < cv->NbParkings); i++)
     { // v3.0
-        if (!(Ok = cv->Parking[i].Defini()))
+        Ok = cv->Parking[i].Defini();
+        if (!(Ok))
         {
             asMsgErr = Format("Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                               TableauDeConstantes(i + 1, cv->NbParkings));
@@ -81,7 +84,8 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 
     for (i = 0; Ok && (i < cv->NbPlacesPark); i++)
     { // v5.0
-        if (!(Ok = cv->PlacePark[i].Definie()))
+        Ok = cv->PlacePark[i].Definie();
+        if (!(Ok))
         {
             asMsgErr =
                 Format("Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
@@ -91,7 +95,8 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
 
     for (i = 0; Ok && (i < cv->NbPlacesVehlib); i++)
     { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
-        if (!(Ok = cv->PlaceVehlib[i].Definie()))
+        Ok = cv->PlaceVehlib[i].Definie();
+        if (!(Ok))
         {
             asMsgErr = Format("Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                               TableauDeConstantes(i + 1));
@@ -147,13 +152,15 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     }
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0
     {
-        if (!(Ok = cv->DepotBus.Defini()))
+        Ok = cv->DepotBus.Defini();
+        if (!(Ok))
         {
             asMsgErr = "Si des arrêts et des lignes de bus sont définis, un dépôt de bus est obligatoire.";
         }
         else
         {
-            if (!(Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune)))
+            Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune);
+            if (!(Ok))
             {
                 xErr = cv->DepotBus.x;
                 yErr = cv->DepotBus.y;
@@ -161,7 +168,8 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
             }
             for (d = nord; Ok && (d <= ouest); d++)
             {
-                if (!(Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0)))
+                Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0);
+                if (!(Ok))
                 {
                     xErr = (cv->DepotBus.x + dx[d]) % cv->NbX;
                     yErr = (cv->DepotBus.y + dy[d]) % cv->NbY;

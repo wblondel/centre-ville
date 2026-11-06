@@ -21,7 +21,8 @@ constexpr const char *asFrmPC = "###.##"; // v5.4, le format de FormatFloat a ch
 //---------------------------------------------------------------------------
 void Composition()
 {
-    if ((frmStatsComposition = new TfrmStatsComposition(Application)))
+    frmStatsComposition = new TfrmStatsComposition(Application);
+    if (frmStatsComposition)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             frmStatsComposition->Release();

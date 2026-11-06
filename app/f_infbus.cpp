@@ -92,12 +92,14 @@ void TfrmInfosBus::RafraichitInfos()
     v = &cv->v[x][y];
     Bus = nullptr;
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
-    if ((Afficher = (v->NumBus > 0)))
+    Afficher = (v->NumBus > 0);
+    if (Afficher)
     {
         Bus = &cv->Bus[v->NumBus - 1];
         LabelDirection->Caption = asDir[Bus->Dir];
         LabelNumeroLigne->Caption = IntToStr(Bus->NumLigne); // v3.5 : un oubli !!!
-        if ((NumDrnArret = Bus->NumDrnArret) != 0)
+        NumDrnArret = Bus->NumDrnArret;
+        if (NumDrnArret != 0)
         {
             LabelDernierArret->Caption =
                 Format(asFrmNumeroCoordonnees[DRN],

@@ -249,7 +249,8 @@ TEST_CASE("Chargement : élimination des feux fantômes (v5.1.1)", "[cvw][roundt
     int yf = -1;
     for (int f = 1; (NumFeu == 0) && (f <= LitEntier(asCarte, Champ(Ref, "NbFeux"))); f++)
     {
-        if ((xf = LitEntier(asCarte, Champ(Ref, "feu" + std::to_string(f) + ".x"))) >= 0)
+        xf = LitEntier(asCarte, Champ(Ref, "feu" + std::to_string(f) + ".x"));
+        if (xf >= 0)
         {
             NumFeu = f;
             yf = LitEntier(asCarte, Champ(Ref, "feu" + std::to_string(f) + ".y"));

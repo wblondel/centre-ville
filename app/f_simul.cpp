@@ -869,7 +869,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         }
         if (v->NumVehicule != 0)
         {
-            if ((NivPriorite = cv->Vehicule[v->NumVehicule - 1].NivPriorite) != 0)
+            NivPriorite = cv->Vehicule[v->NumVehicule - 1].NivPriorite;
+            if (NivPriorite != 0)
             {
                 asMsg = asMsg +
                         Format("Véhicule %s %d. ", TableauDeConstantes(asTypeVehicule[NivPriorite], v->NumVehicule));
@@ -881,7 +882,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
         }
         if (v->NumPlaceVehlib != 0) // v5.3
         {
-            if ((Vlr = cv->PlaceVehlib[v->NumPlaceVehlib - 1].NumVehlibReserve) != 0)
+            Vlr = cv->PlaceVehlib[v->NumPlaceVehlib - 1].NumVehlibReserve;
+            if (Vlr != 0)
             {
                 asMsg = asMsg + Format("Place Vehlib %d (R=%d). ", TableauDeConstantes(v->NumPlaceVehlib, Vlr));
             }
@@ -1584,7 +1586,8 @@ bool TfrmSimulation::VerifieReseau()
     yErr = -1;
     for (i = 0; Ok && (i < cv->NbParkings); i++)
     { // v3.0
-        if (!(Ok = cv->Parking[i].Defini()))
+        Ok = cv->Parking[i].Defini();
+        if (!(Ok))
         {
             asMsgErr = Format("Parking n°%d non défini. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
                               TableauDeConstantes(i + 1, cv->NbParkings));
@@ -1593,7 +1596,8 @@ bool TfrmSimulation::VerifieReseau()
 
     for (i = 0; Ok && (i < cv->NbPlacesPark); i++)
     { // v5.0
-        if (!(Ok = cv->PlacePark[i].Definie()))
+        Ok = cv->PlacePark[i].Definie();
+        if (!(Ok))
         {
             asMsgErr =
                 Format("Place de parking n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.", // v5.1
@@ -1603,7 +1607,8 @@ bool TfrmSimulation::VerifieReseau()
 
     for (i = 0; Ok && (i < cv->NbPlacesVehlib); i++)
     { // v6.0.7 : oubliées par la v5.3, CalculeDistances lisait alors la case (-1,-1)
-        if (!(Ok = cv->PlaceVehlib[i].Definie()))
+        Ok = cv->PlaceVehlib[i].Definie();
+        if (!(Ok))
         {
             asMsgErr = Format("Place de vehlib n°%d non définie. Pour renuméroter : sauvez puis rouvrez le réseau.",
                               TableauDeConstantes(i + 1));
@@ -1659,13 +1664,15 @@ bool TfrmSimulation::VerifieReseau()
     }
     if (Ok && (cv->NbArretsBus > 0) && (cv->NbLignesBus > 0)) // v3.0
     {
-        if (!(Ok = cv->DepotBus.Defini()))
+        Ok = cv->DepotBus.Defini();
+        if (!(Ok))
         {
             asMsgErr = "Si des arrêts et des lignes de bus sont définis, un dépôt de bus est obligatoire.";
         }
         else
         {
-            if (!(Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune)))
+            Ok = (cv->v[cv->DepotBus.x][cv->DepotBus.y].DirPoss > aucune);
+            if (!(Ok))
             {
                 xErr = cv->DepotBus.x;
                 yErr = cv->DepotBus.y;
@@ -1673,7 +1680,8 @@ bool TfrmSimulation::VerifieReseau()
             }
             for (d = nord; Ok && (d <= ouest); d++)
             {
-                if (!(Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0)))
+                Ok = ((cv->Voisine(cv->DepotBus.x, cv->DepotBus.y, d).DirPoss & InvPossDir[d]) == 0);
+                if (!(Ok))
                 {
                     xErr = (cv->DepotBus.x + dx[d]) % cv->NbX;
                     yErr = (cv->DepotBus.y + dy[d]) % cv->NbY;
@@ -2661,7 +2669,8 @@ void TfrmSimulation::FormCloseQuery(TObject * /*Sender*/, bool &CanClose)
 void TfrmSimulation::AfficheStatsAttenteTrafic() // v2.2.7
 {
     affichage AffSvg = Affichage;
-    if ((frmStatsAttenteTrafic = new TfrmStatsAttenteTrafic(this)))
+    frmStatsAttenteTrafic = new TfrmStatsAttenteTrafic(this);
+    if (frmStatsAttenteTrafic)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             StatsAttenteTrafic = false;
@@ -2876,8 +2885,9 @@ void TfrmSimulation::ActionOuvrirExecute(TObject * /*Sender*/)
         {
             asNomFichier = asNomFichAuto;
         }
-        if ((hfile = FileOpen(asNomFichier, fmOpenRead)) != -1) // v6.0.1 : l'échec vaut -1 (l'original chargeait alors
-                                                                // une carte vide)
+        hfile = FileOpen(asNomFichier, fmOpenRead);
+        if (hfile != -1) // v6.0.1 : l'échec vaut -1 (l'original chargeait alors
+                         // une carte vide)
         {
             StatusBar->Panels->Items[0]->Text = "Chargement en cours...";
             FileSeek(hfile, 0, 0);
@@ -2995,9 +3005,9 @@ void TfrmSimulation::ActionEnregistrerExecute(TObject * /*Sender*/)
         // v6.0.2 : le fichier n'est remplacé qu'une fois écrit (l'original le vidait d'abord : un
         // disque plein le détruisait), sauf si le dossier interdit le fichier temporaire (Direct)
         bool Direct = false;
-        if ((hfile = FileCreateRemplacement(
-                 asNomFichier = (asNomFichAuto.IsEmpty() ? SaveDialog->FileName : asNomFichAuto), &Direct)) !=
-            -1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
+        hfile = FileCreateRemplacement(asNomFichier = (asNomFichAuto.IsEmpty() ? SaveDialog->FileName : asNomFichAuto),
+                                       &Direct);
+        if (hfile != -1) // v6.0.1 : l'échec vaut -1 (l'original écrivait alors dans le vide)
         {
             bool Ok = cv->Sauve(hfile);
             if (Ok)
@@ -3783,7 +3793,8 @@ void TfrmSimulation::ActionParkingExecute(TObject * /*Sender*/)
     const int y = DrawGridSimul->Row;
     AnsiString asMsgOp;
     int NumParking = 0;
-    if ((NumParking = cv->v[x][y].NumParking) != 0) // Si parking on le supprime
+    NumParking = cv->v[x][y].NumParking;
+    if (NumParking != 0) // Si parking on le supprime
     {
         cv->SupprimeParking(NumParking - 1);
         asMsgOp = Format("Le parking numéro %d a été supprimé.", TableauDeConstantes(NumParking));
@@ -3791,7 +3802,8 @@ void TfrmSimulation::ActionParkingExecute(TObject * /*Sender*/)
     }
     else // Sinon on la crée
     {
-        if ((NumParking = cv->AjouteParking(x, y)) != 0)
+        NumParking = cv->AjouteParking(x, y);
+        if (NumParking != 0)
         {
             asMsgOp = Format("Le parking créé a le numéro %d.", TableauDeConstantes(NumParking));
             SimulationModifiee = true;
@@ -3872,8 +3884,9 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
         return;
     }
     if (cv->v[x][y].DirPoss != 0)
-    {                                                     // Route (arrêt de bus)
-        if ((NumArretBus = cv->v[x][y].NumArretBus) != 0) // Si arrêt on le supprime
+    { // Route (arrêt de bus)
+        NumArretBus = cv->v[x][y].NumArretBus;
+        if (NumArretBus != 0) // Si arrêt on le supprime
         {
             cv->SupprimeArretBus(x, y);
             for (d = nord; d <= ouest; d++)
@@ -3889,7 +3902,8 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
         }
         else // Sinon on le crée
         {
-            if ((NumArretBus = cv->AjouteArretBus(x, y)) != 0)
+            NumArretBus = cv->AjouteArretBus(x, y);
+            if (NumArretBus != 0)
             {
                 for (d = nord; d <= ouest; d++)
                 { // On rafraîchit les cases voisines du même arrêt
@@ -3918,8 +3932,9 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
         }
     }
     else
-    {                                                       // Voie de tram (arrêt de tram)
-        if ((NumArretTram = cv->v[x][y].NumArretTram) != 0) // Si arrêt on le supprime
+    { // Voie de tram (arrêt de tram)
+        NumArretTram = cv->v[x][y].NumArretTram;
+        if (NumArretTram != 0) // Si arrêt on le supprime
         {
             cv->SupprimeArretTram(x, y);
             for (d = nord; d <= ouest; d++)
@@ -3935,7 +3950,8 @@ void TfrmSimulation::ActionArretBusTramExecute(TObject * /*Sender*/)
         }
         else // Sinon on le crée
         {
-            if ((NumArretTram = cv->AjouteArretTram(x, y)) != 0)
+            NumArretTram = cv->AjouteArretTram(x, y);
+            if (NumArretTram != 0)
             {
                 for (d = nord; d <= ouest; d++)
                 { // On rafraîchit les cases voisines du même arrêt
@@ -3990,7 +4006,8 @@ void TfrmSimulation::ActionPlaceTaxiExecute(TObject * /*Sender*/)
     const int y = DrawGridSimul->Row;
     AnsiString asMsgOp;
     int NumPlaceTaxi = 0;
-    if ((NumPlaceTaxi = cv->v[x][y].NumPlaceTaxi) != 0) // Si Place Taxi on la supprime
+    NumPlaceTaxi = cv->v[x][y].NumPlaceTaxi;
+    if (NumPlaceTaxi != 0) // Si Place Taxi on la supprime
     {
         cv->SupprimePlaceTaxi(NumPlaceTaxi - 1);
         asMsgOp = Format("La place de taxi numéro %d a été supprimée.", TableauDeConstantes(NumPlaceTaxi));
@@ -3998,7 +4015,8 @@ void TfrmSimulation::ActionPlaceTaxiExecute(TObject * /*Sender*/)
     }
     else // Sinon on la crée
     {
-        if ((NumPlaceTaxi = cv->AjoutePlaceTaxi(x, y)) != 0)
+        NumPlaceTaxi = cv->AjoutePlaceTaxi(x, y);
+        if (NumPlaceTaxi != 0)
         {
             asMsgOp = Format("La place de taxi créée a le numéro %d.", TableauDeConstantes(NumPlaceTaxi));
             SimulationModifiee = true;
@@ -4672,7 +4690,8 @@ void TfrmSimulation::ActionPlaceParkExecute(TObject * /*Sender*/)
     const int y = DrawGridSimul->Row;
     AnsiString asMsgOp;
     int NumPlace = 0;
-    if ((NumPlace = cv->v[x][y].NumPlacePark) != 0) // Si Place de parking on la supprime
+    NumPlace = cv->v[x][y].NumPlacePark;
+    if (NumPlace != 0) // Si Place de parking on la supprime
     {
         cv->SupprimePlacePark(NumPlace - 1); // v5.3 renommée de SupprimePlace(n) pour distinguer avec
                                              // SupprimePlaceVehlib(n)
@@ -4681,7 +4700,8 @@ void TfrmSimulation::ActionPlaceParkExecute(TObject * /*Sender*/)
     }
     else // Sinon on la crée
     {
-        if ((NumPlace = cv->AjoutePlacePark(x, y)) != 0) // v5.1 : ancien nom AjoutePlace
+        NumPlace = cv->AjoutePlacePark(x, y);
+        if (NumPlace != 0) // v5.1 : ancien nom AjoutePlace
         {
             asMsgOp = Format("La place de parking créée a le numéro %d.", TableauDeConstantes(NumPlace));
             SimulationModifiee = true;
@@ -4732,7 +4752,8 @@ void TfrmSimulation::ActionPlaceVehlibExecute(TObject * /*Sender*/)
     const int y = DrawGridSimul->Row;
     AnsiString asMsgOp;
     int NumPlace = 0;
-    if ((NumPlace = cv->v[x][y].NumPlaceVehlib) != 0) // Si Place de vehlib on la supprime
+    NumPlace = cv->v[x][y].NumPlaceVehlib;
+    if (NumPlace != 0) // Si Place de vehlib on la supprime
     {
         cv->SupprimePlaceVehlib(NumPlace - 1);
         asMsgOp = Format("La place de vehlib numéro %d a été supprimée.", TableauDeConstantes(NumPlace));
@@ -4740,7 +4761,8 @@ void TfrmSimulation::ActionPlaceVehlibExecute(TObject * /*Sender*/)
     }
     else // Sinon on la crée
     {
-        if ((NumPlace = cv->AjoutePlaceVehlib(x, y)) != 0)
+        NumPlace = cv->AjoutePlaceVehlib(x, y);
+        if (NumPlace != 0)
         {
             asMsgOp = Format("La place de vehlib créée a le numéro %d.", TableauDeConstantes(NumPlace));
             SimulationModifiee = true;

@@ -16,7 +16,8 @@ TfrmGeneration *frmGeneration = nullptr; // portage : =NULL explicite
 //---------------------------------------------------------------------------
 void GenereReseau()
 {
-    if ((frmGeneration = new TfrmGeneration(Application)))
+    frmGeneration = new TfrmGeneration(Application);
+    if (frmGeneration)
     { // portage : try/__finally -> garde RAII (Finalement)
         const Finalement f([&] {
             delete frmGeneration;

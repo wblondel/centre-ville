@@ -168,7 +168,8 @@ void TfrmParamBus::CSpinEditChange(TObject *Sender)
         }
         else if (!InitialisationEnCours)
         {
-            if ((AncNumArretBusAMontrer = NumArretBusAMontrer) != 0)
+            AncNumArretBusAMontrer = NumArretBusAMontrer;
+            if (AncNumArretBusAMontrer != 0)
             {
                 NumArretBusAMontrer = 0;
                 cv->v[cv->ArretBus[AncNumArretBusAMontrer - 1].x][cv->ArretBus[AncNumArretBusAMontrer - 1].y]
@@ -308,7 +309,8 @@ bool TfrmParamBus::AppliqueChoix()
     for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
     {
         CSpinEditNb = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
-        if ((cv->LigneBus[i - 1].NbArrets = CSpinEditNb->Value) != 0)
+        cv->LigneBus[i - 1].NbArrets = CSpinEditNb->Value;
+        if (cv->LigneBus[i - 1].NbArrets != 0)
         {
             cv->NbLignesBus++;
             for (j = 1; j <= CSpinEditNb->Value; j++)
