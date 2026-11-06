@@ -688,9 +688,10 @@ Visuel :
   celles de Windows (Microsoft Sans Serif sous macOS : 2 % en moyenne, jusqu'à
   8 %). Depuis la 6.0.16, le texte d'un libellé, d'une case à cocher, d'un
   bouton radio ou d'un bouton qui ne tient pas à sa place est resserré au
-  dessin (`QFont::setStretch`, `PoliceResserree`), juste assez, au plus à 90 ;
-  la taille et la position du contrôle restent celles du `.dfm`. Sous macOS,
-  la largeur suit le carré de l'étirement (0,81 à 90). Sous Linux, la case
+  dessin (`QFont::setStretch`, `PoliceResserree`), juste assez, au plus de
+  20 % en largeur et pas sous l'étirement 85 ; la taille et la position du
+  contrôle restent celles du `.dfm`. La largeur suit l'étirement sous Windows,
+  son carré sous macOS (0,81 à 90). Sous Linux, la case
   des boutons radio et des cases à cocher du style Fusion, plus grande, peut
   encore couper un texte. Les valeurs écrites par le code (`AutoSize`)
   restent entières, quitte à recouvrir la fin du libellé voisin.
@@ -764,7 +765,7 @@ chiffre reste visible).
 
 | Élément | 6.0.15 | 6.0.16 |
 |---|---|---|
-| Texte d'un `TLabel`, `TCheckBox`, `TRadioButton`, élément de `TRadioGroup`, `TButton` ou `TBitBtn` (`vcl/controles.cpp`) | Dessiné dans la police du contrôle, coupé s'il ne tient pas : sous macOS, fin de mot coupée dans 23 fiches. | `PoliceResserree` : police resserrée au dessin (`QFont::setStretch`, au plus à 90), juste assez pour que le texte tienne, en largeur, et en hauteur s'il va à la ligne. Police inchangée si le texte tient ; résultat mémorisé (fiches d'informations redessinées à chaque tour). |
+| Texte d'un `TLabel`, `TCheckBox`, `TRadioButton`, élément de `TRadioGroup`, `TButton` ou `TBitBtn` (`vcl/controles.cpp`) | Dessiné dans la police du contrôle, coupé s'il ne tient pas : sous macOS, fin de mot coupée dans 23 fiches. | `PoliceResserree` : police resserrée au dessin (`QFont::setStretch`, au plus de 20 % en largeur, pas sous l'étirement 85), juste assez pour que le texte tienne, en largeur, et en hauteur s'il va à la ligne. Police inchangée si le texte tient ; résultat mémorisé (fiches d'informations redessinées à chaque tour). |
 | Small Fonts (notes « (*) », barre d'état, numéros de la carte ; `FamillesQt`) | Verdana, plus large de 13 % en moyenne, jusqu'à 35 % : notes coupées de moitié. | Microsoft Sans Serif, aux largeurs de Small Fonts (2 % de moins en moyenne) ; sous Linux, Arial, Liberation Sans ou Arimo, comme pour MS Sans Serif. |
 | Cadre d'un `TGroupBox` ou d'un `TRadioGroup` (`DessineCadreVcl`) | Style de macOS : titre au-dessus du cadre ; les contrôles, placés pour la VCL, chevauchent le haut du cadre. | Cadre du style, mais placé comme dans la VCL (trait du haut au milieu du titre), quand le style le place plus bas. |
 | Couleur de texte fixée par le `.dfm` sur le fond du système (`CouleurLisible`) | Bleu marine, bordeaux, violet de Composition presque invisibles en mode sombre (contraste de 1,0 à 1,4 sur le fond de macOS). | Sous un contraste de 3, éclaircie (ou foncée sur fond clair) à teinte égale jusqu'au contraste de 4,5. Mode clair : inchangée. |
@@ -774,7 +775,8 @@ Tests ajoutés en 6.0.16 (`test_interface.cpp`) :
 
 - `textesResserres` : `PoliceResserree` rend la police inchangée si le texte
   tient, resserrée juste assez sinon (un cran de moins ne tiendrait pas), au
-  plus à 90, et resserrée pour tenir en hauteur avec le retour à la ligne.
+  plus de 20 % en largeur et pas sous l'étirement 85, et resserrée pour tenir
+  en hauteur avec le retour à la ligne.
   Avec Microsoft Sans Serif (Windows, macOS), chaque libellé des fiches créées
   au démarrage tient une fois resserré. Sauté si le moteur de polices ignore
   `setStretch`.

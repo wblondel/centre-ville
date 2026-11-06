@@ -7690,10 +7690,10 @@ void TestInterface::aideContextuelle()
 void TestInterface::textesResserres()
  { // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
    // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
-   // plus à 90 ; police inchangée s'il tient. Libellés des fiches : texte
-   // entier, une fois resserré (cases à cocher et boutons radio : selon la
-   // taille de la case du style, celle de Fusion, en CI, étant plus grande que
-   // celles de Windows et de macOS)
+   // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
+   // tient. Libellés des fiches : texte entier, une fois resserré (cases à
+   // cocher et boutons radio : selon la taille de la case du style, celle de
+   // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
   QFont f=frmRecherche->RadioButtonParking->font();
   QString t=QString::fromUtf8("Place parking n°");
   int Dr=Qt::AlignLeft|Qt::AlignVCenter;
@@ -7709,7 +7709,14 @@ void TestInterface::textesResserres()
   QFont UnCranDeMoins=r;
   UnCranDeMoins.setStretch(r.stretch()+1); // juste assez : un cran de moins ne tiendrait pas
   QVERIFY(QFontMetricsF(UnCranDeMoins).horizontalAdvance(t)>Etroite.width()+0.5);
-  QCOMPARE(PoliceResserree(f, t, QRect(0, 0, qFloor(w/3), 20), Dr).stretch(), 90); // au plus à 90
+  // Au plus 20 % plus étroit, pas sous l'étirement 85 (la largeur suit
+  // l'étirement sous Windows, son carré sous macOS)
+  QFont Plancher=PoliceResserree(f, t, QRect(0, 0, qFloor(w/3), 20), Dr);
+  QVERIFY2(Plancher.stretch()>=85, qPrintable(QString::number(Plancher.stretch())));
+  QVERIFY(QFontMetricsF(Plancher).horizontalAdvance(t)>=0.8*w-0.01);
+  QFont AuDela=Plancher;
+  AuDela.setStretch(Plancher.stretch()-1);
+  QVERIFY((Plancher.stretch()==85)||(QFontMetricsF(AuDela).horizontalAdvance(t)<0.8*w));
   // Retour à la ligne : trois mots sur trois lignes, deux par ligne une fois
   // resserré, pour tenir dans la hauteur de deux lignes
   QString Mots="cases cases cases";
@@ -7739,7 +7746,7 @@ void TestInterface::textesResserres()
        Coupes<<QString::fromUtf8("%1/%2 « %3 » : %4 pour %5").arg(Fiche->objectName(), l->objectName(), l->text()).arg(Largeur, 0, 'f', 1).arg(Zone.width());
      }
    }
-  QVERIFY2(Coupes.isEmpty(), qPrintable(Coupes.join("\n")));
+  QVERIFY2(Coupes.isEmpty(), qPrintable(Coupes.join(" | "))); // une ligne : la recette Windows ne garde que la ligne de FAIL!
  }
 //---------------------------------------------------------------------------
 void TestInterface::couleursLisibles()

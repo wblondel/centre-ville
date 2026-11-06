@@ -97,12 +97,16 @@ QFont PoliceResserree(const QFont &Police, const QString &Texte, const QRect &Zo
   else
    {
     if (!Tient(Police))
-     { // Au plus 90 (QFont::setStretch), au-delà le texte reste coupé ; sous
-       // macOS, la largeur suit le carré de l'étirement (0,81 à 90)
+     { // Au plus 20 % plus étroit, et pas sous l'étirement 85 : au-delà, le
+       // texte reste coupé. La largeur suit l'étirement (QFont::setStretch)
+       // sous Windows, son carré sous macOS (0,81 à 90, limite atteinte avant 85)
       QFont f=Police;
-      for(Etirement=99; Etirement>90; Etirement--)
+      double Largeur=QFontMetricsF(Police).horizontalAdvance(Texte);
+      for(int e=99; e>=85; e--)
        {
-        f.setStretch(Etirement);
+        f.setStretch(e);
+        if (QFontMetricsF(f).horizontalAdvance(Texte)<0.8*Largeur) break;
+        Etirement=e;
         if (Tient(f)) break;
        }
      }
