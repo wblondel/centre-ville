@@ -3,16 +3,16 @@
 #define f_carfoursH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Buttons.hpp> // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
-//#include <System.ImageList.hpp> // portage
-//#include <Vcl.BaseImageCollection.hpp> // portage
-//#include <Vcl.ImageCollection.hpp> // portage
-//#include <Vcl.ImgList.hpp> // portage
-//#include <Vcl.VirtualImageList.hpp> // portage
+#include "base.h"      // portage
+// #include <Buttons.hpp> // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
+// #include <System.ImageList.hpp> // portage
+// #include <Vcl.BaseImageCollection.hpp> // portage
+// #include <Vcl.ImageCollection.hpp> // portage
+// #include <Vcl.ImgList.hpp> // portage
+// #include <Vcl.VirtualImageList.hpp> // portage
 //---------------------------------------------------------------------------
 class TfrmCarrefours : public TForm
 {
@@ -43,22 +43,22 @@ public: // portage : __published	// Composants gérés par l'EDI
     TButton *ButtonAnnuler{};
     TLabel *Label{};
     TButton *ButtonAide{};
-	TImageCollection *ImageCollection{};
-	TVirtualImageList *VirtualImageList64{};
-	TVirtualImageList *VirtualImageList96{};
-	TVirtualImageList *VirtualImageList128{};
+    TImageCollection *ImageCollection{};
+    TVirtualImageList *VirtualImageList64{};
+    TVirtualImageList *VirtualImageList96{};
+    TVirtualImageList *VirtualImageList128{};
     void SpeedButtonClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-    
-private:	// Déclarations de l'utilisateur
-	void AffecteGlyphe(TVirtualImageList *VirtualImageList, const int NumGlyphe, TBitmap *Glyphe)
-	 { // v5.4 pour affecter les SpeedButton->Glyph à partir des virtualImageList et supporter le HDPI
-	  VirtualImageList->GetBitmap(NumGlyphe, Glyphe);
-	 };
-public:		// Déclarations de l'utilisateur
-    TfrmCarrefours(TComponent* Owner);
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
+    void AffecteGlyphe(TVirtualImageList *VirtualImageList, const int NumGlyphe, TBitmap *Glyphe)
+    { // v5.4 pour affecter les SpeedButton->Glyph à partir des virtualImageList et supporter le HDPI
+        VirtualImageList->GetBitmap(NumGlyphe, Glyphe);
+    }
+
+public: // Déclarations de l'utilisateur
+    TfrmCarrefours(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void Active(int Colonnes, int Lignes);
 };

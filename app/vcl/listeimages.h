@@ -20,21 +20,23 @@
 #include <vector>
 #include "graphiques.h"
 //---------------------------------------------------------------------------
-class TImageCollection : public QObject {}; // Images dans app/ressources (rien à l'exécution)
+class TImageCollection : public QObject
+{}; // Images dans app/ressources (rien à l'exécution)
 //---------------------------------------------------------------------------
 class TVirtualImageList : public QObject
- {
-  std::vector<QPixmap> Images;
-  mutable std::map<int, std::vector<QPixmap>> Agrandies; // par facteur d'échelle (x100)
-  const QPixmap &Image(int Index, qreal Echelle) const;
-  public:
-  int Width=16, Height=16;
-  TVirtualImageList(const char *const *Ressources, int NbImages, QObject *Parent=nullptr);
-  int Count() const { return static_cast<int>(Images.size()); }
-  void Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enabled=true);
-  void GetBitmap(int Index, TBitmap *Bitmap) const;
-  QPixmap Pixmap(int Index) const;
- };
+{
+    std::vector<QPixmap> Images;
+    mutable std::map<int, std::vector<QPixmap>> Agrandies; // par facteur d'échelle (x100)
+    const QPixmap &Image(int Index, qreal Echelle) const;
+
+public:
+    int Width = 16, Height = 16;
+    TVirtualImageList(const char *const *Ressources, int NbImages, QObject *Parent = nullptr);
+    int Count() const { return static_cast<int>(Images.size()); }
+    void Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enabled = true);
+    void GetBitmap(int Index, TBitmap *Bitmap) const;
+    QPixmap Pixmap(int Index) const;
+};
 //---------------------------------------------------------------------------
 // Agrandissement au plus proche voisin, pour un facteur d'échelle d'écran
 QPixmap AgranditSansLissage(const QPixmap &Image, qreal Echelle);

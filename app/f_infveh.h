@@ -3,13 +3,13 @@
 #define f_infvehH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
-//v5.0 ----------------------------------------------------------------------
+// v5.0 ----------------------------------------------------------------------
 #define DEPART   0
 #define ARRIVEE  1
 #define PARKING  0
@@ -24,17 +24,17 @@ public: // portage : __published	// Composants gérés par l'EDI
     TRadioButton *RadioButtonAucunVehicule{};
     TGroupBox *GroupBoxVehicule{};
     TRadioButton *RadioButtonVehiculeNumero{};
-  TLabel *LabelDepart{};
-  TLabel *LabelArrivee{};
+    TLabel *LabelDepart{};
+    TLabel *LabelArrivee{};
     TLabel *Label4{};
     TLabel *Label7{};
-  TLabel *LabelParkingDepart{};
-  TLabel *LabelParkingArrivee{};
+    TLabel *LabelParkingDepart{};
+    TLabel *LabelParkingArrivee{};
     TLabel *LabelTourSortie{};
     TLabel *LabelDistance{};
     TLabel *Label6{};
     TLabel *LabelParcours{};
-  TLabel *Label3{};
+    TLabel *Label3{};
     TLabel *LabelDirection{};
     TLabel *Label8{};
     TLabel *LabelDistanceMin{};
@@ -55,15 +55,16 @@ public: // portage : __published	// Composants gérés par l'EDI
     void FormHide(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
     voie *v{};
     vehicule *Veh{};
     int x{}, y{};
     void RendreVisibleInfos(bool Visible);
-public:		// Déclarations de l'utilisateur
-    TfrmInfosVehicule(TComponent* Owner);
+
+public: // Déclarations de l'utilisateur
+    TfrmInfosVehicule(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
 };
@@ -71,4 +72,3 @@ public:		// Déclarations de l'utilisateur
 extern TfrmInfosVehicule *frmInfosVehicule;
 //---------------------------------------------------------------------------
 #endif
-  

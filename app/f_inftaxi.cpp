@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
-//#pragma hdrstop // portage
+// #pragma hdrstop // portage
 //---------------------------------------------------------------------------
 #include "f_inftaxi.h"
 
@@ -8,134 +8,137 @@
 #include "f_simul.h"
 #include "base.h"
 //---------------------------------------------------------------------------
-#include "ui_f_inftaxi.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
+#include "ui_f_inftaxi.h"         // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 #include "f_inftaxi_composants.h" // portage : #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
 TfrmInfosTaxi *frmInfosTaxi;
 //---------------------------------------------------------------------------
-const AnsiString asDebutTitreCadreTaxi="                           ",
-                 asFrmNumeroCoordonnees="%d (%2.2d, %2.2d)",
-                 asFrmCoordonnees="%2.2d, %2.2d",
-                 asFrmPourcentage="%.3f%%",
-                 asFrmVitesse="%d/%d",
-                 asSituation[NBSITUATIONSTAXI]={"En attente","Départ d'une course","Dépôt de client(s)","Retour d'une course"};
+const AnsiString asDebutTitreCadreTaxi = "                           ", asFrmNumeroCoordonnees = "%d (%2.2d, %2.2d)",
+                 asFrmCoordonnees = "%2.2d, %2.2d", asFrmPourcentage = "%.3f%%", asFrmVitesse = "%d/%d",
+                 asSituation[NBSITUATIONSTAXI] = {"En attente", "Départ d'une course", "Dépôt de client(s)",
+                                                  "Retour d'une course"};
 //---------------------------------------------------------------------------
-TfrmInfosTaxi::TfrmInfosTaxi(TComponent* Owner)
-    : TForm(Owner)
-{ ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
+TfrmInfosTaxi::TfrmInfosTaxi(TComponent *Owner) : TForm(Owner)
+{
+    ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
 }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::RendreVisibleInfos(bool ARendreVisible)
- {
-  int i = 0;
-  GroupBoxTaxi->Caption=asDebutTitreCadreTaxi;
-  if (ARendreVisible)
-   {
-    RadioButtonTaxiNumero->Checked=true;
-    GroupBoxTaxi->Caption= GroupBoxTaxi->Caption+
-                               Format( asFrmNumeroCoordonnees,
-                                       ARRAYOFCONST((v->NumTaxi, Taxi->x, Taxi->y)))+
-                               " ";
-   }
-  else {
-   RadioButtonAucunTaxi->Checked=true;
+{
+    int i = 0;
+    GroupBoxTaxi->Caption = asDebutTitreCadreTaxi;
+    if (ARendreVisible)
+    {
+        RadioButtonTaxiNumero->Checked = true;
+        GroupBoxTaxi->Caption =
+            GroupBoxTaxi->Caption + Format(asFrmNumeroCoordonnees, ARRAYOFCONST((v->NumTaxi, Taxi->x, Taxi->y))) + " ";
+    }
+    else
+    {
+        RadioButtonAucunTaxi->Checked = true;
+    }
+    RadioButtonTaxiNumero->Enabled = ARendreVisible;
+    RadioButtonAucunTaxi->Enabled = !ARendreVisible;
+    for (i = 1; i < 13; i++)
+    {
+        (static_cast<TLabel *>(FindComponent("Label" + IntToStr(i))))->Enabled = ARendreVisible;
+    }
+    LabelSituation->Visible = ARendreVisible;
+    LabelDirection->Visible = ARendreVisible;
+    LabelNumeroFile->Visible = ARendreVisible;
+    LabelTeteFileOrigine->Visible = ARendreVisible;
+    LabelNbPersonnes->Visible = ARendreVisible;
+    LabelParcours->Visible = ARendreVisible;
+    LabelToursDepuisDepart->Visible = ARendreVisible;
+    LabelToursDepuisDepot->Visible = ARendreVisible;
+    LabelToursDepuisRetour->Visible = ARendreVisible;
+    LabelParcoursDepuisDepart->Visible = ARendreVisible;
+    LabelDistanceTeteFileDepart->Visible = ARendreVisible;
+    LabelVitesse->Visible = ARendreVisible;
 }
-  RadioButtonTaxiNumero->Enabled=ARendreVisible;
-  RadioButtonAucunTaxi->Enabled=!ARendreVisible;
-  for(i=1; i<13; i++) {
-   (static_cast<TLabel*>(FindComponent("Label"+IntToStr(i))))->Enabled=ARendreVisible;
-}
-  LabelSituation->Visible=ARendreVisible;
-  LabelDirection->Visible=ARendreVisible;
-  LabelNumeroFile->Visible=ARendreVisible;
-  LabelTeteFileOrigine->Visible=ARendreVisible;
-  LabelNbPersonnes->Visible=ARendreVisible;
-  LabelParcours->Visible=ARendreVisible;
-  LabelToursDepuisDepart->Visible=ARendreVisible;
-  LabelToursDepuisDepot->Visible=ARendreVisible;
-  LabelToursDepuisRetour->Visible=ARendreVisible;
-  LabelParcoursDepuisDepart->Visible=ARendreVisible;
-  LabelDistanceTeteFileDepart->Visible=ARendreVisible;
-  LabelVitesse->Visible=ARendreVisible;
- }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::RafraichitInfos()
- {
-  int i = 0;
-  int NumPlaceTeteFile = 0;
-  int MinDistFile=0x7FFFFFFF;
-  bool Afficher = false;
-  x=frmSimulation->DrawGridSimul->Col;
-  y=frmSimulation->DrawGridSimul->Row;
-  v=&cv->v[x][y];
-  Taxi=nullptr;
-  LabelCoordonnees->Caption=Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
-  if ((Afficher=(v->NumTaxi>0)))
-   {
-    Taxi=cv->Taxi+v->NumTaxi-1;
-    LabelSituation->Caption=asSituation[Taxi->Situation];
-    LabelDirection->Caption=asDir[Taxi->Dir];
-    LabelNumeroFile->Caption=IntToStr(Taxi->NumFile+1);
-    NumPlaceTeteFile=cv->PlaceTaxi[cv->FileTaxi[Taxi->NumFile].NumPlaceQueue].PlaceTeteFile();
-    LabelTeteFileOrigine->Caption=Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumPlaceTeteFile, cv->PlaceTaxi[NumPlaceTeteFile-1].x, cv->PlaceTaxi[NumPlaceTeteFile-1].y)));
-    LabelNbPersonnes->Caption=IntToStr(Taxi->NbPersonnes);
-    LabelParcours->Caption=IntToStr(Taxi->NbCasesParcourues);
-    LabelToursDepuisDepart->Caption=IntToStr(cv->TourCrt-Taxi->TourDepartDrnCourse);
-    LabelToursDepuisDepot->Caption=IntToStr(cv->TourCrt-Taxi->TourDepotDrnCourse);
-    LabelToursDepuisRetour->Caption=IntToStr(cv->TourCrt-Taxi->TourRetourDrnCourse);
-    LabelParcoursDepuisDepart->Caption=IntToStr(Taxi->NbCasesParcouruesDrnCourse);
-    for(i=0; i<NbDir[v->DirPoss]; i++) {
-     MinDistFile = std::min(v->DistFileTaxi[Taxi->NumFile][i], MinDistFile); // v6.0.2 : indices dans l'ordre [file][direction] (lecture hors du tableau)
-
+{
+    int i = 0;
+    int NumPlaceTeteFile = 0;
+    int MinDistFile = 0x7FFFFFFF;
+    bool Afficher = false;
+    x = frmSimulation->DrawGridSimul->Col;
+    y = frmSimulation->DrawGridSimul->Row;
+    v = &cv->v[x][y];
+    Taxi = nullptr;
+    LabelCoordonnees->Caption = Format(asFrmCoordonnees, ARRAYOFCONST((x, y)));
+    if ((Afficher = (v->NumTaxi > 0)))
+    {
+        Taxi = cv->Taxi + v->NumTaxi - 1;
+        LabelSituation->Caption = asSituation[Taxi->Situation];
+        LabelDirection->Caption = asDir[Taxi->Dir];
+        LabelNumeroFile->Caption = IntToStr(Taxi->NumFile + 1);
+        NumPlaceTeteFile = cv->PlaceTaxi[cv->FileTaxi[Taxi->NumFile].NumPlaceQueue].PlaceTeteFile();
+        LabelTeteFileOrigine->Caption =
+            Format(asFrmNumeroCoordonnees, ARRAYOFCONST((NumPlaceTeteFile, cv->PlaceTaxi[NumPlaceTeteFile - 1].x,
+                                                         cv->PlaceTaxi[NumPlaceTeteFile - 1].y)));
+        LabelNbPersonnes->Caption = IntToStr(Taxi->NbPersonnes);
+        LabelParcours->Caption = IntToStr(Taxi->NbCasesParcourues);
+        LabelToursDepuisDepart->Caption = IntToStr(cv->TourCrt - Taxi->TourDepartDrnCourse);
+        LabelToursDepuisDepot->Caption = IntToStr(cv->TourCrt - Taxi->TourDepotDrnCourse);
+        LabelToursDepuisRetour->Caption = IntToStr(cv->TourCrt - Taxi->TourRetourDrnCourse);
+        LabelParcoursDepuisDepart->Caption = IntToStr(Taxi->NbCasesParcouruesDrnCourse);
+        for (i = 0; i < NbDir[v->DirPoss]; i++)
+        {
+            MinDistFile = std::min(v->DistFileTaxi[Taxi->NumFile][i], MinDistFile); // v6.0.2 : indices dans l'ordre
+                                                                                    // [file][direction] (lecture hors
+                                                                                    // du tableau)
+        }
+        LabelDistanceTeteFileDepart->Caption = IntToStr(MinDistFile);
+        LabelVitesse->Caption = Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
+    }
+    RendreVisibleInfos(Afficher);
 }
-    LabelDistanceTeteFileDepart->Caption=IntToStr(MinDistFile);
-    LabelVitesse->Caption=Format(asFrmVitesse, ARRAYOFCONST((1, cv->NbVitesses)));
-   }
-  RendreVisibleInfos(Afficher);
- }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::FormShow(TObject * /*Sender*/)
 {
- frmSimulation->ActionDetailTaxi->Checked=true;
- RafraichitInfos();
+    frmSimulation->ActionDetailTaxi->Checked = true;
+    RafraichitInfos();
 }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::FormHide(TObject * /*Sender*/)
 {
- frmSimulation->ActionDetailTaxi->Checked=false;
+    frmSimulation->ActionDetailTaxi->Checked = false;
 }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::ButtonOkClick(TObject * /*Sender*/)
 {
- Hide();
+    Hide();
 }
 //---------------------------------------------------------------------------
 void TfrmInfosTaxi::ButtonAideClick(TObject * /*Sender*/)
 {
- AfficheAideContextuelle(this); // v3.8
+    AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
-void TfrmInfosTaxi::FormKeyDown(TObject * /*Sender*/, WORD &Key,
-      TShiftState  /*Shift*/)
-{// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112) {
-   AfficheAideContextuelle(this);
-}
+void TfrmInfosTaxi::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*Shift*/)
+{ // v5.3 (nécessite TForm:KeyPreview à true)
+    if (Key == 112)
+    {
+        AfficheAideContextuelle(this);
+    }
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
-#define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire) Connecte(Composant->Evenement, this, &TfrmInfosTaxi::Gestionnaire);
+#define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
+    Connecte(Composant->Evenement, this, &TfrmInfosTaxi::Gestionnaire);
 void TfrmInfosTaxi::ChargeFiche()
- {
-  Ui::frmInfosTaxi().setupUi(this);
-  LieurComposants Lieur(this, "f_inftaxi", Composants);
-  COMPOSANTS_frmInfosTaxi(LIE_COMPOSANT)
-  FinChargement(Lieur);
-  EVENEMENTS_frmInfosTaxi(CONNECTE_EVENEMENT)
-  if (OnCreate) { OnCreate(this);
+{
+    Ui::frmInfosTaxi().setupUi(this);
+    LieurComposants Lieur(this, "f_inftaxi", Composants);
+    COMPOSANTS_frmInfosTaxi(LIE_COMPOSANT) FinChargement(Lieur);
+    EVENEMENTS_frmInfosTaxi(CONNECTE_EVENEMENT) if (OnCreate)
+    {
+        OnCreate(this);
+    }
 }
- }
 //---------------------------------------------------------------------------

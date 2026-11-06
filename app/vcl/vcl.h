@@ -30,20 +30,26 @@ using WORD = unsigned short;
 // quelques méthodes utilisées par les fiches
 //---------------------------------------------------------------------------
 class String : public AnsiString
- {
-  public:
-  String() = default;
-  String(const char *s) : AnsiString(s) {}
-  String(const AnsiString &as) : AnsiString(as) {}
-  String(const std::string &s) : AnsiString(s) {}
-  String UpperCase() const;
- };
+{
+public:
+    String() = default;
+    String(const char *s) : AnsiString(s) {}
+    String(const AnsiString &as) : AnsiString(as) {}
+    String(const std::string &s) : AnsiString(s) {}
+    String UpperCase() const;
+};
 using UnicodeString = String;
 //---------------------------------------------------------------------------
 // Conversions avec Qt
 //---------------------------------------------------------------------------
-inline QString Q(const AnsiString &as) { return QString::fromUtf8(as.c_str()); }
-inline AnsiString A(const QString &qs) { return {qs.toUtf8().toStdString()}; }
+inline QString Q(const AnsiString &as)
+{
+    return QString::fromUtf8(as.c_str());
+}
+inline AnsiString A(const QString &qs)
+{
+    return {qs.toUtf8().toStdString()};
+}
 //---------------------------------------------------------------------------
 // Événements (TNotifyEvent et compagnie) : fonctions appelées avec Sender
 //---------------------------------------------------------------------------
@@ -54,58 +60,85 @@ using TNotifyEvent = std::function<void(TObject *Sender)>;
 //---------------------------------------------------------------------------
 template <class R, class... P, class C, class O>
 void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...))
- {
-  Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
- }
+{
+    Evenement = [Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+}
 // Gestionnaire qui ne modifie pas la fiche (méthode const)
 template <class R, class... P, class C, class O>
 void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...) const)
- {
-  Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
- }
+{
+    Evenement = [Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+}
 //---------------------------------------------------------------------------
 // try/__finally de C++Builder -> garde RAII : le code est exécuté en sortie de bloc
 //---------------------------------------------------------------------------
 class Finalement
- {
-  std::function<void()> Code;
-  public:
-  explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
-  Finalement(const Finalement &)=delete;
-  ~Finalement() { Code(); }
- };
+{
+    std::function<void()> Code;
+
+public:
+    explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
+    Finalement(const Finalement &) = delete;
+    ~Finalement() { Code(); }
+};
 //---------------------------------------------------------------------------
 // TShiftState
 //---------------------------------------------------------------------------
 enum TShiftStateElement { ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble };
 class TShiftState
- {
-  unsigned Bits=0;
-  public:
-  TShiftState() = default;
-  TShiftState &operator<<(TShiftStateElement e) { Bits|=1U<<e; return *this; }
-  bool Contains(TShiftStateElement e) const { return ((Bits>>e)&1U) != 0u; }
- };
+{
+    unsigned Bits = 0;
+
+public:
+    TShiftState() = default;
+    TShiftState &operator<<(TShiftStateElement e)
+    {
+        Bits |= 1U << e;
+        return *this;
+    }
+    bool Contains(TShiftStateElement e) const { return ((Bits >> e) & 1U) != 0u; }
+};
 //---------------------------------------------------------------------------
 // Ensembles de la VCL (TGridOptions, TMsgDlgButtons...) : Options << x, >> x
 //---------------------------------------------------------------------------
 template <class E> class TEnsemble
- {
-  unsigned long long Bits=0;
-  public:
-  TEnsemble() = default;
-  TEnsemble &operator<<(E e) { Bits|=1ULL<<(int)e; return *this; }
-  TEnsemble &operator>>(E e) { Bits&=~(1ULL<<(int)e); return *this; }
-  bool Contains(E e) const { return ((Bits>>(int)e)&1ULL) != 0u; }
-  bool operator==(const TEnsemble &t) const { return Bits==t.Bits; }
- };
+{
+    unsigned long long Bits = 0;
+
+public:
+    TEnsemble() = default;
+    TEnsemble &operator<<(E e)
+    {
+        Bits |= 1ULL << (int)e;
+        return *this;
+    }
+    TEnsemble &operator>>(E e)
+    {
+        Bits &= ~(1ULL << (int)e);
+        return *this;
+    }
+    bool Contains(E e) const { return ((Bits >> (int)e) & 1ULL) != 0u; }
+    bool operator==(const TEnsemble &t) const { return Bits == t.Bits; }
+};
 //---------------------------------------------------------------------------
 // Divers
 //---------------------------------------------------------------------------
 enum TWindowState { wsNormal, wsMinimized, wsMaximized };
-enum TCursor { crDefault=0, crHourGlass=-11, crHandPoint=-21 };
-enum TModalResult { mrNone=0, mrOk=1, mrCancel=2, mrAbort=3, mrRetry=4, mrIgnore=5, mrYes=6, mrNo=7,
-                    mrAll=8, mrNoToAll=9, mrYesToAll=10, mrClose=11, };
+enum TCursor { crDefault = 0, crHourGlass = -11, crHandPoint = -21 };
+enum TModalResult {
+    mrNone = 0,
+    mrOk = 1,
+    mrCancel = 2,
+    mrAbort = 3,
+    mrRetry = 4,
+    mrIgnore = 5,
+    mrYes = 6,
+    mrNo = 7,
+    mrAll = 8,
+    mrNoToAll = 9,
+    mrYesToAll = 10,
+    mrClose = 11,
+};
 //---------------------------------------------------------------------------
 // SysUtils / System
 //---------------------------------------------------------------------------
@@ -122,22 +155,23 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur);
 // donne Windows, 96 × facteur d'échelle (192 sur un écran Retina)
 //---------------------------------------------------------------------------
 class TScreen
- {
-  public:
-  Propriete<int> PixelsPerInch;
-  TScreen();
- };
+{
+public:
+    Propriete<int> PixelsPerInch;
+    TScreen();
+};
 extern TScreen *Screen;
 //---------------------------------------------------------------------------
 // TApplication (Application->Title...)
 //---------------------------------------------------------------------------
 class TApplication : public QObject
- {
-  AnsiString asTitre;
-  public:
-  TApplication();
-  Propriete<AnsiString> Title;
- };
+{
+    AnsiString asTitre;
+
+public:
+    TApplication();
+    Propriete<AnsiString> Title;
+};
 extern TApplication *Application;
 //---------------------------------------------------------------------------
 #endif

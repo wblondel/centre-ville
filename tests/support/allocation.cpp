@@ -17,49 +17,78 @@
 #include <new>
 //---------------------------------------------------------------------------
 static std::atomic<long> AllocationsVives{0};
-long NombreAllocationsVives() { return AllocationsVives; }
+long NombreAllocationsVives()
+{
+    return AllocationsVives;
+}
 static void *Alloue(std::size_t n) noexcept
- {
-  void *p=std::calloc((n != 0u)?n:1, 1);
-  if (p) { AllocationsVives++;
+{
+    void *p = std::calloc((n != 0u) ? n : 1, 1);
+    if (p)
+    {
+        AllocationsVives++;
+    }
+    return p;
 }
-  return p;
- }
 static void Libere(void *p) noexcept
- {
-  if (p) { AllocationsVives--;
+{
+    if (p)
+    {
+        AllocationsVives--;
+    }
+    std::free(p);
 }
-  std::free(p);
- }
 //---------------------------------------------------------------------------
 void *operator new(std::size_t n)
- {
-  if (void *p=Alloue(n)) { return p;
+{
+    if (void *p = Alloue(n))
+    {
+        return p;
+    }
+    throw std::bad_alloc();
 }
-  throw std::bad_alloc();
- }
 //---------------------------------------------------------------------------
 void *operator new[](std::size_t n)
- {
-  if (void *p=Alloue(n)) { return p;
+{
+    if (void *p = Alloue(n))
+    {
+        return p;
+    }
+    throw std::bad_alloc();
 }
-  throw std::bad_alloc();
- }
 //---------------------------------------------------------------------------
 void *operator new(std::size_t n, const std::nothrow_t & /*unused*/) noexcept
- {
-  return Alloue(n);
- }
+{
+    return Alloue(n);
+}
 //---------------------------------------------------------------------------
 void *operator new[](std::size_t n, const std::nothrow_t & /*unused*/) noexcept
- {
-  return Alloue(n);
- }
+{
+    return Alloue(n);
+}
 //---------------------------------------------------------------------------
-void operator delete(void *p) noexcept { Libere(p); }
-void operator delete[](void *p) noexcept { Libere(p); }
-void operator delete(void *p, std::size_t /*unused*/) noexcept { Libere(p); }
-void operator delete[](void *p, std::size_t /*unused*/) noexcept { Libere(p); }
-void operator delete(void *p, const std::nothrow_t & /*unused*/) noexcept { Libere(p); }
-void operator delete[](void *p, const std::nothrow_t & /*unused*/) noexcept { Libere(p); }
+void operator delete(void *p) noexcept
+{
+    Libere(p);
+}
+void operator delete[](void *p) noexcept
+{
+    Libere(p);
+}
+void operator delete(void *p, std::size_t /*unused*/) noexcept
+{
+    Libere(p);
+}
+void operator delete[](void *p, std::size_t /*unused*/) noexcept
+{
+    Libere(p);
+}
+void operator delete(void *p, const std::nothrow_t & /*unused*/) noexcept
+{
+    Libere(p);
+}
+void operator delete[](void *p, const std::nothrow_t & /*unused*/) noexcept
+{
+    Libere(p);
+}
 //---------------------------------------------------------------------------

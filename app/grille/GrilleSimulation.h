@@ -27,74 +27,88 @@
 #include "vcl/controles.h"
 //---------------------------------------------------------------------------
 struct TGridCoord
- {
-  int X=0, Y=0;
- };
+{
+    int X = 0, Y = 0;
+};
 struct TGridRect
- {
-  int Left=0, Top=0, Right=0, Bottom=0;
- };
-enum TGridOption { goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect,
-                   goDrawFocusSelected, goRowSizing, goColSizing, goRowMoving, goColMoving,
-                   goEditing, goTabs, goRowSelect, goAlwaysShowEditor, goThumbTracking, };
+{
+    int Left = 0, Top = 0, Right = 0, Bottom = 0;
+};
+enum TGridOption {
+    goFixedVertLine,
+    goFixedHorzLine,
+    goVertLine,
+    goHorzLine,
+    goRangeSelect,
+    goDrawFocusSelected,
+    goRowSizing,
+    goColSizing,
+    goRowMoving,
+    goColMoving,
+    goEditing,
+    goTabs,
+    goRowSelect,
+    goAlwaysShowEditor,
+    goThumbTracking,
+};
 using TGridOptions = TEnsemble<TGridOption>;
 enum TGridDrawStateElement { gdSelected, gdFocused, gdFixed };
 using TGridDrawState = TEnsemble<TGridDrawStateElement>;
 using TDrawCellEvent = std::function<void(TObject *Sender, int ACol, int ARow, TRect &Rect, TGridDrawState State)>;
 //---------------------------------------------------------------------------
 class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMenuContextuel
- {
-  TCanvas CanvasGrille;
-  TGridCoord Courante, Ancre, HautGauche;
-  int NbColonnes=5, NbLignes=5;
-  bool SelectionEnCours=false;
-  int CumulMolette=0;
-  QTimer DefilementAuto;
-  QPoint DernierePosition;
-  void MetAJourDefilement();
-  void MetAJourSelection();
-  QRect RectGrille(const TGridRect &r) const; // en pixels du viewport
-  void InvalideSelection(const TGridRect &Ancienne);
-  TGridCoord CaseEn(const QPoint &p) const;
-  void MoveCurrent(int ACol, int ARow, bool MoveAnchor);
-  void MoveAnchor(TGridCoord NouvelleAncre);
-  void FocusCell(int ACol, int ARow, bool MoveAnchor);
-  void ClampInView(TGridCoord c);
-  void DefinitHautGauche(int Gauche, int Haut);
-  int ColonnesVisibles() const; // cases entièrement visibles
-  int LignesVisibles() const;
-  int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
-  int LimiteVisible(bool Colonne) const; // v6.0.12 : son bord droit ou bas, en pixels du viewport
-  public:
-  // Propriétés de TDrawGrid utilisées par la fiche
-  Propriete<int> ColCount, RowCount, Col, Row, LeftCol, TopRow;
-  int DefaultColWidth=16, DefaultRowHeight=16;
-  TGridOptions Options;
-  TColor Color=clBlack;
-  SousObjet<TFont> Font;
-  TCanvas *Canvas=&CanvasGrille;
-  TGridRect Selection;
-  TDrawCellEvent OnDrawCell;
-  TNotifyEvent OnDblClick;
-  explicit GrilleSimulation(QWidget *Parent=nullptr);
-  void PrepareVcl() override;
-  TRect CellRect(int ACol, int ARow) const;
-  void InvalidateCell(int ACol, int ARow); // RedessineCase -> update(rect)
-  void Repaint(); // TControl::Repaint : dessin immédiat
-  protected:
-  void paintEvent(QPaintEvent *e) override;
-  void resizeEvent(QResizeEvent *e) override;
-  void scrollContentsBy(int dx, int dy) override;
-  void mousePressEvent(QMouseEvent *e) override;
-  void mouseMoveEvent(QMouseEvent *e) override;
-  void mouseReleaseEvent(QMouseEvent *e) override;
-  void mouseDoubleClickEvent(QMouseEvent *e) override;
-  void wheelEvent(QWheelEvent *e) override;
-  void keyPressEvent(QKeyEvent *e) override;
-  void contextMenuEvent(QContextMenuEvent *e) override;
-  void focusInEvent(QFocusEvent *e) override;
-  void focusOutEvent(QFocusEvent *e) override;
- };
+{
+    TCanvas CanvasGrille;
+    TGridCoord Courante, Ancre, HautGauche;
+    int NbColonnes = 5, NbLignes = 5;
+    bool SelectionEnCours = false;
+    int CumulMolette = 0;
+    QTimer DefilementAuto;
+    QPoint DernierePosition;
+    void MetAJourDefilement();
+    void MetAJourSelection();
+    QRect RectGrille(const TGridRect &r) const; // en pixels du viewport
+    void InvalideSelection(const TGridRect &Ancienne);
+    TGridCoord CaseEn(const QPoint &p) const;
+    void MoveCurrent(int ACol, int ARow, bool MoveAnchor);
+    void MoveAnchor(TGridCoord NouvelleAncre);
+    void FocusCell(int ACol, int ARow, bool MoveAnchor);
+    void ClampInView(TGridCoord c);
+    void DefinitHautGauche(int Gauche, int Haut);
+    int ColonnesVisibles() const; // cases entièrement visibles
+    int LignesVisibles() const;
+    int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
+    int LimiteVisible(bool Colonne) const;   // v6.0.12 : son bord droit ou bas, en pixels du viewport
+public:
+    // Propriétés de TDrawGrid utilisées par la fiche
+    Propriete<int> ColCount, RowCount, Col, Row, LeftCol, TopRow;
+    int DefaultColWidth = 16, DefaultRowHeight = 16;
+    TGridOptions Options;
+    TColor Color = clBlack;
+    SousObjet<TFont> Font;
+    TCanvas *Canvas = &CanvasGrille;
+    TGridRect Selection;
+    TDrawCellEvent OnDrawCell;
+    TNotifyEvent OnDblClick;
+    explicit GrilleSimulation(QWidget *Parent = nullptr);
+    void PrepareVcl() override;
+    TRect CellRect(int ACol, int ARow) const;
+    void InvalidateCell(int ACol, int ARow); // RedessineCase -> update(rect)
+    void Repaint();                          // TControl::Repaint : dessin immédiat
+protected:
+    void paintEvent(QPaintEvent *e) override;
+    void resizeEvent(QResizeEvent *e) override;
+    void scrollContentsBy(int dx, int dy) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *e) override;
+    void wheelEvent(QWheelEvent *e) override;
+    void keyPressEvent(QKeyEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;
+    void focusInEvent(QFocusEvent *e) override;
+    void focusOutEvent(QFocusEvent *e) override;
+};
 //---------------------------------------------------------------------------
 using TDrawGrid = GrilleSimulation;
 //---------------------------------------------------------------------------

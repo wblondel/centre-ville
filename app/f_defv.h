@@ -3,12 +3,12 @@
 #define f_defvH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Buttons.hpp> // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <ExtCtrls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include <Buttons.hpp> // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <ExtCtrls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 //---------------------------------------------------------------------------
@@ -38,15 +38,16 @@ public: // portage : __published	// Composants gérés par l'EDI
     void BitBtnDefFeuClick(TObject *Sender);
     void FormCreate(TObject *Sender);
     void RadioGroupPrioriteClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
     voie *v{};
     int x{}, y{};
-    TBitBtn *BitBtn[NBDIR]{}; // v5.2 
+    TBitBtn *BitBtn[NBDIR]{}; // v5.2
     void DefinitFeu(direction Dir) const;
-public:		// Déclarations de l'utilisateur
-    TfrmDefVoie(TComponent* Owner);
+
+public: // Déclarations de l'utilisateur
+    TfrmDefVoie(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
     void AppliqueChoix();

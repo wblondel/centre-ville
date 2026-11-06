@@ -25,16 +25,16 @@
 #define compat_aleaH
 //---------------------------------------------------------------------------
 namespace alea
- {
-  const int RAND_MAX_BORLAND=0x7FFF;
-  const unsigned MULTIPLICATEUR=0x015A4E35U; // 22695477
-  const unsigned GRAINE_INITIALE=(1U*MULTIPLICATEUR)+1U; // _boot_srand : 0x015A4E36
-  int Rand(); // rand() Borland
-  void Srand(unsigned Graine); // srand() Borland (sauf graine forcée)
-  unsigned Graine(); // état courant du générateur (tests)
-  void FixeGraine(unsigned Graine); // Force la graine utilisée par Srand() et l'applique immédiatement (comme srand)
-  void LibereGraine(); // Srand() utilise de nouveau la graine demandée
- }
+{
+const int RAND_MAX_BORLAND = 0x7FFF;
+const unsigned MULTIPLICATEUR = 0x015A4E35U;                 // 22695477
+const unsigned GRAINE_INITIALE = (1U * MULTIPLICATEUR) + 1U; // _boot_srand : 0x015A4E36
+int Rand();                                                  // rand() Borland
+void Srand(unsigned Graine);                                 // srand() Borland (sauf graine forcée)
+unsigned Graine();                                           // état courant du générateur (tests)
+void FixeGraine(unsigned Graine); // Force la graine utilisée par Srand() et l'applique immédiatement (comme srand)
+void LibereGraine();              // Srand() utilise de nouveau la graine demandée
+} // namespace alea
 //---------------------------------------------------------------------------
 #define rand()   alea::Rand()
 #define srand(g) alea::Srand(g)

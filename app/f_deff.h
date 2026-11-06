@@ -3,13 +3,13 @@
 #define F_deffH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include "CSPIN.h" // portage
-//#include <Buttons.hpp> // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <ExtCtrls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include "CSPIN.h" // portage
+// #include <Buttons.hpp> // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <ExtCtrls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 //---------------------------------------------------------------------------
@@ -44,36 +44,36 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelFeuxPietons{};
     void FormShow(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
-    
+
     void RadioGroupEtatClick(TObject *Sender);
     void RadioGroupTypeDmdVertClick(TObject *Sender);
-    
+
     void CSpinEditDureeVertChange(TObject *Sender) const;
     void ButtonAppliquerClick(TObject *Sender);
     void ButtonAnnulerClick(TObject *Sender);
-    
+
     void SpeedButtonSelFeuxDmdClick(TObject *Sender) const;
     void FormHide(TObject *Sender) const;
     void SpeedButtonSelFeuxAttClick(TObject *Sender) const;
     void RadioGroupTypePsgRougeClick(TObject *Sender);
-    
-    
+
     void ButtonAideClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
 private:
     int Numero{};
     feu *f{};
     voie *v{};
+
 public:
     int x{}, y{};
-    int NbFeuxDmd, // Nbre de feux demandant le rouge
-        NbFeuxAtt,// Nbre de feux devant être rouge pour que Numero passe au vert
+    int NbFeuxDmd,   // Nbre de feux demandant le rouge
+        NbFeuxAtt,   // Nbre de feux devant être rouge pour que Numero passe au vert
         *NumFeuxDmd, // Liste des feux demandant le rouge
         *NumFeuxAtt; // Liste des feux devant être rouge pour que Numero passe au vert
     direction Direction;
-    TfrmDefFeux(TComponent* Owner);
-    void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
+    TfrmDefFeux(TComponent *Owner);
+    void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)
     bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouter le feu
     bool AppliqueChoix();
     void RafraichitInfosFeuxDmd() const;
@@ -83,4 +83,3 @@ public:
 extern TfrmDefFeux *frmDefFeux;
 //---------------------------------------------------------------------------
 #endif
- 

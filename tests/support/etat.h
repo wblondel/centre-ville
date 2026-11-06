@@ -23,59 +23,78 @@
 // modèle (template) instancié pour chaque puits : pas d'appel virtuel, et les
 // noms de champs ne sont fabriqués que si le puits les utilise (Noms).
 class PuitsTexte
- {
-  bool Ignore=false;
-  public:
-  const static bool Noms=true;
-  std::string Texte;
-  void Section(const char *Nom);
-  // Ignorable : l'objet est entièrement « vide » (valeurs par défaut) ; le
-  // texte l'omet, l'empreinte le prend toujours en compte.
-  void Objet(const char *Type, int Numero, bool Ignorable=false);
-  void Champ(const char *Nom, long long Valeur);
-  void FinObjet();
- };
+{
+    bool Ignore = false;
+
+public:
+    const static bool Noms = true;
+    std::string Texte;
+    void Section(const char *Nom);
+    // Ignorable : l'objet est entièrement « vide » (valeurs par défaut) ; le
+    // texte l'omet, l'empreinte le prend toujours en compte.
+    void Objet(const char *Type, int Numero, bool Ignorable = false);
+    void Champ(const char *Nom, long long Valeur);
+    void FinObjet();
+};
 //---------------------------------------------------------------------------
 class PuitsEmpreinte
- {
-  public:
-  const static bool Noms=false;
-  std::uint64_t Empreinte=14695981039346656037ULL; // FNV-1a 64 bits, par mot de 64 bits
-  void Ajoute(std::uint64_t v)
-   {
-    Empreinte^=v;
-    Empreinte*=1099511628211ULL;
-    Empreinte^=Empreinte>>29; // brassage : chaque mot influe sur tous les bits
-   }
-  void Section(const char *Nom) { for(const char *c=Nom; (*c) != 0; c++) { Ajoute(static_cast<unsigned char>(*c)); 
-}}
-  void Objet(const char * /*unused*/, int Numero, bool /*unused*/=false) { Ajoute(0xFFFFFFFF00000000ULL^static_cast<std::uint64_t>(static_cast<std::uint32_t>(Numero))); }
-  void Champ(const char * /*unused*/, long long Valeur) { Ajoute(static_cast<std::uint64_t>(Valeur)); }
-  void FinObjet() {}
- };
+{
+public:
+    const static bool Noms = false;
+    std::uint64_t Empreinte = 14695981039346656037ULL; // FNV-1a 64 bits, par mot de 64 bits
+    void Ajoute(std::uint64_t v)
+    {
+        Empreinte ^= v;
+        Empreinte *= 1099511628211ULL;
+        Empreinte ^= Empreinte >> 29; // brassage : chaque mot influe sur tous les bits
+    }
+    void Section(const char *Nom)
+    {
+        for (const char *c = Nom; (*c) != 0; c++)
+        {
+            Ajoute(static_cast<unsigned char>(*c));
+        }
+    }
+    void Objet(const char * /*unused*/, int Numero, bool /*unused*/ = false)
+    {
+        Ajoute(0xFFFFFFFF00000000ULL ^ static_cast<std::uint64_t>(static_cast<std::uint32_t>(Numero)));
+    }
+    void Champ(const char * /*unused*/, long long Valeur) { Ajoute(static_cast<std::uint64_t>(Valeur)); }
+    void FinObjet() {}
+};
 //---------------------------------------------------------------------------
 // Parties de l'état (une empreinte par partie dans le golden master)
-enum partie_etat
- {
-  peCentreVille, peFeux, peFeuxPietons, peParkings, peVehicules, peBus,
-  peTrams, peTaxis, peParkingsPlaces, peVehlibs, pePietons, peCases,
-  peDistances, // statique après CalculeDistances : hors état « complet »
-  NB_PARTIES_ETAT,
- };
+enum partie_etat {
+    peCentreVille,
+    peFeux,
+    peFeuxPietons,
+    peParkings,
+    peVehicules,
+    peBus,
+    peTrams,
+    peTaxis,
+    peParkingsPlaces,
+    peVehlibs,
+    pePietons,
+    peCases,
+    peDistances, // statique après CalculeDistances : hors état « complet »
+    NB_PARTIES_ETAT,
+};
 const extern char *NomPartieEtat[NB_PARTIES_ETAT];
 //---------------------------------------------------------------------------
 class ExportEtat // ami de la classe infection (champs privés)
- {
-  public:
-  // Exporte une partie de l'état de cv ; Detail : tableaux attente/trafic
-  // complets (sinon seulement les totaux [0][0], suffisants tour par tour)
-  template <class P> static void Exporte(const centre_ville *cv, partie_etat Partie, P &p, bool Detail);
-  // Toutes les parties (sauf les distances), en texte
-  static std::string Texte(const centre_ville *cv, bool Detail);
-  static std::uint64_t Empreinte(const centre_ville *cv, partie_etat Partie, bool Detail);
-  private:
-  template <class P> static void ExporteInfections(const pieton *p, P &s);
- };
+{
+public:
+    // Exporte une partie de l'état de cv ; Detail : tableaux attente/trafic
+    // complets (sinon seulement les totaux [0][0], suffisants tour par tour)
+    template <class P> static void Exporte(const centre_ville *cv, partie_etat Partie, P &p, bool Detail);
+    // Toutes les parties (sauf les distances), en texte
+    static std::string Texte(const centre_ville *cv, bool Detail);
+    static std::uint64_t Empreinte(const centre_ville *cv, partie_etat Partie, bool Detail);
+
+private:
+    template <class P> static void ExporteInfections(const pieton *p, P &s);
+};
 //---------------------------------------------------------------------------
 std::string Hexa(std::uint64_t v);
 //---------------------------------------------------------------------------

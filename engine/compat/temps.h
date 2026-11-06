@@ -10,18 +10,26 @@
 #define compat_tempsH
 //---------------------------------------------------------------------------
 class TDateTime
- {
-  public:
-  double Val;
-  TDateTime() : Val(0.0) {}
-  TDateTime(double d) : Val(d) {}
-  TDateTime(int i) : Val(static_cast<double>(i)) {}
-  operator double() const { return Val; }
-  TDateTime &operator+=(const TDateTime &dt) { Val+=dt.Val; return *this; }
-  TDateTime &operator-=(const TDateTime &dt) { Val-=dt.Val; return *this; }
-  TDateTime operator+(const TDateTime &dt) const { return {Val+dt.Val}; }
-  TDateTime operator-(const TDateTime &dt) const { return {Val-dt.Val}; }
- };
+{
+public:
+    double Val;
+    TDateTime() : Val(0.0) {}
+    TDateTime(double d) : Val(d) {}
+    TDateTime(int i) : Val(static_cast<double>(i)) {}
+    operator double() const { return Val; }
+    TDateTime &operator+=(const TDateTime &dt)
+    {
+        Val += dt.Val;
+        return *this;
+    }
+    TDateTime &operator-=(const TDateTime &dt)
+    {
+        Val -= dt.Val;
+        return *this;
+    }
+    TDateTime operator+(const TDateTime &dt) const { return {Val + dt.Val}; }
+    TDateTime operator-(const TDateTime &dt) const { return {Val - dt.Val}; }
+};
 //---------------------------------------------------------------------------
 TDateTime Time(); // Heure locale courante, en fraction de jour
 //---------------------------------------------------------------------------

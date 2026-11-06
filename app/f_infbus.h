@@ -3,10 +3,10 @@
 #define f_infbusH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 //---------------------------------------------------------------------------
@@ -58,15 +58,16 @@ public: // portage : __published	// Composants gérés par l'EDI
     void FormHide(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
     voie *v{};
     bus *Bus{};
     int x{}, y{};
     void RendreVisibleInfos(bool Visible);
-public:		// Déclarations de l'utilisateur
-    TfrmInfosBus(TComponent* Owner);
+
+public: // Déclarations de l'utilisateur
+    TfrmInfosBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
 };
@@ -74,4 +75,3 @@ public:		// Déclarations de l'utilisateur
 extern TfrmInfosBus *frmInfosBus;
 //---------------------------------------------------------------------------
 #endif
-  

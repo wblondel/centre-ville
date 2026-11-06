@@ -12,14 +12,14 @@ class QApplication;
 // création de frmSimulation, le fichier est mis en attente (EnAttente) ;
 // ensuite, il est ouvert comme par Ouvrir (TfrmSimulation::OuvreFichierDemande).
 class OuvertureFichiers : public QObject
- {
-  public:
-  QString EnAttente;
-  bool eventFilter(QObject *o, QEvent *e) override;
- };
+{
+public:
+    QString EnAttente;
+    bool eventFilter(QObject *o, QEvent *e) override;
+};
 //---------------------------------------------------------------------------
-void InitialiseApplication(QApplication &App); // locale, traductions, polices
-void CreeFiches(const QString &asFichierFinder=QString()); // fiches de cvw.cpp, dans le même ordre
+void InitialiseApplication(QApplication &App);               // locale, traductions, polices
+void CreeFiches(const QString &asFichierFinder = QString()); // fiches de cvw.cpp, dans le même ordre
 void DetruitFiches();
 //---------------------------------------------------------------------------
 #endif

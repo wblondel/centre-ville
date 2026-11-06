@@ -3,10 +3,10 @@
 #define f_inftaxiH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 //---------------------------------------------------------------------------
@@ -48,15 +48,16 @@ public: // portage : __published	// Composants gérés par l'EDI
     void FormHide(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
     voie *v{};
     taxi *Taxi{};
     int x{}, y{};
     void RendreVisibleInfos(bool Visible);
-public:		// Déclarations de l'utilisateur
-    TfrmInfosTaxi(TComponent* Owner);
+
+public: // Déclarations de l'utilisateur
+    TfrmInfosTaxi(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
 };
@@ -64,4 +65,3 @@ public:		// Déclarations de l'utilisateur
 extern TfrmInfosTaxi *frmInfosTaxi;
 //---------------------------------------------------------------------------
 #endif
-  

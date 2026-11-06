@@ -1,0 +1,50 @@
+# Mise en forme du C++ (tools/format_cpp.py, job « Lint C++ » de la CI).
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+ColumnLimit: 120
+IndentWidth: 4
+ContinuationIndentWidth: 4
+UseTab: Never
+LineEnding: LF
+InsertNewlineAtEOF: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterClass: true
+  AfterControlStatement: Always
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  AfterExternBlock: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+AccessModifierOffset: -4
+PointerAlignment: Right
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortEnumsOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: false
+AlignConsecutiveMacros: Consecutive
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+SpacesBeforeTrailingComments: 1
+ReflowComments: Always
+InsertBraces: true
+RemoveSemicolon: true
+SortIncludes: Never
+IncludeBlocks: Preserve
+FixNamespaceComments: true
+PenaltyBreakComment: 10

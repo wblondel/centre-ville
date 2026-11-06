@@ -23,53 +23,56 @@
 #include "compat/alea.h"
 //---------------------------------------------------------------------------
 TEST_CASE("Mémoire non remise à zéro : NbVehlibs, FeuP, DureeVert et DureeRouge initialisés", "[memoire]")
- {
-  VueNulle Vue;
-  vue=&Vue;
-  auto *c=new centre_ville(false, 0, 0);
-  CHECK(c->NbVehlibs==0);
-  CHECK(c->FeuP==nullptr);
-  CHECK(c->DureeVert==0); // nouveau réseau (« Nouveau », génération) : enregistrées telles quelles
-  CHECK(c->DureeRouge==0);
-  delete c;
-  // Démo : format 0x500, sans vehlibs ni feux de piétons (champs apparus en 0x530 et 0x520)
-  const std::string asDemo=CheminCarte(Cartes[3]);
-  REQUIRE(harnais::Ouvre(asDemo));
-  REQUIRE(VersionFichier==0x500);
-  CHECK(cv->NbVehlibs==0);
-  CHECK(cv->FeuP==nullptr);
-  // Réenregistrée en 0x530 : NbVehlibs vaut 0, comme dans la conversion de référence
-  const std::string asCopie=FichierSortie("motif_Demo.cvw");
-  REQUIRE(harnais::SauveSansChaos(asCopie));
-  const conversion_cvw Reference=ConvertitEn530(harnais::LitFichier(asDemo));
-  REQUIRE(Reference.Ok);
-  const bool Identique=(harnais::LitFichier(asCopie)==Reference.Octets);
-  CHECK(Identique);
-  // Premier feu de piétons : IncrementeNombre libère l'ancien tableau FeuP
-  // (l'original libérait un pointeur indéterminé)
-  CHECK(cv->AjouteFeuPietons(0, 0, nord)==1);
-  CHECK(cv->NbFeuxPieton==1);
-  harnais::Ferme();
-  CHECK(Vue.Messages.empty());
-  vue=nullptr;
- }
+{
+    VueNulle Vue;
+    vue = &Vue;
+    auto *c = new centre_ville(false, 0, 0);
+    CHECK(c->NbVehlibs == 0);
+    CHECK(c->FeuP == nullptr);
+    CHECK(c->DureeVert == 0); // nouveau réseau (« Nouveau », génération) : enregistrées telles quelles
+    CHECK(c->DureeRouge == 0);
+    delete c;
+    // Démo : format 0x500, sans vehlibs ni feux de piétons (champs apparus en 0x530 et 0x520)
+    const std::string asDemo = CheminCarte(Cartes[3]);
+    REQUIRE(harnais::Ouvre(asDemo));
+    REQUIRE(VersionFichier == 0x500);
+    CHECK(cv->NbVehlibs == 0);
+    CHECK(cv->FeuP == nullptr);
+    // Réenregistrée en 0x530 : NbVehlibs vaut 0, comme dans la conversion de référence
+    const std::string asCopie = FichierSortie("motif_Demo.cvw");
+    REQUIRE(harnais::SauveSansChaos(asCopie));
+    const conversion_cvw Reference = ConvertitEn530(harnais::LitFichier(asDemo));
+    REQUIRE(Reference.Ok);
+    const bool Identique = (harnais::LitFichier(asCopie) == Reference.Octets);
+    CHECK(Identique);
+    // Premier feu de piétons : IncrementeNombre libère l'ancien tableau FeuP
+    // (l'original libérait un pointeur indéterminé)
+    CHECK(cv->AjouteFeuPietons(0, 0, nord) == 1);
+    CHECK(cv->NbFeuxPieton == 1);
+    harnais::Ferme();
+    CHECK(Vue.Messages.empty());
+    vue = nullptr;
+}
 //---------------------------------------------------------------------------
 TEST_CASE("Mémoire non remise à zéro : piétons initialisés", "[memoire]")
- { // TourAttBus, TourAttTram et TourAttTaxi : 0 tant que le piéton n'a rien attendu
-  VueNulle Vue;
-  vue=&Vue;
-  alea::FixeGraine(1);
-  REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : piétons, bus, trams, taxis
-  AnsiString asMsgErr;
-  REQUIRE(harnais::Demarre(asMsgErr));
-  REQUIRE(cv->NbPietons>0);
-  int NbIndetermines=0;
-  for(int i=0; i<cv->NbPietons; i++) {
-   NbIndetermines+=static_cast<int>(cv->Pieton[i].TourAttBus!=0)+static_cast<int>(cv->Pieton[i].TourAttTram!=0)+static_cast<int>(cv->Pieton[i].TourAttTaxi!=0);
+{ // TourAttBus, TourAttTram et TourAttTaxi : 0 tant que le piéton n'a rien attendu
+    VueNulle Vue;
+    vue = &Vue;
+    alea::FixeGraine(1);
+    REQUIRE(harnais::Ouvre(CheminCarte(Cartes[4]))); // Géant : piétons, bus, trams, taxis
+    AnsiString asMsgErr;
+    REQUIRE(harnais::Demarre(asMsgErr));
+    REQUIRE(cv->NbPietons > 0);
+    int NbIndetermines = 0;
+    for (int i = 0; i < cv->NbPietons; i++)
+    {
+        NbIndetermines += static_cast<int>(cv->Pieton[i].TourAttBus != 0) +
+                          static_cast<int>(cv->Pieton[i].TourAttTram != 0) +
+                          static_cast<int>(cv->Pieton[i].TourAttTaxi != 0);
+    }
+    CHECK(NbIndetermines == 0);
+    harnais::Ferme();
+    alea::LibereGraine();
+    vue = nullptr;
 }
-  CHECK(NbIndetermines==0);
-  harnais::Ferme();
-  alea::LibereGraine();
-  vue=nullptr;
- }
 //---------------------------------------------------------------------------

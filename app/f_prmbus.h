@@ -3,14 +3,14 @@
 #define f_prmbusH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include "CSPIN.h" // portage
-//#include <Buttons.hpp> // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <ExtCtrls.hpp> // portage
-//#include <Menus.hpp> // portage
-//#include <StdCtrls.hpp> // portage
+#include "base.h"      // portage
+// #include "CSPIN.h" // portage
+// #include <Buttons.hpp> // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <ExtCtrls.hpp> // portage
+// #include <Menus.hpp> // portage
+// #include <StdCtrls.hpp> // portage
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 class TfrmParamBus : public TForm
@@ -32,102 +32,102 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelLigne{};
     TLabel *Label5{};
     TLabel *Label6{};
- TCSpinEdit *CSpinEdit1{};
- TCSpinEdit *CSpinEdit2{};
- TCSpinEdit *CSpinEdit3{};
- TCSpinEdit *CSpinEdit4{};
- TCSpinEdit *CSpinEdit5{};
- TCSpinEdit *CSpinEdit6{};
- TCSpinEdit *CSpinEdit7{};
- TCSpinEdit *CSpinEdit8{};
- TCSpinEdit *CSpinEdit11{};
- TCSpinEdit *CSpinEdit12{};
- TCSpinEdit *CSpinEdit13{};
- TCSpinEdit *CSpinEdit14{};
- TCSpinEdit *CSpinEdit15{};
- TCSpinEdit *CSpinEdit16{};
- TCSpinEdit *CSpinEdit17{};
- TCSpinEdit *CSpinEdit18{};
- TCSpinEdit *CSpinEdit19{};
- TCSpinEdit *CSpinEdit21{};
- TCSpinEdit *CSpinEdit22{};
- TCSpinEdit *CSpinEdit23{};
- TCSpinEdit *CSpinEdit24{};
- TCSpinEdit *CSpinEdit25{};
- TCSpinEdit *CSpinEdit26{};
- TCSpinEdit *CSpinEdit27{};
- TCSpinEdit *CSpinEdit28{};
- TCSpinEdit *CSpinEdit29{};
- TCSpinEdit *CSpinEdit31{};
- TCSpinEdit *CSpinEdit32{};
- TCSpinEdit *CSpinEdit33{};
- TCSpinEdit *CSpinEdit34{};
- TCSpinEdit *CSpinEdit35{};
- TCSpinEdit *CSpinEdit36{};
- TCSpinEdit *CSpinEdit37{};
- TCSpinEdit *CSpinEdit38{};
- TCSpinEdit *CSpinEdit39{};
- TCSpinEdit *CSpinEdit41{};
- TCSpinEdit *CSpinEdit42{};
- TCSpinEdit *CSpinEdit43{};
- TCSpinEdit *CSpinEdit44{};
- TCSpinEdit *CSpinEdit45{};
- TCSpinEdit *CSpinEdit46{};
- TCSpinEdit *CSpinEdit47{};
- TCSpinEdit *CSpinEdit48{};
- TCSpinEdit *CSpinEdit49{};
- TCSpinEdit *CSpinEdit51{};
- TCSpinEdit *CSpinEdit52{};
- TCSpinEdit *CSpinEdit53{};
- TCSpinEdit *CSpinEdit54{};
- TCSpinEdit *CSpinEdit55{};
- TCSpinEdit *CSpinEdit56{};
- TCSpinEdit *CSpinEdit57{};
- TCSpinEdit *CSpinEdit58{};
- TCSpinEdit *CSpinEdit59{};
- TCSpinEdit *CSpinEdit61{};
- TCSpinEdit *CSpinEdit62{};
- TCSpinEdit *CSpinEdit63{};
- TCSpinEdit *CSpinEdit64{};
- TCSpinEdit *CSpinEdit65{};
- TCSpinEdit *CSpinEdit66{};
- TCSpinEdit *CSpinEdit67{};
- TCSpinEdit *CSpinEdit68{};
- TCSpinEdit *CSpinEdit69{};
- TCSpinEdit *CSpinEdit71{};
- TCSpinEdit *CSpinEdit72{};
- TCSpinEdit *CSpinEdit73{};
- TCSpinEdit *CSpinEdit74{};
- TCSpinEdit *CSpinEdit75{};
- TCSpinEdit *CSpinEdit76{};
- TCSpinEdit *CSpinEdit77{};
- TCSpinEdit *CSpinEdit78{};
- TCSpinEdit *CSpinEdit79{};
- TCSpinEdit *CSpinEdit81{};
- TCSpinEdit *CSpinEdit82{};
- TCSpinEdit *CSpinEdit83{};
- TCSpinEdit *CSpinEdit84{};
- TCSpinEdit *CSpinEdit85{};
- TCSpinEdit *CSpinEdit86{};
- TCSpinEdit *CSpinEdit87{};
- TCSpinEdit *CSpinEdit88{};
- TCSpinEdit *CSpinEdit89{};
- TCSpinEdit *CSpinEdit9{};
- TCSpinEdit *CSpinEdit91{};
- TCSpinEdit *CSpinEdit92{};
- TCSpinEdit *CSpinEdit93{};
- TCSpinEdit *CSpinEdit94{};
- TCSpinEdit *CSpinEdit95{};
- TCSpinEdit *CSpinEdit96{};
- TCSpinEdit *CSpinEdit97{};
- TCSpinEdit *CSpinEdit98{};
- TCSpinEdit *CSpinEdit99{};
- TCSpinEdit *CSpinEditNbToursStopArretBus{};
- TCSpinEdit *CSpinEditNbMaxPersonnesBus{};
- TCSpinEdit *CSpinEditNbCasesMaxArretBus{};
- TCSpinEdit *CSpinEditNbMaxToursAttenteBus{};
- TCSpinEdit *CSpinEditProbaDirArretBus{};
- TCSpinEdit *CSpinEditProbaArretDmd{};
+    TCSpinEdit *CSpinEdit1{};
+    TCSpinEdit *CSpinEdit2{};
+    TCSpinEdit *CSpinEdit3{};
+    TCSpinEdit *CSpinEdit4{};
+    TCSpinEdit *CSpinEdit5{};
+    TCSpinEdit *CSpinEdit6{};
+    TCSpinEdit *CSpinEdit7{};
+    TCSpinEdit *CSpinEdit8{};
+    TCSpinEdit *CSpinEdit11{};
+    TCSpinEdit *CSpinEdit12{};
+    TCSpinEdit *CSpinEdit13{};
+    TCSpinEdit *CSpinEdit14{};
+    TCSpinEdit *CSpinEdit15{};
+    TCSpinEdit *CSpinEdit16{};
+    TCSpinEdit *CSpinEdit17{};
+    TCSpinEdit *CSpinEdit18{};
+    TCSpinEdit *CSpinEdit19{};
+    TCSpinEdit *CSpinEdit21{};
+    TCSpinEdit *CSpinEdit22{};
+    TCSpinEdit *CSpinEdit23{};
+    TCSpinEdit *CSpinEdit24{};
+    TCSpinEdit *CSpinEdit25{};
+    TCSpinEdit *CSpinEdit26{};
+    TCSpinEdit *CSpinEdit27{};
+    TCSpinEdit *CSpinEdit28{};
+    TCSpinEdit *CSpinEdit29{};
+    TCSpinEdit *CSpinEdit31{};
+    TCSpinEdit *CSpinEdit32{};
+    TCSpinEdit *CSpinEdit33{};
+    TCSpinEdit *CSpinEdit34{};
+    TCSpinEdit *CSpinEdit35{};
+    TCSpinEdit *CSpinEdit36{};
+    TCSpinEdit *CSpinEdit37{};
+    TCSpinEdit *CSpinEdit38{};
+    TCSpinEdit *CSpinEdit39{};
+    TCSpinEdit *CSpinEdit41{};
+    TCSpinEdit *CSpinEdit42{};
+    TCSpinEdit *CSpinEdit43{};
+    TCSpinEdit *CSpinEdit44{};
+    TCSpinEdit *CSpinEdit45{};
+    TCSpinEdit *CSpinEdit46{};
+    TCSpinEdit *CSpinEdit47{};
+    TCSpinEdit *CSpinEdit48{};
+    TCSpinEdit *CSpinEdit49{};
+    TCSpinEdit *CSpinEdit51{};
+    TCSpinEdit *CSpinEdit52{};
+    TCSpinEdit *CSpinEdit53{};
+    TCSpinEdit *CSpinEdit54{};
+    TCSpinEdit *CSpinEdit55{};
+    TCSpinEdit *CSpinEdit56{};
+    TCSpinEdit *CSpinEdit57{};
+    TCSpinEdit *CSpinEdit58{};
+    TCSpinEdit *CSpinEdit59{};
+    TCSpinEdit *CSpinEdit61{};
+    TCSpinEdit *CSpinEdit62{};
+    TCSpinEdit *CSpinEdit63{};
+    TCSpinEdit *CSpinEdit64{};
+    TCSpinEdit *CSpinEdit65{};
+    TCSpinEdit *CSpinEdit66{};
+    TCSpinEdit *CSpinEdit67{};
+    TCSpinEdit *CSpinEdit68{};
+    TCSpinEdit *CSpinEdit69{};
+    TCSpinEdit *CSpinEdit71{};
+    TCSpinEdit *CSpinEdit72{};
+    TCSpinEdit *CSpinEdit73{};
+    TCSpinEdit *CSpinEdit74{};
+    TCSpinEdit *CSpinEdit75{};
+    TCSpinEdit *CSpinEdit76{};
+    TCSpinEdit *CSpinEdit77{};
+    TCSpinEdit *CSpinEdit78{};
+    TCSpinEdit *CSpinEdit79{};
+    TCSpinEdit *CSpinEdit81{};
+    TCSpinEdit *CSpinEdit82{};
+    TCSpinEdit *CSpinEdit83{};
+    TCSpinEdit *CSpinEdit84{};
+    TCSpinEdit *CSpinEdit85{};
+    TCSpinEdit *CSpinEdit86{};
+    TCSpinEdit *CSpinEdit87{};
+    TCSpinEdit *CSpinEdit88{};
+    TCSpinEdit *CSpinEdit89{};
+    TCSpinEdit *CSpinEdit9{};
+    TCSpinEdit *CSpinEdit91{};
+    TCSpinEdit *CSpinEdit92{};
+    TCSpinEdit *CSpinEdit93{};
+    TCSpinEdit *CSpinEdit94{};
+    TCSpinEdit *CSpinEdit95{};
+    TCSpinEdit *CSpinEdit96{};
+    TCSpinEdit *CSpinEdit97{};
+    TCSpinEdit *CSpinEdit98{};
+    TCSpinEdit *CSpinEdit99{};
+    TCSpinEdit *CSpinEditNbToursStopArretBus{};
+    TCSpinEdit *CSpinEditNbMaxPersonnesBus{};
+    TCSpinEdit *CSpinEditNbCasesMaxArretBus{};
+    TCSpinEdit *CSpinEditNbMaxToursAttenteBus{};
+    TCSpinEdit *CSpinEditProbaDirArretBus{};
+    TCSpinEdit *CSpinEditProbaArretDmd{};
     TShape *Shape9{};
     TButton *ButtonAide{};
     TLabel *LabelL1{};
@@ -202,28 +202,28 @@ public: // portage : __published	// Composants gérés par l'EDI
     void MenuItemClick(TObject *Sender);
     void BitBtnDirClick(TObject *Sender) const;
     void TimerClignotementTimer(TObject *Sender) const;
-    
+
     void ButtonOkClick(TObject *Sender);
     void ButtonAppliquerClick(TObject *Sender);
-    
+
     void CSpinEditParametresChange(TObject *Sender) const;
     void CheckBoxClick(TObject *Sender);
-    
+
     void CheckBoxToutClick(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-private:	// Déclarations de l'utilisateur
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
     int NbArretsBus{};
     bool InitialisationEnCours{};
     void RafraichitNbBus() const;
     bool AppliqueChoix();
-public:		// Déclarations de l'utilisateur
+
+public: // Déclarations de l'utilisateur
     int NumArretBusAMontrer{};
-    TfrmParamBus(TComponent* Owner);
+    TfrmParamBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------
 extern TfrmParamBus *frmParamBus;
 //---------------------------------------------------------------------------
 #endif
-  
