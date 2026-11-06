@@ -568,7 +568,7 @@ void GrilleSimulation::keyPressEvent(QKeyEvent *e)
 { // TCustomGrid::KeyDown
     bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier), Maj = e->modifiers().testFlag(Qt::ShiftModifier);
 #ifdef Q_OS_MACOS
-    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0u);
+    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0U);
 #endif
     TGridCoord n = Courante;
     int g = HautGauche.X;

@@ -27,15 +27,15 @@ public:
     AnsiString(const char *src) : s(src ? src : "") {}
     AnsiString(std::string src) : s(std::move(src)) {}
     AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
-    const char *c_str() const { return s.c_str(); }
-    const std::string &str() const { return s; }
-    int Length() const { return static_cast<int>(s.size()); }
-    bool IsEmpty() const { return s.empty(); }
+    [[nodiscard]] const char *c_str() const { return s.c_str(); }
+    [[nodiscard]] const std::string &str() const { return s; }
+    [[nodiscard]] int Length() const { return static_cast<int>(s.size()); }
+    [[nodiscard]] bool IsEmpty() const { return s.empty(); }
     // Indices à partir de 1, comme la VCL
     char &operator[](int i) { return s[static_cast<std::size_t>(i - 1)]; }
     char operator[](int i) const { return s[static_cast<std::size_t>(i - 1)]; }
-    AnsiString SubString(int Index, int Count) const;
-    int Pos(const AnsiString &asSousChaine) const; // 0 si absente
+    [[nodiscard]] AnsiString SubString(int Index, int Count) const;
+    [[nodiscard]] int Pos(const AnsiString &asSousChaine) const; // 0 si absente
     AnsiString &operator+=(const AnsiString &as)
     {
         s += as.s;

@@ -51,13 +51,13 @@ public:
     // frmSimulation->RedessineCase(x, y, EffaceFond)
     virtual void RedessineCase(int x, int y, bool EffaceFond) = 0;
     // frmSimulation->SimulationSanglante (lecture)
-    virtual bool SimulationSanglante() const = 0;
+    [[nodiscard]] virtual bool SimulationSanglante() const = 0;
     // frmSimulation->EpidemieActivee (lecture)
-    virtual bool EpidemieActivee() const = 0;
+    [[nodiscard]] virtual bool EpidemieActivee() const = 0;
     // frmSimulation->ActionEpidemie->Checked (lecture)
-    virtual bool ActionEpidemieCochee() const = 0;
+    [[nodiscard]] virtual bool ActionEpidemieCochee() const = 0;
     // frmSimulation->ResurrectionDemandee (lecture)
-    virtual bool ResurrectionDemandee() const = 0;
+    [[nodiscard]] virtual bool ResurrectionDemandee() const = 0;
     // frmSimulation->ResurrectionDemandee=Demandee (écriture)
     virtual void DefinitResurrectionDemandee(bool Demandee) = 0;
     // frmSimulation->SimulationModifiee=Modifiee (écriture)
@@ -68,14 +68,14 @@ public:
     virtual void RepeintStatut() = 0;
     // --- Fiches d'informations et de statistiques ---
     // frmXxx->Visible
-    virtual bool FicheVisible(fiche_info Fiche) const = 0;
+    [[nodiscard]] virtual bool FicheVisible(fiche_info Fiche) const = 0;
     // frmStatistiques->PaintBoxStats->Repaint() ou frmXxx->RafraichitInfos()
     virtual void RafraichitFiche(fiche_info Fiche) = 0;
     // --- frmRecherche ---
     // frmRecherche&&frmRecherche->Visible
-    virtual bool RechercheVisible() const = 0;
+    [[nodiscard]] virtual bool RechercheVisible() const = 0;
     // frmRecherche->RadioButtonXxx->Checked
-    virtual bool RechercheCochee(objet_recherche Objet) const = 0;
+    [[nodiscard]] virtual bool RechercheCochee(objet_recherche Objet) const = 0;
     // frmRecherche->CSpinEditXxxChange(frmRecherche->CSpinEditXxx)
     virtual void RechercheActualise(objet_recherche Objet) = 0;
     // --- base.cpp ---
@@ -109,10 +109,10 @@ public:
     std::vector<message> Messages;
     AnsiString asStatut[4];
     void RedessineCase(int /*x*/, int /*y*/, bool /*EffaceFond*/) override { NbRedessins++; }
-    bool SimulationSanglante() const override { return Sanglante; }
-    bool EpidemieActivee() const override { return Epidemie; }
-    bool ActionEpidemieCochee() const override { return Epidemie; }
-    bool ResurrectionDemandee() const override { return Resurrection; }
+    [[nodiscard]] bool SimulationSanglante() const override { return Sanglante; }
+    [[nodiscard]] bool EpidemieActivee() const override { return Epidemie; }
+    [[nodiscard]] bool ActionEpidemieCochee() const override { return Epidemie; }
+    [[nodiscard]] bool ResurrectionDemandee() const override { return Resurrection; }
     void DefinitResurrectionDemandee(bool Demandee) override { Resurrection = Demandee; }
     void DefinitSimulationModifiee(bool Modif) override { Modifiee = Modif; }
     void AfficheStatut(int NumPanneau, const AnsiString &asTexte) override
@@ -123,10 +123,10 @@ public:
         }
     }
     void RepeintStatut() override {}
-    bool FicheVisible(fiche_info /*Fiche*/) const override { return false; }
+    [[nodiscard]] bool FicheVisible(fiche_info /*Fiche*/) const override { return false; }
     void RafraichitFiche(fiche_info /*Fiche*/) override {}
-    bool RechercheVisible() const override { return false; }
-    bool RechercheCochee(objet_recherche /*Objet*/) const override { return false; }
+    [[nodiscard]] bool RechercheVisible() const override { return false; }
+    [[nodiscard]] bool RechercheCochee(objet_recherche /*Objet*/) const override { return false; }
     void RechercheActualise(objet_recherche /*Objet*/) override {}
     type_reponse AfficheMessage(const AnsiString &asMessage, const AnsiString &asTitre, type_message Type,
                                 int /*OrdreBoutonDefaut*/, int /*OrdreBoutonEchap*/) override

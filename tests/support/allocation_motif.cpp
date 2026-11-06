@@ -15,10 +15,10 @@ namespace
 {
 void *Alloue(std::size_t n)
 {
-    void *p = std::malloc((n != 0u) ? n : 1);
+    void *p = std::malloc((n != 0U) ? n : 1);
     if (p)
     {
-        std::memset(p, 0xA5, (n != 0u) ? n : 1);
+        std::memset(p, 0xA5, (n != 0U) ? n : 1);
     }
     return p;
 }

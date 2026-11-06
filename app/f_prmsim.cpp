@@ -48,7 +48,7 @@ TfrmParamSimul::TfrmParamSimul(TComponent *Owner) : TForm(Owner)
     frmSimulation->AffecteGlyphe(GLYPHE_DEFF, BitBtnAppliqueDureeFeuRouge->Glyph);
 }
 //---------------------------------------------------------------------------
-bool TfrmParamSimul::AppliqueChoix() const
+bool TfrmParamSimul::AppliqueChoix()
 {
     frmSimulation->SimulationModifiee = true;
     if (NbVehiculesChange)

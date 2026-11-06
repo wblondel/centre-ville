@@ -28,7 +28,7 @@ public:
         Lit = std::move(Lecture);
         Ecrit = std::move(Ecriture);
     }
-    T Valeur() const { return Lit(); }
+    [[nodiscard]] T Valeur() const { return Lit(); }
     operator T() const { return Lit(); }
     // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
     template <class E, std::enable_if_t<std::is_enum_v<E>, int> = 0> explicit operator E() const { return (E)Lit(); }
@@ -76,7 +76,7 @@ public:
         Lit = std::move(Lecture);
         Ecrit = std::move(Ecriture);
     }
-    AnsiString Valeur() const { return Lit(); }
+    [[nodiscard]] AnsiString Valeur() const { return Lit(); }
     operator AnsiString() const { return Lit(); }
     Propriete &operator=(const AnsiString &v)
     {
@@ -93,12 +93,12 @@ public:
         Ecrit(p.Lit());
         return *this;
     }
-    int Length() const { return Lit().Length(); }
-    bool IsEmpty() const { return Lit().IsEmpty(); }
-    int Pos(const AnsiString &as) const { return Lit().Pos(as); }
-    AnsiString SubString(int Index, int Count) const { return Lit().SubString(Index, Count); }
+    [[nodiscard]] int Length() const { return Lit().Length(); }
+    [[nodiscard]] bool IsEmpty() const { return Lit().IsEmpty(); }
+    [[nodiscard]] int Pos(const AnsiString &as) const { return Lit().Pos(as); }
+    [[nodiscard]] AnsiString SubString(int Index, int Count) const { return Lit().SubString(Index, Count); }
     char operator[](int i) const { return Lit()[i]; }
-    const char *c_str() const = delete; // pointeur sur un temporaire : utiliser Valeur().c_str()
+    [[nodiscard]] const char *c_str() const = delete; // pointeur sur un temporaire : utiliser Valeur().c_str()
     AnsiString operator+(const AnsiString &as) const { return Lit() + as; }
     AnsiString operator+(const char *s) const { return Lit() + AnsiString(s); }
     bool operator==(const AnsiString &as) const { return Lit() == as; }

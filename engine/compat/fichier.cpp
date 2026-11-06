@@ -123,7 +123,7 @@ bool Synchronise(fichier *f)
         f->Ecriture.clear();
     }
     const std::size_t Restant = f->Lecture.size() - f->PosLecture;
-    if (Restant != 0u)
+    if (Restant != 0U)
     {
         DeplaceSysteme(f->fd, -static_cast<long long>(Restant), SEEK_CUR);
     }

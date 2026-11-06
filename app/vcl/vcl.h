@@ -36,7 +36,7 @@ public:
     String(const char *s) : AnsiString(s) {}
     String(const AnsiString &as) : AnsiString(as) {}
     String(const std::string &s) : AnsiString(s) {}
-    String UpperCase() const;
+    [[nodiscard]] String UpperCase() const;
 };
 using UnicodeString = String;
 //---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public:
         Bits |= 1U << e;
         return *this;
     }
-    bool Contains(TShiftStateElement e) const { return ((Bits >> e) & 1U) != 0u; }
+    [[nodiscard]] bool Contains(TShiftStateElement e) const { return ((Bits >> e) & 1U) != 0U; }
 };
 //---------------------------------------------------------------------------
 // Ensembles de la VCL (TGridOptions, TMsgDlgButtons...) : Options << x, >> x
@@ -117,7 +117,7 @@ public:
         Bits &= ~(1ULL << (int)e);
         return *this;
     }
-    bool Contains(E e) const { return ((Bits >> (int)e) & 1ULL) != 0u; }
+    [[nodiscard]] bool Contains(E e) const { return ((Bits >> (int)e) & 1ULL) != 0U; }
     bool operator==(const TEnsemble &t) const { return Bits == t.Bits; }
 };
 //---------------------------------------------------------------------------

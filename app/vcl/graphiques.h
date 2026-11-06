@@ -51,9 +51,9 @@ struct TRect
     int Left = 0, Top = 0, Right = 0, Bottom = 0;
     TRect() = default;
     TRect(int l, int t, int r, int b) : Left(l), Top(t), Right(r), Bottom(b) {}
-    int Width() const { return Right - Left; }
-    int Height() const { return Bottom - Top; }
-    QRect Qt() const { return {Left, Top, Right - Left, Bottom - Top}; }
+    [[nodiscard]] int Width() const { return Right - Left; }
+    [[nodiscard]] int Height() const { return Bottom - Top; }
+    [[nodiscard]] QRect Qt() const { return {Left, Top, Right - Left, Bottom - Top}; }
 };
 //---------------------------------------------------------------------------
 enum TBrushStyle { bsSolid, bsClear };
@@ -86,7 +86,7 @@ struct TFont
     int Height = -11; // < 0 : hauteur des caractères en pixels (96 ppp)
     TColor Color = clWindowText;
     TFontStyles Style;
-    QFont Qt() const;
+    [[nodiscard]] QFont Qt() const;
 };
 //---------------------------------------------------------------------------
 // Sous-objet affecté par copie, comme les propriétés objet de la VCL
@@ -120,7 +120,7 @@ public:
         return &Objet;
     }
     T &Ref() { return Objet; }
-    const T &Ref() const { return Objet; }
+    [[nodiscard]] const T &Ref() const { return Objet; }
     SousObjet &operator=(const T *t)
     {
         Objet = *t;
@@ -172,8 +172,8 @@ public:
         }
         Peintre = nullptr;
     }
-    QPainter *Painter() const { return Peintre; }
-    bool Actif() const { return Peintre != nullptr; }
+    [[nodiscard]] QPainter *Painter() const { return Peintre; }
+    [[nodiscard]] bool Actif() const { return Peintre != nullptr; }
     void FillRect(const TRect &r);
     void Rectangle(int x1, int y1, int x2, int y2);
     void Ellipse(int x1, int y1, int x2, int y2);

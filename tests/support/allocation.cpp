@@ -23,7 +23,7 @@ long NombreAllocationsVives()
 }
 static void *Alloue(std::size_t n) noexcept
 {
-    void *p = std::calloc((n != 0u) ? n : 1, 1);
+    void *p = std::calloc((n != 0U) ? n : 1, 1);
     if (p)
     {
         AllocationsVives++;

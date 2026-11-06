@@ -475,8 +475,8 @@ bool infection::Reinfecte(int Tour, int NumPieton, int Rang) // comme le constru
         }
         return true;
     }
-    else
-    {
+    
+    
         if (Svt)
         {
             return Svt->Reinfecte(Tour, NumPieton, Rang);
@@ -484,7 +484,7 @@ bool infection::Reinfecte(int Tour, int NumPieton, int Rang) // comme le constru
 
         Svt = new infection(Tour, NumPieton, Rang);
         return true;
-    }
+    
 }
 //-----------------------------------------------------------------------------
 bool infection::DoitSuccomber(int Tour) const
@@ -497,10 +497,10 @@ bool infection::DoitSuccomber(int Tour) const
     {
         return Svt->DoitSuccomber(Tour);
     }
-    else
-    {
+    
+    
         return false;
-    }
+    
 }
 //-----------------------------------------------------------------------------
 void pieton::Verifie(AnsiString &asMsgErr) const
@@ -944,7 +944,7 @@ bool feu::Sauve(int hfile)
     int Ok = 0;
     int xc = COORDCOPIE(x, cv->Xc);
     int yc = COORDCOPIE(y, cv->Yc); // v4.0.1. v6.0.1 : COORDCOPIE
-    Ok = (static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) &&
+    Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
           (FileWrite(hfile, cv->CopieEnCours ? &xc : &x, sizeof(x)) != 0) && // v4.0.1
           (FileWrite(hfile, cv->CopieEnCours ? &yc : &y, sizeof(y)) != 0) && // v4.0.1
           (FileWrite(hfile, &Dir, sizeof(Dir)) != 0) && (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) &&
@@ -1312,7 +1312,7 @@ bool feu_pieton::Charge(int hfile)
          LitChamp(hfile, &DureeVert, sizeof(DureeVert)) && LitChamp(hfile, &DemandeVert, sizeof(DemandeVert)) &&
          LitChamp(hfile, &RougeDemande, sizeof(RougeDemande));
     Ok = Ok && NombreCredible(NbFeux); // v6.0.2
-    if ((Ok) && (NbFeux != 0))
+    if (Ok && (NbFeux != 0))
     {
         Ok = !((NumFeux = new int[NbFeux]) == nullptr);
     }
@@ -1336,7 +1336,7 @@ bool feu_pieton::Sauve(int hfile)
         xc[NBFEUXPIETONSPARNUMERO] = {COORDCOPIE(x[0], cv->Xc), COORDCOPIE(x[1], cv->Xc)};
     int // v6.0.1 : COORDCOPIE
         yc[NBFEUXPIETONSPARNUMERO] = {COORDCOPIE(y[0], cv->Yc), COORDCOPIE(y[1], cv->Yc)};
-    Ok = (static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) &&
+    Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
           (FileWrite(hfile, cv->CopieEnCours ? xc : x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
           (FileWrite(hfile, cv->CopieEnCours ? yc : y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
           (FileWrite(hfile, Dir, NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) != 0) &&
@@ -2775,7 +2775,7 @@ void place_taxi::Verifie(AnsiString &asMsgErr)
     {
         asMsgErr += asSource + Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
     }
-    if ((cv->DistancesCalculees) && (Definie() && (NumFile < 0))) // Vérification avant simulation seulement
+    if (cv->DistancesCalculees && (Definie() && (NumFile < 0))) // Vérification avant simulation seulement
     {
         asMsgErr += asSource + Format(": numéro de file indéfini ou incorrect (%d)\n", ARRAYOFCONST((NumFile)));
     }
@@ -3094,7 +3094,7 @@ void place_park::Verifie(AnsiString &asMsgErr) const
     {
         asMsgErr += asSource + Format(": numéro incorrect (%d)\n", ARRAYOFCONST((Numero)));
     }
-    if ((cv->DistancesCalculees) && (NumFile < 0)) // Vérification avant simulation seulement
+    if (cv->DistancesCalculees && (NumFile < 0)) // Vérification avant simulation seulement
     {
         asMsgErr += asSource + Format(": numéro de file indéfini ou incorrect (%d)\n", ARRAYOFCONST((NumFile)));
     }
@@ -3337,7 +3337,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
     NbPlacesVehlibDist = npv; // v6.0.1
     if (nd > 0)
     {
-        if ((ne > 0) && ((Ok = (!((DistParking = new int **[ne]) == nullptr)))))
+        if ((ne > 0) && (Ok = (!((DistParking = new int **[ne]) == nullptr))))
 
         {                                    // D'abord le nombre de parkings
             for (i = 0; Ok && (i < ne); i++) // Puis le nombre de directions possibles
@@ -3356,7 +3356,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
             }
         }
 
-        if ((nab > 0) && ((Ok = (!((DistArretBus = new int *[nab]) == nullptr))))) // v3.0
+        if ((nab > 0) && (Ok = (!((DistArretBus = new int *[nab]) == nullptr)))) // v3.0
 
         {                                     // D'abord le nombre d'arrêts de bus
             for (i = 0; Ok && (i < nab); i++) // Puis le nombre de directions possibles
@@ -3372,7 +3372,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
             }
         }
 
-        if ((nft > 0) && ((Ok = (!((DistFileTaxi = new int *[nft]) == nullptr))))) // v3.6
+        if ((nft > 0) && (Ok = (!((DistFileTaxi = new int *[nft]) == nullptr)))) // v3.6
 
         {                                     // D'abord le nombre de files de taxi
             for (i = 0; Ok && (i < nft); i++) // Puis le nombre de directions possibles
@@ -3388,7 +3388,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
             }
         }
 
-        if ((nfp > 0) && ((Ok = (!((DistFilePark = new int **[nfp]) == nullptr))))) // v5.0
+        if ((nfp > 0) && (Ok = (!((DistFilePark = new int **[nfp]) == nullptr)))) // v5.0
 
         {                                     // D'abord le nombre de files de parkings
             for (i = 0; Ok && (i < nfp); i++) // Puis le nombre de directions possibles
@@ -3407,7 +3407,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
             }
         }
 
-        if ((npv > 0) && ((Ok = (!((DistPlaceVehlib = new int *[npv]) == nullptr))))) // v5.3
+        if ((npv > 0) && (Ok = (!((DistPlaceVehlib = new int *[npv]) == nullptr)))) // v5.3
 
         {                                     // D'abord le nombre de places de vehlib
             for (i = 0; Ok && (i < npv); i++) // Puis le nombre de directions possibles
@@ -3424,7 +3424,7 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
         }
     }
     nd = NbDirPossSensVoieTram(indefinie);                                                    // v3.5
-    if (((nd > 0) && (nat > 0)) && ((Ok = (!((DistArretTram = new int *[nat]) == nullptr))))) // v3.5
+    if (((nd > 0) && (nat > 0)) && (Ok = (!((DistArretTram = new int *[nat]) == nullptr)))) // v3.5
 
     {                                     // D'abord le nombre d'arrêts de tram
         for (i = 0; Ok && (i < nat); i++) // Puis le nombre de directions possibles
@@ -3958,10 +3958,10 @@ bool voie::RetirePieton(int NumPietonARetirer) // v2.0
 
         return false;
     }
-    else
-    {
+    
+    
         return false;
-    }
+    
 }
 //-----------------------------------------------------------------------------
 void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, la montée et la descente du bus/tram
@@ -4010,7 +4010,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                 p->AttendTram = true;
                 p->TourAttTram = cv->TourCrt;
             }
-            if ((p->FileTaxiTrv) && ((n = cv->V(x, y, p->Dir).NumPlaceTaxi) != 0))
+            if (p->FileTaxiTrv && ((n = cv->V(x, y, p->Dir).NumPlaceTaxi) != 0))
             {                                                                // Si file de taxis trouvée
                 if ((!PassagePietons) && cv->PlaceTaxi[n - 1].EstTeteFile()) // v3.6. Pas sur passage piétons
                 { // Phase 2 : Si File de taxi trouvée ET qu'il arrive dessus et que c'est la tête de la file ALORS il
@@ -4031,7 +4031,7 @@ void voie::DeplacePietons() // v3.5 : Inclut l'attente aux arrêts de bus/tram, 
                 }
             }
 
-            if ((p->PlaceVehlibTrv) && ((n = cv->V(x, y, p->Dir).NumPlaceVehlib) != 0) &&
+            if (p->PlaceVehlibTrv && ((n = cv->V(x, y, p->Dir).NumPlaceVehlib) != 0) &&
                 (cv->V(x, y, p->Dir).NumVehlib != 0)) // v5.3
                                                       // Si la place est occupé par un vehlib
             { // Phase 2 : Si Place de vehlib trouvée avec vehlib ET qu'il arrive dessus ALORS il attend de prendre le
@@ -7460,7 +7460,7 @@ void centre_ville::DeplacePieton(int NumPieton, int x, int y, direction d) const
 }
 
 //-----------------------------------------------------------------------------
-bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) const // ATTENTION : dp = N|E|S|O
+bool centre_ville::ChangeDirectionSiPossible(int x, int y, dirposs dp) // ATTENTION : dp = N|E|S|O
 {                                                                            // On change si...
     voie *vv = &v[x][y];
     if ((!vv->PassagePietons) && // v3.5

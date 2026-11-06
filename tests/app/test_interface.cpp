@@ -591,7 +591,7 @@ public:
         QFile::setPermissions(f, QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther);
     }
     ~LectureSeule() { QFile::setPermissions(Fichier, Droits); }
-    bool Effective() const { return !QFile(Fichier).open(QIODevice::ReadWrite); } // Faux pour root
+    [[nodiscard]] bool Effective() const { return !QFile(Fichier).open(QIODevice::ReadWrite); } // Faux pour root
 };
 //-------------------------------------------------------------------------
 // Réseau tel qu'il serait enregistré, pour le comparer à un autre
@@ -9123,7 +9123,7 @@ void TestInterface::ficheRecherche()
             const QString Avant = Q(r->StatusBar->SimpleText);
             const int ColAvant = g->Col;
             const int RowAvant = g->Row;
-            if (i == 0u)
+            if (i == 0U)
             { // Le bouton radio active le numéro et recherche l'élément du numéro affiché
                 el.Numero->Value = k;
                 Clique(el.Radio);

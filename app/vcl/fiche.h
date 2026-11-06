@@ -383,7 +383,7 @@ protected:
         if (Couleur.isValid())
         { // Color de la fiche, si elle n'est pas une couleur système (bit 31)
             const TColor c = CouleurDepuisTexte(A(Couleur.toString()));
-            if ((c & 0xFF000000) == 0u)
+            if ((c & 0xFF000000) == 0U)
             {
                 QPalette p = w->palette();
                 p.setColor(QPalette::Window, CouleurQt(c));
@@ -439,7 +439,7 @@ protected:
             return false;
         }
         WORD Key = static_cast<WORD>(ToucheVirtuelleDe(e));
-        if (Key != 0u)
+        if (Key != 0U)
         {
             if (Relache)
             {
@@ -455,7 +455,7 @@ protected:
                     OnKeyDown(this, Key, EtatTouches(e));
                 }
             }
-            if (Key == 0u)
+            if (Key == 0U)
             {
                 return true;
             }

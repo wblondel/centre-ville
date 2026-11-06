@@ -13,7 +13,7 @@
 #include "simul.h"
 #include "f_simul.h"
 
-#include <math.h>
+#include <cmath>
 #include "f_defv.h"
 #include "f_defvp.h"
 #include "f_prmsim.h"
@@ -1654,7 +1654,7 @@ bool TfrmSimulation::VerifieReseau()
     }
     for (i = 0; Ok && (i < cv->NbArretsBus); i++)
     {
-        if ((cv->ArretBus[i].Defini()) && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
+        if (cv->ArretBus[i].Defini() && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
         { // v3.0.3
             xErr = cv->ArretBus[i].x;
             yErr = cv->ArretBus[i].y;
@@ -1665,7 +1665,7 @@ bool TfrmSimulation::VerifieReseau()
     }
     for (i = 0; Ok && (i < cv->NbArretsTram); i++)
     {
-        if ((cv->ArretTram[i].Defini()) &&
+        if (cv->ArretTram[i].Defini() &&
             (!(Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1))))
         { // v3.0.3
             xErr = cv->ArretTram[i].x;
@@ -4852,10 +4852,10 @@ class VueSimulation : public IVueSimulation
 public:
     explicit VueSimulation(TfrmSimulation *Fiche) : f(Fiche) {}
     void RedessineCase(int x, int y, bool EffaceFond) override { f->RedessineCase(x, y, EffaceFond); }
-    bool SimulationSanglante() const override { return f->SimulationSanglante; }
-    bool EpidemieActivee() const override { return f->EpidemieActivee; }
-    bool ActionEpidemieCochee() const override { return f->ActionEpidemie->Checked; }
-    bool ResurrectionDemandee() const override { return f->ResurrectionDemandee; }
+    [[nodiscard]] bool SimulationSanglante() const override { return f->SimulationSanglante; }
+    [[nodiscard]] bool EpidemieActivee() const override { return f->EpidemieActivee; }
+    [[nodiscard]] bool ActionEpidemieCochee() const override { return f->ActionEpidemie->Checked; }
+    [[nodiscard]] bool ResurrectionDemandee() const override { return f->ResurrectionDemandee; }
     void DefinitResurrectionDemandee(bool Demandee) override { f->ResurrectionDemandee = Demandee; }
     void DefinitSimulationModifiee(bool Modifiee) override { f->SimulationModifiee = Modifiee; }
     void AfficheStatut(int NumPanneau, const AnsiString &asTexte) override
@@ -4863,7 +4863,7 @@ public:
         f->StatusBar->Panels->Items[NumPanneau]->Text = asTexte;
     }
     void RepeintStatut() override { f->StatusBar->Repaint(); }
-    bool FicheVisible(fiche_info Fiche) const override
+    [[nodiscard]] bool FicheVisible(fiche_info Fiche) const override
     {
         switch (Fiche)
         {
@@ -4916,8 +4916,8 @@ public:
             break;
         }
     }
-    bool RechercheVisible() const override { return (frmRecherche != nullptr) && frmRecherche->Visible; }
-    bool RechercheCochee(objet_recherche Objet) const override
+    [[nodiscard]] bool RechercheVisible() const override { return (frmRecherche != nullptr) && frmRecherche->Visible; }
+    [[nodiscard]] bool RechercheCochee(objet_recherche Objet) const override
     {
         switch (Objet)
         {

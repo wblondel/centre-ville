@@ -3,7 +3,7 @@
 //---------------------------------------------------------------------------
 #include "controles.h"
 
-#include <math.h>
+#include <cmath>
 #include <QAbstractButton>
 #include <QAction>
 #include <QButtonGroup>
@@ -1175,7 +1175,7 @@ class BarreOnglets : public QTabBar
 {
 public:
     using QTabBar::QTabBar;
-    bool TextesEntiers() const
+    [[nodiscard]] bool TextesEntiers() const
     {
         for (int i = 0; i < count(); i++)
         {

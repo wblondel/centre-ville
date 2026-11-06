@@ -1,31 +1,77 @@
 # Analyse statique du C++ (tools/lint_cpp.py, job « Lint C++ » de la CI).
-# Bugs et performance seulement : le code porté garde le style de l'original, pour rester
-# comparable à src/ (app/README.md). Les constats déjà présents sont dans
-# tools/lint/clang-tidy-reference.txt : seuls les nouveaux font échouer la CI.
+# Tout constat fait échouer la CI : il n'y a pas de liste de constats tolérés.
+# Fausse alerte : // NOLINT(regle) ou // NOLINTNEXTLINE(regle), avec le motif sur la même ligne.
 #
-# Règles retirées, parce qu'elles visent un style de l'original, voulu ou sans risque :
-#  - assignment-in-if-condition, assignment-in-selection-statement : if ((x=...)), partout ;
-#  - signed-bitwise : les directions (dirposs) sont des masques de bits sur des entiers ;
-#  - throwing-static-initialization, cert-err58-cpp : chaînes globales AnsiString ;
-#  - easily-swappable-parameters : (x, y) dans toutes les signatures ;
-#  - performance-enum-size : la taille des énumérés fait partie du format .cvw.
+# Familles actives : bogues, CERT, analyseur statique, concurrence, C++ Core Guidelines,
+# divers, modernisation, performance, portabilité et lisibilité.
+#
+# Règles retirées, avec leur motif :
+#  - bugprone-easily-swappable-parameters : (x, y) dans toutes les signatures de la grille ;
+#  - bugprone-signed-bitwise : les directions (dirposs) sont des masques de bits positifs sur
+#    des entiers, défini en C++20 ;
+#  - cppcoreguidelines-avoid-do-while : les macros de Catch2 et de Qt Test en sont faites ;
+#  - cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers : coordonnées des
+#    fiches (celles des .dfm) et constantes des règles de la simulation, commentées sur place ;
+#  - cppcoreguidelines-avoid-non-const-global-variables : une instance par fiche
+#    (frmSimulation...), la simulation (cv) et sa vue (vue), comme dans l'original ;
+#  - cppcoreguidelines-non-private-member-variables-in-classes,
+#    misc-non-private-member-variables-in-classes : les classes du moteur sont les données de
+#    la simulation, lues par les fiches et écrites champ par champ dans les .cvw ;
+#  - cppcoreguidelines-owning-memory : demande la GSL (gsl::owner) ; les widgets Qt
+#    appartiennent à leur parent ;
+#  - cppcoreguidelines-pro-bounds-constant-array-index,
+#    cppcoreguidelines-pro-bounds-avoid-unchecked-container-access : gsl::at ou .at() à chaque
+#    indice ; les bornes sont vérifiées par les tests sous ASan et UBSan ;
+#  - cppcoreguidelines-use-enum-class : les énumérés du moteur servent d'indices et
+#    d'entiers dans les calculs, et sont sérialisés tels quels ;
+#  - misc-no-recursion : calcul récursif des distances (borné par la taille de la zone) et
+#    infections chaînées ;
+#  - modernize-use-trailing-return-type : simple style ;
+#  - performance-enum-size : la taille des énumérés fait partie du format .cvw ;
+#  - readability-function-cognitive-complexity, readability-function-size : les règles de la
+#    simulation sont de longues fonctions, que les découper changerait trop ;
+#  - readability-identifier-length : x, y, d, i sont les noms naturels de la grille ;
+#  - readability-trailing-comma : simple style, et clang-format met alors un élément par ligne.
 Checks: >
   -*,
   bugprone-*,
+  cert-*,
   clang-analyzer-*,
-  cert-err33-c,cert-err34-c,cert-flp*,cert-mem*,cert-oop*,
   concurrency-*,
-  misc-definitions-in-headers,misc-misplaced-const,misc-new-delete-overloads,
-  misc-redundant-expression,misc-throw-by-value-catch-by-reference,
-  misc-unconventional-assign-operator,misc-uniqueptr-reset-release,misc-unused-using-decls,
+  cppcoreguidelines-*,
+  misc-*,
+  modernize-*,
   performance-*,
   portability-*,
-  -bugprone-assignment-in-if-condition,
-  -bugprone-assignment-in-selection-statement,
-  -bugprone-signed-bitwise,
-  -bugprone-throwing-static-initialization,
-  -cert-err58-cpp,
+  readability-*,
   -bugprone-easily-swappable-parameters,
-  -performance-enum-size
+  -bugprone-signed-bitwise,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -misc-non-private-member-variables-in-classes,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,
+  -cppcoreguidelines-use-enum-class,
+  -misc-no-recursion,
+  -modernize-use-trailing-return-type,
+  -performance-enum-size,
+  -readability-function-cognitive-complexity,
+  -readability-function-size,
+  -readability-identifier-length,
+  -readability-trailing-comma
+CheckOptions:
+  # if (pointeur) reste idiomatique ; les entiers sont comparés explicitement
+  readability-implicit-bool-conversion.AllowPointerConditions: true
+  # Les en-têtes de Qt (<QWidget> inclut qwidget.h) : les symboles de Qt ne sont pas vérifiés
+  misc-include-cleaner.IgnoreHeaders: '.*/Qt[A-Za-z]*/.*;.*/Qt[A-Za-z]*\.framework/.*;q[a-z0-9_]*\.h'
+  # Les propriétés de la VCL (Propriete<T>) s'affectent à travers un pointeur vers un contrôle :
+  # l'analyse les prend pour des lectures
+  misc-const-correctness.WarnPointersAsPointers: false
+  cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor: true
+  cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: true
 HeaderFilterRegex: '(engine|app|tests)/.*\.h$'
 ExcludeHeaderFilterRegex: '(^|/)build/'

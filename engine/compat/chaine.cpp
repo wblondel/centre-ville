@@ -3,7 +3,7 @@
 //---------------------------------------------------------------------------
 #include "chaine.h"
 
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <cctype>
 #include <clocale>
@@ -94,7 +94,7 @@ std::string AvecSeparateurMilliers(const std::string &Nombre)
     std::string Resultat = Nombre.substr(Fin);
     for (std::size_t n = 0, i = Fin; i > Debut; i--, n++)
     {
-        if ((n != 0u) && ((n % 3) == 0u))
+        if ((n != 0U) && ((n % 3) == 0U))
         {
             Resultat = "," + Resultat;
         }

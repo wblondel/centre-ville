@@ -171,7 +171,7 @@ public:
         }
     }
     void SetFocus() { B::setFocus(); }
-    bool Focused() const { return B::hasFocus(); }
+    [[nodiscard]] bool Focused() const { return B::hasFocus(); }
     void PrepareVcl() override; // police, couleurs, curseur
 };
 //---------------------------------------------------------------------------
@@ -216,13 +216,13 @@ class TCSpinEdit : public ControleVcl<QAbstractSpinBox>
 {
     bool ControleActif = false;      // contrôle actif de sa fiche (entre CM_ENTER et CM_EXIT)
     bool AffectationEnCours = false; // v6.0.2 : le texte change par Value=..., pas par la frappe
-    int CheckValue(int v) const;
+    [[nodiscard]] int CheckValue(int v) const;
 
 public:
     Propriete<int> Value, MinValue, MaxValue, Increment;
     TNotifyEvent OnChange;
     TNotifyEvent OnExit; // v6.0.2 : en quittant le champ, et à Entrée, une fois la valeur dans les bornes
-    bool Frappe() const { return !AffectationEnCours; } // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
+    [[nodiscard]] bool Frappe() const { return !AffectationEnCours; } // v6.0.2 : dans OnChange : l'utilisateur est en train de taper
     bool GardeTouchesDeplacement = false; // v6.0.2 : flèches, Origine, Fin et pages restent au champ, avant les
                                           // raccourcis de la fiche
     explicit TCSpinEdit(QWidget *Parent = nullptr);
@@ -232,7 +232,7 @@ public:
     void stepBy(int steps) override; // UpClick / DownClick (flèches, touches haut et bas)
     QValidator::State validate(QString &input, int &pos) const override; // IsValidChar
 protected:
-    StepEnabled stepEnabled() const override;
+    [[nodiscard]] StepEnabled stepEnabled() const override;
     void focusInEvent(QFocusEvent *e) override;  // CMEnter
     void focusOutEvent(QFocusEvent *e) override; // CMExit
 };
@@ -272,7 +272,7 @@ public:
 
 protected:
     // Zone sensible de la VCL : tout le contrôle (Qt : la case et le texte)
-    bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
+    [[nodiscard]] bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
     void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
 };
 //---------------------------------------------------------------------------
@@ -284,7 +284,7 @@ public:
     explicit TRadioButton(QWidget *Parent = nullptr);
 
 protected:
-    bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
+    [[nodiscard]] bool hitButton(const QPoint &pos) const override { return rect().contains(pos); }
     void paintEvent(QPaintEvent *e) override; // v6.0.16 : texte resserré s'il ne tient pas (PoliceResserree)
 };
 //---------------------------------------------------------------------------
@@ -445,10 +445,10 @@ public:
     explicit TStringGrid(QWidget *Parent = nullptr);
     void setRowCount(int n) { RowCount = n; } // propriétés du .ui (uic)
     void setColumnCount(int n) { ColCount = n; }
-    AnsiString LitCellule(int c, int r) const;
+    [[nodiscard]] AnsiString LitCellule(int c, int r) const;
     void EcritCellule(int c, int r, const AnsiString &as);
     void EcritTaille(bool Colonne, int i, int Taille);
-    TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
+    [[nodiscard]] TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
     void Repaint()
     {
         if (TCanvas::NbDessinsEnCours != 0)
@@ -485,16 +485,16 @@ private:
     int CumulMolette = 0;
     void DefinitColonnes(int n);
     void DefinitLignes(int n);
-    int Largeur(int c) const
+    [[nodiscard]] int Largeur(int c) const
     {
         return ((c >= 0) && std::cmp_less(c, Largeurs.size())) ? Largeurs[static_cast<std::size_t>(c)] : LargeurDefaut;
     }
-    int Hauteur(int r) const
+    [[nodiscard]] int Hauteur(int r) const
     {
         return ((r >= 0) && std::cmp_less(r, Hauteurs.size())) ? Hauteurs[static_cast<std::size_t>(r)] : HauteurDefaut;
     }
-    int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
-    int DebutLigne(int r) const;
+    [[nodiscard]] int DebutColonne(int c) const; // abscisse de la case (sans tenir compte du masquage)
+    [[nodiscard]] int DebutLigne(int r) const;
     void MetAJourDefilement();
     void DefinitHautGauche(int Gauche, int Haut);
     void Montre(int c, int r); // TCustomGrid::ClampInView
@@ -551,7 +551,7 @@ public:
     TNotifyEvent OnChange;
     explicit TTabControl(QWidget *Parent = nullptr);
     void PrepareVcl() override;
-    bool OngletsEntiers() const; // v6.0.16 : texte d'aucun onglet abrégé
+    [[nodiscard]] bool OngletsEntiers() const; // v6.0.16 : texte d'aucun onglet abrégé
 protected:
     void paintEvent(QPaintEvent *e) override;
     void changeEvent(QEvent *e) override; // v6.0.16 : police changée (police de la fiche, après PrepareVcl)

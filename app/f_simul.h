@@ -548,7 +548,7 @@ private:
     bool VerifieReseau();
     void AfficheMsgInfoNonDisp(const AnsiString &asTitre); // v3.7
     // Définition de la propriété SimulEnCours
-    bool SimulEstEnCours() const { return SimulEnCours; }
+    [[nodiscard]] bool SimulEstEnCours() const { return SimulEnCours; }
     void MarcheArretSimul(bool EnCours)
     {
         const bool EtaitEnCours = SimulEnCours; // v6.0.2 : Arrêt en pause : le chrono est déjà arrêté
@@ -643,7 +643,7 @@ private:
         InitialiseDeplacementFeu(); // v3.5
     }
     void ChargeFiche(); // portage : chargement du .dfm (setupUi, liaison, gestionnaires), puis OnCreate
-    bool SimulEstModifiee() const { return SimulModifiee; }
+    [[nodiscard]] bool SimulEstModifiee() const { return SimulModifiee; }
     void ModifieSimul(bool Modifiee)
     {
         SimulModifiee = Modifiee;
@@ -665,18 +665,18 @@ private:
             Caption = Caption.SubString(1, Caption.Length() - 1);
         }
     }
-    bool SimulEstSanglante() const { return ActionSanglante->Checked; }                    // v4.3
+    [[nodiscard]] bool SimulEstSanglante() const { return ActionSanglante->Checked; }                    // v4.3
     void ModifieModeSanglant(bool Sanglant) const { ActionSanglante->Checked = Sanglant; } // v4.3
-    bool ResurrectionEstDemandee() const { return ActionResurrection->Checked; }           // v4.3.1
+    [[nodiscard]] bool ResurrectionEstDemandee() const { return ActionResurrection->Checked; }           // v4.3.1
     void ModifieDemandeResurrection(bool Resurrection) const                               // v4.3.1
     {
         ActionResurrection->Checked = Resurrection;
         ActionResurrection->Enabled = !ActionResurrection->Checked;
     }
-    bool EpidemieEstActive() const { return ActionEpidemie->Checked; } // v5.4.1
-    bool ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) const;
+    [[nodiscard]] bool EpidemieEstActive() const { return ActionEpidemie->Checked; } // v5.4.1
+    [[nodiscard]] bool ConfirmeSuppressionFeuxUtilisesDansSelection(type_voie TypeVoie) const;
     void SupprimeFeuxUtilisesDansSelection(type_voie TypeVoie) const;
-    bool ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) const; // v3.5
+    [[nodiscard]] bool ConfirmeSuppressionArretsUtilisesDansSelection(type_voie TypeVoie) const; // v3.5
     void SupprimeArretsUtilisesDansSelection(type_voie TypeVoie) const;            // v3.5
     void ReinitialiseToutDansSelection(type_voie TypeVoie);
     bool ModifiePassagePietonsSiNecessaire(int x, int y);               // v2.0

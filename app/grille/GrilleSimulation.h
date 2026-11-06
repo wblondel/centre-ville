@@ -67,18 +67,18 @@ class GrilleSimulation : public ControleVcl<QAbstractScrollArea>, public AvecMen
     QPoint DernierePosition;
     void MetAJourDefilement();
     void MetAJourSelection();
-    QRect RectGrille(const TGridRect &r) const; // en pixels du viewport
+    [[nodiscard]] QRect RectGrille(const TGridRect &r) const; // en pixels du viewport
     void InvalideSelection(const TGridRect &Ancienne);
-    TGridCoord CaseEn(const QPoint &p) const;
+    [[nodiscard]] TGridCoord CaseEn(const QPoint &p) const;
     void MoveCurrent(int ACol, int ARow, bool MoveAnchor);
     void MoveAnchor(TGridCoord NouvelleAncre);
     void FocusCell(int ACol, int ARow, bool MoveAnchor);
     void ClampInView(TGridCoord c);
     void DefinitHautGauche(int Gauche, int Haut);
-    int ColonnesVisibles() const; // cases entièrement visibles
-    int LignesVisibles() const;
-    int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
-    int LimiteVisible(bool Colonne) const;   // v6.0.12 : son bord droit ou bas, en pixels du viewport
+    [[nodiscard]] int ColonnesVisibles() const; // cases entièrement visibles
+    [[nodiscard]] int LignesVisibles() const;
+    [[nodiscard]] int DerniereVisible(bool Colonne) const; // v6.0.12 : dernière case entièrement visible, dans la grille
+    [[nodiscard]] int LimiteVisible(bool Colonne) const;   // v6.0.12 : son bord droit ou bas, en pixels du viewport
 public:
     // Propriétés de TDrawGrid utilisées par la fiche
     Propriete<int> ColCount, RowCount, Col, Row, LeftCol, TopRow;
@@ -92,7 +92,7 @@ public:
     TNotifyEvent OnDblClick;
     explicit GrilleSimulation(QWidget *Parent = nullptr);
     void PrepareVcl() override;
-    TRect CellRect(int ACol, int ARow) const;
+    [[nodiscard]] TRect CellRect(int ACol, int ARow) const;
     void InvalidateCell(int ACol, int ARow); // RedessineCase -> update(rect)
     void Repaint();                          // TControl::Repaint : dessin immédiat
 protected:

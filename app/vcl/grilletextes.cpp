@@ -51,7 +51,7 @@ QString TexteSymbol(const QString &s)
     QString r = s;
     for (QChar &c : r)
     {
-        if ((c.unicode() >= 0x20) && (c.unicode() < 0xFF) && (CodageSymbol[c.unicode() - 0x20] != 0u))
+        if ((c.unicode() >= 0x20) && (c.unicode() < 0xFF) && (CodageSymbol[c.unicode() - 0x20] != 0U))
         {
             c = QChar(CodageSymbol[c.unicode() - 0x20]);
         }
@@ -684,7 +684,7 @@ void TStringGrid::mousePressEvent(QMouseEvent *e)
         return;
     }
     SelectionEnCours = true;
-    if (((e->modifiers() & Qt::ShiftModifier) != 0u) && PlageSelection)
+    if (((e->modifiers() & Qt::ShiftModifier) != 0U) && PlageSelection)
     {
         ColAncre = c;
         LigAncre = r;
@@ -762,7 +762,7 @@ void TStringGrid::keyPressEvent(QKeyEvent *e)
 { // TCustomGrid::KeyDown (sans goTabs ni goEditing)
     bool Ctrl = e->modifiers().testFlag(Qt::ControlModifier), Maj = e->modifiers().testFlag(Qt::ShiftModifier);
 #ifdef Q_OS_MACOS
-    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0u);
+    Ctrl = Ctrl || ((e->modifiers() & Qt::MetaModifier) != 0U);
 #endif
     int c = ColCour;
     int r = LigCour;

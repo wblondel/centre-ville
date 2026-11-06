@@ -39,8 +39,8 @@ public:
                                          (static_cast<std::uint32_t>(static_cast<unsigned char>(o[3])) << 24));
     }
     std::string Octet() { return Octets(1); }
-    bool Fin() const { return Pos == s.size(); }
-    std::size_t Position() const { return Pos; }
+    [[nodiscard]] bool Fin() const { return Pos == s.size(); }
+    [[nodiscard]] std::size_t Position() const { return Pos; }
 };
 //-------------------------------------------------------------------------
 class ecrivain

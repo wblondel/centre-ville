@@ -127,8 +127,8 @@ public:
     TNotifyEvent OnClick;
     TMenuItem(QAction *Feuille, QObject *Parent);
     TMenuItem(QMenu *Menu, QObject *Parent);
-    QAction *ElementQt() const { return Element; }
-    QMenu *MenuQt() const { return SousMenu; }
+    [[nodiscard]] QAction *ElementQt() const { return Element; }
+    [[nodiscard]] QMenu *MenuQt() const { return SousMenu; }
     void Click();
     TMenuItem *Find(TShortCut Raccourci); // TMenu::FindItem(..., fkShortCut)
     void LieAction(TAction *a);           // lien établi au chargement (sans recopie)

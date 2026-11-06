@@ -543,7 +543,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
             {
                 const voie *v = &cv->v[x][y];
                 const int ne = cv->NbParkings;
-                bool Vide = false;
+                bool Vide = false; // NOLINT(misc-const-correctness) : modifié dans la branche if constexpr des noms
                 if constexpr (P::Noms)
                 { // Cases vides omises du texte (toujours dans l'empreinte)
                     bool AttenteTraficNuls = true;

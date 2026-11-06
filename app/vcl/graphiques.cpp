@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 QColor CouleurQt(TColor Couleur)
 {
-    if ((static_cast<unsigned>(Couleur) & 0x80000000U) != 0u)
+    if ((static_cast<unsigned>(Couleur) & 0x80000000U) != 0U)
     { // Couleur système : palette de Qt (équivalents des COLOR_xxx de Windows)
         const QPalette p = QApplication::palette();
         switch (static_cast<unsigned>(Couleur) & 0xFFU)

@@ -120,7 +120,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     }
     for (i = 0; Ok && (i < cv->NbArretsBus); i++)
     {
-        if ((cv->ArretBus[i].Defini()) && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
+        if (cv->ArretBus[i].Defini() && (!(Ok = (cv->v[cv->ArretBus[i].x][cv->ArretBus[i].y].NumArretBus == i + 1))))
         { // v3.0.3
             xErr = cv->ArretBus[i].x;
             yErr = cv->ArretBus[i].y;
@@ -131,7 +131,7 @@ bool harnais::VerifieReseau(AnsiString &asMsgErr) // harnais : f_simul.cpp, Tfrm
     }
     for (i = 0; Ok && (i < cv->NbArretsTram); i++)
     {
-        if ((cv->ArretTram[i].Defini()) &&
+        if (cv->ArretTram[i].Defini() &&
             (!(Ok = (cv->v[cv->ArretTram[i].x][cv->ArretTram[i].y].NumArretTram == i + 1))))
         { // v3.0.3
             xErr = cv->ArretTram[i].x;
