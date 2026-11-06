@@ -1113,7 +1113,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
         c.Lu = std::move(Lu);
         return c;
     }
-    ChampFiche ChampRadio(const char *Nom, const std::function<TRadioGroup *()> &Groupe, std::function<int()> Lu)
+    static ChampFiche ChampRadio(const char *Nom, const std::function<TRadioGroup *()> &Groupe, std::function<int()> Lu)
     {
         ChampFiche c;
         c.Nom = Nom;
