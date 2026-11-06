@@ -140,14 +140,14 @@ void TfrmCarrefours::SpeedButtonClick(TObject *Sender)
     {
         while (cv->NbFeuxLibres() < 3)
         {
-            IncrementeNombre(&cv->Feu, cv->NbFeux);
+            IncrementeNombre(cv->Feu, cv->NbFeux);
         }
     }
     if ((Dimensions == 44) && (Type > 1))
     {
         while (cv->NbFeuxLibres() < 4)
         {
-            IncrementeNombre(&cv->Feu, cv->NbFeux);
+            IncrementeNombre(cv->Feu, cv->NbFeux);
         }
     }
     if (frmSimulation->SupprimeToutDansSelection(tvTout))

@@ -2,6 +2,7 @@
 #ifndef F_deffH
 #define F_deffH
 //---------------------------------------------------------------------------
+#include <vector>
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
 #include "base.h"      // portage
 // #include "CSPIN.h" // portage
@@ -67,10 +68,10 @@ private:
 
 public:
     int x{}, y{};
-    int NbFeuxDmd,   // Nbre de feux demandant le rouge
-        NbFeuxAtt,   // Nbre de feux devant être rouge pour que Numero passe au vert
-        *NumFeuxDmd, // Liste des feux demandant le rouge
-        *NumFeuxAtt; // Liste des feux devant être rouge pour que Numero passe au vert
+    int NbFeuxDmd{},             // Nbre de feux demandant le rouge
+        NbFeuxAtt{};             // Nbre de feux devant être rouge pour que Numero passe au vert
+    std::vector<int> NumFeuxDmd, // Liste des feux demandant le rouge
+        NumFeuxAtt;              // Liste des feux devant être rouge pour que Numero passe au vert
     direction Direction{};
     explicit TfrmDefFeux(TComponent *Owner);
     void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)

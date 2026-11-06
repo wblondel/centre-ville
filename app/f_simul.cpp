@@ -1253,8 +1253,9 @@ void TfrmSimulation::RedimensionneZone()
 void TfrmSimulation::FormCreate(TObject * /*Sender*/)
 { // Initialise les indicateurs. v5.4 : la màj de la base de registres est faite par l'installateur
     // v5.4 : on applique la résolution courante sur la taille des cases par rapport à la définition prédéfinie
-    Affichage = static_cast<affichage>(aff_sign | aff_voie | aff_env); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
-                                                                       // : masque de bits ; v3.8.1 (aff_env)
+    Affichage =
+        static_cast<affichage>(aff_sign | aff_voie | aff_env); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
+                                                               // : masque de bits ; v3.8.1 (aff_env)
     xErr = -1;
     yErr = -1;
     Pause = false; // v3.5
@@ -1343,7 +1344,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
     int i = 0;
     int j = 0;
     int NbFeux = 0;
-    int *NumFeu = nullptr;
+    std::vector<int> NumFeu;
     int NumFeuVoie[2] = {0, 0}; // Variables de transition
     int NbFeuxListe = 0;        // Numéros de feux de la voie {Prm,Drn}
     int NbFeuxVoie = 0;         // Nombre de feux de la liste frmDefFeux[Pieton]->NumFeux...
@@ -1420,12 +1421,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         // Génération de la liste                                     Selection  Nombre
         NbFeux = NbFeuxListe + ((Selection[1] + 1) / 2) - ((Selection[0] + 1) / 2); // (0,1,2,3)->(0,1,1,2) :
                                                                                     // f(s)=(s+1)/2
-        if (!(NumFeu = new int[NbFeux]))
-        {
-            AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-            RedessineCase(x, y, true);
-            return;
-        }
+        NumFeu = std::vector<int>(NbFeux);
         NbNonSel = 0;
         for (i = 0; i < NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
         {
@@ -1449,12 +1445,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         }
 
         // Changement de liste
-        if (frmDefFeux->NumFeuxDmd)
-        {
-            delete[] frmDefFeux->NumFeuxDmd;
-            frmDefFeux->NumFeuxDmd = nullptr;
-        }
-        frmDefFeux->NumFeuxDmd = NumFeu;
+        frmDefFeux->NumFeuxDmd = std::move(NumFeu);
         frmDefFeux->NbFeuxDmd = NbFeux;
         frmDefFeux->RafraichitInfosFeuxDmd();
         RedessineCase(x, y, true);
@@ -1485,12 +1476,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         // Génération de la liste                                     Selection  Nombre
         NbFeux = NbFeuxListe + ((Selection[1] + 1) / 2) - ((Selection[0] + 1) / 2); // (0,1,2,3)->(0,1,1,2) :
                                                                                     // f(s)=(s+1)/2
-        if (!(NumFeu = new int[NbFeux]))
-        {
-            AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-            RedessineCase(x, y, true);
-            return;
-        }
+        NumFeu = std::vector<int>(NbFeux);
         NbNonSel = 0;
         for (i = 0; i < NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
         {
@@ -1514,12 +1500,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         }
 
         // Changement de liste
-        if (frmDefFeux->NumFeuxAtt)
-        {
-            delete[] frmDefFeux->NumFeuxAtt;
-            frmDefFeux->NumFeuxAtt = nullptr;
-        }
-        frmDefFeux->NumFeuxAtt = NumFeu;
+        frmDefFeux->NumFeuxAtt = std::move(NumFeu);
         frmDefFeux->NbFeuxAtt = NbFeux;
         frmDefFeux->RafraichitInfosFeuxAtt();
         RedessineCase(x, y, true);
@@ -1550,12 +1531,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         // Génération de la liste                                     Selection  Nombre
         NbFeux = NbFeuxListe + ((Selection[1] + 1) / 2) - ((Selection[0] + 1) / 2); // (0,1,2,3)->(0,1,1,2) :
                                                                                     // f(s)=(s+1)/2
-        if (!(NumFeu = new int[NbFeux]))
-        {
-            AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-            RedessineCase(x, y, true);
-            return;
-        }
+        NumFeu = std::vector<int>(NbFeux);
         NbNonSel = 0;
         for (i = 0; i < NbFeuxListe; i++) // On recopie déjà les feux de la précédente liste
         {
@@ -1579,12 +1555,7 @@ void TfrmSimulation::DrawGridSimulDblClick(TObject * /*Sender*/)
         }
 
         // Changement de liste
-        if (frmDefFeuxPietons->NumFeux)
-        {
-            delete[] frmDefFeuxPietons->NumFeux;
-            frmDefFeuxPietons->NumFeux = nullptr;
-        }
-        frmDefFeuxPietons->NumFeux = NumFeu;
+        frmDefFeuxPietons->NumFeux = std::move(NumFeu);
         frmDefFeuxPietons->NbFeux = NbFeux;
         frmDefFeuxPietons->RafraichitInfosFeux();
         RedessineCase(x, y, true);
@@ -2489,8 +2460,8 @@ bool TfrmSimulation::ConfirmeSuppressionArretsUtilisesDansSelection(type_voie Ty
     const int yd = DrawGridSimul->Selection.Top;
     const int xf = DrawGridSimul->Selection.Right;
     const int yf = DrawGridSimul->Selection.Bottom;
-    bool *ArretBusDejaVu = new bool[cv->NbArretsBus];
-    bool *ArretTramDejaVu = new bool[cv->NbArretsTram];
+    std::vector<bool> ArretBusDejaVu(cv->NbArretsBus);
+    std::vector<bool> ArretTramDejaVu(cv->NbArretsTram);
     voie *v = nullptr;
     type_voie TypeVoieCrt{};
     for (i = 0; i < cv->NbArretsBus; i++)
@@ -2548,8 +2519,6 @@ Si vous continuez, il sera supprimé.\n\
             }
         }
     }
-    delete[] ArretBusDejaVu;
-    delete[] ArretTramDejaVu;
     return ToutSupprimer;
 }
 //---------------------------------------------------------------------------
@@ -2563,8 +2532,8 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
     const int yd = DrawGridSimul->Selection.Top;
     const int xf = DrawGridSimul->Selection.Right;
     const int yf = DrawGridSimul->Selection.Bottom;
-    bool *ArretBusDejaVu = new bool[cv->NbArretsBus];
-    bool *ArretTramDejaVu = new bool[cv->NbArretsTram];
+    std::vector<bool> ArretBusDejaVu(cv->NbArretsBus);
+    std::vector<bool> ArretTramDejaVu(cv->NbArretsTram);
     voie *v = nullptr;
     type_voie TypeVoieCrt{};
     for (i = 0; i < cv->NbArretsBus; i++)
@@ -2607,8 +2576,6 @@ void TfrmSimulation::SupprimeArretsUtilisesDansSelection(type_voie TypeVoie)
             }
         }
     }
-    delete[] ArretBusDejaVu;
-    delete[] ArretTramDejaVu;
 }
 //---------------------------------------------------------------------------
 void TfrmSimulation::ReinitialiseToutDansSelection(type_voie TypeVoie)
@@ -3476,16 +3443,8 @@ void TfrmSimulation::ActionMarcheExecute(TObject * /*Sender*/)
             InterromptDemarrage();
             return;
         }
-        if ((cv->Stats = new stats[cv->NbToursStats]))
-        {
-            cv->Stats[0].Definit();
-        }
-        else
-        {
-            AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-            InterromptDemarrage(); // v6.0.1
-            return;
-        }
+        cv->Stats = std::vector<stats>(cv->NbToursStats);
+        cv->Stats[0].Definit();
     }
     if (!Pause) // v3.5 (Remplace !cv->TourCrt)
     {

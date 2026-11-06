@@ -21,7 +21,6 @@ TfrmDefFeuxPietons::TfrmDefFeuxPietons(TComponent *Owner) : TForm(Owner)
 {
     ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
     NbFeux = 0;
-    NumFeux = nullptr;
     // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
     frmSimulation->AffecteGlyphe(GLYPHE_SELF, SpeedButtonSelFeux->Glyph);
 }
@@ -52,16 +51,7 @@ bool TfrmDefFeuxPietons::RafraichitInfos()
                                                                 // C++Builder
     // Copie des listes de feux
     NbFeux = f->NbFeux;
-    if (NumFeux)
-    {
-        delete[] NumFeux;
-        NumFeux = nullptr;
-    }
-    if ((NbFeux != 0) && (!(NumFeux = new int[NbFeux])))
-    {
-        AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-        return false;
-    }
+    NumFeux = std::vector<int>(NbFeux);
     for (i = 0; i < NbFeux; i++)
     {
         NumFeux[i] = f->NumFeux[i];
@@ -181,16 +171,7 @@ bool TfrmDefFeuxPietons::AppliqueChoix()
 
     // Copie des listes de feux
     f->NbFeux = 0;
-    if (f->NumFeux)
-    {
-        delete[] f->NumFeux;
-        f->NumFeux = nullptr;
-    }
-    if ((NbFeux != 0) && (!(f->NumFeux = new int[NbFeux])))
-    {
-        AfficheMessage(asMemInsuff, asErrInattendue, tmErreur, 0, 0);
-        return false;
-    }
+    f->NumFeux = std::vector<int>(NbFeux);
     f->NbFeux = NbFeux;
     for (i = 0; i < NbFeux; i++)
     {

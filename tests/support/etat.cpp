@@ -198,11 +198,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         C(s, "TypeStats", cv->TypeStats);
         C(s, "graine", alea::Graine()); // état du générateur aléatoire
         s.FinObjet();
-        if (cv->Stats)
+        if (!cv->Stats.empty())
         {
             for (i = 0; i < cv->NbToursStats; i++)
             {
-                const stats *st = cv->Stats + i;
+                const stats *st = &cv->Stats[i];
                 s.Objet("stats", i);
                 C(s, "deplaces", st->NbVehiculesDeplaces);
                 C(s, "arrives", st->NbVehiculesArrives);
@@ -217,7 +217,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
     case peFeux:
         for (i = 0; i < cv->NbFeux; i++)
         {
-            const feu *f = cv->Feu + i;
+            const feu *f = &cv->Feu[i];
             s.Objet("feu", i + 1);
             C(s, "x", f->x);
             C(s, "y", f->y);
@@ -246,7 +246,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
     case peFeuxPietons:
         for (i = 0; i < cv->NbFeuxPieton; i++)
         {
-            const feu_pieton *f = cv->FeuP + i;
+            const feu_pieton *f = &cv->FeuP[i];
             s.Objet("feup", i + 1);
             CT(s, "x", f->x, NBFEUXPIETONSPARNUMERO);
             CT(s, "y", f->y, NBFEUXPIETONSPARNUMERO);
@@ -280,11 +280,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         break;
     case peVehicules:
-        if (cv->Vehicule)
+        if (!cv->Vehicule.empty())
         {
             for (i = 0; i < cv->NbVehicules; i++)
             {
-                const vehicule *v = cv->Vehicule + i;
+                const vehicule *v = &cv->Vehicule[i];
                 s.Objet("vehicule", i + 1);
                 C(s, "x", v->x);
                 C(s, "y", v->y);
@@ -309,11 +309,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         C(s, "y", cv->DepotBus.y);
         C(s, "NumDrnBusSorti", cv->DepotBus.NumDrnBusSorti);
         s.FinObjet();
-        if (cv->Bus)
+        if (!cv->Bus.empty())
         {
             for (i = 0; i < cv->NbBus; i++)
             {
-                const bus *b = cv->Bus + i;
+                const bus *b = &cv->Bus[i];
                 s.Objet("bus", i + 1);
                 C(s, "x", b->x);
                 C(s, "y", b->y);
@@ -336,7 +336,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         for (i = 0; i < cv->NbArretsBus; i++)
         {
-            const arret_bus *a = cv->ArretBus + i;
+            const arret_bus *a = &cv->ArretBus[i];
             s.Objet("arret_bus", i + 1);
             C(s, "x", a->x);
             C(s, "y", a->y);
@@ -357,11 +357,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         break;
     case peTrams:
-        if (cv->Tram)
+        if (!cv->Tram.empty())
         {
             for (i = 0; i < cv->NbTrams; i++)
             {
-                const tram *t = cv->Tram + i;
+                const tram *t = &cv->Tram[i];
                 s.Objet("tram", i + 1);
                 C(s, "x", t->x);
                 C(s, "y", t->y);
@@ -383,7 +383,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         for (i = 0; i < cv->NbArretsTram; i++)
         {
-            const arret_tram *a = cv->ArretTram + i;
+            const arret_tram *a = &cv->ArretTram[i];
             s.Objet("arret_tram", i + 1);
             C(s, "x", a->x);
             C(s, "y", a->y);
@@ -412,7 +412,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
             C(s, "NumFile", cv->PlaceTaxi[i].NumFile);
             s.FinObjet();
         }
-        if (cv->FileTaxi)
+        if (!cv->FileTaxi.empty())
         {
             for (i = 0; i < cv->NbFilesTaxi; i++)
             {
@@ -421,11 +421,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                 s.FinObjet();
             }
         }
-        if (cv->Taxi)
+        if (!cv->Taxi.empty())
         {
             for (i = 0; i < cv->NbTaxis; i++)
             {
-                const taxi *t = cv->Taxi + i;
+                const taxi *t = &cv->Taxi[i];
                 s.Objet("taxi", i + 1);
                 C(s, "Situation", t->Situation);
                 C(s, "x", t->x);
@@ -455,7 +455,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
             C(s, "NumFile", cv->PlacePark[i].NumFile);
             s.FinObjet();
         }
-        if (cv->FilePark)
+        if (!cv->FilePark.empty())
         {
             for (i = 0; i < cv->NbFilesPark; i++)
             {
@@ -474,11 +474,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
             C(s, "NumVehlibReserve", cv->PlaceVehlib[i].NumVehlibReserve);
             s.FinObjet();
         }
-        if (cv->Vehlib)
+        if (!cv->Vehlib.empty())
         {
             for (i = 0; i < cv->NbVehlibs; i++)
             {
-                const vehlib *v = cv->Vehlib + i;
+                const vehlib *v = &cv->Vehlib[i];
                 s.Objet("vehlib", i + 1);
                 C(s, "Situation", v->Situation);
                 C(s, "x", v->x);
@@ -497,11 +497,11 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         break;
     case pePietons:
-        if (cv->Pieton)
+        if (!cv->Pieton.empty())
         {
             for (i = 0; i < cv->NbPietons; i++)
             {
-                const pieton *p = cv->Pieton + i;
+                const pieton *p = &cv->Pieton[i];
                 s.Objet("pieton", i + 1);
                 C(s, "x", p->x);
                 C(s, "y", p->y);

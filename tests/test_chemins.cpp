@@ -215,7 +215,7 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
         std::vector<int> NumLigne;
         bool operator==(const arret &) const = default;
     };
-    const auto Arrets = [](auto *a, int n) {
+    const auto Arrets = [](const auto &a, int n) {
         std::vector<arret> l;
         l.reserve(static_cast<std::size_t>(n));
         for (int i = 0; i < n; i++)
@@ -292,7 +292,8 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
                     .x = cv->FeuP[i].x[0],
                     .y = cv->FeuP[i].y[0],
                     .Dir = cv->FeuP[i].Dir[0],
-                    .NumFeux = std::vector<int>(cv->FeuP[i].NumFeux, cv->FeuP[i].NumFeux + cv->FeuP[i].NbFeux),
+                    .NumFeux =
+                        std::vector<int>(cv->FeuP[i].NumFeux.begin(), cv->FeuP[i].NumFeux.begin() + cv->FeuP[i].NbFeux),
                 });
             }
             return l;

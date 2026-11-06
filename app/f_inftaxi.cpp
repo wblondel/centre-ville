@@ -76,7 +76,7 @@ void TfrmInfosTaxi::RafraichitInfos()
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumTaxi > 0)))
     {
-        Taxi = cv->Taxi + v->NumTaxi - 1;
+        Taxi = &cv->Taxi[v->NumTaxi - 1];
         LabelSituation->Caption = asSituation[Taxi->Situation];
         LabelDirection->Caption = asDir[Taxi->Dir];
         LabelNumeroFile->Caption = IntToStr(Taxi->NumFile + 1);

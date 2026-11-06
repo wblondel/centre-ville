@@ -87,7 +87,7 @@ void TfrmDefVoiePietons::RafraichitInfos()
     {
         if (v->NumFeuP[d - 1] != 0)
         {
-            feu_pieton *f = cv->FeuP + (v->NumFeuP[d - 1] - 1);
+            feu_pieton *f = &cv->FeuP[v->NumFeuP[d - 1] - 1];
             xfo[d - 1] = f->x[f->iFeuDir[InvDir[d] - 1]];
             yfo[d - 1] = f->y[f->iFeuDir[InvDir[d] - 1]];
         }

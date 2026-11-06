@@ -914,7 +914,7 @@ class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : clas
             QCOMPARE(cv->LigneBus[i].NbBus, 0);
             QCOMPARE(cv->LigneTram[i].NbTrams, 0);
         }
-        QVERIFY(!cv->Vehicule);
+        QVERIFY(cv->Vehicule.empty());
         QVERIFY(OctetsReseau() == Octets);
     }
     // Réseau de deux boucles à sens unique, chacune avec son parking, sans lien
@@ -4880,7 +4880,7 @@ void TestInterface::fichesInfos()
             Compare(e, "coordonnées", f->LabelCoordonnees->Caption, Coordonnees());
             if (v->NumVehicule > 0)
             {
-                vehicule *Veh = cv->Vehicule + v->NumVehicule - 1;
+                vehicule *Veh = &cv->Vehicule[v->NumVehicule - 1];
                 const char *Priorites[] = {"Normal", "Urgences", "Police"};
                 if (!f->RadioButtonVehiculeNumero->Checked || f->LabelDirection->isHidden())
                 {
@@ -4928,7 +4928,7 @@ void TestInterface::fichesInfos()
         SuitObjet(
             "véhicule", Ecart,
             [n](int &x, int &y) {
-                vehicule *Veh = cv->Vehicule + n - 1;
+                vehicule *Veh = &cv->Vehicule[n - 1];
                 x = Veh->x;
                 y = Veh->y;
                 return (x >= 0) && (y >= 0) && (cv->v[x][y].NumVehicule == n);
@@ -4951,7 +4951,7 @@ void TestInterface::fichesInfos()
             []() {
                 for (int i = 1; i < cv->NbBus; i++)
                 {
-                    if (cv->Bus[i].Defini() && (cv->Bus[i].TourDepartArretSvt != cv->Bus->TourDepartArretSvt))
+                    if (cv->Bus[i].Defini() && (cv->Bus[i].TourDepartArretSvt != cv->Bus[0].TourDepartArretSvt))
                     {
                         return true;
                     }
@@ -4960,7 +4960,7 @@ void TestInterface::fichesInfos()
             },
             2000));
         const int n = Trouve([](voie *v) {
-            return ((v->NumBus > 1) && (cv->Bus[v->NumBus - 1].TourDepartArretSvt != cv->Bus->TourDepartArretSvt))
+            return ((v->NumBus > 1) && (cv->Bus[v->NumBus - 1].TourDepartArretSvt != cv->Bus[0].TourDepartArretSvt))
                        ? v->NumBus
                        : 0;
         });
@@ -4972,7 +4972,7 @@ void TestInterface::fichesInfos()
             Compare(e, "coordonnées", f->LabelCoordonnees->Caption, Coordonnees());
             if (v->NumBus > 0)
             {
-                bus *b = cv->Bus + v->NumBus - 1;
+                bus *b = &cv->Bus[v->NumBus - 1];
                 if (!f->RadioButtonBusNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << "bus non affiché";
@@ -5032,7 +5032,7 @@ void TestInterface::fichesInfos()
             []() {
                 for (int i = 1; i < cv->NbTrams; i++)
                 {
-                    if (cv->Tram[i].Defini() && (cv->Tram[i].TourDepartArretSvt != cv->Tram->TourDepartArretSvt))
+                    if (cv->Tram[i].Defini() && (cv->Tram[i].TourDepartArretSvt != cv->Tram[0].TourDepartArretSvt))
                     {
                         return true;
                     }
@@ -5041,7 +5041,7 @@ void TestInterface::fichesInfos()
             },
             2000));
         const int n = Trouve([](voie *v) {
-            return ((v->NumTram > 1) && (cv->Tram[v->NumTram - 1].TourDepartArretSvt != cv->Tram->TourDepartArretSvt))
+            return ((v->NumTram > 1) && (cv->Tram[v->NumTram - 1].TourDepartArretSvt != cv->Tram[0].TourDepartArretSvt))
                        ? v->NumTram
                        : 0;
         });
@@ -5053,7 +5053,7 @@ void TestInterface::fichesInfos()
             Compare(e, "coordonnées", f->LabelCoordonnees->Caption, Coordonnees());
             if (v->NumTram > 0)
             {
-                tram *t = cv->Tram + v->NumTram - 1;
+                tram *t = &cv->Tram[v->NumTram - 1];
                 if (!f->RadioButtonTramNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << "tram non affiché";
@@ -5124,7 +5124,7 @@ void TestInterface::fichesInfos()
             Compare(e, "coordonnées", f->LabelCoordonnees->Caption, Coordonnees());
             if (v->NumTaxi > 0)
             {
-                taxi *t = cv->Taxi + v->NumTaxi - 1;
+                taxi *t = &cv->Taxi[v->NumTaxi - 1];
                 if (!f->RadioButtonTaxiNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << "taxi non affiché";
@@ -5183,7 +5183,7 @@ void TestInterface::fichesInfos()
             Compare(e, "coordonnées", f->LabelCoordonnees->Caption, Coordonnees());
             if (v->NumVehlib > 0)
             {
-                vehlib *l = cv->Vehlib + v->NumVehlib - 1;
+                vehlib *l = &cv->Vehlib[v->NumVehlib - 1];
                 if (!f->RadioButtonVehlibNumero->Checked || f->LabelDirection->isHidden())
                 {
                     e << "vehlib non affiché";
@@ -5525,7 +5525,7 @@ void TestInterface::fichePietonSuiviAilleurs()
     QVERIFY(f->isVisible() && r->isVisible());
     r->RadioButtonParking->Checked = true;
     const auto APied = [](int i) {
-        pieton *p = cv->Pieton + i;
+        pieton *p = &cv->Pieton[i];
         return p->Defini() && !p->NumBus && !p->NumTram && !p->NumTaxi && !p->NumVehlib &&
                (cv->v[p->x][p->y].NumPieton[0] == i + 1);
     };
@@ -5556,8 +5556,8 @@ void TestInterface::fichePietonSuiviAilleurs()
         f->RafraichitInfos();
         return Q(f->GroupBoxPieton->Caption);
     };
-    pieton *a = cv->Pieton + Autre - 1;
-    pieton *b = cv->Pieton + Suivi - 1;
+    pieton *a = &cv->Pieton[Autre - 1];
+    pieton *b = &cv->Pieton[Suivi - 1];
     const QString asAutre = Fiche(a->x, a->y); // Piéton de la case, rien n'étant suivi
     r->RadioButtonPieton->Checked = true;
     r->CSpinEditPieton->Value = Suivi;
@@ -7432,7 +7432,7 @@ void TestInterface::selectionCaseADeuxFeux()
     const int f2 = cv->v[12][8].NumFeu[sud - 1];
     const int Autre = cv->v[10][8].NumFeu[est - 1];
     QVERIFY((f1 > 0) && (f2 > 0) && (f1 != f2));
-    const auto Liste = [](int *NumFeux, int NbFeux) {
+    const auto Liste = [](const std::vector<int> &NumFeux, int NbFeux) {
         QList<int> l;
         for (int i = 0; i < NbFeux; i++)
         {
@@ -7942,7 +7942,7 @@ void TestInterface::ficheVehiculeNiveauxDePriorite()
         JoueTour();
         for (int i = 0; i < cv->NbVehicules; i++)
         {
-            vehicule *Veh = cv->Vehicule + i;
+            vehicule *Veh = &cv->Vehicule[i];
             if (!Veh->Defini() || Vus[Veh->NivPriorite])
             {
                 continue;
@@ -8998,7 +8998,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbParkings,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    parking *p = cv->Parking + k - 1;
+                    parking *p = &cv->Parking[k - 1];
                     if (!p->Defini())
                     {
                         return QString::fromUtf8("Parking n°%1 non utilisé").arg(k);
@@ -9015,7 +9015,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbFeux,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    feu *f = cv->Feu + k - 1;
+                    feu *f = &cv->Feu[k - 1];
                     if (!f->Defini())
                     {
                         return QString::fromUtf8("Feu n°%1 non utilisé").arg(k);
@@ -9032,7 +9032,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbArretsBus,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    arret_bus *a = cv->ArretBus + k - 1;
+                    arret_bus *a = &cv->ArretBus[k - 1];
                     if (!a->Defini())
                     {
                         return QString::fromUtf8("Arrêt de bus n°%1 non utilisé").arg(k);
@@ -9049,7 +9049,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbArretsTram,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    arret_tram *a = cv->ArretTram + k - 1;
+                    arret_tram *a = &cv->ArretTram[k - 1];
                     if (!a->Defini())
                     {
                         return QString::fromUtf8("Arrêt de tram n°%1 non utilisé").arg(k);
@@ -9066,7 +9066,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbPlacesTaxi,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    place_taxi *p = cv->PlaceTaxi + k - 1;
+                    place_taxi *p = &cv->PlaceTaxi[k - 1];
                     if (!p->Definie())
                     {
                         return QString::fromUtf8("Place de taxi n°%1 non utilisée").arg(k); // v6.0.2 : l'original
@@ -9085,7 +9085,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbFilesTaxi,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    place_taxi *p = cv->PlaceTaxi + cv->FileTaxi[k - 1].NumPlaceQueue;
+                    place_taxi *p = &cv->PlaceTaxi[cv->FileTaxi[k - 1].NumPlaceQueue];
                     x = p->x;
                     y = p->y;
                     return Trouve("file de taxis n°%1 trouvée en (%2, %3)", k, x, y);
@@ -9098,7 +9098,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbPlacesPark,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    place_park *p = cv->PlacePark + k - 1;
+                    place_park *p = &cv->PlacePark[k - 1];
                     if (!p->Definie())
                     {
                         return QString::fromUtf8("Place de parking n°%1 non utilisée").arg(k);
@@ -9115,7 +9115,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbFilesPark,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    place_park *p = cv->PlacePark + cv->FilePark[k - 1].NumPlaceQueue;
+                    place_park *p = &cv->PlacePark[cv->FilePark[k - 1].NumPlaceQueue];
                     x = p->x;
                     y = p->y;
                     return Trouve("file de parkings n°%1 trouvée en (%2, %3)", k, x, y);
@@ -9128,7 +9128,7 @@ void TestInterface::ficheRecherche()
             .Nb = cv->NbPlacesVehlib,
             .Attendu =
                 [Trouve](int k, int &x, int &y) {
-                    place_vehlib *p = cv->PlaceVehlib + k - 1;
+                    place_vehlib *p = &cv->PlaceVehlib[k - 1];
                     if (!p->Definie())
                     {
                         return QString::fromUtf8("Place de vehlib n°%1 non utilisée").arg(k);
@@ -9249,7 +9249,7 @@ void TestInterface::ficheRecherche()
             .Spin = r->CSpinEditVehicule,
             .Attendu =
                 [](int n, int &x, int &y, QString &t) {
-                    vehicule *v = cv->Vehicule + n - 1;
+                    vehicule *v = &cv->Vehicule[n - 1];
                     if (!v->Defini())
                     {
                         t = QString::fromUtf8("Véhicule n°%1 non utilisé").arg(n);
@@ -9276,7 +9276,7 @@ void TestInterface::ficheRecherche()
                 [](int n, int &x, int &y, QString &t) { // v6.0.2 : dans un véhicule, sa position et son numéro
                                                         // (l'original lisait cv->Bus pour un taxi et un vehlib, et ne
                                                         // cherchait pas dans les trams)
-                    pieton *p = cv->Pieton + n - 1;
+                    pieton *p = &cv->Pieton[n - 1];
                     if (p->Defini())
                     {
                         x = p->x;
@@ -9331,7 +9331,7 @@ void TestInterface::ficheRecherche()
             .Spin = r->CSpinEditBus,
             .Attendu =
                 [](int n, int &x, int &y, QString &t) {
-                    bus *b = cv->Bus + n - 1;
+                    bus *b = &cv->Bus[n - 1];
                     if (!b->Defini())
                     {
                         t = QString::fromUtf8("Bus n°%1 au dépôt").arg(n);
@@ -9356,7 +9356,7 @@ void TestInterface::ficheRecherche()
             .Spin = r->CSpinEditTram,
             .Attendu =
                 [](int n, int &x, int &y, QString &t) {
-                    tram *m = cv->Tram + n - 1;
+                    tram *m = &cv->Tram[n - 1];
                     if (!m->Defini())
                     {
                         t = QString::fromUtf8("Tram n°%1 non utilisé").arg(n);
@@ -9381,7 +9381,7 @@ void TestInterface::ficheRecherche()
             .Spin = r->CSpinEditTaxi,
             .Attendu =
                 [](int n, int &x, int &y, QString &t) {
-                    taxi *m = cv->Taxi + n - 1;
+                    taxi *m = &cv->Taxi[n - 1];
                     x = m->x;
                     y = m->y;
                     t = QString::fromUtf8("Taxi n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
@@ -9403,7 +9403,7 @@ void TestInterface::ficheRecherche()
             .Spin = r->CSpinEditVehlib,
             .Attendu =
                 [](int n, int &x, int &y, QString &t) {
-                    vehlib *m = cv->Vehlib + n - 1;
+                    vehlib *m = &cv->Vehlib[n - 1];
                     x = m->x;
                     y = m->y;
                     t = QString::fromUtf8("Vehlib n°%1 trouvé en (%2, %3)").arg(n).arg(x).arg(y);
@@ -9520,7 +9520,7 @@ void TestInterface::ficheRecherche()
     QVERIFY(QTest::qWaitFor([r]() { return QApplication::activeWindow() == r; }, 3000));
     Clique(r->RadioButtonParking);
     QVERIFY(r->CSpinEditParking->hasFocus());
-    parking *Dernier = cv->Parking + NbParkings - 1;
+    parking *Dernier = &cv->Parking[NbParkings - 1];
     QVERIFY(Dernier->Defini());
     QCOMPARE(Q(r->StatusBar->SimpleText),
              QString::fromUtf8("Parking n°%1 trouvé en (%2, %3)").arg(NbParkings).arg(Dernier->x).arg(Dernier->y));
@@ -9646,7 +9646,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                 [Position](voie *v, QPoint &p) {
                     if (v->NumBus)
                     {
-                        Position(cv->Bus + v->NumBus - 1, p);
+                        Position(&cv->Bus[v->NumBus - 1], p);
                     }
                     return v->NumBus;
                 },
@@ -9662,7 +9662,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                 [Position](voie *v, QPoint &p) {
                     if (v->NumArretBus)
                     {
-                        Position(cv->ArretBus + v->NumArretBus - 1, p);
+                        Position(&cv->ArretBus[v->NumArretBus - 1], p);
                     }
                     return v->NumArretBus;
                 },
@@ -9678,7 +9678,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                 [Position](voie *v, QPoint &p) {
                     if (v->NumTram)
                     {
-                        Position(cv->Tram + v->NumTram - 1, p);
+                        Position(&cv->Tram[v->NumTram - 1], p);
                     }
                     return v->NumTram;
                 },
@@ -9694,7 +9694,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                 [Position](voie *v, QPoint &p) {
                     if (v->NumArretTram)
                     {
-                        Position(cv->ArretTram + v->NumArretTram - 1, p);
+                        Position(&cv->ArretTram[v->NumArretTram - 1], p);
                     }
                     return v->NumArretTram;
                 },
@@ -9713,7 +9713,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                         return 0;
                     }
                     const int f = cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile;
-                    Position(cv->PlaceTaxi + cv->FileTaxi[f].NumPlaceQueue, p);
+                    Position(&cv->PlaceTaxi[cv->FileTaxi[f].NumPlaceQueue], p);
                     return f + 1;
                 },
         },
@@ -9731,7 +9731,7 @@ void TestInterface::rechercheSansDeplacerLeCurseur()
                         return 0;
                     }
                     const int f = cv->PlacePark[v->NumPlacePark - 1].NumFile;
-                    Position(cv->PlacePark + cv->FilePark[f].NumPlaceQueue, p);
+                    Position(&cv->PlacePark[cv->FilePark[f].NumPlaceQueue], p);
                     return f + 1;
                 },
         },
@@ -9853,7 +9853,7 @@ void TestInterface::rechercheMessagesDeChaqueElement()
         int *x, *y; // position de l'élément n°1, forcée à (-1, -1) (nul : pas de vérification)
         const char *NonUtilise;
     };
-    pieton *p1 = cv->Pieton;
+    pieton *p1 = cv->Pieton.empty() ? nullptr : cv->Pieton.data();
     const std::vector<Element> Elements = {
         {.Numero = r->CSpinEditParking,
          .Nb = cv->NbParkings,

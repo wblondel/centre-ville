@@ -7,6 +7,7 @@
 // #pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2) // portage : pragma C++Builder neutralisé
 //---------------------------------------------------------------------------
 #include <array>
+#include <vector>
 #include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
 #include "compat/temps.h"  // portage : remplace <systdate.h> (TDateTime, Time)
 //---------------------------------------------------------------------------
@@ -506,8 +507,7 @@ public:
 //---------------------------------------------------------------------------
 class feu
 {
-    bool CopieEnCours; // v5.1
-    int Numero;        // v5.1 : devenu public
+    int Numero; // v5.1 : devenu public
 public:
     feu(const feu &) = delete;
     feu &operator=(const feu &) = delete;
@@ -517,11 +517,11 @@ public:
         NbFeuxAtt{}, // Nbre de feux devant être rouge pour que celui-ci (this) passe au vert
         NbFeuxPtn{}, // Nbre de feux piétons liés (v5.2). ATTENTION: défini au lancement de la simulation car le lien
                      // est établi depuis les feux de piétons.
-        *NumFeuxDmd, // Liste des feux demandant le rouge
-        *NumFeuxAtt, // Liste des feux devant être rouge pour que celui-ci (this) passe au vert
-        *NumFeuxPtn, // Liste des feux de piétons (v5.2). ATTENTION: définie au lancement de la simulation car le lien
-                     // est établi depuis les feux de piétons.
         DureeRouge{}, DureeVert{}, TourDrnChgEtat{}; // Tour du dernier changement d'état
+    std::vector<int> NumFeuxDmd,                     // Liste des feux demandant le rouge (NbFeuxDmd premiers)
+        NumFeuxAtt, // Liste des feux devant être rouge pour que celui-ci (this) passe au vert (NbFeuxAtt premiers)
+        NumFeuxPtn; // Liste des feux de piétons (v5.2), NbFeuxPtn premiers. ATTENTION: définie au lancement de la
+                    // simulation car le lien est établi depuis les feux de piétons.
     dmd_vert TypeDmdVert{};   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
     psg_rouge TypePsgRouge{}; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
     bool DemandeVert{},       // Indique qu'il demande le rouge (à ceux qui ont Numero dans FeuxDmd[])
@@ -546,12 +546,9 @@ public:
     {
         Numero = 0;
         Initialise();
-        NumFeuxPtn = NumFeuxDmd = NumFeuxAtt = nullptr;
-        CopieEnCours = false; /*v5.1*/
-    } // v3.8.2 (NULL) v5.2 (NumFeuP)
-    void Copie(feu *f) // v5.1
+    }
+    void Copie(feu *f) // v5.1 (f est ensuite détruit : ses listes lui sont prises)
     {
-        f->CopieEnCours = true;
         Numero = f->Numero;
         x = f->x;
         y = f->y;
@@ -561,9 +558,9 @@ public:
         NbFeuxDmd = f->NbFeuxDmd;
         NbFeuxAtt = f->NbFeuxAtt;
         NbFeuxPtn = f->NbFeuxPtn; // v5.2
-        NumFeuxDmd = f->NumFeuxDmd;
-        NumFeuxAtt = f->NumFeuxAtt;
-        NumFeuxPtn = f->NumFeuxPtn; // v5.2
+        NumFeuxDmd = std::move(f->NumFeuxDmd);
+        NumFeuxAtt = std::move(f->NumFeuxAtt);
+        NumFeuxPtn = std::move(f->NumFeuxPtn); // v5.2
         DureeRouge = f->DureeRouge;
         DureeVert = f->DureeVert;
         TourDrnChgEtat = f->TourDrnChgEtat;
@@ -583,27 +580,6 @@ public:
         Dir = Dir0;
         Etat = inactif;
     }
-    ~feu()
-    {
-        if (!CopieEnCours) // v5.1
-        {
-            if (NbFeuxDmd != 0)
-            {
-                delete[] NumFeuxDmd;
-                NumFeuxDmd = nullptr;
-            }
-            if (NbFeuxAtt != 0)
-            {
-                delete[] NumFeuxAtt;
-                NumFeuxAtt = nullptr;
-            }
-            if (NbFeuxPtn != 0)
-            {
-                delete[] NumFeuxPtn;
-                NumFeuxPtn = nullptr;
-            } // v5.2
-        }
-    }
     [[nodiscard]] bool Defini() const { return (x > -1) && (y > -1) && (Dir > aucune); }
     void AjouteFeuDmd(int NumNvFeu);
     void AjouteFeuAtt(int NumNvFeu);
@@ -620,7 +596,6 @@ public:
 //---------------------------------------------------------------------------
 class feu_pieton // v5.2
 {
-    bool CopieEnCours;
     int Numero;
 
 public:
@@ -633,10 +608,10 @@ public:
                           // fonction de la direction Attention à l'accès : iFeuDir[(direction)d-1]
     etat_feu Etat{}, ProchainEtat{};
     int NbFeux{},                                    // Nbre de feux de circulation liés
-        *NumFeux,                                    // Liste des feux de circulation liés
         DureeRouge{}, DureeVert{}, DureeTraversee{}, // Soit 1+2*Cases Passage piéton. Défini quand le feu opposé est
                                                      // placé
         TourDrnChgEtat{};                            // Tour du dernier changement d'état
+    std::vector<int> NumFeux;                        // Liste des feux de circulation liés (NbFeux premiers)
     dmd_vert TypeDmdVert{};   // Type de demande du vert : dès l'arrivée d'un vehicule ou dès le passage au rouge
     psg_rouge TypePsgRouge{}; // Type de passage au rouge : dès la première demande ou à l'unanimité des feux demandeurs
     bool DemandeVert{},       // Indique qu'il demande le rouge (à ceux qui ont Numero dans NumFeuxPtn[])
@@ -649,10 +624,8 @@ public:
     {
         Numero = 0;
         Initialise();
-        NumFeux = nullptr;
-        CopieEnCours = false;
     }
-    void Copie(feu_pieton *f);
+    void Copie(feu_pieton *f); // f est ensuite détruit : sa liste lui est prise
     void AffecteNumero(int Num) { Numero = Num; }
     void Definit(int x0, int y0, int Dir0)
     {
@@ -662,15 +635,7 @@ public:
         Etat = inactif;
     }
     void DefinitFeuOppose();
-    ~feu_pieton()
-    {
-        if ((!CopieEnCours) && (NbFeux != 0)) // v5.1
-        {
-            delete[] NumFeux;
-            NumFeux = nullptr;
-        }
-    }
-    bool Defini()
+    [[nodiscard]] bool Defini() const
     {
         return (x[0] > -1) && (y[0] > -1) && (Dir[0] > aucune) && (x[1] > -1) && (y[1] > -1) && (Dir[1] > aucune);
     }
@@ -1539,26 +1504,26 @@ public:
     // Case voisine dans la direction d, ou à n cases dans la direction d, sur le tore (macros V, _V, V_, _V_)
     [[nodiscard]] voie &Voisine(int x, int y, int d) const;
     [[nodiscard]] voie &Voisine(int x, int y, int n, int d) const;
-    feu *Feu;                                 // Tableau de feux
-    feu_pieton *FeuP;                         // v5.2 Tableau de feux piéton
-    parking *Parking;                         // Tableau des parkings
-    vehicule *Vehicule;                       // Tableau de voitures
-    vehlib *Vehlib;                           // v5.3. Tableau de vehlib
-    bus *Bus;                                 // v3.0. Tableau de bus
-    tram *Tram;                               // v3.5. Tableau de trams
-    pieton *Pieton;                           // v2.0. Tableau de piétons
+    std::vector<feu> Feu;                     // Tableau de feux
+    std::vector<feu_pieton> FeuP;             // v5.2 Tableau de feux piéton
+    std::vector<parking> Parking;             // Tableau des parkings
+    std::vector<vehicule> Vehicule;           // Tableau de voitures
+    std::vector<vehlib> Vehlib;               // v5.3. Tableau de vehlib
+    std::vector<bus> Bus;                     // v3.0. Tableau de bus
+    std::vector<tram> Tram;                   // v3.5. Tableau de trams
+    std::vector<pieton> Pieton;               // v2.0. Tableau de piétons
     depot_bus DepotBus;                       // v3.0 : Attention INSTANCE STATIQUE car Dépôt unique !
-    arret_bus *ArretBus;                      // v3.0. Tableau d'arrêts de bus
+    std::vector<arret_bus> ArretBus;          // v3.0. Tableau d'arrêts de bus
     ligne_bus LigneBus[NBMAXLIGNESBUSTRAM];   // v3.0. Tableau (statique) de lignes de bus
-    arret_tram *ArretTram;                    // v3.5. Tableau d'arrêts de tram
+    std::vector<arret_tram> ArretTram;        // v3.5. Tableau d'arrêts de tram
     ligne_tram LigneTram[NBMAXLIGNESBUSTRAM]; // v3.5. Tableau (statique) de lignes de tram
-    taxi *Taxi;                               // v3.6. Tableau de taxis
-    place_taxi *PlaceTaxi;                    // v3.6. Tableau de places de taxis
-    file_taxi *FileTaxi;                      // v3.6. Tableau de files de taxi
-    place_park *PlacePark;                    // v5.0. Tableau de places de parking
-    file_park *FilePark;                      // v5.0. Tableau de files de parkings
-    place_vehlib *PlaceVehlib;                // v5.3. Tableau de places de vehlib
-    stats *Stats;                             // Tableau de statistiques
+    std::vector<taxi> Taxi;                   // v3.6. Tableau de taxis
+    std::vector<place_taxi> PlaceTaxi;        // v3.6. Tableau de places de taxis
+    std::vector<file_taxi> FileTaxi;          // v3.6. Tableau de files de taxi
+    std::vector<place_park> PlacePark;        // v5.0. Tableau de places de parking
+    std::vector<file_park> FilePark;          // v5.0. Tableau de files de parkings
+    std::vector<place_vehlib> PlaceVehlib;    // v5.3. Tableau de places de vehlib
+    std::vector<stats> Stats;                 // Tableau de statistiques
     void CreeZone();                          // v4.0 (allocation dynamique si NbX*NbY>0)
     void RetablitVoisinages() const; // v6.0.2 : dx et dy (globales) suivent le dernier réseau créé : à rappeler quand
                                      // on revient à un réseau existant
@@ -1586,7 +1551,7 @@ public:
     [[nodiscard]] int NumeroFeuLibre() const;
     [[nodiscard]] int NumeroFeuPietonsLibre() const; // v5.2
     [[nodiscard]] int NumeroParkingLibre() const;
-    [[nodiscard]] int ArretBusExistant(int x, int y) const;  // v3.0
+    [[nodiscard]] int ArretBusExistant(int x, int y);        // v3.0
     [[nodiscard]] int ArretTramExistant(int x, int y) const; // v3.5
     int NumeroArretBusLibre(int x, int y);                   // v3.0
     int NumeroArretTramLibre(int x, int y);                  // v3.5
@@ -1667,7 +1632,7 @@ public:
     void DeplacePieton(int NumPieton, int x, int y, direction d); // v2.0
     bool ChangeDirectionSiPossible(int x, int y, dirposs dp);
     void CalculeDistances();
-    void RessuscitePietons() const;                                                 // v4.3.1
+    void RessuscitePietons();                                                       // v4.3.1
     void PlaceVehiculesSurPlacesPark();                                             // v5.0
     [[nodiscard]] bool ExisteFeuPietons(int x, int y) const;                        // v5.2
     void PrepareFeuxPietons();                                                      // v5.2
@@ -1677,12 +1642,12 @@ public:
     bool Charge(int hfile);
     bool Sauve(int hfile);
     void Verifie(AnsiString &asMsgErr);
-    [[nodiscard]] inline bool TourDeDeplacementVehicule(int NumeroVehicule) const;
-    [[nodiscard]] inline bool TourDeDeplacementVehlib(int NumeroVehlib) const;
-    [[nodiscard]] inline bool TourDeDeplacementBus(int NumeroBus) const;
-    [[nodiscard]] inline bool TourDeDeplacementTram(int NumeroTram) const; // v3.5
-    [[nodiscard]] inline bool TourDeDeplacementTaxi(int NumeroTaxi) const; // v3.6
-    void TopChrono()                                                       // v3.9.2
+    [[nodiscard]] inline bool TourDeDeplacementVehicule(int NumeroVehicule);
+    [[nodiscard]] inline bool TourDeDeplacementVehlib(int NumeroVehlib);
+    [[nodiscard]] inline bool TourDeDeplacementBus(int NumeroBus);
+    [[nodiscard]] inline bool TourDeDeplacementTram(int NumeroTram); // v3.5
+    [[nodiscard]] inline bool TourDeDeplacementTaxi(int NumeroTaxi); // v3.6
+    void TopChrono()                                                 // v3.9.2
     {
         dtTop = Time();
     }
@@ -1765,7 +1730,6 @@ inline voie &centre_ville::Voisine(int x, int y, int n, int d) const
 extern void AppelleAuChaos();
 //---------------------------------------------------------------------------
 // v5.4 : conversion BCB6>BCBX (extern après template)
-// extern template <class E> int IncrementeNombre(E **e, int &n); // v5.1
-template <class E> extern int IncrementeNombre(E **e, int &n);
+template <class E> extern int IncrementeNombre(std::vector<E> &e, int &n); // v5.1
 //---------------------------------------------------------------------------
 #endif

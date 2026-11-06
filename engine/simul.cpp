@@ -280,53 +280,29 @@ int SvgNbPlacesTaxi = 0; // v3.6
 //---------------------------------------------------------------------------
 centre_ville *cv = nullptr;
 //-----------------------------------------------------------------------------
-template <class E> int IncrementeNombre(E **e, int &n) // v5.1
+template <class E> int IncrementeNombre(std::vector<E> &e, int &n) // v5.1
 {
-    E *ee = new E[n + 1];
+    std::vector<E> ee(static_cast<std::size_t>(n) + 1);
     for (int i = 0; i < n; i++)
     {
-        ee[i].Copie((*e) + i); // Effectue la copie des membres et affecte CopieEnCours=true pour
+        ee[i].Copie(&e[i]); // Effectue la copie des membres (les listes passent au nouvel élément)
     }
     ee[n].AffecteNumero(n + 1); // v5.2 (oubli)
     ee[n].Initialise();         // v5.2 (oubli)
-    delete[] *e;                // ...empêcher de désallouer les instances membres lors de l'appel à delete[] e
-    *e = ee;
+    e = std::move(ee);
     return ++n;
 }
-// portage : instanciation explicite pour f_carfours.cpp (IncrementeNombre(&(cv->Feu), ...)) ;
+// portage : instanciation explicite pour f_carfours.cpp (IncrementeNombre(cv->Feu, ...)) ;
 // sans elle, l'optimiseur peut ne garder aucune copie appelable de l'instance implicite
-template int IncrementeNombre<feu>(feu **e, int &n);
+template int IncrementeNombre<feu>(std::vector<feu> &e, int &n);
 //-----------------------------------------------------------------------------
 /* Conditions d'utilisation
-1. Exemple d'appel :  IncrementeNombre(&Feu, NbFeux)
+1. Exemple d'appel :  IncrementeNombre(Feu, NbFeux)
 2. La classe E doit avoir les définitions suivantes :
-
-class E
- {
-  bool CopieEnCours; // v5.1 (Si des propriétés sont des références)
-  [...]
-  E()
-   {
-    [..]
-    CopieEnCours=false; // v5.1 (Si des propriétés sont des références)
-   };
-  void Copie(E *e) // v5.1
-   {
-    Numero=n;
-    e->CopieEnCours=true; // (Si des propriétés sont des références)
-    p1=f->p1;
-    [...]
-    pn=f->pn;
-   };
-  ~E()
-   {
-    if (!CopieEnCours) // v5.1 (Si des propriétés sont des références)
-     {
-      if (pa) delete[] pa;
-      [...]
-      if (pz) delete[] pz;
-     }
-   }
+   - un constructeur par défaut, AffecteNumero(int) et Initialise() ;
+   - Copie(E *e), qui reprend les membres de e ; e est détruit juste après, ses listes
+     (std::vector) peuvent lui être prises par std::move (6.0.17 : l'original partageait
+     des pointeurs, protégés par un drapeau CopieEnCours).
 */
 //---------------------------------------------------------------------------
 void AppelleAuChaos()
@@ -627,80 +603,75 @@ bool pieton::DoitSuccomber() const
 void feu::AjouteFeuDmd(int NumNvFeu)
 {
     int i = 0;
-    int *NvNumFeuxDmd = nullptr;
+    std::vector<int> NvNumFeuxDmd;
     NbFeuxDmd++;
-    NvNumFeuxDmd = new int[NbFeuxDmd];
+    NvNumFeuxDmd = std::vector<int>(NbFeuxDmd);
     for (i = 0; i < NbFeuxDmd - 1; i++)
     {
         NvNumFeuxDmd[i] = NumFeuxDmd[i];
     }
     NvNumFeuxDmd[NbFeuxDmd - 1] = NumNvFeu;
-    delete[] NumFeuxDmd;
-    NumFeuxDmd = NvNumFeuxDmd;
+    NumFeuxDmd = std::move(NvNumFeuxDmd);
 }
 //-----------------------------------------------------------------------------
 void feu::AjouteFeuAtt(int NumNvFeu)
 {
     int i = 0;
-    int *NvNumFeuxAtt = nullptr;
+    std::vector<int> NvNumFeuxAtt;
     NbFeuxAtt++;
-    NvNumFeuxAtt = new int[NbFeuxAtt];
+    NvNumFeuxAtt = std::vector<int>(NbFeuxAtt);
     for (i = 0; i < NbFeuxAtt - 1; i++)
     {
         NvNumFeuxAtt[i] = NumFeuxAtt[i];
     }
     NvNumFeuxAtt[NbFeuxAtt - 1] = NumNvFeu;
-    delete[] NumFeuxAtt;
-    NumFeuxAtt = NvNumFeuxAtt;
+    NumFeuxAtt = std::move(NvNumFeuxAtt);
 }
 //-----------------------------------------------------------------------------
 void feu::AjouteFeuPtn(int NumNvFeu) // v5.2
 {
     int i = 0;
-    int *NvNumFeuxPtn = nullptr;
+    std::vector<int> NvNumFeuxPtn;
     NbFeuxPtn++;
-    NvNumFeuxPtn = new int[NbFeuxPtn];
+    NvNumFeuxPtn = std::vector<int>(NbFeuxPtn);
     for (i = 0; i < NbFeuxPtn - 1; i++)
     {
         NvNumFeuxPtn[i] = NumFeuxPtn[i];
     }
     NvNumFeuxPtn[NbFeuxPtn - 1] = NumNvFeu;
-    delete[] NumFeuxPtn;
-    NumFeuxPtn = NvNumFeuxPtn;
+    NumFeuxPtn = std::move(NvNumFeuxPtn);
 }
 //-----------------------------------------------------------------------------
 void feu::RetireFeuDmd(int NumFeu) // NumFeu(>0) doit être dans NumFeuxDmd[]
 {
     int i = 0;
     int Trv = 0;
-    int *NvNumFeuxDmd = nullptr;
+    std::vector<int> NvNumFeuxDmd;
     if ((--NbFeuxDmd) != 0)
     {
-        NvNumFeuxDmd = new int[NbFeuxDmd];
+        NvNumFeuxDmd = std::vector<int>(NbFeuxDmd);
         for (i = 0; i < NbFeuxDmd; i++)
         {
             NvNumFeuxDmd[i] = NumFeuxDmd[i + (Trv |= static_cast<int>(NumFeuxDmd[i] == NumFeu))];
         }
     }
-    delete[] NumFeuxDmd;
-    NumFeuxDmd = NvNumFeuxDmd;
+    NumFeuxDmd = std::move(NvNumFeuxDmd);
 }
 //-----------------------------------------------------------------------------
 void feu::RetireFeuAtt(int NumFeu) // NumFeu(>0) doit être dans NumFeuxAtt[]
 {
     int i = 0;
     int Trv = 0;
-    int *NvNumFeuxAtt = nullptr;
+    std::vector<int> NvNumFeuxAtt;
     if ((--NbFeuxAtt) != 0)
     {
-        NvNumFeuxAtt = new int[NbFeuxAtt];
+        NvNumFeuxAtt = std::vector<int>(NbFeuxAtt);
         for (i = 0; i < NbFeuxAtt; i++)
         {
             NvNumFeuxAtt[i] = NumFeuxAtt[i + (Trv |= static_cast<int>(NumFeuxAtt[i] == NumFeu))];
         }
     }
-    delete[] NumFeuxAtt;
-    NumFeuxAtt = NvNumFeuxAtt;
+    NumFeuxAtt = std::move(NvNumFeuxAtt);
 }
 //-----------------------------------------------------------------------------
 void feu::ChangeEtat()
@@ -907,11 +878,11 @@ bool feu::Charge(int hfile)
     {
         if (NbFeuxDmd != 0)
         {
-            Ok = !((NumFeuxDmd = new int[NbFeuxDmd]) == nullptr);
+            NumFeuxDmd = std::vector<int>(NbFeuxDmd);
         }
         if (NbFeuxAtt != 0)
         {
-            Ok = !((NumFeuxAtt = new int[NbFeuxAtt]) == nullptr);
+            NumFeuxAtt = std::vector<int>(NbFeuxAtt);
         }
         // v5.2 : /!\ On ne charge pas les feux de piétons
     }
@@ -1058,7 +1029,6 @@ void feu_pieton::Initialise() // v5.2
 //-----------------------------------------------------------------------------
 void feu_pieton::Copie(feu_pieton *f) // v5.2
 {
-    f->CopieEnCours = true;
     Numero = f->Numero;
     for (int i = 0; i < NBFEUXPIETONSPARNUMERO; i++)
     {
@@ -1073,7 +1043,7 @@ void feu_pieton::Copie(feu_pieton *f) // v5.2
     Etat = f->Etat;
     ProchainEtat = f->ProchainEtat;
     NbFeux = f->NbFeux;
-    NumFeux = f->NumFeux;
+    NumFeux = std::move(f->NumFeux);
     DureeRouge = f->DureeRouge;
     DureeVert = f->DureeVert;
     DureeTraversee = f->DureeTraversee;
@@ -1111,33 +1081,31 @@ void feu_pieton::DefinitFeuOppose()
 void feu_pieton::AjouteFeu(int NumNvFeu) // v5.2
 {
     int i = 0;
-    int *NvNumFeux = nullptr;
+    std::vector<int> NvNumFeux;
     NbFeux++;
-    NvNumFeux = new int[NbFeux];
+    NvNumFeux = std::vector<int>(NbFeux);
     for (i = 0; i < NbFeux - 1; i++)
     {
         NvNumFeux[i] = NumFeux[i];
     }
     NvNumFeux[NbFeux - 1] = NumNvFeu;
-    delete[] NumFeux;
-    NumFeux = NvNumFeux;
+    NumFeux = std::move(NvNumFeux);
 }
 //-----------------------------------------------------------------------------
 void feu_pieton::RetireFeu(int NumFeu) // //v5.2
 {
     int i = 0;
     int Trv = 0;
-    int *NvNumFeux = nullptr;
+    std::vector<int> NvNumFeux;
     if ((--NbFeux) != 0)
     {
-        NvNumFeux = new int[NbFeux];
+        NvNumFeux = std::vector<int>(NbFeux);
         for (i = 0; i < NbFeux; i++)
         {
             NvNumFeux[i] = NumFeux[i + (Trv |= static_cast<int>(NumFeux[i] == NumFeu))];
         }
     }
-    delete[] NumFeux;
-    NumFeux = NvNumFeux;
+    NumFeux = std::move(NvNumFeux);
 }
 //-----------------------------------------------------------------------------
 void feu_pieton::ChangeEtat()
@@ -1185,7 +1153,7 @@ bool feu_pieton::PietonAttend()
         {
             if ((NumPieton = cv->v[x[i]][y[i]].NumPieton[j]) != 0)
             {
-                pieton *p = cv->Pieton + (NumPieton - 1);
+                pieton *p = &cv->Pieton[NumPieton - 1];
                 Attend = p->PsgPtTrv && (p->Dir == Dir[i]); // Le piéton attend dans le sens du feu piéton.
             }
         }
@@ -1302,7 +1270,7 @@ bool feu_pieton::Charge(int hfile)
     Ok = Ok && NombreCredible(NbFeux); // v6.0.2
     if (Ok && (NbFeux != 0))
     {
-        Ok = !((NumFeux = new int[NbFeux]) == nullptr);
+        NumFeux = std::vector<int>(NbFeux);
     }
 
     for (i = 0; Ok && (i < NbFeux); i++)
@@ -1888,7 +1856,7 @@ void vehlib::FaitDescendrePietons()
         pieton *p = nullptr;
         for (i = 0; i < cv->NbPietons; i++)
         {
-            p = cv->Pieton + i;
+            p = &cv->Pieton[i];
             if (p->NumVehlib == Numero)
             {
                 v->FaitDescendrePieton(static_cast<direction>(d), i);
@@ -1915,7 +1883,7 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
     {
         NumPlace = alea::Rand() % cv->NbPlacesVehlib;
     } while ((NumPlace + 1 == NumPlaceDepart) || (!cv->PlaceVehlib[NumPlace].EstLibre()));
-    place_vehlib *pv = cv->PlaceVehlib + NumPlace;
+    place_vehlib *pv = &cv->PlaceVehlib[NumPlace];
     const int xp = pv->x;
     const int yp = pv->y;
     pv->NumVehlibReserve = Numero;
@@ -1926,7 +1894,7 @@ bool vehlib::ReservePlaceVehlibCible() // v6.0.1 : renvoie false (sans tirage) s
 //-----------------------------------------------------------------------------
 void vehlib::FaitMonterPieton(int NumPietonAFaireMonter)
 {
-    pieton *p = cv->Pieton + NumPietonAFaireMonter;
+    pieton *p = &cv->Pieton[NumPietonAFaireMonter];
     const int xp = p->x;
     const int yp = p->y;
     if ((NbPersonnes < cv->NbMaxPersonnesVehlib) &&
@@ -1951,7 +1919,7 @@ int vehlib::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui atten
             v = &cv->Voisine(x, y, d);
             for (int i = 0; (NbPersonnes <= cv->NbMaxPersonnesVehlib) && (i < NBMAXPIETONSPARCASE); i++)
             {
-                if ((v->NumPieton[i] != 0) && (p = cv->Pieton + v->NumPieton[i] - 1)->AttendVehlib &&
+                if ((v->NumPieton[i] != 0) && (p = &cv->Pieton[v->NumPieton[i] - 1])->AttendVehlib &&
                     (p->NumPlaceVehlib == NumPlaceDepart))
                 {
                     FaitMonterPieton(v->NumPieton[i] - 1);
@@ -2028,7 +1996,7 @@ void depot_bus::Verifie(AnsiString &asMsgErr) const // v3.03
 //-----------------------------------------------------------------------------
 void bus::FaitMonterPieton(int NumPietonAFaireMonter) // v3.0
 {
-    pieton *p = cv->Pieton + NumPietonAFaireMonter;
+    pieton *p = &cv->Pieton[NumPietonAFaireMonter];
     const int xp = p->x;
     const int yp = p->y;
     if (NbPersonnes < cv->NbMaxPersonnesBus)
@@ -2048,7 +2016,7 @@ void bus::FaitMonterEtDescendre() // v3.0
     pieton *p = nullptr;
     for (i = 0; i < cv->NbPietons; i++)
     {
-        p = cv->Pieton + i;
+        p = &cv->Pieton[i];
         if ((p->NumBus == Numero) &&
             (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretBusDmd > (alea::Rand() % 100)))))
         {
@@ -2383,7 +2351,7 @@ void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
 //-----------------------------------------------------------------------------
 void tram::FaitMonterPieton(int NumPietonAFaireMonter) // v3.5
 {
-    pieton *p = cv->Pieton + NumPietonAFaireMonter;
+    pieton *p = &cv->Pieton[NumPietonAFaireMonter];
     const int xp = p->x;
     const int yp = p->y;
     if (NbPersonnes < cv->NbMaxPersonnesTram)
@@ -2403,7 +2371,7 @@ void tram::FaitMonterEtDescendre() // v3.5
     pieton *p = nullptr;
     for (i = 0; i < cv->NbPietons; i++)
     {
-        p = cv->Pieton + i;
+        p = &cv->Pieton[i];
         if ((p->NumTram == Numero) &&
             (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTramDmd > (alea::Rand() % 100)))))
         {
@@ -3014,7 +2982,7 @@ void taxi::FaitDescendrePietons()
     pieton *p = nullptr;
     for (i = 0; i < cv->NbPietons; i++)
     {
-        p = cv->Pieton + i;
+        p = &cv->Pieton[i];
         if ((p->NumTaxi == Numero) &&
             (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTaxiDmd > (alea::Rand() % 100)))))
         {
@@ -3025,7 +2993,7 @@ void taxi::FaitDescendrePietons()
 //-----------------------------------------------------------------------------
 void taxi::FaitMonterPieton(int NumPietonAFaireMonter)
 {
-    pieton *p = cv->Pieton + NumPietonAFaireMonter;
+    pieton *p = &cv->Pieton[NumPietonAFaireMonter];
     const int xp = p->x;
     const int yp = p->y;
     if (NbPersonnes < cv->NbMaxPersonnesTaxi)
@@ -3046,7 +3014,7 @@ int taxi::NbPietonsQuiSontMontes() // retourne le nombre de piétons qui attenda
         v = &cv->Voisine(x, y, d);
         for (int i = 0; (NbPersonnes <= cv->NbMaxPersonnesTaxi) && (i < NBMAXPIETONSPARCASE); i++)
         {
-            if ((v->NumPieton[i] != 0) && (p = cv->Pieton + v->NumPieton[i] - 1)->AttendTaxi &&
+            if ((v->NumPieton[i] != 0) && (p = &cv->Pieton[v->NumPieton[i] - 1])->AttendTaxi &&
                 (p->NumFileTaxi - 1 == NumFile))
             {
                 FaitMonterPieton(v->NumPieton[i] - 1);
@@ -3869,7 +3837,7 @@ bool voie::FaitDescendrePieton(direction DirDescente, int NumPietonAFaireDescend
     if ((NbPietons < NBMAXPIETONSPARCASE) && PietonPeutAller(DirDescente))
     {
         AjoutePieton(NumPietonAFaireDescendre);
-        p = cv->Pieton + NumPietonAFaireDescendre;
+        p = &cv->Pieton[NumPietonAFaireDescendre];
         if (p->NumBus != 0) // v3.5
         {
             cv->Bus[p->NumBus - 1].NbPersonnes--;
@@ -5202,30 +5170,30 @@ centre_ville::centre_ville(bool NbElementsParDefaut, int NbX, int NbY) // v4.0 (
     VerifOk = DistancesCalculees = QuadrillageStats = false;
     NbFilesPark = NbPlacesPark = 0L; // v5.0
     NbVehlibs = NbPlacesVehlib = 0L; // v5.3. v6.0.1 : NbVehlibs (indéterminé pour un fichier antérieur à 0x530)
-    Feu = nullptr;
-    FeuP = nullptr; // v6.0.1 : indéterminé sans feux de piétons (libéré par IncrementeNombre au premier ajout)
-    Parking = nullptr;
-    Vehicule = nullptr;
-    Vehlib = nullptr; // v5.3
-    Bus = nullptr;    // v3.0
-    Tram = nullptr;   // v3.5
-    Pieton = nullptr; // v2.0
-    Stats = nullptr;
-    ArretBus = nullptr;    // v3.0
-    NbLignesBus = 0;       // v3.0
-    NbArretsBus = 0;       // v3.0
-    ArretTram = nullptr;   // v3.5
-    NbLignesTram = 0;      // v3.5
-    NbArretsTram = 0;      // v3.5
-    NbTaxis = 0;           // v3.6
-    NbPlacesTaxi = 0;      // v3.6
-    NbFilesTaxi = 0;       // v3.6
-    Taxi = nullptr;        // v3.6
-    PlaceTaxi = nullptr;   // v3.6
-    FileTaxi = nullptr;    // v3.6
-    PlacePark = nullptr;   // v5.0
-    FilePark = nullptr;    // v5.0
-    PlaceVehlib = nullptr; // v5.3
+    Feu.clear();
+    FeuP.clear(); // v6.0.1 : indéterminé sans feux de piétons (libéré par IncrementeNombre au premier ajout)
+    Parking.clear();
+    Vehicule.clear();
+    Vehlib.clear(); // v5.3
+    Bus.clear();    // v3.0
+    Tram.clear();   // v3.5
+    Pieton.clear(); // v2.0
+    Stats.clear();
+    ArretBus.clear();    // v3.0
+    NbLignesBus = 0;     // v3.0
+    NbArretsBus = 0;     // v3.0
+    ArretTram.clear();   // v3.5
+    NbLignesTram = 0;    // v3.5
+    NbArretsTram = 0;    // v3.5
+    NbTaxis = 0;         // v3.6
+    NbPlacesTaxi = 0;    // v3.6
+    NbFilesTaxi = 0;     // v3.6
+    Taxi.clear();        // v3.6
+    PlaceTaxi.clear();   // v3.6
+    FileTaxi.clear();    // v3.6
+    PlacePark.clear();   // v5.0
+    FilePark.clear();    // v5.0
+    PlaceVehlib.clear(); // v5.3
     for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
         LigneBus[i].AffecteNumero(i + 1);  // v3.0
@@ -5265,90 +5233,73 @@ centre_ville::~centre_ville()
         delete[] v;
         v = nullptr;
     }
-    if (Feu)
+    if (!Feu.empty())
     {
-        delete[] Feu;
-        Feu = nullptr;
+        Feu.clear();
     }
-    if (FeuP)
+    if (!FeuP.empty())
     {
-        delete[] FeuP;
-        FeuP = nullptr;
+        FeuP.clear();
     } // v6.0.2 : oubli
-    if (Parking)
+    if (!Parking.empty())
     {
-        delete[] Parking;
-        Parking = nullptr;
+        Parking.clear();
     }
-    if (Vehicule)
+    if (!Vehicule.empty())
     {
-        delete[] Vehicule;
-        Vehicule = nullptr;
+        Vehicule.clear();
     }
-    if (Vehlib)
+    if (!Vehlib.empty())
     {
-        delete[] Vehlib;
-        Vehlib = nullptr;
+        Vehlib.clear();
     } // v5.3
-    if (Bus)
+    if (!Bus.empty())
     {
-        delete[] Bus;
-        Bus = nullptr;
+        Bus.clear();
     } // v6.0.2 : oubli
-    if (Tram)
+    if (!Tram.empty())
     {
-        delete[] Tram;
-        Tram = nullptr;
+        Tram.clear();
     } // v6.0.2 : oubli
-    if (Pieton)
+    if (!Pieton.empty())
     {
-        delete[] Pieton;
-        Pieton = nullptr;
+        Pieton.clear();
     }
-    if (ArretBus)
+    if (!ArretBus.empty())
     {
-        delete[] ArretBus;
-        ArretBus = nullptr;
+        ArretBus.clear();
     } // v3.6
-    if (ArretTram)
+    if (!ArretTram.empty())
     {
-        delete[] ArretTram;
-        ArretTram = nullptr;
+        ArretTram.clear();
     } // v3.6
-    if (Taxi)
+    if (!Taxi.empty())
     {
-        delete[] Taxi;
-        Taxi = nullptr;
+        Taxi.clear();
     } // v3.6
-    if (PlaceTaxi)
+    if (!PlaceTaxi.empty())
     {
-        delete[] PlaceTaxi;
-        PlaceTaxi = nullptr;
+        PlaceTaxi.clear();
     } // v3.6
-    if (FileTaxi)
+    if (!FileTaxi.empty())
     {
-        delete[] FileTaxi;
-        FileTaxi = nullptr;
+        FileTaxi.clear();
     } // v3.6
-    if (PlacePark)
+    if (!PlacePark.empty())
     {
-        delete[] PlacePark;
-        PlacePark = nullptr;
+        PlacePark.clear();
     } // v5.0
-    if (FilePark)
+    if (!FilePark.empty())
     {
-        delete[] FilePark;
-        FilePark = nullptr;
+        FilePark.clear();
     } // v5.0
-    if (PlaceVehlib)
+    if (!PlaceVehlib.empty())
     {
-        delete[] PlaceVehlib;
-        PlaceVehlib = nullptr;
+        PlaceVehlib.clear();
     } // v5.3
-    if (Stats)
+    if (!Stats.empty())
     {
-        delete[] Stats;
-        Stats = nullptr;
+        Stats.clear();
     }
 }
 //-----------------------------------------------------------------------------
@@ -5357,12 +5308,12 @@ int centre_ville::DefinitNbFeux(int n)
     int i = 0;
     if (NbFeux != 0)
     {
-        delete[] Feu;
-        Feu = nullptr;
+        Feu.clear();
     }
     NbFeux = 0;
-    if ((n != 0) && (Feu = new feu[n]))
+    if (n != 0)
     {
+        Feu = std::vector<feu>(n);
         for (i = 0; i < n; i++)
         {
             Feu[i].AffecteNumero(i + 1);
@@ -5377,12 +5328,12 @@ int centre_ville::DefinitNbFeuxPietons(int n) // v5.2
     int i = 0;
     if (NbFeuxPieton != 0)
     {
-        delete[] FeuP;
-        FeuP = nullptr;
+        FeuP.clear();
     }
     NbFeuxPieton = 0;
-    if ((n != 0) && (FeuP = new feu_pieton[n]))
+    if (n != 0)
     {
+        FeuP = std::vector<feu_pieton>(n);
         for (i = 0; i < n; i++)
         {
             FeuP[i].AffecteNumero(i + 1);
@@ -5397,11 +5348,10 @@ int centre_ville::DefinitNbParkings(int n)
     int i = 0;
     if (NbParkings != 0)
     {
-        delete[] Parking;
-        Parking = nullptr;
+        Parking.clear();
     }
     NbParkings = 0;
-    if ((Parking = new parking[n]))
+    Parking = std::vector<parking>(n);
     {
         for (i = 0; i < n; i++)
         {
@@ -5417,11 +5367,10 @@ int centre_ville::DefinitNbVehicules(int n)
     int i = 0;
     if (NbVehicules != 0)
     {
-        delete[] Vehicule;
-        Vehicule = nullptr;
+        Vehicule.clear();
     }
     NbVehicules = 0;
-    if ((Vehicule = new vehicule[n]))
+    Vehicule = std::vector<vehicule>(n);
     {
         for (i = 0; i < n; i++)
         {
@@ -5437,11 +5386,10 @@ int centre_ville::DefinitNbVehlibs(int n) // v5.3
     int i = 0;
     if (NbVehlibs != 0)
     {
-        delete[] Vehlib;
-        Vehlib = nullptr;
+        Vehlib.clear();
     }
     NbVehlibs = 0;
-    if ((Vehlib = new vehlib[n]))
+    Vehlib = std::vector<vehlib>(n);
     {
         for (i = 0; i < n; i++)
         {
@@ -5457,12 +5405,12 @@ int centre_ville::DefinitNbBus(int n) // v3.0
     int i = 0;
     if (NbBus != 0)
     {
-        delete[] Bus;
-        Bus = nullptr;
+        Bus.clear();
     }
     NbBus = 0;
-    if ((n != 0) && (Bus = new bus[n]))
+    if (n != 0)
     {
+        Bus = std::vector<bus>(n);
         for (i = 0; i < n; i++)
         {
             Bus[i].AffecteNumero(i + 1);
@@ -5477,12 +5425,12 @@ int centre_ville::DefinitNbTrams(int n) // v3.5
     int i = 0;
     if (NbTrams != 0)
     {
-        delete[] Tram;
-        Tram = nullptr;
+        Tram.clear();
     }
     NbTrams = 0;
-    if ((n != 0) && (Tram = new tram[n]))
+    if (n != 0)
     {
+        Tram = std::vector<tram>(n);
         for (i = 0; i < n; i++)
         {
             Tram[i].AffecteNumero(i + 1);
@@ -5497,12 +5445,12 @@ int centre_ville::DefinitNbPietons(int n)
     int i = 0;
     if (NbPietons != 0)
     {
-        delete[] Pieton;
-        Pieton = nullptr;
+        Pieton.clear();
     }
     NbPietons = 0;
-    if ((n != 0) && (Pieton = new pieton[n]))
+    if (n != 0)
     {
+        Pieton = std::vector<pieton>(n);
         for (i = 0; i < n; i++)
         {
             Pieton[i].AffecteNumero(i + 1);
@@ -5523,12 +5471,12 @@ int centre_ville::DefinitNbFilesTaxi(int n) // v3.0
     int i = 0;
     if (NbFilesTaxi != 0)
     {
-        delete[] FileTaxi;
-        FileTaxi = nullptr;
+        FileTaxi.clear();
     }
     NbFilesTaxi = 0;
-    if ((n != 0) && (FileTaxi = new file_taxi[n]))
+    if (n != 0)
     {
+        FileTaxi = std::vector<file_taxi>(n);
         for (i = 0; i < n; i++)
         {
             FileTaxi[i].AffecteNumero(i + 1);
@@ -5543,12 +5491,12 @@ int centre_ville::DefinitNbTaxis(int n) // v3.0
     int i = 0;
     if (NbTaxis != 0)
     {
-        delete[] Taxi;
-        Taxi = nullptr;
+        Taxi.clear();
     }
     NbTaxis = 0;
-    if ((n != 0) && (Taxi = new taxi[n]))
+    if (n != 0)
     {
+        Taxi = std::vector<taxi>(n);
         for (i = 0; i < n; i++)
         {
             Taxi[i].AffecteNumero(i + 1);
@@ -5562,13 +5510,12 @@ int centre_ville::DefinitFilesTaxi() // v3.6
 {
     int NumFile = 0;
     int NbFilesTrv = 0;
-    if (FileTaxi)
+    if (!FileTaxi.empty())
     {
-        delete[] FileTaxi;
-        FileTaxi = nullptr;
+        FileTaxi.clear();
         NbFilesTaxi = 0;
     }
-    if ((NbPlacesTaxi == 0) || (!PlaceTaxi))
+    if ((NbPlacesTaxi == 0) || (PlaceTaxi.empty()))
     {
         return 0;
     }
@@ -5613,12 +5560,12 @@ int centre_ville::DefinitNbFilesPark(int n) // v5.0
     int i = 0;
     if (NbFilesPark != 0)
     {
-        delete[] FilePark;
-        FilePark = nullptr;
+        FilePark.clear();
     }
     NbFilesPark = 0;
-    if ((n != 0) && (FilePark = new file_park[n]))
+    if (n != 0)
     {
+        FilePark = std::vector<file_park>(n);
         for (i = 0; i < n; i++)
         {
             FilePark[i].AffecteNumero(i + 1);
@@ -5632,13 +5579,12 @@ int centre_ville::DefinitFilesPark() // v5.0
 {
     int NumFilePark = 0;
     int NbFilesTrv = 0;
-    if (FilePark)
+    if (!FilePark.empty())
     {
-        delete[] FilePark;
-        FilePark = nullptr;
+        FilePark.clear();
         NbFilesPark = 0;
     }
-    if ((NbPlacesPark == 0) || (!PlacePark))
+    if ((NbPlacesPark == 0) || (PlacePark.empty()))
     {
         return 0;
     }
@@ -5719,7 +5665,7 @@ int centre_ville::NumeroParkingLibre() const
     return (i + 1) * static_cast<int>(i < NbParkings);
 }
 //-----------------------------------------------------------------------------
-int centre_ville::ArretBusExistant(int x, int y) const // v3.0
+int centre_ville::ArretBusExistant(int x, int y) // v3.0
 {
     int d = 0;
     int i = 0;
@@ -5830,7 +5776,7 @@ int centre_ville::AjouteFeu(int x, int y, direction d)
     int i = NumeroFeuLibre();
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&Feu, NbFeux);
+        i = IncrementeNombre(Feu, NbFeux);
     }
     if (i != 0)
     {
@@ -5848,7 +5794,7 @@ int centre_ville::AjouteFeuPietons(int x, int y, direction d) // v5.2
     int i = NumeroFeuPietonsLibre();
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&FeuP, NbFeuxPieton);
+        i = IncrementeNombre(FeuP, NbFeuxPieton);
     }
     if (i != 0)
     {
@@ -5967,7 +5913,7 @@ int centre_ville::AjouteParking(int x, int y)
     int i = NumeroParkingLibre();
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&Parking, NbParkings);
+        i = IncrementeNombre(Parking, NbParkings);
     }
     if (i != 0)
     {
@@ -5991,7 +5937,7 @@ int centre_ville::AjouteArretBus(int x, int y) // v3.0
     int i = NumeroArretBusLibre(x, y);
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&ArretBus, NbArretsBus);
+        i = IncrementeNombre(ArretBus, NbArretsBus);
     }
     if (i != 0)
     {
@@ -6009,7 +5955,7 @@ int centre_ville::AjouteArretTram(int x, int y) // v3.5
     int i = NumeroArretTramLibre(x, y);
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&ArretTram, NbArretsTram);
+        i = IncrementeNombre(ArretTram, NbArretsTram);
     }
     if (i != 0)
     {
@@ -6027,7 +5973,7 @@ int centre_ville::AjoutePlaceTaxi(int x, int y) // v3.6
     int i = NumeroPlaceTaxiLibre();
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&PlaceTaxi, NbPlacesTaxi);
+        i = IncrementeNombre(PlaceTaxi, NbPlacesTaxi);
     }
     if (i != 0)
     {
@@ -6046,7 +5992,7 @@ int centre_ville::AjoutePlacePark(int x, int y) // v5.0, v5.1 : ancien nom Ajout
                                     // NumeroPlaceVehlibLibre()
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&PlacePark, NbPlacesPark);
+        i = IncrementeNombre(PlacePark, NbPlacesPark);
     }
     if (i != 0)
     {
@@ -6064,7 +6010,7 @@ int centre_ville::AjoutePlaceVehlib(int x, int y) // v5.3
     int i = NumeroPlaceVehlibLibre();
     if (i == 0)
     { // v5.1
-        i = IncrementeNombre(&PlaceVehlib, NbPlacesVehlib);
+        i = IncrementeNombre(PlaceVehlib, NbPlacesVehlib);
     }
     if (i != 0)
     {
@@ -6963,7 +6909,7 @@ bool centre_ville::PrepareCalculAttenteTrafic()
 //-----------------------------------------------------------------------------
 void centre_ville::IncrementeTrafic(int NumVehicule)
 { // A VOIR : créer infos trafic pour les parkings extérieurs.
-    vehicule *veh = Vehicule + (NumVehicule - 1);
+    vehicule *veh = &Vehicule[NumVehicule - 1];
     if ((veh->NumParkingDepart != 0) && (veh->NumParkingArrivee != 0))
     {
         v[veh->x][veh->y].Trafic[veh->NumParkingDepart][veh->NumParkingArrivee]++;
@@ -6981,7 +6927,7 @@ void centre_ville::IncrementeTrafic(int NumVehicule)
 //-----------------------------------------------------------------------------
 void centre_ville::IncrementeAttente(int NumVehicule)
 { // A VOIR : créer infos trafic pour les parkings extérieurs.
-    vehicule *veh = Vehicule + (NumVehicule - 1);
+    vehicule *veh = &Vehicule[NumVehicule - 1];
     const int n = TourCrt - veh->TourDrnDepl - 1;
     if (n > 0)
     {
@@ -7086,7 +7032,7 @@ bool centre_ville::PrepareVehicules()
 //-----------------------------------------------------------------------------
 void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
 {
-    bus *b = Bus + NumBus - 1;
+    bus *b = &Bus[NumBus - 1];
     if (b->Defini() && (b->DirDrnDepl != 0))
     {
         Voisine(b->x, b->y, InvDir[b->DirDrnDepl]).NumBus = 0; // Effacé de la case d'origine (arrière du bus)
@@ -7122,7 +7068,7 @@ void centre_ville::PlaceBus(int x, int y, int NumBus) // v3.0
 //-----------------------------------------------------------------------------
 void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
 {
-    tram *t = Tram + NumTram - 1;
+    tram *t = &Tram[NumTram - 1];
     if (t->Defini() && (t->DirDrnDepl != 0))
     {
         Voisine(t->x, t->y, InvDir[t->DirDrnDepl]).NumTram = 0; // Effacé de la case d'origine (arrière du tram)
@@ -7161,7 +7107,7 @@ void centre_ville::PlaceTram(int x, int y, int NumTram) // v3.5
 //-----------------------------------------------------------------------------
 void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
 {
-    taxi *t = Taxi + NumTaxi - 1;
+    taxi *t = &Taxi[NumTaxi - 1];
     int NumPlace = 0;
     t->DirDrnDepl = t->Dir;
     if (vue->SimulationSanglante() && (cv->v[x][y].NbPietons != 0))
@@ -7201,7 +7147,7 @@ void centre_ville::PlaceVehiculeTaxi(int x, int y, int NumTaxi) // v3.6
 //-----------------------------------------------------------------------------
 void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
 {
-    vehlib *vl = Vehlib + NumVehlib - 1;
+    vehlib *vl = &Vehlib[NumVehlib - 1];
     int NumPlace = 0;
     vl->DirDrnDepl = vl->Dir;
     if (vue->SimulationSanglante() && (cv->v[x][y].NbPietons != 0))
@@ -7543,11 +7489,11 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
     }
 }
 //-----------------------------------------------------------------------------
-void centre_ville::RessuscitePietons() const // v4.3.1
+void centre_ville::RessuscitePietons() // v4.3.1
 {
     for (int i = 0; i < NbPietons; i++)
     {
-        pieton *p = Pieton + i;
+        pieton *p = &Pieton[i];
         if (p->Ecrase)
         {
             p->Ecrase = false;
@@ -7565,7 +7511,7 @@ void centre_ville::PlaceVehiculesSurPlacesPark() // v5.0
 {
     for (int i = 0; i < NbVehicules; i++)
     {
-        vehicule *Veh = Vehicule + i;
+        vehicule *Veh = &Vehicule[i];
         if (Veh->NumFileParkDepart != 0)
         {
             v[Veh->x][Veh->y].NumVehicule = i + 1;
@@ -7600,8 +7546,7 @@ void centre_ville::PrepareFeuxPietons() // v5.2
     {
         if (Feu[i].NbFeuxPtn != 0)
         {
-            delete[] Feu[i].NumFeuxPtn;
-            Feu[i].NumFeuxPtn = nullptr; // v6.0.7 : sinon AjouteFeuPtn libère une seconde fois ce tableau
+            Feu[i].NumFeuxPtn.clear(); // v6.0.7 : la liste est refaite (l'original la libérait deux fois)
             Feu[i].NbFeuxPtn = 0;
         }
     }
@@ -7979,18 +7924,18 @@ bool centre_ville::Charge(int hfile)
     Ok = Ok && NombreCredible(NbFeux) && NombreCredible(NbFeuxPieton) && NombreCredible(NbParkings) && // v6.0.2
          NombreCredible(NbArretsBus) && NombreCredible(NbArretsTram) && NombreCredible(NbPlacesTaxi) &&
          NombreCredible(NbPlacesPark) && NombreCredible(NbPlacesVehlib);
-    if (Ok && (NbFeux != 0) && (Ok = !((Feu = new feu[NbFeux]) == nullptr)))
+    if (Ok && (NbFeux != 0))
     {
+        Feu = std::vector<feu>(NbFeux);
         for (i = 0; Ok && (i < NbFeux); i++)
         {
             Ok = Feu[i].Charge(hfile);
             Feu[i].AffecteNumero(i + 1);
         }
     }
-    if ((VersionFichier >= 0x520) &&
-        (Ok && (NbFeuxPieton != 0) && (Ok = !((FeuP = new feu_pieton[NbFeuxPieton]) == nullptr)))) // v5.2
-
+    if ((VersionFichier >= 0x520) && (Ok && (NbFeuxPieton != 0))) // v5.2
     {
+        FeuP = std::vector<feu_pieton>(NbFeuxPieton);
         for (i = 0; Ok && (i < NbFeuxPieton); i++)
         {
             Ok = FeuP[i].Charge(hfile);
@@ -7998,8 +7943,9 @@ bool centre_ville::Charge(int hfile)
         }
     }
 
-    if (Ok && (NbParkings != 0) && (Ok = !((Parking = new parking[NbParkings]) == nullptr)))
+    if (Ok && (NbParkings != 0))
     {
+        Parking = std::vector<parking>(NbParkings);
         for (i = 0; Ok && (i < NbParkings); i++)
         {
             Ok = Parking[i].Charge(hfile);
@@ -8010,26 +7956,24 @@ bool centre_ville::Charge(int hfile)
             }
         }
     }
-    if (Vehicule)
+    if (!Vehicule.empty())
     {
-        delete[] Vehicule;
-        Vehicule = nullptr;
+        Vehicule.clear();
     }
-    if (Vehlib)
+    if (!Vehlib.empty())
     {
-        delete[] Vehlib;
-        Vehlib = nullptr;
+        Vehlib.clear();
     } // v5.3
-    if (Pieton)
+    if (!Pieton.empty())
     {
-        delete[] Pieton;
-        Pieton = nullptr;
+        Pieton.clear();
     }
     if (VersionFichier >= 0x300)           // v3.0
     {                                      // Dépot, arrêts et lignes de bus
         Ok = Ok && DepotBus.Charge(hfile); // v5.2 : Manquait Ok&&
-        if (Ok && (NbArretsBus != 0) && (Ok = !((ArretBus = new arret_bus[NbArretsBus]) == nullptr)))
+        if (Ok && (NbArretsBus != 0))
         {
+            ArretBus = std::vector<arret_bus>(NbArretsBus);
             for (i = 0; Ok && (i < NbArretsBus); i++)
             {
                 Ok = ArretBus[i].Charge(hfile);
@@ -8047,8 +7991,9 @@ bool centre_ville::Charge(int hfile)
     }
     if (VersionFichier >= 0x350) // v3.5
     {                            // Arrêts et lignes de tram
-        if (Ok && (NbArretsTram != 0) && (Ok = !((ArretTram = new arret_tram[NbArretsTram]) == nullptr)))
+        if (Ok && (NbArretsTram != 0))
         {
+            ArretTram = std::vector<arret_tram>(NbArretsTram);
             for (i = 0; Ok && (i < NbArretsTram); i++)
             {
                 Ok = ArretTram[i].Charge(hfile);
@@ -8065,11 +8010,11 @@ bool centre_ville::Charge(int hfile)
         }
     }
 
-    if ((VersionFichier >= 0x360) &&
-        (Ok && (NbPlacesTaxi != 0) && (Ok = !((PlaceTaxi = new place_taxi[NbPlacesTaxi]) == nullptr)))) // v3.6
-                                                                                                        // Places de
-                                                                                                        // Taxis
+    if ((VersionFichier >= 0x360) && (Ok && (NbPlacesTaxi != 0))) // v3.6
+                                                                  // Places de
+                                                                  // Taxis
     {
+        PlaceTaxi = std::vector<place_taxi>(NbPlacesTaxi);
         for (i = 0; Ok && (i < NbPlacesTaxi); i++)
         {
             Ok = PlaceTaxi[i].Charge(hfile);
@@ -8077,11 +8022,11 @@ bool centre_ville::Charge(int hfile)
         }
     }
 
-    if ((VersionFichier >= 0x500) &&
-        (Ok && (NbPlacesPark != 0) && (Ok = !((PlacePark = new place_park[NbPlacesPark]) == nullptr)))) // v5.0
-                                                                                                        // Places de
-                                                                                                        // parkings
+    if ((VersionFichier >= 0x500) && (Ok && (NbPlacesPark != 0))) // v5.0
+                                                                  // Places de
+                                                                  // parkings
     {
+        PlacePark = std::vector<place_park>(NbPlacesPark);
         for (i = 0; Ok && (i < NbPlacesPark); i++)
         {
             Ok = PlacePark[i].Charge(hfile);
@@ -8093,11 +8038,11 @@ bool centre_ville::Charge(int hfile)
         }
     }
 
-    if ((VersionFichier >= 0x530) &&
-        (Ok && (NbPlacesVehlib != 0) && (Ok = !((PlaceVehlib = new place_vehlib[NbPlacesVehlib]) == nullptr)))) // v5.3
+    if ((VersionFichier >= 0x530) && (Ok && (NbPlacesVehlib != 0))) // v5.3
 
     // Places de vehlib
     {
+        PlaceVehlib = std::vector<place_vehlib>(NbPlacesVehlib);
         for (i = 0; Ok && (i < NbPlacesVehlib); i++)
         {
             Ok = PlaceVehlib[i].Charge(hfile);
@@ -8120,8 +8065,8 @@ bool centre_ville::Charge(int hfile)
     // v5.1 : on retire les parkings indéfinis
     if (Ok && (NvNbParkings < NbParkings))
     {
-        parking *NvParking = nullptr;
-        Ok = !((NvParking = new parking[NvNbParkings]) == nullptr);
+        std::vector<parking> NvParking;
+        NvParking = std::vector<parking>(NvNbParkings);
         if (Ok)
         {
             NvNbParkings = 0;
@@ -8129,23 +8074,23 @@ bool centre_ville::Charge(int hfile)
             {
                 if (Parking[i].Defini())
                 {
-                    NvParking[NvNbParkings].Copie(Parking + i);              // NvNbParkings++
+                    NvParking[NvNbParkings].Copie(&Parking[i]);              // NvNbParkings++
                     NvParking[NvNbParkings].AffecteNumero(NvNbParkings + 1); // On renumérote
                     cv->v[NvParking[NvNbParkings].x][NvParking[NvNbParkings].y].NumParking = NvNbParkings + 1;
                     NvNbParkings++;
                 }
             }
             NbParkings = NvNbParkings;
-            delete[] Parking;
-            Parking = NvParking;
+            Parking.clear();
+            Parking = std::move(NvParking);
         }
     }
 
     // v5.1 : on retire les places de parkings indéfinies
     if (Ok && (VersionFichier >= 0x500) && (NvNbPlacesPark < NbPlacesPark))
     {
-        place_park *NvPlacePark = nullptr;
-        Ok = !((NvPlacePark = new place_park[NvNbPlacesPark]) == nullptr);
+        std::vector<place_park> NvPlacePark;
+        NvPlacePark = std::vector<place_park>(NvNbPlacesPark);
         if (Ok)
         {
             NvNbPlacesPark = 0;
@@ -8153,7 +8098,7 @@ bool centre_ville::Charge(int hfile)
             {
                 if (PlacePark[i].Definie())
                 {
-                    NvPlacePark[NvNbPlacesPark].Copie(PlacePark + i);
+                    NvPlacePark[NvNbPlacesPark].Copie(&PlacePark[i]);
                     NvPlacePark[NvNbPlacesPark].AffecteNumero(NvNbPlacesPark + 1); // On renumérote
                     cv->v[NvPlacePark[NvNbPlacesPark].x][NvPlacePark[NvNbPlacesPark].y].NumPlacePark =
                         NvNbPlacesPark + 1;
@@ -8161,16 +8106,16 @@ bool centre_ville::Charge(int hfile)
                 }
             }
             NbPlacesPark = NvNbPlacesPark;
-            delete[] PlacePark;
-            PlacePark = NvPlacePark;
+            PlacePark.clear();
+            PlacePark = std::move(NvPlacePark);
         }
     }
 
     // v5.3 : on retire les places de vehlib indéfinies
     if (Ok && (VersionFichier >= 0x530) && (NvNbPlacesVehlib < NbPlacesVehlib))
     {
-        place_vehlib *NvPlaceVehlib = nullptr;
-        Ok = !((NvPlaceVehlib = new place_vehlib[NvNbPlacesVehlib]) == nullptr);
+        std::vector<place_vehlib> NvPlaceVehlib;
+        NvPlaceVehlib = std::vector<place_vehlib>(NvNbPlacesVehlib);
         if (Ok)
         {
             NvNbPlacesVehlib = 0;
@@ -8178,7 +8123,7 @@ bool centre_ville::Charge(int hfile)
             {
                 if (PlaceVehlib[i].Definie())
                 {
-                    NvPlaceVehlib[NvNbPlacesVehlib].Copie(PlaceVehlib + i);
+                    NvPlaceVehlib[NvNbPlacesVehlib].Copie(&PlaceVehlib[i]);
                     NvPlaceVehlib[NvNbPlacesVehlib].AffecteNumero(NvNbPlacesVehlib + 1); // On renumérote
                     cv->v[NvPlaceVehlib[NvNbPlacesVehlib].x][NvPlaceVehlib[NvNbPlacesVehlib].y].NumPlaceVehlib =
                         NvNbPlacesVehlib + 1;
@@ -8186,8 +8131,8 @@ bool centre_ville::Charge(int hfile)
                 }
             }
             NbPlacesVehlib = NvNbPlacesVehlib;
-            delete[] PlaceVehlib;
-            PlaceVehlib = NvPlaceVehlib;
+            PlaceVehlib.clear();
+            PlaceVehlib = std::move(NvPlaceVehlib);
         }
     }
 
@@ -8446,28 +8391,28 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     {
         Parking[i].Verifie(asMsgErr);
     }
-    if (Vehicule)
+    if (!Vehicule.empty())
     {
         for (i = 0; i < NbVehicules; i++)
         {
             Vehicule[i].Verifie(asMsgErr);
         }
     }
-    if (Pieton)
+    if (!Pieton.empty())
     {
         for (i = 0; i < NbPietons; i++)
         {
             Pieton[i].Verifie(asMsgErr);
         }
     }
-    if (Bus)
+    if (!Bus.empty())
     { // v3.0.4 (un oubli)
         for (i = 0; i < NbBus; i++)
         {
             Bus[i].Verifie(asMsgErr);
         }
     }
-    if (ArretBus)
+    if (!ArretBus.empty())
     { // v3.0
         for (i = 0; i < NbArretsBus; i++)
         {
@@ -8478,14 +8423,14 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     { // v3.0
         LigneBus[i].Verifie(asMsgErr);
     }
-    if (Tram)
+    if (!Tram.empty())
     { // v3.5
         for (i = 0; i < NbTrams; i++)
         {
             Tram[i].Verifie(asMsgErr);
         }
     }
-    if (ArretTram)
+    if (!ArretTram.empty())
     { // v3.5
         for (i = 0; i < NbArretsTram; i++)
         {
@@ -8496,14 +8441,14 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     { // v3.5
         LigneTram[i].Verifie(asMsgErr);
     }
-    if (Taxi)
+    if (!Taxi.empty())
     { // v5.0 (oubli)
         for (i = 0; i < NbTaxis; i++)
         {
             Taxi[i].Verifie(asMsgErr);
         }
     }
-    if (PlaceTaxi)
+    if (!PlaceTaxi.empty())
     {
         for (i = 0; i < NbPlacesTaxi; i++)
         {
@@ -8514,14 +8459,14 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     { // v5.0
         PlacePark[i].Verifie(asMsgErr);
     }
-    if (Vehlib)
+    if (!Vehlib.empty())
     { // v5.3
         for (i = 0; i < NbVehlibs; i++)
         {
             Vehlib[i].Verifie(asMsgErr);
         }
     }
-    if (PlaceVehlib)
+    if (!PlaceVehlib.empty())
     { // v5.3
         for (i = 0; i < NbPlacesVehlib; i++)
         {
@@ -8531,7 +8476,7 @@ void centre_ville::Verifie(AnsiString &asMsgErr)
     DepotBus.Verifie(asMsgErr); // v3.03
 }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) const // v3.0.4
+inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) // v3.0.4
 {
     if ((TourCrt - Vehicule[NumeroVehicule].TourDepart) % NbVitesses <=
         ((Vehicule[NumeroVehicule].NivPriorite != 0) ? NbVitesses - 1 : NumeroVehicule % NbVitesses))
@@ -8543,7 +8488,7 @@ inline bool centre_ville::TourDeDeplacementVehicule(int NumeroVehicule) const //
     return false;
 }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) const // v5.3
+inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) // v5.3
 {
     if ((TourCrt - Vehlib[NumeroVehlib].TourDepart) % NbVitesses <= NbVitesses - 1)
     {
@@ -8554,7 +8499,7 @@ inline bool centre_ville::TourDeDeplacementVehlib(int NumeroVehlib) const // v5.
     return false;
 }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) const // v3.0
+inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) // v3.0
 {
     if (((TourCrt - Bus[NumeroBus].TourDepart) % NbVitesses) == 0)
     {
@@ -8565,7 +8510,7 @@ inline bool centre_ville::TourDeDeplacementBus(int NumeroBus) const // v3.0
     return false;
 }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) const // v3.5
+inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) // v3.5
 {
     if ((TourCrt % NbVitesses) == 0)
     {
@@ -8576,7 +8521,7 @@ inline bool centre_ville::TourDeDeplacementTram(int NumeroTram) const // v3.5
     return false;
 }
 //-----------------------------------------------------------------------------
-inline bool centre_ville::TourDeDeplacementTaxi(int NumeroTaxi) const // v3.6
+inline bool centre_ville::TourDeDeplacementTaxi(int NumeroTaxi) // v3.6
 {
     if ((TourCrt % NbVitesses) == 0)
     {
@@ -8592,9 +8537,9 @@ bool centre_ville::CopieValide() // v4.2.1
     AnsiString asMsg;
     for (int i = 0; i < NbParkings; i++)
     {
-        if (Parking[i].Defini() && (!DansSelectionEnCours(Parking + i)))
+        if (Parking[i].Defini() && (!DansSelectionEnCours(&Parking[i])))
         {
-            asMsg = asMsg + "le parking n°" + IntToStr(i + 1) + " " + asCoordonnees(Parking + i) + ", ";
+            asMsg = asMsg + "le parking n°" + IntToStr(i + 1) + " " + asCoordonnees(&Parking[i]) + ", ";
         }
     }
     if (DepotBus.Defini() && (!DansSelectionEnCours(&DepotBus)))
@@ -8603,37 +8548,37 @@ bool centre_ville::CopieValide() // v4.2.1
     }
     for (int i = 0; i < NbFeux; i++)
     {
-        if (Feu[i].Defini() && (!DansSelectionEnCours(Feu + i)))
+        if (Feu[i].Defini() && (!DansSelectionEnCours(&Feu[i])))
         {
-            asMsg = asMsg + "le feu n°" + IntToStr(i + 1) + " " + asCoordonnees(Feu + i) + ", ";
+            asMsg = asMsg + "le feu n°" + IntToStr(i + 1) + " " + asCoordonnees(&Feu[i]) + ", ";
         }
     }
     for (int i = 0; i < NbArretsBus; i++)
     {
-        if (ArretBus[i].Defini() && (!DansSelectionEnCours(ArretBus + i)))
+        if (ArretBus[i].Defini() && (!DansSelectionEnCours(&ArretBus[i])))
         {
-            asMsg = asMsg + "l'arrêt de bus n°" + IntToStr(i + 1) + " " + asCoordonnees(ArretBus + i) + ", ";
+            asMsg = asMsg + "l'arrêt de bus n°" + IntToStr(i + 1) + " " + asCoordonnees(&ArretBus[i]) + ", ";
         }
     }
     for (int i = 0; i < NbPlacesTaxi; i++)
     {
-        if (PlaceTaxi[i].Definie() && (!DansSelectionEnCours(PlaceTaxi + i)))
+        if (PlaceTaxi[i].Definie() && (!DansSelectionEnCours(&PlaceTaxi[i])))
         {
-            asMsg = asMsg + "la place de taxi n°" + IntToStr(i + 1) + " " + asCoordonnees(PlaceTaxi + i) + ", ";
+            asMsg = asMsg + "la place de taxi n°" + IntToStr(i + 1) + " " + asCoordonnees(&PlaceTaxi[i]) + ", ";
         }
     }
     for (int i = 0; i < NbPlacesPark; i++)
     { // v5.0
-        if (PlacePark[i].Definie() && (!DansSelectionEnCours(PlacePark + i)))
+        if (PlacePark[i].Definie() && (!DansSelectionEnCours(&PlacePark[i])))
         {
-            asMsg = asMsg + "la place de parking n°" + IntToStr(i + 1) + " " + asCoordonnees(PlacePark + i) + ", ";
+            asMsg = asMsg + "la place de parking n°" + IntToStr(i + 1) + " " + asCoordonnees(&PlacePark[i]) + ", ";
         }
     }
     for (int i = 0; i < NbPlacesVehlib; i++)
     { // v5.3
-        if (PlaceVehlib[i].Definie() && (!DansSelectionEnCours(PlaceVehlib + i)))
+        if (PlaceVehlib[i].Definie() && (!DansSelectionEnCours(&PlaceVehlib[i])))
         {
-            asMsg = asMsg + "la place de vehlib n°" + IntToStr(i + 1) + " " + asCoordonnees(PlaceVehlib + i) + ", ";
+            asMsg = asMsg + "la place de vehlib n°" + IntToStr(i + 1) + " " + asCoordonnees(&PlaceVehlib[i]) + ", ";
         }
     }
     if (!asMsg.IsEmpty())

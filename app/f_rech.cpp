@@ -255,8 +255,8 @@ void TfrmRecherche::FormShow(TObject * /*Sender*/)
         const int f = cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile; // v6.0.12 : queue de la file, si la simulation a
                                                                   // défini les files (sinon OnChange ne déplace pas le
                                                                   // curseur)
-        place_taxi *q = (cv->FileTaxi && (f >= 0) && (f < cv->NbFilesTaxi))
-                            ? cv->PlaceTaxi + cv->FileTaxi[f].NumPlaceQueue
+        place_taxi *q = (!cv->FileTaxi.empty() && (f >= 0) && (f < cv->NbFilesTaxi))
+                            ? &cv->PlaceTaxi[cv->FileTaxi[f].NumPlaceQueue]
                             : nullptr;
         CSpinEditPlaceTaxi->Value = v->NumPlaceTaxi; // v3.6
         FixeNumeroCase(CSpinEditFileTaxi, RadioButtonFileTaxi, f + 1,
@@ -265,8 +265,8 @@ void TfrmRecherche::FormShow(TObject * /*Sender*/)
     if (v->NumPlacePark != 0) // v5.0
     {
         const int f = cv->PlacePark[v->NumPlacePark - 1].NumFile; // v6.0.12 : comme pour les taxis
-        place_park *q = (cv->FilePark && (f >= 0) && (f < cv->NbFilesPark))
-                            ? cv->PlacePark + cv->FilePark[f].NumPlaceQueue
+        place_park *q = (!cv->FilePark.empty() && (f >= 0) && (f < cv->NbFilesPark))
+                            ? &cv->PlacePark[cv->FilePark[f].NumPlaceQueue]
                             : nullptr;
         CSpinEditPlacePark->Value = v->NumPlacePark;
         FixeNumeroCase(CSpinEditFilePark, RadioButtonFilePark, f + 1,
@@ -297,12 +297,12 @@ void TfrmRecherche::CSpinEditYChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->Parking) || (CSpinEditParking->Value < 1) || (CSpinEditParking->Value > cv->NbParkings))
+    if ((!cv) || (cv->Parking.empty()) || (CSpinEditParking->Value < 1) || (CSpinEditParking->Value > cv->NbParkings))
     {
         StatusBar->SimpleText = "Aucune parking défini ou n° incorrect";
         return;
     }
-    parking *p = cv->Parking + CSpinEditParking->Value - 1;
+    parking *p = &cv->Parking[CSpinEditParking->Value - 1];
     if (p && p->Defini())
     {
         frmSimulation->DrawGridSimul->Col = p->x;
@@ -319,12 +319,12 @@ void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->Feu) || (CSpinEditFeu->Value < 1) || (CSpinEditFeu->Value > cv->NbFeux))
+    if ((!cv) || (cv->Feu.empty()) || (CSpinEditFeu->Value < 1) || (CSpinEditFeu->Value > cv->NbFeux))
     {
         StatusBar->SimpleText = "Aucun feu défini ou n° incorrect";
         return;
     }
-    feu *f = cv->Feu + CSpinEditFeu->Value - 1;
+    feu *f = &cv->Feu[CSpinEditFeu->Value - 1];
     if (f && f->Defini())
     {
         frmSimulation->DrawGridSimul->Col = f->x;
@@ -341,12 +341,13 @@ void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->Vehicule) || (CSpinEditVehicule->Value < 1) || (CSpinEditVehicule->Value > cv->NbVehicules))
+    if ((!cv) || (cv->Vehicule.empty()) || (CSpinEditVehicule->Value < 1) ||
+        (CSpinEditVehicule->Value > cv->NbVehicules))
     {
         StatusBar->SimpleText = "Aucun véhicule défini ou n° incorrect";
         return;
     }
-    vehicule *veh = cv->Vehicule + CSpinEditVehicule->Value - 1;
+    vehicule *veh = &cv->Vehicule[CSpinEditVehicule->Value - 1];
     if (veh && veh->Defini())
     {
         frmSimulation->DrawGridSimul->Col = veh->x;
@@ -363,12 +364,12 @@ void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->Pieton) || (CSpinEditPieton->Value < 1) || (CSpinEditPieton->Value > cv->NbPietons))
+    if ((!cv) || (cv->Pieton.empty()) || (CSpinEditPieton->Value < 1) || (CSpinEditPieton->Value > cv->NbPietons))
     {
         StatusBar->SimpleText = "Aucun piéton défini ou n° incorrect";
         return;
     }
-    pieton *p = cv->Pieton + CSpinEditPieton->Value - 1;
+    pieton *p = &cv->Pieton[CSpinEditPieton->Value - 1];
     if (p && p->Defini())
     {
         frmSimulation->DrawGridSimul->Col = p->x;
@@ -446,12 +447,13 @@ void TfrmRecherche::ButtonAideClick(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/)
 { // v3.0
-    if ((!cv) || (!cv->ArretBus) || (CSpinEditArretBus->Value < 1) || (CSpinEditArretBus->Value > cv->NbArretsBus))
+    if ((!cv) || (cv->ArretBus.empty()) || (CSpinEditArretBus->Value < 1) ||
+        (CSpinEditArretBus->Value > cv->NbArretsBus))
     {
         StatusBar->SimpleText = "Aucun arrêt de bus défini ou n° incorrect";
         return;
     }
-    arret_bus *ab = cv->ArretBus + CSpinEditArretBus->Value - 1;
+    arret_bus *ab = &cv->ArretBus[CSpinEditArretBus->Value - 1];
     if (ab && ab->Defini())
     {
         frmSimulation->DrawGridSimul->Col = ab->x;
@@ -468,12 +470,12 @@ void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/)
 { // v3.0
-    if ((!cv) || (!cv->Bus) || (CSpinEditBus->Value < 1) || (CSpinEditBus->Value > cv->NbBus))
+    if ((!cv) || (cv->Bus.empty()) || (CSpinEditBus->Value < 1) || (CSpinEditBus->Value > cv->NbBus))
     {
         StatusBar->SimpleText = "Aucun bus défini ou n° incorrect";
         return;
     }
-    bus *b = cv->Bus + CSpinEditBus->Value - 1;
+    bus *b = &cv->Bus[CSpinEditBus->Value - 1];
     if (b && b->Defini())
     {
         frmSimulation->DrawGridSimul->Col = b->x;
@@ -489,12 +491,13 @@ void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/)
 { // v3.5
-    if ((!cv) || (!cv->ArretTram) || (CSpinEditArretTram->Value < 1) || (CSpinEditArretTram->Value > cv->NbArretsTram))
+    if ((!cv) || (cv->ArretTram.empty()) || (CSpinEditArretTram->Value < 1) ||
+        (CSpinEditArretTram->Value > cv->NbArretsTram))
     {
         StatusBar->SimpleText = "Aucun arrêt de tram défini ou n° incorrect";
         return;
     }
-    arret_tram *at = cv->ArretTram + CSpinEditArretTram->Value - 1;
+    arret_tram *at = &cv->ArretTram[CSpinEditArretTram->Value - 1];
     if (at && at->Defini())
     {
         frmSimulation->DrawGridSimul->Col = at->x;
@@ -511,12 +514,12 @@ void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/)
 { // v3.5
-    if ((!cv) || (!cv->Tram) || (CSpinEditTram->Value < 1) || (CSpinEditTram->Value > cv->NbTrams))
+    if ((!cv) || (cv->Tram.empty()) || (CSpinEditTram->Value < 1) || (CSpinEditTram->Value > cv->NbTrams))
     {
         StatusBar->SimpleText = "Aucun tram défini ou n° incorrect";
         return;
     }
-    tram *t = cv->Tram + CSpinEditTram->Value - 1;
+    tram *t = &cv->Tram[CSpinEditTram->Value - 1];
     if (t && t->Defini())
     {
         frmSimulation->DrawGridSimul->Col = t->x;
@@ -533,12 +536,12 @@ void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->Taxi) || (CSpinEditTaxi->Value < 1) || (CSpinEditTaxi->Value > cv->NbTaxis))
+    if ((!cv) || (cv->Taxi.empty()) || (CSpinEditTaxi->Value < 1) || (CSpinEditTaxi->Value > cv->NbTaxis))
     {
         StatusBar->SimpleText = "Aucun taxi défini ou n° incorrect";
         return;
     }
-    taxi *t = cv->Taxi + CSpinEditTaxi->Value - 1;
+    taxi *t = &cv->Taxi[CSpinEditTaxi->Value - 1];
     if (t->Defini()) // v6.0.2
     {
         frmSimulation->DrawGridSimul->Col = t->x;
@@ -555,12 +558,13 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->PlaceTaxi) || (CSpinEditPlaceTaxi->Value < 1) || (CSpinEditPlaceTaxi->Value > cv->NbPlacesTaxi))
+    if ((!cv) || (cv->PlaceTaxi.empty()) || (CSpinEditPlaceTaxi->Value < 1) ||
+        (CSpinEditPlaceTaxi->Value > cv->NbPlacesTaxi))
     {
         StatusBar->SimpleText = "Aucune place de taxi définie ou n° incorrect";
         return;
     }
-    place_taxi *pt = cv->PlaceTaxi + CSpinEditPlaceTaxi->Value - 1;
+    place_taxi *pt = &cv->PlaceTaxi[CSpinEditPlaceTaxi->Value - 1];
     if (pt && pt->Definie())
     {
         frmSimulation->DrawGridSimul->Col = pt->x;
@@ -577,12 +581,13 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->FileTaxi) || (CSpinEditFileTaxi->Value < 1) || (CSpinEditFileTaxi->Value > cv->NbFilesTaxi))
+    if ((!cv) || (cv->FileTaxi.empty()) || (CSpinEditFileTaxi->Value < 1) ||
+        (CSpinEditFileTaxi->Value > cv->NbFilesTaxi))
     {
         StatusBar->SimpleText = "Aucune file de taxis définie ou n° incorrect";
         return;
     }
-    file_taxi *ft = cv->FileTaxi + CSpinEditFileTaxi->Value - 1;
+    file_taxi *ft = &cv->FileTaxi[CSpinEditFileTaxi->Value - 1];
     frmSimulation->DrawGridSimul->Col = cv->PlaceTaxi[ft->NumPlaceQueue].x;
     frmSimulation->DrawGridSimul->Row = cv->PlaceTaxi[ft->NumPlaceQueue].y;
     StatusBar->SimpleText =
@@ -594,12 +599,13 @@ void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/)
 
 void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->PlacePark) || (CSpinEditPlacePark->Value < 1) || (CSpinEditPlacePark->Value > cv->NbPlacesPark))
+    if ((!cv) || (cv->PlacePark.empty()) || (CSpinEditPlacePark->Value < 1) ||
+        (CSpinEditPlacePark->Value > cv->NbPlacesPark))
     {
         StatusBar->SimpleText = "Aucune place de parking définie ou n° incorrect";
         return;
     }
-    place_park *pp = cv->PlacePark + CSpinEditPlacePark->Value - 1;
+    place_park *pp = &cv->PlacePark[CSpinEditPlacePark->Value - 1];
     if (pp && pp->Definie())
     {
         frmSimulation->DrawGridSimul->Col = pp->x;
@@ -617,12 +623,13 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/)
 
 void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (!cv->FilePark) || (CSpinEditFilePark->Value < 1) || (CSpinEditFilePark->Value > cv->NbFilesPark))
+    if ((!cv) || (cv->FilePark.empty()) || (CSpinEditFilePark->Value < 1) ||
+        (CSpinEditFilePark->Value > cv->NbFilesPark))
     {
         StatusBar->SimpleText = "Aucune file de parkings définie ou n° incorrect";
         return;
     }
-    file_park *fp = cv->FilePark + CSpinEditFilePark->Value - 1;
+    file_park *fp = &cv->FilePark[CSpinEditFilePark->Value - 1];
     frmSimulation->DrawGridSimul->Col = cv->PlacePark[fp->NumPlaceQueue].x;
     frmSimulation->DrawGridSimul->Row = cv->PlacePark[fp->NumPlaceQueue].y;
     StatusBar->SimpleText =
@@ -633,12 +640,12 @@ void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/)
 { // v5.3
-    if ((!cv) || (!cv->Vehlib) || (CSpinEditVehlib->Value < 1) || (CSpinEditVehlib->Value > cv->NbVehlibs))
+    if ((!cv) || (cv->Vehlib.empty()) || (CSpinEditVehlib->Value < 1) || (CSpinEditVehlib->Value > cv->NbVehlibs))
     {
         StatusBar->SimpleText = "Aucun vehlib défini ou n° incorrect";
         return;
     }
-    vehlib *vl = cv->Vehlib + CSpinEditVehlib->Value - 1;
+    vehlib *vl = &cv->Vehlib[CSpinEditVehlib->Value - 1];
     if (vl->Defini()) // v6.0.2
     {
         frmSimulation->DrawGridSimul->Col = vl->x;
@@ -655,13 +662,13 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/)
 { // v5.3
-    if ((!cv) || (!cv->PlaceVehlib) || (CSpinEditPlaceVehlib->Value < 1) ||
+    if ((!cv) || (cv->PlaceVehlib.empty()) || (CSpinEditPlaceVehlib->Value < 1) ||
         (CSpinEditPlaceVehlib->Value > cv->NbPlacesVehlib))
     {
         StatusBar->SimpleText = "Aucune place de vehlib définie ou n° incorrect";
         return;
     }
-    place_vehlib *pv = cv->PlaceVehlib + CSpinEditPlaceVehlib->Value - 1;
+    place_vehlib *pv = &cv->PlaceVehlib[CSpinEditPlaceVehlib->Value - 1];
     if (pv && pv->Definie())
     {
         frmSimulation->DrawGridSimul->Col = pv->x;

@@ -674,11 +674,13 @@ TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[correctio
     VueNulle Vue;
     vue = &Vue;
     cv = new centre_ville(true, NBXMIN, NBYMIN);
-    const auto Liste = [](int *Num, int Nb) { return std::vector<int>(Num, Num + Nb); };
+    const auto Liste = [](const std::vector<int> &Num, int Nb) {
+        return std::vector<int>(Num.begin(), Num.begin() + Nb);
+    };
     feu &f = cv->Feu[0];
     f.NbFeuxDmd = f.NbFeuxAtt = 3;
-    f.NumFeuxDmd = new int[3]{4, 5, 6};
-    f.NumFeuxAtt = new int[3]{4, 5, 6};
+    f.NumFeuxDmd = {4, 5, 6};
+    f.NumFeuxAtt = {4, 5, 6};
     f.RetireFeuDmd(5);
     f.RetireFeuAtt(5);
     CHECK(Liste(f.NumFeuxDmd, f.NbFeuxDmd) == std::vector<int>{4, 6});
@@ -690,9 +692,9 @@ TEST_CASE("Listes de feux : le feu retiré est bien celui demandé", "[correctio
     f.RetireFeuDmd(6);
     f.RetireFeuAtt(6);
     CHECK(f.NbFeuxDmd == 0);
-    CHECK(f.NumFeuxDmd == nullptr);
+    CHECK(f.NumFeuxDmd.empty());
     CHECK(f.NbFeuxAtt == 0);
-    CHECK(f.NumFeuxAtt == nullptr);
+    CHECK(f.NumFeuxAtt.empty());
     feu_pieton &p = cv->FeuP[0];
     for (const int n : {4, 5, 6})
     {
@@ -794,14 +796,14 @@ TEST_CASE("Feux de piétons préparés une seconde fois : listes refaites, sans 
     Listes.reserve(static_cast<std::size_t>(cv->NbFeux));
     for (int i = 0; i < cv->NbFeux; i++)
     {
-        Listes.emplace_back(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn + cv->Feu[i].NbFeuxPtn);
+        Listes.emplace_back(cv->Feu[i].NumFeuxPtn.begin(), cv->Feu[i].NumFeuxPtn.begin() + cv->Feu[i].NbFeuxPtn);
     }
     REQUIRE(std::ranges::any_of(Listes, [](const std::vector<int> &l) { return !l.empty(); }));
     cv->PrepareFeuxPietons();
     for (int i = 0; i < cv->NbFeux; i++)
     {
         INFO("Feu n°" << i + 1);
-        CHECK(std::vector<int>(cv->Feu[i].NumFeuxPtn, cv->Feu[i].NumFeuxPtn + cv->Feu[i].NbFeuxPtn) ==
+        CHECK(std::vector<int>(cv->Feu[i].NumFeuxPtn.begin(), cv->Feu[i].NumFeuxPtn.begin() + cv->Feu[i].NbFeuxPtn) ==
               Listes[(std::size_t)i]);
     }
     for (int t = 0; t < 20; t++)

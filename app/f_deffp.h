@@ -2,6 +2,7 @@
 #ifndef f_deffpH
 #define f_deffpH
 //---------------------------------------------------------------------------
+#include <vector>
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
 #include "base.h"      // portage
 // #include "CSPIN.h" // portage
@@ -65,8 +66,8 @@ private:
 
 public:
     int x{}, y{};
-    int NbFeux,   // Nbre de feux liés
-        *NumFeux; // Liste des feux liés
+    int NbFeux{};             // Nbre de feux liés
+    std::vector<int> NumFeux; // Liste des feux liés
     direction Direction{};
     explicit TfrmDefFeuxPietons(TComponent *Owner);
     void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)

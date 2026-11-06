@@ -77,7 +77,7 @@ void TfrmInfosVehlib::RafraichitInfos()
     LabelCoordonnees->Caption = Format(asFrmCoordonnees, TableauDeConstantes(x, y));
     if ((Afficher = (v->NumVehlib > 0)))
     {
-        Vehlib = cv->Vehlib + v->NumVehlib - 1;
+        Vehlib = &cv->Vehlib[v->NumVehlib - 1];
         LabelSituation->Caption = asSituation[Vehlib->Situation];
         LabelDirection->Caption = asDir[Vehlib->Dir];
         LabelNumeroPlaceDepart->Caption =

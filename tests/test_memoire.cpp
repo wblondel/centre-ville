@@ -30,7 +30,7 @@ TEST_CASE("Mémoire non remise à zéro : NbVehlibs, FeuP, DureeVert et DureeRou
     vue = &Vue;
     auto *c = new centre_ville(false, 0, 0);
     CHECK(c->NbVehlibs == 0);
-    CHECK(c->FeuP == nullptr);
+    CHECK(c->FeuP.empty());
     CHECK(c->DureeVert == 0); // nouveau réseau (« Nouveau », génération) : enregistrées telles quelles
     CHECK(c->DureeRouge == 0);
     delete c;
@@ -39,7 +39,7 @@ TEST_CASE("Mémoire non remise à zéro : NbVehlibs, FeuP, DureeVert et DureeRou
     REQUIRE(harnais::Ouvre(asDemo));
     REQUIRE(VersionFichier == 0x500);
     CHECK(cv->NbVehlibs == 0);
-    CHECK(cv->FeuP == nullptr);
+    CHECK(cv->FeuP.empty());
     // Réenregistrée en 0x530 : NbVehlibs vaut 0, comme dans la conversion de référence
     const std::string asCopie = FichierSortie("motif_Demo.cvw");
     REQUIRE(harnais::SauveSansChaos(asCopie));

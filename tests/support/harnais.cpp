@@ -448,14 +448,8 @@ bool harnais::Demarre(AnsiString &asMsgErr)
     // VerifierAvantSimulation : faux par défaut
     // ActionEnregistrer->Execute() : seul effet sur le moteur
     AppelleAuChaos();
-    if ((cv->Stats = new stats[cv->NbToursStats]))
-    {
-        cv->Stats[0].Definit();
-    }
-    else
-    {
-        return false;
-    }
+    cv->Stats = std::vector<stats>(cv->NbToursStats);
+    cv->Stats[0].Definit();
     return true;
 }
 //---------------------------------------------------------------------------

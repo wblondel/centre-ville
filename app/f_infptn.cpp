@@ -173,7 +173,7 @@ void TfrmInfosPieton::RafraichitInfos()
         NumPieton = 0; // portage : numéro tapé hors de 1..NbPietons dans Rechercher (lecture hors de Pieton dans
                        // l'original) : pas de piéton suivi
     }
-    if (!cv->Pieton)
+    if (cv->Pieton.empty())
     {
         NumPieton = 0; // v6.0.2 : réseau rechargé à l'arrêt, sans piétons (accès à un pointeur nul dans l'original, au
                        // clic suivant sur la carte)

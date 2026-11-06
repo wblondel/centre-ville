@@ -69,7 +69,7 @@ void TfrmStatistiques::PaintBoxStatsPaint(TObject * /*Sender*/)
         }
     }
 
-    if (!cv->Stats)
+    if (cv->Stats.empty())
     {
         return;
     }
