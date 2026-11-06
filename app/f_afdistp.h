@@ -17,13 +17,13 @@ public: // portage : __published	// Composants gérés par l'EDI
     TCheckBox *CheckBoxCouloirsBus{};
     TPanel *Panel{};
     void FormShow(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void CheckBoxCouloirsBusClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
-    TfrmAffDistParkings(TComponent *Owner);
+    explicit TfrmAffDistParkings(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void EffaceInfos() const;
     void RafraichitInfos();

@@ -398,7 +398,10 @@ public:
 
         public:
             Cellule(TStringGrid *gg, int cc, int rr) : g(gg), c(cc), r(rr) {}
-            operator AnsiString() const { return g->LitCellule(c, r); }
+            operator AnsiString() const
+            {
+                return g->LitCellule(c, r);
+            } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
             Cellule &operator=(const AnsiString &as)
             {
                 g->EcritCellule(c, r, as);

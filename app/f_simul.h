@@ -421,7 +421,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void FormDestroy(TObject *Sender);
     void DrawGridSimulDblClick(TObject *Sender);
     void FormShow(TObject *Sender);
-    void RafraichitFichesInfos();           // v6.0.2
+    static void RafraichitFichesInfos();    // v6.0.2
     void RafraichitFichesPriorites() const; // v6.0.11
     void DrawGridSimulClick(TObject *Sender);
     void TimerSimulTimer(TObject *Sender);
@@ -443,7 +443,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionAfficherPietonsExecute(TObject *Sender);
     void ActionAfficherQuadrillageExecute(TObject *Sender);
     void ActionAfficherEnvironnementExecute(TObject *Sender);
-    void ActionParametresExecute(TObject *Sender);
+    static void ActionParametresExecute(TObject *Sender);
     void ActionVerifierReseauExecute(TObject *Sender);
     void ActionMarcheExecute(TObject *Sender);
     void ActionInterruptionExecute(TObject *Sender);
@@ -460,9 +460,9 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionStatsAffParPourcentExecute(TObject *Sender) const;
     void ActionStatsAffQuadrillageExecute(TObject *Sender) const;
     void ActionFluiditeTraficExecute(TObject *Sender);
-    void ActionCompositionExecute(TObject *Sender);
+    static void ActionCompositionExecute(TObject *Sender);
     void ActionStatsParkingsExecute(TObject *Sender);
-    void ActionAProposExecute(TObject *Sender);
+    static void ActionAProposExecute(TObject *Sender);
     void ActionSommaireExecute(TObject *Sender);
     void ActionDirectionHautExecute(TObject *Sender);
     void ActionDirectionDroiteExecute(TObject *Sender);
@@ -524,7 +524,7 @@ public: // portage : __published (composants liés par COMPOSANTS_frmSimulation)
     void ActionResurrectionExecute(TObject *Sender);
     void TimerClignotementLocalisationTimer(TObject *Sender) const;
     void ActionDistancesFilesParkExecute(TObject *Sender) const;
-    void ActionTutorielExecute(TObject *Sender);
+    static void ActionTutorielExecute(TObject *Sender);
     void ActionRafraichirExecute(TObject *Sender) const;
     void StatusBarResize(TObject *Sender) const;
     void ActionPrioritesPietonsExecute(TObject *Sender) const;
@@ -546,7 +546,7 @@ private:
     bool EnregistreModificationsAvant(operation_avant Operation);
     bool VerifieIntegrite();
     bool VerifieReseau();
-    void AfficheMsgInfoNonDisp(const AnsiString &asTitre); // v3.7
+    static void AfficheMsgInfoNonDisp(const AnsiString &asTitre); // v3.7
     // Définition de la propriété SimulEnCours
     [[nodiscard]] bool SimulEstEnCours() const { return SimulEnCours; }
     void MarcheArretSimul(bool EnCours)
@@ -705,7 +705,7 @@ public:
     bool SelectionFeuxDmd{}, SelectionFeuxAtt{}, SelectionFeuxPtn{}, // v5.2
         StatsAttenteTrafic{},                                        // v2.2.7
         Pause{};
-    TfrmSimulation(TComponent *Owner);
+    explicit TfrmSimulation(TComponent *Owner);
     ~TfrmSimulation() override;                           // portage : OnDestroy
     IVueSimulation *VueMoteur{};                          // portage : implémentation d'IVueSimulation (vue du moteur)
     void OuvreFichierDemande(const String &asNomFichier); // portage : QFileOpenEvent (macOS)

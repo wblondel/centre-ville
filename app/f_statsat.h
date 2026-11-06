@@ -76,7 +76,7 @@ private: // Déclarations de l'utilisateur
     void RecalculeEtVisualise();
 
 public: // Déclarations de l'utilisateur
-    TfrmStatsAttenteTrafic(TComponent *Owner);
+    explicit TfrmStatsAttenteTrafic(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     TColor CouleurCase(int x, int y);
     AnsiString asMsgDetailCase(int x, int y);

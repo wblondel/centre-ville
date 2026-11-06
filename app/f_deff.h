@@ -72,7 +72,7 @@ public:
         *NumFeuxDmd, // Liste des feux demandant le rouge
         *NumFeuxAtt; // Liste des feux devant être rouge pour que Numero passe au vert
     direction Direction;
-    TfrmDefFeux(TComponent *Owner);
+    explicit TfrmDefFeux(TComponent *Owner);
     void ChargeFiche();     // portage : chargement du .dfm (fiche générée par dfm2ui)
     bool RafraichitInfos(); // retourne faux quand il n'a pas pu ajouter le feu
     bool AppliqueChoix();

@@ -29,7 +29,7 @@ public:
         Ecrit = std::move(Ecriture);
     }
     [[nodiscard]] T Valeur() const { return Lit(); }
-    operator T() const { return Lit(); }
+    operator T() const { return Lit(); } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
     template <class E, std::enable_if_t<std::is_enum_v<E>, int> = 0> explicit operator E() const { return (E)Lit(); }
     Propriete &operator=(const T &v)
@@ -77,7 +77,10 @@ public:
         Ecrit = std::move(Ecriture);
     }
     [[nodiscard]] AnsiString Valeur() const { return Lit(); }
-    operator AnsiString() const { return Lit(); }
+    operator AnsiString() const
+    {
+        return Lit();
+    } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     Propriete &operator=(const AnsiString &v)
     {
         Ecrit(v);

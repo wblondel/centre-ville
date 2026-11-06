@@ -52,13 +52,13 @@ public: // portage : __published	// Composants gérés par l'EDI
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur
-    void AffecteGlyphe(TVirtualImageList *VirtualImageList, const int NumGlyphe, TBitmap *Glyphe)
+    static void AffecteGlyphe(TVirtualImageList *VirtualImageList, const int NumGlyphe, TBitmap *Glyphe)
     { // v5.4 pour affecter les SpeedButton->Glyph à partir des virtualImageList et supporter le HDPI
         VirtualImageList->GetBitmap(NumGlyphe, Glyphe);
     }
 
 public: // Déclarations de l'utilisateur
-    TfrmCarrefours(TComponent *Owner);
+    explicit TfrmCarrefours(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void Active(int Colonnes, int Lignes);
 };

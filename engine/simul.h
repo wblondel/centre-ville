@@ -217,7 +217,7 @@ class infection // v5.4.1
 public:
     friend class ExportEtat; // portage : lecture de l'état complet (tests du moteur)
     infection *Svt;
-    infection(const centre_ville *cv); // Patient zéro
+    explicit infection(const centre_ville *cv); // Patient zéro
     infection(int Tour, int NumPietonOrigine, int Rang);
     ~infection() { delete Svt; }
     [[nodiscard]] bool EstContagieux(int Tour) const

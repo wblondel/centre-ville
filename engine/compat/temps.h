@@ -14,9 +14,13 @@ class TDateTime
 public:
     double Val;
     TDateTime() : Val(0.0) {}
-    TDateTime(double d) : Val(d) {}
-    TDateTime(int i) : Val(static_cast<double>(i)) {}
-    operator double() const { return Val; }
+    TDateTime(double d) : Val(d) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TDateTime(int i)
+        : Val(static_cast<double>(i)) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    operator double() const
+    {
+        return Val;
+    } // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     TDateTime &operator+=(const TDateTime &dt)
     {
         Val += dt.Val;

@@ -313,9 +313,11 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args)
             {
                 ErreurFormat(f, "%p attend un pointeur");
             }
-            Texte = std::format("{:0{}X}", reinterpret_cast<std::uintptr_t>(a.Pointeur), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-                                                                                         // : adresse affichée
-                                2 * sizeof(void *));
+            Texte = std::format(
+                "{:0{}X}",
+                reinterpret_cast<std::uintptr_t>(a.Pointeur), // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+                                                              // : adresse affichée
+                2 * sizeof(void *));
             break;
         }
         default:

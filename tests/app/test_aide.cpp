@@ -103,12 +103,12 @@ QStringList Fichiers(const QString &asDossier)
 }
 } // namespace
 //---------------------------------------------------------------------------
-class TestAide : public QObject
+class TestAide : public QObject // NOLINT(misc-use-internal-linkage) : classe de test, lue par moc
 {
     Q_OBJECT
     QList<QUrl> Ouvertes; // adresses passées à QDesktopServices::openUrl
     QString stRepExe;     // dossier de l'exécutable des tests (stRepAide)
-    QString Cible(const QUrl &Page)
+    static QString Cible(const QUrl &Page)
     { // Adresse chargée par la page de redirection (balise meta et lien)
         const QString stPage = QString::fromUtf8(Contenu(Page.toLocalFile()));
         const QRegularExpressionMatch Meta =
@@ -138,7 +138,8 @@ void TestAide::initTestCase()
     stRepExe = QCoreApplication::applicationDirPath();
 }
 //---------------------------------------------------------------------------
-void TestAide::cleanupTestCase()
+void TestAide::cleanupTestCase() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot de
+                                 // Qt Test)
 {
     QDesktopServices::unsetUrlHandler("file");
 }
@@ -214,7 +215,8 @@ void TestAide::sommaireEtTutoriel()
     QVERIFY(QFile::exists(CV_DOSSIER_DOCS "/tutorial/index.html"));
 }
 //---------------------------------------------------------------------------
-void TestAide::aideCopieeACoteDeCvw()
+void TestAide::aideCopieeACoteDeCvw() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
+                                      // de Qt Test)
 { // html/ et tutocv/ à côté de cvw (Contents/Resources sous macOS), identiques à docs/
     const struct
     {

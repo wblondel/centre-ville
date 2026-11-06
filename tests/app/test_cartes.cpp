@@ -37,7 +37,7 @@ QByteArray Contenu(const QString &asFichier)
 }
 } // namespace
 //---------------------------------------------------------------------------
-class TestCartes : public QObject
+class TestCartes : public QObject // NOLINT(misc-use-internal-linkage) : classe de test, lue par moc
 {
     Q_OBJECT
     QTemporaryDir Temp;

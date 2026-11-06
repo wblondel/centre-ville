@@ -37,7 +37,7 @@ public: // portage : __published	// Composants gérés par l'EDI
 
 private: // Déclarations utilisateur
 public:  // Déclarations utilisateur
-    TfrmEpidemie(TComponent *Owner);
+    explicit TfrmEpidemie(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

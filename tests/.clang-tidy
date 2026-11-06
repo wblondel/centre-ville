@@ -1,6 +1,8 @@
-# Tests : la configuration de la racine, sauf la règle que Catch2 ne peut pas suivre
-# (chaque TEST_CASE s'enregistre dans un objet statique dont le constructeur peut lever une exception).
+# Tests : la configuration de la racine, sauf les règles que les macros de Catch2 ne peuvent pas suivre :
+# chaque TEST_CASE est une fonction static, enregistrée dans un objet statique dont le constructeur
+# peut lever une exception.
 InheritParentConfig: true
 Checks: >
   -bugprone-throwing-static-initialization,
-  -cert-err58-cpp
+  -cert-err58-cpp,
+  -misc-use-anonymous-namespace

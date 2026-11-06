@@ -24,13 +24,13 @@ public: // portage : __published	// Composants gérés par l'EDI
     void ButtonAppliquerClick(TObject *Sender) const;
     void ButtonAideClick(TObject *Sender);
     void FormShow(TObject *Sender) const;
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void ButtonFermerClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
-    TfrmDefNature(TComponent *Owner);
+    explicit TfrmDefNature(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

@@ -19,7 +19,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TStringGrid *StringGridCoordParkings{};
     TButton *ButtonAide{};
     void FormShow(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void ButtonFermerClick(TObject *Sender);
     void TabControlChange(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
@@ -27,7 +27,7 @@ public: // portage : __published	// Composants gérés par l'EDI
 
 private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
-    TfrmStatsVehicules(TComponent *Owner);
+    explicit TfrmStatsVehicules(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos() const;
 };

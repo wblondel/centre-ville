@@ -33,9 +33,12 @@ class String : public AnsiString
 {
 public:
     String() = default;
-    String(const char *s) : AnsiString(s) {}
-    String(const AnsiString &as) : AnsiString(as) {}
-    String(const std::string &s) : AnsiString(s) {}
+    String(const char *s)
+        : AnsiString(s) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const AnsiString &as)
+        : AnsiString(as) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const std::string &s)
+        : AnsiString(s) {} // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     [[nodiscard]] String UpperCase() const;
 };
 using UnicodeString = String;
@@ -62,6 +65,12 @@ template <class R, class... P, class C, class O>
 void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...))
 {
     Evenement = [Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+}
+// Gestionnaire qui n'utilise pas la fiche (fonction membre statique)
+template <class R, class... P, class O>
+void Connecte(std::function<R(P...)> &Evenement, O * /*Objet*/, R (*Gestionnaire)(P...))
+{
+    Evenement = Gestionnaire;
 }
 // Gestionnaire qui ne modifie pas la fiche (méthode const)
 template <class R, class... P, class C, class O>

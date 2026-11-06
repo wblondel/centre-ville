@@ -45,7 +45,7 @@ private: // Déclarations de l'utilisateur
     void AppliqueChoix() const;
 
 public: // Déclarations de l'utilisateur
-    TfrmParamTaxi(TComponent *Owner);
+    explicit TfrmParamTaxi(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

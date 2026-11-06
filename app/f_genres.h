@@ -36,11 +36,11 @@ public: // portage : __published	// Composants gérés par l'EDI
 
 private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
-    TfrmGeneration(TComponent *Owner);
+    explicit TfrmGeneration(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------
-// extern TfrmGeneration *frmGeneration;
+extern TfrmGeneration *frmGeneration; // v6.0.17 : déclaré (en commentaire dans l'original)
 extern void GenereReseau();
 //---------------------------------------------------------------------------
 #endif

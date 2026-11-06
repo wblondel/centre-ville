@@ -957,8 +957,8 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                                                                                                          // de "†"
                                                                                                          // réservé à
                                                                                                          // l'épidémie
-                                                    (2 * static_cast<int>(!!cv->Pieton[i - 1].Mort)) + // v5.4.1 :
-                                                                                                       // affiche "†"
+                                                    (2 * static_cast<int>(!!cv->Pieton[i - 1].Mort)) +   // v5.4.1 :
+                                                                                                         // affiche "†"
                                                     (4 * static_cast<int>(!!(cv->Pieton[i - 1].EstContagieux() &&
                                                                              (!cv->Pieton[i - 1].Mort))))] // v5.4.1 :
                                                                                                            // affiche
@@ -976,7 +976,7 @@ void TfrmSimulation::DrawGridSimulDrawCell(TObject * /*Sender*/, int Col, int Ro
                                                asSupInf[v->EstTeteFileTaxis()], // v4.3 (asSupInf remplace as12)
                                                asSupInf[2 * static_cast<int>(v->EstQueueFileTaxis())], // v4.3 (asSupInf
                                                                                                        // remplace as12)
-                                               cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1)); // v5.3
+                                               cv->PlaceTaxi[v->NumPlaceTaxi - 1].NumFile + 1));       // v5.3
         }
         if (v->NumTaxi != 0)
         { // v3.6
@@ -4879,6 +4879,8 @@ void TfrmSimulation::ActionAfficherInfectionExecute(TObject * /*Sender*/)
 // Implémentation d'IVueSimulation : les accès du moteur à frmSimulation et aux
 // autres fiches (engine/README.md, inventaire), un pour un
 //---------------------------------------------------------------------------
+namespace
+{
 class VueSimulation : public IVueSimulation
 {
     TfrmSimulation *f;
@@ -5000,6 +5002,7 @@ public:
         return ::AfficheMessage(asMessage, asTitre, Type, OrdreBoutonDefaut, OrdreBoutonEchap);
     }
 };
+} // namespace
 //---------------------------------------------------------------------------
 void TfrmSimulation::ChargeFiche()
 { // Équivalent du chargement du .dfm par le constructeur de TForm, puis OnCreate (OldCreateOrder)

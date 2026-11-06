@@ -247,34 +247,34 @@ const coin CoinDir[NBDIR + 1] = {aucun_coin, haut_droite, bas_droite, bas_gauche
 //---------------------------------------------------------------------------
 // v6.0.2 : FileRead renvoie le nombre d'octets lus, ou -1 : les deux étaient vrais dans
 // les chaînes de && des Charge(). Seul un champ lu en entier compte pour lu
-static bool LitChamp(int hfile, void *Champ, unsigned NbOctets)
+namespace
+{
+bool LitChamp(int hfile, void *Champ, unsigned NbOctets)
 {
     return FileRead(hfile, Champ, NbOctets) == static_cast<int>(NbOctets);
 }
 //---------------------------------------------------------------------------
 // v6.0.2 : un nombre d'éléments lu dans le fichier ne peut être ni négatif, ni plus grand
 // que le fichier (un élément y occupe au moins un octet) : il irait sinon jusqu'à new[]
-static long long TailleFichierCharge = 0;
-static bool NombreCredible(long long n)
+long long TailleFichierCharge = 0;
+bool NombreCredible(long long n)
 {
     return (n >= 0) && (n <= TailleFichierCharge);
 }
+} // namespace
 //---------------------------------------------------------------------------
 bool VerifierApresOuverture = false, VerifierAvantSimulation = false;
 //---------------------------------------------------------------------------
-int dx[NBDIR + 1] = {0, 0, 1, 0, NBXDEF - 1}, // v4.0 (const int->int, DEF)
-    dy[NBDIR + 1] = {0, NBYDEF - 1, 0, 1, 0}, // v4.0 (const int->int, DEF)
-    VersionFichier = 0,                       // v3.0
-    SvgNbFeux = 0,
-               SvgNbFeuxPieton = 0, // v5.2
-    SvgNbParkings = 0, SvgNbVehicules = 0,
-               SvgNbVehlibs = 0, // v5.3
-    SvgNbPietons = 0,            // v2.0
-    SvgNbArretsBus = 0,          // v3.0
-    SvgNbArretsTram = 0,         // v3.5
-    SvgNbPlacesTaxi = 0,         // v3.6
-    SvgNbPlacesPark = 0,         // v5.0
-    SvgNbPlacesVehlib = 0;       // v5.3
+int dx[NBDIR + 1] = {0, 0, 1, 0, NBXDEF - 1}; // v4.0 (const int->int, DEF)
+int dy[NBDIR + 1] = {0, NBYDEF - 1, 0, 1, 0}; // v4.0 (const int->int, DEF)
+int VersionFichier = 0;                       // v3.0
+int SvgNbFeux = 0;
+int SvgNbParkings = 0;
+int SvgNbVehicules = 0;
+int SvgNbPietons = 0;    // v2.0
+int SvgNbArretsBus = 0;  // v3.0
+int SvgNbArretsTram = 0; // v3.5
+int SvgNbPlacesTaxi = 0; // v3.6
 //---------------------------------------------------------------------------
 centre_ville *cv = nullptr;
 //-----------------------------------------------------------------------------
@@ -336,15 +336,8 @@ void AppelleAuChaos()
 // Routines privées
 //-----------------------------------------------------------------------------
 // v6.0.1 : asMsgErr par référence (par valeur dans l'original : les messages étaient perdus)
-void VerifiePosition(AnsiString &asMsgErr, const AnsiString &asSource, int x, int y,
-                     bool PeutEtreIndefinie); // v6.0.1 : prototype conforme à la définition
-void VerifieDirection(AnsiString &asMsgErr, const AnsiString &asSource, direction d, bool PeutEtreIndefinie);
-void VerifiePriorite(AnsiString &asMsgErr, const AnsiString &asSource, priorite p);
-void VerifieDirPoss(AnsiString &asMsgErr, const AnsiString &asSource, dirposs dp);
-void VerifieEtat(AnsiString &asMsgErr, const AnsiString &asSource, etat_feu e);
-void VerifieDmdVert(AnsiString &asMsgErr, const AnsiString &asSource, dmd_vert dv);
-void VerifiePsgRouge(AnsiString &asMsgErr, const AnsiString &asSource, psg_rouge pr);
-//-----------------------------------------------------------------------------
+namespace
+{
 void VerifiePosition(AnsiString &asMsgErr, const AnsiString &asSource, int x, int y, bool PeutEtreIndefinie)
 {
     if (((x < -1) && PeutEtreIndefinie) || ((x < 0) && (!PeutEtreIndefinie)) || (x >= cv->NbX))
@@ -428,6 +421,7 @@ void VerifiePsgRouge(AnsiString &asMsgErr, const AnsiString &asSource, psg_rouge
                                       TableauDeConstantes(static_cast<int>(pr))); // v5.4 enum as char type (cast int)
     }
 }
+} // namespace
 //-----------------------------------------------------------------------------
 // Méthodes des classes
 //-----------------------------------------------------------------------------

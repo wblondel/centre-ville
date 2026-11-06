@@ -131,7 +131,9 @@ void TfrmRecherche::RadioButtonClick(TObject * /*Sender*/)
     RafraichitAffichage();
 }
 //---------------------------------------------------------------------------
-static void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 : tirée de FixeNumeroMax
+namespace
+{
+void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 : tirée de FixeNumeroMax
 {
     const TNotifyEvent Change = CSpinEdit->OnChange;
     CSpinEdit->OnChange = nullptr;
@@ -142,7 +144,7 @@ static void FixeValeurSansChange(TCSpinEdit *CSpinEdit, int Valeur) // v6.0.12 :
 // v6.0.2 : un numéro resté plus grand que le nombre d'éléments (carte précédente)
 // est ramené dans les bornes. Sans OnChange : le curseur ne doit pas quitter la case
 // courante à l'ouverture de la fiche
-static void FixeNumeroMax(TCSpinEdit *CSpinEdit, int NumMax)
+void FixeNumeroMax(TCSpinEdit *CSpinEdit, int NumMax)
 {
     CSpinEdit->MaxValue = NumMax;
     if (CSpinEdit->Value > NumMax)
@@ -156,7 +158,7 @@ static void FixeNumeroMax(TCSpinEdit *CSpinEdit, int NumMax)
 // sans OnChange si l'élément est sur une autre case (autre case d'un arrêt, case arrière d'un
 // bus ou d'un tram, queue de la file d'une place), sauf si son bouton est coché : la fiche
 // cherche alors cet élément, comme après un clic sur le bouton
-static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int Numero, bool Ailleurs)
+void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int Numero, bool Ailleurs)
 {
     if (Ailleurs && !RadioButton->Checked)
     {
@@ -167,6 +169,7 @@ static void FixeNumeroCase(TCSpinEdit *CSpinEdit, TRadioButton *RadioButton, int
         CSpinEdit->Value = Numero;
     }
 }
+} // namespace
 //---------------------------------------------------------------------------
 void TfrmRecherche::FormShow(TObject * /*Sender*/) const
 {

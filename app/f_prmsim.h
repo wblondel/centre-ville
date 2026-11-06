@@ -61,8 +61,8 @@ public: // portage : __published	// Composants gérés par l'EDI
     void ButtonAppliquerClick(TObject *Sender);
     void FormShow(TObject *Sender);
 
-    void BitBtnAppliqueDureeFeuVertClick(TObject *Sender);
-    void BitBtnAppliqueDureeFeuRougeClick(TObject *Sender);
+    static void BitBtnAppliqueDureeFeuVertClick(TObject *Sender);
+    static void BitBtnAppliqueDureeFeuRougeClick(TObject *Sender);
     void CSpinEditDureeVertChange(TObject *Sender) const;
     void CSpinEditDureeRougeChange(TObject *Sender) const;
     void CSpinEditNbPietonsChange(TObject *Sender);
@@ -88,7 +88,7 @@ private: // Déclarations de l'utilisateur
     bool AppliqueChoix();
     void CalculeChoixPossiblesNbVehicules(); // v5.0
 public:                                      // Déclarations de l'utilisateur
-    TfrmParamSimul(TComponent *Owner);
+    explicit TfrmParamSimul(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

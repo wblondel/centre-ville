@@ -193,11 +193,8 @@
 #include "format_reference.h"
 #include "harnais.h"
 #include "compat/fichier.h"
-#include "compat/alea.h" // après les en-têtes système
+#include "compat/alea.h"
 //---------------------------------------------------------------------------
-extern TfrmGeneration *frmGeneration;             // défini dans f_genres.cpp (non déclaré par f_genres.h d'origine)
-extern TfrmStatsComposition *frmStatsComposition; // défini dans f_statsc.cpp (déclaration en commentaire dans
-                                                  // f_statsc.h)
 //---------------------------------------------------------------------------
 namespace
 {
@@ -714,7 +711,7 @@ public:
 #endif
 } // namespace
 //---------------------------------------------------------------------------
-class TestInterface : public QObject
+class TestInterface : public QObject // NOLINT(misc-use-internal-linkage) : classe de test, lue par moc
 {
     Q_OBJECT
     QString Carte;
@@ -736,7 +733,7 @@ class TestInterface : public QObject
     {
         Etapes.push_back({.Fiche = std::move(Fiche), .Action = std::move(Action)});
     }
-    void CaptureFiche(QWidget *Fiche, const QString &asNom)
+    static void CaptureFiche(QWidget *Fiche, const QString &asNom)
     {
         if (DossierCaptures.isEmpty())
         {
@@ -746,7 +743,7 @@ class TestInterface : public QObject
         QApplication::processEvents();
         QVERIFY(Fiche->grab().save(DossierCaptures + "/" + asNom));
     }
-    void Clique(QWidget *w)
+    static void Clique(QWidget *w)
     { // Cases à cocher et boutons radio : clic à l'extrémité droite, hors du
       // texte (la VCL y réagit ; Qt, seulement sur la case et le texte)
         if (qobject_cast<QCheckBox *>(w) || qobject_cast<QRadioButton *>(w))
@@ -758,7 +755,7 @@ class TestInterface : public QObject
             QTest::mouseClick(w, Qt::LeftButton);
         }
     }
-    void Touche(QWidget *w, Qt::Key Touche)
+    static void Touche(QWidget *w, Qt::Key Touche)
     { // Touche frappée dans le contrôle actif (qui reçoit le clavier)
         w->window()->activateWindow();
         w->setFocus(Qt::OtherFocusReason);
@@ -770,13 +767,13 @@ class TestInterface : public QObject
         QVERIFY(b);
         Clique(b);
     }
-    void PlaceCurseur(int x, int y)
+    static void PlaceCurseur(int x, int y)
     { // Case courante (et ancre), puis OnDrawCell de la case : état des actions
         frmSimulation->DrawGridSimul->Col = x;
         frmSimulation->DrawGridSimul->Row = y;
         frmSimulation->DrawGridSimul->Repaint();
     }
-    void Selectionne(int x1, int y1, int x2, int y2)
+    static void Selectionne(int x1, int y1, int x2, int y2)
     { // Clic sur (x1, y1) puis Maj+clic sur (x2, y2), comme l'utilisateur
         GrilleSimulation *g = frmSimulation->DrawGridSimul;
         g->LeftCol = 0;
@@ -793,7 +790,7 @@ class TestInterface : public QObject
         QCOMPARE(g->Selection.Right, qMax(x1, x2));
         QCOMPARE(g->Selection.Bottom, qMax(y1, y2));
     }
-    void OuvreFichier(const QString &asFichier)
+    static void OuvreFichier(const QString &asFichier)
     { // Ouverture comme depuis le Finder (QFileOpenEvent, macOS)
         OuvertureFichiers Ouverture;
         qApp->installEventFilter(&Ouverture);
@@ -812,12 +809,12 @@ class TestInterface : public QObject
         OuvreFichier(f);
         return f;
     }
-    void Enregistre(const QString &asFichier)
+    static void Enregistre(const QString &asFichier)
     {
         frmSimulation->SaveDialog->FileName = A(QDir::toNativeSeparators(asFichier));
         frmSimulation->ActionEnregistrer->Execute();
     }
-    void Capture(const QString &asNom)
+    static void Capture(const QString &asNom)
     {
         if (DossierCaptures.isEmpty())
         {
@@ -826,7 +823,7 @@ class TestInterface : public QObject
         QDir().mkpath(DossierCaptures);
         QVERIFY(frmSimulation->grab().save(DossierCaptures + "/" + asNom));
     }
-    bool AttendTour(long Tour, int DelaiMs)
+    static bool AttendTour(long Tour, int DelaiMs)
     {
         return QTest::qWaitFor([Tour] { return cv && (cv->TourCrt >= Tour); }, DelaiMs);
     }
@@ -834,7 +831,7 @@ class TestInterface : public QObject
     // par OnTimer comme le QTimer), puis les événements en attente (dessins), comme
     // dans la boucle de l'application ; le minuteur, arrêté par Demarre, ne joue
     // aucun tour pendant que le test clique et vérifie
-    void JoueTour()
+    static void JoueTour()
     {
         frmSimulation->TimerSimul->OnTimer(frmSimulation->TimerSimul);
         QApplication::processEvents();
@@ -855,7 +852,7 @@ class TestInterface : public QObject
     // Arrêt et Interruption ne sont traités qu'au tic suivant du minuteur
     // (TypeDemande) : relancé après la demande, son premier tic la traite sans
     // jouer de tour
-    void RelanceMinuteur()
+    static void RelanceMinuteur()
     {
         if (frmSimulation->SimulationEnCours)
         {
@@ -894,7 +891,7 @@ class TestInterface : public QObject
     // Marche n'a rien démarré : les boutons et le menu d'Arrêt sont grisés, Marche
     // est disponible et le réseau est celui d'avant le clic (Octets) ; aucun bus
     // ni tram (les Prepare* les comptent sur leur ligne, à l'origine du blocage)
-    void VerifieNonDemarre(const QByteArray &Octets)
+    static void VerifieNonDemarre(const QByteArray &Octets)
     {
         QVERIFY(!frmSimulation->SimulationEnCours);
         QVERIFY(!frmSimulation->Pause);
@@ -1043,7 +1040,7 @@ class TestInterface : public QObject
         return QTest::qWaitFor(
             [] { return !frmSimulation->SimulationEnCours && !frmSimulation->Pause && (cv->TourCrt == 0); }, 10000);
     }
-    void CliqueCase(int x, int y)
+    static void CliqueCase(int x, int y)
     { // Clic de l'utilisateur sur la case (x, y), amenée dans la vue, puis le
       // dessin qui le suit avant toute autre action de l'utilisateur : OnDrawCell
       // de la case courante règle l'état des actions (« Suivre... »)
@@ -1127,7 +1124,7 @@ class TestInterface : public QObject
         std::function<int()> Lu;
         int Cible = 0;
     };
-    ChampFiche ChampSpin(const char *Nom, const std::function<TCSpinEdit *()> &Champ, std::function<int()> Lu)
+    static ChampFiche ChampSpin(const char *Nom, const std::function<TCSpinEdit *()> &Champ, std::function<int()> Lu)
     {
         ChampFiche c;
         c.Nom = Nom;
@@ -1256,7 +1253,7 @@ class TestInterface : public QObject
         QVERIFY2(Etapes.empty(), Fiche);
         QVERIFY2(Ecarts.isEmpty(), qPrintable(Ecarts.join('\n')));
     }
-    void DoubleCliqueCase(int x, int y)
+    static void DoubleCliqueCase(int x, int y)
     { // Double-clic de l'utilisateur sur la case : choix d'un feu pendant une sélection
         GrilleSimulation *g = frmSimulation->DrawGridSimul;
         g->LeftCol = qMax(0, x - 4);
@@ -1343,7 +1340,7 @@ class TestInterface : public QObject
         QVERIFY2(Action->Enabled, qPrintable(QString("(%1, %2)").arg(x).arg(y)));
         Action->Execute();
     }
-    void Focalise()
+    static void Focalise()
     {
         frmSimulation->activateWindow();
         (void)QTest::qWaitForWindowActive(frmSimulation, 2000);
@@ -1409,7 +1406,7 @@ class TestInterface : public QObject
         Clique(frmSimulation->ToolButtonParametres);
     }
     QList<QUrl> UrlsOuvertes; // QDesktopServices::openUrl, intercepté par UrlOuverte
-    QUrl AdresseAide(const QUrl &Url)
+    static QUrl AdresseAide(const QUrl &Url)
     { // Aide contextuelle : adresse que charge la page de redirection (base.cpp)
         const QRegularExpressionMatch m =
             QRegularExpression("url='([^']*)'").match(QString::fromUtf8(Contenu(Url.toLocalFile())));
@@ -10288,16 +10285,17 @@ void TestInterface::menuContextuelDeLaGrille()
     QCOMPARE(EtatGrille(g), EtatAttendu(1, 2, 0, 5));
 }
 //---------------------------------------------------------------------------
-void TestInterface::controleCSpinEdit()
-{ // TCSpinEdit comme CSPIN.pas, sur un champ seul : MinValue et MaxValue sont
-  // de simples champs (ni le texte ni OnChange ne bougent) ; Value=... est
-  // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
-  // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
-  // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
-  // le texte prend cette valeur en quittant le champ (v6.0.3) ; flèches :
-  // Value±Increment, borné ; sans bornes si MinValue=MaxValue=0 (v6.0.3) ;
-  // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
-  // le champ (sauf au clic)
+void TestInterface::controleCSpinEdit() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
+                                        // (slot de Qt Test)
+{                                       // TCSpinEdit comme CSPIN.pas, sur un champ seul : MinValue et MaxValue sont
+                                        // de simples champs (ni le texte ni OnChange ne bougent) ; Value=... est
+                                        // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
+                                        // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
+                                        // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
+                                        // le texte prend cette valeur en quittant le champ (v6.0.3) ; flèches :
+                                        // Value±Increment, borné ; sans bornes si MinValue=MaxValue=0 (v6.0.3) ;
+                                        // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
+                                        // le champ (sauf au clic)
     QWidget Fiche;
     auto *s = new TCSpinEdit(&Fiche);
     auto *b = new TButton(&Fiche);
@@ -10503,13 +10501,14 @@ void TestInterface::aideContextuelle()
     QDesktopServices::unsetUrlHandler("file");
 }
 //---------------------------------------------------------------------------
-void TestInterface::textesResserres()
-{ // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
-  // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
-  // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
-  // tient. Libellés des fiches : texte entier, une fois resserré (cases à
-  // cocher et boutons radio : selon la taille de la case du style, celle de
-  // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
+void TestInterface::textesResserres() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
+                                      // de Qt Test)
+{                                     // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
+                                      // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
+                                      // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
+                                      // tient. Libellés des fiches : texte entier, une fois resserré (cases à
+                                      // cocher et boutons radio : selon la taille de la case du style, celle de
+                                      // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
     const QFont f = frmRecherche->RadioButtonParking->font();
     const QString t = QString::fromUtf8("Place parking n°");
     const int Dr = Qt::AlignLeft | Qt::AlignVCenter;
@@ -10584,11 +10583,12 @@ void TestInterface::textesResserres()
                                                                 // de FAIL!
 }
 //---------------------------------------------------------------------------
-void TestInterface::couleursLisibles()
-{ // v6.0.16 : couleurs de texte fixées par le .dfm (Composition), sous le
-  // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
-  // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
-  // clair de la VCL, vert et rouge sur fond sombre)
+void TestInterface::couleursLisibles() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
+                                       // (slot de Qt Test)
+{                                      // v6.0.16 : couleurs de texte fixées par le .dfm (Composition), sous le
+                                       // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
+                                       // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
+                                       // clair de la VCL, vert et rouge sur fond sombre)
     const QColor Sombre(30, 30, 30);
     const QColor Clair(236, 236, 236);
     for (const TColor c : {clNavy, clMaroon, clPurple})
@@ -10616,10 +10616,11 @@ void TestInterface::couleursLisibles()
     QVERIFY(JauneLisible.lightness() < Jaune.lightness());
 }
 //---------------------------------------------------------------------------
-void TestInterface::ongletsEntiers()
-{ // v6.0.16 : onglets de Véhicules dans la police de la fiche (sous macOS, Qt
-  // leur donnait celle du système, plus grande : texte abrégé), resserrée
-  // tant qu'un texte est abrégé
+void TestInterface::ongletsEntiers() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
+                                     // de Qt Test)
+{                                    // v6.0.16 : onglets de Véhicules dans la police de la fiche (sous macOS, Qt
+                                     // leur donnait celle du système, plus grande : texte abrégé), resserrée
+                                     // tant qu'un texte est abrégé
     TTabControl *t = frmStatsVehicules->TabControl;
     auto *Onglets = t->findChild<QTabBar *>();
     QVERIFY(Onglets);
@@ -10637,11 +10638,12 @@ void TestInterface::ongletsEntiers()
     QVERIFY2(t->OngletsEntiers(), qPrintable(QString::number(Onglets->font().stretch())));
 }
 //---------------------------------------------------------------------------
-void TestInterface::policesEtStyleWindows()
-{ // Affichage natif de Windows (recette, pas la CI en « offscreen ») : les
-  // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
-  // (libellés entiers), avec le style « windowsvista » (valeur des champs
-  // numériques visible)
+void TestInterface::policesEtStyleWindows() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
+                                            // (slot de Qt Test)
+{                                           // Affichage natif de Windows (recette, pas la CI en « offscreen ») : les
+                                            // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
+                                            // (libellés entiers), avec le style « windowsvista » (valeur des champs
+                                            // numériques visible)
     if (QGuiApplication::platformName() != QLatin1String("windows"))
     {
         QSKIP("affichage natif de Windows seulement");

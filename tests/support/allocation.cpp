@@ -12,16 +12,22 @@
 // Compte aussi les blocs vivants, pour vérifier que le moteur libère ce qu'il
 // alloue (NombreAllocationsVives, test_corrections.cpp).
 //---------------------------------------------------------------------------
+#include "allocation.h"
 #include <atomic>
 #include <cstdlib>
 #include <new>
 //---------------------------------------------------------------------------
-static std::atomic<long> AllocationsVives{0};
+namespace
+{
+std::atomic<long> AllocationsVives{0};
+} // namespace
 long NombreAllocationsVives()
 {
     return AllocationsVives;
 }
-static void *Alloue(std::size_t n) noexcept
+namespace
+{
+void *Alloue(std::size_t n) noexcept
 {
     void *p = std::calloc((n != 0U) ? n : 1, 1);
     if (p)
@@ -30,7 +36,7 @@ static void *Alloue(std::size_t n) noexcept
     }
     return p;
 }
-static void Libere(void *p) noexcept
+void Libere(void *p) noexcept
 {
     if (p)
     {
@@ -38,6 +44,7 @@ static void Libere(void *p) noexcept
     }
     std::free(p);
 }
+} // namespace
 //---------------------------------------------------------------------------
 void *operator new(std::size_t n)
 {

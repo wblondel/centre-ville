@@ -114,7 +114,7 @@ public:
         return &Objet;
     }
     const T *operator->() const { return &Objet; }
-    operator T *()
+    operator T *() // NOLINT(*-explicit-constructor) : conversion implicite voulue, comme la VCL
     {
         Acces();
         return &Objet;

@@ -45,7 +45,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     void ButtonOkClick(TObject *Sender);
     void ButtonAppliquerClick(TObject *Sender);
     void ButtonAnnulerClick(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
     void FormCreate(TObject *Sender);
     void SpeedButtonClick(TObject *Sender);
@@ -61,7 +61,7 @@ private:                       // Déclarations de l'utilisateur
     void DefinitFeu(direction Dir) const;
 
 public: // Déclarations de l'utilisateur
-    TfrmDefVoiePietons(TComponent *Owner);
+    explicit TfrmDefVoiePietons(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
     void AppliqueChoix();

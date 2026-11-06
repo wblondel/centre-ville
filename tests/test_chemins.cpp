@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "allocation.h"
 #include "cartes.h"
 #include "catch2/catch_message.hpp"
 #include "compat/chaine.h"
@@ -20,7 +21,6 @@
 #include "vue.h"
 #include "compat/alea.h"
 //---------------------------------------------------------------------------
-long NombreAllocationsVives(); // support/allocation.cpp
 //---------------------------------------------------------------------------
 namespace
 {

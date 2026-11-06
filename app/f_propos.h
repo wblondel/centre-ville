@@ -47,7 +47,7 @@ public: // portage : __published
     void LabelEMailClick(TObject *Sender) const;
     void FormCreate(TObject *Sender);
     void FormKeyPress(TObject *Sender, char &Key) const;
-    void LabelClick(TObject *Sender);
+    static void LabelClick(TObject *Sender);
 
 private:
     int TempsEcoule{};
@@ -55,7 +55,7 @@ private:
 
 public: // Déclarations de l'utilisateur
     bool FermetureAutomatique{};
-    TfrmAPropos(TComponent *Owner);
+    explicit TfrmAPropos(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

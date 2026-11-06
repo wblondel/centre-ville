@@ -4,6 +4,7 @@
 // Chaque cas échoue (ou, pour le blocage des vehlibs, ne se termine pas : le
 // délai de CTest le fait échouer) sur le moteur 6.0.0, identique à l'original.
 //---------------------------------------------------------------------------
+#include "allocation.h"
 #include "catch2/catch_message.hpp"
 #include "compat/chaine.h"
 #include "simul.h"
@@ -409,7 +410,6 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
     vue = nullptr;
 }
 //---------------------------------------------------------------------------
-long NombreAllocationsVives(); // support/allocation.cpp
 //---------------------------------------------------------------------------
 TEST_CASE("~centre_ville libère toute la mémoire du réseau", "[corrections][memoire]")
 { // v6.0.2 : l'original ne libérait ni FeuP, ni Bus, ni Tram

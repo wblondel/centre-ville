@@ -147,7 +147,10 @@ void CopieCartesExemple(const QString &stSource, const QString &stDestination)
 // v5.3. S'active automatiquement au lancement de cvw.exe avec le paramètre ! et génère un fichier cvw.log où se trouve
 // cvw.exe à la fermeture de l'application Usage : DebugEcrit("message");
 bool Debug = false;
+namespace
+{
 std::vector<AnsiString> *slDebug = nullptr; // portage : TStringList -> vecteur de lignes
+} // namespace
 //---------------------------------------------------------------------------
 void DebugOuvre()
 {
@@ -328,6 +331,8 @@ int MessageDlg(const AnsiString &asMessage, TMsgDlgType Type, TMsgDlgButtons Bou
 // d'origine ({app}\bin). Sous macOS, ils sont dans Contents/Resources du
 // paquet : Contents/MacOS ne doit contenir que du code (signature du paquet).
 //---------------------------------------------------------------------------
+namespace
+{
 String stRepAide()
 {
     QString stRep = QCoreApplication::applicationDirPath();
@@ -373,6 +378,7 @@ void AffichePageHtml(const String &stURL)
     }
     QDesktopServices::openUrl(Url);
 }
+} // namespace
 //---------------------------------------------------------------------------
 void AfficheAideContextuelle(QWidget *Form)
 { // v5.3 : conversion HLP > HTML.

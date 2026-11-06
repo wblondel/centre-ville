@@ -197,7 +197,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *LabelT{};
     void FormShow(TObject *Sender);
     void CSpinEditChange(TObject *Sender);
-    void CSpinEditExit(TObject *Sender); // v6.0.2
+    static void CSpinEditExit(TObject *Sender); // v6.0.2
     void ButtonAideClick(TObject *Sender);
     void MenuItemClick(TObject *Sender);
     void BitBtnDirClick(TObject *Sender) const;
@@ -220,7 +220,7 @@ private: // Déclarations de l'utilisateur
 
 public: // Déclarations de l'utilisateur
     int NumArretBusAMontrer{};
-    TfrmParamBus(TComponent *Owner);
+    explicit TfrmParamBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

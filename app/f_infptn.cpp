@@ -70,7 +70,7 @@ constexpr std::array<const char *, NBSITUATIONS> asSituation = {
     "Descend au prochain arrêt",
     "Ecrasé (mode sanglant)",
     "Mort (épidémie)",
-};                                                               // v5.3 // v5.3 // v5.3
+}; // v5.3 // v5.3 // v5.3
 constexpr std::array<const char *, 2> asOuiNon = {"Non", "Oui"}; // v5.4.1
 constexpr const char *asFrmPrmDrn = "%d, %d";                    // v5.4.1
 constexpr std::array<const char *, 2> asEtatFinal = {"Guéri", "Mort"};

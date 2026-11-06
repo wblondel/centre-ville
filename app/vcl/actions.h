@@ -94,7 +94,7 @@ class TActionList : public QObject
 public:
     std::vector<TAction *> Actions;
     Propriete<int> ActionCount;
-    TActionList(QObject *Parent) : QObject(Parent)
+    explicit TActionList(QObject *Parent) : QObject(Parent)
     {
         ActionCount.Definit([this] { return static_cast<int>(Actions.size()); }, [](const int &) {});
     }
@@ -144,7 +144,7 @@ class TMenu : public QObject
 {
 public:
     std::vector<TMenuItem *> Items;
-    TMenu(QObject *Parent) : QObject(Parent) {}
+    explicit TMenu(QObject *Parent) : QObject(Parent) {}
     bool IsShortCut(TShortCut Raccourci, bool Executer);
 };
 //---------------------------------------------------------------------------
@@ -152,7 +152,7 @@ class TMainMenu : public TMenu
 {
 public:
     QMenuBar *Barre;
-    TMainMenu(QMenuBar *b);
+    explicit TMainMenu(QMenuBar *b);
 };
 //---------------------------------------------------------------------------
 class TPopupMenu : public TMenu
@@ -160,7 +160,7 @@ class TPopupMenu : public TMenu
 public:
     QMenu *Menu;
     TNotifyEvent OnPopup;
-    TPopupMenu(QMenu *m);
+    explicit TPopupMenu(QMenu *m);
     void Popup(int X, int Y); // coordonnées écran
 };
 //---------------------------------------------------------------------------

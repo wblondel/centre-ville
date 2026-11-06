@@ -32,7 +32,7 @@ public: // portage : __published	// Composants gérés par l'EDI
 private: // Déclarations de l'utilisateur
 public:  // Déclarations de l'utilisateur
     int NbX{}, NbY{};
-    TfrmDimensionsZone(TComponent *Owner);
+    explicit TfrmDimensionsZone(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

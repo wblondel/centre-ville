@@ -13,15 +13,15 @@ class TfrmStatistiques : public TForm
 public: // portage : __published	// Composants gérés par l'EDI
     TPaintBox *PaintBoxStats{};
     void PaintBoxStatsPaint(TObject *Sender) const;
-    void FormShow(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormShow(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void FormCreate(TObject *Sender) const;
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
 
 private:                      // Déclarations de l'utilisateur
 public:                       // Déclarations de l'utilisateur
     bool AffichageEpidemique; // v5.4.1. Définit avant l'appel à FormShow par frmSimulation
-    TfrmStatistiques(TComponent *Owner);
+    explicit TfrmStatistiques(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------

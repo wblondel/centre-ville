@@ -55,7 +55,7 @@ public: // portage : __published	// Composants gérés par l'EDI
     TLabel *Label16{};
     TLabel *LabelToursEntreArrets{};
     void FormShow(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void ButtonOkClick(TObject *Sender);
     void ButtonAideClick(TObject *Sender);
     void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
@@ -67,7 +67,7 @@ private: // Déclarations de l'utilisateur
     void RendreVisibleInfos(bool Visible);
 
 public: // Déclarations de l'utilisateur
-    TfrmInfosBus(TComponent *Owner);
+    explicit TfrmInfosBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void RafraichitInfos();
 };

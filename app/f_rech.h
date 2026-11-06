@@ -60,7 +60,7 @@ public: // portage : __published	// Composants gérés par l'EDI
 
     void CSpinEditVehiculeChange(TObject *Sender) const;
     void ButtonAnnulerClick(TObject *Sender);
-    void FormHide(TObject *Sender);
+    static void FormHide(TObject *Sender);
     void CSpinEditPietonChange(TObject *Sender) const;
     void ButtonAideClick(TObject *Sender);
     void CSpinEditArretBusChange(TObject *Sender) const;
@@ -80,7 +80,7 @@ private: // Déclarations de l'utilisateur
     void RafraichitAffichage();
 
 public: // Déclarations de l'utilisateur
-    TfrmRecherche(TComponent *Owner);
+    explicit TfrmRecherche(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
 };
 //---------------------------------------------------------------------------
