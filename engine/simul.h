@@ -601,11 +601,13 @@ class feu_pieton // v5.2
 public:
     feu_pieton(const feu_pieton &) = delete;
     feu_pieton &operator=(const feu_pieton &) = delete;
-    int x[NBFEUXPIETONSPARNUMERO]{}, y[NBFEUXPIETONSPARNUMERO]{},
-        Dir[NBFEUXPIETONSPARNUMERO]{}, // Deux feux pitons sont positionnés de part et d'autre d'un passage piétons.
-                                       // NumFeuDir
-        iFeuDir[NBDIR]{}; // (Arch, qu'est-ce qu'y feut dire ?) ...Permet d'avoir directement les coordonnées du feu en
-                          // fonction de la direction Attention à l'accès : iFeuDir[(direction)d-1]
+    std::array<int, NBFEUXPIETONSPARNUMERO> x{};
+    std::array<int, NBFEUXPIETONSPARNUMERO> y{};
+    std::array<int, NBFEUXPIETONSPARNUMERO> Dir{}; // Deux feux pitons sont positionnés de part et d'autre d'un passage
+                                                   // piétons. NumFeuDir
+    std::array<int, NBDIR> iFeuDir{}; // (Arch, qu'est-ce qu'y feut dire ?) ...Permet d'avoir directement les
+                                      // coordonnées du feu en fonction de la direction Attention à l'accès :
+                                      // iFeuDir[(direction)d-1]
     etat_feu Etat{}, ProchainEtat{};
     int NbFeux{},                                    // Nbre de feux de circulation liés
         DureeRouge{}, DureeVert{}, DureeTraversee{}, // Soit 1+2*Cases Passage piéton. Défini quand le feu opposé est
@@ -821,9 +823,10 @@ class arret_bus // v3.0
     int Numero;
 
 public:
-    int x{}, y{};                     // Position de la tête de l'arrêt de bus (indiquant les couleurs de lignes)
-    bool Ligne[NBMAXLIGNESBUSTRAM]{}; // Indique si une ligne de bus passe par cet arrêt (Index-1)
-    int NbLignes{}, NumLigne[NBMAXLIGNESBUSTRAM]{}; // Liste des lignes de bus passant par cet arrêt (Index-1)
+    int x{}, y{}; // Position de la tête de l'arrêt de bus (indiquant les couleurs de lignes)
+    std::array<bool, NBMAXLIGNESBUSTRAM> Ligne{}; // Indique si une ligne de bus passe par cet arrêt (Index-1)
+    int NbLignes{};
+    std::array<int, NBMAXLIGNESBUSTRAM> NumLigne{}; // Liste des lignes de bus passant par cet arrêt (Index-1)
     void Initialise();
     arret_bus()
     {
@@ -851,10 +854,10 @@ class ligne_bus // v3.0
 {
     int Numero; // Numéro de la ligne (CoulLigneBus[Numero]=Couleur de la ligne)
 public:
-    int NbArrets{},                             // Nb arrêts de la ligne
-        NumArret[NBMAXARRETSBUSTRAMPARLIGNE]{}, // Ordre des arrêts à effectuer
-        NbBus{},                                // Nb bus de la ligne
-        NumBus[NBMAXBUSTRAMPARLIGNE]{};         // N° des bus de la ligne
+    int NbArrets{};                                         // Nb arrêts de la ligne
+    int NbBus{};                                            // Nb bus de la ligne
+    std::array<int, NBMAXARRETSBUSTRAMPARLIGNE> NumArret{}; // Ordre des arrêts à effectuer
+    std::array<int, NBMAXBUSTRAMPARLIGNE> NumBus{};         // N° des bus de la ligne
     void Initialise();
     ligne_bus()
     {
@@ -927,9 +930,10 @@ class arret_tram // v3.5
     int Numero;
 
 public:
-    int x{}, y{};                     // Position de la tête de l'arrêt de tram (indiquant les couleurs de lignes)
-    bool Ligne[NBMAXLIGNESBUSTRAM]{}; // Indique si une ligne de tram passe par cet arrêt (Index-1)
-    int NbLignes{}, NumLigne[NBMAXLIGNESBUSTRAM]{}; // Liste des lignes de tram passant par cet arrêt (Index-1)
+    int x{}, y{}; // Position de la tête de l'arrêt de tram (indiquant les couleurs de lignes)
+    std::array<bool, NBMAXLIGNESBUSTRAM> Ligne{}; // Indique si une ligne de tram passe par cet arrêt (Index-1)
+    int NbLignes{};
+    std::array<int, NBMAXLIGNESBUSTRAM> NumLigne{}; // Liste des lignes de tram passant par cet arrêt (Index-1)
     void Initialise();
     arret_tram()
     {
@@ -957,10 +961,10 @@ class ligne_tram // v3.5
 {
     int Numero; // Numéro de la ligne (CoulLigneTram[Numero]=Couleur de la ligne)
 public:
-    int NbArrets{},                             // Nb arrêts de la ligne
-        NumArret[NBMAXARRETSBUSTRAMPARLIGNE]{}, // Ordre des arrêts à effectuer
-        NbTrams{},                              // Nb tram de la ligne
-        NumTram[NBMAXBUSTRAMPARLIGNE]{};        // N° des tram de la ligne
+    int NbArrets{};                                         // Nb arrêts de la ligne
+    int NbTrams{};                                          // Nb tram de la ligne
+    std::array<int, NBMAXARRETSBUSTRAMPARLIGNE> NumArret{}; // Ordre des arrêts à effectuer
+    std::array<int, NBMAXBUSTRAMPARLIGNE> NumTram{};        // N° des tram de la ligne
     void Initialise();
     ligne_tram()
     {
@@ -1253,36 +1257,39 @@ public:
     voie &operator=(const voie &) = delete;
     dirposs DirPoss{};
     sens_voie_tram SensVoieTram{}; // v3.5. 0 = aucune voie. Sinon 0<SensVoieTram<64.
-    priorite Priorite[4]{};
+    std::array<priorite, 4> Priorite{};
     nature Nature{}; // v3.8. 0 = rien (fond noir), poids fort = type (voies,trottoirs,immeubles), poid faible = décors
                      // (arbre, pelouse, etc.)
-    bool ToutDroit{}, PassagePietons{}, // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
-        PassageBus{}, // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
-        LigneBus[NBMAXLIGNESBUSTRAM]{},   // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation
-                                          // par la fiche paramètres du réseau de bus UNIQUEMENT)
-        LigneTram[NBMAXLIGNESBUSTRAM]{};  // v3.5. Si Ligne[i] alors la ligne n°i+1 passe par cette case (visualisation
-                                          // par la fiche paramètres du réseau de tram UNIQUEMENT)
-    int NumFeu[NBFEUXPARCASE]{},          // >0 si feu éventuel (=index+1 de cv->Feu) (v5.2: NBFEUXPARCASE)
-        NumFeuP[NBFEUXPARCASE]{},         // v5.2. >0 si feu piéton éventuel (=index+1 de cv->FeuP)
-        NumVehicule{},                    // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
-        NumVehlib{},                      // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
-        NumBus{},                         // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
-        NumTram{},                        // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
-        NumParking{},                     // >0 si c'est un parking (=index+1 de cv->parking)
-        NumProchVeh{},                    // >0 si un véhicule doit passer sur la case lors du prochain mouvement
-        NumProchVL{},                     // >0 si un vehlib doit passer sur la case lors du prochain mouvement
-        NumProchBus{},                    // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement
-        NumProchTram{},                   // v3.5. >0 si un tram doit passer sur la case lors du prochain mouvement
-        NumProchTaxi{},                   // v3.6. >0 si un taxi doit passer sur la case lors du prochain mouvement
-        NbPietons{},                      // v2.0. Nombre de pietons sur cette case
-        NumArretBus{},                    // v3.0. >0 si arrêt de bus (=index+1 de cv->ArretBus)
-        NumArretTram{},                   // v3.5. >0 si arrêt de tram (=index+1 de cv->ArretTram)
-        NumTaxi{},                        // v3.6. >0 si taxi (=index+1 de cv->Taxi)
-        NumPlaceTaxi{},                   // v3.6. >0 si taxi (=index+1 de cv->PlaceTaxi)
-        NumPlacePark{},                   // v5.0. >0 si place de parking (=index+1 de cv->PlacePark)
-        NumPlaceVehlib{},                 // v5.3. >0 si place de vehlib (=index+1 de cv->PlaceVehlib)
-        NumSpotVehlib{},                  // v5.3. >0 si spot vehlib (=index+1 de cv->SpotVehlib)
-        NumPieton[NBMAXPIETONSPARCASE]{}; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
+    bool ToutDroit{};
+    bool PassagePietons{}; // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
+    bool PassageBus{};     // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
+    std::array<bool, NBMAXLIGNESBUSTRAM> LigneBus{};  // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case
+                                                      // (visualisation par la fiche paramètres du réseau de bus
+                                                      // UNIQUEMENT)
+    std::array<bool, NBMAXLIGNESBUSTRAM> LigneTram{}; // v3.5. Si Ligne[i] alors la ligne n°i+1 passe par cette case
+                                                      // (visualisation par la fiche paramètres du réseau de tram
+                                                      // UNIQUEMENT)
+    int NumVehicule{};                        // >0 si véhicule éventuel (=index+1 de cv->Vehicule)
+    int NumVehlib{};                          // v5.3 si vehlib éventuel (=index+1 de cv->Vehlib)
+    int NumBus{};                             // v3.0. >0 si bus éventuel (=index+1 de cv->Bus)
+    int NumTram{};                            // v3.5. >0 si tram éventuel (=index+1 de cv->Tram)
+    int NumParking{};                         // >0 si c'est un parking (=index+1 de cv->parking)
+    int NumProchVeh{};                        // >0 si un véhicule doit passer sur la case lors du prochain mouvement
+    int NumProchVL{};                         // >0 si un vehlib doit passer sur la case lors du prochain mouvement
+    int NumProchBus{};                        // v3.0. >0 si un bus doit passer sur la case lors du prochain mouvement
+    int NumProchTram{};                       // v3.5. >0 si un tram doit passer sur la case lors du prochain mouvement
+    int NumProchTaxi{};                       // v3.6. >0 si un taxi doit passer sur la case lors du prochain mouvement
+    int NbPietons{};                          // v2.0. Nombre de pietons sur cette case
+    int NumArretBus{};                        // v3.0. >0 si arrêt de bus (=index+1 de cv->ArretBus)
+    int NumArretTram{};                       // v3.5. >0 si arrêt de tram (=index+1 de cv->ArretTram)
+    int NumTaxi{};                            // v3.6. >0 si taxi (=index+1 de cv->Taxi)
+    int NumPlaceTaxi{};                       // v3.6. >0 si taxi (=index+1 de cv->PlaceTaxi)
+    int NumPlacePark{};                       // v5.0. >0 si place de parking (=index+1 de cv->PlacePark)
+    int NumPlaceVehlib{};                     // v5.3. >0 si place de vehlib (=index+1 de cv->PlaceVehlib)
+    int NumSpotVehlib{};                      // v5.3. >0 si spot vehlib (=index+1 de cv->SpotVehlib)
+    std::array<int, NBFEUXPARCASE> NumFeu{};  // >0 si feu éventuel (=index+1 de cv->Feu) (v5.2: NBFEUXPARCASE)
+    std::array<int, NBFEUXPARCASE> NumFeuP{}; // v5.2. >0 si feu piéton éventuel (=index+1 de cv->FeuP)
+    std::array<int, NBMAXPIETONSPARCASE> NumPieton{}; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
     // Distances (en cases) aux éléments, par élément puis par direction possible de la case. DistParking et
     // DistFilePark ont deux valeurs par direction : sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS).
     // Vides tant que la case n'a pas de direction possible ou que le réseau n'a pas l'élément.
@@ -1503,27 +1510,27 @@ public:
     [[nodiscard]] const voie &Voisine(int x, int y, int d) const;
     [[nodiscard]] voie &Voisine(int x, int y, int n, int d);
     [[nodiscard]] const voie &Voisine(int x, int y, int n, int d) const;
-    std::vector<feu> Feu;                     // Tableau de feux
-    std::vector<feu_pieton> FeuP;             // v5.2 Tableau de feux piéton
-    std::vector<parking> Parking;             // Tableau des parkings
-    std::vector<vehicule> Vehicule;           // Tableau de voitures
-    std::vector<vehlib> Vehlib;               // v5.3. Tableau de vehlib
-    std::vector<bus> Bus;                     // v3.0. Tableau de bus
-    std::vector<tram> Tram;                   // v3.5. Tableau de trams
-    std::vector<pieton> Pieton;               // v2.0. Tableau de piétons
-    depot_bus DepotBus;                       // v3.0 : Attention INSTANCE STATIQUE car Dépôt unique !
-    std::vector<arret_bus> ArretBus;          // v3.0. Tableau d'arrêts de bus
-    ligne_bus LigneBus[NBMAXLIGNESBUSTRAM];   // v3.0. Tableau (statique) de lignes de bus
-    std::vector<arret_tram> ArretTram;        // v3.5. Tableau d'arrêts de tram
-    ligne_tram LigneTram[NBMAXLIGNESBUSTRAM]; // v3.5. Tableau (statique) de lignes de tram
-    std::vector<taxi> Taxi;                   // v3.6. Tableau de taxis
-    std::vector<place_taxi> PlaceTaxi;        // v3.6. Tableau de places de taxis
-    std::vector<file_taxi> FileTaxi;          // v3.6. Tableau de files de taxi
-    std::vector<place_park> PlacePark;        // v5.0. Tableau de places de parking
-    std::vector<file_park> FilePark;          // v5.0. Tableau de files de parkings
-    std::vector<place_vehlib> PlaceVehlib;    // v5.3. Tableau de places de vehlib
-    std::vector<stats> Stats;                 // Tableau de statistiques
-    void CreeZone();                          // v4.0 (allocation dynamique si NbX*NbY>0)
+    std::vector<feu> Feu;                                   // Tableau de feux
+    std::vector<feu_pieton> FeuP;                           // v5.2 Tableau de feux piéton
+    std::vector<parking> Parking;                           // Tableau des parkings
+    std::vector<vehicule> Vehicule;                         // Tableau de voitures
+    std::vector<vehlib> Vehlib;                             // v5.3. Tableau de vehlib
+    std::vector<bus> Bus;                                   // v3.0. Tableau de bus
+    std::vector<tram> Tram;                                 // v3.5. Tableau de trams
+    std::vector<pieton> Pieton;                             // v2.0. Tableau de piétons
+    depot_bus DepotBus;                                     // v3.0 : Attention INSTANCE STATIQUE car Dépôt unique !
+    std::vector<arret_bus> ArretBus;                        // v3.0. Tableau d'arrêts de bus
+    std::array<ligne_bus, NBMAXLIGNESBUSTRAM> LigneBus{};   // v3.0. Tableau (statique) de lignes de bus
+    std::vector<arret_tram> ArretTram;                      // v3.5. Tableau d'arrêts de tram
+    std::array<ligne_tram, NBMAXLIGNESBUSTRAM> LigneTram{}; // v3.5. Tableau (statique) de lignes de tram
+    std::vector<taxi> Taxi;                                 // v3.6. Tableau de taxis
+    std::vector<place_taxi> PlaceTaxi;                      // v3.6. Tableau de places de taxis
+    std::vector<file_taxi> FileTaxi;                        // v3.6. Tableau de files de taxi
+    std::vector<place_park> PlacePark;                      // v5.0. Tableau de places de parking
+    std::vector<file_park> FilePark;                        // v5.0. Tableau de files de parkings
+    std::vector<place_vehlib> PlaceVehlib;                  // v5.3. Tableau de places de vehlib
+    std::vector<stats> Stats;                               // Tableau de statistiques
+    void CreeZone();                                        // v4.0 (allocation dynamique si NbX*NbY>0)
     void RetablitVoisinages() const; // v6.0.2 : dx et dy (globales) suivent le dernier réseau créé : à rappeler quand
                                      // on revient à un réseau existant
     centre_ville(bool NbElementsParDefaut, int NbX, int NbY); // v4.0 (NbX, NbY)
@@ -1694,14 +1701,124 @@ public:
     void Genere(int x, int y, int d); // v4.2
 };
 //---------------------------------------------------------------------------
-// v3.5 : remplacement des [5] par |NBDIR+1] et des [4] par [NBDIR]
-const extern dirposs PossDir[NBDIR + 1], InvPossDir[NBDIR + 1], RotPossDir[NBDIR][16];
-const extern int dxr[NBDIR + 1], dyr[NBDIR + 1], // v4.0 (const int->int)
-    NbDir[16], NumDirdp[NBDIR + 1][16];
-const extern sens SensPsgPt[16];
-const extern direction Dirdp[NBDIR][16], InvDir[NBDIR + 1], AGaucheDe[NBDIR + 1], ADroiteDe[NBDIR + 1];
-const extern sens_voie_tram SensVoieTramDir[NBDIR + 1][NBDIR + 1]; // v3.5
-const extern coin CoinDir[NBDIR + 1];                              // v3.8
+// v3.5 : remplacement des [5] par [NBDIR+1] et des [4] par [NBDIR]
+inline constexpr std::array<dirposs, NBDIR + 1> PossDir = {aucune, N, E, S, O};
+inline constexpr std::array<dirposs, NBDIR + 1> InvPossDir = {aucune, S, O, N, E};
+// 1=90°droite, 2=180°, 3=90°gauche
+inline constexpr std::array<std::array<dirposs, 16>, NBDIR> RotPossDir = {{
+    {aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO},
+    {aucune, E, S, SE, O, EO, SO, ESO, N, NE, NS, NES, NO, NEO, NSO, NESO},
+    {aucune, S, O, SO, N, NS, NO, NSO, E, SE, EO, ESO, NE, NES, NEO, NESO},
+    {aucune, O, N, NO, E, EO, NE, NEO, S, SO, NS, NSO, SE, ESO, NES, NESO},
+}};
+inline constexpr std::array<int, NBDIR + 1> dxr = {0, 0, 1, 0, -1};
+inline constexpr std::array<int, NBDIR + 1> dyr = {0, -1, 0, 1, 0};
+inline constexpr std::array<int, 16> NbDir = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
+// NumDirdp[direction][dirposs] = Ordre de direction dans dirposs
+// 0 <= NumDirdp[direction][dirposs] < NbDir[direction][dirposs]
+inline constexpr std::array<std::array<int, 16>, NBDIR + 1> NumDirdp = {{
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // indefinie
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // nord
+    {0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1}, // est
+    {0, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 1, 1, 2}, // sud
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 2, 2, 3},
+}};
+// ouest
+// SensPsgPt[dirposs] = indefini|horizontal|vertical. v2.0
+inline constexpr std::array<sens, 16> SensPsgPt = {
+    indefini, horizontal, vertical, indefini, horizontal, horizontal, indefini, indefini,
+    vertical, indefini,   vertical, indefini, indefini,   indefini,   indefini, indefini,
+};
+// Dirdp[x][y] = (x+1)ème direction pour DirPoss=y
+inline constexpr std::array<std::array<direction, 16>, NBDIR> Dirdp = {{
+    {
+        indefinie,
+        nord,
+        est,
+        nord,
+        sud,
+        nord,
+        est,
+        nord,
+        ouest,
+        nord,
+        est,
+        nord,
+        sud,
+        nord,
+        est,
+        nord,
+    },
+    {
+        indefinie,
+        indefinie,
+        indefinie,
+        est,
+        indefinie,
+        sud,
+        sud,
+        est,
+        indefinie,
+        ouest,
+        ouest,
+        est,
+        ouest,
+        sud,
+        sud,
+        est,
+    },
+    {
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        sud,
+        indefinie,
+        indefinie,
+        indefinie,
+        ouest,
+        indefinie,
+        ouest,
+        ouest,
+        sud,
+    },
+    {
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        indefinie,
+        ouest,
+    },
+}};
+inline constexpr std::array<direction, NBDIR + 1> InvDir = {indefinie, sud, ouest, nord, est};
+inline constexpr std::array<direction, NBDIR + 1> AGaucheDe = {indefinie, ouest, nord, est, sud};
+inline constexpr std::array<direction, NBDIR + 1> ADroiteDe = {indefinie, est, sud, ouest, nord};
+// v3.5. SensVoieTramDir[DirOrig][DirDest] (indefinie, nord, est, sud, ouest)
+inline constexpr std::array<std::array<sens_voie_tram, NBDIR + 1>, NBDIR + 1> SensVoieTramDir = {{
+    {aucune_voie, nord_sud, est_ouest, nord_sud, est_ouest}, // indefinie
+    {aucune_voie, nord_sud, nord_est, nord_sud, nord_ouest}, // nord
+    {aucune_voie, nord_est, est_ouest, sud_est, est_ouest},  // est
+    {aucune_voie, nord_sud, sud_est, nord_sud, sud_ouest},   // sud
+    {aucune_voie, nord_ouest, est_ouest, sud_ouest, est_ouest},
+}};
+// ouest
+// ouest
+inline constexpr std::array<coin, NBDIR + 1> CoinDir = {aucun_coin, haut_droite, bas_droite, bas_gauche, haut_gauche};
+// v3.8
 inline constexpr std::array<const char *, NBDIR + 1> asDir = {"", "Nord", "Est", "Sud", "Ouest"};
 inline constexpr std::array<const char *, 16> asDirPoss = {
     "",          "Nord",           "Est",           "Nord+Est",           "Sud",       "Nord+Sud",
@@ -1710,8 +1827,8 @@ inline constexpr std::array<const char *, 16> asDirPoss = {
 };
 //---------------------------------------------------------------------------
 extern bool VerifierApresOuverture, VerifierAvantSimulation;
-extern int dx[NBDIR + 1], dy[NBDIR + 1],
-    VersionFichier, // v3.5
+extern std::array<int, NBDIR + 1> dx, dy;
+extern int VersionFichier, // v3.5
     SvgNbFeux, SvgNbParkings, SvgNbVehicules, SvgNbPietons, SvgNbArretsBus,
     SvgNbArretsTram, // v3.5
     SvgNbPlacesTaxi; // v3.6

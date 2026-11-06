@@ -5,6 +5,7 @@
 #include <cstdio>
 #include "compat/chaine.h"
 #include <string>
+#include <vector>
 #include "compat/fichier.h"
 #include "simul.h"
 #include "vue.h"

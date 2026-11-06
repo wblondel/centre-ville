@@ -297,7 +297,7 @@ void TfrmRecherche::CSpinEditYChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->Parking.empty()) || (CSpinEditParking->Value < 1) || (CSpinEditParking->Value > cv->NbParkings))
+    if ((!cv) || cv->Parking.empty() || (CSpinEditParking->Value < 1) || (CSpinEditParking->Value > cv->NbParkings))
     {
         StatusBar->SimpleText = "Aucune parking défini ou n° incorrect";
         return;
@@ -319,7 +319,7 @@ void TfrmRecherche::CSpinEditParkingChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->Feu.empty()) || (CSpinEditFeu->Value < 1) || (CSpinEditFeu->Value > cv->NbFeux))
+    if ((!cv) || cv->Feu.empty() || (CSpinEditFeu->Value < 1) || (CSpinEditFeu->Value > cv->NbFeux))
     {
         StatusBar->SimpleText = "Aucun feu défini ou n° incorrect";
         return;
@@ -341,8 +341,7 @@ void TfrmRecherche::CSpinEditFeuChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->Vehicule.empty()) || (CSpinEditVehicule->Value < 1) ||
-        (CSpinEditVehicule->Value > cv->NbVehicules))
+    if ((!cv) || cv->Vehicule.empty() || (CSpinEditVehicule->Value < 1) || (CSpinEditVehicule->Value > cv->NbVehicules))
     {
         StatusBar->SimpleText = "Aucun véhicule défini ou n° incorrect";
         return;
@@ -364,7 +363,7 @@ void TfrmRecherche::CSpinEditVehiculeChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPietonChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->Pieton.empty()) || (CSpinEditPieton->Value < 1) || (CSpinEditPieton->Value > cv->NbPietons))
+    if ((!cv) || cv->Pieton.empty() || (CSpinEditPieton->Value < 1) || (CSpinEditPieton->Value > cv->NbPietons))
     {
         StatusBar->SimpleText = "Aucun piéton défini ou n° incorrect";
         return;
@@ -447,8 +446,7 @@ void TfrmRecherche::ButtonAideClick(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/)
 { // v3.0
-    if ((!cv) || (cv->ArretBus.empty()) || (CSpinEditArretBus->Value < 1) ||
-        (CSpinEditArretBus->Value > cv->NbArretsBus))
+    if ((!cv) || cv->ArretBus.empty() || (CSpinEditArretBus->Value < 1) || (CSpinEditArretBus->Value > cv->NbArretsBus))
     {
         StatusBar->SimpleText = "Aucun arrêt de bus défini ou n° incorrect";
         return;
@@ -470,7 +468,7 @@ void TfrmRecherche::CSpinEditArretBusChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/)
 { // v3.0
-    if ((!cv) || (cv->Bus.empty()) || (CSpinEditBus->Value < 1) || (CSpinEditBus->Value > cv->NbBus))
+    if ((!cv) || cv->Bus.empty() || (CSpinEditBus->Value < 1) || (CSpinEditBus->Value > cv->NbBus))
     {
         StatusBar->SimpleText = "Aucun bus défini ou n° incorrect";
         return;
@@ -491,7 +489,7 @@ void TfrmRecherche::CSpinEditBusChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/)
 { // v3.5
-    if ((!cv) || (cv->ArretTram.empty()) || (CSpinEditArretTram->Value < 1) ||
+    if ((!cv) || cv->ArretTram.empty() || (CSpinEditArretTram->Value < 1) ||
         (CSpinEditArretTram->Value > cv->NbArretsTram))
     {
         StatusBar->SimpleText = "Aucun arrêt de tram défini ou n° incorrect";
@@ -514,7 +512,7 @@ void TfrmRecherche::CSpinEditArretTramChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/)
 { // v3.5
-    if ((!cv) || (cv->Tram.empty()) || (CSpinEditTram->Value < 1) || (CSpinEditTram->Value > cv->NbTrams))
+    if ((!cv) || cv->Tram.empty() || (CSpinEditTram->Value < 1) || (CSpinEditTram->Value > cv->NbTrams))
     {
         StatusBar->SimpleText = "Aucun tram défini ou n° incorrect";
         return;
@@ -536,7 +534,7 @@ void TfrmRecherche::CSpinEditTramChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->Taxi.empty()) || (CSpinEditTaxi->Value < 1) || (CSpinEditTaxi->Value > cv->NbTaxis))
+    if ((!cv) || cv->Taxi.empty() || (CSpinEditTaxi->Value < 1) || (CSpinEditTaxi->Value > cv->NbTaxis))
     {
         StatusBar->SimpleText = "Aucun taxi défini ou n° incorrect";
         return;
@@ -558,7 +556,7 @@ void TfrmRecherche::CSpinEditTaxiChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->PlaceTaxi.empty()) || (CSpinEditPlaceTaxi->Value < 1) ||
+    if ((!cv) || cv->PlaceTaxi.empty() || (CSpinEditPlaceTaxi->Value < 1) ||
         (CSpinEditPlaceTaxi->Value > cv->NbPlacesTaxi))
     {
         StatusBar->SimpleText = "Aucune place de taxi définie ou n° incorrect";
@@ -581,8 +579,7 @@ void TfrmRecherche::CSpinEditPlaceTaxiChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->FileTaxi.empty()) || (CSpinEditFileTaxi->Value < 1) ||
-        (CSpinEditFileTaxi->Value > cv->NbFilesTaxi))
+    if ((!cv) || cv->FileTaxi.empty() || (CSpinEditFileTaxi->Value < 1) || (CSpinEditFileTaxi->Value > cv->NbFilesTaxi))
     {
         StatusBar->SimpleText = "Aucune file de taxis définie ou n° incorrect";
         return;
@@ -599,7 +596,7 @@ void TfrmRecherche::CSpinEditFileTaxiChange(TObject * /*Sender*/)
 
 void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->PlacePark.empty()) || (CSpinEditPlacePark->Value < 1) ||
+    if ((!cv) || cv->PlacePark.empty() || (CSpinEditPlacePark->Value < 1) ||
         (CSpinEditPlacePark->Value > cv->NbPlacesPark))
     {
         StatusBar->SimpleText = "Aucune place de parking définie ou n° incorrect";
@@ -623,8 +620,7 @@ void TfrmRecherche::CSpinEditPlaceParkChange(TObject * /*Sender*/)
 
 void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/)
 {
-    if ((!cv) || (cv->FilePark.empty()) || (CSpinEditFilePark->Value < 1) ||
-        (CSpinEditFilePark->Value > cv->NbFilesPark))
+    if ((!cv) || cv->FilePark.empty() || (CSpinEditFilePark->Value < 1) || (CSpinEditFilePark->Value > cv->NbFilesPark))
     {
         StatusBar->SimpleText = "Aucune file de parkings définie ou n° incorrect";
         return;
@@ -640,7 +636,7 @@ void TfrmRecherche::CSpinEditFileParkChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/)
 { // v5.3
-    if ((!cv) || (cv->Vehlib.empty()) || (CSpinEditVehlib->Value < 1) || (CSpinEditVehlib->Value > cv->NbVehlibs))
+    if ((!cv) || cv->Vehlib.empty() || (CSpinEditVehlib->Value < 1) || (CSpinEditVehlib->Value > cv->NbVehlibs))
     {
         StatusBar->SimpleText = "Aucun vehlib défini ou n° incorrect";
         return;
@@ -662,7 +658,7 @@ void TfrmRecherche::CSpinEditVehlibChange(TObject * /*Sender*/)
 //---------------------------------------------------------------------------
 void TfrmRecherche::CSpinEditPlaceVehlibChange(TObject * /*Sender*/)
 { // v5.3
-    if ((!cv) || (cv->PlaceVehlib.empty()) || (CSpinEditPlaceVehlib->Value < 1) ||
+    if ((!cv) || cv->PlaceVehlib.empty() || (CSpinEditPlaceVehlib->Value < 1) ||
         (CSpinEditPlaceVehlib->Value > cv->NbPlacesVehlib))
     {
         StatusBar->SimpleText = "Aucune place de vehlib définie ou n° incorrect";

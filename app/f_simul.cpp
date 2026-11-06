@@ -21,6 +21,7 @@
 
 #include <cmath>
 #include <utility>
+#include <vector>
 #include "f_defv.h"
 #include "f_defvp.h"
 #include "f_prmsim.h"

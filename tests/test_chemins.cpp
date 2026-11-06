@@ -220,8 +220,8 @@ TEST_CASE("Arrêts et feux de piétons ajoutés quand tous les numéros sont pri
         l.reserve(static_cast<std::size_t>(n));
         for (int i = 0; i < n; i++)
         {
-            l.push_back(
-                arret{a[i].x, a[i].y, a[i].NbLignes, std::vector<int>(a[i].NumLigne, a[i].NumLigne + a[i].NbLignes)});
+            l.push_back(arret{a[i].x, a[i].y, a[i].NbLignes,
+                              std::vector<int>(a[i].NumLigne.begin(), a[i].NumLigne.begin() + a[i].NbLignes)});
         }
         return l;
     };

@@ -3,10 +3,13 @@
 // #pragma hdrstop // portage : C++Builder
 //---------------------------------------------------------------------------
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <utility>
+#include <vector>
 //---------------------------------------------------------------------------
 #include "compat/chaine.h"
 #include "vue.h" // portage : remplace base.h (AfficheMessage) et les fiches f_*.h
@@ -37,125 +40,9 @@ int CoordonneeCopiee(int c, int c0)
 } // namespace
 //---------------------------------------------------------------------------
 
-// v3.5 : remplacement des [5] par [NBDIR+1] et des [4] par [NBDIR]
-const dirposs PossDir[NBDIR + 1] = {aucune, N, E, S, O}, InvPossDir[NBDIR + 1] = {aucune, S, O, N, E},
-                              // 1=90°droite, 2=180°, 3=90°gauche
-    RotPossDir[NBDIR][16] = {
-        {aucune, N, E, NE, S, NS, SE, NES, O, NO, EO, NEO, SO, NSO, ESO, NESO},
-        {aucune, E, S, SE, O, EO, SO, ESO, N, NE, NS, NES, NO, NEO, NSO, NESO},
-        {aucune, S, O, SO, N, NS, NO, NSO, E, SE, EO, ESO, NE, NES, NEO, NESO},
-        {aucune, O, N, NO, E, EO, NE, NEO, S, SO, NS, NSO, SE, ESO, NES, NESO},
-    };
+// Tables des directions : simul.h (PossDir, Dirdp, InvDir, SensVoieTramDir...)
 //---------------------------------------------------------------------------
-const int dxr[NBDIR + 1] = {0, 0, 1, 0, -1}, dyr[NBDIR + 1] = {0, -1, 0, 1, 0},
-                      NbDir[16] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4},
-                      // NumDirdp[direction][dirposs] = Ordre de direction dans dirposs
-                      // 0 <= NumDirdp[direction][dirposs] < NbDir[direction][dirposs]
-    NumDirdp[NBDIR + 1][16] = {
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // indefinie
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // nord
-        {0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1}, // est
-        {0, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 1, 1, 2}, // sud
-        {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 2, 2, 3},
-    }; // ouest
-//---------------------------------------------------------------------------
-// SensPsgPt[dirposs] = indefini|horizontal|vertical. v2.0
-const sens SensPsgPt[16] = {
-    indefini, horizontal, vertical, indefini, horizontal, horizontal, indefini, indefini,
-    vertical, indefini,   vertical, indefini, indefini,   indefini,   indefini, indefini,
-};
-//---------------------------------------------------------------------------
-// (Dirdp[x][y] = (x+1)ème direction pour DirPoss=y
-const direction Dirdp[NBDIR][16] =
-    {
-        {
-            indefinie,
-            nord,
-            est,
-            nord,
-            sud,
-            nord,
-            est,
-            nord,
-            ouest,
-            nord,
-            est,
-            nord,
-            sud,
-            nord,
-            est,
-            nord,
-        },
-        {
-            indefinie,
-            indefinie,
-            indefinie,
-            est,
-            indefinie,
-            sud,
-            sud,
-            est,
-            indefinie,
-            ouest,
-            ouest,
-            est,
-            ouest,
-            sud,
-            sud,
-            est,
-        },
-        {
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            sud,
-            indefinie,
-            indefinie,
-            indefinie,
-            ouest,
-            indefinie,
-            ouest,
-            ouest,
-            sud,
-        },
-        {
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            indefinie,
-            ouest,
-        },
-    },
-                InvDir[NBDIR + 1] = {indefinie, sud, ouest, nord, est},
-                AGaucheDe[NBDIR + 1] = {indefinie, ouest, nord, est, sud},
-                ADroiteDe[NBDIR + 1] = {indefinie, est, sud, ouest, nord};
-//---------------------------------------------------------------------------
-// v3.5                                  DirDest:        indefinie,   nord,       est,       sud,       ouest         //
-// DirOrig:
-const sens_voie_tram SensVoieTramDir[NBDIR + 1][NBDIR + 1] = {
-    {aucune_voie, nord_sud, est_ouest, nord_sud, est_ouest}, // indefinie
-    {aucune_voie, nord_sud, nord_est, nord_sud, nord_ouest}, // nord
-    {aucune_voie, nord_est, est_ouest, sud_est, est_ouest},  // est
-    {aucune_voie, nord_sud, sud_est, nord_sud, sud_ouest},   // sud
-    {aucune_voie, nord_ouest, est_ouest, sud_ouest, est_ouest},
-}; // ouest
-//---------------------------------------------------------------------------
-const sens_voie_tram_base SensVoieTramBase[NBSENSVOIETRAM] = {
+constexpr std::array<sens_voie_tram_base, NBSENSVOIETRAM> SensVoieTramBase = {
     aucune_voie_base,
     ne,
     ns,
@@ -192,59 +79,59 @@ const sens_voie_tram_base SensVoieTramBase[NBSENSVOIETRAM] = {
 };
 //---------------------------------------------------------------------------
 // v3.5                                                           DirDest:  indef, nord,  est,  sud,ouest  // DirOrig
-const bool DirPossSensVoieTramBase[NBSENSVOIETRAMBASE][NBDIR + 1][NBDIR + 1] = {
+constexpr std::array<std::array<std::array<bool, NBDIR + 1>, NBDIR + 1>, NBSENSVOIETRAMBASE> DirPossSensVoieTramBase = {
     {
-        {false, false, false, false, false}, // indef.// aucune_voie_base
-        {false, false, false, false, false}, // nord
-        {false, false, false, false, false}, // est
-        {false, false, false, false, false}, // sud
-        {false, false, false, false, false},
-    }, // ouest
-    {
-        {false, true, true, false, false},   // indef.// ne
-        {false, false, true, false, false},  // nord
-        {false, true, false, false, false},  // est
-        {false, false, false, false, false}, // sud
-        {false, false, false, false, false},
-    }, // ouest
-    {
-        {false, true, false, true, false},   // indef.// ns
-        {false, false, false, true, false},  // nord
-        {false, false, false, false, false}, // est
-        {false, true, false, false, false},  // sud
-        {false, false, false, false, false},
-    }, // ouest
-    {
-        {false, true, false, false, true},   // indef.// no
-        {false, false, false, false, true},  // nord
-        {false, false, false, false, false}, // est
-        {false, false, false, false, false}, // sud
-        {false, true, false, false, false},
-    }, // ouest
-    {
-        {false, false, true, true, false},   // indef.// se
-        {false, false, false, false, false}, // nord
-        {false, false, false, true, false},  // est
-        {false, false, true, false, false},  // sud
-        {false, false, false, false, false},
-    }, // ouest
-    {
-        {false, false, true, false, true},   // indef.// eo
-        {false, false, false, false, false}, // nord
-        {false, false, false, false, true},  // est
-        {false, false, false, false, false}, // sud
-        {false, false, true, false, false},
-    }, // ouest
-    {
-        {false, false, false, true, true},   // indef.// so
-        {false, false, false, false, false}, // nord
-        {false, false, false, false, false}, // est
-        {false, false, false, false, true},  // sud
-        {false, false, false, true, false},
-    },
-}; // ouest
+        {{
+            {false, false, false, false, false}, // indef.// aucune_voie_base
+            {false, false, false, false, false}, // nord
+            {false, false, false, false, false}, // est
+            {false, false, false, false, false}, // sud
+            {false, false, false, false, false},
+        }}, // ouest
+        {{
+            {false, true, true, false, false},   // indef.// ne
+            {false, false, true, false, false},  // nord
+            {false, true, false, false, false},  // est
+            {false, false, false, false, false}, // sud
+            {false, false, false, false, false},
+        }}, // ouest
+        {{
+            {false, true, false, true, false},   // indef.// ns
+            {false, false, false, true, false},  // nord
+            {false, false, false, false, false}, // est
+            {false, true, false, false, false},  // sud
+            {false, false, false, false, false},
+        }}, // ouest
+        {{
+            {false, true, false, false, true},   // indef.// no
+            {false, false, false, false, true},  // nord
+            {false, false, false, false, false}, // est
+            {false, false, false, false, false}, // sud
+            {false, true, false, false, false},
+        }}, // ouest
+        {{
+            {false, false, true, true, false},   // indef.// se
+            {false, false, false, false, false}, // nord
+            {false, false, false, true, false},  // est
+            {false, false, true, false, false},  // sud
+            {false, false, false, false, false},
+        }}, // ouest
+        {{
+            {false, false, true, false, true},   // indef.// eo
+            {false, false, false, false, false}, // nord
+            {false, false, false, false, true},  // est
+            {false, false, false, false, false}, // sud
+            {false, false, true, false, false},
+        }}, // ouest
+        {{
+            {false, false, false, true, true},   // indef.// so
+            {false, false, false, false, false}, // nord
+            {false, false, false, false, false}, // est
+            {false, false, false, false, true},  // sud
+            {false, false, false, true, false},
+        }},
+    }};
 //---------------------------------------------------------------------------
-const coin CoinDir[NBDIR + 1] = {aucun_coin, haut_droite, bas_droite, bas_gauche, haut_gauche}; // v3.8
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // v6.0.2 : FileRead renvoie le nombre d'octets lus, ou -1 : les deux étaient vrais dans
@@ -267,9 +154,9 @@ bool NombreCredible(long long n)
 //---------------------------------------------------------------------------
 bool VerifierApresOuverture = false, VerifierAvantSimulation = false;
 //---------------------------------------------------------------------------
-int dx[NBDIR + 1] = {0, 0, 1, 0, NBXDEF - 1}; // v4.0 (const int->int, DEF)
-int dy[NBDIR + 1] = {0, NBYDEF - 1, 0, 1, 0}; // v4.0 (const int->int, DEF)
-int VersionFichier = 0;                       // v3.0
+std::array<int, NBDIR + 1> dx = {0, 0, 1, 0, NBXDEF - 1}; // v4.0 (const int->int, DEF)
+std::array<int, NBDIR + 1> dy = {0, NBYDEF - 1, 0, 1, 0}; // v4.0 (const int->int, DEF)
+int VersionFichier = 0;                                   // v3.0
 int SvgNbFeux = 0;
 int SvgNbParkings = 0;
 int SvgNbVehicules = 0;
@@ -1259,10 +1146,10 @@ bool feu_pieton::Charge(int hfile)
 {
     int i = 0;
     bool Ok = false;
-    Ok = LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) &&
-         LitChamp(hfile, y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) &&
-         LitChamp(hfile, Dir, NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) &&
-         LitChamp(hfile, iFeuDir, NBDIR * sizeof(iFeuDir[0])) && LitChamp(hfile, &Etat, sizeof(Etat)) &&
+    Ok = LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, x.data(), NBFEUXPIETONSPARNUMERO * sizeof(x[0])) &&
+         LitChamp(hfile, y.data(), NBFEUXPIETONSPARNUMERO * sizeof(y[0])) &&
+         LitChamp(hfile, Dir.data(), NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) &&
+         LitChamp(hfile, iFeuDir.data(), NBDIR * sizeof(iFeuDir[0])) && LitChamp(hfile, &Etat, sizeof(Etat)) &&
          LitChamp(hfile, &NbFeux, sizeof(NbFeux)) && LitChamp(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) &&
          LitChamp(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) && LitChamp(hfile, &DureeRouge, sizeof(DureeRouge)) &&
          LitChamp(hfile, &DureeVert, sizeof(DureeVert)) && LitChamp(hfile, &DemandeVert, sizeof(DemandeVert)) &&
@@ -1288,25 +1175,27 @@ bool feu_pieton::Sauve(int hfile)
 {
     int i = 0;
     int Ok = 0;
-    int xc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(x[0], cv->Xc), CoordonneeCopiee(x[1], cv->Xc)}; // xc,yc :
-                                                                                                       // gestion copie
-                                                                                                       // vers fichier
-                                                                                                       // (v4.0.1)
-    int yc[NBFEUXPIETONSPARNUMERO] = {CoordonneeCopiee(y[0], cv->Yc), CoordonneeCopiee(y[1], cv->Yc)}; // v6.0.1 :
-                                                                                                       // COORDCOPIE
-    Ok = static_cast<int>((static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
-                          (FileWrite(hfile, cv->CopieEnCours ? xc : x, NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
-                          (FileWrite(hfile, cv->CopieEnCours ? yc : y, NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
-                          (FileWrite(hfile, Dir, NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) != 0) &&
-                          (FileWrite(hfile, iFeuDir, NBDIR * sizeof(iFeuDir[0])) != 0) &&
-                          (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) &&
-                          (FileWrite(hfile, &NbFeux, sizeof(NbFeux)) != 0) &&
-                          (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
-                          (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
-                          (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
-                          (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
-                          (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
-                          (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
+    const std::array<int, NBFEUXPIETONSPARNUMERO> xc = {CoordonneeCopiee(x[0], cv->Xc),
+                                                        CoordonneeCopiee(x[1], cv->Xc)}; // xc,yc :
+                                                                                         // gestion copie
+                                                                                         // vers fichier
+                                                                                         // (v4.0.1)
+    const std::array<int, NBFEUXPIETONSPARNUMERO> yc = {CoordonneeCopiee(y[0], cv->Yc),
+                                                        CoordonneeCopiee(y[1], cv->Yc)}; // v6.0.1 :
+                                                                                         // COORDCOPIE
+    Ok = static_cast<int>(
+        (static_cast<int>(FileWrite(hfile, &Numero, sizeof(Numero)) != 0) != 0) &&
+        (FileWrite(hfile, (cv->CopieEnCours ? xc : x).data(), NBFEUXPIETONSPARNUMERO * sizeof(x[0])) != 0) &&
+        (FileWrite(hfile, (cv->CopieEnCours ? yc : y).data(), NBFEUXPIETONSPARNUMERO * sizeof(y[0])) != 0) &&
+        (FileWrite(hfile, Dir.data(), NBFEUXPIETONSPARNUMERO * sizeof(Dir[0])) != 0) &&
+        (FileWrite(hfile, iFeuDir.data(), NBDIR * sizeof(iFeuDir[0])) != 0) &&
+        (FileWrite(hfile, &Etat, sizeof(Etat)) != 0) && (FileWrite(hfile, &NbFeux, sizeof(NbFeux)) != 0) &&
+        (FileWrite(hfile, &TypeDmdVert, sizeof(TypeDmdVert)) != 0) &&
+        (FileWrite(hfile, &TypePsgRouge, sizeof(TypePsgRouge)) != 0) &&
+        (FileWrite(hfile, &DureeRouge, sizeof(DureeRouge)) != 0) &&
+        (FileWrite(hfile, &DureeVert, sizeof(DureeVert)) != 0) &&
+        (FileWrite(hfile, &DemandeVert, sizeof(DemandeVert)) != 0) &&
+        (FileWrite(hfile, &RougeDemande, sizeof(RougeDemande)) != 0));
     for (i = 0; (Ok != 0) && (i < NbFeux); i++)
     {
         Ok = FileWrite(hfile, &NumFeux[i], sizeof(NumFeux[i]));
@@ -1419,10 +1308,10 @@ void vehicule::CalculeProchaineDirection()
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark != 0) &&
                              (cv->PlacePark[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark - 1].NumFile + 1 ==
                               NumFileParkArrivee))) || // 2. Distance à la file. v5.2.3 : NumFile+1 et non NumFile
-                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire] >
-                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire]) ||
-                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire] ==
-                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire]) &&
+                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
+                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                           ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante
                                                                // : v2.2.4.  // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
@@ -1441,10 +1330,10 @@ void vehicule::CalculeProchaineDirection()
                 if (i != j)
                 { // On dégringole si distance supérieure.
                     OrdreDir[i] += static_cast<int>(
-                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire] >
-                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire]) ||
-                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire] ==
-                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire]) &&
+                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
+                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                          ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante
                                                               // : v2.2.4.  // v3.5 : || par && !
                           ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // sinon tirage au
@@ -1535,10 +1424,10 @@ direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOI
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark != 0) &&
                              (cv->PlacePark[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark - 1].NumFile + 1 ==
                               NumFileParkArrivee))) || // 2. Distance à la file. v5.2.3 : NumFile+1 et non NumFile
-                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire] >
-                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire]) ||
-                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire] ==
-                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire]) &&
+                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
+                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                           ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante :
                                                             // v2.2.4.  // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // tirage au
@@ -1558,10 +1447,10 @@ direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOI
                 if (i != j)
                 {
                     OrdreDir[i] += static_cast<int>(
-                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire] >
-                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire]) ||
-                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire] ==
-                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire]) &&
+                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
+                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                          ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante :
                                                            // v2.2.4.  // v3.5 : || par && !
                           ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard
@@ -2254,9 +2143,9 @@ AnsiString arret_bus::asListeLignesBus() // v3.0.5
 bool arret_bus::Charge(int hfile) // v3.0
 {
     return LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, &x, sizeof(x)) &&
-           LitChamp(hfile, &y, sizeof(y)) && LitChamp(hfile, Ligne, NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) &&
+           LitChamp(hfile, &y, sizeof(y)) && LitChamp(hfile, Ligne.data(), NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) &&
            LitChamp(hfile, &NbLignes, sizeof(NbLignes)) &&
-           LitChamp(hfile, NumLigne, NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0]));
+           LitChamp(hfile, NumLigne.data(), NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0]));
 }
 //-----------------------------------------------------------------------------
 bool arret_bus::Sauve(int hfile) // v3.0
@@ -2266,9 +2155,9 @@ bool arret_bus::Sauve(int hfile) // v3.0
     return (FileWrite(hfile, &Numero, sizeof(Numero)) != 0) &&
            (FileWrite(hfile, cv->CopieEnCours ? &xc : &x, sizeof(x)) != 0) &&
            (FileWrite(hfile, cv->CopieEnCours ? &yc : &y, sizeof(y)) != 0) &&
-           (FileWrite(hfile, Ligne, NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) != 0) &&
+           (FileWrite(hfile, Ligne.data(), NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) != 0) &&
            (FileWrite(hfile, &NbLignes, sizeof(NbLignes)) != 0) &&
-           (FileWrite(hfile, NumLigne, NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0])) != 0);
+           (FileWrite(hfile, NumLigne.data(), NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0])) != 0);
 }
 //-----------------------------------------------------------------------------
 void arret_bus::Verifie(AnsiString &asMsgErr) // v3.0
@@ -2316,13 +2205,13 @@ void ligne_bus::AjouteBus(int NumeroBus) // v3.0
 bool ligne_bus::Charge(int hfile) // v3.0
 {                                 // Attention : On ne stocke pas le nombre et les n° de bus (calculés avant simul)
     return LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, &NbArrets, sizeof(NbArrets)) &&
-           LitChamp(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0]));
+           LitChamp(hfile, NumArret.data(), NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0]));
 }
 //-----------------------------------------------------------------------------
 bool ligne_bus::Sauve(int hfile) // v3.0
 {                                // Attention : On ne stocke pas le nombre et les n° de bus (calculés avant simul)
     return (FileWrite(hfile, &Numero, sizeof(Numero)) != 0) && (FileWrite(hfile, &NbArrets, sizeof(NbArrets)) != 0) &&
-           (FileWrite(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0])) != 0);
+           (FileWrite(hfile, NumArret.data(), NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0])) != 0);
 }
 //-----------------------------------------------------------------------------
 void ligne_bus::Verifie(AnsiString &asMsgErr) // v3.0
@@ -2617,9 +2506,9 @@ AnsiString arret_tram::asListeLignesTram() // v3.0.5
 bool arret_tram::Charge(int hfile) // v3.0
 {
     return LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, &x, sizeof(x)) &&
-           LitChamp(hfile, &y, sizeof(y)) && LitChamp(hfile, Ligne, NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) &&
+           LitChamp(hfile, &y, sizeof(y)) && LitChamp(hfile, Ligne.data(), NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) &&
            LitChamp(hfile, &NbLignes, sizeof(NbLignes)) &&
-           LitChamp(hfile, NumLigne, NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0]));
+           LitChamp(hfile, NumLigne.data(), NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0]));
 }
 //-----------------------------------------------------------------------------
 bool arret_tram::Sauve(int hfile) // v3.0
@@ -2629,9 +2518,9 @@ bool arret_tram::Sauve(int hfile) // v3.0
     return (FileWrite(hfile, &Numero, sizeof(Numero)) != 0) &&
            (FileWrite(hfile, cv->CopieEnCours ? &xc : &x, sizeof(x)) != 0) && // v4.0.1
            (FileWrite(hfile, cv->CopieEnCours ? &yc : &y, sizeof(y)) != 0) && // v4.0.1
-           (FileWrite(hfile, Ligne, NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) != 0) &&
+           (FileWrite(hfile, Ligne.data(), NBMAXLIGNESBUSTRAM * sizeof(Ligne[0])) != 0) &&
            (FileWrite(hfile, &NbLignes, sizeof(NbLignes)) != 0) &&
-           (FileWrite(hfile, NumLigne, NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0])) != 0);
+           (FileWrite(hfile, NumLigne.data(), NBMAXLIGNESBUSTRAM * sizeof(NumLigne[0])) != 0);
 }
 //-----------------------------------------------------------------------------
 void arret_tram::Verifie(AnsiString &asMsgErr) // v3.0
@@ -2679,13 +2568,13 @@ void ligne_tram::AjouteTram(int NumeroTram) // v3.0
 bool ligne_tram::Charge(int hfile) // v3.0
 {                                  // Attention : On ne stocke pas le nombre et les n° de tram (calculés avant simul)
     return LitChamp(hfile, &Numero, sizeof(Numero)) && LitChamp(hfile, &NbArrets, sizeof(NbArrets)) &&
-           LitChamp(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0]));
+           LitChamp(hfile, NumArret.data(), NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0]));
 }
 //-----------------------------------------------------------------------------
 bool ligne_tram::Sauve(int hfile) // v3.0
 {                                 // Attention : On ne stocke pas le nombre et les n° de tram (calculés avant simul)
     return (FileWrite(hfile, &Numero, sizeof(Numero)) != 0) && (FileWrite(hfile, &NbArrets, sizeof(NbArrets)) != 0) &&
-           (FileWrite(hfile, NumArret, NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0])) != 0);
+           (FileWrite(hfile, NumArret.data(), NBMAXARRETSBUSTRAMPARLIGNE * sizeof(NumArret[0])) != 0);
 }
 //-----------------------------------------------------------------------------
 void ligne_tram::Verifie(AnsiString &asMsgErr) // v3.0
@@ -5299,7 +5188,7 @@ int centre_ville::DefinitFilesTaxi() // v3.6
         FileTaxi.clear();
         NbFilesTaxi = 0;
     }
-    if ((NbPlacesTaxi == 0) || (PlaceTaxi.empty()))
+    if ((NbPlacesTaxi == 0) || PlaceTaxi.empty())
     {
         return 0;
     }
@@ -5368,7 +5257,7 @@ int centre_ville::DefinitFilesPark() // v5.0
         FilePark.clear();
         NbFilesPark = 0;
     }
-    if ((NbPlacesPark == 0) || (PlacePark.empty()))
+    if ((NbPlacesPark == 0) || PlacePark.empty())
     {
         return 0;
     }

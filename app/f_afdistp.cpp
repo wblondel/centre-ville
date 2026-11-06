@@ -65,7 +65,7 @@ void TfrmAffDistParkings::RafraichitInfos()
             if (((i % NbX) != 0) && (i >= NbX))
             { // v3.5 // v5.4 : conversion BCB6>BCBX (AnsiString>String)
                 StringGridDistances->Cells[i % NbX][i / NbX] =
-                    ((de = v->DistParking[(i / NbX) - 1][(i % NbX) - 1][CheckBoxCouloirsBus->Checked]) ==
+                    ((de = v->DistParking[(i / NbX) - 1][(i % NbX) - 1][CheckBoxCouloirsBus->Checked ? 1 : 0]) ==
                      DIST_INDEFINIE)
                         ? String("     ")
                         : Format("%5d", TableauDeConstantes(de));

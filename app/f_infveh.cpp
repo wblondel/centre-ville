@@ -144,7 +144,7 @@ void TfrmInfosVehicule::RafraichitInfos()
         { // v5.0
             LabelDistance->Caption = IntToStr(
                 ResteAParcourir =
-                    v->DistParking[NumParkingArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire]); // v3.5
+                    v->DistParking[NumParkingArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire ? 1 : 0]); // v3.5
         }
         if (NumParkingDepart != 0)
         { // v5.0
@@ -152,9 +152,9 @@ void TfrmInfosVehicule::RafraichitInfos()
         }
         if (NumFileParkArrivee != 0)
         { // v5.0
-            LabelDistance->Caption = IntToStr(
-                ResteAParcourir =
-                    v->DistFilePark[NumFileParkArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire]); // v3.5
+            LabelDistance->Caption =
+                IntToStr(ResteAParcourir = v->DistFilePark[NumFileParkArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]]
+                                                          [Prioritaire ? 1 : 0]); // v3.5
         }
         if (NumFileParkDepart != 0)
         { // v5.0
@@ -166,14 +166,15 @@ void TfrmInfosVehicule::RafraichitInfos()
         { // v5.0
             for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
             {
-                DistMin = min(DistMin, CaseDepart->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire]); // v5.0
+                DistMin =
+                    min(DistMin, CaseDepart->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0]); // v5.0
             }
         }
         if (NumParkingArrivee != 0)
         {
             for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
             {
-                DistMin = min(DistMin, CaseDepart->DistParking[NumParkingArrivee - 1][i][Prioritaire]); // v3.5
+                DistMin = min(DistMin, CaseDepart->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0]); // v3.5
             }
         }
         LabelDistanceMin->Caption = IntToStr(DistMin);

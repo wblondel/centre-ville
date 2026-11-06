@@ -347,7 +347,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
         {
-            const ligne_bus *l = cv->LigneBus + i;
+            const ligne_bus *l = &cv->LigneBus[i];
             s.Objet("ligne_bus", i + 1);
             C(s, "NbArrets", l->NbArrets);
             CT(s, "Arret", l->NumArret, NBMAXARRETSBUSTRAMPARLIGNE);
@@ -394,7 +394,7 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
         }
         for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
         {
-            const ligne_tram *l = cv->LigneTram + i;
+            const ligne_tram *l = &cv->LigneTram[i];
             s.Objet("ligne_tram", i + 1);
             C(s, "NbArrets", l->NbArrets);
             CT(s, "Arret", l->NumArret, NBMAXARRETSBUSTRAMPARLIGNE);

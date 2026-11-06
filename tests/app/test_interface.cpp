@@ -2333,8 +2333,7 @@ void TestInterface::interruptionTramsImpossibles()
     std::vector<ligne> Lignes;
     for (auto &i : cv->LigneTram)
     {
-        Lignes.push_back({.NbArrets = i.NbArrets,
-                          .NumArret = std::vector<int>(i.NumArret, i.NumArret + NBMAXARRETSBUSTRAMPARLIGNE)});
+        Lignes.push_back({.NbArrets = i.NbArrets, .NumArret = std::vector<int>(i.NumArret.begin(), i.NumArret.end())});
     }
     const auto Retablit = [&Lignes] {
         for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
@@ -5590,7 +5589,7 @@ void TestInterface::fichePietonSuiviAilleurs()
 void TestInterface::dimensionsZoneBornees()
 { // v6.0.3 : l'original n'avait aucune limite haute (99999x99999 : 2,5 To)
     QVERIFY(!OuvreDemo("dimensions_zone.cvw").isEmpty());
-    const voie *Zone = &cv->v[0][0];
+    const voie *Zone = cv->v[0].data();
     bool Refuse = false;
     bool Ouverte = false;
     Messages.clear();
@@ -5617,7 +5616,7 @@ void TestInterface::dimensionsZoneBornees()
     QVERIFY(Etapes.empty());
     QVERIFY(Refuse);
     QVERIFY(Ouverte);
-    QCOMPARE(static_cast<const voie *>(&cv->v[0][0]), Zone); // Réseau ouvert gardé
+    QCOMPARE(static_cast<const voie *>(cv->v[0].data()), Zone); // Réseau ouvert gardé
     // La plus grande zone possible
     Messages.clear();
     QuandModale([] { return frmDimensionsZone; },

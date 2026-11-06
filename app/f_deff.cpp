@@ -12,7 +12,7 @@
 #include "ui_f_deff.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
 // #pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_deff_composants.h" // portage : #pragma resource "*.dfm"
-#include "vue.h"
+#include <vector>
 //---------------------------------------------------------------------------
 TfrmDefFeux *frmDefFeux = nullptr;
 //---------------------------------------------------------------------------

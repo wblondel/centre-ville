@@ -14,6 +14,7 @@
 // #pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_deffp_composants.h" // portage : #pragma resource "*.dfm"
 #include "vue.h"
+#include <vector>
 //---------------------------------------------------------------------------
 TfrmDefFeuxPietons *frmDefFeuxPietons = nullptr;
 //---------------------------------------------------------------------------
