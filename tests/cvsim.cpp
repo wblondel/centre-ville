@@ -11,6 +11,7 @@
 //   cvsim --golden DOSSIER_MAPS DOSSIER_GOLDEN
 //       Régénère les fichiers de référence du golden master.
 //---------------------------------------------------------------------------
+#include <span>
 #include <exception>
 #include <cstdlib>
 #include <cstring>
@@ -82,19 +83,20 @@ int RegenereGolden(const std::string &asMaps, const std::string &asGolden)
 int main(int argc, char *const *argv)
 try
 {
+    const std::span<char *const> Args(argv, static_cast<std::size_t>(argc));
     if (argc < 2)
     {
         return Usage();
     }
-    if (std::strcmp(argv[1], "--golden") == 0)
+    if (std::strcmp(Args[1], "--golden") == 0)
     {
         if (argc != 4)
         {
             return Usage();
         }
-        return RegenereGolden(argv[2], argv[3]);
+        return RegenereGolden(Args[2], Args[3]);
     }
-    const std::string asCarte = argv[1];
+    const std::string asCarte = Args[1];
     std::string asSortie;
     int NbTours = 100;
     int TourResurrection = 0;
@@ -104,32 +106,32 @@ try
     VueNulle Vue;
     for (int i = 2; i < argc; i++)
     {
-        if ((std::strcmp(argv[i], "--tours") == 0) && (i + 1 < argc))
+        if ((std::strcmp(Args[i], "--tours") == 0) && (i + 1 < argc))
         {
-            NbTours = std::stoi(argv[++i]);
+            NbTours = std::stoi(Args[++i]);
         }
-        else if ((std::strcmp(argv[i], "--graine") == 0) && (i + 1 < argc))
+        else if ((std::strcmp(Args[i], "--graine") == 0) && (i + 1 < argc))
         {
-            Graine = static_cast<unsigned>(std::strtoul(argv[++i], nullptr, 0));
+            Graine = static_cast<unsigned>(std::strtoul(Args[++i], nullptr, 0));
             GraineFixee = true;
         }
-        else if (std::strcmp(argv[i], "--sanglante") == 0)
+        else if (std::strcmp(Args[i], "--sanglante") == 0)
         {
             Vue.Sanglante = true;
         }
-        else if (std::strcmp(argv[i], "--epidemie") == 0)
+        else if (std::strcmp(Args[i], "--epidemie") == 0)
         {
             Vue.Epidemie = true;
         }
-        else if ((std::strcmp(argv[i], "--resurrection") == 0) && (i + 1 < argc))
+        else if ((std::strcmp(Args[i], "--resurrection") == 0) && (i + 1 < argc))
         {
-            TourResurrection = std::stoi(argv[++i]);
+            TourResurrection = std::stoi(Args[++i]);
         }
-        else if ((std::strcmp(argv[i], "--sauve") == 0) && (i + 1 < argc))
+        else if ((std::strcmp(Args[i], "--sauve") == 0) && (i + 1 < argc))
         {
-            asSortie = argv[++i];
+            asSortie = Args[++i];
         }
-        else if (std::strcmp(argv[i], "--etat") == 0)
+        else if (std::strcmp(Args[i], "--etat") == 0)
         {
             Etat = true;
         }

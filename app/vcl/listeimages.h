@@ -32,7 +32,7 @@ class TVirtualImageList : public QObject
 
 public:
     int Width = 16, Height = 16;
-    TVirtualImageList(std::span<const char *const> Ressources, QObject *Parent = nullptr);
+    explicit TVirtualImageList(std::span<const char *const> Ressources, QObject *Parent = nullptr);
     int Count() const { return static_cast<int>(Images.size()); }
     void Draw(TCanvas *Canvas, int X, int Y, int Index, bool Enabled = true);
     void GetBitmap(int Index, TBitmap *Bitmap) const;

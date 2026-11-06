@@ -888,14 +888,7 @@ bool FicheRaccourcis::IsShortCut(TShortCut Raccourci, bool Executer)
     {
         return true;
     }
-    for (TActionList *l : ListesActions)
-    {
-        if (l->IsShortCut(Raccourci, Executer))
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(ListesActions, [&](TActionList *l) { return l->IsShortCut(Raccourci, Executer); });
 }
 //---------------------------------------------------------------------------
 void InscritFicheRaccourcis(const FicheRaccourcis &Fiche)

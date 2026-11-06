@@ -1248,8 +1248,8 @@ void TfrmSimulation::FormCreate(TObject * /*Sender*/)
 { // Initialise les indicateurs. v5.4 : la màj de la base de registres est faite par l'installateur
     // v5.4 : on applique la résolution courante sur la taille des cases par rapport à la définition prédéfinie
     Affichage =
-        static_cast<affichage>(aff_sign | aff_voie | aff_env); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
-                                                               // : masque de bits ; v3.8.1 (aff_env)
+        // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange) : : masque de bits ; v3.8.1 (aff_env)
+        static_cast<affichage>(aff_sign | aff_voie | aff_env);
     xErr = -1;
     yErr = -1;
     Pause = false; // v3.5
@@ -1877,7 +1877,8 @@ bool TfrmSimulation::VerifieReseau()
         asMsgErr = Format("Il n'y a pas assez de place pour %d piétons (%d possibles). Ajoutez des trottoirs.",
                           TableauDeConstantes(cv->NbPietons, NbCasesPietonPeutAller));
     }
-    StatusBar->Panels->Items[0]->Text = (cv->VerifOk = Ok) ? asMsgOk : asMsgErr;
+    cv->VerifOk = Ok;
+    StatusBar->Panels->Items[0]->Text = Ok ? asMsgOk : asMsgErr;
     if ((xErr > -1) && (yErr > -1))
     {
         TimerClignotementErreur->Enabled = true;
@@ -4977,6 +4978,7 @@ void TfrmSimulation::ChargeFiche()
     }
 }
 //---------------------------------------------------------------------------
+// NOLINTNEXTLINE(bugprone-exception-escape) : une exception à la destruction de la fiche termine le programme
 TfrmSimulation::~TfrmSimulation()
 {
     if (OnDestroy)

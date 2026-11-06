@@ -142,8 +142,8 @@ void TestAide::initTestCase()
     stRepExe = QCoreApplication::applicationDirPath();
 }
 //---------------------------------------------------------------------------
-void TestAide::cleanupTestCase() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot de
-                                 // Qt Test)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestAide::cleanupTestCase()
 {
     QDesktopServices::unsetUrlHandler("file");
 }
@@ -220,8 +220,8 @@ void TestAide::sommaireEtTutoriel()
     QVERIFY(QFile::exists(CV_DOSSIER_DOCS "/tutorial/index.html"));
 }
 //---------------------------------------------------------------------------
-void TestAide::aideCopieeACoteDeCvw() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
-                                      // de Qt Test)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestAide::aideCopieeACoteDeCvw()
 { // html/ et tutocv/ à côté de cvw (Contents/Resources sous macOS), identiques à docs/
     struct ElementDossiers
     {

@@ -621,8 +621,8 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                             {
                                 if (v->Attente[a][b] || v->Trafic[a][b])
                                 {
-                                    std::string n; // NOLINT(misc-const-correctness) : modifié dans une branche if
-                                                   // constexpr
+                                    // NOLINTNEXTLINE(misc-const-correctness) : modifié dans une branche if constexpr
+                                    std::string n;
                                     if constexpr (P::Noms)
                                     {
                                         n = std::format("att{}.{}", a, b);

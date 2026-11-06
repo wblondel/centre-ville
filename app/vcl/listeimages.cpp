@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QtMath>
 #include <cstddef>
+#include <span>
 #include <vector>
 //---------------------------------------------------------------------------
 QPixmap AgranditSansLissage(const QPixmap &Image, qreal Echelle)

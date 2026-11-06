@@ -51,9 +51,9 @@ public:
     }
     void Section(const char *Nom)
     {
-        for (const char *c = Nom; (*c) != 0; c++)
+        for (const char c : std::string_view(Nom))
         {
-            Ajoute(static_cast<unsigned char>(*c));
+            Ajoute(static_cast<unsigned char>(c));
         }
     }
     void Objet(const char * /*unused*/, int Numero, bool /*unused*/ = false)

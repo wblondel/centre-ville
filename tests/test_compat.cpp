@@ -267,11 +267,7 @@ namespace
 {
 std::string LitTout(const AnsiString &asNom)
 {
-    std::ifstream f(std::filesystem::path(std::u8string(
-                        reinterpret_cast<const char8_t *>(
-                            asNom.str().data()) /* NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : UTF-8 */,
-                        asNom.str().size())),
-                    std::ios::binary);
+    std::ifstream f(std::filesystem::path(std::u8string(asNom.str().begin(), asNom.str().end())), std::ios::binary);
     return {std::istreambuf_iterator<char>(f), {}};
 }
 void EcritTout(const AnsiString &asNom, const std::string &asOctets)
@@ -283,9 +279,7 @@ void EcritTout(const AnsiString &asNom, const std::string &asOctets)
 }
 std::filesystem::path CheminDe(const AnsiString &asNom)
 {
-    return {std::u8string(reinterpret_cast<const char8_t *>(
-                              asNom.str().data()) /* NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) : UTF-8 */,
-                          asNom.str().size())};
+    return {std::u8string(asNom.str().begin(), asNom.str().end())};
 }
 // Fichiers du dossier de sortie : aucun fichier temporaire ne doit rester
 std::size_t NbFichiers(const std::filesystem::path &Dossier)

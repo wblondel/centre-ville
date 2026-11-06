@@ -138,6 +138,7 @@
 #include <array>
 #include <exception>
 #include <format>
+#include <span>
 #include <iostream>
 #include <chrono>
 #include <condition_variable>
@@ -1601,10 +1602,10 @@ void TestInterface::init()
     Messages.clear();
 }
 //---------------------------------------------------------------------------
-void TestInterface::aProposAuDemarrage() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
-                                         // (slot de Qt Test)
-{                                        // f_simul FormShow : « À propos » affichée (non modale), feu vert puis texte
-                                         // en vert au premier tic du minuteur, fermeture automatique au deuxième (2 s)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::aProposAuDemarrage()
+{ // f_simul FormShow : « À propos » affichée (non modale), feu vert puis texte
+  // en vert au premier tic du minuteur, fermeture automatique au deuxième (2 s)
     QVERIFY(frmAPropos);
     QVERIFY(frmAPropos->isVisible());
     QVERIFY(!QApplication::activeModalWidget());
@@ -1663,8 +1664,8 @@ void TestInterface::ouvertureParLigneDeCommande()
     Capture("demo_tour0.png");
 }
 //---------------------------------------------------------------------------
-void TestInterface::raccourcisSelonLeMode() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
-                                            // (slot de Qt Test)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::raccourcisSelonLeMode()
 { // Ctrl+B : « Passage de bus » (menu contextuel d'édition) avant la simulation
     int x = -1;
     int y = -1;
@@ -2017,11 +2018,11 @@ void TestInterface::ouvertureEnEchec()
     std::memcpy(Futur.data(), &VersionFuture, sizeof(VersionFuture));
     QByteArray Incoherent = Fichier;
     int NbFeuxNegatif = -5;
-    std::memcpy(Incoherent.data() + sizeof(int), &NbFeuxNegatif, sizeof(NbFeuxNegatif)); // Nombre de feux, après la
-                                                                                         // version
+    std::memcpy(&Incoherent[sizeof(int)], &NbFeuxNegatif, sizeof(NbFeuxNegatif)); // Nombre de feux, après la
+                                                                                  // version
     QByteArray Enorme = Fichier;
     int NbFeuxEnorme = 0x7FFFFFF0;
-    std::memcpy(Enorme.data() + sizeof(int), &NbFeuxEnorme, sizeof(NbFeuxEnorme));
+    std::memcpy(&Enorme[sizeof(int)], &NbFeuxEnorme, sizeof(NbFeuxEnorme));
     const QString Repertoire = Dossier + "/repertoire.cvw";
     QVERIFY(QDir().mkpath(Repertoire));
     struct Cas
@@ -2300,6 +2301,7 @@ void TestInterface::interruptionTramsImpossibles()
         std::vector<int> NumArret;
     };
     std::vector<ligne> Lignes;
+    Lignes.reserve(cv->LigneTram.size());
     for (auto &i : cv->LigneTram)
     {
         Lignes.push_back({.NbArrets = i.NbArrets, .NumArret = std::vector<int>(i.NumArret.begin(), i.NumArret.end())});
@@ -4038,6 +4040,11 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
             {
                 b = &a;
             }
+        }
+        if (b == nullptr)
+        {
+            QTest::qFail(Nom, "test_interface.cpp", 0); // bouton de carrefour inconnu
+            return QStringList();
         }
         Selectionne(xd, yd, xd + b->Colonnes - 1, yd + b->Lignes - 1);
         if (QTest::currentTestFailed())
@@ -6079,6 +6086,9 @@ void TestInterface::epidemieSansPietonDansLaBarreDEtat()
     TfrmSimulation *s = frmSimulation;
     const struct Retablit
     { // Affichage d'origine pour les tests suivants, même après un échec
+        Retablit() = default;
+        Retablit(const Retablit &) = delete;
+        Retablit &operator=(const Retablit &) = delete;
         ~Retablit()
         {
             try
@@ -6899,6 +6909,9 @@ void TestInterface::dessinsPendantLaSimulation()
     const struct Retablit
     {
         std::function<void()> FermeRecherche;
+        explicit Retablit(std::function<void()> f) : FermeRecherche(std::move(f)) {}
+        Retablit(const Retablit &) = delete;
+        Retablit &operator=(const Retablit &) = delete;
         ~Retablit()
         { // Modes d'origine pour les tests suivants, même après un échec
             try
@@ -10283,17 +10296,17 @@ void TestInterface::menuContextuelDeLaGrille()
     QCOMPARE(EtatGrille(g), EtatAttendu(1, 2, 0, 5));
 }
 //---------------------------------------------------------------------------
-void TestInterface::controleCSpinEdit() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
-                                        // (slot de Qt Test)
-{                                       // TCSpinEdit comme CSPIN.pas, sur un champ seul : MinValue et MaxValue sont
-                                        // de simples champs (ni le texte ni OnChange ne bougent) ; Value=... est
-                                        // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
-                                        // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
-                                        // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
-                                        // le texte prend cette valeur en quittant le champ (v6.0.3) ; flèches :
-                                        // Value±Increment, borné ; sans bornes si MinValue=MaxValue=0 (v6.0.3) ;
-                                        // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
-                                        // le champ (sauf au clic)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::controleCSpinEdit()
+{ // TCSpinEdit comme CSPIN.pas, sur un champ seul : MinValue et MaxValue sont
+  // de simples champs (ni le texte ni OnChange ne bougent) ; Value=... est
+  // borné si MinValue<>MaxValue, et OnChange suit le texte ; la frappe n'est
+  // pas bornée (chiffres et signes), mais l'est en quittant le champ, pas
+  // quand la fenêtre perd l'activation ; texte vide : Value vaut MinValue, et
+  // le texte prend cette valeur en quittant le champ (v6.0.3) ; flèches :
+  // Value±Increment, borné ; sans bornes si MinValue=MaxValue=0 (v6.0.3) ;
+  // EditorEnabled=False : flèches seulement ; texte sélectionné en entrant dans
+  // le champ (sauf au clic)
     QWidget Fiche;
     auto *s = new TCSpinEdit(&Fiche);
     auto *b = new TButton(&Fiche);
@@ -10499,14 +10512,14 @@ void TestInterface::aideContextuelle()
     QDesktopServices::unsetUrlHandler("file");
 }
 //---------------------------------------------------------------------------
-void TestInterface::textesResserres() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
-                                      // de Qt Test)
-{                                     // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
-                                      // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
-                                      // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
-                                      // tient. Libellés des fiches : texte entier, une fois resserré (cases à
-                                      // cocher et boutons radio : selon la taille de la case du style, celle de
-                                      // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::textesResserres()
+{ // v6.0.16 : texte trop large pour sa zone (polices de remplacement plus
+  // larges que celles de Windows) resserré juste assez (QFont::setStretch), au
+  // plus de 20 % en largeur et pas sous l'étirement 85 ; police inchangée s'il
+  // tient. Libellés des fiches : texte entier, une fois resserré (cases à
+  // cocher et boutons radio : selon la taille de la case du style, celle de
+  // Fusion, en CI, étant plus grande que celles de Windows et de macOS)
     const QFont f = frmRecherche->RadioButtonParking->font();
     const QString t = QString::fromUtf8("Place parking n°");
     const int Dr = Qt::AlignLeft | Qt::AlignVCenter;
@@ -10582,12 +10595,12 @@ void TestInterface::textesResserres() // NOLINT(readability-convert-member-funct
                                                                 // de FAIL!
 }
 //---------------------------------------------------------------------------
-void TestInterface::couleursLisibles() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
-                                       // (slot de Qt Test)
-{                                      // v6.0.16 : couleurs de texte fixées par le .dfm (Composition), sous le
-                                       // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
-                                       // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
-                                       // clair de la VCL, vert et rouge sur fond sombre)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::couleursLisibles()
+{ // v6.0.16 : couleurs de texte fixées par le .dfm (Composition), sous le
+  // contraste de 3 sur un fond sombre (thème du système), éclaircies à teinte
+  // égale jusqu'au contraste de 4,5 ; inchangées si elles se lisent (fond
+  // clair de la VCL, vert et rouge sur fond sombre)
     const QColor Sombre(30, 30, 30);
     const QColor Clair(236, 236, 236);
     for (const TColor c : {clNavy, clMaroon, clPurple})
@@ -10615,11 +10628,11 @@ void TestInterface::couleursLisibles() // NOLINT(readability-convert-member-func
     QVERIFY(JauneLisible.lightness() < Jaune.lightness());
 }
 //---------------------------------------------------------------------------
-void TestInterface::ongletsEntiers() // NOLINT(readability-convert-member-functions-to-static) : fonction de test (slot
-                                     // de Qt Test)
-{                                    // v6.0.16 : onglets de Véhicules dans la police de la fiche (sous macOS, Qt
-                                     // leur donnait celle du système, plus grande : texte abrégé), resserrée
-                                     // tant qu'un texte est abrégé
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::ongletsEntiers()
+{ // v6.0.16 : onglets de Véhicules dans la police de la fiche (sous macOS, Qt
+  // leur donnait celle du système, plus grande : texte abrégé), resserrée
+  // tant qu'un texte est abrégé
     TTabControl *t = frmStatsVehicules->TabControl;
     auto *Onglets = t->findChild<QTabBar *>();
     QVERIFY(Onglets);
@@ -10637,12 +10650,12 @@ void TestInterface::ongletsEntiers() // NOLINT(readability-convert-member-functi
     QVERIFY2(t->OngletsEntiers(), qPrintable(QString::number(Onglets->font().stretch())));
 }
 //---------------------------------------------------------------------------
-void TestInterface::policesEtStyleWindows() // NOLINT(readability-convert-member-functions-to-static) : fonction de test
-                                            // (slot de Qt Test)
-{                                           // Affichage natif de Windows (recette, pas la CI en « offscreen ») : les
-                                            // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
-                                            // (libellés entiers), avec le style « windowsvista » (valeur des champs
-                                            // numériques visible)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static) : fonction de test (slot de Qt Test)
+void TestInterface::policesEtStyleWindows()
+{ // Affichage natif de Windows (recette, pas la CI en « offscreen ») : les
+  // fiches sont en Microsoft Sans Serif, équivalent TrueType de MS Sans Serif
+  // (libellés entiers), avec le style « windowsvista » (valeur des champs
+  // numériques visible)
     if (QGuiApplication::platformName() != QLatin1String("windows"))
     {
         QSKIP("affichage natif de Windows seulement");
@@ -10673,15 +10686,16 @@ try
     const QString Origine = qEnvironmentVariable("CV_CARTE");
     const QString Copie = Temp.path() + "/carte.cvw";
     QFile::copy(Origine, Copie);
+    const std::span<char *> Args(argv, static_cast<std::size_t>(argc));
     QByteArray CopieLocale = Copie.toLocal8Bit();
-    std::vector<char *> ArgsApplication = {argv[0], CopieLocale.data()};
+    std::vector<char *> ArgsApplication = {Args[0], CopieLocale.data()};
     int NbArgsApplication = 2;
     // Boîtes de message de Qt et non natives (NSAlert sous macOS) : le test y répond
     QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
     QApplication App(NbArgsApplication, ArgsApplication.data());
     InitialiseApplication(App);
     // Carte : le chemin tel que passé à l'application (ParamStr(1), affiché tel quel dans le titre)
-    ArgumentsTest << QString::fromLocal8Bit(argv[0]) << Copie << Origine;
+    ArgumentsTest << QString::fromLocal8Bit(Args[0]) << Copie << Origine;
     DossierCaptures = qEnvironmentVariable("CV_DOSSIER_CAPTURES");
     TestInterface t;
     return QTest::qExec(&t, argc, argv);

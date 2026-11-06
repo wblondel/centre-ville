@@ -402,7 +402,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
         {
             INFO(c.Nom << " = " << Valeur);
             std::string asDonnees = asOctets;
-            std::memcpy(asDonnees.data() + c.Position, &Valeur, sizeof(Valeur));
+            std::memcpy(&asDonnees[c.Position], &Valeur, sizeof(Valeur));
             CHECK_FALSE(Charge(asDonnees));
         }
     }
@@ -411,7 +411,7 @@ TEST_CASE("Ouverture : un nombre d'éléments impossible fait échouer Charge", 
     {
         std::string asDonnees = asOctets;
         int Zero = 0;
-        std::memcpy(asDonnees.data() + Position, &Zero, sizeof(Zero));
+        std::memcpy(&asDonnees[Position], &Zero, sizeof(Zero));
         CHECK_FALSE(Charge(asDonnees));
     }
     vue = nullptr;

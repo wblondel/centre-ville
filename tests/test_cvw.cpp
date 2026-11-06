@@ -110,6 +110,7 @@ TEST_CASE("Round-trip Charge -> Sauve octet par octet sur les 6 cartes et les 3 
         std::string asChemin;
     };
     std::vector<carte_roundtrip> Liste;
+    Liste.reserve(Cartes.size());
     for (const carte &c : Cartes)
     {
         Liste.push_back({.c = c, .asChemin = CheminCarte(c)});

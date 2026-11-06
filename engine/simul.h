@@ -447,6 +447,7 @@ public:
     } // v5.4.1
     [[nodiscard]] bool EstVivant() const { return (!Ecrase) && (!Mort); }
     bool EstContagieux();
+    bool DecideDeDescendre(int Probabilite);       // Probabilite chances sur 100 de vouloir descendre au prochain arrêt
     void EstContaminePar(int NumPieton, int Rang); // v5.4.1. Utilisation :
                                                    // UnPieton->EstContaminePar(PietonContagieux->Numero+1,
                                                    // PietonContagieux->DonneRang()+1)
@@ -511,6 +512,9 @@ class feu
 public:
     feu(const feu &) = delete;
     feu &operator=(const feu &) = delete;
+    feu(feu &&) = delete;
+    feu &operator=(feu &&) = delete;
+    ~feu() = default;
     int x{}, y{}, Dir{}; // Orientation. Mais il peut y avoir max. 2 feux par case;
     etat_feu Etat{}, ProchainEtat{};
     int NbFeuxDmd{}, // Nbre de feux demandant le rouge
@@ -601,6 +605,9 @@ class feu_pieton // v5.2
 public:
     feu_pieton(const feu_pieton &) = delete;
     feu_pieton &operator=(const feu_pieton &) = delete;
+    feu_pieton(feu_pieton &&) = delete;
+    feu_pieton &operator=(feu_pieton &&) = delete;
+    ~feu_pieton() = default;
     std::array<int, NBFEUXPIETONSPARNUMERO> x{};
     std::array<int, NBFEUXPIETONSPARNUMERO> y{};
     std::array<int, NBFEUXPIETONSPARNUMERO> Dir{}; // Deux feux pitons sont positionnés de part et d'autre d'un passage
@@ -1255,6 +1262,9 @@ class voie
 public:
     voie(const voie &) = delete;
     voie &operator=(const voie &) = delete;
+    voie(voie &&) = delete;
+    voie &operator=(voie &&) = delete;
+    ~voie() = default;
     dirposs DirPoss{};
     sens_voie_tram SensVoieTram{}; // v3.5. 0 = aucune voie. Sinon 0<SensVoieTram<64.
     std::array<priorite, 4> Priorite{};

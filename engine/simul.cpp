@@ -439,6 +439,15 @@ void pieton::ChercheFileTaxi() // v3.6
     }
 }
 //-----------------------------------------------------------------------------
+bool pieton::DecideDeDescendre(int Probabilite) // v6.0.17 : tirage seulement s'il ne veut pas déjà descendre
+{
+    if (!VeutDescendre)
+    {
+        VeutDescendre = Probabilite > (alea::Rand() % 100);
+    }
+    return VeutDescendre;
+}
+//-----------------------------------------------------------------------------
 bool pieton::EstContagieux()
 {
     if (EstVivant() && Infection)
@@ -1906,8 +1915,7 @@ void bus::FaitMonterEtDescendre() // v3.0
     for (i = 0; i < cv->NbPietons; i++)
     {
         p = &cv->Pieton[i];
-        if ((p->NumBus == Numero) &&
-            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretBusDmd > (alea::Rand() % 100)))))
+        if ((p->NumBus == Numero) && p->DecideDeDescendre(cv->ProbaArretBusDmd))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
         }
@@ -2261,8 +2269,7 @@ void tram::FaitMonterEtDescendre() // v3.5
     for (i = 0; i < cv->NbPietons; i++)
     {
         p = &cv->Pieton[i];
-        if ((p->NumTram == Numero) &&
-            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTramDmd > (alea::Rand() % 100)))))
+        if ((p->NumTram == Numero) && p->DecideDeDescendre(cv->ProbaArretTramDmd))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra au prochain arrêt
         }
@@ -2872,8 +2879,7 @@ void taxi::FaitDescendrePietons()
     for (i = 0; i < cv->NbPietons; i++)
     {
         p = &cv->Pieton[i];
-        if ((p->NumTaxi == Numero) &&
-            (p->VeutDescendre || (p->VeutDescendre = (cv->ProbaArretTaxiDmd > (alea::Rand() % 100)))))
+        if ((p->NumTaxi == Numero) && p->DecideDeDescendre(cv->ProbaArretTaxiDmd))
         {
             v->FaitDescendrePieton(d, i); // Si on peut pas faire descendre, il descendra une prochaine fois
         }
@@ -3077,7 +3083,6 @@ voie *voie::v(direction d) const
 //-----------------------------------------------------------------------------
 bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation des distances aux arrêts de bus.
 {                                   // v3.5... Et des trams ! v3.6...Et des taxis ! v5.0...Et des places de parking
-    bool Ok = true;
     int nd = NbDir[DirPoss];
     const int ne = cv->NbParkings;
     const int nab = cv->NbArretsBus;
@@ -3123,12 +3128,11 @@ bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation 
     {
         DistArretTram.assign(nat, std::vector<int>(nd, DIST_INDEFINIE));
     }
-    return Ok;
+    return true;
 }
 //-----------------------------------------------------------------------------
 bool voie::PrepareCalculAttenteTrafic()
 {
-    bool Ok = true;
     const int ne = cv->NbParkings;
     LibereAttenteTrafic();  // v6.0.1
     NbParkingsAttente = ne; // v6.0.1
@@ -3137,7 +3141,7 @@ bool voie::PrepareCalculAttenteTrafic()
         Attente.assign(ne + 1, std::vector<int>(ne + 1, 0));
         Trafic.assign(ne + 1, std::vector<int>(ne + 1, 0));
     }
-    return Ok;
+    return true;
 }
 //-----------------------------------------------------------------------------
 void voie::CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib() // v3.6. Rq : Nécessite de connaître les 2 prochaines
@@ -6839,18 +6843,17 @@ void centre_ville::PlaceVehiculeVehlib(int x, int y, int NumVehlib) // v5.3
     vl->DirDrnDepl = vl->Dir;
     v[x][y].NumVehlib = NumVehlib;
     v[x][y].RedessineCase(false);
-    if (vl->Situation == svDepart)
+    if ((vl->Situation == svDepart) && (((NumPlace = v[x][y].NumPlaceVehlib) != 0) && // Si c'est une place de vehlib ET
+                                        (NumPlace == vl->NumPlaceArrivee) &&          // c'est la place d'arrivée ET
+                                        (PlaceVehlib[NumPlace - 1].NumVehlibReserve == NumVehlib))) // elle a été
+                                                                                                    // réservée pour ce
+                                                                                                    // vehlib
     {
-        if (((NumPlace = v[x][y].NumPlaceVehlib) != 0) &&              // Si c'est une place de vehlib ET
-            (NumPlace == vl->NumPlaceArrivee) &&                       // c'est la place d'arrivée ET
-            (PlaceVehlib[NumPlace - 1].NumVehlibReserve == NumVehlib)) // elle a été réservée pour ce vehlib
-        {
-            vl->FaitDescendrePietons();
-            vl->NumPlaceDepart = NumPlace;
-            vl->NumPlaceArrivee = 0;
-            vl->Situation = svAttente;
-            PlaceVehlib[NumPlace - 1].NumVehlibReserve = 0;
-        }
+        vl->FaitDescendrePietons();
+        vl->NumPlaceDepart = NumPlace;
+        vl->NumPlaceArrivee = 0;
+        vl->Situation = svAttente;
+        PlaceVehlib[NumPlace - 1].NumVehlibReserve = 0;
     }
 }
 //-----------------------------------------------------------------------------
@@ -7016,11 +7019,7 @@ bool centre_ville::PrepareVehlibs() // v5.3. Les vehlibs ainsi que leurs places
     }
 
     // On détermine la place de chaque vehlib pour répartir les places libres
-    int *NumPlace = new int[NbVehlibsADefinir];
-    for (int i = 0; i < NbVehlibsADefinir; i++)
-    {
-        NumPlace[i] = 0;
-    }
+    std::vector<int> NumPlace(NbVehlibsADefinir, 0);
     for (int i = 0; i < NbPlacesVehlib; i++)
     {
         if (NumPlace[NumVehlibPlace(i)] == 0)
@@ -7035,7 +7034,6 @@ bool centre_ville::PrepareVehlibs() // v5.3. Les vehlibs ainsi que leurs places
         Vehlib[NumVehlib].DefinitEtPlace(NumPlace[i]);
         NumVehlib++;
     }
-    delete[] NumPlace;
     return true;
 }
 //-----------------------------------------------------------------------------
@@ -7744,9 +7742,7 @@ bool centre_ville::Charge(int hfile)
     // v5.1 : on retire les parkings indéfinis
     if (Ok && (NvNbParkings < NbParkings))
     {
-        std::vector<parking> NvParking;
-        NvParking = std::vector<parking>(NvNbParkings);
-        if (Ok)
+        std::vector<parking> NvParking(NvNbParkings);
         {
             NvNbParkings = 0;
             for (i = 0; i < NbParkings; i++)
@@ -7768,9 +7764,7 @@ bool centre_ville::Charge(int hfile)
     // v5.1 : on retire les places de parkings indéfinies
     if (Ok && (VersionFichier >= 0x500) && (NvNbPlacesPark < NbPlacesPark))
     {
-        std::vector<place_park> NvPlacePark;
-        NvPlacePark = std::vector<place_park>(NvNbPlacesPark);
-        if (Ok)
+        std::vector<place_park> NvPlacePark(NvNbPlacesPark);
         {
             NvNbPlacesPark = 0;
             for (i = 0; i < NbPlacesPark; i++)
@@ -7793,9 +7787,7 @@ bool centre_ville::Charge(int hfile)
     // v5.3 : on retire les places de vehlib indéfinies
     if (Ok && (VersionFichier >= 0x530) && (NvNbPlacesVehlib < NbPlacesVehlib))
     {
-        std::vector<place_vehlib> NvPlaceVehlib;
-        NvPlaceVehlib = std::vector<place_vehlib>(NvNbPlacesVehlib);
-        if (Ok)
+        std::vector<place_vehlib> NvPlaceVehlib(NvNbPlacesVehlib);
         {
             NvNbPlacesVehlib = 0;
             for (i = 0; i < NbPlacesVehlib; i++)
@@ -8287,23 +8279,26 @@ void centre_ville::Genere(int x, int y, int d) // v4.2
             1 + ((LgrMinSgmtRoute * ((((d - 1) % 2) != 0) ? NbX : NbY)) / 10) + // Longueur du nouveau segment de route
             (alea::Rand() % (1 + (((LgrMaxSgmtRoute - LgrMinSgmtRoute) * ((((d - 1) % 2) != 0) ? NbX : NbY)) / 10)));
         // AfficheMessage("Départ du segment","("+IntToStr(x)+","+IntToStr(y)+"),"+asDir[d], tmInformation,0,0);
-        bool // MemeDir=false, // pour débogage
-             // TraverseeRoute=true, // pour débogage
-            DirOpposee = false;
-        bool // MemeDir=false, // pour débogage
-             // TraverseeRoute=true, // pour débogage
-            EntreeIntersection = true;
+        bool DirOpposee = false;
+        bool EntreeIntersection = true;
+        const auto TireEntreeIntersection = [&] { // ProbaEntreeIntersection chances sur 10
+            EntreeIntersection = (ProbaEntreeIntersection > alea::Rand() % 10);
+            return EntreeIntersection;
+        };
+        const auto VoitDirOpposee = [&](const voie *vc) {
+            DirOpposee = ((vc->DirPoss & InvPossDir[d]) != 0);
+            return DirOpposee;
+        };
         for (k = 0, Ok = true, AutreDirection = false; Ok && (k <= l); k++)
         {
-            voie *vc = &Voisine(x, y, k, d);                               // Case suivante
-            Ok = ((/*MemeDir=*/vc->DirPoss & PossDir[d]) == 0) &&          // S'il s'agit d'une direction possible = d
-                 (!(DirOpposee = ((vc->DirPoss & InvPossDir[d]) != 0))) && // OU une direction opposée à d
+            voie *vc = &Voisine(x, y, k, d);                      // Case suivante
+            Ok = ((/*MemeDir=*/vc->DirPoss & PossDir[d]) == 0) && // S'il s'agit d'une direction possible = d
+                 (!VoitDirOpposee(vc)) &&                         // OU une direction opposée à d
                  ((vc->DirPoss == 0) ||
                   /*TraverseeRoute=*/(ProbaTraverseeRoute > alea::Rand() % 10) || // OU une traversée de route refusée,
                                                                                   // ALORS on NE TRACE pas le segment de
                                                                                   // route sur la case.
-                  (EntreeIntersection = (ProbaEntreeIntersection > alea::Rand() % 10))); // OU une entrée d'intersection
-                                                                                         // ?
+                  TireEntreeIntersection());                                      // OU une entrée d'intersection ?
             if (Ok)
             { // v5.4 : Conversion BCB6>BCBX pas de a+=b sur énumérés
                 vc->DirPoss =

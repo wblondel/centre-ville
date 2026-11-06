@@ -181,7 +181,8 @@ QObject *LieurComposants::Lie(const char *Nom, const char *Classe)
         {
             if ((std::strcmp(l.Fiche, Fichier) == 0) && (std::strcmp(l.Nom, Nom) == 0))
             {
-                o = new TVirtualImageList(l.Ressources, Fiche);
+                o = new TVirtualImageList(l.Ressources, Fiche); // appartient à la fiche (parent Qt)
+                break;
             }
         }
     }

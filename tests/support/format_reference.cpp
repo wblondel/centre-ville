@@ -5,6 +5,7 @@
 // énumérés = 1 octet, nature = 4 octets.
 //---------------------------------------------------------------------------
 #include "format_reference.h"
+#include <array>
 #include <cstdint>
 #include <cstring>
 #include <exception>
@@ -18,8 +19,8 @@ const int NB_LIGNES = 9, NB_ARRETS_PAR_LIGNE = 9, NB_DIR = 4;
 //-------------------------------------------------------------------------
 class lecteur
 {
-    const std::string &s; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : contenu lu, qui survit au
-                          // lecteur
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) : contenu lu, qui survit au lecteur
+    const std::string &s;
     std::size_t Pos = 0;
 
 public:
@@ -50,8 +51,8 @@ public:
 class ecrivain
 {
 public:
-    conversion_cvw &c; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : conversion écrite, qui survit à
-                       // l'écrivain
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) : conversion écrite, qui survit à l'écrivain
+    conversion_cvw &c;
     explicit ecrivain(conversion_cvw &Conversion) : c(Conversion) {}
     void Brut(const std::string &Nom, const std::string &o)
     {
@@ -435,8 +436,8 @@ std::vector<std::string> EcartsParChamp(const conversion_cvw &Reference, const s
     };
     for (const champ_cvw &c : Reference.Champs)
     {
-        if ((c.Debut + c.Taille > asObtenu.size()) ||
-            (std::memcmp(Reference.Octets.data() + c.Debut, asObtenu.data() + c.Debut, c.Taille) != 0))
+        if ((c.Debut + c.Taille > asObtenu.size()) || (std::string_view(Reference.Octets).substr(c.Debut, c.Taille) !=
+                                                       std::string_view(asObtenu).substr(c.Debut, c.Taille)))
         {
             Ecarts.push_back(c.Nom + " : " + Valeur(Reference.Octets, c.Debut, c.Taille) + " -> " +
                              Valeur(asObtenu, c.Debut, c.Taille));

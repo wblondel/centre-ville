@@ -113,8 +113,8 @@ public:
 // Propriétés communes à tous les contrôles (TControl / TWinControl)
 //---------------------------------------------------------------------------
 template <class B>
-class ControleVcl : public B, public ControleVclBase // NOLINT(misc-multiple-inheritance) : widget Qt et services de la
-                                                     // VCL (mixins)
+// NOLINTNEXTLINE(misc-multiple-inheritance) : widget Qt et services de la VCL (mixins)
+class ControleVcl : public B, public ControleVclBase
 {
     PoliceControle Police;
 
@@ -123,8 +123,8 @@ public:
     Propriete<bool> Visible, Enabled;
     Propriete<AnsiString> Hint, Name;
     Propriete<TColor> Color;
-    PoliceControle *const Font = &Police; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) : Font désigne
-                                          // toujours la police du contrôle
+    // NOLINTNEXTLINE(cppcoreguidelines-avoid-const-or-ref-data-members) : Font désigne toujours la police du contrôle
+    PoliceControle *const Font = &Police;
     TNotifyEvent OnClick;
     explicit ControleVcl(QWidget *Parent = nullptr) : B(Parent)
     {
@@ -176,8 +176,9 @@ public:
     }
     void SetFocus() { B::setFocus(); }
     [[nodiscard]] bool Focused() const { return B::hasFocus(); }
-    void PrepareVcl() override; // NOLINT(portability-template-virtual-member-function) : compilée pour chaque classe de
-                                // base (CI sous MSVC, GCC, Clang) ; police, couleurs, curseur
+    // NOLINTNEXTLINE(portability-template-virtual-member-function) : compilée pour chaque classe de base (CI sous MSVC,
+    // GCC, Clang) ;…
+    void PrepareVcl() override;
 };
 //---------------------------------------------------------------------------
 // AutoSize (True par défaut, sauf WordWrap) : à chaque Caption=... du code, le
@@ -396,8 +397,8 @@ public:
 
     public:
         Colonne(TStringGrid *gg, int cc) : g(gg), c(cc) {}
-        class Cellule // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur
-                      // (VCL)
+        // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
+        class Cellule
         {
             TStringGrid *g;
             int c, r;
@@ -463,6 +464,7 @@ public:
     void EcritCellule(int c, int r, const AnsiString &as);
     void EcritTaille(bool Colonne, int i, int Taille);
     [[nodiscard]] TRect CellRect(int ACol, int ARow) const; // rectangle dans le viewport (vide si la case est cachée)
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method) : Repaint de la grille, appelé sur son type
     void Repaint()
     {
         if (TCanvas::NbDessinsEnCours != 0)
@@ -524,8 +526,8 @@ public:
     explicit TTrackBar(QWidget *Parent = nullptr);
 };
 //---------------------------------------------------------------------------
-class TPanel : public ControleVcl<QFrame>, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance) : widget Qt et
-                                                                     // services de la VCL (mixins)
+// NOLINTNEXTLINE(misc-multiple-inheritance) : widget Qt et services de la VCL (mixins)
+class TPanel : public ControleVcl<QFrame>, public AvecMenuContextuel
 {
 public:
     explicit TPanel(QWidget *Parent = nullptr) : ControleVcl<QFrame>(Parent) {}
@@ -596,8 +598,8 @@ public:
     std::vector<TStatusPanel *> Items;
     ~TStatusPanels();
 };
-class TStatusBar : public ControleVcl<QStatusBar>, public AvecMenuContextuel // NOLINT(misc-multiple-inheritance) :
-                                                                             // widget Qt et services de la VCL (mixins)
+// NOLINTNEXTLINE(misc-multiple-inheritance) : widget Qt et services de la VCL (mixins)
+class TStatusBar : public ControleVcl<QStatusBar>, public AvecMenuContextuel
 {
     TStatusPanels PanneauxVcl;
     AnsiString asSimpleText;

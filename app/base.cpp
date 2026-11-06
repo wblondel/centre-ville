@@ -40,6 +40,8 @@ const std::array<std::array<int, NBMAXBOUTONS>, NBTYPESMESSAGE> BoutonDefaut = {
 }}; // MB_DEFBUTTONn - 1
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+namespace
+{
 // v5.3 : aide type HLP converti en type HTML : correspondances TForm::HelpContext en URL "html\index.html#"
 struct ContexteAide
 {
@@ -77,6 +79,7 @@ const std::array<ContexteAide, NBCONTEXTESAIDE> caCorresp = {{
     {.Numero = 68, .szHREF = "ISUP"},       {.Numero = 69, .szHREF = "RC"},
     {.Numero = 70, .szHREF = "MDE"},
 }};
+} // namespace
 //---------------------------------------------------------------------------
 // v5.4 : Pour les fichiers créés par Centre-Ville
 //        on utilise le chemin donné par %LocalAppData% pour Windows 7 ou plus

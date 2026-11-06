@@ -91,10 +91,8 @@ public:
     Finalement &operator=(const Finalement &) = delete;
     Finalement(Finalement &&) = delete;
     Finalement &operator=(Finalement &&) = delete;
-    ~Finalement()
-    {
-        Code();
-    } // NOLINT(bugprone-exception-escape) : comme __finally, une exception du code de sortie termine le programme
+    // NOLINTNEXTLINE(bugprone-exception-escape) : comme __finally, une exception en sortie termine le programme
+    ~Finalement() { Code(); }
 };
 //---------------------------------------------------------------------------
 // TShiftState

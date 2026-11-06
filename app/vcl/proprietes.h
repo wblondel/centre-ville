@@ -75,8 +75,8 @@ public:
 // Propriétés texte : mêmes méthodes qu'AnsiString (Caption[Caption.Length()]...)
 //---------------------------------------------------------------------------
 template <>
-class Propriete<AnsiString> // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la
-                            // valeur (VCL)
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
+class Propriete<AnsiString>
 {
     std::function<AnsiString()> Lit;
     std::function<void(const AnsiString &)> Ecrit;
