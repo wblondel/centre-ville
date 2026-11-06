@@ -42,6 +42,16 @@ code n'a plus à rester comparable ligne à ligne à celui de la version d'origi
   déclaration des classes ; classes qui possèdent des ressources non copiables.
 - `std::format` au lieu de `snprintf`, chaînes constantes `constexpr`, espaces de noms
   anonymes, `const` et `[[nodiscard]]` là où ils s'appliquent.
+- **Calcul des distances** : un parcours (template) pour les distances simples et un pour
+  les distances doubles, au lieu de cinq copies de la même récursion.
+
+### Tests
+
+- **« Tout droit » sur deux cases** : chemin du calcul des distances qu'aucune carte livrée
+  ne parcourt. Des cases « Tout droit » et des passages de bus tirés au hasard sur cinq
+  cartes donnent les mêmes tables de distances qu'avec le moteur 6.0.16.
+- **Délai du test d'interface** : 15 minutes sans optimisation (Debug, couverture), où les
+  accès aux conteneurs standard ne sont pas inlinés.
 
 ### Corrections
 
