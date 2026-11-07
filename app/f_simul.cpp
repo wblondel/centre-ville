@@ -1948,7 +1948,7 @@ void TfrmSimulation::AfficheBilan()
                 ndp = NbDir[cv->v[xe][ye].DirPoss];
                 for (d = 0; d < ndp; d++)
                 {
-                    MinDist = min(MinDist, cv->v[xe][ye].DistParking[j][d][SANSPSGBUS]); // v3.5 (SANSPSGBUS)
+                    MinDist = min(MinDist, cv->v[xe][ye].DistParking()[j][d][SANSPSGBUS]); // v3.5 (SANSPSGBUS)
                 }
                 ParcoursMin += MinDist;
             }

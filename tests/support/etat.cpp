@@ -660,65 +660,65 @@ template <class P> void ExportEtat::Exporte(const centre_ville *cv, partie_etat 
                 const int nd = NbDir[v->DirPoss];
                 const int ndt = v->NbDirPossSensVoieTram(indefinie);
                 s.Objet("distances", (x * 1000) + y);
-                if (!v->DistParking.empty())
+                if (!v->DistParking().empty())
                 {
                     for (int e = 0; e < cv->NbParkings; e++)
                     {
                         for (int d = 0; d < nd; d++)
                         {
-                            C(s, "pk", v->DistParking[e][d][0]);
-                            C(s, "pk", v->DistParking[e][d][1]);
+                            C(s, "pk", v->DistParking()[e][d][0]);
+                            C(s, "pk", v->DistParking()[e][d][1]);
                         }
                     }
                 }
-                if (!v->DistArretBus.empty())
+                if (!v->DistArretBus().empty())
                 {
                     for (int e = 0; e < cv->NbArretsBus; e++)
                     {
                         for (int d = 0; d < nd; d++)
                         {
-                            C(s, "ab", v->DistArretBus[e][d]);
+                            C(s, "ab", v->DistArretBus()[e][d]);
                         }
                     }
                 }
-                if (!v->DistArretTram.empty())
+                if (!v->DistArretTram().empty())
                 {
                     for (int e = 0; e < cv->NbArretsTram; e++)
                     {
                         for (int d = 0; d < ndt; d++)
                         {
-                            C(s, "at", v->DistArretTram[e][d]);
+                            C(s, "at", v->DistArretTram()[e][d]);
                         }
                     }
                 }
-                if (!v->DistFileTaxi.empty())
+                if (!v->DistFileTaxi().empty())
                 {
                     for (int e = 0; e < cv->NbFilesTaxi; e++)
                     {
                         for (int d = 0; d < nd; d++)
                         {
-                            C(s, "ft", v->DistFileTaxi[e][d]);
+                            C(s, "ft", v->DistFileTaxi()[e][d]);
                         }
                     }
                 }
-                if (!v->DistFilePark.empty())
+                if (!v->DistFilePark().empty())
                 {
                     for (int e = 0; e < cv->NbFilesPark; e++)
                     {
                         for (int d = 0; d < nd; d++)
                         {
-                            C(s, "fp", v->DistFilePark[e][d][0]);
-                            C(s, "fp", v->DistFilePark[e][d][1]);
+                            C(s, "fp", v->DistFilePark()[e][d][0]);
+                            C(s, "fp", v->DistFilePark()[e][d][1]);
                         }
                     }
                 }
-                if (!v->DistPlaceVehlib.empty())
+                if (!v->DistPlaceVehlib().empty())
                 {
                     for (int e = 0; e < cv->NbPlacesVehlib; e++)
                     {
                         for (int d = 0; d < nd; d++)
                         {
-                            C(s, "pv", v->DistPlaceVehlib[e][d]);
+                            C(s, "pv", v->DistPlaceVehlib()[e][d]);
                         }
                     }
                 }

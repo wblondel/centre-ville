@@ -83,35 +83,35 @@ std::string TablesDistances()
             Texte += std::format("{} {} :", x, y);
             for (int k = 0; k < V.NbDirDist; k++)
             {
-                for (int e = 0; e < V.NbParkingsDist; e++)
+                for (int e = 0; e < V.DistParking().size(); e++)
                 {
-                    Texte += std::format(" P{},{}", V.DistParking[e][k][0], V.DistParking[e][k][1]);
+                    Texte += std::format(" P{},{}", V.DistParking()[e][k][0], V.DistParking()[e][k][1]);
                 }
-                for (int e = 0; e < V.NbFilesParkDist; e++)
+                for (int e = 0; e < V.DistFilePark().size(); e++)
                 {
-                    Texte += std::format(" F{},{}", V.DistFilePark[e][k][0], V.DistFilePark[e][k][1]);
+                    Texte += std::format(" F{},{}", V.DistFilePark()[e][k][0], V.DistFilePark()[e][k][1]);
                 }
-                for (int e = 0; e < V.NbArretsBusDist; e++)
+                for (int e = 0; e < V.DistArretBus().size(); e++)
                 {
-                    Texte += std::format(" B{}", V.DistArretBus[e][k]);
+                    Texte += std::format(" B{}", V.DistArretBus()[e][k]);
                 }
-                for (int e = 0; e < V.NbFilesTaxiDist; e++)
+                for (int e = 0; e < V.DistFileTaxi().size(); e++)
                 {
-                    Texte += std::format(" T{}", V.DistFileTaxi[e][k]);
+                    Texte += std::format(" T{}", V.DistFileTaxi()[e][k]);
                 }
-                for (int e = 0; e < V.NbPlacesVehlibDist; e++)
+                for (int e = 0; e < V.DistPlaceVehlib().size(); e++)
                 {
-                    Texte += std::format(" V{}", V.DistPlaceVehlib[e][k]);
+                    Texte += std::format(" V{}", V.DistPlaceVehlib()[e][k]);
                 }
             }
             if (V.SensVoieTram > 0)
             {
                 const int nd = V.NbDirPossSensVoieTram(indefinie);
-                for (int e = 0; e < V.NbArretsTramDist; e++)
+                for (int e = 0; e < V.DistArretTram().size(); e++)
                 {
                     for (int k = 0; k < nd; k++)
                     {
-                        Texte += std::format(" R{}", V.DistArretTram[e][k]);
+                        Texte += std::format(" R{}", V.DistArretTram()[e][k]);
                     }
                 }
             }

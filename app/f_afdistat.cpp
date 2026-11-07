@@ -44,7 +44,7 @@ void TfrmAffDistArretsTram::RafraichitInfos()
     const int y = frmSimulation->DrawGridSimul->Row;
     voie *v = &cv->v[x][y];
     EffaceInfos();
-    if (v->DistArretTram.empty())
+    if (v->DistArretTram().empty())
     {
         return;
     }
@@ -65,7 +65,7 @@ void TfrmAffDistArretsTram::RafraichitInfos()
             if (((i % NbX) != 0) && (i >= NbX))
             { // v5.4 : conversion BCB6>BCBX (AnsiString>String)
                 StringGridDistances->Cells[i % NbX][i / NbX] =
-                    ((de = v->DistArretTram[(i / NbX) - 1][(i % NbX) - 1]) == DIST_INDEFINIE)
+                    ((de = v->DistArretTram()[(i / NbX) - 1][(i % NbX) - 1]) == DIST_INDEFINIE)
                         ? String("     ")
                         : Format("%5d", TableauDeConstantes(de));
             }

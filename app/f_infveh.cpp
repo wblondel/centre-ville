@@ -143,9 +143,9 @@ void TfrmInfosVehicule::RafraichitInfos()
         LabelParcours->Caption = IntToStr(DejaParcouru = Veh->NbCasesParcourues);
         if (NumParkingArrivee != 0)
         { // v5.0
-            LabelDistance->Caption = IntToStr(
-                ResteAParcourir =
-                    v->DistParking[NumParkingArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]][Prioritaire ? 1 : 0]); // v3.5
+            LabelDistance->Caption =
+                IntToStr(ResteAParcourir = v->DistParking()[NumParkingArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]]
+                                                           [Prioritaire ? 1 : 0]); // v3.5
         }
         if (NumParkingDepart != 0)
         { // v5.0
@@ -154,8 +154,8 @@ void TfrmInfosVehicule::RafraichitInfos()
         if (NumFileParkArrivee != 0)
         { // v5.0
             LabelDistance->Caption =
-                IntToStr(ResteAParcourir = v->DistFilePark[NumFileParkArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]]
-                                                          [Prioritaire ? 1 : 0]); // v3.5
+                IntToStr(ResteAParcourir = v->DistFilePark()[NumFileParkArrivee - 1][NumDirdp[Veh->Dir][v->DirPoss]]
+                                                            [Prioritaire ? 1 : 0]); // v3.5
         }
         if (NumFileParkDepart != 0)
         { // v5.0
@@ -168,14 +168,15 @@ void TfrmInfosVehicule::RafraichitInfos()
             for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
             {
                 DistMin =
-                    min(DistMin, CaseDepart->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0]); // v5.0
+                    min(DistMin, CaseDepart->DistFilePark()[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0]); // v5.0
             }
         }
         if (NumParkingArrivee != 0)
         {
             for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
             {
-                DistMin = min(DistMin, CaseDepart->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0]); // v3.5
+                DistMin =
+                    min(DistMin, CaseDepart->DistParking()[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0]); // v3.5
             }
         }
         LabelDistanceMin->Caption = IntToStr(DistMin);

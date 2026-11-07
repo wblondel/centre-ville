@@ -2372,7 +2372,7 @@ void TestInterface::interruptionReseauNonConnexe()
         QVERIFY(!frmSimulation->ToolButtonArret->isEnabled());
         QVERIFY(!frmSimulation->MenuItemArret->ElementQt()->isEnabled());
         QVERIFY(frmAffDistParkings->isVisible());
-        QVERIFY(!cv->v[4][2].DistParking.empty());
+        QVERIFY(!cv->v[4][2].DistParking().empty());
         QVERIFY(OctetsReseau() == Reseau);
         QVERIFY(Contenu(f) == Reseau);
     }
@@ -2381,7 +2381,7 @@ void TestInterface::interruptionReseauNonConnexe()
     frmSimulation->ActionDirectionDroite->Execute();
     QCOMPARE((int)cv->v[6][3].DirPoss, (int)(S | E));
     QVERIFY(frmSimulation->SimulationModifiee);
-    QVERIFY(cv->v[4][2].DistParking.empty());                        // distances obsolètes libérées...
+    QVERIFY(cv->v[4][2].DistParking().empty());                      // distances obsolètes libérées...
     frmSimulation->DrawGridSimulClick(frmSimulation->DrawGridSimul); // ... et la fiche encore ouverte le voit
     for (int x = 7; x <= 9; x++)
     {
@@ -4487,8 +4487,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Parkings";
                     t.Nb = cv->NbParkings;
-                    t.Definie = !v->DistParking.empty();
-                    t.Distance = [v, c](int k, int d) { return v->DistParking[k][d][c]; };
+                    t.Definie = !v->DistParking().empty();
+                    t.Distance = [v, c](int k, int d) { return v->DistParking()[k][d][c]; };
                     return t;
                 },
             .Ouvre = [s] { s->MenuItemInfosDistancesEtapes->ElementQt()->trigger(); },
@@ -4505,8 +4505,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = QString::fromUtf8("Arrêts bus");
                     t.Nb = cv->NbArretsBus;
-                    t.Definie = !v->DistArretBus.empty();
-                    t.Distance = [v](int k, int d) { return v->DistArretBus[k][d]; };
+                    t.Definie = !v->DistArretBus().empty();
+                    t.Distance = [v](int k, int d) { return v->DistArretBus()[k][d]; };
                     return t;
                 },
             .Ouvre = [s] { s->MenuItemDistancesArretsBus->ElementQt()->trigger(); },
@@ -4523,10 +4523,10 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t;
                     t.Titre = QString::fromUtf8("Arrêts tram");
                     t.Nb = cv->NbArretsTram;
-                    t.Definie = !v->DistArretTram.empty();
+                    t.Definie = !v->DistArretTram().empty();
                     t.NbDir = v->NbDirPossSensVoieTram(indefinie);
                     t.Dir = [v](int d) { return v->DirSensVoieTram(indefinie, d); };
-                    t.Distance = [v](int k, int d) { return v->DistArretTram[k][d]; };
+                    t.Distance = [v](int k, int d) { return v->DistArretTram()[k][d]; };
                     return t;
                 },
             .Ouvre = [] { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_R, Qt::ControlModifier); },
@@ -4543,8 +4543,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Files taxi";
                     t.Nb = cv->NbFilesTaxi;
-                    t.Definie = !v->DistFileTaxi.empty();
-                    t.Distance = [v](int k, int d) { return v->DistFileTaxi[k][d]; };
+                    t.Definie = !v->DistFileTaxi().empty();
+                    t.Distance = [v](int k, int d) { return v->DistFileTaxi()[k][d]; };
                     return t;
                 },
             .Ouvre = [s] { s->MenuItemInfosDistancesFilesTaxi->ElementQt()->trigger(); },
@@ -4561,8 +4561,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Files parking";
                     t.Nb = cv->NbFilesPark;
-                    t.Definie = !v->DistFilePark.empty();
-                    t.Distance = [v, c](int k, int d) { return v->DistFilePark[k][d][c]; };
+                    t.Definie = !v->DistFilePark().empty();
+                    t.Distance = [v, c](int k, int d) { return v->DistFilePark()[k][d][c]; };
                     return t;
                 },
             .Ouvre = [] { QTest::keyClick(frmSimulation->DrawGridSimul, Qt::Key_K, Qt::ControlModifier); },
@@ -4579,8 +4579,8 @@ void TestInterface::VerifieFichesDistances(const QString &asCarte, bool Captures
                     TableDistances t = TableRoute(v);
                     t.Titre = "Places vehlib";
                     t.Nb = cv->NbPlacesVehlib;
-                    t.Definie = !v->DistPlaceVehlib.empty();
-                    t.Distance = [v](int k, int d) { return v->DistPlaceVehlib[k][d]; };
+                    t.Definie = !v->DistPlaceVehlib().empty();
+                    t.Distance = [v](int k, int d) { return v->DistPlaceVehlib()[k][d]; };
                     return t;
                 },
             .Ouvre = [s] { s->ActionDistancesPlacesVehlib->Execute(); },
@@ -5129,7 +5129,7 @@ void TestInterface::fichesInfos()
                 int Min = 0x7FFFFFFF;
                 for (int d = 0; d < NbDir[v->DirPoss]; d++)
                 {
-                    Min = qMin(Min, v->DistFileTaxi[t->NumFile][d]);
+                    Min = qMin(Min, v->DistFileTaxi()[t->NumFile][d]);
                 }
                 Compare(e, "distance à la tête de file", f->LabelDistanceTeteFileDepart->Caption, QString::number(Min));
             }

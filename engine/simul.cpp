@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <span>
 #include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
@@ -1308,10 +1309,10 @@ void vehicule::CalculeProchaineDirection()
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark != 0) &&
                              (cv->PlacePark[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark - 1].NumFile + 1 ==
                               NumFileParkArrivee))) || // 2. Distance à la file. v5.2.3 : NumFile+1 et non NumFile
-                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
-                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
-                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
-                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
+                        ((v->DistFilePark()[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
+                          v->DistFilePark()[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                         ((v->DistFilePark()[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                           v->DistFilePark()[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                           ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante
                                                                // : v2.2.4.  // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
@@ -1330,10 +1331,10 @@ void vehicule::CalculeProchaineDirection()
                 if (i != j)
                 { // On dégringole si distance supérieure.
                     OrdreDir[i] += static_cast<int>(
-                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
-                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
-                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
-                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
+                        (v->DistParking()[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
+                         v->DistParking()[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                        ((v->DistParking()[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                          v->DistParking()[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                          ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante
                                                               // : v2.2.4.  // v3.5 : || par && !
                           ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // sinon tirage au
@@ -1424,10 +1425,10 @@ direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOI
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark != 0) &&
                              (cv->PlacePark[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlacePark - 1].NumFile + 1 ==
                               NumFileParkArrivee))) || // 2. Distance à la file. v5.2.3 : NumFile+1 et non NumFile
-                        ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
-                          v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
-                         ((v->DistFilePark[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
-                           v->DistFilePark[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
+                        ((v->DistFilePark()[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] >
+                          v->DistFilePark()[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                         ((v->DistFilePark()[NumFileParkArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                           v->DistFilePark()[NumFileParkArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                           ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante :
                                                             // v2.2.4.  // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // tirage au
@@ -1447,10 +1448,10 @@ direction vehicule::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOI
                 if (i != j)
                 {
                     OrdreDir[i] += static_cast<int>(
-                        (v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
-                         v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
-                        ((v->DistParking[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
-                          v->DistParking[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
+                        (v->DistParking()[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] >
+                         v->DistParking()[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) ||
+                        ((v->DistParking()[NumParkingArrivee - 1][i][Prioritaire ? 1 : 0] ==
+                          v->DistParking()[NumParkingArrivee - 1][j][Prioritaire ? 1 : 0]) &&
                          ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante :
                                                            // v2.2.4.  // v3.5 : || par && !
                           ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard
@@ -1616,9 +1617,10 @@ void vehlib::CalculeProchaineDirection()
                         (static_cast<int>(cv->Voisine(x, y, Dirdp[j][v->DirPoss]).NumPlaceVehlib ==
                                           NumPlaceArrivee) > // 1. Place arrivée
                          static_cast<int>(cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceVehlib == NumPlaceArrivee)) ||
-                        ((v->DistPlaceVehlib[NumPlaceArrivee - 1][i] >
-                          v->DistPlaceVehlib[NumPlaceArrivee - 1][j]) || // 2. Distance à la place.
-                         ((v->DistPlaceVehlib[NumPlaceArrivee - 1][i] == v->DistPlaceVehlib[NumPlaceArrivee - 1][j]) &&
+                        ((v->DistPlaceVehlib()[NumPlaceArrivee - 1][i] >
+                          v->DistPlaceVehlib()[NumPlaceArrivee - 1][j]) || // 2. Distance à la place.
+                         ((v->DistPlaceVehlib()[NumPlaceArrivee - 1][i] ==
+                           v->DistPlaceVehlib()[NumPlaceArrivee - 1][j]) &&
                           ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
                                                                                                       // hasard (Ici
@@ -1693,9 +1695,10 @@ direction vehlib::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT 
                         (static_cast<int>(cv->Voisine(x, y, Dirdp[j][v->DirPoss]).NumPlaceVehlib ==
                                           NumPlaceArrivee) > // 1. Place arrivée
                          static_cast<int>(cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceVehlib == NumPlaceArrivee)) ||
-                        ((v->DistPlaceVehlib[NumPlaceArrivee - 1][i] >
-                          v->DistPlaceVehlib[NumPlaceArrivee - 1][j]) || // 2. Distance à la place.
-                         ((v->DistPlaceVehlib[NumPlaceArrivee - 1][i] == v->DistPlaceVehlib[NumPlaceArrivee - 1][j]) &&
+                        ((v->DistPlaceVehlib()[NumPlaceArrivee - 1][i] >
+                          v->DistPlaceVehlib()[NumPlaceArrivee - 1][j]) || // 2. Distance à la place.
+                         ((v->DistPlaceVehlib()[NumPlaceArrivee - 1][i] ==
+                           v->DistPlaceVehlib()[NumPlaceArrivee - 1][j]) &&
                           ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
                                                                                                       // hasard (Ici
@@ -1939,8 +1942,8 @@ void bus::CalculeProchaineDirection() // v3.0
             if (i != j)
             { // On dégringole si distance supérieure.
                 OrdreDir[i] += static_cast<int>(
-                    (v->DistArretBus[NumArretSvt - 1][i] > v->DistArretBus[NumArretSvt - 1][j]) ||
-                    ((v->DistArretBus[NumArretSvt - 1][i] == v->DistArretBus[NumArretSvt - 1][j]) &&
+                    (v->DistArretBus()[NumArretSvt - 1][i] > v->DistArretBus()[NumArretSvt - 1][j]) ||
+                    ((v->DistArretBus()[NumArretSvt - 1][i] == v->DistArretBus()[NumArretSvt - 1][j]) &&
                      ((Dirdp[i][v->DirPoss] != AncDir) || // En cas d'égalité, préfère garder la direction courante :
                                                           // v2.2.4
                       ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // sinon tirage au
@@ -2011,8 +2014,8 @@ direction bus::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ETR
             if (i != j)
             {
                 OrdreDir[i] += static_cast<int>(
-                    (v->DistArretBus[NumArretSvt - 1][i] > v->DistArretBus[NumArretSvt - 1][j]) ||
-                    ((v->DistArretBus[NumArretSvt - 1][i] == v->DistArretBus[NumArretSvt - 1][j]) &&
+                    (v->DistArretBus()[NumArretSvt - 1][i] > v->DistArretBus()[NumArretSvt - 1][j]) ||
+                    ((v->DistArretBus()[NumArretSvt - 1][i] == v->DistArretBus()[NumArretSvt - 1][j]) &&
                      ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante : //
                                                        // v3.5 : || par && !
                       ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard en
@@ -2301,8 +2304,8 @@ void tram::CalculeProchaineDirection() // v3.5
                 {
                     // On dégringole si distance supérieure.
                     OrdreDir[d - 1] += static_cast<int>(
-                        (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
-                        ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
+                        (v->DistArretTram()[NumArretSvt - 1][i] > v->DistArretTram()[NumArretSvt - 1][j]) ||
+                        ((v->DistArretTram()[NumArretSvt - 1][i] == v->DistArretTram()[NumArretSvt - 1][j]) &&
                          ((d != AncDir) || // En cas d'égalité, préfère garder la direction courante // v3.5 : || par &&
                                            // !
                           ((i + Numero + cv->TourCrt) % nd > (j + Numero + cv->TourCrt) % nd)))); // sinon tirage au
@@ -2381,8 +2384,8 @@ direction tram::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
                 {
                     // On dégringole si distance supérieure.
                     OrdreDir[d - 1] += static_cast<int>(
-                        (v->DistArretTram[NumArretSvt - 1][i] > v->DistArretTram[NumArretSvt - 1][j]) ||
-                        ((v->DistArretTram[NumArretSvt - 1][i] == v->DistArretTram[NumArretSvt - 1][j]) &&
+                        (v->DistArretTram()[NumArretSvt - 1][i] > v->DistArretTram()[NumArretSvt - 1][j]) ||
+                        ((v->DistArretTram()[NumArretSvt - 1][i] == v->DistArretTram()[NumArretSvt - 1][j]) &&
                          ((d != Dir) || // En cas d'égalité, préfère garder la direction courante. // v3.5 : || par && !
                           ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp)))); // tirage au hasard
                                                                                                     // en cas d'égalité
@@ -2753,8 +2756,8 @@ void taxi::CalculeProchaineDirection()
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceTaxi != 0) &&
                              (cv->PlaceTaxi[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceTaxi - 1].NumFile ==
                               NumFile))) ||
-                        ((v->DistFileTaxi[NumFile][i] > v->DistFileTaxi[NumFile][j]) || // 2. Distance à la file
-                         ((v->DistFileTaxi[NumFile][i] == v->DistFileTaxi[NumFile][j]) &&
+                        ((v->DistFileTaxi()[NumFile][i] > v->DistFileTaxi()[NumFile][j]) || // 2. Distance à la file
+                         ((v->DistFileTaxi()[NumFile][i] == v->DistFileTaxi()[NumFile][j]) &&
                           ((Dirdp[i][v->DirPoss] != AncDir) || // 3. En cas d'égalité, préfère garder la direction
                                                                // courante : v2.2.4. // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
@@ -2837,8 +2840,8 @@ direction taxi::ProchaineDirectionAuCarrefour() const // ATTENTION : DIR DOIT ET
                              (cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceTaxi != 0) &&
                              (cv->PlaceTaxi[cv->Voisine(x, y, Dirdp[i][v->DirPoss]).NumPlaceTaxi - 1].NumFile ==
                               NumFile))) ||
-                        ((v->DistFileTaxi[NumFile][i] > v->DistFileTaxi[NumFile][j]) ||
-                         ((v->DistFileTaxi[NumFile][i] == v->DistFileTaxi[NumFile][j]) &&
+                        ((v->DistFileTaxi()[NumFile][i] > v->DistFileTaxi()[NumFile][j]) ||
+                         ((v->DistFileTaxi()[NumFile][i] == v->DistFileTaxi()[NumFile][j]) &&
                           ((Dirdp[i][v->DirPoss] != Dir) || // En cas d'égalité, préfère garder la direction courante :
                                                             // v2.2.4.  // v3.5 : || par && !
                            ((i + Numero + cv->TourCrt) % ndp > (j + Numero + cv->TourCrt) % ndp))))); // sinon tirage au
@@ -2989,16 +2992,6 @@ voie::voie()
     Initialise();
 }
 //-----------------------------------------------------------------------------
-void voie::LibereDistances() // v6.0.1
-{
-    DistParking.clear();
-    DistArretBus.clear();    // v3.0
-    DistArretTram.clear();   // v3.5
-    DistFileTaxi.clear();    // v3.6
-    DistFilePark.clear();    // v5.0
-    DistPlaceVehlib.clear(); // v5.3
-}
-//-----------------------------------------------------------------------------
 void voie::LibereAttenteTrafic() // v6.0.1
 {
     Attente.clear();
@@ -3084,56 +3077,6 @@ void voie::Initialise(type_voie TypeVoie) // v3.5
 voie *voie::v(direction d) const
 { // v3.0
     return &cv->Voisine(x, y, d);
-}
-//-----------------------------------------------------------------------------
-bool voie::PrepareCalculDistances() // v3.0 : inclut également la préparation des distances aux arrêts de bus.
-{                                   // v3.5... Et des trams ! v3.6...Et des taxis ! v5.0...Et des places de parking
-    int nd = NbDir[DirPoss];
-    const int ne = cv->NbParkings;
-    const int nab = cv->NbArretsBus;
-    const int nat = cv->NbArretsTram;   // v3.0
-    const int nft = cv->NbFilesTaxi;    // v3.5
-    const int nfp = cv->NbFilesPark;    // v3.6
-    const int npv = cv->NbPlacesVehlib; // v5.0 // v5.3
-    LibereDistances();                  // v6.0.1
-    NbDirDist = nd;
-    NbParkingsDist = ne;
-    NbArretsBusDist = nab;
-    NbArretsTramDist = nat; // v6.0.1
-    NbFilesTaxiDist = nft;
-    NbFilesParkDist = nfp;
-    NbPlacesVehlibDist = npv; // v6.0.1
-    if (nd > 0)
-    {
-        const std::vector<std::array<int, 2>> Indefinies2(nd, {DIST_INDEFINIE, DIST_INDEFINIE});
-        const std::vector<int> Indefinies(nd, DIST_INDEFINIE);
-        if (ne > 0) // D'abord le nombre de parkings, puis le nombre de directions possibles
-        {
-            DistParking.assign(ne, Indefinies2);
-        }
-        if (nab > 0) // v3.0. D'abord le nombre d'arrêts de bus
-        {
-            DistArretBus.assign(nab, Indefinies);
-        }
-        if (nft > 0) // v3.6. D'abord le nombre de files de taxi
-        {
-            DistFileTaxi.assign(nft, Indefinies);
-        }
-        if (nfp > 0) // v5.0. D'abord le nombre de files de parkings
-        {
-            DistFilePark.assign(nfp, Indefinies2);
-        }
-        if (npv > 0) // v5.3. D'abord le nombre de places de vehlib
-        {
-            DistPlaceVehlib.assign(npv, Indefinies);
-        }
-    }
-    nd = NbDirPossSensVoieTram(indefinie); // v3.5
-    if ((nd > 0) && (nat > 0))             // D'abord le nombre d'arrêts de tram
-    {
-        DistArretTram.assign(nat, std::vector<int>(nd, DIST_INDEFINIE));
-    }
-    return true;
 }
 //-----------------------------------------------------------------------------
 bool voie::PrepareCalculAttenteTrafic()
@@ -4249,15 +4192,16 @@ bool voie::EstDepotBus() const // v3.0
     return (x == cv->DepotBus.x) && (y == cv->DepotBus.y);
 }
 //-----------------------------------------------------------------------------
-// Distance simple (une par direction possible) à l'élément i : arrêt de bus (v3.0), file de taxis (v3.6), place de
+// Distance simple (une par direction possible) à un élément : arrêt de bus (v3.0), file de taxis (v3.6), place de
 // vehlib (v5.3). La case reçoit Distance en venant de DirOrig, puis la propage aux cases qui mènent à elle : sa
-// voisine et, si celle-ci oblige à aller tout droit, la case suivante (v3.9.1). 6.0.17 : un template pour les trois
-// distances simples, au lieu de trois copies
-template <voie::DistancesSimples voie::*Distances> void voie::CalculeDistance(int i, int Distance, direction DirOrig)
+// voisine et, si celle-ci oblige à aller tout droit, la case suivante (v3.9.1). 6.0.17 : un parcours pour les trois
+// distances simples, au lieu de trois copies. 6.0.19 : Dist contient les distances de toutes les cases à l'élément
+// (table_distances::Element), à l'indice IndiceDist de chacune
+void voie::CalculeDistance(std::span<int> Dist, int Distance, direction DirOrig)
 {
     if (DirOrig != 0)
     {
-        (this->*Distances)[i][NumDirdp[DirOrig][DirPoss]] = Distance;
+        Dist[IndiceDist + NumDirdp[DirOrig][DirPoss]] = Distance;
     }
     for (int d = nord; d <= ouest; d++)
     {
@@ -4266,30 +4210,29 @@ template <voie::DistancesSimples voie::*Distances> void voie::CalculeDistance(in
         const direction Retour = InvDir[d];
         const dirposs PossRetour = InvPossDir[d];
         if (((VoieCrt.DirPoss & PossRetour) == PossRetour) && // Si VoieCrt mène ici ET sa distance s'en trouve réduite
-            ((VoieCrt.*Distances)[i][NumDirdp[Retour][VoieCrt.DirPoss]] > Distance + 1))
+            (Dist[VoieCrt.IndiceDist + NumDirdp[Retour][VoieCrt.DirPoss]] > Distance + 1))
         {
-            VoieCrt.CalculeDistance<Distances>(i, Distance + 1, Retour);
+            VoieCrt.CalculeDistance(Dist, Distance + 1, Retour);
         }
         if (VoieCrt.ToutDroit && // v3.9.1 (On traite le ToutDroit : 2 cases)
             ((Voie2Cases.DirPoss & PossRetour) == PossRetour) &&
-            ((Voie2Cases.*Distances)[i][NumDirdp[Retour][Voie2Cases.DirPoss]] > Distance + 2))
+            (Dist[Voie2Cases.IndiceDist + NumDirdp[Retour][Voie2Cases.DirPoss]] > Distance + 2))
         {
-            Voie2Cases.CalculeDistance<Distances>(i, Distance + 2, Retour);
+            Voie2Cases.CalculeDistance(Dist, Distance + 2, Retour);
         }
     }
 }
 
 //-----------------------------------------------------------------------------
-// Distances doubles à l'élément i, sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS) : parking (v3.5), file
+// Distances doubles à un élément, sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS) : parking (v3.5), file
 // de parkings (v5.0). Même parcours que les distances simples, avec deux différences : une case qui oblige à aller
 // tout droit part de la distance de la case d'en face (v3.9.1), et une voisine de passage de bus ne propage que la
-// distance avec passages de bus. 6.0.17 : un template pour les deux, au lieu de deux copies
-template <voie::DistancesDoubles voie::*Distances>
-void voie::CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig)
+// distance avec passages de bus. 6.0.17 : un parcours pour les deux, au lieu de deux copies
+void voie::CalculeDistance(std::span<distance_double> Dist, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig)
 {
     if (DirOrig != 0)
     { // v3.5
-        auto &Ici = (this->*Distances)[i][NumDirdp[DirOrig][DirPoss]];
+        distance_double &Ici = Dist[IndiceDist + NumDirdp[DirOrig][DirPoss]];
         Ici[SANSPSGBUS] = std::min(Ici[SANSPSGBUS], DistSansPsgBus);
         Ici[AVECPSGBUS] = std::min(Ici[AVECPSGBUS], DistAvecPsgBus);
     }
@@ -4307,7 +4250,7 @@ void voie::CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direct
         if (ToutDroit && ((DirPoss & PossRetour) == PossRetour))
         {
             const voie &VoieOpposee = cv->Voisine(x, y, Retour);
-            const auto &DistOpposee = (VoieOpposee.*Distances)[i][NumDirdp[Retour][VoieOpposee.DirPoss]];
+            const distance_double &DistOpposee = Dist[VoieOpposee.IndiceDist + NumDirdp[Retour][VoieOpposee.DirPoss]];
             DistCrtAvecPsgBus = DistOpposee[AVECPSGBUS];
             DistCrtSansPsgBus = DistOpposee[SANSPSGBUS];
             if (DistCrtAvecPsgBus != DIST_INDEFINIE)
@@ -4324,36 +4267,37 @@ void voie::CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direct
         if (VoieCrt.PassageBus)
         {
             if (((VoieCrt.DirPoss & PossRetour) == PossRetour) &&
-                ((VoieCrt.*Distances)[i][NumDirdp[Retour][VoieCrt.DirPoss]][AVECPSGBUS] > DistCrtAvecPsgBus + 1))
+                (Dist[VoieCrt.IndiceDist + NumDirdp[Retour][VoieCrt.DirPoss]][AVECPSGBUS] > DistCrtAvecPsgBus + 1))
             {
-                VoieCrt.CalculeDistance<Distances>(i, DIST_INDEFINIE, DistCrtAvecPsgBus + 1, Retour);
+                VoieCrt.CalculeDistance(Dist, DIST_INDEFINIE, DistCrtAvecPsgBus + 1, Retour);
             }
             if (VoieCrt.ToutDroit && ((Voie2Cases.DirPoss & PossRetour) == PossRetour) &&
-                ((Voie2Cases.*Distances)[i][NumDirdp[Retour][Voie2Cases.DirPoss]][AVECPSGBUS] > DistCrtAvecPsgBus + 2))
+                (Dist[Voie2Cases.IndiceDist + NumDirdp[Retour][Voie2Cases.DirPoss]][AVECPSGBUS] >
+                 DistCrtAvecPsgBus + 2))
             {
-                Voie2Cases.CalculeDistance<Distances>(i, DIST_INDEFINIE, DistCrtAvecPsgBus + 2, Retour);
+                Voie2Cases.CalculeDistance(Dist, DIST_INDEFINIE, DistCrtAvecPsgBus + 2, Retour);
             }
         }
         else
         {
             if ((VoieCrt.DirPoss & PossRetour) == PossRetour)
             {
-                const auto &DistCrt = (VoieCrt.*Distances)[i][NumDirdp[Retour][VoieCrt.DirPoss]];
+                const distance_double &DistCrt = Dist[VoieCrt.IndiceDist + NumDirdp[Retour][VoieCrt.DirPoss]];
                 if ((DistCrt[AVECPSGBUS] > DistCrtAvecPsgBus + 1) || (DistCrt[SANSPSGBUS] > DistCrtSansPsgBus + 1))
                 {
-                    VoieCrt.CalculeDistance<Distances>(
-                        i, (DistCrtSansPsgBus == DIST_INDEFINIE) ? DIST_INDEFINIE : DistCrtSansPsgBus + 1,
+                    VoieCrt.CalculeDistance(
+                        Dist, (DistCrtSansPsgBus == DIST_INDEFINIE) ? DIST_INDEFINIE : DistCrtSansPsgBus + 1,
                         DistCrtAvecPsgBus + 1, Retour);
                 }
             }
             if (VoieCrt.ToutDroit && ((Voie2Cases.DirPoss & PossRetour) == PossRetour))
             {
-                const auto &Dist2Cases = (Voie2Cases.*Distances)[i][NumDirdp[Retour][Voie2Cases.DirPoss]];
+                const distance_double &Dist2Cases = Dist[Voie2Cases.IndiceDist + NumDirdp[Retour][Voie2Cases.DirPoss]];
                 if ((Dist2Cases[AVECPSGBUS] > DistCrtAvecPsgBus + 2) ||
                     (Dist2Cases[SANSPSGBUS] > DistCrtSansPsgBus + 2))
                 {
-                    Voie2Cases.CalculeDistance<Distances>(
-                        i, (DistCrtSansPsgBus == DIST_INDEFINIE) ? DIST_INDEFINIE : DistCrtSansPsgBus + 2,
+                    Voie2Cases.CalculeDistance(
+                        Dist, (DistCrtSansPsgBus == DIST_INDEFINIE) ? DIST_INDEFINIE : DistCrtSansPsgBus + 2,
                         DistCrtAvecPsgBus + 2, Retour);
                 }
             }
@@ -4362,11 +4306,11 @@ void voie::CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direct
 }
 
 //-----------------------------------------------------------------------------
-void voie::CalculeDistanceArretTram(int at, int Distance, direction DirOrig) // 0 <= at < NbArretTram. v3.5
-{
+void voie::CalculeDistanceArretTram(std::span<int> Dist, int Distance, direction DirOrig) // v3.5
+{ // 6.0.19 : Dist, les distances de toutes les cases à l'arrêt, à l'indice IndiceDistTram de chacune
     if (DirOrig != 0)
     {
-        DistArretTram[at][NumDirPossSensVoieTram(indefinie, DirOrig)] = Distance;
+        Dist[IndiceDistTram + NumDirPossSensVoieTram(indefinie, DirOrig)] = Distance;
     }
     for (int d = nord; d <= ouest; d++)
     { // v5.4 : manquait parenthèses autour de b&&c (a||(b&&c))
@@ -4380,9 +4324,9 @@ void voie::CalculeDistanceArretTram(int at, int Distance, direction DirOrig) // 
                                                                                               // directions
         {
             voie *VoieCrt = v(static_cast<direction>(d));
-            if (VoieCrt->DistArretTram[at][VoieCrt->NumDirPossSensVoieTram(indefinie, InvDir[d])] > Distance + 1)
-            {                                                                   // Distance indéfinie
-                VoieCrt->CalculeDistanceArretTram(at, Distance + 1, InvDir[d]); // On lance le calcul de distance
+            if (Dist[VoieCrt->IndiceDistTram + VoieCrt->NumDirPossSensVoieTram(indefinie, InvDir[d])] > Distance + 1)
+            {                                                                     // Distance indéfinie
+                VoieCrt->CalculeDistanceArretTram(Dist, Distance + 1, InvDir[d]); // On lance le calcul de distance
             }
         }
     }
@@ -4689,12 +4633,12 @@ void stats::Definit()
 //-----------------------------------------------------------------------------
 void centre_ville::CreeZone() // v4.0 (allocation dynamique)
 {
+    LibereDistances(); // 6.0.19 : celles de l'ancienne grille (jusqu'à la 6.0.18, détruites avec ses cases)
     if ((NbX > 0) && (NbY > 0))
     {
-        v = std::vector<std::vector<voie>>(NbX);
+        v.Cree(NbX, NbY);
         for (int i = 0; i < NbX; i++)
         {
-            v[i] = std::vector<voie>(NbY);
             for (int j = 0; j < NbY; j++)
             {
                 v[i][j].Definit(i, j);
@@ -6210,7 +6154,7 @@ void centre_ville::CalculeTrajetLignesBus() // v3.0.3
                     ndp = NbDir[Voie->DirPoss];
                     for (dp = 0; dp < ndp; dp++) // v3.5
                     {
-                        DistCrt = Voie->DistArretBus[NumArretSvt - 1][dp];
+                        DistCrt = Voie->DistArretBus()[NumArretSvt - 1][dp];
                         if (DistArretBus > DistCrt)
                         {
                             DistArretBus = DistCrt;
@@ -6260,7 +6204,7 @@ void centre_ville::CalculeTrajetLignesTram() // v3.5. Correction : v3.8
                         DirCrt = Voie->DirSensVoieTram(indefinie, dp);
                         if (Voie->EstDirPossSensVoieTram(InvDir[DirPrc], DirCrt))
                         {
-                            DistCrt = Voie->DistArretTram[NumArretSvt - 1][dp];
+                            DistCrt = Voie->DistArretTram()[NumArretSvt - 1][dp];
                             if (DistArretTram > DistCrt)
                             {
                                 DistArretTram = DistCrt;
@@ -6298,7 +6242,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                     if (v[i][j].PassageBus ||                                // Si passage de bus OU
                         Voisine(i, j, Dirdp[d][v[i][j].DirPoss]).PassageBus) // pointe sur un passage de bus
                     { // On ne teste que la distance AVEC passage de bus
-                        Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE);
+                        Ok = (v[i][j].DistParking()[k][d][AVECPSGBUS] < DIST_INDEFINIE);
                         if (!Ok)
                         {
                             xErr = i;
@@ -6308,8 +6252,8 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                     }
                     else
                     {
-                        Ok = (v[i][j].DistParking[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
-                             (v[i][j].DistParking[k][d][SANSPSGBUS] < DIST_INDEFINIE);
+                        Ok = (v[i][j].DistParking()[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
+                             (v[i][j].DistParking()[k][d][SANSPSGBUS] < DIST_INDEFINIE);
                         if (!Ok)
                         {
                             xErr = i;
@@ -6322,7 +6266,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 {                             // v3.0
                     if (ArretBus[k].Defini()) // v3.5
                     {
-                        Ok = (v[i][j].DistArretBus[k][d] < DIST_INDEFINIE);
+                        Ok = (v[i][j].DistArretBus()[k][d] < DIST_INDEFINIE);
                         if (!Ok)
                         {
                             xErr = i;
@@ -6333,7 +6277,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 }
                 for (k = 0; Ok && (k < NbFilesTaxi); k++)
                 { // v3.6
-                    Ok = (v[i][j].DistFileTaxi[k][d] < DIST_INDEFINIE);
+                    Ok = (v[i][j].DistFileTaxi()[k][d] < DIST_INDEFINIE);
                     if (!Ok)
                     {
                         xErr = i;
@@ -6345,11 +6289,11 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 // démarrait, et les véhicules destinés à une place inaccessible tournaient sans fin
                 for (k = 0; Ok && (k < NbFilesPark); k++)
                 {
-                    Ok = (v[i][j].DistFilePark[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
+                    Ok = (v[i][j].DistFilePark()[k][d][AVECPSGBUS] < DIST_INDEFINIE) &&
                          (v[i][j].PassageBus || // Sur un passage de bus ou pointant sur un, comme pour les
                                                 // parkings
                           Voisine(i, j, Dirdp[d][v[i][j].DirPoss]).PassageBus ||
-                          (v[i][j].DistFilePark[k][d][SANSPSGBUS] < DIST_INDEFINIE));
+                          (v[i][j].DistFilePark()[k][d][SANSPSGBUS] < DIST_INDEFINIE));
                     if (!Ok)
                     {
                         xErr = i;
@@ -6361,7 +6305,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 {
                     if (PlaceVehlib[k].Definie())
                     {
-                        Ok = (v[i][j].DistPlaceVehlib[k][d] < DIST_INDEFINIE);
+                        Ok = (v[i][j].DistPlaceVehlib()[k][d] < DIST_INDEFINIE);
                         if (!Ok)
                         {
                             xErr = i;
@@ -6379,7 +6323,7 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
                 {
                     if (ArretTram[k].Defini())
                     {
-                        Ok = (v[i][j].DistArretTram[k][d] < DIST_INDEFINIE);
+                        Ok = (v[i][j].DistArretTram()[k][d] < DIST_INDEFINIE);
                         if (!Ok)
                         {
                             xErr = i;
@@ -6396,29 +6340,41 @@ bool centre_ville::VerifieCalculDistances(type_distance &TypeDistance) // v3.5 :
 //-----------------------------------------------------------------------------
 bool centre_ville::PrepareCalculDistances() // v3.0 : inclut également celui des arrêts de bus/tram. v3.6 ...Et
                                             // des files de taxi
-{
-    bool Ok = true;
-    int i = 0;
-    int j = 0;
-    for (i = 0; Ok && (i < NbX); i++)
-    {
-        for (j = 0; Ok && (j < NbY); j++)
-        {
-            Ok = v[i][j].PrepareCalculDistances();
-        }
-    }
-    return Ok;
-}
-//-----------------------------------------------------------------------------
-void centre_ville::LibereDistances() // v6.0.1
-{
+{ // 6.0.19 : une table par type d'élément (table_distances), au lieu de tableaux dans chaque case
+    int NbDirTotal = 0;
+    int NbDirTotalTram = 0; // v3.5 : directions possibles des voies de tram
+    LibereDistances();      // v6.0.1
     for (int i = 0; i < NbX; i++)
     {
         for (int j = 0; j < NbY; j++)
         {
-            v[i][j].LibereDistances();
+            voie &Case = v[i][j];
+            Case.IndiceDist = NbDirTotal;
+            Case.NbDirDist = NbDir[Case.DirPoss];
+            NbDirTotal += Case.NbDirDist;
+            Case.IndiceDistTram = NbDirTotalTram;
+            Case.NbDirDistTram = Case.NbDirPossSensVoieTram(indefinie);
+            NbDirTotalTram += Case.NbDirDistTram;
         }
     }
+    const distance_double Indefinie2 = {DIST_INDEFINIE, DIST_INDEFINIE};
+    DistancesParking.Prepare(NbParkings, NbDirTotal, Indefinie2);
+    DistancesArretBus.Prepare(NbArretsBus, NbDirTotal, DIST_INDEFINIE);       // v3.0
+    DistancesArretTram.Prepare(NbArretsTram, NbDirTotalTram, DIST_INDEFINIE); // v3.5
+    DistancesFileTaxi.Prepare(NbFilesTaxi, NbDirTotal, DIST_INDEFINIE);       // v3.6
+    DistancesFilePark.Prepare(NbFilesPark, NbDirTotal, Indefinie2);           // v5.0
+    DistancesPlaceVehlib.Prepare(NbPlacesVehlib, NbDirTotal, DIST_INDEFINIE); // v5.3
+    return true;
+}
+//-----------------------------------------------------------------------------
+void centre_ville::LibereDistances() // v6.0.1
+{
+    DistancesParking.Libere();
+    DistancesArretBus.Libere();
+    DistancesArretTram.Libere();
+    DistancesFileTaxi.Libere();
+    DistancesFilePark.Libere();
+    DistancesPlaceVehlib.Libere();
 }
 //-----------------------------------------------------------------------------
 bool centre_ville::PrepareCalculAttenteTrafic()
@@ -6803,9 +6759,9 @@ bool centre_ville::PrepareTrams() // v3.5
             // On trouve dans quel sens on va
             for (DistProchArret = DIST_INDEFINIE, dp = 0; dp < Voie->NbDirPossSensVoieTram(indefinie); dp++)
             {
-                if (Voie->DistArretTram[NumProchArret - 1][dp] < DistProchArret)
+                if (Voie->DistArretTram()[NumProchArret - 1][dp] < DistProchArret)
                 {
-                    DistProchArret = Voie->DistArretTram[NumProchArret - 1][dp];
+                    DistProchArret = Voie->DistArretTram()[NumProchArret - 1][dp];
                     Tram[i].Dir = Tram[i].DirDrnDepl = Tram[i].DirAvtDrnDepl = Voie->DirSensVoieTram(indefinie, dp);
                     Tram[i].NumArretSvt = NumArret;
                 }
@@ -6959,7 +6915,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
         vue->RepeintStatut();                                                           // portage
         if (Parking[i].Defini())
         {
-            v[Parking[i].x][Parking[i].y].CalculeDistance<&voie::DistParking>(i, 0, 0, indefinie);
+            v[Parking[i].x][Parking[i].y].CalculeDistance(DistancesParking.Element(i), 0, 0, indefinie);
         }
     }
     // v3.0
@@ -6971,7 +6927,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
         vue->RepeintStatut();                                                            // portage
         if (ArretBus[i].Defini())
         {
-            v[ArretBus[i].x][ArretBus[i].y].CalculeDistance<&voie::DistArretBus>(i, 0, indefinie);
+            v[ArretBus[i].x][ArretBus[i].y].CalculeDistance(DistancesArretBus.Element(i), 0, indefinie);
         }
     }
     // v3.5
@@ -6983,7 +6939,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
         vue->RepeintStatut();                                                             // portage
         if (ArretTram[i].Defini())
         {
-            v[ArretTram[i].x][ArretTram[i].y].CalculeDistanceArretTram(i, 0, indefinie);
+            v[ArretTram[i].x][ArretTram[i].y].CalculeDistanceArretTram(DistancesArretTram.Element(i), 0, indefinie);
         }
     }
     // v3.6
@@ -6993,8 +6949,8 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
     {
         vue->AfficheStatut(3, Format("%d/%d", TableauDeConstantes(i + 1, NbFilesTaxi))); // portage
         vue->RepeintStatut();                                                            // portage
-        v[PlaceTaxi[FileTaxi[i].NumPlaceQueue].x][PlaceTaxi[FileTaxi[i].NumPlaceQueue].y]
-            .CalculeDistance<&voie::DistFileTaxi>(i, 0, indefinie);
+        v[PlaceTaxi[FileTaxi[i].NumPlaceQueue].x][PlaceTaxi[FileTaxi[i].NumPlaceQueue].y].CalculeDistance(
+            DistancesFileTaxi.Element(i), 0, indefinie);
     }
     // v5.0
     vue->AfficheStatut(0, "Calcul des distances aux files de parkings..."); // portage
@@ -7003,8 +6959,8 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
     {
         vue->AfficheStatut(3, Format("%d/%d", TableauDeConstantes(i + 1, NbFilesPark))); // portage
         vue->RepeintStatut();                                                            // portage
-        v[PlacePark[FilePark[i].NumPlaceQueue].x][PlacePark[FilePark[i].NumPlaceQueue].y]
-            .CalculeDistance<&voie::DistFilePark>(i, 0, 0, indefinie);
+        v[PlacePark[FilePark[i].NumPlaceQueue].x][PlacePark[FilePark[i].NumPlaceQueue].y].CalculeDistance(
+            DistancesFilePark.Element(i), 0, 0, indefinie);
     }
     // v5.3
     vue->AfficheStatut(0, "Calcul des distances aux places de vehlib..."); // portage
@@ -7013,7 +6969,7 @@ void centre_ville::CalculeDistances() // v3.0 : inclut également celles des arr
     {
         vue->AfficheStatut(3, Format("%d/%d", TableauDeConstantes(i + 1, NbPlacesVehlib))); // portage
         vue->RepeintStatut();                                                               // portage
-        v[PlaceVehlib[i].x][PlaceVehlib[i].y].CalculeDistance<&voie::DistPlaceVehlib>(i, 0, indefinie);
+        v[PlaceVehlib[i].x][PlaceVehlib[i].y].CalculeDistance(DistancesPlaceVehlib.Element(i), 0, indefinie);
     }
 }
 //-----------------------------------------------------------------------------
