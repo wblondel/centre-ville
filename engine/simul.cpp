@@ -3075,8 +3075,8 @@ void voie::Initialise(type_voie TypeVoie) // v3.5
 }
 //-----------------------------------------------------------------------------
 voie *voie::v(direction d) const
-{ // v3.0
-    return &cv->Voisine(x, y, d);
+{                       // v3.0
+    return &Voisine(d); // 6.0.19 : case voisine lue dans IndiceVoisine
 }
 //-----------------------------------------------------------------------------
 bool voie::PrepareCalculAttenteTrafic()
@@ -4205,8 +4205,8 @@ void voie::CalculeDistance(std::span<int> Dist, int Distance, direction DirOrig)
     }
     for (int d = nord; d <= ouest; d++)
     {
-        voie &VoieCrt = cv->Voisine(x, y, d);
-        voie &Voie2Cases = cv->Voisine(x, y, 2, d);
+        voie &VoieCrt = Voisine(d);
+        voie &Voie2Cases = VoieCrt.Voisine(d); // La case suivante, à deux cases
         const direction Retour = InvDir[d];
         const dirposs PossRetour = InvPossDir[d];
         if (((VoieCrt.DirPoss & PossRetour) == PossRetour) && // Si VoieCrt mène ici ET sa distance s'en trouve réduite
@@ -4241,15 +4241,15 @@ void voie::CalculeDistance(std::span<distance_double> Dist, int DistSansPsgBus, 
       // définie plus tard par isolation (on ne passe pas deux fois sur une même case)
         int DistCrtAvecPsgBus = DistAvecPsgBus;
         int DistCrtSansPsgBus = DistSansPsgBus; // Distances par défaut (v3.9.1)
-        voie &VoieCrt = cv->Voisine(x, y, d);
-        voie &Voie2Cases = cv->Voisine(x, y, 2, d);
+        voie &VoieCrt = Voisine(d);
+        voie &Voie2Cases = VoieCrt.Voisine(d); // La case suivante, à deux cases
         const direction Retour = InvDir[d];
         const dirposs PossRetour = InvPossDir[d];
         // SI ToutDroit ET d est une direction possible ALORS on ne prend que la distance de la case d'en face (v3.9.1),
         // incrémentée de 1 si elle est définie
         if (ToutDroit && ((DirPoss & PossRetour) == PossRetour))
         {
-            const voie &VoieOpposee = cv->Voisine(x, y, Retour);
+            const voie &VoieOpposee = Voisine(Retour);
             const distance_double &DistOpposee = Dist[VoieOpposee.IndiceDist + NumDirdp[Retour][VoieOpposee.DirPoss]];
             DistCrtAvecPsgBus = DistOpposee[AVECPSGBUS];
             DistCrtSansPsgBus = DistOpposee[SANSPSGBUS];
@@ -4650,6 +4650,16 @@ void centre_ville::CreeZone() // v4.0 (allocation dynamique)
         v.clear();
     }
     RetablitVoisinages();
+    for (int i = 0; i < NbX; i++) // 6.0.19 : cases voisines de chacune, avec les dx et dy de ce réseau (Voisine)
+    {
+        for (int j = 0; j < NbY; j++)
+        {
+            for (int d = indefinie; d <= ouest; d++)
+            {
+                v[i][j].IndiceVoisine[d] = static_cast<int>(v.Indice((i + dx[d]) % NbX, (j + dy[d]) % NbY));
+            }
+        }
+    }
 }
 //-----------------------------------------------------------------------------
 void centre_ville::RetablitVoisinages() const // v6.0.2

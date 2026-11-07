@@ -514,3 +514,33 @@ TEST_CASE("Distances avec des cases « Tout droit » et des passages de bus ajou
     vue = nullptr;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+TEST_CASE("Cases voisines lues dans voie::IndiceVoisine : celles de centre_ville::Voisine", "[chemins][voisines]")
+{ // 6.0.19 : le calcul des distances lit les voisines dans IndiceVoisine, fixé par CreeZone, au lieu de les calculer
+  // sur le tore (Voisine). Toutes les cases, toutes les directions, à une et deux cases ; aussi après l'ouverture
+  // d'une carte d'autres dimensions (dx et dy suivent alors la nouvelle)
+    VueNulle Vue;
+    vue = &Vue;
+    for (const carte &c : Cartes)
+    {
+        INFO(c.Nom);
+        REQUIRE(harnais::Ouvre(CheminCarte(c)));
+        int NbDifferences = 0;
+        for (int x = 0; x < cv->NbX; x++)
+        {
+            for (int y = 0; y < cv->NbY; y++)
+            {
+                const voie &V = cv->v[x][y];
+                for (int d = indefinie; d <= ouest; d++)
+                {
+                    NbDifferences += static_cast<int>(&V.Voisine(d) != &cv->Voisine(x, y, d));
+                    NbDifferences += static_cast<int>(&V.Voisine(d).Voisine(d) != &cv->Voisine(x, y, 2, d));
+                    NbDifferences += static_cast<int>(V.v(static_cast<direction>(d)) != &cv->Voisine(x, y, d));
+                }
+            }
+        }
+        CHECK(NbDifferences == 0);
+        harnais::Ferme();
+    }
+    vue = nullptr;
+}

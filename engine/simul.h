@@ -1191,7 +1191,7 @@ public:
 // d'une case à sa voisine, lit ainsi des distances proches les unes des autres. En 6.0.17, chaque case avait un
 // std::vector par élément, et ses 8 std::vector (6 de distances, 2 de statistiques) occupaient 192 octets, contre 64
 // pour les pointeurs de la 6.0.16 (voie : 384 octets au lieu de 256) : avec la grille (voir grille), le calcul des
-// distances avait ralenti de 20 %. Avec ces tables, voie fait 232 octets.
+// distances avait ralenti de 20 %. Avec ces tables, voie fait 248 octets (232 sans IndiceVoisine).
 template <class T> class table_distances
 {
     std::vector<T> Valeurs;
@@ -1267,6 +1267,9 @@ public:
     // directions possibles à la préparation. Lus avec DirPoss, ToutDroit et PassageBus par le calcul des distances :
     // sur la même ligne de cache
     int IndiceDist{}, NbDirDist{}, IndiceDistTram{}, NbDirDistTram{};
+    // 6.0.19 : place des cases voisines dans la grille, par direction (indefinie : la case elle-même), fixée par
+    // centre_ville::CreeZone (voir voie::Voisine)
+    std::array<int, NBDIR + 1> IndiceVoisine{};
     std::array<bool, NBMAXLIGNESBUSTRAM> LigneBus{};  // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case
                                                       // (visualisation par la fiche paramètres du réseau de bus
                                                       // UNIQUEMENT)
@@ -1310,6 +1313,11 @@ public:
         Initialise();
     }
     [[nodiscard]] voie *v(direction d) const; // v3.0
+    // Case voisine dans la direction d (indefinie : la case elle-même), celle de centre_ville::Voisine(x, y, d). Lue
+    // dans IndiceVoisine, sans le calcul sur le tore de Voisine (deux divisions), que le compilateur refait après
+    // chaque écriture d'un entier (NbX, NbY, dx et dy en sont) : 40 % du calcul des distances (6.0.19). Sans dx ni
+    // dy, il déroule aussi la boucle des directions des parcours. Définie après centre_ville
+    [[nodiscard]] voie &Voisine(int d) const;
     // Distances (en cases) de la case aux éléments, Dist[élément][direction possible] : tables de centre_ville
     // (6.0.19 ; membres de voie jusqu'à la 6.0.18). DistParking et DistFilePark ont deux valeurs par direction :
     // sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS). Définies après centre_ville
@@ -1440,14 +1448,13 @@ public:
         return std::span<const voie>(Cases).subspan(static_cast<std::size_t>(x) * NbY, NbY);
     }
     // Case (x, y) : comme v[x][y], en une seule multiplication par sizeof(voie) (centre_ville::Voisine)
-    [[nodiscard]] voie &Case(int x, int y)
+    [[nodiscard]] std::size_t Indice(int x, int y) const
     {
-        return Cases[(static_cast<std::size_t>(x) * NbY) + static_cast<std::size_t>(y)];
+        return (static_cast<std::size_t>(x) * NbY) + static_cast<std::size_t>(y);
     }
-    [[nodiscard]] const voie &Case(int x, int y) const
-    {
-        return Cases[(static_cast<std::size_t>(x) * NbY) + static_cast<std::size_t>(y)];
-    }
+    [[nodiscard]] voie &Case(int x, int y) { return Cases[Indice(x, y)]; }
+    [[nodiscard]] const voie &Case(int x, int y) const { return Cases[Indice(x, y)]; }
+    [[nodiscard]] voie &Case(int i) { return Cases[static_cast<std::size_t>(i)]; } // Case d'indice Indice(x, y)
 };
 //---------------------------------------------------------------------------
 class centre_ville
@@ -1892,6 +1899,10 @@ inline voie &centre_ville::Voisine(int x, int y, int n, int d)
 inline const voie &centre_ville::Voisine(int x, int y, int n, int d) const
 {
     return v.Case((x + (n * dx[d])) % NbX, (y + (n * dy[d])) % NbY);
+}
+inline voie &voie::Voisine(int d) const
+{
+    return cv->v.Case(IndiceVoisine[d]);
 }
 inline distances_case<distance_double> voie::DistParking() const
 {
