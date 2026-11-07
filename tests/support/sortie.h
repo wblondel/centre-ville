@@ -14,11 +14,11 @@
 // Renvoie le chemin (UTF-8) d'un fichier du dossier de sortie, après avoir
 // créé les dossiers nécessaires
 inline std::string FichierSortie(const std::string &asNom)
- {
-  std::string asChemin=std::string(CV_DOSSIER_SORTIE)+"/"+asNom;
-  std::filesystem::path p(std::u8string(asChemin.begin(), asChemin.end()));
-  std::filesystem::create_directories(p.parent_path());
-  return asChemin;
- }
+{
+    std::string asChemin = std::string(CV_DOSSIER_SORTIE) + "/" + asNom;
+    const std::filesystem::path p(std::u8string(asChemin.begin(), asChemin.end()));
+    std::filesystem::create_directories(p.parent_path());
+    return asChemin;
+}
 //---------------------------------------------------------------------------
 #endif

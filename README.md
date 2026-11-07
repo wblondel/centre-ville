@@ -116,9 +116,10 @@ PATH=".venv-lint/bin:$PATH" actionlint
 .venv-lint/bin/zizmor .github/workflows
 cmake --preset dev && cmake --build --preset dev
 .venv-lint/bin/python tools/lint_cpp.py --dossier build/dev --clang-tidy .venv-lint/bin/clang-tidy
+.venv-lint/bin/python tools/format_cpp.py --verifie --clang-format .venv-lint/bin/clang-format
 ```
 
-`clang-tidy` ne fait échouer que les constats absents de `tools/lint/clang-tidy-reference.txt`, qui liste ceux du code porté sous Linux, ainsi que 5 vus seulement sous macOS, pour que le lint passe aussi en local. Fausse alerte : `// NOLINT(regle)` sur la ligne, avec le motif. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md), et la manière de signaler une faille dans [`SECURITY.md`](SECURITY.md).
+Le moindre constat de `clang-tidy` fait échouer le lint : les règles sont dans `.clang-tidy`, avec le motif de chaque règle écartée. Une fausse alerte s'annote dans le code, avec son motif : `// NOLINT(regle)` sur la ligne, ou `// NOLINTNEXTLINE(regle)` au-dessus. Le C++ est mis en forme par `clang-format` (`.clang-format`) : `tools/format_cpp.py` sans option met tout en forme. Le plan d'amélioration de la CI est dans [`PLAN_CI.md`](PLAN_CI.md), et la manière de signaler une faille dans [`SECURITY.md`](SECURITY.md).
 
 ### 5. Publier une version
 1. Mettre le numéro dans `project(VERSION …)` de `CMakeLists.txt` et une section `## [<version>]` dans `CHANGELOG.md` (elle devient les notes de la release).
@@ -136,7 +137,7 @@ cmake --preset dev && cmake --build --preset dev
 
 Rien d'autre ne le lit : la compilation, les tests et les installeurs s'en passent (l'archive des sources le contient, comme le reste du dépôt). Depuis la 6.0.15, le job hebdomadaire « Couverture des tests » met `src/` de côté avant de tout compiler et de lancer tous les tests. Pour retirer `src/`, il faudrait faire des fiches `.ui` et des images extraites les sources du port, ne garder les deux outils que pour comparer avec l'original, retirer les deux contrôles du ruleset `main : CI obligatoire`, et poser un tag sur la dernière version qui contient `src/`.
 
-Le port garde les noms de fichiers et de fonctions de `src/` : `git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` montre le portage ligne à ligne.
+Le port garde les noms de fichiers et de fonctions de `src/`. Jusqu'à la 6.0.16, il en restait une copie ligne à ligne (`git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` dans le tag `v6.0.16`) ; depuis la 6.0.17, le code est modernisé (bibliothèque standard, `clang-tidy` et `clang-format`), et la logique reste vérifiée par le golden master.
 
 ---
 

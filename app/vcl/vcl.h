@@ -1,11 +1,11 @@
 //---------------------------------------------------------------------------
 // vcl/vcl.h - Portage de Centre-Ville : sous-ensemble de la VCL au-dessus de Qt
-//
+
 // Remplace <vcl.h> et les en-têtes *.hpp de C++Builder pour le code des
 // fiches. Seul ce qu'utilisent les fiches de Centre-Ville est reproduit, avec
 // la sémantique de la VCL (événements implicites compris, PLAN_PORTAGE.md
 // §4.4), pour que le code porté reste lisible ligne à ligne face à l'original.
-//
+
 // Correspondances de base :
 //   TObject, TComponent -> QObject ; String -> AnsiString (UTF-8) étendue ;
 //   TColor -> entier 0x00BBGGRR (vcl/couleurs.h) ; __property -> Propriete<T>.
@@ -16,90 +16,144 @@
 #include <QObject>
 #include <QString>
 #include <functional>
+#include <string>
+#include <utility>
 #include <vector>
 #include "compat/chaine.h"
 #include "compat/fichier.h"
 #include "compat/temps.h"
 #include "proprietes.h"
 //---------------------------------------------------------------------------
-typedef QObject TObject;
-typedef QObject TComponent;
-typedef unsigned short WORD;
+using TObject = QObject;
+using TComponent = QObject;
+using WORD = unsigned short;
 //---------------------------------------------------------------------------
 // String (UnicodeString de C++Builder X) : AnsiString en UTF-8, plus les
 // quelques méthodes utilisées par les fiches
 //---------------------------------------------------------------------------
 class String : public AnsiString
- {
-  public:
-  String() {}
-  String(const char *s) : AnsiString(s) {}
-  String(const AnsiString &as) : AnsiString(as) {}
-  String(const std::string &s) : AnsiString(s) {}
-  String UpperCase() const;
- };
-typedef String UnicodeString;
+{
+public:
+    String() = default;
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const char *s) : AnsiString(s) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const AnsiString &as) : AnsiString(as) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    String(const std::string &s) : AnsiString(s) {}
+    [[nodiscard]] String UpperCase() const;
+};
+using UnicodeString = String;
 //---------------------------------------------------------------------------
 // Conversions avec Qt
 //---------------------------------------------------------------------------
-inline QString Q(const AnsiString &as) { return QString::fromUtf8(as.c_str()); }
-inline AnsiString A(const QString &qs) { return AnsiString(qs.toUtf8().toStdString()); }
+inline QString Q(const AnsiString &as)
+{
+    return QString::fromUtf8(as.c_str());
+}
+inline AnsiString A(const QString &qs)
+{
+    return {qs.toUtf8().toStdString()};
+}
 //---------------------------------------------------------------------------
 // Événements (TNotifyEvent et compagnie) : fonctions appelées avec Sender
 //---------------------------------------------------------------------------
-typedef std::function<void(TObject *Sender)> TNotifyEvent;
+using TNotifyEvent = std::function<void(TObject *Sender)>;
 //---------------------------------------------------------------------------
 // Connecte(Evenement, objet, &Classe::Gestionnaire) : affecte un gestionnaire
 // (méthode de fiche) à un événement, comme l'inspecteur d'objets de l'EDI
 //---------------------------------------------------------------------------
 template <class R, class... P, class C, class O>
 void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...))
- {
-  Evenement=[Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
- }
+{
+    Evenement = [Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+}
+// Gestionnaire qui n'utilise pas la fiche (fonction membre statique)
+template <class R, class... P, class O>
+void Connecte(std::function<R(P...)> &Evenement, O * /*Objet*/, R (*Gestionnaire)(P...))
+{
+    Evenement = Gestionnaire;
+}
+// Gestionnaire qui ne modifie pas la fiche (méthode const)
+template <class R, class... P, class C, class O>
+void Connecte(std::function<R(P...)> &Evenement, O *Objet, R (C::*Gestionnaire)(P...) const)
+{
+    Evenement = [Objet, Gestionnaire](P... a) -> R { return (Objet->*Gestionnaire)(std::forward<P>(a)...); };
+}
 //---------------------------------------------------------------------------
 // try/__finally de C++Builder -> garde RAII : le code est exécuté en sortie de bloc
 //---------------------------------------------------------------------------
 class Finalement
- {
-  std::function<void()> Code;
-  public:
-  explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
-  Finalement(const Finalement &)=delete;
-  ~Finalement() { Code(); }
- };
+{
+    std::function<void()> Code;
+
+public:
+    explicit Finalement(std::function<void()> c) : Code(std::move(c)) {}
+    Finalement(const Finalement &) = delete;
+    Finalement &operator=(const Finalement &) = delete;
+    Finalement(Finalement &&) = delete;
+    Finalement &operator=(Finalement &&) = delete;
+    // NOLINTNEXTLINE(bugprone-exception-escape) : comme __finally, une exception en sortie termine le programme
+    ~Finalement() { Code(); }
+};
 //---------------------------------------------------------------------------
 // TShiftState
 //---------------------------------------------------------------------------
 enum TShiftStateElement { ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble };
 class TShiftState
- {
-  unsigned Bits=0;
-  public:
-  TShiftState() {}
-  TShiftState &operator<<(TShiftStateElement e) { Bits|=1u<<e; return *this; }
-  bool Contains(TShiftStateElement e) const { return (Bits>>e)&1u; }
- };
+{
+    unsigned Bits = 0;
+
+public:
+    TShiftState() = default;
+    TShiftState &operator<<(TShiftStateElement e)
+    {
+        Bits |= 1U << e;
+        return *this;
+    }
+    [[nodiscard]] bool Contains(TShiftStateElement e) const { return ((Bits >> e) & 1U) != 0U; }
+};
 //---------------------------------------------------------------------------
 // Ensembles de la VCL (TGridOptions, TMsgDlgButtons...) : Options << x, >> x
 //---------------------------------------------------------------------------
 template <class E> class TEnsemble
- {
-  unsigned long long Bits=0;
-  public:
-  TEnsemble() {}
-  TEnsemble &operator<<(E e) { Bits|=1ull<<(int)e; return *this; }
-  TEnsemble &operator>>(E e) { Bits&=~(1ull<<(int)e); return *this; }
-  bool Contains(E e) const { return (Bits>>(int)e)&1ull; }
-  bool operator==(const TEnsemble &t) const { return Bits==t.Bits; }
- };
+{
+    unsigned long long Bits = 0;
+
+public:
+    TEnsemble() = default;
+    TEnsemble &operator<<(E e)
+    {
+        Bits |= 1ULL << static_cast<int>(e);
+        return *this;
+    }
+    TEnsemble &operator>>(E e)
+    {
+        Bits &= ~(1ULL << static_cast<int>(e));
+        return *this;
+    }
+    [[nodiscard]] bool Contains(E e) const { return ((Bits >> static_cast<int>(e)) & 1ULL) != 0U; }
+    bool operator==(const TEnsemble &t) const { return Bits == t.Bits; }
+};
 //---------------------------------------------------------------------------
 // Divers
 //---------------------------------------------------------------------------
 enum TWindowState { wsNormal, wsMinimized, wsMaximized };
-enum TCursor { crDefault=0, crHourGlass=-11, crHandPoint=-21 };
-enum TModalResult { mrNone=0, mrOk=1, mrCancel=2, mrAbort=3, mrRetry=4, mrIgnore=5, mrYes=6, mrNo=7,
-                    mrAll=8, mrNoToAll=9, mrYesToAll=10, mrClose=11 };
+enum TCursor { crDefault = 0, crHourGlass = -11, crHandPoint = -21 };
+enum TModalResult {
+    mrNone = 0,
+    mrOk = 1,
+    mrCancel = 2,
+    mrAbort = 3,
+    mrRetry = 4,
+    mrIgnore = 5,
+    mrYes = 6,
+    mrNo = 7,
+    mrAll = 8,
+    mrNoToAll = 9,
+    mrYesToAll = 10,
+    mrClose = 11,
+};
 //---------------------------------------------------------------------------
 // SysUtils / System
 //---------------------------------------------------------------------------
@@ -112,26 +166,27 @@ int StrToInt(const AnsiString &asTexte); // texte invalide : exception (EConvert
 // plus proche (la moitié vers le haut), NAN/INF comme la VCL
 String FormatFloat(const AnsiString &asFormat, long double Valeur);
 //---------------------------------------------------------------------------
-// TScreen (Screen->PixelsPerInch) : résolution de l'écran principal comme la
+// TScreen (Screen()->PixelsPerInch) : résolution de l'écran principal comme la
 // donne Windows, 96 × facteur d'échelle (192 sur un écran Retina)
 //---------------------------------------------------------------------------
 class TScreen
- {
-  public:
-  Propriete<int> PixelsPerInch;
-  TScreen();
- };
-extern TScreen *Screen;
+{
+public:
+    Propriete<int> PixelsPerInch;
+    TScreen();
+};
+TScreen *Screen(); // Screen de la VCL
 //---------------------------------------------------------------------------
 // TApplication (Application->Title...)
 //---------------------------------------------------------------------------
 class TApplication : public QObject
- {
-  AnsiString asTitre;
-  public:
-  TApplication();
-  Propriete<AnsiString> Title;
- };
+{
+    AnsiString asTitre;
+
+public:
+    TApplication();
+    Propriete<AnsiString> Title;
+};
 extern TApplication *Application;
 //---------------------------------------------------------------------------
 #endif

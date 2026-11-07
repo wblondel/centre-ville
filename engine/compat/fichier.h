@@ -20,21 +20,21 @@
 #include "chaine.h"
 //---------------------------------------------------------------------------
 // Modes de FileOpen (valeurs de SysUtils)
-const unsigned fmOpenRead       = 0x0000;
-const unsigned fmOpenWrite      = 0x0001;
-const unsigned fmOpenReadWrite  = 0x0002;
-const unsigned fmShareCompat    = 0x0000;
+const unsigned fmOpenRead = 0x0000;
+const unsigned fmOpenWrite = 0x0001;
+const unsigned fmOpenReadWrite = 0x0002;
+const unsigned fmShareCompat = 0x0000;
 const unsigned fmShareExclusive = 0x0010;
 const unsigned fmShareDenyWrite = 0x0020;
-const unsigned fmShareDenyRead  = 0x0030;
-const unsigned fmShareDenyNone  = 0x0040;
+const unsigned fmShareDenyRead = 0x0030;
+const unsigned fmShareDenyNone = 0x0040;
 //---------------------------------------------------------------------------
 int FileOpen(const AnsiString &asNomFichier, unsigned Mode);
 int FileCreate(const AnsiString &asNomFichier);
 int FileRead(int Handle, void *Tampon, unsigned NbOctets);
 int FileWrite(int Handle, const void *Tampon, unsigned NbOctets);
 int FileSeek(int Handle, int Decalage, int Origine); // Origine : 0 début, 1 courant, 2 fin
-bool FileFlush(int Handle); // false si une écriture a échoué depuis l'ouverture (v6.0.1)
+bool FileFlush(int Handle);                          // false si une écriture a échoué depuis l'ouverture (v6.0.1)
 void FileClose(int Handle);
 // v6.0.2 : remplacement d'un fichier en un seul geste, pour qu'une écriture interrompue (disque
 // plein) ne le détruise pas. FileCreateRemplacement écrit dans un fichier temporaire voisin, qui
@@ -43,7 +43,7 @@ void FileClose(int Handle);
 // fermée. Comme FileCreate, -1 si le fichier ne peut être ni créé ni réécrit (lecture seule,
 // dossier). Si le dossier interdit le fichier temporaire mais que le fichier existant reste
 // inscriptible, celui-ci est réécrit directement, et donc vidé : *Direct est alors vrai
-int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct=nullptr);
+int FileCreateRemplacement(const AnsiString &asNomFichier, bool *Direct = nullptr);
 bool FileCommitRemplacement(int Handle);
 void FileAbandonRemplacement(int Handle);
 //---------------------------------------------------------------------------

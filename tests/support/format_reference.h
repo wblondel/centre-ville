@@ -16,19 +16,19 @@
 #include <vector>
 //---------------------------------------------------------------------------
 struct champ_cvw
- {
-  std::size_t Debut, Taille; // position dans le fichier converti
-  std::string Nom; // ex. "case(12,5).NumFeu[2]"
- };
+{
+    std::size_t Debut, Taille; // position dans le fichier converti
+    std::string Nom;           // ex. "case(12,5).NumFeu[2]"
+};
 //---------------------------------------------------------------------------
 struct conversion_cvw
- {
-  bool Ok=false;
-  int Version=0;
-  std::string Erreur;
-  std::string Octets; // fichier au format 0x530
-  std::vector<champ_cvw> Champs; // description de chaque champ écrit
- };
+{
+    bool Ok = false;
+    int Version = 0;
+    std::string Erreur;
+    std::string Octets;            // fichier au format 0x530
+    std::vector<champ_cvw> Champs; // description de chaque champ écrit
+};
 //---------------------------------------------------------------------------
 // Convertit le contenu d'un .cvw (0x300 <= version <= 0x530) au format 0x530
 conversion_cvw ConvertitEn530(const std::string &asOrigine);

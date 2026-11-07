@@ -554,18 +554,17 @@ def entete_cpp(ex):
          "// Les constantes IDB_* de f_simul.cpp s'appliquent telles quelles à",
          "// VirtualImageList8x8 (malgré son nom, des images 16x16).",
          "//---------------------------------------------------------------------------",
-         "#ifndef index_imagesH", "#define index_imagesH", ""]
+         "#ifndef index_imagesH", "#define index_imagesH", "", "#include <array>", ""]
     for fiche, listes in ex.listes.items():
         for nom_liste, liste in listes.items():
             lignes.append("// %s.dfm, %s : %d images %dx%d" % (fiche, nom_liste, len(liste["images"]),
                                                           liste["largeur"], liste["hauteur"]))
-            lignes.append("const int NB_%s_%s=%d;" % (fiche.upper(), nom_liste, len(liste["images"])))
-            lignes.append(f"const char *const {fiche}_{nom_liste}[NB_{fiche.upper()}_{nom_liste}]=")
-            lignes.append(" {")
+            lignes.append("constexpr int NB_%s_%s = %d;" % (fiche.upper(), nom_liste, len(liste["images"])))
+            lignes.append(f"inline constexpr std::array<const char *, NB_{fiche.upper()}_{nom_liste}> {fiche}_{nom_liste} = {{")
             for i, img in enumerate(liste["images"]):
                 fichier = fichier_de_collection(ex, fiche, liste["collection"], img["collection"])
-                lignes.append('  ":/%s", // %d : %s' % (fichier, i, img["collection"].replace("\\", "/")))
-            lignes.append(" };")
+                lignes.append('    ":/%s", // %d : %s' % (fichier, i, img["collection"].replace("\\", "/")))
+            lignes.append("};")
             lignes.append("")
     lignes.append("#endif")
     return "\n".join(lignes) + "\n"

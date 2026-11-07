@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
-"""Lance clang-tidy sur le code C++ et compare les constats à une référence.
+"""Lance clang-tidy sur le code C++ du projet ; le moindre constat fait échouer le script.
 
-Le code porté garde le style de l'original : les constats déjà présents sont notés dans
-tools/lint/clang-tidy-reference.txt, et seuls les nouveaux font échouer le script. Un constat est
-identifié par son fichier, sa règle et son message, sans numéro de ligne : déplacer du code n'en
-crée pas. La référence vaut pour la version de tools/lint/requirements.txt : les constats de
-Linux, ceux de la CI, et quelques-uns vus seulement sous macOS, pour que le script passe aussi en local.
+Règles : .clang-tidy (et tests/.clang-tidy pour les tests), version de tools/lint/requirements.txt.
+Une fausse alerte s'annote dans le code, avec son motif : // NOLINT(regle) ou // NOLINTNEXTLINE(regle).
 
-    python3 tools/lint_cpp.py --dossier build/dev            # compare à la référence
-    python3 tools/lint_cpp.py --dossier build/dev --reference-a-jour  # la réécrit
+    python3 tools/lint_cpp.py --dossier build/dev
+    python3 tools/lint_cpp.py --dossier build/dev --sortie constats.txt   # écrit aussi la liste
 """
 
 import argparse
-import collections
 import concurrent.futures
 import json
 import os
@@ -23,7 +19,6 @@ import subprocess
 import sys
 
 RACINE = pathlib.Path(__file__).resolve().parent.parent
-REFERENCE = RACINE / "tools" / "lint" / "clang-tidy-reference.txt"
 CONSTAT = re.compile(r"^(.+?):(\d+):\d+: (warning|error): (.*) \[([\w.,-]+)\]$")
 SOURCES = ("engine/", "app/", "tests/")
 
@@ -57,7 +52,7 @@ def lance(outil, dossier, fichier, arguments):
 
 
 def constats(sortie):
-    """(cle, emplacement) de chaque constat du projet. Une clé peut revenir : même message ailleurs."""
+    """Constats du projet : (fichier, ligne, règle, message) -> texte affiché."""
     vus = {}
     for ligne in sortie.splitlines():
         m = CONSTAT.match(ligne)
@@ -71,7 +66,7 @@ def constats(sortie):
         if not relatif.startswith(SOURCES):
             continue
         regle = m[5]
-        vus[(relatif, m[2], regle, m[4])] = f"{relatif}: [{regle}] {m[4]}"
+        vus[(relatif, m[2], regle, m[4])] = f"{relatif}:{m[2]}: [{regle}] {m[4]}"
     return vus
 
 
@@ -80,8 +75,7 @@ def main():
     p.add_argument("--dossier", default="build/dev", help="dossier de compilation (compile_commands.json)")
     p.add_argument("--clang-tidy", default=shutil.which("clang-tidy") or "clang-tidy")
     p.add_argument("--travaux", type=int, default=os.cpu_count())
-    p.add_argument("--sortie", help="écrit les constats dans ce fichier, au format de la référence")
-    p.add_argument("--reference-a-jour", action="store_true", help="réécrit la référence au lieu de comparer")
+    p.add_argument("--sortie", help="écrit aussi les constats dans ce fichier")
     args = p.parse_args()
 
     dossier = (RACINE / args.dossier).resolve()
@@ -106,30 +100,18 @@ def main():
             print(f"ERREUR DE COMPILATION {fichier}:{ligne}: {message}")
         return 2
 
-    actuels = collections.Counter(tous.values())
+    lignes = [tous[k] for k in sorted(tous)]
     if args.sortie:
-        pathlib.Path(args.sortie).write_text("".join(f"{c}\n" for c in sorted(actuels.elements())), encoding="utf-8")
-    if args.reference_a_jour:
-        REFERENCE.write_text("".join(f"{c}\n" for c in sorted(actuels.elements())), encoding="utf-8")
-        print(f"Référence réécrite : {REFERENCE.relative_to(RACINE)}")
-        return 0
-
-    reference = collections.Counter(REFERENCE.read_text(encoding="utf-8").splitlines())
-    nouveaux = actuels - reference
-    disparus = reference - actuels
-    if disparus:
-        print(f"{sum(disparus.values())} constat(s) de la référence ont disparu ; --reference-a-jour les retire.")
-    if nouveaux:
-        print(f"\n{sum(nouveaux.values())} NOUVEAU(X) CONSTAT(S) :")
-        for (fichier, ligne, regle, message), cle in sorted(tous.items()):
-            if nouveaux[cle] > 0:
-                print(f"  {fichier}:{ligne}: [{regle}] {message}")
+        pathlib.Path(args.sortie).write_text("".join(f"{ligne}\n" for ligne in lignes), encoding="utf-8")
+    for ligne in lignes:
+        print(f"  {ligne}")
+    if lignes:
         print(
-            "\nCorriger le code. Fausse alerte : // NOLINT(regle) sur la ligne, avec le motif."
-            "\nLe nombre compte par fichier, règle et message : un constat identique déjà noté est listé avec lui."
+            f"\n{len(lignes)} constat(s) : corriger le code. Fausse alerte : // NOLINT(regle) ou"
+            " // NOLINTNEXTLINE(regle), avec le motif."
         )
         return 1
-    print("Aucun nouveau constat.")
+    print("Aucun constat.")
     return 0
 
 

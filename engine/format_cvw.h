@@ -20,14 +20,15 @@
 #include <type_traits>
 #include "simul.h"
 //---------------------------------------------------------------------------
-static_assert(VERSION==0x530, "Le format de fichier ne doit pas changer pendant le portage");
-static_assert(sizeof(int)==4, "Format .cvw : int sur 4 octets");
-static_assert(sizeof(bool)==1, "Format .cvw : bool sur 1 octet");
-static_assert(sizeof(nature)==4, "Format .cvw : nature sur 4 octets");
+static_assert(VERSION == 0x530, "Le format de fichier ne doit pas changer pendant le portage");
+static_assert(sizeof(int) == 4, "Format .cvw : int sur 4 octets");
+static_assert(sizeof(bool) == 1, "Format .cvw : bool sur 1 octet");
+static_assert(sizeof(nature) == 4, "Format .cvw : nature sur 4 octets");
 //---------------------------------------------------------------------------
-#define CVW_ENUM_OCTET(e) \
-  static_assert(sizeof(e)==1, "Format .cvw : " #e " sur 1 octet"); \
-  static_assert(std::is_same<std::underlying_type<e>::type, signed char>::value, #e " : type sous-jacent signed char")
+#define CVW_ENUM_OCTET(e)                                                                                              \
+    static_assert(sizeof(e) == 1, "Format .cvw : " #e " sur 1 octet");                                                 \
+    static_assert(std::is_same_v<std::underlying_type_t<e>, signed char>, #e " : type sous-jacent signed "             \
+                                                                             "char")
 CVW_ENUM_OCTET(priorite);
 CVW_ENUM_OCTET(direction);
 CVW_ENUM_OCTET(sens);
@@ -50,8 +51,8 @@ CVW_ENUM_OCTET(coin);
 #undef CVW_ENUM_OCTET
 //---------------------------------------------------------------------------
 // Champs publics sérialisés (les champs privés « Numero » sont des int)
-#define CVW_CHAMP(classe, champ, taille) \
-  static_assert(sizeof(classe::champ)==(taille), "Format .cvw : " #classe "::" #champ)
+#define CVW_CHAMP(classe, champ, taille)                                                                               \
+    static_assert(sizeof(classe::champ) == (taille), "Format .cvw : " #classe "::" #champ)
 // centre_ville::Charge/Sauve (en-tête)
 CVW_CHAMP(centre_ville, NbFeux, 4);
 CVW_CHAMP(centre_ville, NbX, 4);
@@ -115,10 +116,10 @@ CVW_CHAMP(feu, DureeVert, 4);
 CVW_CHAMP(feu, DemandeVert, 1);
 CVW_CHAMP(feu, RougeDemande, 1);
 // feu_pieton::Charge/Sauve
-CVW_CHAMP(feu_pieton, x, 4*NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, y, 4*NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, Dir, 4*NBFEUXPIETONSPARNUMERO);
-CVW_CHAMP(feu_pieton, iFeuDir, 4*NBDIR);
+CVW_CHAMP(feu_pieton, x, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, y, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, Dir, sizeof(int) * NBFEUXPIETONSPARNUMERO);
+CVW_CHAMP(feu_pieton, iFeuDir, sizeof(int) * NBDIR);
 CVW_CHAMP(feu_pieton, Etat, 1);
 CVW_CHAMP(feu_pieton, NbFeux, 4);
 CVW_CHAMP(feu_pieton, TypeDmdVert, 1);
@@ -143,17 +144,17 @@ CVW_CHAMP(arret_bus, x, 4);
 CVW_CHAMP(arret_bus, y, 4);
 CVW_CHAMP(arret_bus, Ligne, NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_bus, NbLignes, 4);
-CVW_CHAMP(arret_bus, NumLigne, 4*NBMAXLIGNESBUSTRAM);
+CVW_CHAMP(arret_bus, NumLigne, sizeof(int) * NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_tram, x, 4);
 CVW_CHAMP(arret_tram, y, 4);
 CVW_CHAMP(arret_tram, Ligne, NBMAXLIGNESBUSTRAM);
 CVW_CHAMP(arret_tram, NbLignes, 4);
-CVW_CHAMP(arret_tram, NumLigne, 4*NBMAXLIGNESBUSTRAM);
+CVW_CHAMP(arret_tram, NumLigne, sizeof(int) * NBMAXLIGNESBUSTRAM);
 // ligne_bus, ligne_tram
 CVW_CHAMP(ligne_bus, NbArrets, 4);
-CVW_CHAMP(ligne_bus, NumArret, 4*NBMAXARRETSBUSTRAMPARLIGNE);
+CVW_CHAMP(ligne_bus, NumArret, sizeof(int) * NBMAXARRETSBUSTRAMPARLIGNE);
 CVW_CHAMP(ligne_tram, NbArrets, 4);
-CVW_CHAMP(ligne_tram, NumArret, 4*NBMAXARRETSBUSTRAMPARLIGNE);
+CVW_CHAMP(ligne_tram, NumArret, sizeof(int) * NBMAXARRETSBUSTRAMPARLIGNE);
 // voie::Charge/Sauve (x et y sont privés : des int)
 CVW_CHAMP(voie, DirPoss, 1);
 CVW_CHAMP(voie, SensVoieTram, 1);
@@ -169,8 +170,8 @@ CVW_CHAMP(voie, NumPlacePark, 4);
 CVW_CHAMP(voie, NumPlaceVehlib, 4);
 CVW_CHAMP(voie, NumSpotVehlib, 4);
 CVW_CHAMP(voie, Priorite, NBFEUXPARCASE);
-CVW_CHAMP(voie, NumFeu, 4*NBFEUXPARCASE);
-CVW_CHAMP(voie, NumFeuP, 4*NBFEUXPARCASE);
+CVW_CHAMP(voie, NumFeu, sizeof(int) * NBFEUXPARCASE);
+CVW_CHAMP(voie, NumFeuP, sizeof(int) * NBFEUXPARCASE);
 #undef CVW_CHAMP
 //---------------------------------------------------------------------------
 #endif

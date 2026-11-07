@@ -65,7 +65,7 @@ Sans intérêt pour un dépôt à un seul mainteneur et un jeu à un seul joueur
 
 ## Linter (fait)
 
-- **C++** : `clang-tidy`, règles de bogues et de performance (`.clang-tidy`). Le code porté garde le style de l'original pour rester comparable à `src/` : pas de `clang-format`, et les 251 constats existants sont dans `tools/lint/clang-tidy-reference.txt`. Seuls les nouveaux font échouer la CI.
+- **C++** : `clang-tidy` (`.clang-tidy` : bogues, CERT, analyseur, C++ Core Guidelines, modernisation, performance, portabilité, lisibilité), sans constat restant, et `clang-format` (`.clang-format`). Depuis la 6.0.17, le moindre constat ou écart de mise en forme fait échouer la CI.
 - **Python** : `ruff` (`ruff.toml`), sans constat restant.
 - **Workflows** : `actionlint`, `shellcheck` pour leurs scripts et `zizmor` pour leur sécurité, sans constat restant.
 - **Versions** : figées dans `tools/lint/requirements.txt`.

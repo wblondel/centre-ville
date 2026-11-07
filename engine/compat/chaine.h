@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------
 // compat/chaine.h - Portage de Centre-Ville hors de C++Builder
-//
+
 // Remplace <dstring.h> pour le moteur : sous-ensemble d'AnsiString,
 // Format(..., ARRAYOFCONST((...))) et IntToStr, en C++ standard.
-//
+
 // Différence assumée avec C++Builder : les littéraux du dépôt sont en UTF-8
 // (et non plus en Windows-1252). Length() compte donc des octets ; le moteur
 // ne dépend jamais de la longueur d'une chaîne accentuée.
@@ -15,82 +15,109 @@
 #include <ostream>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 //---------------------------------------------------------------------------
 class AnsiString
- {
-  std::string s;
-  public:
-  AnsiString() {}
-  AnsiString(const char *src) : s(src?src:"") {}
-  AnsiString(const std::string &src) : s(src) {}
-  AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
-  const char *c_str() const { return s.c_str(); }
-  const std::string &str() const { return s; }
-  int Length() const { return (int)s.size(); }
-  bool IsEmpty() const { return s.empty(); }
-  // Indices à partir de 1, comme la VCL
-  char &operator[](int i) { return s[(std::size_t)(i-1)]; }
-  char operator[](int i) const { return s[(std::size_t)(i-1)]; }
-  AnsiString SubString(int Index, int Count) const;
-  int Pos(const AnsiString &asSousChaine) const; // 0 si absente
-  AnsiString &operator+=(const AnsiString &as) { s+=as.s; return *this; }
-  AnsiString operator+(const AnsiString &as) const { return AnsiString(s+as.s); }
-  bool operator==(const AnsiString &as) const { return s==as.s; }
-  bool operator!=(const AnsiString &as) const { return s!=as.s; }
-  bool operator<(const AnsiString &as) const { return s<as.s; }
-  bool operator>(const AnsiString &as) const { return s>as.s; }
-  bool operator<=(const AnsiString &as) const { return s<=as.s; }
-  bool operator>=(const AnsiString &as) const { return s>=as.s; }
- };
+{
+    std::string s;
+
+public:
+    AnsiString() = default;
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(const char *src) : s(src ? src : "") {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(std::string src) : s(std::move(src)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    AnsiString(char c) : s(1, c) {} // comme C++Builder : chaîne d'un caractère
+    [[nodiscard]] const char *c_str() const { return s.c_str(); }
+    [[nodiscard]] const std::string &str() const { return s; }
+    [[nodiscard]] int Length() const { return static_cast<int>(s.size()); }
+    [[nodiscard]] bool IsEmpty() const { return s.empty(); }
+    // Indices à partir de 1, comme la VCL
+    char &operator[](int i) { return s[static_cast<std::size_t>(i - 1)]; }
+    char operator[](int i) const { return s[static_cast<std::size_t>(i - 1)]; }
+    [[nodiscard]] AnsiString SubString(int Index, int Count) const;
+    [[nodiscard]] int Pos(const AnsiString &asSousChaine) const; // 0 si absente
+    AnsiString &operator+=(const AnsiString &as)
+    {
+        s += as.s;
+        return *this;
+    }
+    AnsiString operator+(const AnsiString &as) const { return {s + as.s}; }
+    bool operator==(const AnsiString &as) const { return s == as.s; }
+    bool operator!=(const AnsiString &as) const { return s != as.s; }
+    bool operator<(const AnsiString &as) const { return s < as.s; }
+    bool operator>(const AnsiString &as) const { return s > as.s; }
+    bool operator<=(const AnsiString &as) const { return s <= as.s; }
+    bool operator>=(const AnsiString &as) const { return s >= as.s; }
+};
 //---------------------------------------------------------------------------
 inline AnsiString operator+(const char *gauche, const AnsiString &droite)
- {
-  return AnsiString(gauche)+droite;
- }
+{
+    return AnsiString(gauche) + droite;
+}
 //---------------------------------------------------------------------------
 inline std::ostream &operator<<(std::ostream &os, const AnsiString &as)
- {
-  return os<<as.str();
- }
+{
+    return os << as.str();
+}
 //---------------------------------------------------------------------------
 // TVarRec : un élément de tableau ouvert « array of const » (Delphi)
 //---------------------------------------------------------------------------
 class TVarRec
- {
-  public:
-  enum genre { vtEntier, vtReel, vtChaine, vtCaractere, vtBooleen, vtPointeur };
-  genre Genre;
-  long long Entier=0;
-  double Reel=0.0;
-  std::string Chaine;
-  const void *Pointeur=nullptr;
-  template <class T,
-            typename std::enable_if<std::is_integral<T>::value&&
-                                    (!std::is_same<T, char>::value)&&
-                                    (!std::is_same<T, bool>::value), int>::type=0>
-  TVarRec(T v) : Genre(vtEntier), Entier((long long)v) {}
-  TVarRec(char c) : Genre(vtCaractere), Chaine(1, c) {}
-  TVarRec(bool b) : Genre(vtBooleen), Entier(b) {}
-  TVarRec(double d) : Genre(vtReel), Reel(d) {}
-  TVarRec(float f) : Genre(vtReel), Reel(f) {}
-  TVarRec(long double d) : Genre(vtReel), Reel((double)d) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
-  TVarRec(const char *c) : Genre(vtChaine), Chaine(c?c:"") {}
-  TVarRec(const std::string &c) : Genre(vtChaine), Chaine(c) {}
-  TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}
-  TVarRec(const void *p) : Genre(vtPointeur), Pointeur(p) {}
- };
+{
+public:
+    enum genre { vtEntier, vtReel, vtChaine, vtCaractere, vtBooleen, vtPointeur };
+    genre Genre;
+    long long Entier = 0;
+    double Reel = 0.0;
+    std::string Chaine;
+    const void *Pointeur = nullptr;
+    template <class T>
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(T v)
+        requires(std::is_integral_v<T> && (!std::is_same_v<T, char>) && (!std::is_same_v<T, bool>))
+        : Genre(vtEntier), Entier(static_cast<long long>(v))
+    {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(char c) : Genre(vtCaractere), Chaine(1, c) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(bool b) : Genre(vtBooleen), Entier(static_cast<long long>(b)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(double d) : Genre(vtReel), Reel(d) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(float f) : Genre(vtReel), Reel(f) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(long double d)
+        : Genre(vtReel), Reel(static_cast<double>(d)) {} // portage : (long double) de f_simul.cpp (AfficheBilan)
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const char *c) : Genre(vtChaine), Chaine(c ? c : "") {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(std::string c) : Genre(vtChaine), Chaine(std::move(c)) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const AnsiString &as) : Genre(vtChaine), Chaine(as.str()) {}
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    TVarRec(const void *p) : Genre(vtPointeur), Pointeur(p) {}
+};
 //---------------------------------------------------------------------------
 // portage : point d'extension, pour que l'interface puisse passer ses
-// propriétés (__property de la VCL) à ARRAYOFCONST
-template <class T> TVarRec VersTVarRec(const T &v) { return TVarRec(v); }
-template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &... v)
- {
-  return std::vector<TVarRec>{ VersTVarRec(v)... };
- }
-//---------------------------------------------------------------------------
-// ARRAYOFCONST((a, b, c)) -> TableauDeConstantes (a, b, c)
-#define ARRAYOFCONST(valeurs) TableauDeConstantes valeurs
+// propriétés (__property de la VCL) à TableauDeConstantes (ARRAYOFCONST de la VCL)
+template <class T> TVarRec VersTVarRec(const T &v)
+{
+    if constexpr (std::is_array_v<T>)
+    {
+        return TVarRec(std::data(v)); // littéral de chaîne
+    }
+    else
+    {
+        return TVarRec(v);
+    }
+}
+template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &...v)
+{
+    return std::vector<TVarRec>{VersTVarRec(v)...};
+}
 //---------------------------------------------------------------------------
 // portage : séparateurs utilisés par Format (SysUtils::FormatSettings). La VCL
 // les prenait dans les paramètres régionaux de Windows (',' et espace
@@ -99,10 +126,10 @@ template <class... T> std::vector<TVarRec> TableauDeConstantes(const T &... v)
 // comme la VCL en français (app/main.cpp).
 //---------------------------------------------------------------------------
 struct TFormatSettings
- {
-  char DecimalSeparator='.';
-  std::string ThousandSeparator=",";
- };
+{
+    char DecimalSeparator = '.';
+    std::string ThousandSeparator = ",";
+};
 extern TFormatSettings FormatSettings;
 //---------------------------------------------------------------------------
 // Format façon SysUtils : % [index ":"] ["-"] [largeur] ["." précision] type

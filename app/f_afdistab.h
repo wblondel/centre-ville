@@ -3,24 +3,22 @@
 #define f_afdistabH
 //---------------------------------------------------------------------------
 #include "vcl/fiche.h" // portage : remplace les en-têtes de la VCL
-#include "base.h" // portage
-//#include <Classes.hpp> // portage
-//#include <Controls.hpp> // portage
-//#include <Grids.hpp> // portage
+#include "base.h"      // portage
+// #include <Classes.hpp> // portage
+// #include <Controls.hpp> // portage
+// #include <Grids.hpp> // portage
 //---------------------------------------------------------------------------
 class TfrmAffDistArretsBus : public TForm
 {
-public: // portage : __published	// Composants gérés par l'EDI
-    TStringGrid *StringGridDistances;
+public:
+    TStringGrid *StringGridDistances{}; // portage : __published	// Composants gérés par l'EDI
     void FormShow(TObject *Sender);
-    void FormHide(TObject *Sender);
-        void FormKeyDown(TObject *Sender, WORD &Key,
-          TShiftState Shift);
-    
-    
-private:	// Déclarations de l'utilisateur
-public:		// Déclarations de l'utilisateur
-    TfrmAffDistArretsBus(TComponent* Owner);
+    static void FormHide(TObject *Sender);
+    void FormKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+
+private: // Déclarations de l'utilisateur
+public:  // Déclarations de l'utilisateur
+    explicit TfrmAffDistArretsBus(TComponent *Owner);
     void ChargeFiche(); // portage : chargement du .dfm (fiche générée par dfm2ui)
     void EffaceInfos();
     void RafraichitInfos();

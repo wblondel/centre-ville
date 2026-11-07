@@ -26,6 +26,7 @@
 //---------------------------------------------------------------------------
 #include <QIcon>
 #include <QKeySequence>
+#include <functional>
 #include <map>
 #include <vector>
 #include "vcl.h"
@@ -43,148 +44,150 @@ class TPopupMenu;
 //---------------------------------------------------------------------------
 // TShortCut : code de touche virtuelle Windows + scShift/scCtrl/scAlt
 //---------------------------------------------------------------------------
-typedef int TShortCut;
-const TShortCut scShift=0x2000, scCtrl=0x4000, scAlt=0x8000;
+using TShortCut = int;
+const TShortCut scShift = 0x2000, scCtrl = 0x4000, scAlt = 0x8000;
 TShortCut RaccourciVcl(const QKeyEvent *Evenement); // 0 si la touche n'a pas d'équivalent
 QKeySequence SequenceQt(TShortCut Raccourci);
 //---------------------------------------------------------------------------
 // Client d'une action (TMenuItem, TToolButton) : homologue de TActionLink
 //---------------------------------------------------------------------------
 class ClientAction
- {
-  public:
-  virtual ~ClientAction() {}
-  // Recopie complète (affectation de Action à l'exécution : CheckDefaults=false)
-  virtual void ActionChange(TAction *Action) = 0;
-  // Propagation d'un changement d'état (seulement si le client suivait l'action)
-  virtual void LienChecked(bool Ancien, bool Nouveau) = 0;
-  virtual void LienEnabled(bool Ancien, bool Nouveau) = 0;
-  virtual void LienVisible(bool Ancien, bool Nouveau) = 0;
- };
+{
+public:
+    virtual ~ClientAction() = default;
+    // Recopie complète (affectation de Action à l'exécution : CheckDefaults=false)
+    virtual void ActionChange(TAction *Action) = 0;
+    // Propagation d'un changement d'état (seulement si le client suivait l'action)
+    virtual void LienChecked(bool Ancien, bool Nouveau) = 0;
+    virtual void LienEnabled(bool Ancien, bool Nouveau) = 0;
+    virtual void LienVisible(bool Ancien, bool Nouveau) = 0;
+};
 //---------------------------------------------------------------------------
 class TAction : public QObject
- {
-  friend class TActionList;
-  AnsiString asCaption, asHint;
-  bool bChecked=false, bEnabled=true, bVisible=true, Verification=false;
-  std::vector<ClientAction *> Clients;
-  void DefinitChecked(bool Valeur);
-  void DefinitEnabled(bool Valeur);
-  void DefinitVisible(bool Valeur);
-  public:
-  TActionList *ActionList=nullptr;
-  AnsiString Category;
-  int ImageIndex=-1, GroupIndex=0, Tag=0, HelpContext=0;
-  TShortCut ShortCut=0;
-  bool AutoCheck=false;
-  QIcon Icone;
-  Propriete<AnsiString> Caption, Hint;
-  Propriete<bool> Checked, Enabled, Visible;
-  TNotifyEvent OnExecute;
-  // Création à partir de l'<action> du .ui (propriétés de la VCL en « vcl... »)
-  TAction(QAction *Modele, TActionList *Liste);
-  bool Execute();
-  void AjouteClient(ClientAction *c);
-  void RetireClient(ClientAction *c);
- };
+{
+    friend class TActionList;
+    AnsiString asCaption, asHint;
+    bool bChecked = false, bEnabled = true, bVisible = true, Verification = false;
+    std::vector<ClientAction *> Clients;
+    void DefinitChecked(bool Valeur);
+    void DefinitEnabled(bool Valeur);
+    void DefinitVisible(bool Valeur);
+
+public:
+    TActionList *ActionList = nullptr;
+    AnsiString Category;
+    int ImageIndex = -1, GroupIndex = 0, Tag = 0, HelpContext = 0;
+    TShortCut ShortCut = 0;
+    bool AutoCheck = false;
+    QIcon Icone;
+    Propriete<AnsiString> Caption, Hint;
+    Propriete<bool> Checked, Enabled, Visible;
+    TNotifyEvent OnExecute;
+    // Création à partir de l'<action> du .ui (propriétés de la VCL en « vcl... »)
+    TAction(QAction *Modele, TActionList *Liste);
+    bool Execute();
+    void AjouteClient(ClientAction *c);
+    void RetireClient(ClientAction *c);
+};
 //---------------------------------------------------------------------------
 class TActionList : public QObject
- {
-  public:
-  std::vector<TAction *> Actions;
-  Propriete<int> ActionCount;
-  TActionList(QObject *Parent) : QObject(Parent)
-   {
-    ActionCount.Definit([this]() { return (int)Actions.size(); }, [](const int &) {});
-   }
-  bool IsShortCut(TShortCut Raccourci, bool Executer);
- };
+{
+public:
+    std::vector<TAction *> Actions;
+    Propriete<int> ActionCount;
+    explicit TActionList(QObject *Parent) : QObject(Parent)
+    {
+        ActionCount.Definit([this] { return static_cast<int>(Actions.size()); }, [](const int &) {});
+    }
+    bool IsShortCut(TShortCut Raccourci, bool Executer);
+};
 //---------------------------------------------------------------------------
 // TMenuItem : feuille (QAction) ou sous-menu (QMenu)
 //---------------------------------------------------------------------------
 class TMenuItem : public QObject, public ClientAction
- {
-  QAction *Element; // l'élément affiché (menuAction() pour un sous-menu)
-  QMenu *SousMenu; // nullptr pour une feuille
-  QActionGroup *Groupe=nullptr; // éléments radio (RadioItem) de même GroupIndex
-  TAction *ActionLiee=nullptr;
-  AnsiString asCaption, asHint;
-  bool bChecked=false, bEnabled=true, bVisible=true;
-  void AfficheCoche();
-  void ElementDeclenche();
-  void TurnSiblingsOff();
-  public:
-  TMenuItem *Parent=nullptr;
-  std::vector<TMenuItem *> Items;
-  int Tag=0, GroupIndex=0, ImageIndex=-1, HelpContext=0;
-  bool RadioItem=false, AutoCheck=false;
-  TShortCut ShortCut=0;
-  Propriete<AnsiString> Caption, Hint;
-  Propriete<bool> Checked, Enabled, Visible;
-  Propriete<TAction *> Action;
-  TNotifyEvent OnClick;
-  TMenuItem(QAction *Feuille, QObject *Parent);
-  TMenuItem(QMenu *Menu, QObject *Parent);
-  QAction *ElementQt() const { return Element; }
-  QMenu *MenuQt() const { return SousMenu; }
-  void Click();
-  TMenuItem *Find(TShortCut Raccourci); // TMenu::FindItem(..., fkShortCut)
-  void LieAction(TAction *a); // lien établi au chargement (sans recopie)
-  void DefinitGroupe(QActionGroup *g);
-  // ClientAction
-  void ActionChange(TAction *a) override;
-  void LienChecked(bool Ancien, bool Nouveau) override;
-  void LienEnabled(bool Ancien, bool Nouveau) override;
-  void LienVisible(bool Ancien, bool Nouveau) override;
- };
+{
+    QAction *Element;               // l'élément affiché (menuAction() pour un sous-menu)
+    QMenu *SousMenu;                // nullptr pour une feuille
+    QActionGroup *Groupe = nullptr; // éléments radio (RadioItem) de même GroupIndex
+    TAction *ActionLiee = nullptr;
+    AnsiString asCaption, asHint;
+    bool bChecked = false, bEnabled = true, bVisible = true;
+    void AfficheCoche();
+    void ElementDeclenche();
+    void TurnSiblingsOff();
+
+public:
+    TMenuItem *Parent = nullptr;
+    std::vector<TMenuItem *> Items;
+    int Tag = 0, GroupIndex = 0, ImageIndex = -1, HelpContext = 0;
+    bool RadioItem = false, AutoCheck = false;
+    TShortCut ShortCut = 0;
+    Propriete<AnsiString> Caption, Hint;
+    Propriete<bool> Checked, Enabled, Visible;
+    Propriete<TAction *> Action;
+    TNotifyEvent OnClick;
+    TMenuItem(QAction *Feuille, QObject *Parent);
+    TMenuItem(QMenu *Menu, QObject *Parent);
+    [[nodiscard]] QAction *ElementQt() const { return Element; }
+    [[nodiscard]] QMenu *MenuQt() const { return SousMenu; }
+    void Click();
+    TMenuItem *Find(TShortCut Raccourci); // TMenu::FindItem(..., fkShortCut)
+    void LieAction(TAction *a);           // lien établi au chargement (sans recopie)
+    void DefinitGroupe(QActionGroup *g);
+    // ClientAction
+    void ActionChange(TAction *a) override;
+    void LienChecked(bool Ancien, bool Nouveau) override;
+    void LienEnabled(bool Ancien, bool Nouveau) override;
+    void LienVisible(bool Ancien, bool Nouveau) override;
+};
 //---------------------------------------------------------------------------
 class TMenu : public QObject
- {
-  public:
-  std::vector<TMenuItem *> Items;
-  TMenu(QObject *Parent) : QObject(Parent) {}
-  bool IsShortCut(TShortCut Raccourci, bool Executer);
- };
+{
+public:
+    std::vector<TMenuItem *> Items;
+    explicit TMenu(QObject *Parent) : QObject(Parent) {}
+    bool IsShortCut(TShortCut Raccourci, bool Executer);
+};
 //---------------------------------------------------------------------------
 class TMainMenu : public TMenu
- {
-  public:
-  QMenuBar *Barre;
-  TMainMenu(QMenuBar *b);
- };
+{
+public:
+    QMenuBar *Barre;
+    explicit TMainMenu(QMenuBar *b);
+};
 //---------------------------------------------------------------------------
 class TPopupMenu : public TMenu
- {
-  public:
-  QMenu *Menu;
-  TNotifyEvent OnPopup;
-  TPopupMenu(QMenu *m);
-  void Popup(int X, int Y); // coordonnées écran
- };
+{
+public:
+    QMenu *Menu;
+    TNotifyEvent OnPopup;
+    explicit TPopupMenu(QMenu *m);
+    void Popup(int X, int Y); // coordonnées écran
+};
 //---------------------------------------------------------------------------
 // Contrôle possédant une propriété PopupMenu (TControl::PopupMenu)
 //---------------------------------------------------------------------------
 class AvecMenuContextuel
- {
-  public:
-  virtual ~AvecMenuContextuel() {}
-  TPopupMenu *PopupMenu=nullptr;
- };
+{
+public:
+    virtual ~AvecMenuContextuel() = default;
+    TPopupMenu *PopupMenu = nullptr;
+};
 //---------------------------------------------------------------------------
 // Répartition des raccourcis façon VCL
 //---------------------------------------------------------------------------
 struct FicheRaccourcis
- {
-  QWidget *Fenetre=nullptr;
-  TMainMenu *Menu=nullptr;
-  std::vector<TActionList *> ListesActions;
-  bool Principale=false;
-  // KeyPreview : OnKeyDown/OnKeyUp de la fiche ; vrai si la touche est absorbée (Key=0)
-  std::function<bool(QKeyEvent *, bool Relache)> Apercu;
-  // CM_DIALOGKEY : Entrée = bouton actif ou Default, Échap = bouton Cancel (avant KeyPreview)
-  std::function<bool(QKeyEvent *)> ToucheDialogue;
-  bool IsShortCut(TShortCut Raccourci, bool Executer); // TCustomForm::IsShortCut
- };
+{
+    QWidget *Fenetre = nullptr;
+    TMainMenu *Menu = nullptr;
+    std::vector<TActionList *> ListesActions;
+    bool Principale = false;
+    // KeyPreview : OnKeyDown/OnKeyUp de la fiche ; vrai si la touche est absorbée (Key=0)
+    std::function<bool(QKeyEvent *, bool Relache)> Apercu;
+    // CM_DIALOGKEY : Entrée = bouton actif ou Default, Échap = bouton Cancel (avant KeyPreview)
+    std::function<bool(QKeyEvent *)> ToucheDialogue;
+    bool IsShortCut(TShortCut Raccourci, bool Executer); // TCustomForm::IsShortCut
+};
 void InscritFicheRaccourcis(const FicheRaccourcis &Fiche);
 void DesinscritFicheRaccourcis(QWidget *Fenetre);
 //---------------------------------------------------------------------------

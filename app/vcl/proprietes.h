@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 // vcl/proprietes.h - Portage de Centre-Ville : propriétés façon C++Builder
-//
+
 // Les fiches d'origine lisent et écrivent les propriétés des composants
 // (__property de la VCL) : ActionX->Checked^=true, Caption=Caption+"*",
 // StatusBar->Panels->Items[0]->Text=..., etc. Propriete<T> reproduit cette
@@ -13,72 +13,127 @@
 //---------------------------------------------------------------------------
 #include <functional>
 #include <type_traits>
+#include <utility>
 #include "compat/chaine.h"
 //---------------------------------------------------------------------------
-template <class T> class Propriete
- {
-  std::function<T()> Lit;
-  std::function<void(const T &)> Ecrit;
-  public:
-  Propriete() {}
-  Propriete(const Propriete &)=delete;
-  void Definit(std::function<T()> Lecture, std::function<void(const T &)> Ecriture)
-   {
-    Lit=std::move(Lecture);
-    Ecrit=std::move(Ecriture);
-   }
-  T Valeur() const { return Lit(); }
-  operator T() const { return Lit(); }
-  // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
-  template <class E, typename std::enable_if<std::is_enum<E>::value, int>::type=0>
-  explicit operator E() const { return (E)Lit(); }
-  Propriete &operator=(const T &v) { Ecrit(v); return *this; }
-  // Affectation d'une propriété à une autre : copie de la valeur, pas des accesseurs
-  Propriete &operator=(const Propriete &p) { Ecrit(p.Lit()); return *this; }
-  // Opérateurs composés (Tag^=1, Checked^=true, Width+=...)
-  template <class U> Propriete &operator^=(const U &v) { Ecrit((T)(Lit()^v)); return *this; }
-  template <class U> Propriete &operator+=(const U &v) { Ecrit((T)(Lit()+v)); return *this; }
-  template <class U> Propriete &operator-=(const U &v) { Ecrit((T)(Lit()-v)); return *this; }
- };
+template <class T>
+class Propriete // NOLINT(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
+{
+    std::function<T()> Lit;
+    std::function<void(const T &)> Ecrit;
+
+public:
+    Propriete() = default;
+    Propriete(const Propriete &) = delete;
+    void Definit(std::function<T()> Lecture, std::function<void(const T &)> Ecriture)
+    {
+        Lit = std::move(Lecture);
+        Ecrit = std::move(Ecriture);
+    }
+    [[nodiscard]] T Valeur() const { return Lit(); }
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    operator T() const { return Lit(); }
+    // Conversion explicite vers un énuméré : (etat_feu)RadioGroupEtat->ItemIndex
+    template <class E>
+    explicit operator E() const
+        requires(std::is_enum_v<E>)
+    {
+        return static_cast<E>(Lit());
+    }
+    Propriete &operator=(const T &v)
+    {
+        Ecrit(v);
+        return *this;
+    }
+    // Affectation d'une propriété à une autre : copie de la valeur, pas des accesseurs
+    Propriete &operator=(const Propriete &p)
+    {
+        if (this == &p)
+        {
+            return *this;
+        }
+        Ecrit(p.Lit());
+        return *this;
+    }
+    // Opérateurs composés (Tag^=1, Checked^=true, Width+=...)
+    template <class U> Propriete &operator^=(const U &v)
+    {
+        Ecrit(static_cast<T>(Lit() ^ v));
+        return *this;
+    }
+    template <class U> Propriete &operator+=(const U &v)
+    {
+        Ecrit(static_cast<T>(Lit() + v));
+        return *this;
+    }
+    template <class U> Propriete &operator-=(const U &v)
+    {
+        Ecrit(static_cast<T>(Lit() - v));
+        return *this;
+    }
+};
 //---------------------------------------------------------------------------
 // Propriétés texte : mêmes méthodes qu'AnsiString (Caption[Caption.Length()]...)
 //---------------------------------------------------------------------------
-template <> class Propriete<AnsiString>
- {
-  std::function<AnsiString()> Lit;
-  std::function<void(const AnsiString &)> Ecrit;
-  public:
-  Propriete() {}
-  Propriete(const Propriete &)=delete;
-  void Definit(std::function<AnsiString()> Lecture, std::function<void(const AnsiString &)> Ecriture)
-   {
-    Lit=std::move(Lecture);
-    Ecrit=std::move(Ecriture);
-   }
-  AnsiString Valeur() const { return Lit(); }
-  operator AnsiString() const { return Lit(); }
-  Propriete &operator=(const AnsiString &v) { Ecrit(v); return *this; }
-  Propriete &operator=(const char *v) { Ecrit(AnsiString(v)); return *this; }
-  Propriete &operator=(const Propriete &p) { Ecrit(p.Lit()); return *this; }
-  int Length() const { return Lit().Length(); }
-  bool IsEmpty() const { return Lit().IsEmpty(); }
-  int Pos(const AnsiString &as) const { return Lit().Pos(as); }
-  AnsiString SubString(int Index, int Count) const { return Lit().SubString(Index, Count); }
-  char operator[](int i) const { return Lit()[i]; }
-  const char *c_str() const = delete; // pointeur sur un temporaire : utiliser Valeur().c_str()
-  AnsiString operator+(const AnsiString &as) const { return Lit()+as; }
-  AnsiString operator+(const char *s) const { return Lit()+AnsiString(s); }
-  bool operator==(const AnsiString &as) const { return Lit()==as; }
-  bool operator!=(const AnsiString &as) const { return Lit()!=as; }
- };
+template <>
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions) : mandataire, l'affectation écrit la valeur (VCL)
+class Propriete<AnsiString>
+{
+    std::function<AnsiString()> Lit;
+    std::function<void(const AnsiString &)> Ecrit;
+
+public:
+    Propriete() = default;
+    Propriete(const Propriete &) = delete;
+    void Definit(std::function<AnsiString()> Lecture, std::function<void(const AnsiString &)> Ecriture)
+    {
+        Lit = std::move(Lecture);
+        Ecrit = std::move(Ecriture);
+    }
+    [[nodiscard]] AnsiString Valeur() const { return Lit(); }
+    // NOLINTNEXTLINE(*-explicit-constructor) : conversion implicite voulue, comme la VCL
+    operator AnsiString() const { return Lit(); }
+    Propriete &operator=(const AnsiString &v)
+    {
+        Ecrit(v);
+        return *this;
+    }
+    Propriete &operator=(const char *v)
+    {
+        Ecrit(AnsiString(v));
+        return *this;
+    }
+    Propriete &operator=(const Propriete &p)
+    {
+        if (this == &p)
+        {
+            return *this;
+        }
+        Ecrit(p.Lit());
+        return *this;
+    }
+    [[nodiscard]] int Length() const { return Lit().Length(); }
+    [[nodiscard]] bool IsEmpty() const { return Lit().IsEmpty(); }
+    [[nodiscard]] int Pos(const AnsiString &as) const { return Lit().Pos(as); }
+    [[nodiscard]] AnsiString SubString(int Index, int Count) const { return Lit().SubString(Index, Count); }
+    char operator[](int i) const { return Lit()[i]; }
+    [[nodiscard]] const char *c_str() const = delete; // pointeur sur un temporaire : utiliser Valeur().c_str()
+    AnsiString operator+(const AnsiString &as) const { return Lit() + as; }
+    AnsiString operator+(const char *s) const { return Lit() + AnsiString(s); }
+    bool operator==(const AnsiString &as) const { return Lit() == as; }
+    bool operator!=(const AnsiString &as) const { return Lit() != as; }
+};
 //---------------------------------------------------------------------------
 inline AnsiString operator+(const char *gauche, const Propriete<AnsiString> &droite)
- {
-  return AnsiString(gauche)+droite.Valeur();
- }
+{
+    return AnsiString(gauche) + droite.Valeur();
+}
 //---------------------------------------------------------------------------
 // ARRAYOFCONST((Grille->Col, ...)) : la valeur de la propriété (compat/chaine.h)
 //---------------------------------------------------------------------------
-template <class T> TVarRec VersTVarRec(const Propriete<T> &p) { return TVarRec(p.Valeur()); }
+template <class T> TVarRec VersTVarRec(const Propriete<T> &p)
+{
+    return TVarRec(p.Valeur());
+}
 //---------------------------------------------------------------------------
 #endif

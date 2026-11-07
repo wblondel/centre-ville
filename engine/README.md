@@ -12,6 +12,12 @@ les écarts avec l'original ligne à ligne :
 git diff --no-index --ignore-cr-at-eol --word-diff src/simul.cpp engine/simul.cpp
 ```
 
+Depuis la 6.0.17, le moteur est modernisé : `std::vector` et `std::array` au lieu des
+tableaux alloués à la main, constantes `constexpr` au lieu des macros, plus d'affectation
+dans les conditions, mise en forme par `clang-format`. La comparaison ligne à ligne avec
+`src/` se fait donc dans le tag `v6.0.16` ; la simulation, elle, reste identique (golden
+master). Les annotations `// portage` et `// v6.0.x` sont gardées.
+
 ## Construction et tests
 
 ```bash
@@ -361,8 +367,8 @@ sur 5 388 en 6.0.9. Tri de ce qui reste :
   ne produisent pas (numéros négatifs, nombres hors bornes...).
 - **Cas atteignables, absents des cartes, non testés** : feu relié à deux feux de piétons
   (`feu::AjouteFeuPtn`), arrêt ou place à égale distance des deux côtés d'un piéton
-  (`ChercheArretBus`, `ChercheArretTram`, `CherchePlaceTaxi`, `CherchePlaceVehlib`), « Tout
-  droit » sur deux cases (`CalculeDistanceParking`, `CalculeDistanceFilePark`), certains effacements de voie
+  (`ChercheArretBus`, `ChercheArretTram`, `CherchePlaceTaxi`, `CherchePlaceVehlib`), certains
+  effacements de voie
   (`voie::Initialise`), « Copier vers… » laissant hors de la sélection autre chose qu'un
   parking (`CopieValide`), place de taxi ajoutée quand tous les numéros sont pris
   (`IncrementeNombre`, `place_taxi::Copie`).
@@ -371,6 +377,8 @@ Les chemins testés en 6.0.7 (`tests/test_chemins.cpp`) : places de parking et d
 retirées par `Charge`, arrêts de plusieurs cases (`ExisteCaseArretBus`,
 `ExisteCaseArretTram`, `ArretTramExistant`), `SupprimeArretTram`, tableaux agrandis par
 `IncrementeNombre` (`Copie` des arrêts et des feux de piétons), réinfections (`infection::Svt`).
+En 6.0.17 : « Tout droit » sur deux cases dans `voie::CalculeDistance`, sur des cases tirées au
+hasard, comparé aux tables de distances du moteur 6.0.16.
 
 ## Code mort retiré
 

@@ -13,28 +13,28 @@
 #ifndef goldenH
 #define goldenH
 //---------------------------------------------------------------------------
+#include <array>
 #include <string>
 #include "simul.h"
 //---------------------------------------------------------------------------
 struct config_golden
- {
-  const char *Nom;
-  bool Sanglante; // ActionSanglante->Checked
-  bool Epidemie; // ActionEpidemie->Checked
-  int TourResurrection; // > 0 : résurrection demandée avant ce tour
- };
+{
+    const char *Nom;
+    bool Sanglante;       // ActionSanglante->Checked
+    bool Epidemie;        // ActionEpidemie->Checked
+    int TourResurrection; // > 0 : résurrection demandée avant ce tour
+};
 //---------------------------------------------------------------------------
-const unsigned GRAINE_GOLDEN=12345;
-const int NB_TOURS_GOLDEN=500;
-const config_golden ConfigsGolden[]=
- {
-  {"standard", false, false, 0},
-  {"epidemie", true, true, 250}, // épidémie + mode sanglant + résurrection
- };
-const int NB_CONFIGS_GOLDEN=sizeof(ConfigsGolden)/sizeof(ConfigsGolden[0]);
+const unsigned GRAINE_GOLDEN = 12345;
+const int NB_TOURS_GOLDEN = 500;
+const auto ConfigsGolden = std::to_array<config_golden>({
+    {.Nom = "standard", .Sanglante = false, .Epidemie = false, .TourResurrection = 0},
+    {.Nom = "epidemie", .Sanglante = true, .Epidemie = true, .TourResurrection = 250},
+
+}); // épidémie + mode sanglant + résurrection
+const int NB_CONFIGS_GOLDEN = sizeof(ConfigsGolden) / sizeof(ConfigsGolden[0]);
 //---------------------------------------------------------------------------
-std::string ProduitGolden(const std::string &asCheminCarte, const std::string &asNomCarte,
-                          const config_golden &Config);
+std::string ProduitGolden(const std::string &asCheminCarte, const std::string &asNomCarte, const config_golden &Config);
 //---------------------------------------------------------------------------
 // Nom du fichier de référence, relatif à tests/golden/
 std::string FichierGolden(const std::string &asNomCarte, const config_golden &Config);
@@ -43,18 +43,17 @@ std::string FichierGolden(const std::string &asNomCarte, const config_golden &Co
 // centre_ville par défaut NbX x NbY, paramètres par défaut de f_genres.dfm,
 // point de départ tiré par rand() (x, puis y, puis direction : ordre du binaire d'origine).
 struct config_generation
- {
-  const char *Nom;
-  unsigned Graine;
-  int NbX, NbY;
- };
-const config_generation ConfigsGeneration[]=
- {
-  {"defaut_1", 1, NBXDEF, NBYDEF},
-  {"defaut_12345", 12345, NBXDEF, NBYDEF},
-  {"petit_777", 777, 40, 30},
- };
-const int NB_CONFIGS_GENERATION=sizeof(ConfigsGeneration)/sizeof(ConfigsGeneration[0]);
+{
+    const char *Nom;
+    unsigned Graine;
+    int NbX, NbY;
+};
+const auto ConfigsGeneration = std::to_array<config_generation>({
+    {.Nom = "defaut_1", .Graine = 1, .NbX = NBXDEF, .NbY = NBYDEF},
+    {.Nom = "defaut_12345", .Graine = 12345, .NbX = NBXDEF, .NbY = NBYDEF},
+    {.Nom = "petit_777", .Graine = 777, .NbX = 40, .NbY = 30},
+});
+const int NB_CONFIGS_GENERATION = sizeof(ConfigsGeneration) / sizeof(ConfigsGeneration[0]);
 std::string ProduitGoldenGeneration(const config_generation &Config, const std::string &asFichierCvw);
 //---------------------------------------------------------------------------
 // « Copier vers... » (PrepareCopie/CopieValide/Sauve) : sélection complète

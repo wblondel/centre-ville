@@ -1,314 +1,414 @@
 //---------------------------------------------------------------------------
+#include "base.h"
+#include <array>
+#include "compat/chaine.h"
+#include "controles.h"
+#include "vcl.h"
 #include "vcl/fiche.h" // portage : remplace <vcl.h>
-//#pragma hdrstop // portage
+// #pragma hdrstop // portage
 //---------------------------------------------------------------------------
 #include "simul.h"
 #include "f_prmbus.h"
-#include "f_prmsim.h"
 #include "f_simul.h"
 //---------------------------------------------------------------------------
 #include "ui_f_prmbus.h" // portage : #pragma package -> fiche générée par tools/dfm2ui.py
-//#pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
+// #pragma link "cspin" // portage : TCSpinEdit dans vcl/controles.h
 #include "f_prmbus_composants.h" // portage : #pragma resource "*.dfm"
+#include "vue.h"
 //---------------------------------------------------------------------------
 TfrmParamBus *frmParamBus;
 //---------------------------------------------------------------------------
-const AnsiString asOrdre[2]={"ème","er"};
+constexpr std::array<const char *, 2> asOrdre = {"ème", "er"};
 //---------------------------------------------------------------------------
-TfrmParamBus::TfrmParamBus(TComponent* Owner)
-    : TForm(Owner)
-{ ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
- // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
- for(int i=0; i<9; i++)
-  if (i!=4) // v5.4 : plus de zoom !
-   frmSimulation->AffecteGlyphe(GLYPHE_DIR+i, ((TBitBtn*)(FindComponent((UnicodeString)("BitBtn"+IntToStr(1+i%3)+IntToStr(1+i/3)))))->Glyph);
- for(int i=1; i<=NBMAXLIGNESBUSTRAM; i++) // v6.0.2 : champs des n° d'arrêts
-  for(int j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
-   Connecte(((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->OnExit, this, &TfrmParamBus::CSpinEditExit);
+TfrmParamBus::TfrmParamBus(TComponent *Owner) : TForm(Owner)
+{
+    ChargeFiche(); // portage : chargement du .dfm, puis OnCreate
+    // v5.4 on charge les glyphes manuellement pour prendre en compte le HDPI
+    for (int i = 0; i < 9; i++)
+    {
+        if (i != 4)
+        { // v5.4 : plus de zoom !
+            frmSimulation->AffecteGlyphe(GLYPHE_DIR + i,
+                                         (dynamic_cast<TBitBtn *>(FindComponent(
+                                              UnicodeString("BitBtn" + IntToStr(1 + (i % 3)) + IntToStr(1 + (i / 3))))))
+                                             ->Glyph);
+        }
+    }
+    for (int i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
+    { // v6.0.2 : champs des n° d'arrêts
+        for (int j = 1; j <= NBMAXARRETSBUSTRAMPARLIGNE; j++)
+        {
+            Connecte((dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->OnExit,
+                     this, &TfrmParamBus::CSpinEditExit);
+        }
+    }
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::RafraichitNbBus()
- {
-  int i, NbBus=0;
-  for(i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   if (cv->LigneBus[i].NbArrets)
-    NbBus+=1+(cv->LigneBus[i].NbArrets-1)/3; // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6 arrêts et 3 bus de 7 à 9 arrêts
-  LabelNbBus->Caption=IntToStr(NbBus);
- }
-//---------------------------------------------------------------------------
-void TfrmParamBus::FormShow(TObject *Sender)
 {
- int i, j;
- AnsiString asNumLigne;
- TShape* Shape;
- NumArretBusAMontrer=0;
- InitialisationEnCours=true;
- for(NbArretsBus=i=0; i<cv->NbArretsBus; i++) NbArretsBus+=cv->ArretBus[i].Defini();
- LabelNbArretsBus->Caption=IntToStr(NbArretsBus);
- LabelNbMaxArretsBus->Caption=IntToStr(cv->NbArretsBus);
- RafraichitNbBus();
- if (NbArretsBus)
-  {
-   CheckBoxTout->Visible=(cv->TourCrt>0);
-   LabelT->Visible=(cv->TourCrt>0);
-   ShapeT->Visible=(cv->TourCrt>0);
-   if (!cv->TourCrt)
+    int i = 0;
+    int NbBus = 0;
+    for (i = 0; i < NBMAXLIGNESBUSTRAM; i++)
     {
-     LabelLigne->Caption="Ligne";
-     LabelLigne->Left=LabelLigne->Left+8;
+        if (cv->LigneBus[i].NbArrets != 0)
+        {
+            NbBus += 1 + ((cv->LigneBus[i].NbArrets - 1) / 3); // On définit 1 bus de 1 à 3 arrêts. 2 bus de 4 à 6
+                                                               // arrêts et 3 bus de 7 à 9 arrêts
+        }
     }
-   LabelRqCochesLignesBus->Visible=(cv->TourCrt>0);
-   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
+    LabelNbBus->Caption = IntToStr(NbBus);
+}
+//---------------------------------------------------------------------------
+void TfrmParamBus::FormShow(TObject * /*Sender*/)
+{
+    int i = 0;
+    int j = 0;
+    AnsiString asNumLigne;
+    TShape *Shape = nullptr;
+    NumArretBusAMontrer = 0;
+    InitialisationEnCours = true;
+    for (NbArretsBus = i = 0; i < cv->NbArretsBus; i++)
     {
-     if (cv->NbArretsBus<NBMAXARRETSBUSTRAMPARLIGNE)
-      ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->MAXVALUE=cv->NbArretsBus;
-     ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Value=cv->LigneBus[i-1].NbArrets;
-     ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Enabled=!cv->TourCrt;
-     ((TCheckBox*)FindComponent("CheckBox"+IntToStr(i)))->Visible=(cv->TourCrt>0)&&(cv->LigneBus[i-1].NbArrets>0);
-     for(j=1; j<=NBMAXARRETSBUSTRAMPARLIGNE; j++)
-      {
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->MAXVALUE=cv->NbArretsBus;
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->Value=cv->LigneBus[i-1].NumArret[j-1];
-       ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j)))->Enabled=!cv->TourCrt;
-      }
-     asNumLigne=IntToStr(i);
-     Shape=(TShape*)FindComponent("Shape"+asNumLigne);
-     Shape->Brush->Color=CoulLigneBusTram[i-1];
-     Shape->Pen->Color=CoulLigneBusTram[i-1];
-     ((TLabel*)FindComponent("LabelL"+asNumLigne))->Font->Color=CoulTLigneBusTram[i-1];
+        NbArretsBus += static_cast<int>(cv->ArretBus[i].Defini());
     }
-  }
- else
-  {
-   for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-    ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i)))->Visible=false;
-   AfficheMessage( "Vous devez poser au moins un arrêt de bus sur le réseau pour pouvoir définir le réseau de lignes de bus.",
-                   "Impossible de paramétrer le réseau de lignes de bus", tmAvertissement, 0, 0);
-  }
- CSpinEditNbMaxPersonnesBus->Value=cv->NbMaxPersonnesBus;
- CSpinEditNbToursStopArretBus->Value=cv->NbToursStopArretBus;
- CSpinEditNbCasesMaxArretBus->Value=cv->NbMaxCasesDetectArretBus;
- CSpinEditProbaDirArretBus->Value=cv->ProbaDirArretBus;
- CSpinEditNbMaxToursAttenteBus->Value=cv->NbMaxToursAttenteBus;
- CSpinEditProbaArretDmd->Value=cv->ProbaArretBusDmd;
- InitialisationEnCours=false;
+    LabelNbArretsBus->Caption = IntToStr(NbArretsBus);
+    LabelNbMaxArretsBus->Caption = IntToStr(cv->NbArretsBus);
+    RafraichitNbBus();
+    if (NbArretsBus != 0)
+    {
+        CheckBoxTout->Visible = (cv->TourCrt > 0);
+        LabelT->Visible = (cv->TourCrt > 0);
+        ShapeT->Visible = (cv->TourCrt > 0);
+        if (cv->TourCrt == 0)
+        {
+            LabelLigne->Caption = "Ligne";
+            LabelLigne->Left = LabelLigne->Left + 8;
+        }
+        LabelRqCochesLignesBus->Visible = (cv->TourCrt > 0);
+        for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
+        {
+            if (cv->NbArretsBus < NBMAXARRETSBUSTRAMPARLIGNE)
+            {
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->MaxValue =
+                    cv->NbArretsBus;
+            }
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Value =
+                cv->LigneBus[i - 1].NbArrets;
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Enabled = cv->TourCrt == 0;
+            (dynamic_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i))))->Visible =
+                (cv->TourCrt > 0) && (cv->LigneBus[i - 1].NbArrets > 0);
+            for (j = 1; j <= NBMAXARRETSBUSTRAMPARLIGNE; j++)
+            {
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->MaxValue =
+                    cv->NbArretsBus;
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Value =
+                    cv->LigneBus[i - 1].NumArret[j - 1];
+                (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j))))->Enabled =
+                    cv->TourCrt == 0;
+            }
+            asNumLigne = IntToStr(i);
+            Shape = dynamic_cast<TShape *>(FindComponent("Shape" + asNumLigne));
+            Shape->Brush->Color = CoulLigneBusTram[i - 1];
+            Shape->Pen->Color = CoulLigneBusTram[i - 1];
+            (dynamic_cast<TLabel *>(FindComponent("LabelL" + asNumLigne)))->Font->Color = CoulTLigneBusTram[i - 1];
+        }
+    }
+    else
+    {
+        for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
+        {
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i))))->Visible = false;
+        }
+        AfficheMessage(
+            "Vous devez poser au moins un arrêt de bus sur le réseau pour pouvoir définir le réseau de lignes de bus.",
+            "Impossible de paramétrer le réseau de lignes de bus", tmAvertissement, 0, 0);
+    }
+    CSpinEditNbMaxPersonnesBus->Value = cv->NbMaxPersonnesBus;
+    CSpinEditNbToursStopArretBus->Value = cv->NbToursStopArretBus;
+    CSpinEditNbCasesMaxArretBus->Value = cv->NbMaxCasesDetectArretBus;
+    CSpinEditProbaDirArretBus->Value = cv->ProbaDirArretBus;
+    CSpinEditNbMaxToursAttenteBus->Value = cv->NbMaxToursAttenteBus;
+    CSpinEditProbaArretDmd->Value = cv->ProbaArretBusDmd;
+    InitialisationEnCours = false;
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::CSpinEditChange(TObject *Sender)
 {
- TCSpinEdit *CSpinEdit=(TCSpinEdit*)Sender;
- int i,
-     k=StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length()-9)),
-     n=CSpinEdit->Value,
-     AncNumArretBusAMontrer;
- switch(k/10)
-  {
-   case 0: // Nombre d'arrêts
-           for(i=1; i<=NBMAXARRETSBUSTRAMPARLIGNE; i++)
-            ((TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*k+i)))->Visible=(i<=n);
-           break;
-   default:// N°d'arrêt de bus
-           // v6.0.2 : pendant la frappe, le texte n'est pas réécrit (l'original le remettait à 0 ou au suivant à chaque chiffre) : voir CSpinEditExit
-           if ((n<=0)||(n>cv->NbArretsBus)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de ArretBus dans l'original)
-            { if (!CSpinEdit->Frappe()) CSpinEdit->Value=0; }
-           else
-            if (!cv->ArretBus[n-1].Defini())
-             { if (!CSpinEdit->Frappe()) CSpinEdit->Value=1+CSpinEdit->Value%cv->NbArretsBus; }
-            else
-             if (!InitialisationEnCours)
-              {
-			   if ((AncNumArretBusAMontrer=NumArretBusAMontrer))
-                {
-                 NumArretBusAMontrer=0;
-                 cv->v[cv->ArretBus[AncNumArretBusAMontrer-1].x]
-                      [cv->ArretBus[AncNumArretBusAMontrer-1].y].RedessineCasesArretBus(indefinie);
-                }
-               NumArretBusAMontrer=CSpinEdit->Value;
-               // On bouge le curseur pour être sûr de voir l'arrêt
-               frmSimulation->DrawGridSimul->Col=cv->ArretBus[NumArretBusAMontrer-1].x;
-               frmSimulation->DrawGridSimul->Row=cv->ArretBus[NumArretBusAMontrer-1].y;
-              }
-           break;
-  }
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+    auto *CSpinEdit = dynamic_cast<TCSpinEdit *>(Sender);
+    int i = 0;
+    const int k = StrToInt(CSpinEdit->Name.SubString(10, CSpinEdit->Name.Length() - 9));
+    const int n = CSpinEdit->Value;
+    int AncNumArretBusAMontrer = 0;
+    if ((k / 10) == 0) // Nombre d'arrêts
+    {
+        for (i = 1; i <= NBMAXARRETSBUSTRAMPARLIGNE; i++)
+        {
+            (dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * k) + i))))->Visible =
+                (i <= n);
+        }
+    }
+    else // N°d'arrêt de bus
+    {
+        // v6.0.2 : pendant la frappe, le texte n'est pas réécrit (l'original le remettait à 0 ou au suivant à chaque
+        // chiffre) : voir CSpinEditExit
+        if ((n <= 0) || (n > cv->NbArretsBus)) // portage : n<=0 au lieu de !n (numéro négatif tapé : lecture hors de
+                                               // ArretBus dans l'original)
+        {
+            if (!CSpinEdit->Frappe())
+            {
+                CSpinEdit->Value = 0;
+            }
+        }
+        else if (!cv->ArretBus[n - 1].Defini())
+        {
+            if (!CSpinEdit->Frappe())
+            {
+                CSpinEdit->Value = 1 + (CSpinEdit->Value % cv->NbArretsBus);
+            }
+        }
+        else if (!InitialisationEnCours)
+        {
+            AncNumArretBusAMontrer = NumArretBusAMontrer;
+            if (AncNumArretBusAMontrer != 0)
+            {
+                NumArretBusAMontrer = 0;
+                cv->v[cv->ArretBus[AncNumArretBusAMontrer - 1].x][cv->ArretBus[AncNumArretBusAMontrer - 1].y]
+                    .RedessineCasesArretBus(indefinie);
+            }
+            NumArretBusAMontrer = CSpinEdit->Value;
+            // On bouge le curseur pour être sûr de voir l'arrêt
+            frmSimulation->DrawGridSimul->Col = cv->ArretBus[NumArretBusAMontrer - 1].x;
+            frmSimulation->DrawGridSimul->Row = cv->ArretBus[NumArretBusAMontrer - 1].y;
+        }
+    }
+    if (!InitialisationEnCours)
+    {
+        ButtonAppliquer->Enabled = true;
+    }
 }
 //---------------------------------------------------------------------------
 void TfrmParamBus::CSpinEditExit(TObject *Sender)
 { // v6.0.2 : ce que CSpinEditChange ne fait plus pendant la frappe
- TCSpinEdit *CSpinEdit=(TCSpinEdit*)Sender;
- int n=CSpinEdit->Value;
- if ((n<=0)||(n>cv->NbArretsBus))
-  CSpinEdit->Value=0;
- else
-  if (!cv->ArretBus[n-1].Defini())
-   CSpinEdit->Value=1+n%cv->NbArretsBus;
+    auto *CSpinEdit = dynamic_cast<TCSpinEdit *>(Sender);
+    const int n = CSpinEdit->Value;
+    if ((n <= 0) || (n > cv->NbArretsBus))
+    {
+        CSpinEdit->Value = 0;
+    }
+    else if (!cv->ArretBus[n - 1].Defini())
+    {
+        CSpinEdit->Value = 1 + (n % cv->NbArretsBus);
+    }
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::ButtonAideClick(TObject *Sender)
-{ // v3.0
- AfficheAideContextuelle(this); // v3.8
+void TfrmParamBus::ButtonAideClick(TObject * /*Sender*/)
+{                                  // v3.0
+    AfficheAideContextuelle(this); // v3.8
 }
 //---------------------------------------------------------------------------
 
 void TfrmParamBus::MenuItemClick(TObject *Sender)
 {
- ((TBitBtn*)FindComponent("BitBtn"+IntToStr(TagDe((TComponent*)Sender))))->Click(); // portage : TComponent::Tag -> TagDe
+    (dynamic_cast<TBitBtn *>(FindComponent("BitBtn" + IntToStr(TagDe(static_cast<TComponent *>(Sender))))))
+        ->Click(); // portage : TComponent::Tag -> TagDe
 }
 //---------------------------------------------------------------------------
 
 void TfrmParamBus::BitBtnDirClick(TObject *Sender)
 {
- int n=StrToInt(NomDe((TComponent*)Sender).SubString(7, NomDe((TComponent*)Sender).Length()-6)), // portage : TComponent::Name -> NomDe
-     dx=n/10-2, dy=n%10-2;
- if (CheckBoxCoins->Checked)
-  {
-   switch(dx)
+    const int n = StrToInt(
+        NomDe(static_cast<TComponent *>(Sender)).SubString(7, NomDe(static_cast<TComponent *>(Sender)).Length() - 6));
+    int // portage : TComponent::Name -> NomDe
+        const dx = (n / 10) - 2;
+    const int dy = (n % 10) - 2;
+    if (CheckBoxCoins->Checked)
     {
-     case -1: frmSimulation->DrawGridSimul->Col=0; break;
-     case +1: frmSimulation->DrawGridSimul->Col=frmSimulation->DrawGridSimul->ColCount-1; break;
+        switch (dx)
+        {
+        case -1:
+            frmSimulation->DrawGridSimul->Col = 0;
+            break;
+        case +1:
+            frmSimulation->DrawGridSimul->Col = frmSimulation->DrawGridSimul->ColCount - 1;
+            break;
+        default:
+            break;
+        }
+        switch (dy)
+        {
+        case -1:
+            frmSimulation->DrawGridSimul->Row = 0;
+            break;
+        case +1:
+            frmSimulation->DrawGridSimul->Row = frmSimulation->DrawGridSimul->RowCount - 1;
+            break;
+        default:
+            break;
+        }
     }
-   switch(dy)
+    else
     {
-     case -1: frmSimulation->DrawGridSimul->Row=0; break;
-     case +1: frmSimulation->DrawGridSimul->Row=frmSimulation->DrawGridSimul->RowCount-1; break;
+        if ((frmSimulation->DrawGridSimul->Col + dx >= 0) &&
+            (frmSimulation->DrawGridSimul->Col + dx < frmSimulation->DrawGridSimul->ColCount))
+        {
+            frmSimulation->DrawGridSimul->Col += dx;
+        }
+        if ((frmSimulation->DrawGridSimul->Row + dy >= 0) &&
+            (frmSimulation->DrawGridSimul->Row + dy < frmSimulation->DrawGridSimul->RowCount))
+        {
+            frmSimulation->DrawGridSimul->Row += dy;
+        }
     }
-  }
- else
-  {
-   if ((frmSimulation->DrawGridSimul->Col+dx>=0)&&
-       (frmSimulation->DrawGridSimul->Col+dx<frmSimulation->DrawGridSimul->ColCount))
-    frmSimulation->DrawGridSimul->Col+=dx;
-   if ((frmSimulation->DrawGridSimul->Row+dy>=0)&&
-       (frmSimulation->DrawGridSimul->Row+dy<frmSimulation->DrawGridSimul->RowCount))
-    frmSimulation->DrawGridSimul->Row+=dy;
-  }
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::TimerClignotementTimer(TObject *Sender)
+void TfrmParamBus::TimerClignotementTimer(TObject * /*Sender*/)
 {
- TimerClignotement->Tag^=1;
- if (NumArretBusAMontrer)
-  cv->v[cv->ArretBus[NumArretBusAMontrer-1].x]
-       [cv->ArretBus[NumArretBusAMontrer-1].y].RedessineCasesArretBus(indefinie);
+    TimerClignotement->Tag ^= 1;
+    if (NumArretBusAMontrer != 0)
+    {
+        cv->v[cv->ArretBus[NumArretBusAMontrer - 1].x][cv->ArretBus[NumArretBusAMontrer - 1].y].RedessineCasesArretBus(
+            indefinie);
+    }
 }
 //---------------------------------------------------------------------------
 bool TfrmParamBus::AppliqueChoix()
- {
-  AnsiString asMsg;
-  int i, j;
-  TCSpinEdit *CSpinEditNb, *CSpinEditNum;
-  // 1. On vérifie que tous les arrêts sont définis
-  for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-   {
-    CSpinEditNb=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
-    if (CSpinEditNb->Value)
-     {
-      for(j=1; j<=CSpinEditNb->Value; j++)
-       {
-        CSpinEditNum=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
-        if (!CSpinEditNum->Value)
-         asMsg= asMsg+
-                Format( " - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
-                        ARRAYOFCONST(( j, asOrdre[!(j-1)], i)));
-       }
-     }
-   }
-  if (!asMsg.IsEmpty())
-   {
-    AfficheMessage( Format("Le réseau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.", ARRAYOFCONST((asMsg))),
-                    "Impossible de continuer", tmAvertissement, 0, 0);
-    return false;
-   }
-  // 2. On valide les lignes de bus
-  frmSimulation->SimulationModifiee=true;
-  cv->InitialiseInfosLignesBus();
-  for(i=1; i<=NBMAXLIGNESBUSTRAM; i++)
-   {
-    CSpinEditNb=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(i));
-    if ((cv->LigneBus[i-1].NbArrets=CSpinEditNb->Value))
-     {
-      cv->NbLignesBus++;
-      for(j=1; j<=CSpinEditNb->Value; j++)
-       {
-        CSpinEditNum=(TCSpinEdit*)FindComponent(asDebutNomSpinEdit+IntToStr(10*i+j));
-        cv->LigneBus[i-1].NumArret[j-1]=CSpinEditNum->Value;
-        cv->ArretBus[CSpinEditNum->Value-1].AjouteLigneBus(i); // v3.0.5
-       }
-     }
-   }
-  // 3. On valide les autres paramètres
-  cv->NbMaxPersonnesBus=CSpinEditNbMaxPersonnesBus->Value;
-  cv->NbToursStopArretBus=CSpinEditNbToursStopArretBus->Value;
-  cv->NbMaxCasesDetectArretBus=CSpinEditNbCasesMaxArretBus->Value;
-  cv->ProbaDirArretBus=CSpinEditProbaDirArretBus->Value;
-  cv->NbMaxToursAttenteBus=CSpinEditNbMaxToursAttenteBus->Value;
-  cv->ProbaArretBusDmd=CSpinEditProbaArretDmd->Value;
-  ButtonAppliquer->Enabled=false;
-  RafraichitNbBus();
-  return true;
- }
-//---------------------------------------------------------------------------
-void TfrmParamBus::ButtonOkClick(TObject *Sender)
 {
- if (AppliqueChoix()) ModalResult=mrOk;
+    AnsiString asMsg;
+    int i = 0;
+    int j = 0;
+    TCSpinEdit *CSpinEditNb = nullptr;
+    TCSpinEdit *CSpinEditNum = nullptr;
+    // 1. On vérifie que tous les arrêts sont définis
+    for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
+    {
+        CSpinEditNb = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
+        if (CSpinEditNb->Value != 0)
+        {
+            for (j = 1; j <= CSpinEditNb->Value; j++)
+            {
+                CSpinEditNum = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
+                if (CSpinEditNum->Value == 0)
+                {
+                    asMsg = asMsg + Format(" - Le %d%s arrêt de la ligne n°%d n'est pas défini.\n",
+                                           TableauDeConstantes(j, asOrdre[((j - 1) == 0) ? 1 : 0], i));
+                }
+            }
+        }
+    }
+    if (!asMsg.IsEmpty())
+    {
+        AfficheMessage(Format("Le réseau de bus n'est pas correct :\n%s\nCorrigez avant de continuer.",
+                              TableauDeConstantes(asMsg)),
+                       "Impossible de continuer", tmAvertissement, 0, 0);
+        return false;
+    }
+    // 2. On valide les lignes de bus
+    frmSimulation->SimulationModifiee = true;
+    cv->InitialiseInfosLignesBus();
+    for (i = 1; i <= NBMAXLIGNESBUSTRAM; i++)
+    {
+        CSpinEditNb = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr(i)));
+        cv->LigneBus[i - 1].NbArrets = CSpinEditNb->Value;
+        if (cv->LigneBus[i - 1].NbArrets != 0)
+        {
+            cv->NbLignesBus++;
+            for (j = 1; j <= CSpinEditNb->Value; j++)
+            {
+                CSpinEditNum = dynamic_cast<TCSpinEdit *>(FindComponent(asDebutNomSpinEdit + IntToStr((10 * i) + j)));
+                cv->LigneBus[i - 1].NumArret[j - 1] = CSpinEditNum->Value;
+                cv->ArretBus[CSpinEditNum->Value - 1].AjouteLigneBus(i); // v3.0.5
+            }
+        }
+    }
+    // 3. On valide les autres paramètres
+    cv->NbMaxPersonnesBus = CSpinEditNbMaxPersonnesBus->Value;
+    cv->NbToursStopArretBus = CSpinEditNbToursStopArretBus->Value;
+    cv->NbMaxCasesDetectArretBus = CSpinEditNbCasesMaxArretBus->Value;
+    cv->ProbaDirArretBus = CSpinEditProbaDirArretBus->Value;
+    cv->NbMaxToursAttenteBus = CSpinEditNbMaxToursAttenteBus->Value;
+    cv->ProbaArretBusDmd = CSpinEditProbaArretDmd->Value;
+    ButtonAppliquer->Enabled = false;
+    RafraichitNbBus();
+    return true;
 }
 //---------------------------------------------------------------------------
-void TfrmParamBus::ButtonAppliquerClick(TObject *Sender)
+void TfrmParamBus::ButtonOkClick(TObject * /*Sender*/)
 {
- AppliqueChoix();
+    if (AppliqueChoix())
+    {
+        ModalResult = mrOk;
+    }
+}
+//---------------------------------------------------------------------------
+void TfrmParamBus::ButtonAppliquerClick(TObject * /*Sender*/)
+{
+    AppliqueChoix();
 }
 //---------------------------------------------------------------------------
 
-
-void TfrmParamBus::CSpinEditParametresChange(
-      TObject *Sender)
+void TfrmParamBus::CSpinEditParametresChange(TObject * /*Sender*/)
 {
- if (!InitialisationEnCours) ButtonAppliquer->Enabled=true;
+    if (!InitialisationEnCours)
+    {
+        ButtonAppliquer->Enabled = true;
+    }
 }
 //---------------------------------------------------------------------------
 
 void TfrmParamBus::CheckBoxClick(TObject *Sender)
 {
- if (!CheckBoxTout->Tag)
-  {
-   if (((TCheckBox*)Sender)->Checked) // v5.3
-     WindowState=wsMinimized;
-   frmSimulation->DrawGridSimul->Repaint();
-  }
+    if (CheckBoxTout->Tag == 0)
+    {
+        if ((dynamic_cast<TCheckBox *>(Sender))->Checked)
+        { // v5.3
+            WindowState = wsMinimized;
+        }
+        frmSimulation->DrawGridSimul->Repaint();
+    }
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::CheckBoxToutClick(TObject *Sender)
+void TfrmParamBus::CheckBoxToutClick(TObject * /*Sender*/)
 {
- CheckBoxTout->Tag=1;
- for(int i=0; i<NBMAXLIGNESBUSTRAM; i++)
-   ((TCheckBox*)FindComponent("CheckBox"+IntToStr(i+1)))->Checked=(cv->LigneBus[i].NbArrets>0)?CheckBoxTout->Checked:false;
- CheckBoxTout->Tag=0;
- if (CheckBoxTout->Checked) // v5.3
-   WindowState=wsMinimized;
- frmSimulation->DrawGridSimul->Repaint();
+    CheckBoxTout->Tag = 1;
+    for (int i = 0; i < NBMAXLIGNESBUSTRAM; i++)
+    {
+        (dynamic_cast<TCheckBox *>(FindComponent("CheckBox" + IntToStr(i + 1))))->Checked =
+            (cv->LigneBus[i].NbArrets > 0) ? CheckBoxTout->Checked : false;
+    }
+    CheckBoxTout->Tag = 0;
+    if (CheckBoxTout->Checked)
+    { // v5.3
+        WindowState = wsMinimized;
+    }
+    frmSimulation->DrawGridSimul->Repaint();
 }
 //---------------------------------------------------------------------------
 
-void TfrmParamBus::FormKeyDown(TObject *Sender, WORD &Key,
-      TShiftState Shift)
-{// v5.3 (nécessite TForm:KeyPreview à true)
- if (Key==112)
-   AfficheAideContextuelle(this);
+void TfrmParamBus::FormKeyDown(TObject * /*Sender*/, WORD &Key, TShiftState /*Shift*/)
+{ // v5.3 (nécessite TForm:KeyPreview à true)
+    if (Key == 112)
+    {
+        AfficheAideContextuelle(this);
+    }
 }
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // portage : chargement du .dfm (fiche générée par tools/dfm2ui.py) et gestionnaires
 //---------------------------------------------------------------------------
-#define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire) Connecte(Composant->Evenement, this, &TfrmParamBus::Gestionnaire);
+// NOLINTBEGIN(bugprone-macro-parentheses) : noms du composant, de l'événement et du gestionnaire
+#define CONNECTE_EVENEMENT(Composant, Evenement, Gestionnaire)                                                         \
+    Connecte(Composant->Evenement, this, &TfrmParamBus::Gestionnaire);
+// NOLINTEND(bugprone-macro-parentheses)
 void TfrmParamBus::ChargeFiche()
- {
-  Ui::frmParamBus().setupUi(this);
-  LieurComposants Lieur(this, "f_prmbus", Composants);
-  COMPOSANTS_frmParamBus(LIE_COMPOSANT)
-  FinChargement(Lieur);
-  EVENEMENTS_frmParamBus(CONNECTE_EVENEMENT)
-  if (OnCreate) OnCreate(this);
- }
+{
+    Ui::frmParamBus().setupUi(this);
+    LieurComposants Lieur(this, "f_prmbus", Composants);
+    COMPOSANTS_frmParamBus(LIE_COMPOSANT) FinChargement(Lieur);
+    EVENEMENTS_frmParamBus(CONNECTE_EVENEMENT) if (OnCreate)
+    {
+        OnCreate(this);
+    }
+}
 //---------------------------------------------------------------------------

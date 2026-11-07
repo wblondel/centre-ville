@@ -13,37 +13,41 @@
 #include <QMessageBox>
 #include <exception>
 #include "application.h"
-#include "base.h"
-#include "f_simul.h"
+#ifdef Q_OS_MACOS
+#include "base.h" // stRepLocalAppData, CopieCartesExemple
+#include "vcl.h"  // Q
+#endif
 //---------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
- QApplication App(argc, argv);
- InitialiseApplication(App);
+    QApplication App(argc, argv);
+    InitialiseApplication(App);
 #ifdef Q_OS_MACOS
- // v6.0.1 : cartes embarquées dans l'exécutable (app/CMakeLists.txt).
- // stRepLocalAppData se rabat sur le dossier de l'exécutable s'il ne peut créer
- // le sien : on n'écrit pas dans le paquet (signature)
- if (Q(stRepLocalAppData())!=QDir::toNativeSeparators(QCoreApplication::applicationDirPath()+"/"))
-  CopieCartesExemple(":/cartes", Q(stRepLocalAppData()));
+    // v6.0.1 : cartes embarquées dans l'exécutable (app/CMakeLists.txt).
+    // stRepLocalAppData se rabat sur le dossier de l'exécutable s'il ne peut créer
+    // le sien : on n'écrit pas dans le paquet (signature)
+    if (Q(stRepLocalAppData()) != QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/"))
+    {
+        CopieCartesExemple(":/cartes", Q(stRepLocalAppData()));
+    }
 #endif
- OuvertureFichiers Ouverture;
- App.installEventFilter(&Ouverture);
- int Resultat=0;
- try
-	{
-		CreeFiches(Ouverture.EnAttente);
-		Resultat=App.exec(); // Application->Run();
-		DetruitFiches();
-	}
- catch (std::exception &exception)
-	{ // Application->ShowException(&exception);
-		QMessageBox::critical(nullptr, "Centre-Ville", QString::fromUtf8(exception.what()));
-	}
- catch (...)
-	{
-		QMessageBox::critical(nullptr, "Centre-Ville", "Exception");
-	}
- return Resultat;
+    OuvertureFichiers Ouverture;
+    App.installEventFilter(&Ouverture);
+    int Resultat = 0;
+    try
+    {
+        CreeFiches(Ouverture.EnAttente);
+        Resultat = QApplication::exec(); // Application->Run();
+        DetruitFiches();
+    }
+    catch (std::exception &exception)
+    { // Application->ShowException(&exception);
+        QMessageBox::critical(nullptr, "Centre-Ville", QString::fromUtf8(exception.what()));
+    }
+    catch (...)
+    {
+        QMessageBox::critical(nullptr, "Centre-Ville", "Exception");
+    }
+    return Resultat;
 }
 //---------------------------------------------------------------------------
