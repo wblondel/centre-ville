@@ -2,7 +2,7 @@ name: Installeurs
 
 # Compile l'application Qt 6 (cvw) depuis les sources sur les trois systèmes
 # (phases 8 et 9 de PLAN_PORTAGE.md) et produit :
-#   - Windows : installeur Inno Setup (inno-setup/inscvw95.iss) sur le
+#   - Windows : installeur Inno Setup (inno-setup/inscv.iss) sur le
 #     contenu de « cmake --install » (windeployqt, DLL de MSVC, aide) ;
 #   - macOS   : image disque .dmg (Centre-Ville.app universel arm64 + x86_64,
 #     macdeployqt, CPack) ;
@@ -97,6 +97,11 @@ jobs:
     timeout-minutes: 30
     env:
       PAQUET: ${{ needs.version.outputs.paquet }}
+      # Inno Setup : installeur de la release officielle (github.com/jrsoftware/issrc,
+      # édition 64 bits), vérifié par son SHA256 (digest de l'asset). Dependabot ne suit
+      # pas les releases : veille-inno-setup.yml ouvre une issue à chaque nouvelle version
+      INNO_SETUP_VERSION: 7.1.1
+      INNO_SETUP_SHA256: 8a5a6711c3766a6e5fb74f280ba0e3551e719ce94538d901fdbd1f8f9920b3f0
 
     steps:
       - name: Checkout repository
@@ -128,20 +133,31 @@ jobs:
       - name: Archive sources for the installer (cvw-src-win64.zip)
         run: git archive --format=zip -o cvw-src-win64.zip HEAD
 
+      # Dans un dossier à part : l'Inno Setup préinstallé sur la machine de GitHub
+      # (6.7.1 sur windows-2025-vs2026) n'est jamais utilisé
       - name: Install Inno Setup
-        run: choco install innosetup --version=6.7.1 --allow-downgrade --no-progress -y
+        shell: pwsh
+        run: |
+          $tag = 'is-' + $env:INNO_SETUP_VERSION.Replace('.', '_')
+          $exe = "$env:RUNNER_TEMP\innosetup-$env:INNO_SETUP_VERSION-x64.exe"
+          Invoke-WebRequest -Uri "https://github.com/jrsoftware/issrc/releases/download/$tag/innosetup-$env:INNO_SETUP_VERSION-x64.exe" -OutFile $exe
+          $empreinte = (Get-FileHash $exe -Algorithm SHA256).Hash
+          if ($empreinte -ne $env:INNO_SETUP_SHA256) { throw "empreinte inattendue de l'installeur d'Inno Setup : $empreinte" }
+          $dossier = "$env:RUNNER_TEMP\InnoSetup"
+          $p = Start-Process -Wait -PassThru -FilePath $exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/DIR=$dossier", "/LOG=$env:RUNNER_TEMP\innosetup.log"
+          if ($p.ExitCode -ne 0) { Get-Content "$env:RUNNER_TEMP\innosetup.log" -Tail 30; throw "installation d'Inno Setup : code $($p.ExitCode)" }
+          $iscc = "$dossier\ISCC.exe"
+          $version = (Get-Item $iscc).VersionInfo.ProductVersion
+          "ISCC : $iscc, version $version"
+          if ($version -notmatch ('^' + [regex]::Escape($env:INNO_SETUP_VERSION) + '(\.0)?$')) { throw "ISCC $version au lieu de $env:INNO_SETUP_VERSION" }
+          "ISCC_EXE=$iscc" >> $env:GITHUB_ENV
 
-      # Inno Setup 6 (32 bits, Program Files (x86)) ou 7 (édition 64 bits,
-      # Program Files) : le script compile avec 6.3 et plus (essayé : 6.7.3, 7.1.0)
       - name: Compile installer (ISCC)
         shell: pwsh
         run: |
-          $iscc = Get-ChildItem "$env:ProgramFiles\Inno Setup *\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup *\ISCC.exe" -ErrorAction SilentlyContinue |
-            Sort-Object FullName -Descending | Select-Object -First 1
-          if (-not $iscc) { Write-Error "ISCC.exe introuvable"; exit 1 }
-          & $iscc.FullName "/DStaging=$PWD\build\installeur" inno-setup\inscvw95.iss
+          & $env:ISCC_EXE "/DStaging=$PWD\build\installeur" inno-setup\inscv.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          Move-Item inno-setup\output\inscvw95.exe "Centre-Ville-$env:PAQUET-Windows-x64-Setup.exe"
+          Move-Item inno-setup\output\inscv.exe "Centre-Ville-$env:PAQUET-Windows-x64-Setup.exe"
 
       - name: Upload installer
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
