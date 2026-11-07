@@ -8,7 +8,8 @@
 |---|---|---|---|
 | `ci.yml` | PR, `main` et chaque semaine | 90 min-machine | 27 min (ASan macOS) |
 | `build-installer.yml` | tag `v*` | 34 min-machine | environ 25 min |
-| `recette-windows.yml` | appelé avant la release, ou à la main | 10 min-machine | 7 min |
+| `recette-windows.yml` | appelé avant la release, ou à la main | 15 min-machine | 7 min |
+| `veille-inno-setup.yml` | chaque lundi | moins de 1 min | moins de 1 min |
 | `deploy-docs.yml` | `docs/` sur `main` | moins de 1 min | moins de 1 min |
 
 Déjà en place : permissions en lecture par défaut, écriture limitée au job de release, CodeQL (actions, C++, Python), détection de secrets avec blocage au push, alertes Dependabot, Catch2 vérifié par SHA256, 10 jobs requis sur `main`.
@@ -21,7 +22,7 @@ Déjà en place : permissions en lecture par défaut, écriture limitée au job 
 - [x] **Installeur 5.4.3.2** : SHA256 vérifié avant de l'exécuter.
 - [x] **Injection de `inputs.tag`** : passé par `env:`.
 - [x] **`persist-credentials: false`** sur tous les checkouts.
-- [x] **Inno Setup** : version figée (6.7.1).
+- [x] **Inno Setup** : version figée, depuis la 6.0.20 installeur de la release officielle (7.1.1, `github.com/jrsoftware/issrc`) vérifié par SHA256, au lieu de Chocolatey, dont le paquet s'arrête à la 6.7.1 et ne vérifie aucune empreinte. L'`ISCC.exe` utilisé est celui de cette installation, pas celui de l'image de GitHub. Dependabot ne suit pas les releases : `veille-inno-setup.yml` ouvre une issue à chaque nouvelle version.
 - [x] **`deploy-docs.yml`** : `pages: write` et `id-token: write` au niveau du job.
 - [x] **Règles du dépôt** : force-push et suppression bloqués sur `main`, contournement administrateur limité aux PR ; tags `v*` impossibles à déplacer ou à supprimer.
 - [x] **`zizmor` bloquant** dans le job de lint.

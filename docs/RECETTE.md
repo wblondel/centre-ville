@@ -14,8 +14,9 @@ Sans machine Windows : le workflow « Recette Windows »
 (`.github/workflows/recette-windows.yml`, lancé avant chaque release, ou à la main sur un tag) refait
 sur une machine Windows de GitHub l'installation, l'ouverture d'un `.cvw` par
 son association, F1, « À propos » et la désinstallation, sur une machine
-neuve et en mise à jour d'une 5.4.3.2 installée par l'installeur d'origine
-(`http://patquoi.free.fr/INSCVW95.EXE`) ; il vérifie que l'original ouvre
+neuve, en mise à jour d'une 5.4.3.2 installée par l'installeur d'origine
+(`http://patquoi.free.fr/INSCVW95.EXE`) et en mise à jour de la release
+publiée précédente ; il vérifie que l'original ouvre
 des fichiers enregistrés par la 6.0.0, et joint des captures d'écran au
 run, dont chaque fiche dans l'affichage natif de Windows. Il ne couvre ni
 SmartScreen, ni Windows 10/11 grand public, ni ARM64.

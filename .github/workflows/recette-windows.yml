@@ -2,10 +2,12 @@ name: Recette Windows
 
 # Recette de l'installeur Windows, avant sa publication ou d'une release publiée
 # (docs/RECETTE.md, partie Windows), sur une machine Windows de GitHub
-# (Windows Server x64), pour qui n'a pas de Windows sous la main, en deux
-# scénarios : installation sur une machine neuve, et mise à jour d'une 5.4.3.2
+# (Windows Server x64), pour qui n'a pas de Windows sous la main, en trois
+# scénarios : installation sur une machine neuve, mise à jour d'une 5.4.3.2
 # installée par l'installeur d'origine (http://patquoi.free.fr/INSCVW95.EXE,
-# même AppId) ; dans les deux cas :
+# même AppId), et mise à jour de la release publiée précédente (6.0.20 : un
+# installeur d'Inno Setup 7 met à jour une installation d'Inno Setup 6) ; dans
+# les trois cas :
 #   - installation silencieuse : fichiers, cartes d'exemple dans
 #     %LOCALAPPDATA%\Patquoi.fr\Centre-Ville, menu Démarrer, entrée des
 #     applications installées (version, une seule entrée), association des
@@ -62,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario: [installation, mise-a-jour]
+        scenario: [installation, mise-a-jour, mise-a-jour-precedente]
     runs-on: windows-2025-vs2026
     timeout-minutes: 30
     env:
@@ -152,6 +154,31 @@ jobs:
           # cvw.exe d'origine gardé pour l'interopérabilité (exécutable autonome)
           New-Item -ItemType Directory "$env:RUNNER_TEMP\origine" | Out-Null
           Copy-Item "$env:APP\bin\cvw.exe" "$env:RUNNER_TEMP\origine\cvw.exe"
+
+      # Mise à jour de la release précédente : la plus récente publiée avant celle
+      # essayée (avant l'installeur de ce run, s'il n'est pas encore publié)
+      - name: Install the previous release (previous-release scenario)
+        if: matrix.scenario == 'mise-a-jour-precedente'
+        env:
+          TAG: ${{ inputs.tag }}
+          ARTEFACT: ${{ inputs.artefact }}
+        run: |
+          . "$env:RUNNER_TEMP\outils.ps1"
+          $releases = @(gh release list -R $env:GITHUB_REPOSITORY --exclude-pre-releases --limit 50 --json tagName --jq '.[].tagName')
+          if ($env:ARTEFACT) { $precedente = $releases[0] }
+          else {
+            $essayee = $env:TAG
+            if (-not $essayee) { $essayee = gh release list -R $env:GITHUB_REPOSITORY --limit 1 --json tagName --jq '.[0].tagName' }
+            $i = [array]::IndexOf($releases, $essayee)
+            $precedente = if ($i -ge 0) { $releases[$i + 1] } else { $releases[0] }
+          }
+          if (-not $precedente) { throw 'pas de release précédente' }
+          "Release précédente : $precedente"
+          gh release download $precedente -R $env:GITHUB_REPOSITORY -p '*Windows-x64-Setup.exe' -D precedente
+          Installe (Get-ChildItem precedente\*.exe).FullName installation-precedente.log
+          $v = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
+          "Installé : cvw.exe $($v.FileVersion) ; applications installées : $((EntreesCentreVille | ForEach-Object { "$($_.DisplayName) $($_.DisplayVersion)" }) -join ', ')"
+          if ($v.FileVersion -ne $precedente.TrimStart('v')) { throw "version installée $($v.FileVersion) au lieu de $precedente" }
 
       - name: Install (silent)
         run: |
@@ -293,6 +320,7 @@ jobs:
           path: |
             captures
             installation-origine.log
+            installation-precedente.log
             installation.log
             interop
             desinstallation.log

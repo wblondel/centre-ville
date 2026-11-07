@@ -203,7 +203,7 @@ add_dependencies(cvw cvw_aide)
 # Installation (phase 8) : cmake --install <build> --prefix <dossier>
 #   Windows : bin/cvw.exe, DLL de Qt et de MSVC, bin/qt.conf, plugins/ et
 #             translations/ (windeployqt), bin/html, bin/tutocv : contenu de
-#             l'installeur (inno-setup/inscvw95.iss) ;
+#             l'installeur (inno-setup/inscv.iss) ;
 #   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
 #   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
 #             fichiers .cvw, icônes, cartes d'exemple (share/centre-ville/cartes) ;

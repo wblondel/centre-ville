@@ -1,0 +1,78 @@
+name: Veille Inno Setup
+
+# Dependabot ne suit pas les releases GitHub, d'où viennent les installeurs
+# d'Inno Setup (github.com/jrsoftware/issrc). Chaque lundi, ce workflow compare
+# INNO_SETUP_VERSION de build-installer.yml à la plus haute version publiée
+# (tags is-X_Y_Z, hors pré-releases) et, si elle est plus récente, ouvre une
+# issue, une seule par version, même refermée.
+#
+# Mise à jour : INNO_SETUP_VERSION et INNO_SETUP_SHA256 (l'issue donne le
+# digest de innosetup-<version>-x64.exe), nouveautés lues pour ce que le script
+# inno-setup/inscv.iss utilise, puis workflow Installeurs lancé à la main sur
+# la branche (il compile l'installeur et passe la recette Windows).
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  veille:
+    name: Version d'Inno Setup
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Compare with the latest Inno Setup release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          actuelle=$(sed -n 's/^ *INNO_SETUP_VERSION: *\([0-9.]*\) *$/\1/p' .github/workflows/build-installer.yml)
+          if [ -z "$actuelle" ]; then
+            echo "::error::INNO_SETUP_VERSION introuvable dans build-installer.yml"
+            exit 1
+          fi
+          derniere=$(gh api 'repos/jrsoftware/issrc/releases?per_page=30' --jq '.[] | select(.prerelease | not) | .tag_name' |
+            sed -n 's/^is-\([0-9]\{1,\}\)_\([0-9]\{1,\}\)_\([0-9]\{1,\}\)$/\1.\2.\3/p' | sort -V | tail -n 1)
+          if [ -z "$derniere" ]; then
+            echo "::error::aucune release d'Inno Setup lue sur github.com/jrsoftware/issrc"
+            exit 1
+          fi
+          echo "Inno Setup : $actuelle dans build-installer.yml, $derniere publiée"
+          if [ "$(printf '%s\n%s\n' "$actuelle" "$derniere" | sort -V | tail -n 1)" = "$actuelle" ]; then
+            exit 0
+          fi
+          titre="Inno Setup $derniere disponible"
+          deja=$(gh issue list -R "$GITHUB_REPOSITORY" --state all --search "\"$titre\" in:title" --json title \
+            --jq "[.[] | select(.title == \"$titre\")] | length")
+          if [ "$deja" != "0" ]; then
+            echo "Issue déjà ouverte pour cette version : $titre"
+            exit 0
+          fi
+          tag="is-${derniere//./_}"
+          digest=$(gh api "repos/jrsoftware/issrc/releases/tags/$tag" \
+            --jq ".assets[] | select(.name == \"innosetup-$derniere-x64.exe\") | .digest")
+          {
+            echo "Inno Setup $derniere est publié ; \`build-installer.yml\` utilise la $actuelle."
+            echo
+            echo "- Release : https://github.com/jrsoftware/issrc/releases/tag/$tag"
+            echo "- Nouveautés : https://jrsoftware.org/files/is${derniere%%.*}-whatsnew.htm"
+            echo "- Digest de \`innosetup-$derniere-x64.exe\` : \`${digest:-introuvable}\`"
+            echo
+            echo "Mise à jour : \`INNO_SETUP_VERSION\` et \`INNO_SETUP_SHA256\` (digest sans « sha256: »)"
+            echo "dans \`.github/workflows/build-installer.yml\`, après lecture des nouveautés pour ce"
+            echo "qu'utilise \`inno-setup/inscv.iss\`, puis workflow Installeurs lancé à la main sur la"
+            echo "branche : il compile l'installeur et passe la recette Windows."
+          } > corps.md
+          gh issue create -R "$GITHUB_REPOSITORY" --title "$titre" --body-file corps.md
