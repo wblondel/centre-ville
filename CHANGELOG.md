@@ -4,6 +4,53 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.19] — calcul des distances deux fois plus rapide
+
+Cette version ne change ni l'interface, ni la simulation des cartes livrées (golden master
+identique), ni le format des fichiers `.cvw` (0x530). Le calcul des distances, fait au
+démarrage de chaque simulation, avait ralenti de 20 % avec la modernisation de la 6.0.17 : il
+prend maintenant deux fois moins de temps qu'en 6.0.18, et 40 % de moins qu'en 6.0.16.
+
+### Performance
+
+- **Mesures** (Release, Apple M1 Pro, versions alternées dans un même script) : calcul des
+  distances de la carte Colimasson en 1,85 s, contre 3,82 à 3,86 s en 6.0.18 et 3,15 s en
+  6.0.16 ; test `moteur.simulation` en 9,7 s, contre 15,3 à 15,9 s et 13,8 à 14,3 s.
+- **Causes du ralentissement de la 6.0.17**, mesurées une à une sans changer le calcul : la
+  grille `std::vector<std::vector<voie>>`, où chaque case voisine chargeait sa colonne (7 %) ;
+  les huit `std::vector` de chaque case, 192 octets au lieu de 64 pour les pointeurs, qui
+  faisaient passer `voie` de 256 à 384 octets (6 à 7 %) ; un bloc du tas par élément et par
+  case (le reste).
+- **Grille en un seul tableau** : toutes les cases dans un `std::vector<voie>` ; `v[x][y]` ne
+  change pas (une `std::span` par colonne).
+- **Tables de distances** (`table_distances`) : une par type d'élément dans `centre_ville`,
+  les distances de toutes les cases à un élément à la suite. La récursion lit des distances
+  proches en mémoire, et la préparation fait six allocations au lieu d'une par élément et par
+  case.
+- **Cases voisines précalculées** (`voie::IndiceVoisine`) : le calcul sur le tore de
+  `Voisine()` coûtait 40 % du calcul des distances. Ses deux divisions n'en étaient pas la
+  cause (les remplacer par des soustractions le ralentit) : ses entiers (`NbX`, `NbY`, `dx`,
+  `dy`) étaient relus après chaque distance écrite. Les voisines sont fixées une fois par
+  grille.
+- **Taille d'une case** : `voie` fait 248 octets.
+
+### API du moteur
+
+- **Distances d'une case** : `v->DistParking()[e][d]` au lieu de `v->DistParking[e][d]`, de
+  même pour `DistFilePark()`, `DistArretBus()`, `DistArretTram()`, `DistFileTaxi()` et
+  `DistPlaceVehlib()`, avec `empty()` et `size()` (nombre d'éléments). Les dimensions
+  `Nb…Dist` de chaque case sont retirées, sauf `NbDirDist`.
+- **Voisine d'une case** : `voie::Voisine(d)`, la même case que
+  `centre_ville::Voisine(x, y, d)`.
+
+### Tests
+
+- **`[chemins][voisines]`** : sur toutes les cartes, les voisines à une et deux cases lues
+  dans `IndiceVoisine` sont celles de `Voisine()` ; une voisine faussée fait échouer le test.
+- **Distances identiques à la 6.0.16** : les six tables comparées sur 90 cas (9 cartes, avec
+  des cases « Tout droit » et des passages de bus tirés au hasard), en plus du test
+  `[chemins][distances]` et du golden master.
+
 ## [6.0.18] — code C++ modernisé, lint bloquant
 
 Cette version publie le travail de la 6.0.17, dont les installeurs ne se compilaient pas (le
