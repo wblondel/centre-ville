@@ -9,9 +9,11 @@
 ; version est lu dans les ressources de cvw.exe (FileVersion : project(VERSION)
 ; de CMakeLists.txt). Même AppId que l'installeur d'origine : il le met à jour.
 ;
-;   iscc inscvw95.iss                          (Staging : ..\build\installeur)
-;   iscc /DStaging=C:\chemin\absolu inscvw95.iss
-; Inno Setup 6.3 ou plus récent (compilé avec 6.7.3 et 7.1.0).
+;   iscc inscv.iss                          (Staging : ..\build\installeur)
+;   iscc /DStaging=C:\chemin\absolu inscv.iss
+; Inno Setup 6.3 ou plus récent. La CI compile avec Inno Setup 7.1.1 (édition
+; 64 bits, installeur 32 bits comme avant). Nom du script : inscv (6.0.20),
+; l'installeur d'origine étant INSCVW95.EXE (Windows 95 et plus).
 
 #if Ver < EncodeVer(6, 3, 0)
   #error Inno Setup 6.3 ou plus récent requis (script UTF-8 sans BOM, x64compatible)
@@ -41,7 +43,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppPublisher}\{#MyAppName}
+DefaultDirName={autopf}\{#MyAppPublisher}\{#MyAppName}
 DefaultGroupName={#MyAppPublisher}\{#MyAppName}
 UninstallDisplayIcon={app}\Uninstall.ico
 UninstallDisplayName={#MyAppName}
@@ -51,7 +53,7 @@ InfoAfterFile=..\docs\lisezmoi.txt
 WizardImageFile=Gauche.bmp
 WizardSmallImageFile=Coin.bmp
 OutputDir="output"
-OutputBaseFilename=inscvw95
+OutputBaseFilename=inscv
 SetupIconFile="cvw5.ico"
 AppComments=La simulation de circulation urbaine
 AppContact=cvw@patquoi.fr

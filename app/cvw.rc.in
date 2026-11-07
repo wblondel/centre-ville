@@ -2,7 +2,7 @@
 // cvw.rc - GÉNÉRÉ par CMake depuis app/cvw.rc.in (ne pas modifier)
 //
 // Icônes de src/cvw_resources.rc : Icon_0 (application) et Icon_1 (fichiers
-// .cvw, « {app}\bin\cvw.exe,1 » dans inno-setup/inscvw95.iss).
+// .cvw, « {app}\bin\cvw.exe,1 » dans inno-setup/inscv.iss).
 // Informations de version de src/cvw.cbproj (VerInfo_Keys, VerInfo_Locale
 // 1036) ; numéro de version : project(VERSION) de CMakeLists.txt.
 #include <winver.h>
