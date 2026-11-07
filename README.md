@@ -32,6 +32,8 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 │   └── workflows/
 │       ├── ci.yml                # CI : tests, ASan et UBSan, lint et couverture
 │       ├── build-installer.yml   # Installeurs (Windows, macOS, Linux) et release sur tag v*
+│       ├── recette-windows.yml   # Recette de l'installeur Windows, avant chaque release
+│       ├── veille-inno-setup.yml # Issue à chaque nouvelle version d'Inno Setup
 │       └── deploy-docs.yml       # CI Pages : déploiement automatique de la documentation
 ├── app/                          # Application Qt 6 (cvw) : les 33 fiches portées, couche VCL (app/vcl)
 ├── engine/                       # Moteur de simulation (C++20, sans Qt)
@@ -42,7 +44,7 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 │   ├── guide/                    # Manuel complet d'utilisation (HTML), aide F1 de l'application
 │   ├── tutorial/                 # Tutoriel pas-à-pas illustré
 │   └── RECETTE.md                # Liste de recette d'une version (Windows, macOS, Linux)
-├── inno-setup/                   # Script d'installation Inno Setup (inscvw95.iss)
+├── inno-setup/                   # Script d'installation Inno Setup (inscv.iss)
 ├── maps/                         # Cartes de simulation d'exemple (*.cvw)
 ├── res/                          # Icônes et bitmaps graphiques haute résolution
 ├── src/                          # Code VCL d'origine (C++Builder), en lecture seule : voir plus bas
@@ -93,7 +95,7 @@ L'application est `build/dev/app/cvw` (`cvw.exe` sous Windows, `Centre-Ville.app
 cmake --preset release -DCV_TESTS=OFF && cmake --build --preset release
 cmake --install build/release --prefix "$PWD/build/installeur"   # windeployqt / macdeployqt (préfixe absolu)
 ```
-* **Windows** : `iscc /DStaging=<chemin absolu de build\installeur> inno-setup\inscvw95.iss` (Inno Setup ≥ 6.3).
+* **Windows** : `iscc /DStaging=<chemin absolu de build\installeur> inno-setup\inscv.iss` (Inno Setup ≥ 6.3 ; la CI utilise la 7.1.1).
 * **macOS** : `cd build/release && cpack` produit `Centre-Ville-<version>-macOS.dmg`.
 * **Linux** : AppImage avec [linuxdeploy](https://github.com/linuxdeploy/linuxdeploy) et son greffon Qt, comme dans `build-installer.yml` (le crochet `app/linux/apprun-hooks/centre-ville-cartes.sh` copie les cartes au premier lancement) ; ou installation dans un préfixe dédié (`--prefix /opt/centre-ville`), avec entrée de bureau, type MIME des fichiers `.cvw` et cartes dans `share/centre-ville/cartes`.
 
@@ -102,8 +104,9 @@ Le numéro de version est celui de `project(VERSION …)` dans `CMakeLists.txt` 
 ### 3. Intégration continue
 * `.github/workflows/ci.yml` : moteur et application compilés et testés sous Windows, macOS et Linux à chaque modification, et toute la suite sous AddressSanitizer et UBSan (Linux sur les PR, macOS aussi sur `main` et chaque semaine).
 * `.github/workflows/build-installer.yml` : sur un tag `v*` ou à la main, compile depuis les sources et produit l'installeur Windows, le `.dmg`, l'AppImage et les archives des sources ; sur un tag seulement, les joint à une release GitHub (voir ci-dessous).
-* `.github/workflows/recette-windows.yml` : avant chaque release (ou à la main), installe le paquet Windows sur une machine Windows de GitHub, neuve ou avec la 5.4.3.2 d'origine (mise à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
+* `.github/workflows/recette-windows.yml` : avant chaque release (ou à la main), installe le paquet Windows sur une machine Windows de GitHub, neuve, avec la 5.4.3.2 d'origine ou avec la release précédente (mises à jour), ouvre un `.cvw`, essaie F1 et la désinstallation, et joint des captures d'écran (recette sans machine Windows).
 * `.github/dependabot.yml` : mises à jour mensuelles et groupées des actions et des outils de lint.
+* `.github/workflows/veille-inno-setup.yml` : chaque lundi, ouvre une issue si une version d'Inno Setup plus récente que celle de `build-installer.yml` est publiée (Dependabot ne suit pas les releases GitHub, d'où vient son installeur, vérifié par SHA256).
 * `.github/workflows/deploy-docs.yml` : publie le dossier `docs/` sur **GitHub Pages** à chaque mise à jour de `main` (guide : `<url-pages>/guide/index.html`, tutoriel : `<url-pages>/tutorial/index.html`).
 
 ### 4. Lint

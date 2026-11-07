@@ -4,6 +4,37 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.20] — installeur Windows compilé par Inno Setup 7.1.1
+
+Cette version ne change ni l'application, ni la simulation des cartes livrées (golden master
+identique), ni le format des fichiers `.cvw` (0x530). Seul l'installeur Windows change de
+compilateur.
+
+### Installeur Windows
+
+- **Inno Setup 7.1.1** au lieu de 6.7.1 : la version que recommande son auteur, la seule à
+  recevoir tous les correctifs. L'installeur reste un programme 32 bits qui installe
+  Centre-Ville en 64 bits, avec le même `AppId` : il met à jour les versions précédentes, la
+  5.4.3.2 d'origine comprise. Aucun des changements incompatibles de la 7 ne touche le
+  script : `AppVerName` et les architectures y sont fixés, il n'a pas de code Pascal, et le
+  fichier de langue est le `French.isl` fourni.
+- **Inno Setup installé depuis sa release officielle** (`github.com/jrsoftware/issrc`), vérifié
+  par SHA256, au lieu de Chocolatey : son paquet s'arrête à la 6.7.1 et ne vérifie aucune
+  empreinte. L'`ISCC.exe` utilisé est celui de cette installation. Auparavant, c'était celui
+  qu'avait l'image de GitHub : la version n'était figée que par elle.
+- **Script renommé** `inno-setup/inscv.iss` : `inscvw95` venait de Windows 95, que
+  l'application ne vise plus depuis longtemps. `{autopf}` remplace `{pf}`, renommé par Inno
+  Setup : même dossier d'installation, un avertissement du compilateur en moins.
+
+### CI
+
+- **Veille Inno Setup** (`veille-inno-setup.yml`) : Dependabot ne suit pas les releases
+  GitHub. Chaque lundi, une issue est ouverte si une version plus récente que celle de
+  `build-installer.yml` est publiée, avec l'empreinte de son installeur.
+- **Recette Windows** : troisième scénario, la mise à jour de la release publiée précédente.
+  Un installeur d'Inno Setup 7 y remplace une installation faite par un installeur d'Inno
+  Setup 6.
+
 ## [6.0.19] — calcul des distances deux fois plus rapide
 
 Cette version ne change ni l'interface, ni la simulation des cartes livrées (golden master
