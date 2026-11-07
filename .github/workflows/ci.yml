@@ -280,6 +280,15 @@ jobs:
       - name: Check formatting (clang-format)
         run: python3 tools/format_cpp.py --verifie --clang-format "$RUNNER_TEMP/lint/bin/clang-format"
 
+      # Le code livré se compile pour macOS 12 (.dmg) et avec GCC 12 (AppImage, Ubuntu 22.04), que les
+      # autres jobs ne vérifient pas : ni <format> (GCC 13), ni std::to_chars des réels (macOS 13.3)
+      - name: Shipped code buildable for the installers
+        run: |
+          if git grep -nE '#include <(format|charconv)>|std::(format|to_chars)\(' -- engine app; then
+            echo "::error::<format> et std::to_chars sont indisponibles pour les installeurs (macOS 12, GCC 12)"
+            exit 1
+          fi
+
       - name: Run clang-tidy
         run: >
           python3 tools/lint_cpp.py --dossier build/lint --clang-tidy "$RUNNER_TEMP/lint/bin/clang-tidy"

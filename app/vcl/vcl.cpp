@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <format>
 #include <string>
 #include <utility>
 //---------------------------------------------------------------------------
@@ -57,22 +56,22 @@ String FormatDateTime(const AnsiString &asFormat, const TDateTime &dt)
         const auto Commence = [&](const char *m) { return f.compare(i, std::char_traits<char>::length(m), m) == 0; };
         if (Commence("hh"))
         {
-            r += std::format("{:02d}", h);
+            r += ChiffresDecimaux(h, 2);
             i += 2;
         }
         else if (Commence("nn"))
         {
-            r += std::format("{:02d}", n);
+            r += ChiffresDecimaux(n, 2);
             i += 2;
         }
         else if (Commence("ss"))
         {
-            r += std::format("{:02d}", s);
+            r += ChiffresDecimaux(s, 2);
             i += 2;
         }
         else if (Commence("zzz"))
         {
-            r += std::format("{:03d}", z);
+            r += ChiffresDecimaux(z, 3);
             i += 3;
         }
         else
@@ -150,7 +149,7 @@ String FormatFloat(const AnsiString &asFormat, long double Valeur)
     }
     const int EntiersMin = (PremierZero < 0) ? 0 : NbAvant - PremierZero;
     // Chiffres : Valeur = 0,Chiffres x 10^(Exposant+1), arrondis à Decimales
-    const std::string Brut = std::format("{:.16e}", std::fabs(Valeur)); // d.dddddddddddddddde±xx
+    const std::string Brut = ReelEnTexte('e', 16, std::fabs(Valeur)); // d.dddddddddddddddde±xx
     std::string Chiffres = Brut.substr(0, 1) + Brut.substr(2, 16);
     int Exposant = std::stoi(Brut.substr(Brut.find('e') + 1));
     const int Garde = Exposant + 1 + Decimales;

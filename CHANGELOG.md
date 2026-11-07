@@ -4,12 +4,14 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
-## [6.0.17] — code C++ modernisé, lint bloquant
+## [6.0.18] — code C++ modernisé, lint bloquant
 
-Cette version ne change ni l'interface, ni la simulation des cartes livrées (golden master
-identique), ni le format des fichiers `.cvw` (0x530). Elle met tout le code C++ (moteur,
-interface, tests) aux bonnes pratiques actuelles, et rend le lint réellement bloquant : le
-code n'a plus à rester comparable ligne à ligne à celui de la version d'origine (`src/`).
+Cette version publie le travail de la 6.0.17, dont les installeurs ne se compilaient pas (le
+tag `v6.0.17` existe, sans release). Elle ne change ni l'interface, ni la simulation des cartes
+livrées (golden master identique), ni le format des fichiers `.cvw` (0x530). Elle met tout le
+code C++ (moteur, interface, tests) aux bonnes pratiques actuelles, et rend le lint réellement
+bloquant : le code n'a plus à rester comparable ligne à ligne à celui de la version d'origine
+(`src/`).
 
 ### Lint et mise en forme
 
@@ -40,8 +42,8 @@ code n'a plus à rester comparable ligne à ligne à celui de la version d'origi
   changer l'ordre d'évaluation.
 - **Initialisation** : variables et membres initialisés, valeurs par défaut dans la
   déclaration des classes ; classes qui possèdent des ressources non copiables.
-- `std::format` au lieu de `snprintf`, chaînes constantes `constexpr`, espaces de noms
-  anonymes, `const` et `[[nodiscard]]` là où ils s'appliquent.
+- Chaînes constantes `constexpr`, espaces de noms anonymes, `const` et `[[nodiscard]]` là où
+  ils s'appliquent ; nombres écrits sans `snprintf` (voir « Installeurs » ci-dessous).
 - **Calcul des distances** : un parcours (template) pour les distances simples et un pour
   les distances doubles, au lieu de cinq copies de la même récursion.
 
@@ -59,6 +61,19 @@ code n'a plus à rester comparable ligne à ligne à celui de la version d'origi
   sa case, le message donnait l'ordonnée d'un feu précédent.
 - **Indicateurs inutilisés** : six indicateurs de la fiche Paramètres, jamais relus, sont
   retirés.
+- **Installeurs** : le `.dmg` cible macOS 12 et l'AppImage se compile avec GCC 12 (Ubuntu
+  22.04). `std::format` n'y est pas disponible : la bibliothèque de macOS 12 n'a pas
+  `std::to_chars` pour les réels (macOS 13.3), GCC 12 n'a pas `<format>`. Les nombres du code
+  livré (`Format`, `FormatFloat`, `FormatDateTime`) sont écrits par `ChiffresDecimaux`,
+  `ChiffresHexadecimaux` et `ReelEnTexte` (`compat/chaine.h`), comme `printf` et dans la
+  locale « C » : identiques à `snprintf` sur 690 184 comparaisons, sous macOS et sous Linux.
+  Le lint refuse maintenant `<format>` et `std::to_chars` dans `engine/` et `app/` : les
+  installeurs ne sont compilés qu'au tag.
+
+## [6.0.17] — tag sans release
+
+Les installeurs de cette version ne se compilaient pas (`std::format`, voir la 6.0.18). Son
+contenu est publié avec la 6.0.18.
 
 ## [6.0.16] — textes entiers et fiches lisibles sous macOS
 
