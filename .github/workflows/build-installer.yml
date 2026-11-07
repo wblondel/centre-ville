@@ -147,16 +147,21 @@ jobs:
           $p = Start-Process -Wait -PassThru -FilePath $exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', "/DIR=$dossier", "/LOG=$env:RUNNER_TEMP\innosetup.log"
           if ($p.ExitCode -ne 0) { Get-Content "$env:RUNNER_TEMP\innosetup.log" -Tail 30; throw "installation d'Inno Setup : code $($p.ExitCode)" }
           $iscc = "$dossier\ISCC.exe"
-          $version = (Get-Item $iscc).VersionInfo.ProductVersion
-          "ISCC : $iscc, version $version"
-          if ($version -notmatch ('^' + [regex]::Escape($env:INNO_SETUP_VERSION) + '(\.0)?$')) { throw "ISCC $version au lieu de $env:INNO_SETUP_VERSION" }
+          if (-not (Test-Path $iscc)) { throw "$iscc absent" }
           "ISCC_EXE=$iscc" >> $env:GITHUB_ENV
 
+      # ISCC.exe n'a pas de numéro de version dans ses ressources : celle du
+      # moteur qui compile est lue dans ce qu'il affiche
       - name: Compile installer (ISCC)
         shell: pwsh
         run: |
-          & $env:ISCC_EXE "/DStaging=$PWD\build\installeur" inno-setup\inscv.iss
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $sortie = & $env:ISCC_EXE "/DStaging=$PWD\build\installeur" inno-setup\inscv.iss 2>&1 | ForEach-Object { "$_" }
+          $code = $LASTEXITCODE
+          $sortie
+          if ($code -ne 0) { exit $code }
+          $ligne = $sortie | Select-String '^Compiler engine version: Inno Setup ([0-9.]+)' | Select-Object -First 1
+          $moteur = if ($ligne) { $ligne.Matches[0].Groups[1].Value } else { '' }
+          if ($moteur -ne $env:INNO_SETUP_VERSION) { throw "moteur d'Inno Setup « $moteur » au lieu de $env:INNO_SETUP_VERSION" }
           Move-Item inno-setup\output\inscv.exe "Centre-Ville-$env:PAQUET-Windows-x64-Setup.exe"
 
       - name: Upload installer
