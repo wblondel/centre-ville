@@ -32,6 +32,10 @@ avant ou les renommer (au menu principal, rubrique Fichier | Enregistrer sous).
 ------------------------------------------------------------------------------
 4. MODIFICATIONS APPORTÉES DANS LES VERSIONS SUCCESSIVES
 ------------------------------------------------------------------------------
+[Version 6.0.19]
+ - Calcul des distances au démarrage d'une simulation deux fois plus rapide,
+   simulation inchangée.
+
 [Version 6.0.18]
  - Code modernisé, sans changement de la simulation ni de l'interface.
 

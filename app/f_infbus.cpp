@@ -128,11 +128,11 @@ void TfrmInfosBus::RafraichitInfos()
         LabelToursEntreArrets->Caption = IntToStr(NbTours = cv->TourCrt - Bus->TourArriveDrnArret);
         LabelParcoursEntreArrets->Caption = IntToStr(DejaParcouru = Bus->NbCasesParcouruesDepuisDrnArret);
         LabelDistance->Caption =
-            IntToStr(ResteAParcourir = v->DistArretBus[NumArretSvt - 1][NumDirdp[Bus->Dir][v->DirPoss]]);
+            IntToStr(ResteAParcourir = v->DistArretBus()[NumArretSvt - 1][NumDirdp[Bus->Dir][v->DirPoss]]);
         NbDirPoss = NbDir[DrnArret->DirPoss];
         for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
         {
-            DistMin = min(DistMin, DrnArret->DistArretBus[NumArretSvt - 1][i]);
+            DistMin = min(DistMin, DrnArret->DistArretBus()[NumArretSvt - 1][i]);
         }
         LabelDistanceMin->Caption = IntToStr(DistMin);
         // v1.8.4 : FormatFloat au lieu de Format

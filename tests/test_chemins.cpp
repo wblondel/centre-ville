@@ -83,35 +83,35 @@ std::string TablesDistances()
             Texte += std::format("{} {} :", x, y);
             for (int k = 0; k < V.NbDirDist; k++)
             {
-                for (int e = 0; e < V.NbParkingsDist; e++)
+                for (int e = 0; e < V.DistParking().size(); e++)
                 {
-                    Texte += std::format(" P{},{}", V.DistParking[e][k][0], V.DistParking[e][k][1]);
+                    Texte += std::format(" P{},{}", V.DistParking()[e][k][0], V.DistParking()[e][k][1]);
                 }
-                for (int e = 0; e < V.NbFilesParkDist; e++)
+                for (int e = 0; e < V.DistFilePark().size(); e++)
                 {
-                    Texte += std::format(" F{},{}", V.DistFilePark[e][k][0], V.DistFilePark[e][k][1]);
+                    Texte += std::format(" F{},{}", V.DistFilePark()[e][k][0], V.DistFilePark()[e][k][1]);
                 }
-                for (int e = 0; e < V.NbArretsBusDist; e++)
+                for (int e = 0; e < V.DistArretBus().size(); e++)
                 {
-                    Texte += std::format(" B{}", V.DistArretBus[e][k]);
+                    Texte += std::format(" B{}", V.DistArretBus()[e][k]);
                 }
-                for (int e = 0; e < V.NbFilesTaxiDist; e++)
+                for (int e = 0; e < V.DistFileTaxi().size(); e++)
                 {
-                    Texte += std::format(" T{}", V.DistFileTaxi[e][k]);
+                    Texte += std::format(" T{}", V.DistFileTaxi()[e][k]);
                 }
-                for (int e = 0; e < V.NbPlacesVehlibDist; e++)
+                for (int e = 0; e < V.DistPlaceVehlib().size(); e++)
                 {
-                    Texte += std::format(" V{}", V.DistPlaceVehlib[e][k]);
+                    Texte += std::format(" V{}", V.DistPlaceVehlib()[e][k]);
                 }
             }
             if (V.SensVoieTram > 0)
             {
                 const int nd = V.NbDirPossSensVoieTram(indefinie);
-                for (int e = 0; e < V.NbArretsTramDist; e++)
+                for (int e = 0; e < V.DistArretTram().size(); e++)
                 {
                     for (int k = 0; k < nd; k++)
                     {
-                        Texte += std::format(" R{}", V.DistArretTram[e][k]);
+                        Texte += std::format(" R{}", V.DistArretTram()[e][k]);
                     }
                 }
             }
@@ -514,3 +514,33 @@ TEST_CASE("Distances avec des cases « Tout droit » et des passages de bus ajou
     vue = nullptr;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+TEST_CASE("Cases voisines lues dans voie::IndiceVoisine : celles de centre_ville::Voisine", "[chemins][voisines]")
+{ // 6.0.19 : le calcul des distances lit les voisines dans IndiceVoisine, fixé par CreeZone, au lieu de les calculer
+  // sur le tore (Voisine). Toutes les cases, toutes les directions, à une et deux cases ; aussi après l'ouverture
+  // d'une carte d'autres dimensions (dx et dy suivent alors la nouvelle)
+    VueNulle Vue;
+    vue = &Vue;
+    for (const carte &c : Cartes)
+    {
+        INFO(c.Nom);
+        REQUIRE(harnais::Ouvre(CheminCarte(c)));
+        int NbDifferences = 0;
+        for (int x = 0; x < cv->NbX; x++)
+        {
+            for (int y = 0; y < cv->NbY; y++)
+            {
+                const voie &V = cv->v[x][y];
+                for (int d = indefinie; d <= ouest; d++)
+                {
+                    NbDifferences += static_cast<int>(&V.Voisine(d) != &cv->Voisine(x, y, d));
+                    NbDifferences += static_cast<int>(&V.Voisine(d).Voisine(d) != &cv->Voisine(x, y, 2, d));
+                    NbDifferences += static_cast<int>(V.v(static_cast<direction>(d)) != &cv->Voisine(x, y, d));
+                }
+            }
+        }
+        CHECK(NbDifferences == 0);
+        harnais::Ferme();
+    }
+    vue = nullptr;
+}

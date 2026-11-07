@@ -113,7 +113,7 @@ void TfrmInfosVehlib::RafraichitInfos()
         {
             for (i = 0; i < NbDir[v->DirPoss]; i++)
             {
-                MinDistPlace = std::min(v->DistPlaceVehlib[Vehlib->NumPlaceArrivee - 1][i], MinDistPlace);
+                MinDistPlace = std::min(v->DistPlaceVehlib()[Vehlib->NumPlaceArrivee - 1][i], MinDistPlace);
             }
             LabelDistancePlaceArrivee->Caption = IntToStr(MinDistPlace);
         }

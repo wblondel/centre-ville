@@ -210,6 +210,8 @@ l'audit des lectures hors tableau s'appuie sur les sanitizers (plus bas).
   `voie` retient les dimensions de l'allocation (hors du format `.cvw`), et
   `centre_ville::LibereDistances`, appelée dès que l'application voit le réseau
   modifié, évite aux fiches de relire ces tableaux avec les nouvelles dimensions.
+  Depuis la 6.0.19, les distances sont des tables de `centre_ville`
+  (`table_distances`, une par type d'élément), libérées d'un bloc.
 - **Erreurs d'écriture** : `voie::Sauve` contenait un `;` au lieu de `&&`,
   `centre_ville::Sauve` écrasait `Ok` par le résultat de `DepotBus.Sauve`, et
   surtout `FileWrite` renvoie -1 (vrai dans les chaînes de `&&`) en cas

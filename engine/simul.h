@@ -7,6 +7,8 @@
 // #pragma warn -pia // Inhibe "Possibly Incorrect Assignment" (v5.2) // portage : pragma C++Builder neutralisé
 //---------------------------------------------------------------------------
 #include <array>
+#include <cstddef>
+#include <span>
 #include <utility>
 #include <vector>
 #include "compat/chaine.h" // portage : remplace <dstring.h> (AnsiString, Format, IntToStr)
@@ -47,7 +49,7 @@ constexpr int DIST_INDEFINIE = 32767;
 // Filtre pour ne donner que la nature (sans les décors) dans la propriété Nature (poids fort) :
 // NatureSansDecor(), après la classe voie
 //---------------------------------------------------------------------------
-// 3ème index de voie::DistParking[][][]
+// Index de distance_double (voie::DistParking()[][][], voie::DistFilePark()[][][])
 constexpr int SANSPSGBUS = 0;
 constexpr int AVECPSGBUS = 1;
 //---------------------------------------------------------------------------
@@ -1182,6 +1184,64 @@ public:
     void Verifie(AnsiString &asMsgErr) const;
 };
 //---------------------------------------------------------------------------
+// Distances (en cases) aux éléments d'un type (parkings, arrêts de bus...), pour toutes les cases (6.0.19)
+//---------------------------------------------------------------------------
+// Une table par type, dans centre_ville. Pour chaque élément, les distances de toutes les cases se suivent, une par
+// direction possible, à partir de voie::IndiceDist (voie::IndiceDistTram pour les trams). Le calcul récursif, qui va
+// d'une case à sa voisine, lit ainsi des distances proches les unes des autres. En 6.0.17, chaque case avait un
+// std::vector par élément, et ses 8 std::vector (6 de distances, 2 de statistiques) occupaient 192 octets, contre 64
+// pour les pointeurs de la 6.0.16 (voie : 384 octets au lieu de 256) : avec la grille (voir grille), le calcul des
+// distances avait ralenti de 20 %. Avec ces tables, voie fait 248 octets (232 sans IndiceVoisine).
+template <class T> class table_distances
+{
+    std::vector<T> Valeurs;
+    std::size_t NbDirElement{}; // Directions possibles de toutes les cases, pour un élément
+    int NbElements{};
+
+public:
+    void Prepare(int NbElements0, int NbDirElement0, T Indefinie)
+    {
+        NbElements = NbElements0;
+        NbDirElement = static_cast<std::size_t>(NbDirElement0);
+        Valeurs.assign(static_cast<std::size_t>(NbElements) * NbDirElement, Indefinie);
+    }
+    void Libere()
+    {
+        Valeurs = std::vector<T>();
+        NbDirElement = 0;
+        NbElements = 0;
+    }
+    [[nodiscard]] bool empty() const { return Valeurs.empty(); }
+    [[nodiscard]] int size() const { return NbElements; }
+    // Distances de toutes les cases à l'élément e, à indicer par voie::IndiceDist (ou IndiceDistTram) + direction
+    [[nodiscard]] std::span<T> Element(int e)
+    {
+        return std::span<T>(Valeurs).subspan(static_cast<std::size_t>(e) * NbDirElement, NbDirElement);
+    }
+    [[nodiscard]] std::span<const T> Element(int e) const
+    {
+        return std::span<const T>(Valeurs).subspan(static_cast<std::size_t>(e) * NbDirElement, NbDirElement);
+    }
+};
+// Distances d'une case aux éléments d'un type, Dist[élément][direction] (voie::DistParking()...). Vide tant que la
+// case n'a pas de direction possible ou que le réseau n'a pas l'élément.
+template <class T> class distances_case
+{
+    table_distances<T> *Table;
+    int Indice, NbDir;
+
+public:
+    distances_case(table_distances<T> &Table0, int Indice0, int NbDir0) : Table(&Table0), Indice(Indice0), NbDir(NbDir0)
+    {}
+    [[nodiscard]] bool empty() const { return (NbDir == 0) || Table->empty(); }
+    [[nodiscard]] int size() const { return (NbDir == 0) ? 0 : Table->size(); } // Nombre d'éléments
+    [[nodiscard]] std::span<T> operator[](int e) const
+    {
+        return Table->Element(e).subspan(static_cast<std::size_t>(Indice), static_cast<std::size_t>(NbDir));
+    }
+};
+using distance_double = std::array<int, 2>; // [SANSPSGBUS, AVECPSGBUS]
+//---------------------------------------------------------------------------
 // Classes de GESTION GENERALE de la SIMULATION
 //---------------------------------------------------------------------------
 class voie
@@ -1203,6 +1263,13 @@ public:
     bool ToutDroit{};
     bool PassagePietons{}; // v2.0. Si PassagePieton, est perpendiculaire au sens de la route
     bool PassageBus{};     // v3.0. Si PassageBus, seuls les bus peuvent franchir la case (et véhicules prioritaires)
+    // 6.0.19 : place des distances de la case dans les tables de centre_ville (table_distances), et son nombre de
+    // directions possibles à la préparation. Lus avec DirPoss, ToutDroit et PassageBus par le calcul des distances :
+    // sur la même ligne de cache
+    int IndiceDist{}, NbDirDist{}, IndiceDistTram{}, NbDirDistTram{};
+    // 6.0.19 : place des cases voisines dans la grille, par direction (indefinie : la case elle-même), fixée par
+    // centre_ville::CreeZone (voir voie::Voisine)
+    std::array<int, NBDIR + 1> IndiceVoisine{};
     std::array<bool, NBMAXLIGNESBUSTRAM> LigneBus{};  // v3.0. Si Ligne[i] alors la ligne n°i+1 passe par cette case
                                                       // (visualisation par la fiche paramètres du réseau de bus
                                                       // UNIQUEMENT)
@@ -1230,26 +1297,12 @@ public:
     std::array<int, NBFEUXPARCASE> NumFeu{};  // >0 si feu éventuel (=index+1 de cv->Feu) (v5.2: NBFEUXPARCASE)
     std::array<int, NBFEUXPARCASE> NumFeuP{}; // v5.2. >0 si feu piéton éventuel (=index+1 de cv->FeuP)
     std::array<int, NBMAXPIETONSPARCASE> NumPieton{}; // v2.0. >0 si un piéton est sur la case. Max: 2 piétons/case.
-    // Distances (en cases) aux éléments, par élément puis par direction possible de la case. DistParking et
-    // DistFilePark ont deux valeurs par direction : sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS).
-    // Vides tant que la case n'a pas de direction possible ou que le réseau n'a pas l'élément.
-    using DistancesSimples = std::vector<std::vector<int>>;                // [élément][direction]
-    using DistancesDoubles = std::vector<std::vector<std::array<int, 2>>>; // [élément][direction][sans, avec]
-
-    DistancesDoubles DistParking;     // v3.5. Distances aux parkings
-    DistancesDoubles DistFilePark;    // v5.0. Distance jusqu'à la queue de la file de parkings
-    DistancesSimples DistArretBus;    // v3.0. Distance à un arrêt de bus
-    DistancesSimples DistArretTram;   // v3.5. Distance à un arrêt de tram (uniquement quand SensVoieTram>aucune_voie)
-    DistancesSimples DistFileTaxi;    // v3.6. Distance jusqu'à la queue de la file de taxis
-    DistancesSimples DistPlaceVehlib; // v5.3. Distance jusqu'à une place de vehlib (sans notion de priorité)
     // v2.2.7. Statistiques sur les passages de véhicules : Attente[ed][ea] et Trafic[ed][ea] avec
     // ed=ParkingDépart, ea=ParkingArrivée. Si ed=0, par ParkingArrivée (toute ParkingDépart confondue) ;
     // si ea=0, par ParkingDépart (toute ParkingArrivée confondue) ; si ed=ea=0, tous véhicules.
     std::vector<std::vector<int>> Attente, // v2.2.7. Nombre de tours pendant lesquels un véhicule est resté sur la case
         Trafic;                            // v2.2.7. Nombre de véhicules passés par la case
-    // v6.0.1 : dimensions des tableaux à leur allocation
-    int NbDirDist{}, NbParkingsDist{}, NbArretsBusDist{}, NbArretsTramDist{}, NbFilesTaxiDist{}, NbFilesParkDist{},
-        NbPlacesVehlibDist{}, NbParkingsAttente{};
+    int NbParkingsAttente{};               // v6.0.1 : dimension des tableaux à leur allocation
     voie();
     void Initialise();
     void Initialise(type_voie TypeVoie); // v3.5
@@ -1259,15 +1312,27 @@ public:
         y = y0;
         Initialise();
     }
-    [[nodiscard]] voie *v(direction d) const;                // v3.0
-    bool PrepareCalculDistances();                           // v3.0 : inclut également celui des arrêts de bus/tram
-    void LibereDistances();                                  // v6.0.1
-    bool PrepareCalculAttenteTrafic();                       // v2.2.7
-    void LibereAttenteTrafic();                              // v6.0.1
-    void CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib(); // v3.6 (changement de nom : +OuTaxi) v5.3 (changement de
-                                                             // nom : +OuVehlib)
-    void DeplaceVehiculeOuBusOuTramOuTaxi();                 // v3.6 (changement de nom : +OuTaxi)
-    bool PietonPeutAller(direction DirPieton);               // v2.0
+    [[nodiscard]] voie *v(direction d) const; // v3.0
+    // Case voisine dans la direction d (indefinie : la case elle-même), celle de centre_ville::Voisine(x, y, d). Lue
+    // dans IndiceVoisine, sans le calcul sur le tore de Voisine (deux divisions), que le compilateur refait après
+    // chaque écriture d'un entier (NbX, NbY, dx et dy en sont) : 40 % du calcul des distances (6.0.19). Sans dx ni
+    // dy, il déroule aussi la boucle des directions des parcours. Définie après centre_ville
+    [[nodiscard]] voie &Voisine(int d) const;
+    // Distances (en cases) de la case aux éléments, Dist[élément][direction possible] : tables de centre_ville
+    // (6.0.19 ; membres de voie jusqu'à la 6.0.18). DistParking et DistFilePark ont deux valeurs par direction :
+    // sans et avec les passages de bus (SANSPSGBUS, AVECPSGBUS). Définies après centre_ville
+    [[nodiscard]] distances_case<distance_double> DistParking() const;  // v3.5. Distances aux parkings
+    [[nodiscard]] distances_case<distance_double> DistFilePark() const; // v5.0. Jusqu'à la queue de la file de parkings
+    [[nodiscard]] distances_case<int> DistArretBus() const;             // v3.0. Distance à un arrêt de bus
+    [[nodiscard]] distances_case<int> DistArretTram() const;   // v3.5. Arrêt de tram (quand SensVoieTram>aucune_voie)
+    [[nodiscard]] distances_case<int> DistFileTaxi() const;    // v3.6. Jusqu'à la queue de la file de taxis
+    [[nodiscard]] distances_case<int> DistPlaceVehlib() const; // v5.3. Place de vehlib (sans notion de priorité)
+    bool PrepareCalculAttenteTrafic();                         // v2.2.7
+    void LibereAttenteTrafic();                                // v6.0.1
+    void CalculeProchainVehiculeOuBusOuTramOuTaxiOuVehlib();   // v3.6 (changement de nom : +OuTaxi) v5.3 (changement de
+                                                               // nom : +OuVehlib)
+    void DeplaceVehiculeOuBusOuTramOuTaxi();                   // v3.6 (changement de nom : +OuTaxi)
+    bool PietonPeutAller(direction DirPieton);                 // v2.0
     bool FaitDescendrePieton(direction DirDescente, int NumPietonAFaireDescendre); // v3.6 (taxis+DirDescente)
     bool AjoutePieton(int NumPietonAAjouter);                                      // v2.0
     bool RetirePieton(int NumPietonARetirer);                                      // v2.0
@@ -1306,13 +1371,12 @@ public:
     void RedessineCasesArretTram(direction d0); // v3.5
     [[nodiscard]] bool EstDepotBus() const;     // v3.0
 
-    // Distances à l'élément i, propagées depuis sa case. Le tableau de distances est un paramètre du template, et
-    // chaque instance accède directement à son membre (6.0.17 : deux parcours au lieu des cinq copies
-    // CalculeDistanceParking, ArretBus, FileTaxi, FilePark et PlaceVehlib ; définis et appelés dans simul.cpp)
-    template <DistancesSimples voie::*Distances> void CalculeDistance(int i, int Distance, direction DirOrig);
-    template <DistancesDoubles voie::*Distances>
-    void CalculeDistance(int i, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
-    void CalculeDistanceArretTram(int at, int Distance, direction DirOrig);                          // v3.5
+    // Distances à un élément, propagées depuis sa case. Dist : les distances de toutes les cases à cet élément
+    // (table_distances::Element). 6.0.17 : deux parcours au lieu des cinq copies CalculeDistanceParking, ArretBus,
+    // FileTaxi, FilePark et PlaceVehlib
+    void CalculeDistance(std::span<int> Dist, int Distance, direction DirOrig);
+    void CalculeDistance(std::span<distance_double> Dist, int DistSansPsgBus, int DistAvecPsgBus, direction DirOrig);
+    void CalculeDistanceArretTram(std::span<int> Dist, int Distance, direction DirOrig);             // v3.5
     void InitialiseInfosLignesBus();                                                                 // v3.0
     void ModifieSensVoieTram(direction DirOrig, direction DirDest);                                  // v3.5
     direction DirSensVoieTram(direction DirOrigine, int iDir);                                       // v3.5
@@ -1354,6 +1418,43 @@ public:
         NbPietonsGueris = NbPietonsInfectes = NbPietonsMorts = 0L; // v5.4.1 : stats épidémiques des piétons
     }
     void Definit();
+};
+//---------------------------------------------------------------------------
+// Grille des cases, v[x][y] : un seul tableau, colonne après colonne (6.0.19). Avec un std::vector par
+// colonne (6.0.17), chaque accès chargeait la colonne et multipliait x par sizeof(std::vector) : 7 % du
+// calcul des distances, qui ne fait presque qu'aller d'une case à sa voisine.
+class grille
+{
+    std::vector<voie> Cases;
+    std::size_t NbY{};
+
+public:
+    void Cree(int NbX, int NbY0) // NbX colonnes de NbY0 cases, non définies (voie::Definit)
+    {
+        NbY = static_cast<std::size_t>(NbY0);
+        Cases = std::vector<voie>(static_cast<std::size_t>(NbX) * NbY);
+    }
+    void clear()
+    {
+        Cases.clear();
+        NbY = 0;
+    }
+    [[nodiscard]] std::span<voie> operator[](int x)
+    {
+        return std::span<voie>(Cases).subspan(static_cast<std::size_t>(x) * NbY, NbY);
+    }
+    [[nodiscard]] std::span<const voie> operator[](int x) const
+    {
+        return std::span<const voie>(Cases).subspan(static_cast<std::size_t>(x) * NbY, NbY);
+    }
+    // Case (x, y) : comme v[x][y], en une seule multiplication par sizeof(voie) (centre_ville::Voisine)
+    [[nodiscard]] std::size_t Indice(int x, int y) const
+    {
+        return (static_cast<std::size_t>(x) * NbY) + static_cast<std::size_t>(y);
+    }
+    [[nodiscard]] voie &Case(int x, int y) { return Cases[Indice(x, y)]; }
+    [[nodiscard]] const voie &Case(int x, int y) const { return Cases[Indice(x, y)]; }
+    [[nodiscard]] voie &Case(int i) { return Cases[static_cast<std::size_t>(i)]; } // Case d'indice Indice(x, y)
 };
 //---------------------------------------------------------------------------
 class centre_ville
@@ -1448,7 +1549,11 @@ public:
     bool VerifOk{}, DistancesCalculees{}, QuadrillageStats{};
     type_stats TypeStats{par_pourcentage};
 
-    std::vector<std::vector<voie>> v; // v[x][y]. Dimensions modifiables (v4.0)
+    grille v; // v[x][y]. Dimensions modifiables (v4.0)
+    // Distances aux éléments, pour toutes les cases (6.0.19 : tables de distances, voir table_distances).
+    // Vides tant que PrepareCalculDistances n'a pas été appelée ou que le réseau n'a pas l'élément
+    table_distances<distance_double> DistancesParking, DistancesFilePark; // [SANSPSGBUS, AVECPSGBUS]
+    table_distances<int> DistancesArretBus, DistancesArretTram, DistancesFileTaxi, DistancesPlaceVehlib;
     // Case voisine dans la direction d, ou à n cases dans la direction d, sur le tore (macros V, _V, V_, _V_)
     [[nodiscard]] voie &Voisine(int x, int y, int d);
     [[nodiscard]] const voie &Voisine(int x, int y, int d) const;
@@ -1781,19 +1886,47 @@ extern centre_ville *cv;
 //---------------------------------------------------------------------------
 inline voie &centre_ville::Voisine(int x, int y, int d)
 {
-    return v[(x + dx[d]) % NbX][(y + dy[d]) % NbY];
+    return v.Case((x + dx[d]) % NbX, (y + dy[d]) % NbY);
 }
 inline const voie &centre_ville::Voisine(int x, int y, int d) const
 {
-    return v[(x + dx[d]) % NbX][(y + dy[d]) % NbY];
+    return v.Case((x + dx[d]) % NbX, (y + dy[d]) % NbY);
 }
 inline voie &centre_ville::Voisine(int x, int y, int n, int d)
 {
-    return v[(x + (n * dx[d])) % NbX][(y + (n * dy[d])) % NbY];
+    return v.Case((x + (n * dx[d])) % NbX, (y + (n * dy[d])) % NbY);
 }
 inline const voie &centre_ville::Voisine(int x, int y, int n, int d) const
 {
-    return v[(x + (n * dx[d])) % NbX][(y + (n * dy[d])) % NbY];
+    return v.Case((x + (n * dx[d])) % NbX, (y + (n * dy[d])) % NbY);
+}
+inline voie &voie::Voisine(int d) const
+{
+    return cv->v.Case(IndiceVoisine[d]);
+}
+inline distances_case<distance_double> voie::DistParking() const
+{
+    return {cv->DistancesParking, IndiceDist, NbDirDist};
+}
+inline distances_case<distance_double> voie::DistFilePark() const
+{
+    return {cv->DistancesFilePark, IndiceDist, NbDirDist};
+}
+inline distances_case<int> voie::DistArretBus() const
+{
+    return {cv->DistancesArretBus, IndiceDist, NbDirDist};
+}
+inline distances_case<int> voie::DistArretTram() const
+{
+    return {cv->DistancesArretTram, IndiceDistTram, NbDirDistTram};
+}
+inline distances_case<int> voie::DistFileTaxi() const
+{
+    return {cv->DistancesFileTaxi, IndiceDist, NbDirDist};
+}
+inline distances_case<int> voie::DistPlaceVehlib() const
+{
+    return {cv->DistancesPlaceVehlib, IndiceDist, NbDirDist};
 }
 //---------------------------------------------------------------------------
 extern void AppelleAuChaos();

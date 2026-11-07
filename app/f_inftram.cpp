@@ -127,11 +127,11 @@ void TfrmInfosTram::RafraichitInfos()
         LabelToursEntreArrets->Caption = IntToStr(NbTours = cv->TourCrt - Tram->TourArriveDrnArret);
         LabelParcoursEntreArrets->Caption = IntToStr(DejaParcouru = Tram->NbCasesParcouruesDepuisDrnArret);
         LabelDistance->Caption = IntToStr(
-            ResteAParcourir = v->DistArretTram[NumArretSvt - 1][v->NumDirPossSensVoieTram(indefinie, Tram->Dir)]);
+            ResteAParcourir = v->DistArretTram()[NumArretSvt - 1][v->NumDirPossSensVoieTram(indefinie, Tram->Dir)]);
         NbDirPoss = DrnArret->NbDirPossSensVoieTram(indefinie);
         for (i = 0, DistMin = DIST_INDEFINIE; i < NbDirPoss; i++)
         {
-            DistMin = min(DistMin, DrnArret->DistArretTram[NumArretSvt - 1][i]);
+            DistMin = min(DistMin, DrnArret->DistArretTram()[NumArretSvt - 1][i]);
         }
         LabelDistanceMin->Caption = IntToStr(DistMin);
         // v1.8.4 : FormatFloat au lieu de Format
