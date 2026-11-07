@@ -142,4 +142,13 @@ AnsiString Format(const AnsiString &asFormat, const std::vector<TVarRec> &Args);
 //---------------------------------------------------------------------------
 AnsiString IntToStr(long long Valeur); // couvre IntToStr(int) et IntToStr(__int64)
 //---------------------------------------------------------------------------
+// Nombres en texte pour le code livré, sans std::format ni std::to_chars des réels : indisponibles pour les
+// installeurs (macOS 12 du .dmg : to_chars des réels à partir de macOS 13.3 ; GCC 12 de l'AppImage : pas de
+// <format>). Les réels sont écrits dans la locale "C" : séparateur décimal '.'
+//---------------------------------------------------------------------------
+std::string ChiffresDecimaux(long long Valeur, int Largeur);              // printf("%0*lld")
+std::string ChiffresHexadecimaux(unsigned long long Valeur, int Largeur); // printf("%0*llX")
+// Type 'f', 'e', 'E' ou 'G' : printf("%.*Lf"), "%.*Le", "%.*LE" ou "%.*LG"
+std::string ReelEnTexte(char Type, int Precision, long double Valeur);
+//---------------------------------------------------------------------------
 #endif
