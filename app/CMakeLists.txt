@@ -1,8 +1,9 @@
 # Application Centre-Ville (Qt 6 Widgets) : exécutable cvw
 #
 # Phases 4 et 5 de PLAN_PORTAGE.md. Les fiches sont décrites par les .ui
-# générés par tools/dfm2ui.py (app/ui) ; app/vcl reproduit le sous-ensemble de
-# la VCL utilisé par le code des fiches.
+# (app/ui), générés jusqu'à la 6.0.20 par tools/dfm2ui.py depuis les .dfm
+# d'origine (tag v6.0.20) ; app/vcl reproduit le sous-ensemble de la VCL utilisé
+# par le code des fiches.
 
 # Qt 6.8.3 et antérieurs (FindWrapOpenGL) lient le framework AGL, retiré des
 # SDK récents de macOS : AGL reste dans /System/Library/Frameworks, où

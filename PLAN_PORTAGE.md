@@ -1,5 +1,8 @@
 # Plan de portage — Centre-Ville 5.4.3.2 vers une stack moderne
 
+> Plan suivi de la 6.0.0 à la 6.0.20. Depuis la 6.0.21, `src/` (code d'origine), `tools/dfm2ui.py` et
+> `tools/extrait_images.py` ne sont plus dans le dépôt : ils restent dans le tag `v6.0.20`.
+
 ## 0. Objectif et contraintes
 
 - **Logique intacte** : mêmes règles de simulation, mêmes paramètres, même format `.cvw` (lecture des anciennes versions, écriture en `0x530` octet pour octet).

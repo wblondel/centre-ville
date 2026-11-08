@@ -1,3 +1,4 @@
-# Fichiers générés (tools/dfm2ui.py, tools/extrait_images.py) : mis en forme par leur générateur
+# Générés jusqu'à la 6.0.20 par tools/dfm2ui.py et tools/extrait_images.py (tag v6.0.20) : gardés dans la
+# forme de leur générateur
 app/ui/*
 app/ressources/index_images.h

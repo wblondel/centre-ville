@@ -29,7 +29,7 @@ name: CI
 # (tools/lint_cpp.py) et le moindre écart de mise en forme (tools/format_cpp.py) font échouer la CI.
 
 on:
-  # Chaque semaine : voir les dérives des outils et des images sans attendre une PR
+  # Chaque semaine : voir les dérives des outils et des dépendances sans attendre une PR
   schedule:
     - cron: '17 3 * * 1'
   push:
@@ -73,7 +73,7 @@ jobs:
           fi
           fichiers=$(git diff --name-only HEAD^1 HEAD)
           echo "$fichiers"
-          if grep -qE '^(app|engine|tests|maps|tools|src|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^\.clang-format(-ignore)?$|^ruff\.toml$|^\.github/workflows/ci\.yml$|^\.github/actions/' <<< "$fichiers"; then
+          if grep -qE '^(app|engine|tests|maps|tools|docs|res)/|^CMakeLists\.txt$|^CMakePresets\.json$|^\.clang-tidy$|^\.clang-format(-ignore)?$|^ruff\.toml$|^\.github/workflows/ci\.yml$|^\.github/actions/' <<< "$fichiers"; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
             echo "code=false" >> "$GITHUB_OUTPUT"
@@ -139,36 +139,6 @@ jobs:
           path: build/ci/tests/sortie/captures
           if-no-files-found: ignore
           retention-days: 14
-
-  fiches:
-    name: Fiches .ui générées à jour
-    needs: changements
-    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Check tools/dfm2ui.py output
-        run: python3 tools/dfm2ui.py --verifie
-
-  images:
-    name: Images extraites des .dfm à jour
-    needs: changements
-    if: ${{ !cancelled() && needs.changements.outputs.code != 'false' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Check tools/extrait_images.py output
-        run: python3 tools/extrait_images.py --verifie
 
   sanitizers:
     name: ASan et UBSan (${{ matrix.os }})
@@ -314,11 +284,6 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      # La compilation et les tests ne lisent pas src/ (code d'origine) : seuls les jobs
-      # « fiches » et « images » en ont besoin. Le mettre de côté vérifie que rien d'autre ne le lit
-      - name: Set src/ aside
-        run: mv src "$RUNNER_TEMP/src-origine"
 
       - name: Prepare Qt, Ninja and Clang
         uses: ./.github/actions/prepare-qt

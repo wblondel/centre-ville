@@ -2,7 +2,7 @@
 """Met en forme le C++ du projet avec clang-format (.clang-format), ou vérifie qu'il l'est.
 
 Fichiers : les .cpp et .h suivis par git dans engine/, app/ et tests/, sauf ceux que
-.clang-format-ignore écarte (fichiers générés par tools/dfm2ui.py et tools/extrait_images.py).
+.clang-format-ignore écarte (générés jusqu'à la 6.0.20 par tools/dfm2ui.py et tools/extrait_images.py).
 La version de clang-format est celle de tools/lint/requirements.txt.
 
     python3 tools/format_cpp.py              # met en forme

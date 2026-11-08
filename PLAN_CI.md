@@ -58,7 +58,7 @@ Pas de `ccache` pour l'instant : la compilation prend 2 min sous Linux, et ce so
 - [x] **Lint requis** : les 8 checks exigés comprennent les deux jobs de lint, pour que la fusion automatique ne puisse plus passer outre.
 - [x] **Réglages du dépôt** : branches supprimées après fusion, merge commit seul autorisé.
 - [x] **`SECURITY.md`** et signalement privé des failles activé.
-- [x] **Couverture chaque semaine**, en artefact et sans seuil : un pourcentage imposé pousserait à tester les boutons d'aide. Depuis la 6.0.15, ce job met `src/` de côté : la compilation et les tests ne doivent pas le lire.
+- [x] **Couverture chaque semaine**, en artefact et sans seuil : un pourcentage imposé pousserait à tester les boutons d'aide. De la 6.0.15 à la 6.0.20, ce job mettait `src/` de côté pour vérifier que la compilation et les tests ne le lisaient pas ; `src/` est retiré du dépôt depuis la 6.0.21.
 
 ## Écarté volontairement
 

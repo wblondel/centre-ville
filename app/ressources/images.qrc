@@ -1,5 +1,5 @@
 <!DOCTYPE RCC>
-<!-- GÉNÉRÉ par tools/extrait_images.py : ne pas modifier -->
+<!-- Source du portage depuis la 6.0.21 ; généré jusqu'à la 6.0.20 par tools/extrait_images.py (tag v6.0.20) -->
 <RCC version="1.0">
   <qresource prefix="/">
     <file>images/f_carfours/SpeedButton34b1.png</file>

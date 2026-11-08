@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
-// f_afdistpv_composants.h - GÉNÉRÉ par tools/dfm2ui.py depuis src/f_afdistpv.dfm : ne pas modifier
+// f_afdistpv_composants.h - source du portage depuis la 6.0.21 ; généré jusqu'à la 6.0.20 par
+// tools/dfm2ui.py depuis src/f_afdistpv.dfm (tag v6.0.20)
 //
 // COMPOSANTS_frmAffDistPlacesVehlib(X) : X(classe VCL, nom) pour chaque composant de la fiche,
 // dans l'ordre du .dfm (membres à lier aux objets créés par uic).

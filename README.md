@@ -38,7 +38,7 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 ├── app/                          # Application Qt 6 (cvw) : les 33 fiches portées, couche VCL (app/vcl)
 ├── engine/                       # Moteur de simulation (C++20, sans Qt)
 ├── tests/                        # Tests du moteur (golden master) et de l'interface
-├── tools/                        # Conversion des .dfm (dfm2ui.py), extraction des images et icônes, audit des bornes (audit_bornes.py)
+├── tools/                        # Lint et mise en forme, extraction des icônes, audit des bornes (audit_bornes.py)
 ├── docs/                         # Documentation en ligne (Guide & Tutoriels)
 │   ├── index.html                # Portail d'accueil moderne
 │   ├── guide/                    # Manuel complet d'utilisation (HTML), aide F1 de l'application
@@ -47,7 +47,6 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 ├── inno-setup/                   # Script d'installation Inno Setup (inscv.iss)
 ├── maps/                         # Cartes de simulation d'exemple (*.cvw)
 ├── res/                          # Icônes et bitmaps graphiques haute résolution
-├── src/                          # Code VCL d'origine (C++Builder), en lecture seule : voir plus bas
 ├── CHANGELOG.md                  # Journal des versions (notes des releases), bogues d'origine conservés
 ├── CMakeLists.txt                # Projet CMake (numéro de version)
 ├── CMakePresets.json
@@ -132,15 +131,14 @@ Le moindre constat de `clang-tidy` fait échouer le lint : les règles sont dans
 5. Chaque release joint `SHA256SUMS` et une attestation de provenance : `gh attestation verify <paquet> --repo wblondel/centre-ville`.
 6. Ce qu'une machine ne couvre pas reste à faire à la main si besoin : [`docs/RECETTE.md`](docs/RECETTE.md).
 
-### 6. Code d'origine (`src/`)
-`src/` contient le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4). Il est en **lecture seule** : on ne le modifie pas, mais il sert encore de source au portage :
-* `tools/dfm2ui.py` produit les fiches Qt (`app/ui/*.ui`) depuis ses `.dfm` ;
-* `tools/extrait_images.py` en extrait les images (`app/ressources`) ;
-* deux contrôles de la CI (`ci.yml`) vérifient que les fiches `.ui` et les images extraites sont à jour.
+### 6. Code d'origine (tag `v6.0.20`)
+Le code VCL d'origine de la version 5.4.3.2 (C++Builder ; `src/cvw.cbproj` s'ouvre dans RAD Studio 10.3 / 10.4) a été retiré du dépôt en 6.0.21. Il reste dans le tag `v6.0.20`, la dernière version qui le contient, avec les deux outils qui en tiraient le portage : `tools/dfm2ui.py` (fiches `app/ui/*.ui` depuis les `.dfm`) et `tools/extrait_images.py` (images de `app/ressources`). Depuis la 6.0.21, les fiches `.ui` et les images sont les sources du portage.
 
-Rien d'autre ne le lit : la compilation, les tests et les installeurs s'en passent (l'archive des sources le contient, comme le reste du dépôt). Depuis la 6.0.15, le job hebdomadaire « Couverture des tests » met `src/` de côté avant de tout compiler et de lancer tous les tests. Pour retirer `src/`, il faudrait faire des fiches `.ui` et des images extraites les sources du port, ne garder les deux outils que pour comparer avec l'original, retirer les deux contrôles du ruleset `main : CI obligatoire`, et poser un tag sur la dernière version qui contient `src/`.
+```bash
+git worktree add --detach ../centre-ville-origine v6.0.20   # src/ et les deux outils
+```
 
-Le port garde les noms de fichiers et de fonctions de `src/`. Jusqu'à la 6.0.16, il en restait une copie ligne à ligne (`git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` dans le tag `v6.0.16`) ; depuis la 6.0.17, le code est modernisé (bibliothèque standard, `clang-tidy` et `clang-format`), et la logique reste vérifiée par le golden master.
+Les commentaires du code qui citent `src/…` désignent ce code d'origine. Le port garde ses noms de fichiers et de fonctions. Jusqu'à la 6.0.16, il en restait une copie ligne à ligne (`git diff --no-index --word-diff src/f_simul.cpp app/f_simul.cpp` dans le tag `v6.0.16`) ; depuis la 6.0.17, le code est modernisé (bibliothèque standard, `clang-tidy` et `clang-format`), et la logique reste vérifiée par le golden master. La liste de travail de l'auteur d'origine (`src/A_FAIRE.txt`, problèmes connus et idées de la 5.x) est dans le même tag.
 
 ---
 
@@ -162,7 +160,7 @@ Les écarts avec l'original et les bogues d'origine corrigés (moteur en 6.0.1, 
 
 ## 🗺️ Feuille de Route & Modernisation
 
-Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de [`src/simul.cpp`](src/simul.cpp)) est découplé de l'interface ; l'interface est portée sur Qt 6 ([`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)).
+Le cœur de simulation ([`engine/simul.cpp`](engine/simul.cpp), port de `src/simul.cpp`, tag `v6.0.20`) est découplé de l'interface ; l'interface est portée sur Qt 6 ([`PLAN_PORTAGE.md`](PLAN_PORTAGE.md)).
 
 * [x] Découplage complet du moteur de simulation de la couche VCL.
 * [x] Portage vers un framework multiplateforme moderne (**Qt 6** avec CMake).

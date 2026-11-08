@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <comment>GÉNÉRÉ par tools/dfm2ui.py depuis src/f_defn.dfm : ne pas modifier à la main avant la fin du portage de la fiche</comment>
+ <comment>Source du portage depuis la 6.0.21 ; générée jusqu'à la 6.0.20 par tools/dfm2ui.py depuis src/f_defn.dfm (tag v6.0.20)</comment>
  <class>frmDefNature</class>
  <widget class="QDialog" name="frmDefNature">
   <property name="geometry">

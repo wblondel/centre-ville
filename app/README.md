@@ -31,7 +31,8 @@ git diff --no-index --word-diff src/f_prmsim.cpp app/f_prmsim.cpp
 ```
 
 Depuis la 6.0.17, les fiches sont modernisées comme le moteur (`engine/README.md`) : la
-comparaison ligne à ligne avec `src/` se fait dans le tag `v6.0.16`.
+comparaison ligne à ligne avec `src/` se fait dans le tag `v6.0.16`. `src/` est
+retiré du dépôt depuis la 6.0.21 : le code d'origine reste dans le tag `v6.0.20`.
 
 ## Construction et lancement
 
@@ -141,8 +142,8 @@ signature ni notarisation.
 | `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide (`stRepAide`, page de redirection pour l'ancre) ; `min`/`max`. |
 | `grille/GrilleSimulation.*` | Remplace le `TDrawGrid` : voir l'en-tête pour le comportement reproduit. |
 | `vcl/` | Sous-ensemble de la VCL au-dessus de Qt, pour garder le code des fiches tel quel. |
-| `ui/` | GÉNÉRÉ par `tools/dfm2ui.py` : `.ui` des 33 fiches et `<fiche>_composants.h`. |
-| `ressources/` | GÉNÉRÉ par `tools/extrait_images.py` : images des `.dfm` et index des `TVirtualImageList` ; `ressources/icones` : GÉNÉRÉ par `tools/extrait_icones.py`. |
+| `ui/` | `.ui` des 33 fiches et `<fiche>_composants.h` : générés jusqu'à la 6.0.20 par `tools/dfm2ui.py` depuis les `.dfm` de `src/` (tag `v6.0.20`), sources du portage depuis la 6.0.21. |
+| `ressources/` | Images des `.dfm` et index des `TVirtualImageList` : générés jusqu'à la 6.0.20 par `tools/extrait_images.py` (tag `v6.0.20`), sources depuis la 6.0.21 ; `ressources/icones` : GÉNÉRÉ par `tools/extrait_icones.py`. |
 | `Info.plist.in`, `icones_macos.cmake`, `cvw.rc.in`, `linux/` | Paquet macOS (type `.cvw`, icônes), ressources Windows (icônes, version), entrée de bureau et type MIME Linux. |
 
 ### Couche `vcl/`
@@ -706,7 +707,7 @@ Visuel :
   `Height=26+21*RowCount` donne une grille de `RowCount` lignes entières,
   comme avec le cadre que suppose le code d'origine. L'auteur prévoyait de
   revoir ce calcul, pour déduire la taille de la fiche de celle de la grille
-  (`src/A_FAIRE.txt`).
+  (`src/A_FAIRE.txt`, tag `v6.0.20`).
 - **Onglets** (`TTabControl` de Statistiques véhicules) : style du système,
   police de la fiche comme dans la VCL (depuis la 6.0.16 : Qt donnait la
   police du système, plus grande sous macOS, et les deux libellés étaient
