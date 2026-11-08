@@ -26,7 +26,7 @@ Installation neuve (machine sans Centre-Ville) :
 - [ ] SmartScreen : « Informations complémentaires », puis « Exécuter quand même ».
 - [ ] L'assistant est en français ; licence et lisez-moi (avec l'entrée [Version 6.0.0]) s'affichent.
 - [ ] Installation dans `C:\Program Files\Patquoi.fr\Centre-Ville` : `bin\cvw.exe`, `bin\html`, `bin\tutocv`, `plugins`, `translations`.
-- [ ] Cartes d'exemple dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville` (6 fichiers `.cvw`).
+- [ ] Cartes d'exemple dans `C:\Program Files\Patquoi.fr\Centre-Ville\cartes`, puis, après le premier lancement, dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville` (6 fichiers `.cvw`), pour l'utilisateur qui lance Centre-Ville et non pour celui qui a fourni le mot de passe administrateur.
 - [ ] Menu Démarrer › Patquoi.fr › Centre-Ville : application, Aide, Lisez-moi, Sources, Désinstaller.
 - [ ] « Ouvrir Centre-Ville ! » en fin d'installation : écran « À propos » animé (« 6,0 » « ,0 », « version 64 bits »), puis fenêtre principale.
 - [ ] Panneau « Applications installées » : Centre-Ville 6.0.0.
@@ -35,7 +35,7 @@ Mise à jour d'une 5.4.3.2 (installeur d'origine de patquoi.fr, 64 ou 32 bits) :
 
 - [ ] L'installeur 6.0.0 reconnaît l'installation existante (même dossier proposé) et la met à jour.
 - [ ] Une seule entrée « Centre-Ville » dans les applications installées, en 6.0.0.
-- [ ] Cartes d'exemple de `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville` réécrites, comme avec l'installeur d'origine (le lisez-moi conseille de renommer les exemples modifiés) ; les autres fichiers de l'utilisateur sont gardés.
+- [ ] Cartes d'exemple de `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville` gardées telles quelles, et les manquantes copiées au premier lancement (6.0.21 ; l'installeur d'origine et ceux de la 6.0.0 à la 6.0.20 les réécrivaient) ; les autres fichiers de l'utilisateur sont gardés.
 - [ ] `cvw.32.exe` éventuel : plus utilisé ; l'association `.cvw` pointe vers `bin\cvw.exe`.
 
 Utilisation :

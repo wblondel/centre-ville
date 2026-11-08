@@ -4070,11 +4070,11 @@ void TestInterface::carrefoursTableDesFeuxAgrandie()
     };
     const auto Feux = [](int xd, int yd, int l, int h) {
         QSet<int> n;
-        for (int x = xd; x < xd + l; x++)
+        for (int i = 0; i < l; i++)
         {
-            for (int y = yd; y < yd + h; y++)
+            for (int j = 0; j < h; j++)
             {
-                for (const int d : cv->v[x][y].NumFeu)
+                for (const int d : cv->v[xd + i][yd + j].NumFeu)
                 {
                     if (d)
                     {

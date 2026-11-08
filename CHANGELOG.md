@@ -4,6 +4,40 @@ La section de chaque version sert de notes à sa release GitHub
 (`.github/workflows/build-installer.yml` la reprend jusqu'à la section
 suivante, pour la version et ses pré-releases).
 
+## [6.0.21] — cartes d'exemple de Windows au premier lancement, code d'origine retiré
+
+Cette version ne change ni la simulation des cartes livrées (golden master identique), ni le
+format des fichiers `.cvw` (0x530).
+
+### Windows
+
+- **Cartes d'exemple copiées au premier lancement** : l'installeur, exécuté en administrateur,
+  les copiait dans le `%LOCALAPPDATA%` du compte qui l'exécute. Quand un utilisateur standard
+  installe avec le mot de passe d'un administrateur, c'était celui de l'administrateur, et
+  l'utilisateur n'avait pas les exemples (avertissement `UsedUserAreasWarning` d'Inno Setup).
+  Elles sont maintenant installées dans le dossier du programme (`cartes`), et Centre-Ville
+  les copie au premier lancement de chaque utilisateur dans
+  `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`, comme sous macOS : rien n'est écrasé, et une
+  carte supprimée ensuite n'est pas recopiée.
+- **Mise à jour** : les cartes d'exemple de l'utilisateur sont gardées telles quelles, au lieu
+  d'être réécrites par l'installeur ; seules les manquantes sont copiées.
+
+### Dépôt
+
+- **Code d'origine retiré** : `src/` (5.4.3.2, C++Builder), avec `tools/dfm2ui.py` et
+  `tools/extrait_images.py` qui en tiraient les fiches et les images, reste dans le tag
+  `v6.0.20` (`git worktree add --detach ../centre-ville-origine v6.0.20`). Les fiches `.ui` et
+  les images sont les sources du portage. Les contrôles « Fiches .ui générées à jour » et
+  « Images extraites des .dfm à jour » sont retirés de la CI, et les archives des sources de
+  la release ne contiennent plus `src/`.
+
+### Tests
+
+- **Alerte CodeQL** (`cpp/signed-overflow-check`) : une boucle du test d'interface, dont la
+  borne s'écrivait comme une somme, parcourt les cases par leurs décalages.
+- **Recette Windows** : Centre-Ville est lancé une première fois après l'installation ; les
+  cartes doivent être dans le dossier du programme puis dans `%LOCALAPPDATA%`.
+
 ## [6.0.20] — installeur Windows compilé par Inno Setup 7.1.1
 
 Cette version ne change ni l'application, ni la simulation des cartes livrées (golden master

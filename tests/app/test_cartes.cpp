@@ -4,8 +4,7 @@
 // app/linux/apprun-hooks/centre-ville-cartes.sh, lu par l'AppRun de
 // l'AppImage avant cvw, copie au premier lancement les cartes de
 // usr/share/centre-ville/cartes dans le dossier des fichiers de Centre-Ville,
-// sans écraser un fichier existant (comme l'installeur Windows dans
-// %LOCALAPPDATA%\Patquoi.fr\Centre-Ville). Le script est lancé comme par
+// sans écraser un fichier existant. Le script est lancé comme par
 // l'AppRun (sh, set -e), sur une AppDir et un XDG_DATA_HOME temporaires :
 //   - premier lancement : les cartes de maps/ copiées, une carte déjà
 //     présente gardée telle quelle ;
@@ -17,7 +16,9 @@
 // Sous macOS, cvw fait de même au lancement (CopieCartesExemple de base.cpp,
 // main.cpp), depuis ses ressources Qt, car le dossier Cartes du .dmg est en
 // lecture seule : la fonction, puis le paquet compilé lancé pour de vrai
-// avec un dossier personnel temporaire (CFFIXED_USER_HOME).
+// avec un dossier personnel temporaire (CFFIXED_USER_HOME). Sous Windows
+// (6.0.21), depuis {app}\cartes, où l'installeur les met : vérifié par la
+// recette Windows (.github/workflows/recette-windows.yml), sur l'installeur.
 //---------------------------------------------------------------------------
 #include <QDir>
 #include <QFile>

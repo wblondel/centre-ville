@@ -8,8 +8,9 @@ name: Recette Windows
 # même AppId), et mise à jour de la release publiée précédente (6.0.20 : un
 # installeur d'Inno Setup 7 met à jour une installation d'Inno Setup 6) ; dans
 # les trois cas :
-#   - installation silencieuse : fichiers, cartes d'exemple dans
-#     %LOCALAPPDATA%\Patquoi.fr\Centre-Ville, menu Démarrer, entrée des
+#   - installation silencieuse : fichiers, cartes d'exemple dans {app}\cartes,
+#     copiées au premier lancement dans %LOCALAPPDATA%\Patquoi.fr\Centre-Ville
+#     (6.0.21 ; avant, par l'installeur), menu Démarrer, entrée des
 #     applications installées (version, une seule entrée), association des
 #     .cvw et icônes ;
 #   - ouverture d'un .cvw comme par un double-clic dans l'Explorateur : la
@@ -185,6 +186,25 @@ jobs:
           . "$env:RUNNER_TEMP\outils.ps1"
           Installe $env:SETUP installation.log
 
+      # 6.0.21 : cartes d'exemple copiées par cvw.exe au premier lancement, de
+      # {app}\cartes vers %LOCALAPPDATA%, et non plus par l'installeur (une
+      # release antérieure, essayée à la main ou au push, les installe encore)
+      - name: First launch (example maps copied)
+        run: |
+          $version = [version](Get-Item "$env:APP\bin\cvw.exe").VersionInfo.FileVersion
+          $auLancement = $version -ge [version]'6.0.21'
+          "CARTES_AU_LANCEMENT=$auLancement" >> $env:GITHUB_ENV
+          if (-not $auLancement) { "cvw.exe $version : cartes copiées par l'installeur, pas de premier lancement"; exit 0 }
+          $marque = "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\.cartes-copiees"
+          if (Test-Path $marque) { throw '.cartes-copiees présent avant le premier lancement' }
+          $p = Start-Process -PassThru "$env:APP\bin\cvw.exe"
+          for ($i = 0; ($i -lt 60) -and -not (Test-Path $marque); $i++) { Start-Sleep -Seconds 1 }
+          Start-Sleep -Seconds 2
+          Stop-Process $p -Force -ErrorAction SilentlyContinue
+          Start-Sleep -Seconds 1
+          if (-not (Test-Path $marque)) { throw 'premier lancement : cartes d''exemple non copiées (.cartes-copiees absent)' }
+          "Premier lancement : $((Get-ChildItem "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville" -Force).Name -join ', ')"
+
       - name: Check installed files, maps, shortcuts and registry
         run: |
           . "$env:RUNNER_TEMP\outils.ps1"
@@ -196,9 +216,14 @@ jobs:
           }
           $version = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
           "cvw.exe : FileVersion $($version.FileVersion), ProductVersion $($version.ProductVersion)"
+          if ($env:CARTES_AU_LANCEMENT -eq 'True') {
+            $installees = Get-ChildItem "$env:APP\cartes\*.cvw"
+            "Cartes installées : $($installees.Name -join ', ')"
+            if ($installees.Count -ne 6) { $erreurs += "$($installees.Count) cartes installées au lieu de 6" }
+          }
           $cartes = Get-ChildItem "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\*.cvw"
-          "Cartes d'exemple : $($cartes.Name -join ', ')"
-          if ($cartes.Count -ne 6) { $erreurs += "$($cartes.Count) cartes au lieu de 6" }
+          "Cartes d'exemple de l'utilisateur : $($cartes.Name -join ', ')"
+          if ($cartes.Count -ne 6) { $erreurs += "$($cartes.Count) cartes de l'utilisateur au lieu de 6" }
           $menu = "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Patquoi.fr\Centre-Ville"
           "Menu Démarrer : $((Get-ChildItem $menu).Name -join ', ')"
           if (-not (Test-Path "$menu\Centre-Ville.lnk")) { $erreurs += 'raccourci Centre-Ville absent' }
@@ -298,7 +323,7 @@ jobs:
 
       - name: Uninstall (silent)
         run: |
-          # Une carte de l'utilisateur, à garder ; les cartes installées sont retirées comme par l'original
+          # Une carte de l'utilisateur, à garder ; {app}\cartes part avec le programme
           Copy-Item "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Démo.cvw" "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\Ma carte.cvw"
           $p = Start-Process -Wait -PassThru -FilePath "$env:APP\unins000.exe" -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/LOG=$PWD\desinstallation.log"
           "Désinstallation : code $($p.ExitCode)"

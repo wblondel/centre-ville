@@ -1,8 +1,9 @@
 # Application Centre-Ville (Qt 6 Widgets) : exécutable cvw
 #
 # Phases 4 et 5 de PLAN_PORTAGE.md. Les fiches sont décrites par les .ui
-# générés par tools/dfm2ui.py (app/ui) ; app/vcl reproduit le sous-ensemble de
-# la VCL utilisé par le code des fiches.
+# (app/ui), générés jusqu'à la 6.0.20 par tools/dfm2ui.py depuis les .dfm
+# d'origine (tag v6.0.20) ; app/vcl reproduit le sous-ensemble de la VCL utilisé
+# par le code des fiches.
 
 # Qt 6.8.3 et antérieurs (FindWrapOpenGL) lient le framework AGL, retiré des
 # SDK récents de macOS : AGL reste dans /System/Library/Frameworks, où
@@ -202,8 +203,8 @@ add_dependencies(cvw cvw_aide)
 
 # Installation (phase 8) : cmake --install <build> --prefix <dossier>
 #   Windows : bin/cvw.exe, DLL de Qt et de MSVC, bin/qt.conf, plugins/ et
-#             translations/ (windeployqt), bin/html, bin/tutocv : contenu de
-#             l'installeur (inno-setup/inscv.iss) ;
+#             translations/ (windeployqt), bin/html, bin/tutocv, cartes d'exemple
+#             (cartes/) : contenu de l'installeur (inno-setup/inscv.iss) ;
 #   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
 #   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
 #             fichiers .cvw, icônes, cartes d'exemple (share/centre-ville/cartes) ;
@@ -218,6 +219,12 @@ else()
 endif()
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/guide/ DESTINATION ${CV_INSTALL_AIDE}/html)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/tutorial/ DESTINATION ${CV_INSTALL_AIDE}/tutocv)
+
+# Cartes d'exemple de Windows dans {app}\cartes, copiées au premier lancement de
+# chaque utilisateur dans le dossier de stRepLocalAppData (main.cpp)
+if(WIN32)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/maps/ DESTINATION cartes FILES_MATCHING PATTERN "*.cvw")
+endif()
 
 if(UNIX AND NOT APPLE)
   install(FILES linux/fr.patquoi.CentreVille.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)

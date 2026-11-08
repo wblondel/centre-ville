@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
-// index_images.h - GÉNÉRÉ par tools/extrait_images.py : ne pas modifier
+// index_images.h - source du portage depuis la 6.0.21 ; généré jusqu'à la 6.0.20 par
+// tools/extrait_images.py depuis les .dfm de src/ (tag v6.0.20)
 //
 // Indices des TVirtualImageList de f_simul.dfm -> images des ressources Qt.
 // Les constantes IDB_* de f_simul.cpp s'appliquent telles quelles à

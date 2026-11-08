@@ -4,8 +4,11 @@
 ; Portage Qt 6 (phase 8 de PLAN_PORTAGE.md) : l'installeur reprend le contenu
 ; de « cmake --install <build> --prefix <Staging> » : bin\cvw.exe (64 bits),
 ; DLL de Qt et de MSVC, bin\qt.conf, plugins\ et translations\ (windeployqt),
-; aide bin\html et bin\tutocv. Qt 6 n'existant pas en 32 bits, cvw.32.exe est
-; abandonné : Windows 10/11 x64, ou ARM64 avec l'émulation x64. Le numéro de
+; aide bin\html et bin\tutocv, cartes d'exemple cartes\ (6.0.21 : copiées par
+; cvw.exe au premier lancement de chaque utilisateur dans %LOCALAPPDATA%, et non
+; plus par l'installeur, qui les mettait chez l'administrateur). Qt 6
+; n'existant pas en 32 bits, cvw.32.exe est abandonné : Windows 10/11 x64, ou
+; ARM64 avec l'émulation x64. Le numéro de
 ; version est lu dans les ressources de cvw.exe (FileVersion : project(VERSION)
 ; de CMakeLists.txt). Même AppId que l'installeur d'origine : il le met à jour.
 ;
@@ -91,9 +94,8 @@ Source: "..\docs\licence.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}"; DestName: "license.txt"; Flags: ignoreversion
 Source: "..\docs\lisezmoi.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Uninstall.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\maps\*.cvw"; DestDir: "{localappdata}\Patquoi.fr\Centre-Ville"; Flags: ignoreversion
 #if FileExists(SourcesZip)
 Source: "{#SourcesZip}"; DestDir: "{app}"; Flags: ignoreversion
 #endif
-; portage : bin\cvw.exe et ses DLL, bin\html, bin\tutocv, plugins\, translations\
+; portage : bin\cvw.exe et ses DLL, bin\html, bin\tutocv, plugins\, translations\, cartes\
 Source: "{#Staging}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

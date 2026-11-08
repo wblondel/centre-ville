@@ -31,7 +31,8 @@ git diff --no-index --word-diff src/f_prmsim.cpp app/f_prmsim.cpp
 ```
 
 Depuis la 6.0.17, les fiches sont modernisées comme le moteur (`engine/README.md`) : la
-comparaison ligne à ligne avec `src/` se fait dans le tag `v6.0.16`.
+comparaison ligne à ligne avec `src/` se fait dans le tag `v6.0.16`. `src/` est
+retiré du dépôt depuis la 6.0.21 : le code d'origine reste dans le tag `v6.0.20`.
 
 ## Construction et lancement
 
@@ -99,7 +100,7 @@ l'interface.
 
 ## Installation et paquets
 
-Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.20)` du
+Le numéro de version n'est écrit qu'une fois : `project(VERSION 6.0.21)` du
 `CMakeLists.txt` racine (`Info.plist`, ressources de version de `cvw.exe`,
 lues par l'installeur Inno Setup, noms des paquets, et « À propos » :
 `ImageVersion` « 6,0 », dessinée comme la bitmap d'origine « 5,4 » par
@@ -113,7 +114,7 @@ cmake --install build/release --prefix "$PWD/build/installeur"   # préfixe abso
 
 | Système | Contenu installé | Paquet |
 |---|---|---|
-| Windows | `bin/cvw.exe` (icônes `Icon_0` et `Icon_1`, version : `cvw.rc.in`), DLL de Qt et de MSVC, `bin/qt.conf`, `plugins/`, `translations/` (windeployqt, par `qt_generate_deploy_app_script`), `bin/html`, `bin/tutocv` | `inno-setup/inscv.iss` (même `AppId`, association `.cvw`, cartes dans `{localappdata}\Patquoi.fr\Centre-Ville`) : `iscc /DStaging=<dossier installé> inno-setup\inscv.iss` |
+| Windows | `bin/cvw.exe` (icônes `Icon_0` et `Icon_1`, version : `cvw.rc.in`), DLL de Qt et de MSVC, `bin/qt.conf`, `plugins/`, `translations/` (windeployqt, par `qt_generate_deploy_app_script`), `bin/html`, `bin/tutocv`, `cartes/` | `inno-setup/inscv.iss` (même `AppId`, association `.cvw` ; cartes d'exemple dans `cartes/`, copiées au premier lancement dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`) : `iscc /DStaging=<dossier installé> inno-setup\inscv.iss` |
 | macOS | `Centre-Ville.app` (macdeployqt), aide et `qtbase_fr.qm` dans `Contents/Resources`, cartes d'exemple dans l'exécutable (ressources Qt `:/cartes`, car le volume HFS+ du `.dmg` réécrit les noms accentués en NFD et romprait le sceau de `Contents/Resources` ; copiées au premier lancement dans le dossier de `stRepLocalAppData` par `CopieCartesExemple`, appelée par `main.cpp`), icônes `.icns` (`icones_macos.cmake`), type `.cvw` exporté (`Info.plist.in`), signature ad hoc | `cpack` dans le dossier de compilation : `Centre-Ville-<version>-macOS.dmg` (avec `Applications`, `Cartes/` et `licence.txt`) |
 | Linux | `bin/cvw`, `bin/html`, `bin/tutocv`, `share/applications/fr.patquoi.CentreVille.desktop`, type MIME `application/x-centre-ville` (`*.cvw`), icônes (`linux/`, `ressources/icones`), cartes d'exemple (`share/centre-ville/cartes`) | AppImage : linuxdeploy et linuxdeploy-plugin-qt sur `DESTDIR=AppDir cmake --install`, plus le crochet `linux/apprun-hooks/centre-ville-cartes.sh` (`.github/workflows/build-installer.yml`) : au premier lancement, les cartes sont copiées, sans écraser un fichier existant, dans `~/.local/share/Patquoi.fr/Centre-Ville`, le dossier de `stRepLocalAppData` où Ouvrir et Enregistrer démarrent (comme l'installeur Windows dans `%LOCALAPPDATA%`) |
 
@@ -141,8 +142,8 @@ signature ni notarisation.
 | `base.*` | Port de `src/base.*` : `AfficheMessage` (`QMessageBox`), `MessageDlg`, `stRepLocalAppData`, journal, aide (`stRepAide`, page de redirection pour l'ancre) ; `min`/`max`. |
 | `grille/GrilleSimulation.*` | Remplace le `TDrawGrid` : voir l'en-tête pour le comportement reproduit. |
 | `vcl/` | Sous-ensemble de la VCL au-dessus de Qt, pour garder le code des fiches tel quel. |
-| `ui/` | GÉNÉRÉ par `tools/dfm2ui.py` : `.ui` des 33 fiches et `<fiche>_composants.h`. |
-| `ressources/` | GÉNÉRÉ par `tools/extrait_images.py` : images des `.dfm` et index des `TVirtualImageList` ; `ressources/icones` : GÉNÉRÉ par `tools/extrait_icones.py`. |
+| `ui/` | `.ui` des 33 fiches et `<fiche>_composants.h` : générés jusqu'à la 6.0.20 par `tools/dfm2ui.py` depuis les `.dfm` de `src/` (tag `v6.0.20`), sources du portage depuis la 6.0.21. |
+| `ressources/` | Images des `.dfm` et index des `TVirtualImageList` : générés jusqu'à la 6.0.20 par `tools/extrait_images.py` (tag `v6.0.20`), sources depuis la 6.0.21 ; `ressources/icones` : GÉNÉRÉ par `tools/extrait_icones.py`. |
 | `Info.plist.in`, `icones_macos.cmake`, `cvw.rc.in`, `linux/` | Paquet macOS (type `.cvw`, icônes), ressources Windows (icônes, version), entrée de bureau et type MIME Linux. |
 
 ### Couche `vcl/`
@@ -706,7 +707,7 @@ Visuel :
   `Height=26+21*RowCount` donne une grille de `RowCount` lignes entières,
   comme avec le cadre que suppose le code d'origine. L'auteur prévoyait de
   revoir ce calcul, pour déduire la taille de la fiche de celle de la grille
-  (`src/A_FAIRE.txt`).
+  (`src/A_FAIRE.txt`, tag `v6.0.20`).
 - **Onglets** (`TTabControl` de Statistiques véhicules) : style du système,
   police de la fiche comme dans la VCL (depuis la 6.0.16 : Qt donnait la
   police du système, plus grande sous macOS, et les deux libellés étaient
