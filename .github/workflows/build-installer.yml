@@ -126,7 +126,7 @@ jobs:
         run: |
           for f in bin/cvw.exe bin/qt.conf bin/Qt6Core.dll bin/Qt6Widgets.dll bin/vcruntime140.dll \
                    plugins/platforms/qwindows.dll translations/qt_fr.qm \
-                   bin/html/index.html bin/tutocv/index.html; do
+                   bin/html/index.html bin/tutocv/index.html cartes/Spaghettis.cvw; do
             test -f "build/installeur/$f" || { echo "absent : $f"; exit 1; }
           done
 

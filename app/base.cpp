@@ -113,7 +113,8 @@ String stRepLocalAppData()
 //---------------------------------------------------------------------------
 // v6.0.1 : au premier lancement, cartes d'exemple copiées dans le dossier des
 // fichiers de Centre-Ville, où « Ouvrir » et « Enregistrer » démarrent, comme le
-// font l'installeur Windows et l'AppImage (linux/apprun-hooks/centre-ville-cartes.sh).
+// fait l'AppImage (linux/apprun-hooks/centre-ville-cartes.sh). Sous macOS, et sous
+// Windows depuis la 6.0.21 (avant : l'installeur), par main.cpp.
 // Aucun fichier existant n'est écrasé ; .cartes-copiees marque le premier
 // lancement (une carte supprimée ensuite n'est pas recopiée). Écrit seulement si
 // tout a été copié : une copie en échec (disque plein) est retentée au lancement suivant

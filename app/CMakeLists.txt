@@ -202,8 +202,8 @@ add_dependencies(cvw cvw_aide)
 
 # Installation (phase 8) : cmake --install <build> --prefix <dossier>
 #   Windows : bin/cvw.exe, DLL de Qt et de MSVC, bin/qt.conf, plugins/ et
-#             translations/ (windeployqt), bin/html, bin/tutocv : contenu de
-#             l'installeur (inno-setup/inscv.iss) ;
+#             translations/ (windeployqt), bin/html, bin/tutocv, cartes d'exemple
+#             (cartes/) : contenu de l'installeur (inno-setup/inscv.iss) ;
 #   macOS   : Centre-Ville.app (macdeployqt), aide dans Contents/Resources ;
 #   Linux   : bin/cvw, bin/html, bin/tutocv, entrée de bureau, type MIME des
 #             fichiers .cvw, icônes, cartes d'exemple (share/centre-ville/cartes) ;
@@ -218,6 +218,12 @@ else()
 endif()
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/guide/ DESTINATION ${CV_INSTALL_AIDE}/html)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/docs/tutorial/ DESTINATION ${CV_INSTALL_AIDE}/tutocv)
+
+# Cartes d'exemple de Windows dans {app}\cartes, copiées au premier lancement de
+# chaque utilisateur dans le dossier de stRepLocalAppData (main.cpp)
+if(WIN32)
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/maps/ DESTINATION cartes FILES_MATCHING PATTERN "*.cvw")
+endif()
 
 if(UNIX AND NOT APPLE)
   install(FILES linux/fr.patquoi.CentreVille.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
