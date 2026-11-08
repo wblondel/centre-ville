@@ -187,9 +187,14 @@ jobs:
           Installe $env:SETUP installation.log
 
       # 6.0.21 : cartes d'exemple copiées par cvw.exe au premier lancement, de
-      # {app}\cartes vers %LOCALAPPDATA%, et non plus par l'installeur
+      # {app}\cartes vers %LOCALAPPDATA%, et non plus par l'installeur (une
+      # release antérieure, essayée à la main ou au push, les installe encore)
       - name: First launch (example maps copied)
         run: |
+          $version = [version](Get-Item "$env:APP\bin\cvw.exe").VersionInfo.FileVersion
+          $auLancement = $version -ge [version]'6.0.21'
+          "CARTES_AU_LANCEMENT=$auLancement" >> $env:GITHUB_ENV
+          if (-not $auLancement) { "cvw.exe $version : cartes copiées par l'installeur, pas de premier lancement"; exit 0 }
           $marque = "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\.cartes-copiees"
           if (Test-Path $marque) { throw '.cartes-copiees présent avant le premier lancement' }
           $p = Start-Process -PassThru "$env:APP\bin\cvw.exe"
@@ -211,9 +216,11 @@ jobs:
           }
           $version = (Get-Item "$env:APP\bin\cvw.exe").VersionInfo
           "cvw.exe : FileVersion $($version.FileVersion), ProductVersion $($version.ProductVersion)"
-          $installees = Get-ChildItem "$env:APP\cartes\*.cvw"
-          "Cartes installées : $($installees.Name -join ', ')"
-          if ($installees.Count -ne 6) { $erreurs += "$($installees.Count) cartes installées au lieu de 6" }
+          if ($env:CARTES_AU_LANCEMENT -eq 'True') {
+            $installees = Get-ChildItem "$env:APP\cartes\*.cvw"
+            "Cartes installées : $($installees.Name -join ', ')"
+            if ($installees.Count -ne 6) { $erreurs += "$($installees.Count) cartes installées au lieu de 6" }
+          }
           $cartes = Get-ChildItem "$env:LOCALAPPDATA\Patquoi.fr\Centre-Ville\*.cvw"
           "Cartes d'exemple de l'utilisateur : $($cartes.Name -join ', ')"
           if ($cartes.Count -ne 6) { $erreurs += "$($cartes.Count) cartes de l'utilisateur au lieu de 6" }
