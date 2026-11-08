@@ -62,7 +62,7 @@ La version **6.0.0** est la version officielle finale **5.4.3.2**, portée de C+
 Les paquets sont joints aux [Releases](../../releases) (sans signature : le système affiche un avertissement au premier lancement). Les versions marquées « Pre-release » (par exemple `6.0.0-rc1`) sont des versions candidates, à essayer avant la version finale.
 
 ### Windows 10 / 11 (64 bits)
-Téléchargez `Centre-Ville-<version>-Windows-x64-Setup.exe` et suivez l'assistant Inno Setup : il installe Centre-Ville, son aide et ses cartes d'exemple (dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville`) et associe les fichiers `.cvw`. Il met à jour une version 5.4.3.2 d'origine déjà installée (même identifiant d'application). Si SmartScreen bloque l'installeur : « Informations complémentaires », puis « Exécuter quand même ». La version 32 bits n'existe plus (Qt 6) ; Windows ARM64 exécute la version x64.
+Téléchargez `Centre-Ville-<version>-Windows-x64-Setup.exe` et suivez l'assistant Inno Setup : il installe Centre-Ville, son aide et ses cartes d'exemple, et associe les fichiers `.cvw`. Au premier lancement, Centre-Ville copie les cartes d'exemple dans `%LOCALAPPDATA%\Patquoi.fr\Centre-Ville` (sans écraser un fichier existant), pour chaque utilisateur. Il met à jour une version 5.4.3.2 d'origine déjà installée (même identifiant d'application). Si SmartScreen bloque l'installeur : « Informations complémentaires », puis « Exécuter quand même ». La version 32 bits n'existe plus (Qt 6) ; Windows ARM64 exécute la version x64.
 
 ### macOS 12 ou plus récent (Apple Silicon et Intel)
 Ouvrez `Centre-Ville-<version>-macOS.dmg` et glissez **Centre-Ville** dans **Applications** ; le dossier `Cartes` contient les cartes d'exemple. L'application n'étant pas notarisée, macOS refuse le premier lancement : ouvrez **Réglages Système › Confidentialité et sécurité**, puis « Ouvrir quand même », ou retirez la quarantaine :
@@ -76,7 +76,7 @@ Téléchargez `Centre-Ville-<version>-x86_64.AppImage`, rendez-la exécutable et
 chmod +x Centre-Ville-*-x86_64.AppImage
 ./Centre-Ville-*-x86_64.AppImage
 ```
-Au premier lancement, l'AppImage copie les cartes d'exemple dans `~/.local/share/Patquoi.fr/Centre-Ville` (sans écraser un fichier existant), où « Ouvrir » et « Enregistrer » démarrent, comme l'installeur Windows dans `%LOCALAPPDATA%`. Il faut une distribution x86_64 avec glibc 2.35 ou plus récente (Ubuntu 22.04, Debian 12…). Sans FUSE, ajoutez l'option `--appimage-extract-and-run`. L'association des fichiers `.cvw` demande un outil d'intégration des AppImage (AppImageLauncher, Gear Lever) ou une installation par CMake (ci-dessous). Avec un navigateur confiné (snap ou Flatpak, comme le Firefox d'Ubuntu), l'aide de l'AppImage ne s'ouvre pas : utilisez un navigateur installé autrement, ou l'aide en ligne.
+Au premier lancement, l'AppImage copie les cartes d'exemple dans `~/.local/share/Patquoi.fr/Centre-Ville` (sans écraser un fichier existant), où « Ouvrir » et « Enregistrer » démarrent, comme Centre-Ville sous Windows dans `%LOCALAPPDATA%`. Il faut une distribution x86_64 avec glibc 2.35 ou plus récente (Ubuntu 22.04, Debian 12…). Sans FUSE, ajoutez l'option `--appimage-extract-and-run`. L'association des fichiers `.cvw` demande un outil d'intégration des AppImage (AppImageLauncher, Gear Lever) ou une installation par CMake (ci-dessous). Avec un navigateur confiné (snap ou Flatpak, comme le Firefox d'Ubuntu), l'aide de l'AppImage ne s'ouvre pas : utilisez un navigateur installé autrement, ou l'aide en ligne.
 
 ---
 
